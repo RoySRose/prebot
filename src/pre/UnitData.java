@@ -1,3 +1,4 @@
+package pre;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -6,6 +7,7 @@ import java.util.Vector;
 import bwapi.Color;
 import bwapi.Unit;
 import bwapi.UnitType;
+import pre.main.MyBotModule;
 
 public class UnitData {
 

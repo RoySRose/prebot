@@ -1,3 +1,4 @@
+package pre;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +9,8 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
+import pre.main.MyBotModule;
+import pre.util.CommandUtil;
 
 public class WorkerData {
 

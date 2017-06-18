@@ -1,13 +1,15 @@
+package pre.manager;
 import bwapi.Race;
-import bwapi.TechType;
-import bwapi.TilePosition;
 import bwapi.Unit;
-import bwapi.UnitCommand;
 import bwapi.UnitType;
-import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import pre.BuildOrderItem;
+import pre.MetaType;
+import pre.BuildOrderItem.SeedPositionStrategy;
+import pre.main.MyBotModule;
+import pre.util.CommandUtil;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>

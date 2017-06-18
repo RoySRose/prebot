@@ -1,4 +1,4 @@
-import bwapi.Color;
+package pre.util;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitCommand;
@@ -6,10 +6,11 @@ import bwapi.UnitCommandType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
+import pre.main.MyBotModule;
 
 public class CommandUtil {
 
-	public void attackUnit(Unit attacker, Unit target)
+	public static void attackUnit(Unit attacker, Unit target)
 	{
 		if (attacker == null || target == null)
 		{
@@ -35,7 +36,7 @@ public class CommandUtil {
 		attacker.attack(target);
 	}
 
-	public void attackMove(Unit attacker, final Position targetPosition)
+	public static void attackMove(Unit attacker, final Position targetPosition)
 	{
 		// Position 객체에 대해서는 == 가 아니라 equals() 로 비교해야 합니다		
 		if (attacker == null || !targetPosition.isValid())
@@ -62,7 +63,7 @@ public class CommandUtil {
 		attacker.attack(targetPosition);
 	}
 
-	public void move(Unit attacker, final Position targetPosition)
+	public static void move(Unit attacker, final Position targetPosition)
 	{
 		if (attacker == null || !targetPosition.isValid())
 		{
@@ -88,7 +89,7 @@ public class CommandUtil {
 		attacker.move(targetPosition);
 	}
 
-	public void rightClick(Unit unit, Unit target)
+	public static void rightClick(Unit unit, Unit target)
 	{
 		if (unit == null || target == null)
 		{
@@ -114,7 +115,7 @@ public class CommandUtil {
 		unit.rightClick(target);
 	}
 
-	public void repair(Unit unit, Unit target)
+	public static void repair(Unit unit, Unit target)
 	{
 		if (unit == null || target == null)
 		{
@@ -140,7 +141,7 @@ public class CommandUtil {
 		unit.repair(target);
 	}
 
-	public boolean IsCombatUnit(Unit unit)
+	public static boolean IsCombatUnit(Unit unit)
 	{
 		if (unit == null)
 		{
@@ -166,7 +167,7 @@ public class CommandUtil {
 		return false;
 	}
 
-	public boolean IsValidUnit(Unit unit)
+	public static boolean IsValidUnit(Unit unit)
 	{
 		if (unit == null)
 		{
@@ -188,7 +189,7 @@ public class CommandUtil {
 	}
 
 	// 미사용
-//	public double GetDistanceBetweenTwoRectangles(Rect rect1, Rect rect2)
+//	public static double GetDistanceBetweenTwoRectangles(Rect rect1, Rect rect2)
 //	{
 //		Rect & mostLeft = rect1.x < rect2.x ? rect1 : rect2;
 //		Rect & mostRight = rect2.x < rect1.x ? rect1 : rect2;
@@ -201,22 +202,22 @@ public class CommandUtil {
 //		return std::sqrtf(static_cast<float>(diffX*diffX + diffY*diffY));
 //	}
 
-	public boolean CanAttack(Unit attacker, Unit target)
+	public static boolean CanAttack(Unit attacker, Unit target)
 	{
 		return GetWeapon(attacker, target) != WeaponType.None;
 	}
 
-	public boolean CanAttackAir(Unit unit)
+	public static boolean CanAttackAir(Unit unit)
 	{
 		return unit.getType().airWeapon() != WeaponType.None;
 	}
 
-	public boolean CanAttackGround(Unit unit)
+	public static boolean CanAttackGround(Unit unit)
 	{
 		return unit.getType().groundWeapon() != WeaponType.None;
 	}
 
-	public double CalculateLTD(Unit attacker, Unit target)
+	public static double CalculateLTD(Unit attacker, Unit target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
 
@@ -228,17 +229,17 @@ public class CommandUtil {
 		return 0; // C++ : static_cast<double>(weapon.damageAmount()) / weapon.damageCooldown();
 	}
 
-	public WeaponType GetWeapon(Unit attacker, Unit target)
+	public static WeaponType GetWeapon(Unit attacker, Unit target)
 	{
 		return target.isFlying() ? attacker.getType().airWeapon() : attacker.getType().groundWeapon();
 	}
 
-	public WeaponType GetWeapon(UnitType attacker, UnitType target)
+	public static WeaponType GetWeapon(UnitType attacker, UnitType target)
 	{
 		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
 	}
 
-	public int GetAttackRange(Unit attacker, Unit target)
+	public static int GetAttackRange(Unit attacker, Unit target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
 
@@ -259,7 +260,7 @@ public class CommandUtil {
 		return range;
 	}
 
-	public int GetAttackRange(UnitType attacker, UnitType target)
+	public static int GetAttackRange(UnitType attacker, UnitType target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
 
@@ -271,7 +272,7 @@ public class CommandUtil {
 		return weapon.maxRange();
 	}
 
-	public int GetAllUnitCount(UnitType type)
+	public static int GetAllUnitCount(UnitType type)
 	{
 		int count = 0;
 		for (final Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -304,7 +305,7 @@ public class CommandUtil {
 	}
 
 	// 전체 순차탐색을 하기 때문에 느리다
-	public Unit GetClosestUnitTypeToTarget(UnitType type, Position target)
+	public static Unit GetClosestUnitTypeToTarget(UnitType type, Position target)
 	{
 		Unit closestUnit = null;
 		double closestDist = 100000000;

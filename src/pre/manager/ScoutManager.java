@@ -1,3 +1,4 @@
+package pre.manager;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -9,6 +10,10 @@ import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
+import pre.Config;
+import pre.MapTools;
+import pre.main.MyBotModule;
+import pre.util.CommandUtil;
 
 /// 게임 초반에 일꾼 유닛 중에서 정찰 유닛을 하나 지정하고, 정찰 유닛을 이동시켜 정찰을 수행하는 class<br>
 /// 적군의 BaseLocation 위치를 알아내는 것까지만 개발되어있습니다

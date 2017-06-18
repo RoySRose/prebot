@@ -1,13 +1,12 @@
+package pre;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import bwapi.Position;
-import bwapi.TilePosition;
 import bwapi.Unit;
-import bwapi.UnitType;
-import bwapi.Unitset;
 import bwta.BWTA;
+import pre.main.MyBotModule;
+import pre.manager.InformationManager;
 
 /// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
 public class MapGrid {
@@ -17,12 +16,16 @@ public class MapGrid {
 	{
 		private int timeLastVisited; 		///< 가장 마지막에 방문했던 시각이 언제인지 -> Scout 에 활용		
 		private int timeLastOpponentSeen;	///< 가장 마지막에 적을 발견했던 시각이 언제인지 -> 적 의도 파악, 적 부대 파악, 전략 수립에 활용
+		private int timeLastScan;
 		private List<Unit> ourUnits= new ArrayList<Unit>();
 		private List<Unit> oppUnits= new ArrayList<Unit>();
 		private Position center;
+		
+		public static final int ScanDuration = 240;    // approximate time that a comsat scan provides vision
 
 		public GridCell()
 		{
+			timeLastScan = -ScanDuration;
 			timeLastVisited = 0;
 			timeLastOpponentSeen = 0;
 		}
@@ -208,75 +211,101 @@ public class MapGrid {
 	
 	/// 해당 position 근처에 있는 아군 혹은 적군 유닛들의 목록을 UnitSet 에 저장합니다<br>
 	/// BWAPI::Broodwar->self()->getUnitsOnTile, getUnitsInRectangle, getUnitsInRadius, getClosestUnit 함수와 유사하지만 쓰임새가 다릅니다
-	public void getUnitsNear(Unitset units, Position center, int radius, boolean ourUnits, boolean oppUnits)
+	public void getUnitsNear(List<Unit> units, Position position, int radius, boolean ourUnits, boolean oppUnits)
 	{
-		final int x0 = Math.max((center.getX() - radius) / cellSize, 0);
-		final int x1 = Math.min((center.getX() + radius) / cellSize, cols-1);
-		final int y0 = Math.max((center.getY() - radius) / cellSize, 0);
-		final int y1 = Math.min((center.getY() + radius) / cellSize, rows-1);
-		final int radiusSq = radius * radius;
-		for (int y = y0; y <= y1; ++y)
-		{
-			for (int x = x0; x <= x1; ++x)
-			{
-				int row = y;
-				int col = x;
-
-				GridCell cell = getCellByIndex(row, col);
-				if (ourUnits)
-				{
-					for (Unit unit : cell.ourUnits)
-					{
-						Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
-						if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
-						{
-							if (!units.getLoadedUnits().contains(unit))
-							{
-								units.getLoadedUnits().add(unit);
-							}
-						}
-					}
+		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
+		for (Unit u : unitsInRadius) {
+			if (ourUnits && u.getPlayer() == InformationManager.Instance().selfPlayer) {
+				if (!units.contains(u)) {
+					units.add(u);
 				}
-				if (oppUnits)
-				{
-					for (Unit unit : cell.oppUnits) 
-					{
-						if (unit.getType() != UnitType.Unknown && unit.isVisible())
-						{
-							Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
-							if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
-							{
-								if (!units.getLoadedUnits().contains(unit))
-								{
-									units.getLoadedUnits().add(unit);
-								}
-							}
-						}
-					}
+				
+			} else if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
+				if (!units.contains(u)) {
+					units.add(u);
 				}
 			}
 		}
+
+//		final int x0 = Math.max((center.getX() - radius) / cellSize, 0);
+//		final int x1 = Math.min((center.getX() + radius) / cellSize, cols-1);
+//		final int y0 = Math.max((center.getY() - radius) / cellSize, 0);
+//		final int y1 = Math.min((center.getY() + radius) / cellSize, rows-1);
+//		final int radiusSq = radius * radius;
+//		for (int y = y0; y <= y1; ++y)
+//		{
+//			for (int x = x0; x <= x1; ++x)
+//			{
+//				int row = y;
+//				int col = x;
+//
+//				GridCell cell = getCellByIndex(row, col);
+//				if (ourUnits)
+//				{
+//					for (Unit unit : cell.ourUnits)
+//					{
+//						Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
+//						if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
+//						{
+//							if (!units.getLoadedUnits().contains(unit))
+//							{
+//								units.getLoadedUnits().add(unit);
+//							}
+//						}
+//					}
+//				}
+//				if (oppUnits)
+//				{
+//					for (Unit unit : cell.oppUnits) 
+//					{
+//						if (unit.getType() != UnitType.Unknown && unit.isVisible())
+//						{
+//							Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
+//							if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
+//							{
+//								if (!units.getLoadedUnits().contains(unit))
+//								{
+//									units.getLoadedUnits().add(unit);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+	}
+	
+	// The bot scanned the given position. Record it so we don't scan the same position
+	// again before it wears off.
+	public void scanAtPosition(Position pos) {
+		GridCell cell = getCell(pos);
+		cell.timeLastScan = MyBotModule.Broodwar.getFrameCount();
+	}
+	
+	public boolean scanIsActiveAt(Position pos) {
+		GridCell cell = getCell(pos);
+		return cell.timeLastScan + GridCell.ScanDuration > MyBotModule.Broodwar.getFrameCount();
 	}
 
-	int	getCellSize()
+	public int	getCellSize()
 	{
 		return cellSize;
 	}
 
-	int getMapWidth(){
+	public int getMapWidth(){
 		return mapWidth;
 	}
 
-	int getMapHeight(){
+	public int getMapHeight(){
 		return mapHeight;
 	}
 
-	int getRows()
+	public int getRows()
 	{
 		return rows;
 	}
 
-	int getCols()
+	public int getCols()
 	{
 		return cols;
 	}

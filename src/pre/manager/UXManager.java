@@ -1,3 +1,4 @@
+package pre.manager;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
@@ -20,6 +21,15 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
+import pre.BuildOrderItem;
+import pre.Config;
+import pre.ConstructionPlaceFinder;
+import pre.ConstructionTask;
+import pre.MapGrid;
+import pre.UnitInfo;
+import pre.WorkerData;
+import pre.ConstructionTask.ConstructionStatus;
+import pre.main.MyBotModule;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다

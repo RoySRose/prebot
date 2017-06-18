@@ -1,3 +1,4 @@
+package pre.main;
 /*
 +----------------------------------------------------------------------+
 | BasicBot                                                             |
@@ -32,6 +33,8 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
+import pre.Config;
+import pre.manager.UXManager;
 
 /// 봇프로그램의 기본적인 뼈대 구조를 정의한 class 로서, 스타크래프트 대결 도중 발생하는 이벤트들을 GameCommander class 인스턴스에게 전달합니다.<br>
 /// MyBotModule class는 수정을 하지 말고,<br>

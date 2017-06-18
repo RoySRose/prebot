@@ -1,3 +1,4 @@
+package pre;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -6,6 +7,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
+import pre.main.MyBotModule;
 
 public class DistanceMap {
 

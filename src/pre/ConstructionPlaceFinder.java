@@ -1,3 +1,4 @@
+package pre;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,8 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.main.MyBotModule;
+import pre.manager.InformationManager;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {

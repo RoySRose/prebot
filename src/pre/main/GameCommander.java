@@ -1,6 +1,15 @@
+package pre.main;
 import bwapi.Player;
 import bwapi.TilePosition;
 import bwapi.Unit;
+import pre.MapGrid;
+import pre.manager.BuildManager;
+import pre.manager.CombatManager;
+import pre.manager.ConstructionManager;
+import pre.manager.InformationManager;
+import pre.manager.ScoutManager;
+import pre.manager.StrategyManager;
+import pre.manager.WorkerManager;
 
 /// 실제 봇프로그램의 본체가 되는 class<br>
 /// 스타크래프트 경기 도중 발생하는 이벤트들이 적절하게 처리되도록 해당 Manager 객체에게 이벤트를 전달하는 관리자 Controller 역할을 합니다
@@ -73,6 +82,8 @@ public class GameCommander {
 			StrategyManager.Instance().update();
 
 			if ( isToFindError) System.out.print("h)");
+			
+			CombatManager.Instance().update();
 
 		} catch (Exception e) {
 			e.printStackTrace();

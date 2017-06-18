@@ -1,3 +1,4 @@
+package pre.manager;
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
@@ -5,6 +6,12 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import pre.Config;
+import pre.WorkerData;
+import pre.WorkerMoveData;
+import pre.WorkerData.WorkerJob;
+import pre.main.MyBotModule;
+import pre.util.CommandUtil;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
