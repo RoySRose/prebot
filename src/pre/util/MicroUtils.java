@@ -86,7 +86,7 @@ public class MicroUtils {
 		int moveX = target.getPosition().getX() - unit.getPosition().getX();
 		int moveY = target.getPosition().getY() - unit.getPosition().getY();
 	    double fleeAngle = Math.atan2(moveY, moveX);
-	    Position fleeVec = new Position((int)(64 * Math.cos(fleeAngle)), (int)(64 * Math.cos(fleeAngle)));
+	    Position fleeVec = new Position((int)(64 * Math.cos(fleeAngle)), (int)(64 * Math.sin(fleeAngle)));
 	    return fleeVec;
 	}
 	

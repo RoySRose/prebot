@@ -27,7 +27,7 @@ public class CommandUtil {
 		UnitCommand currentCommand = attacker.getLastCommand();
 
 		// if we've already told this unit to attack this target, ignore this command
-		if (currentCommand.getUnitCommandType() == UnitCommandType.Attack_Unit &&	currentCommand.getTarget() == target)
+		if (currentCommand.getUnitCommandType() == UnitCommandType.Attack_Unit &&	currentCommand.getTarget().getID() == target.getID())
 		{
 			return;
 		}
@@ -132,7 +132,7 @@ public class CommandUtil {
 		UnitCommand currentCommand = unit.getLastCommand();
 
 		// if we've already told this unit to move to this position, ignore this command
-		if ((currentCommand.getUnitCommandType() == UnitCommandType.Repair) && (currentCommand.getTarget() == target))
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Repair) && (currentCommand.getTarget().getID() == target.getID()))
 		{
 			return;
 		}
