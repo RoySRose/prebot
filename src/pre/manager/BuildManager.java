@@ -111,17 +111,17 @@ public class BuildManager {
 				// Protoss_High_Templar / Protoss_Dark_Templar 두 유닛을 합체시키는 기술을
 				// 써서 만들기 때문에
 				// secondProducer 을 추가로 찾아 확인한다
-				if (canMake) {
-					if (currentItem.metaType.isUnit()) {
-						if (currentItem.metaType.getUnitType() == UnitType.Protoss_Archon
-								|| currentItem.metaType.getUnitType() == UnitType.Protoss_Dark_Archon) {
-							secondProducer = getAnotherProducer(producer, producer.getPosition());
-							if (secondProducer == null) {
-								canMake = false;
-							}
-						}
-					}
-				}
+//				if (canMake) {
+//					if (currentItem.metaType.isUnit()) {
+//						if (currentItem.metaType.getUnitType() == UnitType.Protoss_Archon
+//								|| currentItem.metaType.getUnitType() == UnitType.Protoss_Dark_Archon) {
+//							secondProducer = getAnotherProducer(producer, producer.getPosition());
+//							if (secondProducer == null) {
+//								canMake = false;
+//							}
+//						}
+//					}
+//				}
 			}
 
 			// if we can make the current item, create it
@@ -131,18 +131,7 @@ public class BuildManager {
 				if (t.isUnit()) {
 					if (t.getUnitType().isBuilding()) {
 
-						// 저그 종족 건물 중 Zerg_Lair, Zerg_Hive, Zerg_Greater_Spire,
-						// Zerg_Sunken_Colony, Zerg_Spore_Colony 는 기존 건물을 Morph
-						// 시켜 만든다
-						// Morph를 시작하면 isMorphing = true, isBeingConstructed =
-						// true, isConstructing = true 가 되고
-						// 완성되면 isMorphing = false, isBeingConstructed = false,
-						// isConstructing = false, isCompleted = true 가 된다
-						if (t.getUnitType().getRace() == Race.Zerg && t.getUnitType().whatBuilds().first.isBuilding()) {
-							producer.morph(t.getUnitType());
-						}
-						// 테란 Addon 건물의 경우 (Addon 건물을 지을수 있는지는 getProducer 함수에서
-						// 이미 체크완료)
+						// 테란 Addon 건물의 경우 (Addon 건물을 지을수 있는지는 getProducer 함수에서 이미 체크완료)
 						// 모건물이 Addon 건물 짓기 전에는 canBuildAddon = true,
 						// isConstructing = false, canCommand = true 이다가
 						// Addon 건물을 짓기 시작하면 canBuildAddon = false,
@@ -150,9 +139,7 @@ public class BuildManager {
 						// 건물 건설 취소는 가능하나 Train 등 커맨드는 불가능)
 						// 완성되면 canBuildAddon = false, isConstructing = false 가
 						// 된다
-						else if (t.getUnitType().isAddon()) {
-
-							// std::cout + "addon build start " + std::endl;
+						if (t.getUnitType().isAddon()) {
 
 							producer.buildAddon(t.getUnitType());
 							// 테란 Addon 건물의 경우 정상적으로 buildAddon 명령을 내려도 SCV가 모건물
@@ -162,7 +149,6 @@ public class BuildManager {
 							if (producer.isConstructing() == false) {
 								isOkToRemoveQueue = false;
 							}
-							// std::cout + "8";
 						}
 						// 그외 대부분 건물의 경우
 						else {
@@ -173,8 +159,7 @@ public class BuildManager {
 							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시
 							// ConstructionPlaceFinder 를 통해 건설 가능 위치를
 							// desiredPosition 주위에서 찾을 것이다
-							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,
-									currentItem.seedLocationStrategy);
+							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							// std::cout << "BuildManager " +
 							// currentItem.metaType.getUnitType().getName().c_str()
@@ -191,51 +176,18 @@ public class BuildManager {
 								// 없는 경우인데,
 								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음
 								// frame 에 건물 지을 공간을 다시 탐색하도록 한다.
-								System.out.print(
-										"There is no place to construct " + currentItem.metaType.getUnitType()
-												+ " strategy " + currentItem.seedLocationStrategy);
+								System.out.print("There is no place to construct " + currentItem.metaType.getUnitType()+ " strategy " + currentItem.seedLocationStrategy);
 								if (currentItem.seedLocation != null)
-									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","
-											+ currentItem.seedLocation.getY());
+									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
 								if (desiredPosition != null)
-									System.out.print(" desiredPosition " + desiredPosition.getX() + ","
-											+ desiredPosition.getY());
+									System.out.print(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								isOkToRemoveQueue = false;
 							}
 						}
 					}
 					// 지상유닛 / 공중유닛의 경우
 					else {
-						// 저그 지상유닛 / 공중유닛
-						if (t.getUnitType().getRace() == Race.Zerg) {
-							// 저그 종족 유닛의 거의 대부분은 Morph 시켜 만든다
-							if (t.getUnitType() != UnitType.Zerg_Infested_Terran) {
-								producer.morph(t.getUnitType());
-							}
-							// 저그 종족 유닛 중 Zerg_Infested_Terran 은 Train 시켜 만든다
-							else {
-								producer.train(t.getUnitType());
-							}
-						}
-						// 프로토스 지상유닛 / 공중유닛
-						else if (t.getUnitType().getRace() == Race.Protoss) {
-							// 프로토스 종족 유닛 중 Protoss_Archon 은 기존
-							// Protoss_High_Templar 두 유닛을 합체시키는 기술을 써서 만든다
-							if (t.getUnitType() == UnitType.Protoss_Archon) {
-								producer.useTech(TechType.Archon_Warp, secondProducer);
-							}
-							// 프로토스 종족 유닛 중 Protoss_Dark_Archon 은 기존
-							// Protoss_Dark_Templar 두 유닛을 합체시키는 기술을 써서 만든다
-							else if (t.getUnitType() == UnitType.Protoss_Dark_Archon) {
-								producer.useTech(TechType.Dark_Archon_Meld, secondProducer);
-							} else {
-								producer.train(t.getUnitType());
-							}
-						}
-						// 테란 지상유닛 / 공중유닛
-						else {
-							producer.train(t.getUnitType());
-						}
+						producer.train(t.getUnitType());
 					}
 				}
 				// if we're dealing with a tech research
@@ -244,14 +196,10 @@ public class BuildManager {
 				} else if (t.isUpgrade()) {
 					producer.upgrade(t.getUpgradeType());
 				}
-
-				//System.out.println(" build " + t.getName() + " started ");
-
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
 					buildQueue.removeCurrentItem();
 				}
-
 				// don't actually loop around in here
 				break;
 			}
@@ -414,6 +362,7 @@ public class BuildManager {
 		return getProducer(t, Position.None, -1);
 	}
 
+	/*
 	/// 해당 MetaType 을 build 할 수 있는, getProducer 리턴값과 다른 producer 를 찾아 반환합니다<br>
 	/// 프로토스 종족 유닛 중 Protoss_Archon / Protoss_Dark_Archon 을 빌드할 때 사용합니다
 	public Unit getAnotherProducer(Unit producer, Position closestTo) {
@@ -452,7 +401,8 @@ public class BuildManager {
 
 		return getClosestUnitToPosition(candidateProducers, closestTo);
 	}
-
+	*/
+	
 	public Unit getClosestUnitToPosition(final List<Unit> units, Position closestTo) {
 		if (units.size() == 0) {
 			return null;
@@ -510,11 +460,9 @@ public class BuildManager {
 	// seedLocationStrategy 가 SeedPositionSpecified 인 경우에는 그 근처만 찾아보고,<br>
 	// SeedPositionSpecified 이 아닌 경우에는 seedLocationStrategy 를 조금씩 바꿔가며 계속 찾아본다.<br>
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
-	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,
-			BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
-		TilePosition desiredPosition = ConstructionPlaceFinder.Instance()
-				.getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-
+	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
+		
+		TilePosition desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 		/*
 		 * std::cout +
 		 * "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
@@ -550,8 +498,7 @@ public class BuildManager {
 
 			// 다른 곳을 더 찾아본다
 			if (findAnotherPlace) {
-				desiredPosition = ConstructionPlaceFinder.Instance()
-						.getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
+				desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 				/*
 				 * std::cout +
 				 * "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
@@ -561,7 +508,7 @@ public class BuildManager {
 				 * desiredPosition.x + "," + desiredPosition.y + std::endl;
 				 */
 			}
-			// 다른 곳을 더 찾아보지 않고, 끝낸다
+			// @@@@@@ 여기서 포기하면 됨? 다른 곳을 더 찾아보지 않고, 끝낸다
 			else {
 				break;
 			}

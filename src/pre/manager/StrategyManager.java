@@ -1,13 +1,15 @@
 package pre.manager;
-
-
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Chokepoint;
 import pre.BuildOrderItem;
 import pre.InitialBuild;
 import pre.MetaType;
 import pre.main.MyBotModule;
+import pre.util.CommandUtil;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
@@ -17,7 +19,16 @@ public class StrategyManager {
 
 	private static StrategyManager instance = new StrategyManager();
 
+	private CommandUtil commandUtil = new CommandUtil();
+
+	private boolean isFullScaleAttackStarted;
 	private boolean isInitialBuildOrderFinished;
+	
+	private boolean previousStrategyStatus;
+	private boolean CurrentStrategyStatus;
+	private boolean CreateSCVOn;
+	private boolean AttackUnitCreate;
+	
 
 	/// static singleton 객체를 리턴합니다
 	public static StrategyManager Instance() {
@@ -25,6 +36,7 @@ public class StrategyManager {
 	}
 
 	public StrategyManager() {
+		isFullScaleAttackStarted = false;
 		isInitialBuildOrderFinished = false;
 	}
 
@@ -111,14 +123,13 @@ public class StrategyManager {
 	
 	private int getcurrenttot(UnitType checkunit) {
 		
-		int result;
-		result = BuildManager.Instance().buildQueue.getItemCount(checkunit) + 
+		int cnt;
+		cnt = BuildManager.Instance().buildQueue.getItemCount(checkunit) + 
 				 MyBotModule.Broodwar.self().completedUnitCount(checkunit);
 		
-		return result;
+		return cnt;
 	}
 
-	
 	
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
@@ -129,7 +140,7 @@ public class StrategyManager {
 		}
 
 		//@@@@@@ 상대 정보를 판단해서 분석하고 전략 세팅하는것 필요
-		//ㄴ();
+		//AnalyzeStrategy();
 		
 		executeWorkerTraining();
 		executeSupplyManagement();
@@ -195,34 +206,46 @@ public class StrategyManager {
 
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
-			int supplyMargin = 12;
-
+			int supplyMargin = 4;
+			int fac_cnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
+			boolean barrackflag = false;
+			boolean factoryflag = false;
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == UnitType.Terran_Factory) {
+					factoryflag = true;
+				}
+				if (unit.getType() == UnitType.Terran_Barracks) {
+					barrackflag = true;
+				}
+			}
+			
+			if(MyBotModule.Broodwar.getFrameCount()<14000){
+				if(barrackflag==true && factoryflag==false){
+					supplyMargin = 6;
+				}else if(factoryflag==true){
+					supplyMargin = 4+4*fac_cnt;
+				}
+			}else if(MyBotModule.Broodwar.getFrameCount()>14000 && MyBotModule.Broodwar.getFrameCount()<28000){
+				supplyMargin = 6+4*fac_cnt;
+			}else{
+				supplyMargin = 8+4*fac_cnt;
+			}
+			
+			
+			
 			// currentSupplyShortage 를 계산한다
-			int currentSupplyShortage = MyBotModule.Broodwar.self().supplyUsed() + supplyMargin - MyBotModule.Broodwar.self().supplyTotal();
+			int currentSupplyShortage = MyBotModule.Broodwar.self().supplyUsed() + supplyMargin + 1 - MyBotModule.Broodwar.self().supplyTotal();
 
 			if (currentSupplyShortage > 0) {
 				
 				// 생산/건설 중인 Supply를 센다
 				int onBuildingSupplyCount = 0;
 
-				// 저그 종족인 경우, 생산중인 Zerg_Overlord (Zerg_Egg) 를 센다. Hatchery 등 건물은 세지 않는다
-				if (MyBotModule.Broodwar.self().getRace() == Race.Zerg) {
-					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-						if (unit.getType() == UnitType.Zerg_Egg && unit.getBuildType() == UnitType.Zerg_Overlord) {
-							onBuildingSupplyCount += UnitType.Zerg_Overlord.supplyProvided();
-						}
-						// 갓태어난 Overlord 는 아직 SupplyTotal 에 반영안되어서, 추가 카운트를 해줘야함
-						if (unit.getType() == UnitType.Zerg_Overlord && unit.isConstructing()) {
-							onBuildingSupplyCount += UnitType.Zerg_Overlord.supplyProvided();
-						}
-					}
-				}
 				// 저그 종족이 아닌 경우, 건설중인 Protoss_Pylon, Terran_Supply_Depot 를 센다. Nexus, Command Center 등 건물은 세지 않는다
-				else {
-					onBuildingSupplyCount += ConstructionManager.Instance().getConstructionQueueItemCount(
-							InformationManager.Instance().getBasicSupplyProviderUnitType(), null)
-							* InformationManager.Instance().getBasicSupplyProviderUnitType().supplyProvided();
-				}
+				onBuildingSupplyCount += ConstructionManager.Instance().getConstructionQueueItemCount(
+						InformationManager.Instance().getBasicSupplyProviderUnitType(), null)
+						* InformationManager.Instance().getBasicSupplyProviderUnitType().supplyProvided();
 
 				//System.out.println("currentSupplyShortage : " + currentSupplyShortage + " onBuildingSupplyCount : " + onBuildingSupplyCount);
 
@@ -232,17 +255,14 @@ public class StrategyManager {
 					boolean isToEnqueue = true;
 					if (!BuildManager.Instance().buildQueue.isEmpty()) {
 						BuildOrderItem currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
-						if (currentItem.metaType.isUnit() 
-							&& currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
+						if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
 						{
 							isToEnqueue = false;
 						}
 					}
 					if (isToEnqueue) {
-						System.out.println("enqueue supply provider "
-								+ InformationManager.Instance().getBasicSupplyProviderUnitType());
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(
-								new MetaType(InformationManager.Instance().getBasicSupplyProviderUnitType()), true);
+						System.out.println("enqueue supply provider " + InformationManager.Instance().getBasicSupplyProviderUnitType());
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getBasicSupplyProviderUnitType()), true);
 					}
 				}
 			}
@@ -250,7 +270,10 @@ public class StrategyManager {
 	}
 
 	public void executeAddFactory() {
-		//@@@@@@ 자원에 소모에 따른 적절한 값 구하기
+		//@@@@@@ 팩토리 전체가 다 생산하고 있고 자원이 일정 이상 남았을시에 추가 팩토리를 짓는데.... 세부 기준은? 
+		
+		
+		
 	}
 	public void executeBasicCombatUnitTraining() {
 
@@ -264,29 +287,46 @@ public class StrategyManager {
 		int ratec = 3;
 		int wgt = 1;
 		
-		int tot_vulture = getcurrenttot(UnitType.Terran_Vulture);
-		int tot_tank = getcurrenttot(UnitType.Terran_Siege_Tank_Siege_Mode) + getcurrenttot(UnitType.Terran_Siege_Tank_Tank_Mode);
-		int tot_goliath = getcurrenttot(UnitType.Terran_Vulture);
+		//@@@@@@ getTrainingQueue 에 있는 애들도 확인해야 할듯? buildqueue 와 달라보임
+		int tot_vulture = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
+		int tot_tank = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+						+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int tot_goliath = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
+		//int faccnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
+		UnitType selected = chooseunit(ratea, rateb, ratec, wgt, tot_vulture, tot_tank, tot_goliath);; 
 		
 		
-		UnitType selected = chooseunit(ratea, rateb, ratec, wgt, tot_vulture, tot_tank, tot_goliath);
+		//@@@@@@ 들어가는 선 조건이 있어야 하지 않을지.... 매번 팩토리 다 볼수는 없지 않나????????? 겉에 루프가 없어도 될거 같은데 나중에 실험해 보자.. 한 프레임에 한번만 들어와서 팩토리 하나만 하고 break 하고 다음에 빈거 또 하겠지?
 		
-		
-		// 기본 병력 추가 훈련
-		if (MyBotModule.Broodwar.self().minerals() >= 200 && MyBotModule.Broodwar.self().supplyUsed() < 400) {
+		if(selected == UnitType.Terran_Vulture && MyBotModule.Broodwar.self().minerals() >= 100 && MyBotModule.Broodwar.self().supplyUsed() < 396
+				||selected == UnitType.Terran_Siege_Tank_Tank_Mode && MyBotModule.Broodwar.self().minerals() >= 170 && MyBotModule.Broodwar.self().gas() >= 120 && MyBotModule.Broodwar.self().supplyUsed() < 392
+				||selected == UnitType.Terran_Goliath && MyBotModule.Broodwar.self().minerals() >= 120 && MyBotModule.Broodwar.self().minerals() >= 70 && MyBotModule.Broodwar.self().supplyUsed() < 396){
+			
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if (unit.getType() == UnitType.Terran_Factory) {
-					//if (unit.isTraining() == false || unit.getLarva().size() > 0) {
-					if (unit.isTraining() == false) {						
-						if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatUnitType(), null) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicCombatUnitType(),BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					if (unit.isTraining() == false) {	
+						if(selected == UnitType.Terran_Vulture && MyBotModule.Broodwar.self().minerals() >= 95 && MyBotModule.Broodwar.self().supplyUsed() < 396){
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Vulture,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							tot_vulture++;
+						}else if(selected == UnitType.Terran_Siege_Tank_Tank_Mode && MyBotModule.Broodwar.self().minerals() >= 170 && MyBotModule.Broodwar.self().gas() >= 120 && MyBotModule.Broodwar.self().supplyUsed() < 392){
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							tot_tank++;
 						}
+						else if(selected == UnitType.Terran_Goliath && MyBotModule.Broodwar.self().minerals() >= 120 && MyBotModule.Broodwar.self().minerals() >= 70 && MyBotModule.Broodwar.self().supplyUsed() < 396){
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Goliath,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							tot_goliath++;
+						}
+						selected = chooseunit(ratea, rateb, ratec, wgt, tot_vulture, tot_tank, tot_goliath);
 					}
 				}
 			}
 		}
+		
+		//@@ 멀티를 하기위해서 생산을 쉬어야 한다면??? 어떻게 판단하지?
+		//@@ 사이언스 베슬이나 발키리 하는 로직
+		
+		
 	}
-
 
 	public void executeCombat() {
 		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 5) {
@@ -295,4 +335,74 @@ public class StrategyManager {
 			CombatManager.Instance().setAggressive(false);
 		}
 	}
+
+	/*
+	public void executeCombat() {
+
+		// 공격 모드가 아닐 때에는 전투유닛들을 아군 진영 길목에 집결시켜서 방어
+		if (isFullScaleAttackStarted == false) {
+			Chokepoint firstChokePoint = BWTA.getNearestChokepoint(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getTilePosition());
+
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == InformationManager.Instance().getBasicCombatUnitType() && unit.isIdle()) {
+					commandUtil.attackMove(unit, firstChokePoint.getCenter());
+				}
+			}
+
+			// 전투 유닛이 2개 이상 생산되었고, 적군 위치가 파악되었으면 총공격 모드로 전환
+			if (MyBotModule.Broodwar.self().completedUnitCount(InformationManager.Instance().getBasicCombatUnitType()) > 2) {
+				if (InformationManager.Instance().enemyPlayer != null
+					&& InformationManager.Instance().enemyRace != Race.Unknown  
+					&& InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer).size() > 0) {				
+					isFullScaleAttackStarted = true;
+				}
+			}
+		}
+		// 공격 모드가 되면, 모든 전투유닛들을 적군 Main BaseLocation 로 공격 가도록 합니다
+		else {
+			//std.cout << "enemy OccupiedBaseLocations : " << InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance()._enemy).size() << std.endl;
+			
+			if (InformationManager.Instance().enemyPlayer != null
+					&& InformationManager.Instance().enemyRace != Race.Unknown 
+					&& InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer).size() > 0) 
+			{					
+				// 공격 대상 지역 결정
+				BaseLocation targetBaseLocation = null;
+				double closestDistance = 100000000;
+
+				for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
+					double distance = BWTA.getGroundDistance(
+						InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getTilePosition(), 
+						baseLocation.getTilePosition());
+
+					if (distance < closestDistance) {
+						closestDistance = distance;
+						targetBaseLocation = baseLocation;
+					}
+				}
+
+				if (targetBaseLocation != null) {
+					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+						// 건물은 제외
+						if (unit.getType().isBuilding()) {
+							continue;
+						}
+						// 모든 일꾼은 제외
+						if (unit.getType().isWorker()) {
+							continue;
+						}
+											
+						// canAttack 유닛은 attackMove Command 로 공격을 보냅니다
+						if (unit.canAttack()) {
+							
+							if (unit.isIdle()) {
+								commandUtil.attackMove(unit, targetBaseLocation.getPosition());
+							}
+						} 
+					}
+				}
+			}
+		}
+	}
+	*/
 }
