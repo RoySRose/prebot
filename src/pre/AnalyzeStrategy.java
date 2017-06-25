@@ -5,6 +5,8 @@ import java.util.Set;
 import bwapi.Color;
 import bwapi.Race;
 import bwapi.UnitType;
+import pre.main.MyBotModule;
+import pre.manager.StrategyManager;
 
 /// 봇 프로그램 설정
 public class AnalyzeStrategy {
@@ -15,26 +17,30 @@ public class AnalyzeStrategy {
 		return instance;
 	}
 	
-	//@@@@@@ 상대 input 에 따른 확인 함수- enum 이 익숙하면 enum 쓰는 것도 좋지만 그렇지 않다면 그냥 
-	//한 쪽에다가 주석 처리 아래와 같이 해 놓고 
-	//1 : 기본 전략
-	//2 : 4,5드론 저글링 scv 러쉬 방어 전략
-	//이런식으로 적어두고 int 형 쓰는게 훨씬 편할 수도 있음.
-	public enum Strategy { 
-		BasicStrategy,				// 기본 전략
-		scvzerglingDF,				// 4,5드론 저글링 scv 러쉬 방어 전략
-		
-		temp1,			// 
-		temp2,		// 
-		temp3,			// 
-		temp4		// 
-	};
 
-	
-	//@@@@@@ 상대 input 에 따른 확인 함수 
-	public static int AnalyzeInfo(){
+	public void AnalyzeEnemyStrategy() {
+
+		//최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행 
+		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+			AnalyzeVsProtoss();
+		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			AnalyzeVsTerran();
+		}else{
+			AnalyzeVsZerg();
+		}
+
+	}
+
+
+	private void AnalyzeVsProtoss() {
 		
-		int res = 0;
+		
+		//조건에 따라...
+		//basic 의 기본은 상대 종족별로 다른거 같고.
+		StrategyManager.Instance().setCurrentStrategyBasic("BaiscVsProtoss"); // 이런식으로 기본 전략 세팅가능
+		
+		//exception 상태가 아닐때는 Init 으로
+		//StrategyManager.Instance().setCurrentStrategyException("Init"); // 이런식으로 exception 도 세팅 가능
 		//@@@@@@ 예를 들어 유닛이 보였다
 		// if(wraith 가 보였다){
 			 
@@ -43,7 +49,24 @@ public class AnalyzeStrategy {
 		//}else{
 			//res = 2; // 4,5드론 저글링 scv 러쉬 방어 전략
 		//}
-		return res;
+		
 	}
+	
+	private void AnalyzeVsTerran() {
+		StrategyManager.Instance().setCurrentStrategyBasic("BaiscVsTerran");
+		
+		//exception 상태가 아닐때는 Init 으로
+		//StrategyManager.Instance().setCurrentStrategyException("Init");
+		
+	}
+	
+	private void AnalyzeVsZerg() {
+		StrategyManager.Instance().setCurrentStrategyBasic("BaiscVsZerg");
+		
+		//exception 상태가 아닐때는 Init 으로
+		//StrategyManager.Instance().setCurrentStrategyException("Init");
+		
+	}
+	
 	
 }

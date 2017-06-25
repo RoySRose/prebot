@@ -1,13 +1,19 @@
 package pre.manager;
+import java.util.ArrayList;
+import java.util.List;
+
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import pre.AnalyzeStrategy;
 import pre.BuildOrderItem;
+import pre.Config;
 import pre.InitialBuild;
 import pre.MetaType;
+import pre.WorkerData;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
 
@@ -25,20 +31,37 @@ public class StrategyManager {
 	private boolean isInitialBuildOrderFinished;
 	
 	private boolean previousStrategyStatus;
-	private boolean CurrentStrategyStatus;
-	private boolean CreateSCVOn;
-	private boolean AttackUnitCreate;
+	//private String CurrentStrategyBasic;
+	//private String CurrentStrategyException;
+	//private boolean CreateSCVOn;
+	//private boolean AttackUnitCreate;
 	
+	public enum Strategys { BaiscVsZerg, BaiscVsProtoss, BaiscVsTerran, Init} //기본 전략 나열
+	public enum StrategysException { Init, Temp} //예외 전략 나열, 예외가 아닐때는 무조건 Init 으로 
 
 	/// static singleton 객체를 리턴합니다
 	public static StrategyManager Instance() {
 		return instance;
 	}
 
+	Strategys CurrentStrategyBasic = null;
+	StrategysException CurrentStrategyException = null;
+	
+	
 	public StrategyManager() {
 		isFullScaleAttackStarted = false;
 		isInitialBuildOrderFinished = false;
+		CurrentStrategyBasic = Strategys.valueOf("BaiscVsZerg");
+		CurrentStrategyException = StrategysException.valueOf("Temp");
 	}
+	
+	public void setCurrentStrategyBasic(String strategy) {
+		CurrentStrategyBasic = Strategys.valueOf(strategy);
+	}
+	public void setCurrentStrategyException(String strategy) {
+		CurrentStrategyException = StrategysException.valueOf(strategy);;
+	}
+
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {
@@ -49,7 +72,20 @@ public class StrategyManager {
 	public void onEnd(boolean isWinner) {
 
 	}
-
+	public int getMineralPatchesNearDepotOnlySelf(Unit depot)
+	{
+	    // if there are minerals near the depot, add them to the set
+	    int radius = 320;
+	    int mineralsNearDepot =0;
+	    for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+		{
+			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
+			{
+	            mineralsNearDepot++;
+			}
+		}
+	    return mineralsNearDepot;
+	}
 	public static int gcd(int a, int b)
 	{ //삼항 연산자 축약형 
 	    return (a % b == 0 ? b : gcd(b,a%b));
@@ -125,7 +161,15 @@ public class StrategyManager {
 		
 		int cnt;
 		cnt = BuildManager.Instance().buildQueue.getItemCount(checkunit) + 
-				 MyBotModule.Broodwar.self().completedUnitCount(checkunit);
+				 MyBotModule.Broodwar.self().allUnitCount(checkunit);
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if (unit.getType() == UnitType.Terran_Factory) {
+				if (unit.isTraining()) {
+					cnt += unit.getTrainingQueue().size();
+				}
+			}
+		}
 		
 		return cnt;
 	}
@@ -134,30 +178,111 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
-		//@@@@@@ 초반 4드론 5드론 scv 러쉬 등에 대해서도 초반 빌드오더 버려야함
+		//@@@@@@ 초반 4드론 5드론 scv 러쉬 등에 대해서도 초반 빌드오더 버려야함, 그러므로 아래 initialbuildorder 처리 보다 앞에 와야함.
+		//@@@@@@ 전략은 자주 확인할 필요 없다, 1초에 한번
+		
+		System.out.println("CurrentStrategyBasic: " + CurrentStrategyBasic);
+		
+		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
+			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		}
+
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
 			isInitialBuildOrderFinished = true;
 		}
 
-		//@@@@@@ 상대 정보를 판단해서 분석하고 전략 세팅하는것 필요
-		//AnalyzeStrategy();
+		int vultureratio = 0;
+		int tankratio = 0;
+		int goliathratio = 0;
+		int wgt = 1;
+		
+		//config setting 가지고 오기
+		if(CurrentStrategyException.toString() == "Init"){
+			vultureratio = Config.vultureratio[CurrentStrategyBasic.ordinal()];
+			tankratio = Config.tankratio[CurrentStrategyBasic.ordinal()];
+			goliathratio = Config.goliathratio[CurrentStrategyBasic.ordinal()];
+			wgt = Config.wgt[CurrentStrategyBasic.ordinal()];
+		}else{
+			vultureratio = Config.vultureratioexception[CurrentStrategyException.ordinal()];
+			tankratio = Config.tankratioexception[CurrentStrategyException.ordinal()];
+			goliathratio = Config.goliathratioexception[CurrentStrategyException.ordinal()];
+			wgt = Config.wgtexception[CurrentStrategyException.ordinal()];
+		}
+		System.out.println("vultureratio : " + vultureratio);
+		System.out.println("tankratio : " + tankratio);
+		System.out.println("goliathratio : " + goliathratio);
+		
+		
 		
 		executeWorkerTraining();
 		executeSupplyManagement();
 		executeBasicCombatUnitTraining();
 		executeCombat();
+		
 	}
 
+	
 	// 일꾼 계속 추가 생산
 	public void executeWorkerTraining() {
 
+		
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
+		/*@@@@@@ 살려야될듯?
 		if (isInitialBuildOrderFinished == false) {
 			return;
 		}
+		*/
+		
+		
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
+			//System.out.println("tot_mineral_self: "+ tot_mineral_self);
+			return;
+		}
+		int tot_mineral_self = 0 ;
+		//@@@@@@@ 자주 안돌게 위에꺼로 몇초에 한번씩만 실행하게끔 해야할듯
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			if (unit.getType().isResourceDepot()){
+				int minerals = getMineralPatchesNearDepotOnlySelf(unit);
+				if(minerals > 0){
+					if(unit.isCompleted() == false){
+						/*
+						if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
+							System.out.println("gethit: "+ unit.getHitPoints());
+							//return;
+						}
+						*/
+						minerals= minerals * unit.getHitPoints()/1500;
+					}
+					tot_mineral_self += minerals;
+				}
+			}
+ 		}
 
+		
+		//@@@@@@ 현재 mineral 이 50이하인데 scv 가 0 일때 현재 빌드중인거 취소해야하는 만약 취소할것이 없다면!!! 총공격 모드!! 삽입해야되지 않을까
+//		if (MyBotModule.Broodwar.self().minerals() < 50) {
+//			int workerCount = MyBotModule.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType());
+//						
+//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//				if (unit.getType().isResourceDepot()) {
+//					if (unit.isTraining()) {
+//						workerCount += unit.getTrainingQueue().size();
+//					}
+//				}
+//			}
+//			
+//			if(workerCount == 0){
+//				CurrentStrategyStatus = "FullAttackALLIn";
+//			}
+//		}
+
+		//@@@@@@ mineral 이 50 이하이고 scv 도 0 이면 다른고 취소하고 해야되는 로직 입력 필요.
 		if (MyBotModule.Broodwar.self().minerals() >= 50) {
 			// workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
+			int maxworkerCount = tot_mineral_self * 2 + 4 * MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+			
 			int workerCount = MyBotModule.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType());
 			
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -168,18 +293,43 @@ public class StrategyManager {
 				}
 			}
 			
-			if (workerCount < 30) {
+			//System.out.println("exWork current blocking : " + BuildManager.Instance().buildQueue.getHighestPriorityItem().blocking);
+			//System.out.print("workerCount : " + workerCount);
+			
+			if (workerCount < 60 && workerCount < maxworkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if (unit.getType().isResourceDepot()) {
-						if (unit.isTraining() == false || unit.getLarva().size() > 0) {
-							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
-							if (BuildManager.Instance().buildQueue
-									.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
-								// std.cout << "worker enqueue" << std.endl;
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
+						if (unit.isCompleted() && unit.isTraining() == false) {
+							
+							BuildOrderItem firstitemholding = null;
+							
+							if(BuildManager.Instance().buildQueue.isEmpty() == false){
+								firstitemholding = BuildManager.Instance().buildQueue.getHighestPriorityItem();
+							}
+							
+							if (firstitemholding == null){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+							}else if(firstitemholding.metaType.getUnitType() != UnitType.Terran_SCV){
+								if(workerCount == 0 ){
+									BuildManager.Instance().buildQueue.clearAll();
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+								}else if(workerCount < 5){
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+								}else{
+									if(firstitemholding.blocking == true && MyBotModule.Broodwar.self().minerals() > firstitemholding.metaType.getUnitType().mineralPrice()+50 ){
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+										//System.out.println("working@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+									}else{
+										// 빌드큐에 일꾼 생산이 1개는 있도록 한다
+										//System.out.println("why am i here");
+										if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+										}
+									}
+								}
 							}
 						}
+						
 					}
 				}
 			}
@@ -211,12 +361,15 @@ public class StrategyManager {
 			boolean barrackflag = false;
 			boolean factoryflag = false;
 			
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if (unit.getType() == UnitType.Terran_Factory) {
-					factoryflag = true;
-				}
-				if (unit.getType() == UnitType.Terran_Barracks) {
-					barrackflag = true;
+
+			if(factoryflag==false){
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if (unit.getType() == UnitType.Terran_Factory  && unit.isCompleted()) {
+						factoryflag = true;
+					}
+					if (unit.getType() == UnitType.Terran_Barracks && unit.isCompleted()) {
+						barrackflag = true;
+					}
 				}
 			}
 			
@@ -224,12 +377,12 @@ public class StrategyManager {
 				if(barrackflag==true && factoryflag==false){
 					supplyMargin = 6;
 				}else if(factoryflag==true){
-					supplyMargin = 4+4*fac_cnt;
+					supplyMargin = 6+4*fac_cnt;
 				}
 			}else if(MyBotModule.Broodwar.getFrameCount()>14000 && MyBotModule.Broodwar.getFrameCount()<28000){
-				supplyMargin = 6+4*fac_cnt;
-			}else{
 				supplyMargin = 8+4*fac_cnt;
+			}else{
+				supplyMargin = 12+4*fac_cnt;
 			}
 			
 			
@@ -271,9 +424,7 @@ public class StrategyManager {
 
 	public void executeAddFactory() {
 		//@@@@@@ 팩토리 전체가 다 생산하고 있고 자원이 일정 이상 남았을시에 추가 팩토리를 짓는데.... 세부 기준은? 
-		
-		
-		
+	
 	}
 	public void executeBasicCombatUnitTraining() {
 
@@ -282,18 +433,30 @@ public class StrategyManager {
 			return;
 		}
 
-		int ratea = 1;
-		int rateb = 2;
-		int ratec = 3;
+		int vultureratio = 0;
+		int tankratio = 0;
+		int goliathratio = 0;
 		int wgt = 1;
 		
+		//config setting 가지고 오기
+		if(CurrentStrategyException.toString() == "Init"){
+			vultureratio = Config.vultureratio[CurrentStrategyBasic.ordinal()];
+			tankratio = Config.tankratio[CurrentStrategyBasic.ordinal()];
+			goliathratio = Config.goliathratio[CurrentStrategyBasic.ordinal()];
+			wgt = Config.wgt[CurrentStrategyBasic.ordinal()];
+		}else{
+			vultureratio = Config.vultureratioexception[CurrentStrategyException.ordinal()];
+			tankratio = Config.tankratioexception[CurrentStrategyException.ordinal()];
+			goliathratio = Config.goliathratioexception[CurrentStrategyException.ordinal()];
+			wgt = Config.wgtexception[CurrentStrategyException.ordinal()];
+		}
+		
 		//@@@@@@ getTrainingQueue 에 있는 애들도 확인해야 할듯? buildqueue 와 달라보임
-		int tot_vulture = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
-		int tot_tank = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-						+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
-		int tot_goliath = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
+		int tot_vulture = getcurrenttot(UnitType.Terran_Vulture);
+		int tot_tank = getcurrenttot(UnitType.Terran_Siege_Tank_Tank_Mode) + getcurrenttot(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int tot_goliath = getcurrenttot(UnitType.Terran_Goliath);
 		//int faccnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
-		UnitType selected = chooseunit(ratea, rateb, ratec, wgt, tot_vulture, tot_tank, tot_goliath);; 
+		UnitType selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);; 
 		
 		
 		//@@@@@@ 들어가는 선 조건이 있어야 하지 않을지.... 매번 팩토리 다 볼수는 없지 않나????????? 겉에 루프가 없어도 될거 같은데 나중에 실험해 보자.. 한 프레임에 한번만 들어와서 팩토리 하나만 하고 break 하고 다음에 빈거 또 하겠지?
@@ -316,7 +479,7 @@ public class StrategyManager {
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Goliath,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 							tot_goliath++;
 						}
-						selected = chooseunit(ratea, rateb, ratec, wgt, tot_vulture, tot_tank, tot_goliath);
+						selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
 					}
 				}
 			}
@@ -335,6 +498,8 @@ public class StrategyManager {
 			CombatManager.Instance().setAggressive(false);
 		}
 	}
+
+	
 
 	/*
 	public void executeCombat() {
