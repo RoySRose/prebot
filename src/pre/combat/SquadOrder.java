@@ -38,5 +38,10 @@ public class SquadOrder {
 			   type == SqaudOrderType.DEFEND ||
 			   type == SqaudOrderType.HOLD;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "SquadOrder [type=" + type + ", position=" + position + ", radius=" + radius + ", status=" + status
+				+ "]";
+	}
 }

@@ -9,6 +9,33 @@ import bwapi.WeaponType;
 import pre.main.MyBotModule;
 
 public class CommandUtil {
+	
+	public static void patrolMove(Unit attacker, final Position targetPosition)
+	{
+		// Position 객체에 대해서는 == 가 아니라 equals() 로 비교해야 합니다		
+		if (attacker == null || !targetPosition.isValid())
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (attacker.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || attacker.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = attacker.getLastCommand();
+
+		// if we've already told this unit to attack this target, ignore this command
+		if (currentCommand.getUnitCommandType() == UnitCommandType.Patrol &&	currentCommand.getTargetPosition().equals(targetPosition))
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		attacker.patrol(targetPosition);
+	}
 
 	public static void attackUnit(Unit attacker, Unit target)
 	{
@@ -113,6 +140,32 @@ public class CommandUtil {
 
 		// if nothing prevents it, attack the target
 		unit.rightClick(target);
+	}
+
+	public static void rightClick(Unit unit, Position position)
+	{
+		if (unit == null || position == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Unit) && (position.equals(currentCommand.getTargetPosition())))
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		unit.rightClick(position);
 	}
 
 	public static void repair(Unit unit, Unit target)

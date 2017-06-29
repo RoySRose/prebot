@@ -275,6 +275,29 @@ public class MapGrid {
 //		}
 	}
 	
+	public List<Unit> getUnitsNear(Position position, int radius, boolean ourUnits, boolean oppUnits)
+	{
+		List<Unit> units = new ArrayList<>();
+		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
+		for (Unit u : unitsInRadius) {
+			if (ourUnits && u.getPlayer() == InformationManager.Instance().selfPlayer) {
+				if (!units.contains(u)) {
+					units.add(u);
+				}
+				
+			} else if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
+				if (!units.contains(u)) {
+					units.add(u);
+				}
+			} else {
+				if (!units.contains(u)) {
+					units.add(u);
+				}
+			}
+		}
+		return units;
+	}
+	
 	// The bot scanned the given position. Record it so we don't scan the same position
 	// again before it wears off.
 	public void scanAtPosition(Position pos) {
