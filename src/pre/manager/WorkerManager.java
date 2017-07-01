@@ -1,4 +1,6 @@
 package pre.manager;
+import java.util.List;
+
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
@@ -35,11 +37,13 @@ public class WorkerManager {
 	public void update() {
 
 		// 1초에 1번만 실행한다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-
+		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0) return;
+		
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
+		updatework();
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
@@ -57,7 +61,6 @@ public class WorkerManager {
 			{
 				continue;
 			}
-
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다 
 			if ( worker.isIdle() )
 			{
@@ -66,6 +69,7 @@ public class WorkerManager {
 					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move)
 					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout))  
 				{
+					
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
 				}
 			}
@@ -129,7 +133,6 @@ public class WorkerManager {
 		for (Unit worker : workerData.getWorkers())
 		{
 			if (worker == null) continue;
-
 			// if worker's job is idle 
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default )
 			{
@@ -139,16 +142,90 @@ public class WorkerManager {
 		}
 	}
 
+	private void updatework() {
+		
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		for (Unit worker : workerData.getWorkers())
+		{
+			if (!worker.isCompleted())
+			{
+				continue;
+			}
+			//workerMineralMap = new HashMap<Integer, Unit>();
+			
+			if(worker.isGatheringMinerals()){
+				Unit depot = workerData.getWorkerDepot(worker);
+				List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
+				int maxSCV = 0;
+				int lowSCV = 10000;
+				int sCV = 0;
+				Unit minMineral = null;
+				for (Unit mineral : mineralPatches){
+					sCV = workerData.workersOnMineralPatch.get(mineral.getID());
+					minMineral = mineral;
+					if(maxSCV < sCV){
+						maxSCV = sCV;
+					}
+					if(lowSCV > sCV){
+						lowSCV = sCV;
+					}
+					if(sCV+2 <= maxSCV){
+						setMineralWorker(worker);
+						continue;
+					}
+		        	//System.out.println("mineralPatches : " + mineralPatches.size());
+		        }
+				//int plangetmineral = workerData.workerMineralAssignment.get(worker.getID()).getID();
+				Unit temp = workerData.workerMineralAssignment.get(worker.getID());
+				/*
+				 * 
+				 */
+				
+				
+				int plangetmineral = temp.getID();
+				
+				int realgetmineral = 0;
+				if(worker.getOrderTarget() != null){
+					realgetmineral = worker.getOrderTarget().getID();
+				}
+				if(worker.isCarryingMinerals() == true || worker.getOrderTarget()  == null){
+					continue;
+				}
+				if(plangetmineral != realgetmineral){
+					//System.out.println(" realgetmineral:" + realgetmineral +"changing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					worker.gather(temp);
+					realgetmineral = worker.getOrderTarget().getID();
+					//commandUtil.rightClick(worker, temp);
+				}
+				
+				
+				
+				//System.out.print(" isMoving:" + worker.isMoving());
+				//System.out.println(" realgetmineral:" + realgetmineral + " plangetmineral:" + plangetmineral);
+				
+				//worker.
+	//			if(workerData.workerMineralMap != null){
+	//				System.out.print("getmineral2:" + workerData.workerMineralMap.get(worker.getID()).getID());
+	//			}
+				//System.out.print(" getmineral:" + workerData.getMineralToMine(worker).getID());
+				//System.out.print(" isgather:" + worker.isGatheringMinerals());
+				//System.out.println(" iscarry:" + worker.isCarryingMinerals());
+				// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
+			}
+		}	
+	}
+
+
 	public void handleMoveWorkers()
 	{
 		// for each of our workers
 		for (Unit worker : workerData.getWorkers())
 		{
 			if (worker == null) continue;
-
 			// if it is a move worker
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move)
 			{
+				System.out.println(" worker : " + worker.getID() + " workerData.getWorkerJob(worker) : " + workerData.getWorkerJob(worker));
 				WorkerMoveData data = workerData.getWorkerMoveData(worker);
 
 				// 목적지에 도착한 경우 이동 명령을 해제한다
@@ -260,8 +337,8 @@ public class WorkerManager {
 		if (unit == null) return;
 
 		// check if there is a mineral available to send the worker to
+		/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
 		Unit depot = getClosestResourceDepotFromWorker(unit);
-
 		// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
 		if (depot != null)
 		{
@@ -337,7 +414,7 @@ public class WorkerManager {
 	public void setIdleWorker(Unit unit)
 	{
 		if (unit == null) return;
-
+	
 		workerData.setWorkerJob(unit, WorkerData.WorkerJob.Idle, (Unit)null);
 	}
 
@@ -468,6 +545,7 @@ public class WorkerManager {
 
 	
 	// get a worker which will move to a current location
+	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
 	public Unit chooseMoveWorkerClosestTo(Position p)
 	{
 		// set up the pointer
@@ -496,7 +574,7 @@ public class WorkerManager {
 		return closestWorker;
 	}
 
-	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
+	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다??????
 	public void setMoveWorker(Unit worker, int mineralsNeeded, int gasNeeded, Position p)
 	{
 		// set up the pointer

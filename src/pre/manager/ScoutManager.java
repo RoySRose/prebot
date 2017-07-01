@@ -82,7 +82,11 @@ public class ScoutManager {
 				if (firstBuilding != null)
 				{
 					// grab the closest worker to the first building to send to scout
-					Unit unit = WorkerManager.Instance().getClosestMineralWorkerTo(firstBuilding.getPosition());
+					//Unit unit = WorkerManager.Instance().getClosestMineralWorkerTo(firstBuilding.getPosition());
+					/*	se-min.park 추가
+					 *  정찰 최소 손실
+					 */
+					Unit unit = WorkerManager.Instance().chooseMoveWorkerClosestTo(firstBuilding.getPosition());
 
 					// if we find a worker (which we should) add it to the scout units
 					// 정찰 나갈 일꾼이 없으면, 아무것도 하지 않는다
@@ -154,7 +158,6 @@ public class ScoutManager {
 		{
 			// if scout is exist, move scout into enemy region
 			if (currentScoutUnit != null) {
-				
 				currentScoutTargetBaseLocation = enemyBaseLocation;
 				
 				if (MyBotModule.Broodwar.isExplored(currentScoutTargetBaseLocation.getTilePosition()) == false) {
@@ -168,8 +171,9 @@ public class ScoutManager {
 					//currentScoutStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
 					//currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices();
 					//commandUtil.move(currentScoutUnit, currentScoutTargetPosition);					
+					//System.out.println("444444444444444");
 					
-					WorkerManager.Instance().setIdleWorker(currentScoutUnit);
+					//WorkerManager.Instance().setIdleWorker(currentScoutUnit);
 					currentScoutStatus = ScoutStatus.NoScout.ordinal();
 					currentScoutTargetPosition = myBaseLocation.getPosition();
 				}
