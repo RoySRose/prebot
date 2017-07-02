@@ -98,7 +98,7 @@ public class MicroTank extends MicroManager {
 					List<Unit> targetsInTankRange = MapGrid.Instance().getUnitsNear(tank.getPosition(), TANK_MODE_RANGE, false, true);
 					if (!targetsInTankRange.isEmpty() || !seigeResearched) { // 탱크모드로 때릴 적이 있다면 때림
 						Unit target = getTarget(tank, tankTargets, false);
-						MicroUtils.smartKiteTarget(tank, target, order.getPosition(), true, true);
+						MicroUtils.preciseKiting(tank, target, true, true, order.getPosition());
 					} else { // 가까운 곳에 탱크모드로 때릴 적이 없으면 시즈모드로 때릴 적을 찾는다.
 						List<Unit> targetsInSiegeRange = MapGrid.Instance().getUnitsNear(tank.getPosition(), SIEGE_MODE_MAX_RANGE, false, true);
 						if (!targetsInSiegeRange.isEmpty()) { // 시즈모드로 때릴 적을 찾았다.
@@ -109,7 +109,7 @@ public class MicroTank extends MicroManager {
 								tank.siege();
 							} else {
 								target = getTarget(tank, targetsInSiegeRange, false);
-								MicroUtils.smartKiteTarget(tank, target, order.getPosition(), true, true);
+								MicroUtils.preciseKiting(tank, target, true, true, order.getPosition());
 							}
 						} else { // 시즈모드로 때릴 적도 없다.
 							boolean shouldSiege = false;
@@ -130,7 +130,7 @@ public class MicroTank extends MicroManager {
 								tank.siege();
 							} else {
 								Unit target = getTarget(tank, tankTargets, false);
-								MicroUtils.smartKiteTarget(tank, target, order.getPosition(), true, true);
+								MicroUtils.preciseKiting(tank, target, true, true, order.getPosition());
 							}
 						}
 					}
@@ -240,7 +240,14 @@ public class MicroTank extends MicroManager {
 		UnitType targetType = target.getType();
 		
 		// 0순위 : 움직이는 스파이더 마인
-		if (targetType == UnitType.Terran_Vulture_Spider_Mine && target.isMoving()) {
+		if (targetType == UnitType.Terran_Vulture_Spider_Mine) { // && target.isMoving()
+			if (!target.isBurrowed()) {
+				MyBotModule.Broodwar.sendText("Spider_Mine is unBurrowed");
+			}
+			
+			if (!target.isDetected()) {
+				MyBotModule.Broodwar.sendText("Spider_Mine is dectected");
+			}
 			return 15;
 		}
 		
