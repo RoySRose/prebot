@@ -33,9 +33,9 @@ public class MicroMarine extends MicroManager {
 			if (target != null) {
 				if (kiteWithRangedUnits) {
 					if (rangedUnit.getType() == UnitType.Terran_Vulture) {
-						MicroUtils.smartKiteTarget(rangedUnit, target, order.getPosition(), false, true);
+						MicroUtils.preciseKiting(rangedUnit, target, false, true, order.getPosition());
 					} else {
-						MicroUtils.smartKiteTarget(rangedUnit, target, order.getPosition(), true, true);
+						MicroUtils.preciseKiting(rangedUnit, target, true, true, order.getPosition());
 					}
 				} else {
 					CommandUtil.attackUnit(rangedUnit, target);
