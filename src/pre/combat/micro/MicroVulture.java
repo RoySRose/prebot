@@ -24,7 +24,7 @@ public class MicroVulture extends MicroManager {
 		for (Unit vulture : vultures) {
 			Unit target = getTarget(vulture, vultureTargets);
 			if (target != null) {
-				MicroUtils.smartKiteTarget(vulture, target, order.getPosition(), false, false);
+				MicroUtils.preciseKiting(vulture, target, false, false, order.getPosition());
 			} else {
 				// if we're not near the order position, go there
 				if (vulture.getDistance(order.getPosition()) > 100) {
