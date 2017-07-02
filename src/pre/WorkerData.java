@@ -38,7 +38,7 @@ public class WorkerData {
 	//일꾼과 건설일꾼 배정
 	private Map<Integer, UnitType> workerBuildingTypeMap = new HashMap<Integer, UnitType>();
 	//CC에 배정된 일꾼 수
-	private Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
+	public Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
 	//Gas 에 배정된 일꾼 수
 	private Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
 	//작업중인 광물 ????
@@ -326,6 +326,7 @@ public class WorkerData {
 		}
 		else if (previousJob == WorkerJob.Gas)
 		{
+			System.out.println("gas 다다다다다다다");
 			refineryWorkerCount.put(workerRefineryMap.get(unit.getID()).getID(), refineryWorkerCount.get(workerRefineryMap.get(unit.getID()).getID()) - 1);
 			workerRefineryMap.remove(unit.getID()); // C++ : workerRefineryMap.erase(unit);
 		}
