@@ -112,10 +112,10 @@ public class MicroUtils {
 	 * @param rangedUnit
 	 * @param target
 	 * @param cooltimeAlwaysAttack : true인 경우 쿨타임이 돌아왔을 때 항상 공격을 한다. 벌처, 레이스등의 견제의 경우 이 값을 true로 하면 안된다.
-	 * @param united : 회피지역의 risk를 계산시, united값이 true인 경우 자신의 유닛 분포상태를 안전한 지역으로 판단할지 결정한다.(해당값이 false이면 흩어지는 kiting을 한다.)
+	 * @param unitedKiting : 회피지역의 risk를 계산시, united값이 true인 경우 자신의 유닛 분포상태를 안전한 지역으로 판단할지 결정한다.(해당값이 false이면 흩어지는 kiting을 한다.)
 	 * @param goalPosition : 목표지점. 회피지점을 결정할때 risk가 같으면 목표지점을 고려한다.
 	 */
-	public static void preciseKiting(Unit rangedUnit, Unit target, boolean cooltimeAlwaysAttack, boolean united, Position goalPosition) {
+	public static void preciseKiting(Unit rangedUnit, Unit target, boolean cooltimeAlwaysAttack, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		// 유닛 유효성 검사
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
@@ -154,9 +154,10 @@ public class MicroUtils {
 			// 1. 공격
 			//  - 상대가 때리기 위해 거리를 좁혀야 할때(currentCooldown <= timeToCatch)
 			//  - 쿨타임이 되었을때 (cooltimeAlwaysAttack && currentCooldown) (파라미터로 설정가능)
+			//  - 타깃이 건물일 경우
 			// 2. 회피
 			//  - getFleePosition을 통해 최적의 회피지역을 선정하여 이동한다.
-			if (currentCooldown <= timeToCatch || (!survivalInstinct && cooltimeAlwaysAttack && currentCooldown == 0)) { // || target.getType().isBuilding()) { TODO 빌딩이면 때리는 로직 사용?
+			if (target.getType().isBuilding() || currentCooldown <= timeToCatch || (!survivalInstinct && cooltimeAlwaysAttack && currentCooldown == 0)) {
 				// TODO P컨이 잘안되어 사용하지 않는다.
 //			    double rad = Math.atan2(vulture.getPosition().getY() - target.getPosition().getY()
 //			    		, vulture.getPosition().getX() - target.getPosition().getX());
@@ -173,7 +174,7 @@ public class MicroUtils {
 				}
 				
 				// 회피지역을 선정한다.
-				Position fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, survivalInstinct? false : united, goalPosition);
+				Position fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, (survivalInstinct? false : unitedKiting), goalPosition, fleeAngle);
 				CommandUtil.rightClick(rangedUnit, fleePosition);
 			}
 		}
@@ -186,11 +187,11 @@ public class MicroUtils {
 	 * @param rangedUnit
 	 * @param target
 	 * @param moveDistPerSec : 초당 이동거리(pixel per 24frame). 해당 pixel만큼의 거리를 회피지점으로 선정한다. 찾지 못했을 경우 거리를 좁힌다.
-	 * @param united
+	 * @param unitedKiting
 	 * @param goalPosition
 	 * @return
 	 */
-	private static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean united, Position goalPosition) {
+	private static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		int reverseX = rangedUnit.getPosition().getX() - target.getPosition().getX(); // 타겟과 반대로 가는 x양
 		int reverseY = rangedUnit.getPosition().getY() - target.getPosition().getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
@@ -199,7 +200,8 @@ public class MicroUtils {
 		int minimumRisk = 99999;
 		int minimumDistanceToGoal = 99999;
 
-		Integer[] FLEE_ANGLE = MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType()); // MicroData.FleeAngle에 저장된 유닛타입에 따른 회피 각 범위(골리앗 새끼들은 뚱뚱해서 각이 넓으면 지들끼리 낑김)
+//		Integer[] FLEE_ANGLE = MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType()); // MicroData.FleeAngle에 저장된 유닛타입에 따른 회피 각 범위(골리앗 새끼들은 뚱뚱해서 각이 넓으면 지들끼리 낑김)
+		Integer[] FLEE_ANGLE = fleeAngle != null ? fleeAngle : MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType());
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
 		int moveCalcSize = moveDistPerSec; // 이동 회피지점의 거리 = 유닛의 초당이동거리
 		
@@ -209,7 +211,7 @@ public class MicroUtils {
 				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
 				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
-				int risk = riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize, united); // 회피지점에서의 예상위험도
+				int risk = riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize, unitedKiting); // 회피지점에서의 예상위험도
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
 
 				// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
@@ -384,7 +386,21 @@ public class MicroUtils {
 		return false;
 	}
 	
-	private static Position centerOfUnits(List<Unit> units) {
+	public static List<Unit> filterTargets(List<Unit> targets, boolean includeFlyer) {
+		List<Unit> newTargets = new ArrayList<>();
+		for (Unit target : targets) {
+			if (!includeFlyer && target.isFlying()) {
+				continue;
+			}
+			
+			if (target.isVisible() && !target.isStasised()) {
+				newTargets.add(target);
+			}
+		}
+		return newTargets;
+	}
+	
+	public static Position centerOfUnits(List<Unit> units) {
 		if (units.isEmpty()) {
 			return null;
 		}
@@ -401,6 +417,16 @@ public class MicroUtils {
 		}
 
 		return new Position(x / unitCount, y / unitCount);
+	}
+	
+	public static int calcArriveDecisionRange(UnitType unitType, int numOfUnits) {
+		
+		// 도착판정거리 : 유닛시야 + 유닛타입별 개체수에 비례하는 로그값 (ex: 320pixel(시즈시야) + 25 * log12)
+		int arriveDecisionRange = unitType.sightRange();
+		if (numOfUnits > 0) {
+			arriveDecisionRange += Math.log(numOfUnits) * 25;
+		}
+		return arriveDecisionRange;
 	}
 	
 	// weapon.damageType() bwapi 오류발생하여 구현함.

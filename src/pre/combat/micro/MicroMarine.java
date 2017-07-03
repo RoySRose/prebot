@@ -9,6 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import pre.util.CommandUtil;
 import pre.util.MicroUtils;
+import pre.util.MicroSet.FleeAngle;
 
 public class MicroMarine extends MicroManager {
 
@@ -33,9 +34,9 @@ public class MicroMarine extends MicroManager {
 			if (target != null) {
 				if (kiteWithRangedUnits) {
 					if (rangedUnit.getType() == UnitType.Terran_Vulture) {
-						MicroUtils.preciseKiting(rangedUnit, target, false, true, order.getPosition());
+						MicroUtils.preciseKiting(rangedUnit, target, false, true, order.getPosition(), FleeAngle.WIDE_ANGLE);
 					} else {
-						MicroUtils.preciseKiting(rangedUnit, target, true, true, order.getPosition());
+						MicroUtils.preciseKiting(rangedUnit, target, true, true, order.getPosition(), FleeAngle.WIDE_ANGLE);
 					}
 				} else {
 					CommandUtil.attackUnit(rangedUnit, target);
