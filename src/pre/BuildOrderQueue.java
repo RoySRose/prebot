@@ -385,6 +385,16 @@ public class BuildOrderQueue {
 		lowestPriority  = queue.isEmpty() ? 0 : lowestPriority;
 	}
 
+	public BuildOrderItem getCurrentItem() 
+	{
+		// remove the back element of the vector
+		// C++ : queue.erase(queue.begin() + queue.size() - 1 - numSkippedItems);
+
+		Object[] tempArr = queue.toArray();
+		BuildOrderItem currentItem = (BuildOrderItem)tempArr[numSkippedItems];
+		
+		return currentItem;
+	}
 	/// skippedItems 다음의 item 을 제거합니다
 	public void removeCurrentItem() 
 	{

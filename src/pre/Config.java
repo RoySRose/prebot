@@ -29,7 +29,7 @@ public class Config {
 	/// Fastest: 42 ms/frame.  1초에 24 frame. 일반적으로 1초에 24frame을 기준 게임속도로 합니다<br>
 	/// Normal: 67 ms/frame. 1초에 15 frame<br>
 	/// As fast as possible : 0 ms/frame. CPU가 할수있는 가장 빠른 속도.
-	public static int SetLocalSpeed = 42;
+	public static int SetLocalSpeed = 12;
 	
 	/// 로컬에서 게임을 실행할 때 FrameSkip (코드 제출 후 서버에서 게임을 실행할 때는 서버 설정을 사용함)<br>
 	/// frameskip을 늘리면 화면 표시도 업데이트 안하므로 훨씬 빠릅니다
@@ -100,6 +100,8 @@ public class Config {
 	/// 화면 표시 여부 - 마우스 커서	
 	public static boolean DrawMouseCursorInfo = true;
 	
+	public static boolean BuildQueueDebugYN = false;
+	
 
 	public static final Color ColorLineTarget = Color.White;
 	public static final Color ColorLineMineral = Color.Cyan;
@@ -109,9 +111,9 @@ public class Config {
 	//전략 0  BaiscVsZerg
 	//전략 1  BaiscVsProtoss
 	//전략 2  BaiscVsTerran
-	public static final int[] vultureratio = new int[] {4,2,93}; //기본전략 벌쳐 비, 예 vultureratio[0] 은 BasicvsZerg 에서의 비율
-	public static final int[] tankratio    = new int[] {3,2,10}; //기본전략 탱크 비
-	public static final int[] goliathratio = new int[] {4,2,13}; //기본전략 골리앗 비
+	public static final int[] vultureratio = new int[] {4,2,1}; //기본전략 벌쳐 비, 예 vultureratio[0] 은 BasicvsZerg 에서의 비율
+	public static final int[] tankratio    = new int[] {3,2,2}; //기본전략 탱크 비
+	public static final int[] goliathratio = new int[] {4,2,10}; //기본전략 골리앗 비
 	public static final int[] wgt          = new int[] {1,2,3}; //기본전략 우선순위 1벌쳐, 2탱크, 3골리앗
 
 	public static final int[] vultureratioexception = new int[] {7,8,9}; //예외전략 벌쳐 비, 예 vultureratio[0] 은 

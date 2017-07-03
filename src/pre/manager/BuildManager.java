@@ -44,13 +44,16 @@ public class BuildManager {
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
 		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0)
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0){
 			return;
+		}
 
 		if (buildQueue.isEmpty()) {
 			return;
 		}
 		
+		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
+		checkBuildOrderQueueDeadlockAndInsert();
 		// Dead Lock 을 체크해서 제거한다
 		checkBuildOrderQueueDeadlockAndAndFixIt();
 		// Dead Lock 제거후 Empty 될 수 있다
@@ -106,22 +109,6 @@ public class BuildManager {
 				 * + "Build " + currentItem.metaType.getName() +
 				 * " canMakeNow : " + canMake + std::endl; }
 				 */
-
-				// 프로토스 종족 유닛 중 Protoss_Archon / Protoss_Dark_Archon 은 기존
-				// Protoss_High_Templar / Protoss_Dark_Templar 두 유닛을 합체시키는 기술을
-				// 써서 만들기 때문에
-				// secondProducer 을 추가로 찾아 확인한다
-//				if (canMake) {
-//					if (currentItem.metaType.isUnit()) {
-//						if (currentItem.metaType.getUnitType() == UnitType.Protoss_Archon
-//								|| currentItem.metaType.getUnitType() == UnitType.Protoss_Dark_Archon) {
-//							secondProducer = getAnotherProducer(producer, producer.getPosition());
-//							if (secondProducer == null) {
-//								canMake = false;
-//							}
-//						}
-//					}
-//				}
 			}
 
 			// if we can make the current item, create it
@@ -188,6 +175,9 @@ public class BuildManager {
 					// 지상유닛 / 공중유닛의 경우
 					else {
 						producer.train(t.getUnitType());
+//						if(producer.isTraining() == false){
+//							isOkToRemoveQueue = false;
+//						}
 					}
 				}
 				// if we're dealing with a tech research
@@ -198,6 +188,9 @@ public class BuildManager {
 				}
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
+					if(Config.BuildQueueDebugYN){
+						System.out.println("here I am!!! Killing: " + buildQueue.getCurrentItem().metaType.getName());
+					}
 					buildQueue.removeCurrentItem();
 				}
 				// don't actually loop around in here
@@ -253,6 +246,11 @@ public class BuildManager {
 			if (producerID != -1 && unit.getID() != producerID)	{ 
 				continue; 
 			}
+			if ((producerType == UnitType.Terran_Factory || producerType == UnitType.Terran_Starport || producerType == UnitType.Terran_Science_Facility || producerType == UnitType.Terran_Command_Center) && unit.getType() == producerType && unit.isConstructing() == true ) {
+				continue;
+			}
+
+			
 			
 			if (t.isUnit()) {
 				// if the type requires an addon and the producer doesn't have
@@ -453,6 +451,25 @@ public class BuildManager {
 			}
 		}
 
+		//@@@@@@ 맞을런지?
+		if(producer.getType() == UnitType.Terran_Factory || producer.getType() == UnitType.Terran_Starport || producer.getType() == UnitType.Terran_Science_Facility || producer.getType() == UnitType.Terran_Command_Center){
+			if(producer.canBuildAddon()==false && producer.isConstructing() == true){
+				canMake = false;
+			}
+		}
+		// 테란 Addon 건물의 경우 (Addon 건물을 지을수 있는지는 getProducer 함수에서 이미 체크완료)
+		// 모건물이 Addon 건물 짓기 전에는 canBuildAddon = true,
+		// isConstructing = false, canCommand = true 이다가
+		// Addon 건물을 짓기 시작하면 canBuildAddon = false,
+		// isConstructing = true, canCommand = true 가 되고 (Addon
+		// 건물 건설 취소는 가능하나 Train 등 커맨드는 불가능)
+		// 완성되면 canBuildAddon = false, isConstructing = false 가
+		// 된다
+			// 테란 Addon 건물의 경우 정상적으로 buildAddon 명령을 내려도 SCV가 모건물
+			// 근처에 있을 때 한동안 buildAddon 명령이 취소되는 경우가 있어서
+			// 모건물이 isConstructing = true 상태로 바뀐 것을 확인한 후
+			// buildQueue 에서 제거해야한다
+		
 		return canMake;
 	}
 
@@ -727,49 +744,49 @@ public class BuildManager {
 			// producer 가 건물이 아닌 경우 : producer 가 생성될 예정인지 추가 파악
 			// producerType : 일꾼. Larva. Hydralisk, Mutalisk
 			else {
-				// Larva 는 시간이 지나면 Hatchery, Lair, Hive 로부터 생성되기 때문에 해당 건물이 있는지
-				// 추가 파악
-				if (producerType == UnitType.Zerg_Larva) {
-					if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0
-							&& MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
-							&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Lair) == 0
-							&& MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Lair) == 0
-							&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Hive) == 0
-							&& MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
-						if (ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery,
-								null) == 0
-								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair,
-										null) == 0
-								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive,
-										null) == 0) {
-							isProducerWillExist = false;
-						}
-					}
-				}
-				// Hydralisk, Mutalisk 는 Egg 로부터 생성되기 때문에 추가 파악
-				else if (producerType.getRace() == Race.Zerg) {
-					boolean isInEgg = false;
-					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-						if (unit.getType() == UnitType.Zerg_Egg && unit.getBuildType() == producerType) {
-							isInEgg = true;
-						}
-						// 갓태어난 유닛은 아직 반영안되어있을 수 있어서, 추가 카운트를 해줘야함
-						if (unit.getType() == producerType && unit.isConstructing()) {
-							isInEgg = true;
-						}
-					}
-					if (isInEgg == false) {
-						isProducerWillExist = false;
-					}
-				} else {
 					isProducerWillExist = false;
-				}
 			}
 		}
 
 		return isProducerWillExist;
 	}
 
+	public void checkBuildOrderQueueDeadlockAndInsert() {
+		
+		BuildOrderQueue buildQueue = BuildManager.Instance().getBuildQueue();
+		if (!buildQueue.isEmpty()) {
+			BuildOrderItem currentItem = buildQueue.getHighestPriorityItem();
+
+			// 건물이나 유닛의 경우
+			if (currentItem.metaType.isUnit()) {
+				UnitType unitType = currentItem.metaType.getUnitType();
+				final Map<UnitType, Integer> requiredUnits = unitType.requiredUnits();
+
+				Iterator<UnitType> it = requiredUnits.keySet().iterator();
+				// 선행 건물/유닛이 있는데
+				if (requiredUnits.size() > 0) {
+					while (it.hasNext()) {
+						UnitType requiredUnitType = it.next(); // C++ : u.first;
+						if (requiredUnitType != UnitType.None) {
+							if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+									&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+								// 선행 건물이 건설 예정이지도 않으면 만들기
+								if (requiredUnitType.isBuilding()) {
+									if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
+										if(Config.BuildQueueDebugYN){
+											System.out.println("Inserting blocked unit: " + requiredUnitType);
+										}
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+	}
 	public void checkBuildOrderQueueDeadlockAndAndFixIt() {
 		// 빌드오더를 수정할 수 있는 프레임인지 먼저 판단한다
 		// this will be true if any unit is on the first frame if it's training
@@ -803,7 +820,7 @@ public class BuildManager {
 		}
 
 		// BuildQueue 의 HighestPriority 에 있는 BuildQueueItem 이 skip 불가능한 것인데,
-		// 선행조건이 충족될 수 없거나, 실행이 앞으로도 계속 불가능한 경우, dead lock 이 발생한다
+		// 선행조건이 충족될 수 없거나, 실)행이 앞으로도 계속 불가능한 경우, dead lock 이 발생한다
 		// 선행 건물을 BuildQueue에 추가해넣을지, 해당 BuildQueueItem 을 삭제할지 전략적으로 판단해야 한다
 		BuildOrderQueue buildQueue = BuildManager.Instance().getBuildQueue();
 		if (!buildQueue.isEmpty()) {
@@ -850,14 +867,10 @@ public class BuildManager {
 						// Refinery 를 지으려는 장소를 찾을 수 없으면 dead lock
 						if (testLocation == TilePosition.None || testLocation == TilePosition.Invalid
 								|| testLocation.isValid() == false) {
-							System.out
-									.println("Build Order Dead lock case . Cann't find place to construct " + unitType); // C++
-																															// :
-																															// unitType.getName()
+							System.out.println("Build Order Dead lock case . Cann't find place to construct " + unitType); // C++ : unitType.getName()
 							hasAvailableGeyser = false;
 						} else {
-							// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead
-							// lock
+							// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead lock
 							for (Unit u : MyBotModule.Broodwar.getUnitsOnTile(testLocation)) {
 								if (u.getType().isRefinery() && u.exists()) {
 									hasAvailableGeyser = false;
@@ -885,11 +898,8 @@ public class BuildManager {
 					if (!isDeadlockCase && requiredUnits.size() > 0) {
 						// for (Unit u : it)
 						while (it.hasNext()) {
-							UnitType requiredUnitType = it.next(); // C++ :
-																	// u.first;
-
+							UnitType requiredUnitType = it.next(); // C++ : u.first;
 							if (requiredUnitType != UnitType.None) {
-
 								/*
 								 * std::cout + "pre requiredUnitType " +
 								 * requiredUnitType.getName() +
@@ -907,34 +917,8 @@ public class BuildManager {
 										&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 									// 선행 건물이 건설 예정이지도 않으면 dead lock
 									if (requiredUnitType.isBuilding()) {
-										if (ConstructionManager.Instance()
-												.getConstructionQueueItemCount(requiredUnitType, null) == 0) {
+										if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
 											isDeadlockCase = true;
-										}
-									}
-									// 선행 유닛이 Larva 인 Zerg 유닛의 경우, Larva,
-									// Hatchery, Lair, Hive 가 하나도 존재하지 않고, 건설
-									// 예정이지 않은 경우에 dead lock
-									else if (requiredUnitType == UnitType.Zerg_Larva) {
-										if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0
-												&& MyBotModule.Broodwar.self()
-														.incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
-												&& MyBotModule.Broodwar.self()
-														.completedUnitCount(UnitType.Zerg_Lair) == 0
-												&& MyBotModule.Broodwar.self()
-														.incompleteUnitCount(UnitType.Zerg_Lair) == 0
-												&& MyBotModule.Broodwar.self()
-														.completedUnitCount(UnitType.Zerg_Hive) == 0
-												&& MyBotModule.Broodwar.self()
-														.incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
-											if (ConstructionManager.Instance()
-													.getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0
-													&& ConstructionManager.Instance().getConstructionQueueItemCount(
-															UnitType.Zerg_Lair, null) == 0
-													&& ConstructionManager.Instance().getConstructionQueueItemCount(
-															UnitType.Zerg_Hive, null) == 0) {
-												isDeadlockCase = true;
-											}
 										}
 									}
 								}
