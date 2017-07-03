@@ -5,6 +5,8 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwta.BWTA;
+import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.combat.SquadOrder;
 import pre.combat.SquadOrder.SqaudOrderType;
@@ -19,8 +21,12 @@ public abstract class MicroManager {
 	public void setUnits(List<Unit> units) {
 		this.units = units;
 	}
-	
+
 	protected SquadOrder order;
+	protected Position squadCenter = null;
+	protected int squadRange = 0;
+	
+	
 	protected abstract void executeMicro(List<Unit> targets);
 	
 	public void execute(SquadOrder inputOrder) {
@@ -68,5 +74,31 @@ public abstract class MicroManager {
 				CommandUtil.attackMove(unit, unit.getPosition());
 			}
 		}
+	}
+	
+	public void setSquadAreaRange(Position squadCenter, int squadRange) {
+		this.squadCenter = squadCenter;
+		this.squadRange = squadRange;
+	}
+	
+	public boolean inUnityThereIsStrength(Unit unit) {
+		if (order.getType() == SqaudOrderType.ATTACK && unit.getDistance(squadCenter) > squadRange - 100) {
+			boolean vultureNearChokepoint = false; 
+	        for (Chokepoint choke : BWTA.getChokepoints()) {
+	            if (choke.getCenter().getDistance(unit.getPosition()) < 64) {
+	            	vultureNearChokepoint = true;
+	                break;
+	            }
+	        }
+			
+	        if (vultureNearChokepoint) {
+	        	CommandUtil.move(unit, order.getPosition());
+	        	return true;
+	        } else {
+	        	CommandUtil.move(unit, squadCenter);
+	        	return true;
+	        }
+		}
+		return false;
 	}
 }

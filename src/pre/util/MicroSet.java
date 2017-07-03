@@ -3,11 +3,17 @@ package pre.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import pre.main.MyBotModule;
+import pre.manager.InformationManager;
 
 public class MicroSet {
+	
+	public static class Common {
+		public static final int ARRIVE_DECISION_RANGE = 100;
+	}
 	
 	public static class Network {
 		public static final int LATENCY = MyBotModule.Broodwar.getLatency();
@@ -16,6 +22,8 @@ public class MicroSet {
 	public static class Upgrade {
 		private static boolean vultureSpeedUpgrade = false;
 		private static boolean goliathAttkRangeUpgrade = false;
+		
+		private static boolean siegeModeUpgrade = false;
 		
 		public static double getUpgradeAdvantageAmount(UpgradeType upgrade) {
 			if (upgrade == UpgradeType.Ion_Thrusters) {
@@ -35,8 +43,20 @@ public class MicroSet {
 					return 3.0 * 24.0;
 				}
 			}
-			
 			return 0.0;
+		}
+		
+		public static boolean hasResearched(TechType tech) {
+			if (tech == TechType.Tank_Siege_Mode) {
+				if (siegeModeUpgrade) {
+					return true;
+				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Tank_Siege_Mode)) {
+					siegeModeUpgrade = true;
+					MyBotModule.Broodwar.sendText("Siege Mode Upgraded!");
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	
@@ -59,7 +79,7 @@ public class MicroSet {
 		static {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Marine, WIDE_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Vulture, WIDE_ANGLE);
-			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, WIDE_ANGLE);
+			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, NARROW_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Goliath, NARROW_ANGLE);
 		}
 	}

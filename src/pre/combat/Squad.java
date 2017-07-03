@@ -24,6 +24,7 @@ import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.manager.WorkerManager;
 import pre.util.CommandUtil;
+import pre.util.MicroUtils;
 
 public class Squad {
 	
@@ -93,6 +94,22 @@ public class Squad {
 			microWraith.regroup(regroupPosition);
 			microVessel.regroup(regroupPosition);
 		} else {
+			// * 공격스쿼드 : 탱크가 주력인 메카닉의 경우, 탱크 중심으로 squad지역을 설정해 유닛이 분산되지 않도록 한다.
+			// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
+			// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
+			if (order.getType() == SqaudOrderType.ATTACK) {
+				Position centerOfTanks = MicroUtils.centerOfUnits(microTank.getUnits());
+				int squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, microTank.getUnits().size());
+				
+				microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
+				microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			}
+			
 			microScv.execute(order);
 			microMarine.execute(order);
 			microVulture.execute(order);

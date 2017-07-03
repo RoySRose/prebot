@@ -58,6 +58,9 @@ public class InformationManager {
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
+	
+	/// 센터 진출로
+	private Map<Player, Position> readyToAttackPosition = new HashMap<Player, Position>();
 
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
@@ -386,6 +389,7 @@ public class InformationManager {
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(selfPlayer, chokepoint);
+						this.updateReadyToAttackPosition(selfPlayer, chokepoint);
 					}
 				}
 			}
@@ -421,12 +425,36 @@ public class InformationManager {
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(enemyPlayer, chokepoint);
+						this.updateReadyToAttackPosition(enemyPlayer, chokepoint);
 					}
 				}
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
 		}
 	}
+	
+	public void updateReadyToAttackPosition(Player player, Chokepoint chokepoint) {
+		int approachDist = 300;
+		
+		Position secondChokePosition = chokepoint.getCenter();
+		Position center = new Position(2048, 2048); // 128x128 맵의 센터
+
+		int x = center.getX() - secondChokePosition.getX();
+		int y = center.getY() - secondChokePosition.getY();
+	    double radian = Math.atan2(y, x);
+
+	    while (approachDist > 0) {
+		    Position approachVector = new Position((int)(approachDist * Math.cos(radian)), (int)(approachDist * Math.sin(radian)));
+		    Position position = new Position (secondChokePosition.getX() + approachVector.getX(), secondChokePosition.getY() + approachVector.getY());
+		    if (position.isValid() && BWTA.getRegion(position) != null
+		    		&& MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8)) {
+				readyToAttackPosition.put(player, position);
+				break;
+		    }
+		    approachDist += 10;
+	    }
+	}
+	
 
 	public void updateOccupiedRegions(Region region, Player player) {
 		// if the region is valid (flying buildings may be in null regions)
@@ -541,6 +569,11 @@ public class InformationManager {
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	public Chokepoint getSecondChokePoint(Player player) {
 		return secondChokePoint.get(player);
+	}
+	
+	/// 센터 진출로 포지션을 리턴한다. 헌터에서 썼다가 결과는 책임못진다. insaneojw
+	public Position getReadyToAttackPosition(Player player) {
+		return readyToAttackPosition.get(player);
 	}
 
 	/// 해당 UnitType 이 전투 유닛인지 리턴합니다

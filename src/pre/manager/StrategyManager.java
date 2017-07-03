@@ -492,11 +492,11 @@ public class StrategyManager {
 	}
 
 	public void executeCombat() {
-		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 5) {
-			CombatManager.Instance().setAggressive(true);
-		} else {
-			CombatManager.Instance().setAggressive(false);
-		}
+//		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 5) {
+//			CombatManager.Instance().setAggressive(true);
+//		} else {
+//			CombatManager.Instance().setAggressive(false);
+//		}
 	}
 
 	

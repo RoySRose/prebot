@@ -11,6 +11,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import bwta.Region;
 import pre.MapGrid;
 import pre.UnitInfo;
@@ -33,7 +34,11 @@ public class CombatManager {
 	private SquadData squadData = new SquadData();
 
 	private boolean initialized = false;
-	private boolean goAggressive = false; // TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
+	
+	// TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
+	public enum CombatStrategy { DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, READY_TO_ATTACK, ATTACK };
+	
+	private CombatStrategy combatStrategy;
 	
 	private static CombatManager instance = new CombatManager();
 	
@@ -44,16 +49,9 @@ public class CombatManager {
 	public static CombatManager Instance() {
 		return instance;
 	}
-	
-	public boolean getAggressive() {
-		return goAggressive;
-	}
-
-	public void setAggressive(boolean goAggressive) {
-		this.goAggressive = goAggressive;
-	}
 
 	public void initSquads() {
+		combatStrategy = CombatStrategy.DEFENCE_INSIDE;
 		
 		SquadOrder idleOrder = new SquadOrder(SqaudOrderType.IDLE, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 100, "Chill out");
 		squadData.putSquad(new Squad("Idle", idleOrder, IDLE_PRIORITY));
@@ -121,7 +119,8 @@ public class CombatManager {
 	}
 	
 	private Position getMainAttackLocation(Squad squad) {
-		if (!goAggressive) {
+		
+		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
 			// We are guaranteed to always have a main base location, even if it has been destroyed.
 			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
@@ -133,66 +132,83 @@ public class CombatManager {
 				}
 			}
 			return base.getPosition();
-		}
-
-	    // What stuff the squad can attack.
-		boolean canAttackAir = true;
-		boolean canAttackGround = true;
-		if (squad != null) {
-//			canAttackAir = squad.hasAntiAir();
-//			canAttackGround = squad.hasAntiGround();
-		}
-		
-		// First choice: Attack the enemy main unless we think it's empty.
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-		if (enemyBaseLocation != null) {
-			Position enemyBasePosition = enemyBaseLocation.getPosition();
-
-			if (!MyBotModule.Broodwar.isExplored(enemyBasePosition.toTilePosition())) {
-				return enemyBasePosition;
+			
+		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+			Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+			for (BaseLocation occupied : occupiedBases) {
+				if (occupied == firstExpansion) {
+					choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+					break;
+				}
 			}
+			return choke.getCenter();
+			
+		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
+			Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+			return readyToAttack;
+			
+		} else { //if (combatStrategy == CombatStrategy.ATTACK) { 
 
-			// get all known enemy units in the area
-			List<Unit> enemyUnitsInArea = new ArrayList<>();
-			MapGrid.Instance().getUnitsNear(enemyUnitsInArea, enemyBasePosition, 800, false, true);
+		    // What stuff the squad can attack.
+			boolean canAttackAir = true;
+			boolean canAttackGround = true;
+			if (squad != null) {
+//				canAttackAir = squad.hasAntiAir();
+//				canAttackGround = squad.hasAntiGround();
+			}
+			
+			// First choice: Attack the enemy main unless we think it's empty.
+			BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+			if (enemyBaseLocation != null) {
+				Position enemyBasePosition = enemyBaseLocation.getPosition();
 
-			for (Unit unit : enemyUnitsInArea) {
-				if (unit.getType() != UnitType.Zerg_Larva && (unit.isFlying() && canAttackAir || !unit.isFlying() && canAttackGround)) {
-					// Enemy base is not empty: Something interesting is in the enemy base area.
+				if (!MyBotModule.Broodwar.isExplored(enemyBasePosition.toTilePosition())) {
 					return enemyBasePosition;
 				}
-			}
-		}
-		
-		// Second choice: Attack known enemy buildings.
-		// We assume that a terran can lift the buildings; otherwise, the squad must be able to attack ground.
-		if (canAttackGround || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
-			Map<Integer, UnitInfo> unitAndUnitInfoMap = InformationManager.Instance().getUnitAndUnitInfoMap(MyBotModule.Broodwar.enemy());
-			for (Integer unitId : unitAndUnitInfoMap.keySet()) {
-				UnitInfo ui = unitAndUnitInfoMap.get(unitId);
 
-				if (ui.getType().isBuilding() && ui.getLastPosition() != Position.None) {
-					return ui.getLastPosition();
+				// get all known enemy units in the area
+				List<Unit> enemyUnitsInArea = new ArrayList<>();
+				MapGrid.Instance().getUnitsNear(enemyUnitsInArea, enemyBasePosition, 800, false, true);
+
+				for (Unit unit : enemyUnitsInArea) {
+					if (unit.getType() != UnitType.Zerg_Larva && (unit.isFlying() && canAttackAir || !unit.isFlying() && canAttackGround)) {
+						// Enemy base is not empty: Something interesting is in the enemy base area.
+						return enemyBasePosition;
+					}
 				}
 			}
-		}
+			
+			// Second choice: Attack known enemy buildings.
+			// We assume that a terran can lift the buildings; otherwise, the squad must be able to attack ground.
+			if (canAttackGround || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+				Map<Integer, UnitInfo> unitAndUnitInfoMap = InformationManager.Instance().getUnitAndUnitInfoMap(MyBotModule.Broodwar.enemy());
+				for (Integer unitId : unitAndUnitInfoMap.keySet()) {
+					UnitInfo ui = unitAndUnitInfoMap.get(unitId);
 
-		// Third choice: Attack visible enemy units.
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.getType() == UnitType.Zerg_Larva ||
-				!CommandUtil.IsValidUnit(unit) || !unit.isVisible()) {
-				continue;
+					if (ui.getType().isBuilding() && ui.getLastPosition() != Position.None) {
+						return ui.getLastPosition();
+					}
+				}
 			}
 
-			if (unit.isFlying() && canAttackAir || !unit.isFlying() && canAttackGround) {
-				return unit.getPosition();
-			}
-		}
+			// Third choice: Attack visible enemy units.
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				if (unit.getType() == UnitType.Zerg_Larva || !CommandUtil.IsValidUnit(unit) || !unit.isVisible()) {
+					continue;
+				}
 
-		// Fourth choice: We can't see anything so explore the map attacking along the way
-		return MapGrid.Instance().getLeastExplored();
+				if (unit.isFlying() && canAttackAir || !unit.isFlying() && canAttackGround) {
+					return unit.getPosition();
+				}
+			}
+
+			// Fourth choice: We can't see anything so explore the map attacking along the way
+			return MapGrid.Instance().getLeastExplored();
+		}
 	}
-	
+
 	private void updateIdleSquad() {
 		Squad squad = squadData.getSquad("Idle");
 		
@@ -392,26 +408,29 @@ public class CombatManager {
 	
 	private void updateAttackSquads() {
 	    Squad mainAttackSquad = squadData.getSquad("MainAttack");
-	    Squad flyingSquad = squadData.getSquad("Flying");
+//	    Squad flyingSquad = squadData.getSquad("Flying");
 
 		for (Unit unit : combatUnits) {
-			if (squadData.canAssignUnitToSquad(unit, flyingSquad)
-				  && unit.getType() == UnitType.Terran_Wraith
-				  || unit.getType() == UnitType.Terran_Valkyrie
-				  || unit.getType() == UnitType.Terran_Battlecruiser) {
-				squadData.assignUnitToSquad(unit, flyingSquad);
-			}
-	        else if (!unit.getType().isWorker() && squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
+//			if (squadData.canAssignUnitToSquad(unit, flyingSquad)
+//				  && unit.getType() == UnitType.Terran_Wraith
+//				  || unit.getType() == UnitType.Terran_Valkyrie
+//				  || unit.getType() == UnitType.Terran_Battlecruiser) {
+//				squadData.assignUnitToSquad(unit, flyingSquad);
+//			} else
+	        if (!unit.getType().isWorker() && squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
 				squadData.assignUnitToSquad(unit, mainAttackSquad);// 배슬, 드랍십도 포함됨
 	        }
 	    }
 
-	    SquadOrder mainAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
-	    mainAttackSquad.setOrder(mainAttackOrder);
+		if (mainAttackSquad.getOrder().getType() != SqaudOrderType.BATTLE) {
+			SquadOrder mainAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
+		    mainAttackSquad.setOrder(mainAttackOrder);
+		}
 
-	    SquadOrder flyingAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(flyingSquad), 800, "Attack enemy base");
-		flyingSquad.setOrder(flyingAttackOrder);
-		
+//		if (flyingSquad.getOrder().getType() != SqaudOrderType.BATTLE) {
+//		    SquadOrder flyingAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(flyingSquad), 800, "Attack enemy base");
+//			flyingSquad.setOrder(flyingAttackOrder);
+//		}
 	}
 	
 	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers) {
