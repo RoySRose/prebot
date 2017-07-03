@@ -146,12 +146,17 @@ public class WorkerManager {
 	private void updatework() {
 		
 		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		Unit overDepot = null;
-		Unit lessDepot = null;
+		/*
+		 * se-min.park
+		 * CC간 일꾼 재배 치 위해 체크 (CC당 일꾼수가 > 미네랄 * 2 일때 멀티 일꾼으로 지원 보냄(멀티 또한 미네랄 * 2 보다 작을 때) 
+		 */
+		Unit overDepot = null; //미네랄 * 2보다 많이 할당된 CC
+		Unit lessDepot = null; //미네랄 * 2보다 저게 할당된 CC
 		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots())
 		{
 			if (depot == null) continue;
-			int workerCnt = workerData.depotWorkerCount.get(depot.getID());
+//			int workerCnt = workerData.depotWorkerCount.get(depot.getID());
+			int workerCnt = workerData.getNumAssignedWorkers(depot);
 			List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
 			//System.out.println("workerCnt : " + workerCnt + " mineralPatches.size() : " + mineralPatches.size());
 			if(workerCnt > mineralPatches.size()*2){
@@ -184,12 +189,10 @@ public class WorkerManager {
 				if(overDepot != null && lessDepot != null){
 					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(overDepot);
 					for (Unit mineral : mineralPatches){
-						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
+//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
+						int workerCnt = workerData.getNumAssignedWorkers(overDepot);
 						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						if(sCvCnt == maxSCV && workerCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals()){
-							setMineralWorker(worker,lessDepot);
-							continue;
-						}
+						
 						if(maxSCV < sCvCnt){
 							maxSCV = sCvCnt;
 						}
@@ -198,6 +201,15 @@ public class WorkerManager {
 						}
 			        	//System.out.println("mineralPatches : " + mineralPatches.size());
 			        }
+					for (Unit mineral : mineralPatches){
+//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
+						int workerCnt = workerData.depotWorkerCount.get(overDepot);
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
+						if(sCvCnt == maxSCV && workerCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals()){
+							setMineralWorker(worker,lessDepot);
+							continue;
+						}
+					}
 					
 				}else{
 					Unit depot = workerData.getWorkerDepot(worker);
@@ -211,6 +223,10 @@ public class WorkerManager {
 						if(lowSCV > sCvCnt){
 							lowSCV = sCvCnt;
 						}
+			        	//System.out.println("mineralPatches : " + mineralPatches.size());
+			        }
+					for (Unit mineral : mineralPatches){
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
 						if(sCvCnt+2 <= maxSCV){
 							setMineralWorker(worker);
 							continue;
@@ -224,21 +240,21 @@ public class WorkerManager {
 				 * 일꾼 재배치 위한 로직 끝
 				 */
 				//int plangetmineral = workerData.workerMineralAssignment.get(worker.getID()).getID();
-				Unit temp = workerData.workerMineralAssignment.get(worker.getID());
+				Unit tempMineral = workerData.workerMineralAssignment.get(worker.getID());
 				
-				int plangetmineral = temp.getID();
+				int planGetMineral = tempMineral.getID();
 				
-				int realgetmineral = 0;
+				int realGetMineral = 0;
 				if(worker.getOrderTarget() != null){
-					realgetmineral = worker.getOrderTarget().getID();
+					realGetMineral = worker.getOrderTarget().getID();
 				}
 				if(worker.isCarryingMinerals() == true || worker.getOrderTarget()  == null){
 					continue;
 				}
-				if(plangetmineral != realgetmineral){
+				if(planGetMineral != realGetMineral){
 					//System.out.println(" realgetmineral:" + realgetmineral +"changing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					worker.gather(temp);
-					realgetmineral = worker.getOrderTarget().getID();
+					worker.gather(tempMineral);
+					realGetMineral = worker.getOrderTarget().getID();
 					//commandUtil.rightClick(worker, temp);
 				}
 				

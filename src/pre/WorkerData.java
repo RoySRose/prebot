@@ -200,25 +200,6 @@ public class WorkerData {
 	        workerMineralAssignment.put(unit.getID(), mineralToMine);
 	        addToMineralPatch(mineralToMine, 1);
 	        
-	        /*se-min.park
-	         * 2017.06.23
-	         * 미네랄이 채집중일경우 이동 명령 
-	         
-	       if(mineralToMine.isBeingGathered()){
-				System.out.println("unit ID : " +unit.getID() + " minerals.getID() : " + mineralToMine.getID() + "야 채집중이래" + "workerMineralAssignment.containsKey(unit.getID()) : " + workerMineralAssignment.containsKey(unit.getID()));
-				unit.move(mineralToMine.getPosition());
-				job = WorkerJob.Move;
-				workerJobMap.put(unit.getID(), job);
-				//setWorkerJob(unit, WorkerData.WorkerJob.Move, new WorkerMoveData(0,0, mineralToMine.getPosition()));
-			}
-			else{
-				System.out.println("unit ID : " +unit.getID() +" minerals.getID()"  + mineralToMine.getID() + "야 채집중아니래");
-				unit.move(mineralToMine.getPosition());
-				//commandUtil.rightClick(unit, mineralToMine);
-				job = WorkerJob.Move;
-				workerJobMap.put(unit.getID(), job);
-			}*/
-			// right click the mineral to start mining
 	        commandUtil.rightClick(unit, mineralToMine);
 		}
 		else if (job == WorkerJob.Gas)
