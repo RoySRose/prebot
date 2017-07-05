@@ -3,9 +3,12 @@ package pre.combat.micro;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.combat.SquadOrder.SqaudOrderType;
 import pre.main.MyBotModule;
@@ -26,7 +29,7 @@ public class MicroTank extends MicroManager {
 	private static final int SIEGE_MODE_MEDIAN_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().medianSplashRadius();
 	private static final int SIEGE_MODE_OUTER_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().outerSplashRadius();
 	
-	private static final int SIEGE_LINK_DISTANCE = 150;
+	private static final int SIEGE_LINK_DISTANCE = 300;
 	private static final int INITIATE_SIZE = 1;
 	
 	private int initiatedFrame = 0;
@@ -101,9 +104,9 @@ public class MicroTank extends MicroManager {
 					// (범위 밖의 적에 대해서 시즈를 푸는 것은 신중해야 한다.)
 					
 					// 자리를 잡았을 때, 시즈를 푸는 것은 위험하다. 
-					if (tank.getDistance(squadCenter) <= squadRange) {
-						return;
-					}
+//					if (tank.getDistance(squadCenter) <= squadRange) {
+//						return;
+//					}
 					
 					boolean targetIsFree = true; // target이 시즈포격에서 자유로운가
 					Unit closestTank = tank;
@@ -142,13 +145,23 @@ public class MicroTank extends MicroManager {
 				
 			} else { // ***** 탱크모드 *****
 				List<Unit> targetsInTankRange = MapGrid.Instance().getUnitsNear(tank.getPosition(), TANK_MODE_RANGE, false, true);
-				if (initiatedFrame == MyBotModule.Broodwar.getFrameCount() && tank.getDistance(squadCenter) <= squadRange) {
+				if (!MicroSet.Upgrade.hasResearched(TechType.Tank_Siege_Mode)) {
+					// 0. 시즈 개발이 안됐으면 퉁퉁
+					Unit target = null;
+					if (targetsInTankRange.isEmpty()) {
+						target = getTarget(tank, tankTargets, false);
+					} else {
+						target = getTarget(tank, targetsInTankRange, false);
+					}
+					MicroUtils.preciseKiting(tank, target, true, true, order.getPosition(), FleeAngle.NARROW_ANGLE);
+					
+				} else if (initiatedFrame == MyBotModule.Broodwar.getFrameCount() && tank.getDistance(squadCenter) <= squadRange) {
 					// 1. 이니시에이트
 					tank.siege();
 					
-				} else if (MicroSet.Upgrade.hasResearched(TechType.Tank_Siege_Mode) || !targetsInTankRange.isEmpty()) {
+				} else if (!targetsInTankRange.isEmpty()) {
 					// 2. 탱크모드로 때릴 적이 있다
-					Unit target = getTarget(tank, tankTargets, false);
+					Unit target = getTarget(tank, targetsInTankRange, false);
 					MicroUtils.preciseKiting(tank, target, true, true, order.getPosition(), FleeAngle.NARROW_ANGLE);
 					
 				} else {
@@ -200,19 +213,16 @@ public class MicroTank extends MicroManager {
 		if (tank.getDistance(order.getPosition()) <= squadRange) {
 			// 도착했다면 시즈모드
 			if (tank.canSiege()) {
-				int siegeCount = 0;
-				List<Unit> units = MapGrid.Instance().getUnitsNear(tank.getPosition(), SIEGE_LINK_DISTANCE, true, false);
-				for(Unit unit : units) {
-					if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-						siegeCount++;
+				Position positionToSiege = findPositionToSiege();
+				if (positionToSiege != null) {
+					if (tank.getDistance(positionToSiege) <= 50) {
+						tank.siege();
+					} else {
+						CommandUtil.attackMove(tank, positionToSiege);
 					}
 				}
-				
-				if (siegeCount > 2) {
-	            	CommandUtil.attackMove(tank, order.getPosition());
-				} else {
-					tank.siege();
-				}
+			} else {
+				// TODO 시즈 위치 조절
 			}
 		} else {
 			// 아직 도착하지 못했을때
@@ -222,6 +232,48 @@ public class MicroTank extends MicroManager {
             	CommandUtil.attackMove(tank, order.getPosition());
             }
 		}
+	}
+	
+	private Position findPositionToSiege() {
+		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
+		double radian = 0.0;
+		
+		int limit = 1;
+		int distance = 100;
+		
+		while (limit < 10) {
+			while (distance < squadRange) {
+				for (Integer angle : MicroSet.FleeAngle.EIGHT_360_ANGLE) {
+					double radianAdjust = MicroUtils.rotate(radian, angle);
+				    Position fleeVector = new Position((int)(distance * Math.cos(radianAdjust)), (int)(distance * Math.sin(radianAdjust)));
+				    int x = order.getPosition().getX() + fleeVector.getX();
+				    int y = order.getPosition().getY() + fleeVector.getY();
+				    
+				    Position movePosition = new Position(x, y);
+				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
+							&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
+				    	
+				    	if (choke.getCenter().getDistance(movePosition) >= 128) {
+				    		int siegeCount = 0;
+					    	List<Unit> units = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false);
+							for (Unit unit : units) {
+					    		if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+					    			siegeCount++;
+					    		}
+					    	}
+							if (siegeCount <= limit) {
+								return movePosition;
+							} 
+				    	}
+				    }
+				}
+				distance += 100;
+			}
+			limit++;
+		}
+		
+		MyBotModule.Broodwar.sendText("findPositionToSiege is null");
+		return null;
 	}
 	
 	

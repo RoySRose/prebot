@@ -34,7 +34,9 @@ public class MicroVulture extends MicroManager {
 		}
 
 		for (Unit vulture : vultures) {
-			if (inUnityThereIsStrength(vulture)) {
+			if (awayFromChokePoint(vulture)) {
+				continue;
+			} else if (inUnityThereIsStrength(vulture)) {
 				continue;
 			}
 			
