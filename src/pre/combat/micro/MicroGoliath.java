@@ -18,7 +18,9 @@ public class MicroGoliath extends MicroManager {
 		List<Unit> goliathTargets = MicroUtils.filterTargets(targets, true);
 		
 		for (Unit goliath : goliaths) {
-			if (inUnityThereIsStrength(goliath)) {
+			if (awayFromChokePoint(goliath)) {
+				continue;
+			} else if (inUnityThereIsStrength(goliath)) {
 				continue;
 			}
 			

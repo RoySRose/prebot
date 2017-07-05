@@ -48,7 +48,7 @@ public abstract class MicroManager {
 		MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 
 		// For attack but not defense, also include enemies near our units.
-		if (order.getType() == SqaudOrderType.ATTACK) {
+		if (order.getType() == SqaudOrderType.ATTACK || order.getType() == SqaudOrderType.BATTLE) {
 			for (Unit unit : units) {
 				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange(), false, true);
 			}
@@ -81,24 +81,46 @@ public abstract class MicroManager {
 		this.squadRange = squadRange;
 	}
 	
-	public boolean inUnityThereIsStrength(Unit unit) {
-		if (order.getType() == SqaudOrderType.ATTACK && unit.getDistance(squadCenter) > squadRange - 100) {
-			boolean vultureNearChokepoint = false; 
-	        for (Chokepoint choke : BWTA.getChokepoints()) {
-	            if (choke.getCenter().getDistance(unit.getPosition()) < 64) {
-	            	vultureNearChokepoint = true;
-	                break;
-	            }
-	        }
-			
-	        if (vultureNearChokepoint) {
-	        	CommandUtil.move(unit, order.getPosition());
-	        	return true;
-	        } else {
-	        	CommandUtil.move(unit, squadCenter);
-	        	return true;
-	        }
+	public boolean awayFromChokePoint(Unit unit) {
+		if (order.getType() == SqaudOrderType.BATTLE) {
+			return false;
 		}
+		
+		boolean nearChokepoint = false;
+		boolean nearChokePointIsOrderPosition = false;
+        for (Chokepoint choke : BWTA.getChokepoints()) {
+            if (choke.getCenter().getDistance(unit.getPosition()) < 64) {
+            	nearChokepoint = true;
+                if (choke.getDistance(order.getPosition()) < 64) {
+                	nearChokePointIsOrderPosition = true;
+                }
+                break;
+            }
+        }
+		
+        if (nearChokepoint) {
+        	if (nearChokePointIsOrderPosition) {
+        		CommandUtil.move(unit, BWTA.getRegion(order.getPosition()).getCenter());
+        	} else {
+	        	CommandUtil.move(unit, order.getPosition());
+        	}
+        	return true;
+        }
+        
+        return false;
+	}
+	
+	public boolean inUnityThereIsStrength(Unit unit) {
+		if (order.getType() != SqaudOrderType.ATTACK) {
+			return false;
+		}
+		
+		if (unit.getDistance(squadCenter) > squadRange - 100) {
+        	CommandUtil.move(unit, squadCenter);
+        	return true;
+		}
+		
 		return false;
 	}
+	
 }

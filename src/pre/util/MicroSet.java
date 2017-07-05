@@ -75,6 +75,7 @@ public class MicroSet {
 		public static final Map<UnitType, Integer[]> FLEE_ANGLE_MAP = new HashMap<>();
 		public static final Integer[] NARROW_ANGLE = { -5, +5, -10, +10, -15, +15 };
 		public static final Integer[] WIDE_ANGLE = { -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
+		public static final Integer[] EIGHT_360_ANGLE = {45, 90, 135, 180, 225, 270, 315, 360};
 		
 		static {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Marine, WIDE_ANGLE);

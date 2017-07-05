@@ -229,10 +229,12 @@ public class MicroUtils {
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
 		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
-		    	moveCalcSize /= 2;
+		    	moveCalcSize = moveCalcSize * 2 / 3;
 		    	
-		    	if (moveCalcSize < 0 && FLEE_ANGLE.equals(FleeAngle.NARROW_ANGLE)) { // 회피지역이 없을 경우 2) 각 범위를 넓힘
+		    	if (moveCalcSize <= 10 && FLEE_ANGLE.equals(FleeAngle.NARROW_ANGLE)) { // 회피지역이 없을 경우 2) 각 범위를 넓힘
+			    	MyBotModule.Broodwar.sendText("wider angle");
 					FLEE_ANGLE = FleeAngle.WIDE_ANGLE;
+					unitedKiting = false;
 					moveCalcSize = moveDistPerSec;
 				}
 			}
@@ -297,7 +299,7 @@ public class MicroUtils {
 	// 공식: radian = (π / 180) * 각도 
 	// -> 각도 = (radian * 180) / π
 	// -> 회원 radian = (π / 180) * ((radian * 180) / π + 회전각)
-	private static double rotate(double radian, int angle) { 
+	public static double rotate(double radian, int angle) { 
 		double rotatedRadian = (Math.PI / 180) * ((radian * 180 / Math.PI) + angle);
 		return rotatedRadian;
 	}

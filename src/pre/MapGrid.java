@@ -289,10 +289,6 @@ public class MapGrid {
 				if (!units.contains(u)) {
 					units.add(u);
 				}
-			} else {
-				if (!units.contains(u)) {
-					units.add(u);
-				}
 			}
 		}
 		return units;
