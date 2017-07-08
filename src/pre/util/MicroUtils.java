@@ -106,16 +106,9 @@ public class MicroUtils {
 	}
 	
 	/**
-	 * 
 	 * rangeUnit은 target에 대한 카이팅을 한다.
-	 * 
-	 * @param rangedUnit
-	 * @param target
-	 * @param cooltimeAlwaysAttack : true인 경우 쿨타임이 돌아왔을 때 항상 공격을 한다. 벌처, 레이스등의 견제의 경우 이 값을 true로 하면 안된다.
-	 * @param unitedKiting : 회피지역의 risk를 계산시, united값이 true인 경우 자신의 유닛 분포상태를 안전한 지역으로 판단할지 결정한다.(해당값이 false이면 흩어지는 kiting을 한다.)
-	 * @param goalPosition : 목표지점. 회피지점을 결정할때 risk가 같으면 목표지점을 고려한다.
 	 */
-	public static void preciseKiting(Unit rangedUnit, Unit target, boolean cooltimeAlwaysAttack, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
+	public static void preciseKiting(Unit rangedUnit, Unit target, KitingOption kitingOption) {
 		// 유닛 유효성 검사
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
@@ -140,7 +133,8 @@ public class MicroUtils {
 			CommandUtil.attackUnit(rangedUnit, target);
 			
 		} else {
-			double distanceToAttack = rangedUnit.getDistance(target) - (rangedUnitWeapon.maxRange() + weaponUpgradeRange); // 거리(pixel)
+			double distanceToTarget = rangedUnit.getDistance(target);
+			double distanceToAttack = distanceToTarget - (rangedUnitWeapon.maxRange() + weaponUpgradeRange); // 거리(pixel)
 			int timeToCatch = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
 			
 			// 명령에 대한 지연시간(latency)을 더한다.
@@ -157,7 +151,19 @@ public class MicroUtils {
 			//  - 타깃이 건물일 경우
 			// 2. 회피
 			//  - getFleePosition을 통해 최적의 회피지역을 선정하여 이동한다.
-			if (target.getType().isBuilding() || currentCooldown <= timeToCatch || (!survivalInstinct && cooltimeAlwaysAttack && currentCooldown == 0)) {
+			//  - watcher인 경우는 안전하게 회피
+			boolean haveToAttack = false;
+			if (kitingOption.getSpecialSquadType() > 0 && distanceToTarget <= targetWeapon.maxRange() + target.getType().topSpeed() * 36) { // watcer 안전거리확보 : target.getType().topSpeed() * 36 (적이 1.5초 이동거리)
+				haveToAttack = false;
+			} else if (target.getType().isBuilding()) {
+				haveToAttack = true;
+			} else if (currentCooldown <= timeToCatch) {
+				haveToAttack = true;
+			} else if (!survivalInstinct && kitingOption.isCooltimeAlwaysAttack() && currentCooldown == 0) {
+				haveToAttack = true;
+			}
+			
+			if (haveToAttack) {
 				// TODO P컨이 잘안되어 사용하지 않는다.
 //			    double rad = Math.atan2(vulture.getPosition().getY() - target.getPosition().getY()
 //			    		, vulture.getPosition().getX() - target.getPosition().getX());
@@ -167,6 +173,7 @@ public class MicroUtils {
 //				Position pConPos = new Position(pConX, pConY);
 //				CommandUtil.patrolMove(vulture, pConPos);
 				CommandUtil.attackUnit(rangedUnit, target);
+				
 			} else {
 				double rangedUnitSpeed = rangedUnit.getType().topSpeed() * 24.0; // 1초(24frame)에 몇 pixel가는지
 				if (rangedUnit.getType() == UnitType.Terran_Vulture) {
@@ -174,7 +181,14 @@ public class MicroUtils {
 				}
 				
 				// 회피지역을 선정한다.
-				Position fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, (survivalInstinct? false : unitedKiting), goalPosition, fleeAngle);
+				Position fleePosition = null;
+				if (kitingOption.getSpecialSquadType() == 1) { // watcher는 본진방향으로 후퇴한다.
+					fleePosition = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition();
+				} else {
+					fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, (survivalInstinct? false : kitingOption.isUnitedKiting())
+							, kitingOption.getGoalPosition(), kitingOption.getFleeAngle());
+				}
+				
 				CommandUtil.rightClick(rangedUnit, fleePosition);
 			}
 		}
@@ -245,7 +259,6 @@ public class MicroUtils {
 		
 	    return safePosition;
 	}
-	
 	
 	/**
 	 * 회피지점의 위험도
@@ -429,6 +442,28 @@ public class MicroUtils {
 			arriveDecisionRange += Math.log(numOfUnits) * 25;
 		}
 		return arriveDecisionRange;
+	}
+	
+	public static Position randomPosition(Position sourcePosition, int dist) {
+		int x = sourcePosition.getX() + (int) (Math.random() * dist) - dist / 2;
+		int y = sourcePosition.getY() + (int) (Math.random() * dist) - dist / 2;
+		Position destPosition = new Position(x, y);
+		return destPosition;
+	}
+	
+	
+	public static Unit leaderOfUnit(List<Unit> units, Position goalPosition) {
+		Unit leader = null;
+		int minimumDistance = 999999;
+		for (Unit unit : units) {
+			int dist = unit.getDistance(goalPosition);
+			if (dist < minimumDistance) {
+				leader = unit;
+				minimumDistance = dist;
+			}
+		}
+		return leader;
+		
 	}
 	
 	// weapon.damageType() bwapi 오류발생하여 구현함.

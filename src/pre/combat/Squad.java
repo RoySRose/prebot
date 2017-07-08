@@ -12,7 +12,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import pre.UnitData;
 import pre.UnitInfo;
-import pre.combat.SquadOrder.SqaudOrderType;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.combat.micro.MicroGoliath;
 import pre.combat.micro.MicroMarine;
 import pre.combat.micro.MicroScv;
@@ -98,28 +98,25 @@ public class Squad {
 			// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
 			// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
 			
-			List<Unit> units = microTank.getUnits();
-			if (order.getType() == SqaudOrderType.ATTACK) {
+			List<Unit> tanks = microTank.getUnits();
 				
-				Position centerOfTanks = null;
-				int squadAreaRange = 0;
-				if (units.isEmpty()) {
-					centerOfTanks = MicroUtils.centerOfUnits(unitSet);
-					squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
-					
-				} else {
-					centerOfTanks = MicroUtils.centerOfUnits(microTank.getUnits());
-					squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, microTank.getUnits().size());
-				}
+			Position centerOfTanks = null;
+			int squadAreaRange = 0;
+			if (!tanks.isEmpty()) {
+				centerOfTanks = MicroUtils.centerOfUnits(tanks);
+				squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 				
-				microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
-				microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			} else {
+				centerOfTanks = MicroUtils.centerOfUnits(unitSet);
+				squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 			}
+			microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
+			microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
 			
 			microScv.execute(order);
 			microMarine.execute(order);
@@ -246,7 +243,7 @@ public class Squad {
 			return false;
 		}
 
-		if (order.getType() != SqaudOrderType.ATTACK) {
+		if (order.getType() != SquadOrderType.ATTACK) {
 			return false;
 		}
 

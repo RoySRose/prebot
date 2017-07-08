@@ -9,7 +9,7 @@ import bwta.BWTA;
 import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.combat.SquadOrder;
-import pre.combat.SquadOrder.SqaudOrderType;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.util.CommandUtil;
 
 public abstract class MicroManager {
@@ -42,13 +42,12 @@ public abstract class MicroManager {
 			return;
 		}
 
-		// Discover enemies within region of interest.
 		List<Unit> nearbyEnemies = new ArrayList<>();
-		
 		MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 
-		// For attack but not defense, also include enemies near our units.
-		if (order.getType() == SqaudOrderType.ATTACK || order.getType() == SqaudOrderType.BATTLE) {
+		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
+		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.BATTLE || order.getType() == SquadOrderType.WATCH
+				|| order.getType() == SquadOrderType.CHECK_INACTIVE || order.getType() == SquadOrderType.CHECK_ACTIVE) {
 			for (Unit unit : units) {
 				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange(), false, true);
 			}
@@ -82,9 +81,6 @@ public abstract class MicroManager {
 	}
 	
 	public boolean awayFromChokePoint(Unit unit) {
-		if (order.getType() == SqaudOrderType.BATTLE) {
-			return false;
-		}
 		
 		boolean nearChokepoint = false;
 		boolean nearChokePointIsOrderPosition = false;
@@ -111,9 +107,6 @@ public abstract class MicroManager {
 	}
 	
 	public boolean inUnityThereIsStrength(Unit unit) {
-		if (order.getType() != SqaudOrderType.ATTACK) {
-			return false;
-		}
 		
 		if (unit.getDistance(squadCenter) > squadRange - 100) {
         	CommandUtil.move(unit, squadCenter);
