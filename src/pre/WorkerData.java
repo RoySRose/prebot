@@ -26,7 +26,11 @@ public class WorkerData {
 		Repair,			///< 수리. Terran_SCV 만 가능
 		Move,			///< 이동
 		Scout, 			///< 정찰. Move와 다름. Mineral / Gas / Build 등의 다른 임무로 차출되지 않게 됨. 
-		Default 		///< 기본. 미설정 상태. 
+		Default, 		///< 기본. 미설정 상태.
+		NongBongM,	///< 농봉 미네랄 붙어있는 상태
+		NongBongG,	///< 농봉 가스 붙어있는 상태
+		NongBongGS,	///< 농봉 가스(shift) 붙어있는 상태
+		NongBongAT	///< 농봉 공격중 상태
 	};
 	
 	/// 일꾼 목록
@@ -324,6 +328,45 @@ public class WorkerData {
 		for (Unit unit : workers)
 		{
 			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.Minerals)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+	
+	public final int getNumNongBongMWorkers()
+	{
+		int num = 0;
+		for (Unit unit : workers)
+		{
+			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.NongBongM)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+	
+	public final int getNumNongBongGWorkers()
+	{
+		int num = 0;
+		for (Unit unit : workers)
+		{
+			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.NongBongG)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+	
+	public final int getNumNongBongGSWorkers()
+	{
+		int num = 0;
+		for (Unit unit : workers)
+		{
+			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.NongBongGS)
 			{
 				num++;
 			}
