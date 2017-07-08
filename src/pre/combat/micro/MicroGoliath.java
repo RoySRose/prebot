@@ -2,8 +2,11 @@ package pre.combat.micro;
 
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.util.CommandUtil;
+import pre.util.KitingOption;
 import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
 import pre.util.TargetPriority;
@@ -17,21 +20,32 @@ public class MicroGoliath extends MicroManager {
 	    List<Unit> goliaths = getUnits();
 		List<Unit> goliathTargets = MicroUtils.filterTargets(targets, true);
 		
+		KitingOption kitingOption = new KitingOption();
+		kitingOption.setCooltimeAlwaysAttack(true);
+		kitingOption.setUnitedKiting(true);
+		kitingOption.setGoalPosition(order.getPosition());
+		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+		
 		for (Unit goliath : goliaths) {
-			if (awayFromChokePoint(goliath)) {
+			if (order.getType() != SquadOrderType.BATTLE && awayFromChokePoint(goliath)) {
 				continue;
-			} else if (inUnityThereIsStrength(goliath)) {
+			}
+			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(goliath)) {
 				continue;
 			}
 			
 			Unit target = getTarget(goliath, goliathTargets);
 			if (target != null) {
-//				MicroUtils.preciseKiting(goliath, target, false, false, order.getPosition());
-				MicroUtils.preciseKiting(goliath, target, true, true, order.getPosition(), FleeAngle.NARROW_ANGLE);
+				MicroUtils.preciseKiting(goliath, target, kitingOption);
 			} else {
 				// if we're not near the order position, go there
 				if (goliath.getDistance(order.getPosition()) > squadRange) {
 					CommandUtil.attackMove(goliath, order.getPosition());
+				} else {
+					if (goliath.isIdle()) {
+						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), squadRange);
+						CommandUtil.attackMove(goliath, randomPosition);
+					}
 				}
 			}
 		}

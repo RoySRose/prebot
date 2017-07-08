@@ -5,26 +5,26 @@ import bwapi.Position;
 public class SquadOrder {
 	
 	// ATTACK <-> BATTLE 스위칭 관계, 전투중인 경우 상태가 BATTLE로 바뀐다.
-	public enum SqaudOrderType {
-		NONE, IDLE, ATTACK, BATTLE, DEFEND, HOLD
+	public enum SquadOrderType {
+		NONE, IDLE, WATCH, CHECK_INACTIVE, CHECK_ACTIVE, ATTACK, BATTLE, DEFEND, HOLD
 	}
 	
-	private SqaudOrderType type;
+	private SquadOrderType type;
 	private Position position;
 	private int radius;
 	private String status;
 	
-	public SquadOrder(SqaudOrderType type, Position position, int radius, String status) {
+	public SquadOrder(SquadOrderType type, Position position, int radius, String status) {
 		this.type = type;
 		this.position = position;
 		this.radius = radius;
 		this.status = status;
 	}
 	
-	public SqaudOrderType getType() {
+	public SquadOrderType getType() {
 		return type;
 	}
-	public void setType(SqaudOrderType type) {
+	public void setType(SquadOrderType type) {
 		this.type = type;
 	}
 	public Position getPosition() {
@@ -47,10 +47,13 @@ public class SquadOrder {
 	}
 
 	public boolean isCombatOrder() {
-		return type == SqaudOrderType.ATTACK ||
-			   type == SqaudOrderType.BATTLE ||
-			   type == SqaudOrderType.DEFEND ||
-			   type == SqaudOrderType.HOLD;
+		return type == SquadOrderType.ATTACK ||
+			   type == SquadOrderType.BATTLE ||
+			   type == SquadOrderType.WATCH ||
+			   type == SquadOrderType.CHECK_INACTIVE ||
+			   type == SquadOrderType.CHECK_ACTIVE ||
+			   type == SquadOrderType.DEFEND ||
+			   type == SquadOrderType.HOLD;
 	}
 
 	@Override

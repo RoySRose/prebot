@@ -8,6 +8,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import pre.util.CommandUtil;
+import pre.util.KitingOption;
 import pre.util.MicroUtils;
 import pre.util.MicroSet.FleeAngle;
 
@@ -27,17 +28,20 @@ public class MicroMarine extends MicroManager {
 				rangedUnitTargets.add(target);
 			}
 		}
+		
+		KitingOption kitingOption = new KitingOption();
+		kitingOption.setCooltimeAlwaysAttack(true);
+		kitingOption.setUnitedKiting(true);
+		kitingOption.setGoalPosition(order.getPosition());
+		kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
 
 		boolean kiteWithRangedUnits = true;
 		for (Unit rangedUnit : rangedUnits) {
 			Unit target = getTarget(rangedUnit, rangedUnitTargets);
 			if (target != null) {
 				if (kiteWithRangedUnits) {
-					if (rangedUnit.getType() == UnitType.Terran_Vulture) {
-						MicroUtils.preciseKiting(rangedUnit, target, false, true, order.getPosition(), FleeAngle.WIDE_ANGLE);
-					} else {
-						MicroUtils.preciseKiting(rangedUnit, target, true, true, order.getPosition(), FleeAngle.WIDE_ANGLE);
-					}
+					MicroUtils.preciseKiting(rangedUnit, target, kitingOption);
+					
 				} else {
 					CommandUtil.attackUnit(rangedUnit, target);
 				}

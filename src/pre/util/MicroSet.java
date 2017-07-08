@@ -6,6 +6,7 @@ import java.util.Map;
 import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
+import pre.combat.SpiderMineManger;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 
@@ -24,6 +25,7 @@ public class MicroSet {
 		private static boolean goliathAttkRangeUpgrade = false;
 		
 		private static boolean siegeModeUpgrade = false;
+		private static boolean spiderMineUpgrade = false;
 		
 		public static double getUpgradeAdvantageAmount(UpgradeType upgrade) {
 			if (upgrade == UpgradeType.Ion_Thrusters) {
@@ -55,6 +57,16 @@ public class MicroSet {
 					MyBotModule.Broodwar.sendText("Siege Mode Upgraded!");
 					return true;
 				}
+			} else if (tech == TechType.Spider_Mines) {
+				if (spiderMineUpgrade) {
+					return true;
+				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Spider_Mines)) {
+					SpiderMineManger.Instance().setGoodPosition();
+					
+					spiderMineUpgrade = true;
+					MyBotModule.Broodwar.sendText("Spider Mines Upgraded!");
+					return true;
+				} 
 			}
 			return false;
 		}

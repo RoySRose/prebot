@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BWTA;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
@@ -275,18 +276,18 @@ public class MapGrid {
 //		}
 	}
 	
-	public List<Unit> getUnitsNear(Position position, int radius, boolean ourUnits, boolean oppUnits)
+	public List<Unit> getUnitsNear(Position position, int radius, boolean ourUnits, boolean oppUnits, UnitType unitType)
 	{
 		List<Unit> units = new ArrayList<>();
 		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
 		for (Unit u : unitsInRadius) {
 			if (ourUnits && u.getPlayer() == InformationManager.Instance().selfPlayer) {
-				if (!units.contains(u)) {
+				if ((unitType == null || u.getType() == unitType) && !units.contains(u)) {
 					units.add(u);
 				}
 				
 			} else if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
-				if (!units.contains(u)) {
+				if ((unitType == null || u.getType() == unitType) && !units.contains(u)) {
 					units.add(u);
 				}
 			}

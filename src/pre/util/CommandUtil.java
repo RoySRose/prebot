@@ -1,5 +1,6 @@
 package pre.util;
 import bwapi.Position;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
@@ -150,7 +151,7 @@ public class CommandUtil {
 		}
 
 		// if we have issued a command to this unit already this frame, ignore this one
-		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount())
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) // unit.isAttackFrame()이 너무 길어서 hit and run이 안되어 주석으로 제거
 		{
 			return;
 		}
@@ -192,6 +193,31 @@ public class CommandUtil {
 
 		// if nothing prevents it, attack the target
 		unit.repair(target);
+	}
+	
+	public static void useTechPosition(Unit unit, TechType tech, Position position)
+	{
+		if (unit == null || tech == null || position == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || unit.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Use_Tech_Position) && (currentCommand.getTargetPosition().equals(position)))
+		{
+			return;
+		}
+
+		unit.useTech(tech, position);
 	}
 
 	public static boolean IsCombatUnit(Unit unit)
