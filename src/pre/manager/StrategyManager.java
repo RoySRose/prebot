@@ -111,8 +111,8 @@ public class StrategyManager {
 	public StrategyManager() {
 		
 		isInitialBuildOrderFinished = false;
-		CurrentStrategyBasic = Strategys.valueOf("zergBasic");
-		CurrentStrategyException = StrategysException.valueOf("Temp");
+		CurrentStrategyBasic = Strategys.zergBasic;
+		CurrentStrategyException = StrategysException.Init;
 	}
 	
 	public void setCurrentStrategyBasic(Strategys strategy) {
