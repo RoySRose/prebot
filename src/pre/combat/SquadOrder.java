@@ -6,7 +6,8 @@ public class SquadOrder {
 	
 	// ATTACK <-> BATTLE 스위칭 관계, 전투중인 경우 상태가 BATTLE로 바뀐다.
 	public enum SquadOrderType {
-		NONE, IDLE, WATCH, CHECK_INACTIVE, CHECK_ACTIVE, ATTACK, BATTLE, DEFEND, HOLD
+		NONE, IDLE, WATCH, ATTACK, BATTLE, DEFEND, HOLD,
+		CHECK_INACTIVE, CHECK_ACTIVE, CHECK_ARRIVE
 	}
 	
 	private SquadOrderType type;
@@ -47,18 +48,11 @@ public class SquadOrder {
 	}
 
 	public boolean isCombatOrder() {
-		return type == SquadOrderType.ATTACK ||
-			   type == SquadOrderType.BATTLE ||
-			   type == SquadOrderType.WATCH ||
-			   type == SquadOrderType.CHECK_INACTIVE ||
-			   type == SquadOrderType.CHECK_ACTIVE ||
-			   type == SquadOrderType.DEFEND ||
-			   type == SquadOrderType.HOLD;
+		return type != SquadOrderType.NONE && type != SquadOrderType.IDLE;
 	}
 
 	@Override
 	public String toString() {
-		return "SquadOrder [type=" + type + ", position=" + position + ", radius=" + radius + ", status=" + status
-				+ "]";
+		return "SquadOrder [type=" + type + ", position=" + position + ", radius=" + radius + ", status=" + status + "]";
 	}
 }

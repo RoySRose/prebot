@@ -6,11 +6,16 @@ import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Region;
 import pre.MapGrid;
 import pre.combat.SpiderMineManger;
 import pre.combat.SquadOrder.SquadOrderType;
+import pre.manager.InformationManager;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
+import pre.util.MicroSet;
 import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
 import pre.util.TargetPriority;
@@ -25,13 +30,12 @@ public class MicroVulture extends MicroManager {
 		KitingOption kitingOption = new KitingOption();
 		kitingOption.setGoalPosition(order.getPosition());
 		
-		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.BATTLE
-				|| order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
+		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.BATTLE || order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
 			kitingOption.setCooltimeAlwaysAttack(true);
 			kitingOption.setUnitedKiting(true);
 			kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 			
-		} else if (order.getType() == SquadOrderType.WATCH) { // 회피가 아주 좋은 설정(상대병력 감시용 - watcher)
+		} else if (order.getType() == SquadOrderType.WATCH) { // 회피가 아주 좋은 설정(상대병력 감시용 - watcher : 회피를 자신의 base로 한다)
 			kitingOption.setCooltimeAlwaysAttack(false);
 			kitingOption.setUnitedKiting(false);
 			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
@@ -49,12 +53,6 @@ public class MicroVulture extends MicroManager {
 			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
 		}
 
-//		Unit leader = MicroUtils.leaderOfUnit(vultures, order.getPosition());
-//		if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
-//			for (Unit vulture : vultures) {
-//			}
-//		}
-
 		for (Unit vulture : vultures) {
 			if (order.getType() == SquadOrderType.BATTLE && awayFromChokePoint(vulture)) {
 				continue;
@@ -63,7 +61,7 @@ public class MicroVulture extends MicroManager {
 				continue;
 			}
 			Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
-			if (positionToMine != null) { // 심기로 한 마인은 심어야지
+			if (positionToMine != null) { // 마인매설
 				CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
 				continue;
 			}
@@ -73,18 +71,37 @@ public class MicroVulture extends MicroManager {
 				MicroUtils.preciseKiting(vulture, target, kitingOption);
 				
 			} else {
+				if (order.getType() == SquadOrderType.WATCH) {
+					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
+					if (position == null) {
+						BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+						Region baseRegion = BWTA.getRegion(base.getPosition());
+						Region vultureRegion = BWTA.getRegion(vulture.getPosition());
+						
+						if (baseRegion != vultureRegion) {
+							position = SpiderMineManger.Instance().getPositionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.mineNumPerPosition);
+						}
+					}
+					if (position != null) {
+						continue;
+					}
+					
+				} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
+					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
+					if (position != null) {
+						continue;
+					}
+				}
+				
 				if (vulture.getDistance(order.getPosition()) > squadRange) {
-					positionToMine = null;
-					if (order.getType() == SquadOrderType.WATCH || order.getType() == SquadOrderType.CHECK_ACTIVE) {
-						positionToMine = SpiderMineManger.Instance().getPositionToMine(vulture);
+					CommandUtil.attackMove(vulture, order.getPosition());
+					
+				} else { // 목적지 도착
+					if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
+						order.setType(SquadOrderType.CHECK_ARRIVE); // CombatManager에 목적지에 도착한걸 알려주기 위함
 					}
-					if (positionToMine != null) {
-						CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
-					} else {
-						CommandUtil.attackMove(vulture, order.getPosition());
-					}
-				} else {
-					if (vulture.isIdle()) {
+					
+					if (vulture.isIdle() || vulture.isBraking()) {
 						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange);
 						CommandUtil.attackMove(vulture, randomPosition);
 					}

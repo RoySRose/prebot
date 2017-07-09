@@ -67,11 +67,12 @@ public abstract class MicroManager {
 			// A unit whose retreat path is blocked by enemies should do something else, at least attack-move.
 //			if (unitDistanceFromBase > regroupDistanceFromBase) {
 //	            UnitUtils.move(unit, ourBasePosition); } else
-	        if (unit.getDistance(regroupPosition) > 96) {
-				CommandUtil.move(unit, regroupPosition);
-			} else {
-				CommandUtil.attackMove(unit, unit.getPosition());
-			}
+//	        if (unit.getDistance(regroupPosition) > 96) {
+//				CommandUtil.move(unit, regroupPosition);
+//			} else {
+//				CommandUtil.attackMove(unit, unit.getPosition());
+//			}
+	        CommandUtil.attackMove(unit, squadCenter);
 		}
 	}
 	

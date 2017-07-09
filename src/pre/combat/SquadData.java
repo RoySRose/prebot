@@ -73,8 +73,14 @@ public class SquadData {
 	public void printSquadInfo() {
 		for (String squadName : squads.keySet()) {
 			Squad squad = squads.get(squadName);
-			System.out.println("[" + squad.getName() + "]\nSIZE: " + squad.getUnitSet().size() + "\nORDER: " + squad.getOrder());
+			System.out.println("[" + squad.getName() + "] SIZE: " + squad.getUnitSet().size() + "\nORDER: " + squad.getOrder());
 		}
 		System.out.println();
 	}
+
+	@Override
+	public String toString() {
+		return "SquadData [squads=" + squads + "]";
+	}
+	
 }

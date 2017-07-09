@@ -1,6 +1,7 @@
 package pre.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import pre.combat.VultureTravelManager;
 import pre.combat.SquadOrder.SquadOrderType;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
+import pre.util.MicroSet;
 import pre.util.MicroUtils;
 
 public class CombatManager {
@@ -110,9 +112,9 @@ public class CombatManager {
 			doComsatScan();
 		}
 		
-		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
-			squadData.printSquadInfo();
-		}
+//		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
+//			squadData.printSquadInfo();
+//		}
 		
 		squadData.update();
 	}
@@ -527,24 +529,54 @@ public class CombatManager {
 
 		return closestDefender;
 	}
-
-
-    int watcherMaxNum = 1; // TODO 변동 숫자 
-	char checkerIdx = 'A'; // TODO 이거 수정필요
-	int maxCheckerSquadNum = 1; // TODO 변동 숫자 
-	int checkcerMaxNum = 1; // TODO 변동 숫자 
 	
 	private void updateWatcherSquad() {
 	    Squad watcherSquad = squadData.getSquad("Watcher");
 
 		if (combatStrategy != CombatStrategy.ATTACK_ENEMY) {
+			
+			Map<Integer, List<Unit>> vutureMapBySpiderMine = new HashMap<>();
 			for (Unit unit : combatUnits) {
 		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, watcherSquad)) {
-					if (watcherSquad.getUnitSet().size() < watcherMaxNum) {
-						squadData.assignUnitToSquad(unit, watcherSquad);
+		        	int spiderMineCount = unit.getSpiderMineCount();
+		        	List<Unit> vultureList = vutureMapBySpiderMine.get(spiderMineCount);
+		        	if (vultureList == null) {
+		        		vultureList = new ArrayList<>();
 		        	}
+		        	vultureList.add(unit);
+		        	vutureMapBySpiderMine.put(spiderMineCount, vultureList);
 		        }
 		    }
+			
+			if (watcherSquad.getUnitSet().size() > 0) {
+				boolean clearSquad = true;
+				for (Unit unit : watcherSquad.getUnitSet()) {
+					if (unit.getSpiderMineCount() > 0) {
+						clearSquad = false;
+						break;
+					}
+				}
+				
+				if (clearSquad) {
+					watcherSquad.clear();
+				}
+			}
+			
+			for (int mineNum = 3; mineNum >= 0; mineNum--) {
+				List<Unit> vultureList = vutureMapBySpiderMine.get(mineNum);
+				if (vultureList == null) {
+					continue;
+				}
+				for (Unit vulture : vultureList) {
+					if (watcherSquad.getUnitSet().size() < MicroSet.Vulture.maxNumWatcher) {
+						if (squadData.canAssignUnitToSquad(vulture, watcherSquad)) {
+							squadData.assignUnitToSquad(vulture, watcherSquad);
+						}
+					} else {
+						break;
+					}
+				}
+			}
 		}
 
 		SquadOrder watchOrder = new SquadOrder(SquadOrderType.WATCH, watchersPosition(watcherSquad), 800, "Over Watcher");
@@ -553,56 +585,91 @@ public class CombatManager {
 	
 	private void updateCheckerSquad() {
 		List<Squad> checkerSquads = squadData.getSquadList("Checker");
-		
-		// 대기중(inactive)인 checker squad에 unit을 할당한다.
-		// 활동중(active) 상태인 checker는 이미 돌아다니고 있으니 병력 할당을 하지 않는다.
-		for (Unit unit : combatUnits) {
+
+		// 전투상태로 바뀌는 순간 다 없앤다.
+		if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
 			for (Squad squad : checkerSquads) {
-				if (squad.getOrder().getType() == SquadOrderType.CHECK_ACTIVE) {
-					// active squad의 병력이 모두 죽었다면 squad를 삭제한다.
-					if (squad.getUnitSet().size() == 0) {
-						squadData.removeSquad(squad.getName());
-						VultureTravelManager.Instance().getSquadSiteMap().remove(squad.getName());
-					}
-					continue;
-				}
-				
-				// unit을 할당한다.
-		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, squad)) {
-		        	if (squad.getUnitSet().size() < checkcerMaxNum) {
-						squadData.assignUnitToSquad(unit, squad);
-		        	}
-		        }
-		        
-		        // 최대 숫자만큼 unit이 할당되었으니 active 상태로 변경한다.
-		        // 전투상태이면 inactive -> active 변경
-		        if (squad.getUnitSet().size() >= checkcerMaxNum || combatStrategy == CombatStrategy.ATTACK_ENEMY) {
-		        	squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
-		        }
-		    }
+				squadData.removeSquad(squad.getName());
+				VultureTravelManager.Instance().getSquadSiteMap().remove(squad.getName());
+			}
+			return;
 		}
 		
-		boolean inactiveSquadExist = false;
-		for (Squad squad : checkerSquads) {
-			if (squad.getOrder().getType() == SquadOrderType.CHECK_ACTIVE) {
-				BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName());
-				Position orderPosition = null;
-	        	if (baseLocation != null) {
-	        		orderPosition = baseLocation.getPosition();
-	        	} else {
-	        		orderPosition = getMainAttackLocation(squad);
-	        	}
-	        	squad.getOrder().setPosition(orderPosition);
-			} else {
-				inactiveSquadExist = true;
+		boolean battleNow = false;
+		Squad mainAttackSquad = squadData.getSquad("MainAttack");
+		if (mainAttackSquad.getOrder().getType() == SquadOrderType.BATTLE) { // 주력이 싸우고 있으면
+			battleNow = true;
+		}
+		
+		// 1. 대기중 스쿼드에 병력 할당
+		// 대기중(inactive)인 checker squad에 unit을 할당한다.
+		// 활동중(active, arrive) 상태인 checker는 이미 돌아다니고 있으니 병력 할당을 하지 않는다.
+		if (!battleNow) {
+			for (Unit unit : combatUnits) {
+				for (Squad squad : checkerSquads) {
+					if (squad.getOrder().getType() != SquadOrderType.CHECK_INACTIVE) {
+						continue;
+					}
+					
+					// unit을 할당한다.
+			        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, squad)) {
+			        	if (squad.getUnitSet().size() < MicroSet.Vulture.maxNumChecker) {
+							squadData.assignUnitToSquad(unit, squad);
+			        	}
+			        }
+			        
+			        // 최대 숫자만큼 unit이 할당되었으니 active 상태로 변경한다.
+			        // 전투상태이면 inactive -> active 변경
+			        if (squad.getUnitSet().size() >= MicroSet.Vulture.maxNumChecker) {
+			        	BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName()); // 이동할 지역이 있어야 ACTIVE로 변경한다.
+			        	if (baseLocation != null) {
+				        	squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
+			        	}
+			        }
+			    }
 			}
 		}
 		
-		if (!inactiveSquadExist && combatStrategy != CombatStrategy.ATTACK_ENEMY) {
-			// 새로운 checker squad를 생성한다. 전투상태이면 스쿼드를 생성하지 않는다.
-			if (checkerSquads.size() < maxCheckerSquadNum) {
+		// 2. 스쿼드 제거 및 이동지점 설정
+		boolean inactiveSquadExist = false;
+		for (Squad squad : checkerSquads) {
+			if (squad.getOrder().getType() == SquadOrderType.CHECK_INACTIVE) {
+				inactiveSquadExist = true;
+				continue;
+			}
+
+			// inactive squad의 병력이 아니라면 모두 죽었을 때 squad를 삭제
+			if (squad.getUnitSet().size() == 0) {
+				squadData.removeSquad(squad.getName());
+				VultureTravelManager.Instance().getSquadSiteMap().remove(squad.getName());
+				continue;
+			}
+
+			BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName());
+			Position orderPosition = null;
+			
+			if (baseLocation == null) {
+				orderPosition = getMainAttackLocation(squad);
+			} else {
+        		orderPosition = baseLocation.getPosition();
+			}
+        	squad.getOrder().setPosition(orderPosition);
+
+			// 이동할 곳이 없이 공격스쿼드 지점으로 돌아왔다면 스쿼드를 없앤다.
+        	if (squad.getOrder().getType() == SquadOrderType.CHECK_ARRIVE) {
+        		if(orderPosition.getDistance(getMainAttackLocation(squad)) <= 500) {
+    				squadData.removeSquad(squad.getName());
+        		} else {
+        			squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
+        		}
+        	}
+		}
+
+		// 3. 새로운 inactive checker squad를 생성한다.
+		if (!battleNow) {
+			if (!inactiveSquadExist && checkerSquads.size() < MicroSet.Vulture.maxNumCheckerSquad) {
 	    		SquadOrder squadOrder = new SquadOrder(SquadOrderType.CHECK_INACTIVE, getMainAttackLocation(null), 100, "Check it out");
-	    		Squad newCheckerSquad = new Squad("Checker " + checkerIdx++, squadOrder, CHECKER_PRIORITY);
+	    		Squad newCheckerSquad = new Squad("Checker " + MicroSet.Vulture.getCheckerSquadPostFix(), squadOrder, CHECKER_PRIORITY);
 	    		squadData.putSquad(newCheckerSquad);
 			}
 		}

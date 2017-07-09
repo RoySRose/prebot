@@ -80,53 +80,56 @@ public class Squad {
 		if (unitSet.isEmpty()) {
 			return;
 		}
+
+//		boolean needToRegroup = false; //needsToRegroup();
+//		if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
+//			needToRegroup = needsToRegroupChecker();
+//		}
 		
-		boolean needToRegroup = needsToRegroup();
-		
-		if (needToRegroup) {
-			Position regroupPosition = calcRegroupPosition();
-			
-			microScv.regroup(regroupPosition);
-			microMarine.regroup(regroupPosition);
-			microVulture.regroup(regroupPosition);
-			microTank.regroup(regroupPosition);
-			microGoliath.regroup(regroupPosition);
-			microWraith.regroup(regroupPosition);
-			microVessel.regroup(regroupPosition);
+		// * 공격스쿼드 : 탱크가 주력인 메카닉의 경우, 탱크 중심으로 squad지역을 설정해 유닛이 분산되지 않도록 한다.
+		// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
+		// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
+		List<Unit> tanks = microTank.getUnits();
+		Position centerOfTanks = null;
+		int squadAreaRange = 0;
+		if (!tanks.isEmpty()) {
+			centerOfTanks = MicroUtils.centerOfUnits(tanks);
+			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 		} else {
-			// * 공격스쿼드 : 탱크가 주력인 메카닉의 경우, 탱크 중심으로 squad지역을 설정해 유닛이 분산되지 않도록 한다.
-			// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
-			// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
-			
-			List<Unit> tanks = microTank.getUnits();
-				
-			Position centerOfTanks = null;
-			int squadAreaRange = 0;
-			if (!tanks.isEmpty()) {
-				centerOfTanks = MicroUtils.centerOfUnits(tanks);
-				squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
-				
-			} else {
-				centerOfTanks = MicroUtils.centerOfUnits(unitSet);
-				squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
-			}
-			microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
-			
-			microScv.execute(order);
-			microMarine.execute(order);
-			microVulture.execute(order);
-			microTank.execute(order);
-			microGoliath.execute(order);
-			microWraith.execute(order);
-			microVessel.execute(order);
+			centerOfTanks = MicroUtils.centerOfUnits(unitSet);
+			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 		}
+		microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		
+//		if (needToRegroup) {
+//			Position regroupPosition = calcRegroupPosition();
+//			
+//			microScv.regroup(regroupPosition);
+//			microMarine.regroup(regroupPosition);
+//			microVulture.regroup(regroupPosition);
+//			microTank.regroup(regroupPosition);
+//			microGoliath.regroup(regroupPosition);
+//			microWraith.regroup(regroupPosition);
+//			microVessel.regroup(regroupPosition);
+//		} else {
+			
+		microScv.execute(order);
+		microMarine.execute(order);
+		microVulture.execute(order);
+		microTank.execute(order);
+		microGoliath.execute(order);
+		microWraith.execute(order);
+		microVessel.execute(order);
+//		}
 	}
+	
+	
 	
 	private void updateUnits() {
 		setAllUnits();
@@ -236,6 +239,24 @@ public class Squad {
 			}
 		}
 		unitSet.clear();
+	}
+	
+	
+	private boolean needsToRegroupChecker() {
+		if (unitSet.isEmpty()) {
+			return false;
+		}
+		Unit leader = MicroUtils.leaderOfUnit(unitSet, order.getPosition());
+		for (Unit unit : unitSet) {
+			if (unit.getID() == leader.getID()) {
+				continue;
+			}
+			if (leader.getDistance(unit) > 500) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private boolean needsToRegroup() {
@@ -384,6 +405,10 @@ public class Squad {
 		}
 		
 		return regroup;
+	}
+	@Override
+	public String toString() {
+		return "Squad [name=" + name + ", order=" + order + ", unitSet.size()=" + unitSet.size() + "]";
 	}
 	
 }

@@ -105,6 +105,24 @@ public class MicroUtils {
 		}
 	}
 	
+	public static boolean groundUnitFreeKiting(Unit rangedUnit, int freeKitingRadius) {
+		List<Unit> units = MapGrid.Instance().getUnitsNear(rangedUnit.getPosition(), freeKitingRadius, true, false, null);
+		
+		boolean freeKiting = true;;
+		int myGroundUnitCount = 0;
+		for (Unit unit : units) {
+			if (unit.getType().isWorker() || unit.isFlying() || unit.getType().isBuilding()) {
+				continue;
+			}
+			if (++myGroundUnitCount > 2) {
+				freeKiting = false;
+				break;
+			}
+		}
+		
+		return freeKiting;
+	}
+	
 	/**
 	 * rangeUnit은 target에 대한 카이팅을 한다.
 	 */
@@ -115,6 +133,27 @@ public class MicroUtils {
 				!CommandUtil.IsValidUnit(target, false, true)) {
 			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
 			return;
+		}
+
+		boolean cooltimeAlwaysAttack = kitingOption.isCooltimeAlwaysAttack();
+		boolean unitedKiting = kitingOption.isUnitedKiting();
+		Position goalPosition = kitingOption.getGoalPosition();
+		Integer[] fleeAngle = kitingOption.getFleeAngle();
+		int specialSquadType = kitingOption.getSpecialSquadType();
+
+		boolean survivalInstinct = !killedByNShot(rangedUnit, target, 1) && killedByNShot(target, rangedUnit, 2); // 생존본능(딸피)
+		if (survivalInstinct || groundUnitFreeKiting(rangedUnit, (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8))) {
+			unitedKiting = false;
+			fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
+		}
+		if (specialSquadType > 0) { // 특수 벌처가 자신의 지역에서 싸우는데 커맨드로 회피하거나 심하게 사리는 이상한 행동을 하지 않도록 한다. 
+			Region rangedUnitRegion = BWTA.getRegion(rangedUnit.getPosition());
+			for (Region region : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
+				if (region == rangedUnitRegion) {
+					specialSquadType = 0;
+					break;
+				}
+			}
 		}
 
 		// rangedUnit, target 각각의 지상/공중 무기를 선택
@@ -142,8 +181,6 @@ public class MicroUtils {
 
 			int currentCooldown = rangedUnit.isStartingAttack() ? rangedUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
 					: (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
-
-			boolean survivalInstinct = !killedByNShot(rangedUnit, target, 1) && killedByNShot(target, rangedUnit, 2); // 생존본능(딸피)
 			
 			// 1. 공격
 			//  - 상대가 때리기 위해 거리를 좁혀야 할때(currentCooldown <= timeToCatch)
@@ -151,15 +188,15 @@ public class MicroUtils {
 			//  - 타깃이 건물일 경우
 			// 2. 회피
 			//  - getFleePosition을 통해 최적의 회피지역을 선정하여 이동한다.
-			//  - watcher인 경우는 안전하게 회피
+			//  - watcher, checker인 경우는 안전하게 회피
 			boolean haveToAttack = false;
-			if (kitingOption.getSpecialSquadType() > 0 && distanceToTarget <= targetWeapon.maxRange() + target.getType().topSpeed() * 36) { // watcer 안전거리확보 : target.getType().topSpeed() * 36 (적이 1.5초 이동거리)
+			if (specialSquadType > 0 && distanceToTarget <= targetWeapon.maxRange() + target.getType().topSpeed() * 36) { // watcer 안전거리확보 : target.getType().topSpeed() * 36 (적이 1.5초 이동거리)
 				haveToAttack = false;
 			} else if (target.getType().isBuilding()) {
 				haveToAttack = true;
 			} else if (currentCooldown <= timeToCatch) {
 				haveToAttack = true;
-			} else if (!survivalInstinct && kitingOption.isCooltimeAlwaysAttack() && currentCooldown == 0) {
+			} else if (!survivalInstinct && cooltimeAlwaysAttack && currentCooldown == 0) {
 				haveToAttack = true;
 			}
 			
@@ -181,12 +218,9 @@ public class MicroUtils {
 				}
 				
 				// 회피지역을 선정한다.
-				Position fleePosition = null;
-				if (kitingOption.getSpecialSquadType() == 1) { // watcher는 본진방향으로 후퇴한다.
+				Position fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle);
+				if (specialSquadType == 1) { // watcher는 본진방향으로 후퇴한다.
 					fleePosition = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition();
-				} else {
-					fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, (survivalInstinct? false : kitingOption.isUnitedKiting())
-							, kitingOption.getGoalPosition(), kitingOption.getFleeAngle());
 				}
 				
 				CommandUtil.rightClick(rangedUnit, fleePosition);
@@ -229,9 +263,7 @@ public class MicroUtils {
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
 
 				// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
-				if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
-						&& middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
-						&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)
+				if (isValidGroundPosition(movePosition) && middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
 						&& (risk < minimumRisk || (risk == minimumRisk && distanceToGoal < minimumDistanceToGoal))) {
 					
 					safePosition =  movePosition;
@@ -242,7 +274,7 @@ public class MicroUtils {
 				}
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
-		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
+//		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
 		    	moveCalcSize = moveCalcSize * 2 / 3;
 		    	
 		    	if (moveCalcSize <= 10 && FLEE_ANGLE.equals(FleeAngle.NARROW_ANGLE)) { // 회피지역이 없을 경우 2) 각 범위를 넓힘
@@ -430,8 +462,25 @@ public class MicroUtils {
 				y += pos.getY();
 			}
 		}
-
-		return new Position(x / unitCount, y / unitCount);
+		
+		Position centerPosition = new Position(x / unitCount, y / unitCount);
+		if (isValidGroundPosition(centerPosition)) {
+			return centerPosition;
+		} else {
+			Position tempPosition = null;
+			for (int i = 0; i < 3; i++) {
+				tempPosition = randomPosition(centerPosition, 100);
+				if (isValidGroundPosition(tempPosition)) {
+					return tempPosition;
+				}
+			}
+		}
+		return centerPosition;
+	}
+	
+	public static boolean isValidGroundPosition(Position position) {
+		return position.isValid() && BWTA.getRegion(position) != null && MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8);
+		
 	}
 	
 	public static int calcArriveDecisionRange(UnitType unitType, int numOfUnits) {
