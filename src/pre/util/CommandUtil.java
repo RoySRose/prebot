@@ -266,6 +266,30 @@ public class CommandUtil {
 			return false;
 		}
 	}
+	
+	public static boolean IsValidUnit(Unit unit, boolean completed, boolean detected)
+	{
+		if (unit == null) {
+			return false;
+		}
+		if (completed && !unit.isCompleted()) {
+			return false;
+		}
+		if (detected && !unit.isDetected()) {
+			return false;
+		}
+
+		if (unit.exists()
+			&& unit.getType() != UnitType.Unknown
+			&& unit.getPosition().isValid())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	// 미사용
 //	public static double GetDistanceBetweenTwoRectangles(Rect rect1, Rect rect2)

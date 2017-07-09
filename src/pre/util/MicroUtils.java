@@ -112,7 +112,7 @@ public class MicroUtils {
 		// 유닛 유효성 검사
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
-				!CommandUtil.IsValidUnit(target)) {
+				!CommandUtil.IsValidUnit(target, false, true)) {
 			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
 			return;
 		}

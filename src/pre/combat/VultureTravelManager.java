@@ -33,12 +33,15 @@ public class VultureTravelManager {
 	}
 	
 	public void init() {
-		travelSites.clear();
 		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
-		for (BaseLocation base : otherBases) {
-			travelSites.add(new TravelSite(base, 0, 0));
+		
+		if (!otherBases.isEmpty()) {
+			travelSites.clear();
+			for (BaseLocation base : otherBases) {
+				travelSites.add(new TravelSite(base, 0, 0));
+			}
+			initialized = true;
 		}
-		initialized = true;
 	}
 	
 	public void update() {
@@ -61,6 +64,7 @@ public class VultureTravelManager {
 				}
 				
 				if (relatedSquadName != null) {
+					System.out.println("change travel site");
 					BaseLocation currentBase = squadSiteMap.get(relatedSquadName).baseLocation;
 					squadSiteMap.remove(relatedSquadName);
 					getBestTravelSite(relatedSquadName, currentBase);
@@ -76,6 +80,10 @@ public class VultureTravelManager {
 	
 	
 	public BaseLocation getBestTravelSite(String squadName, BaseLocation currentBase) {
+		if (!initialized) {
+			return null;
+		}
+		
 		TravelSite site = squadSiteMap.get(squadName);
 		if (site != null) {
 			return site.baseLocation;
@@ -89,6 +97,10 @@ public class VultureTravelManager {
 		
 		int currentFrame = MyBotModule.Broodwar.getFrameCount();
 		for (TravelSite travelSite : travelSites) {
+			if (squadSiteMap.values().contains(travelSite)) {
+				System.out.println("dulplicated");
+				continue;
+			}
 			
 			int visitPassedFrame = currentFrame - travelSite.visitFrame;
 			int assignPassedFrame = currentFrame - travelSite.assignedFrame;
@@ -104,9 +116,14 @@ public class VultureTravelManager {
 			}
 		}
 		
-		bestTravelSite.assignedFrame = currentFrame;
-		squadSiteMap.put(squadName, bestTravelSite);
-		return bestTravelSite.baseLocation;
+		if (bestTravelSite != null) {
+			bestTravelSite.assignedFrame = currentFrame;
+			squadSiteMap.put(squadName, bestTravelSite);
+			return bestTravelSite.baseLocation;
+		} else {
+			squadSiteMap.remove(squadName);
+			return null;
+		}
 	}
 
 }
@@ -123,6 +140,6 @@ class TravelSite {
 
 	@Override
 	public String toString() {
-		return "TravelSite [baseLocation=" + baseLocation + ", visitFrame=" + visitFrame + ", assignedFrame=" + assignedFrame + "]";
+		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", assignedFrame=" + assignedFrame + "]";
 	}
 }

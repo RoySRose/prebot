@@ -407,7 +407,7 @@ public class InformationManager {
 						this.updateReadyToAttackPosition(selfPlayer, chokepoint);
 					}
 				}
-				this.updateOtherExpansionLocation(sourceBaseLocation, selfPlayer);
+				this.updateOtherExpansionLocation(sourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(selfPlayer, new Boolean(false));
 		}
@@ -444,7 +444,7 @@ public class InformationManager {
 						this.updateReadyToAttackPosition(enemyPlayer, chokepoint);
 					}
 				}
-				this.updateOtherExpansionLocation(sourceBaseLocation, enemyPlayer);
+				this.updateOtherExpansionLocation(sourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
 		}
@@ -459,7 +459,7 @@ public class InformationManager {
 		double distance;
 	}
 	
-	public void updateOtherExpansionLocation(BaseLocation baseLocation, final Player player) {
+	public void updateOtherExpansionLocation(BaseLocation baseLocation) {
 		
 		final BaseLocation myBase = mainBaseLocations.get(selfPlayer);
 		final BaseLocation myFirstExpansion = firstExpansionLocation.get(selfPlayer);
@@ -470,27 +470,43 @@ public class InformationManager {
 		if (myBase == null || myFirstExpansion == null || enemyBase == null || enemyFirstExpansion == null) {
 			return;
 		}
+
+		otherExpansionLocations.get(selfPlayer).clear();
+		otherExpansionLocations.get(enemyPlayer).clear();
 		
-		otherExpansionLocations.get(player).clear();
-		
+		int islandCnt = 0;
+		int mainBaseCnt = 0;
 		for (BaseLocation base : BWTA.getBaseLocations()) {
-			if (base.isIsland() || base.equals(myBase) || base.equals(myFirstExpansion)
-					|| base.equals(enemyBase) || base.equals(enemyFirstExpansion)) {
+			if (base.isIsland()) {
+				islandCnt++;
+				continue;
+			}
+			// BaseLocation을 equal로 비교하면 오류가 있을 수 있다.
+			if (base.getPosition().equals(myBase.getPosition()) || base.getPosition().equals(myFirstExpansion.getPosition())
+					|| base.getPosition().equals(enemyBase.getPosition()) || base.getPosition().equals(enemyFirstExpansion.getPosition())) {
+				mainBaseCnt++;
 				continue;
 			}
 			if (base.minerals() < 1000) {
 				continue;
 			}
-			otherExpansionLocations.get(player).add(base);
+			otherExpansionLocations.get(selfPlayer).add(base);
+			otherExpansionLocations.get(enemyPlayer).add(base);
 		}
+		System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " + mainBaseCnt);
 		
-		Collections.sort(otherExpansionLocations.get(player), new Comparator<BaseLocation>() {
+		Collections.sort(otherExpansionLocations.get(selfPlayer), new Comparator<BaseLocation>() {
 			@Override public int compare(BaseLocation base1, BaseLocation base2) {
-				BaseLocation srcBase = player == selfPlayer ? myFirstExpansion : enemyFirstExpansion;
+				BaseLocation srcBase = myFirstExpansion;
 				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
 			}
 		});
-		
+		Collections.sort(otherExpansionLocations.get(enemyPlayer), new Comparator<BaseLocation>() {
+			@Override public int compare(BaseLocation base1, BaseLocation base2) {
+				BaseLocation srcBase = enemyFirstExpansion;
+				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
+			}
+		});
 	}
 	
 	public void updateReadyToAttackPosition(Player player, Chokepoint chokepoint) {
