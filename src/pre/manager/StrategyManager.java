@@ -51,6 +51,12 @@ public class StrategyManager {
 	//private boolean CreateSCVOn;
 	//private boolean AttackUnitCreate;
 	
+	public int vultureratio = 0;
+	public int tankratio = 0;
+	public int goliathratio = 0;
+	public int wgt = 1;
+	private int InitFaccnt = 0;
+	
 	public enum Strategys { 
 		zergBasic
 		,zergBasic_GiftSet
