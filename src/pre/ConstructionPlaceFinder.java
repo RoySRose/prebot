@@ -178,7 +178,15 @@ public class ConstructionPlaceFinder {
 					desiredPosition = getBuildLocationNear(buildingType, tempChokePoint.getCenter().toTilePosition());
 				}
 				break;
+				
+			case NextExpansionPoint:
+				tempBaseLocation = InformationManager.Instance().getNextExpansionLocation();
+				if (tempBaseLocation != null) {
+					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
+				}
+				break;
 			}
+			
 		}
 
 		return desiredPosition;

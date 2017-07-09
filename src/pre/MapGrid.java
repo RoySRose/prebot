@@ -12,9 +12,10 @@ import pre.manager.InformationManager;
 public class MapGrid {
 
 	/// 지도를 바둑판처럼 Cell 들로 나누기 위해서 정의한 하나의 Cell
-	class GridCell
+	public class GridCell
 	{
 		private int timeLastVisited; 		///< 가장 마지막에 방문했던 시각이 언제인지 -> Scout 에 활용		
+
 		private int timeLastOpponentSeen;	///< 가장 마지막에 적을 발견했던 시각이 언제인지 -> 적 의도 파악, 적 부대 파악, 전략 수립에 활용
 		private int timeLastScan;
 		private List<Unit> ourUnits= new ArrayList<Unit>();
@@ -34,6 +35,11 @@ public class MapGrid {
 		{
 			return center;
 		}
+		
+		public int getTimeLastVisited() {
+			return timeLastVisited;
+		}
+		
 	};
 	
 	private int cellSize;
@@ -111,7 +117,7 @@ public class MapGrid {
 			for (int c = 0; c < cols; ++c)
 			{
 				GridCell cell = getCellByIndex(r, c);
-
+				
 				int centerX = (c * cellSize) + (cellSize / 2);
 				int centerY = (r * cellSize) + (cellSize / 2);
 
@@ -309,6 +315,47 @@ public class MapGrid {
 		GridCell cell = getCell(pos);
 		return cell.timeLastScan + GridCell.ScanDuration > MyBotModule.Broodwar.getFrameCount();
 	}
+
+	
+	//	public GridCell getCell(Position pos)
+//	{
+//		return getCellByIndex(pos.getY() / cellSize, pos.getX() / cellSize);
+//	}
+//	public GridCell getCellByIndex(int r, int c)
+//	{
+//		return gridCells[r * cols + c];	
+//	}	
+	
+	
+	public int getCellLastVisitDuration(Position pos) {
+		
+		int tpx = pos.getX() / cellSize;
+		int tpy = pos.getY() / cellSize;
+		int latesttime = 0;
+		
+		
+		//@@@@@@ 해당 로직이 과연 맞을까?
+		for(int i = -5; i<=5; i++){
+			for(int j = -5; j<=5; j++){
+				if(i*i+j*j > 26){
+					continue;
+				}
+				if((tpy+i)*cols+(tpx+j) < 0){
+					continue;
+				}
+				if(gridCells[(tpy+i)*cols+(tpx+j)].timeLastVisited > latesttime){
+					latesttime = gridCells[(tpy+i)*cols+(tpx+j)].timeLastVisited;
+				}
+			}
+		}
+		
+		if(latesttime == 0){
+			return 100000000;
+		}
+//		System.out.println("timeLastVisited returning: " + (MyBotModule.Broodwar.getFrameCount() - latesttime));
+		return MyBotModule.Broodwar.getFrameCount() - latesttime;
+	}
+	
 
 	public int	getCellSize()
 	{
