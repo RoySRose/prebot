@@ -97,7 +97,9 @@ public class ConstructionManager {
 	public void update()
 	{
 		// 1초에 4번만 실행합니다
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0){
+			return;
+		}
 
 		// constructionQueue 에 들어있는 ConstructionTask 들은 
 		// Unassigned . Assigned (buildCommandGiven=false) . Assigned (buildCommandGiven=true) . UnderConstruction . (Finished) 로 상태 변화된다

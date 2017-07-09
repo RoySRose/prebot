@@ -14,7 +14,6 @@ import pre.util.CommandUtil;
 
 public class WorkerData {
 
-	private Map<Integer, Integer> workersOnMineralPatch = new HashMap<Integer, Integer>();
 	
 	/// 일꾼 유닛에게 지정하는 임무의 종류
 	public  enum WorkerJob { 
@@ -38,15 +37,27 @@ public class WorkerData {
 	/// ResourceDepot 목록
 	private List<Unit> depots = new ArrayList<Unit>();
 	
+	//일꾼 유닛과 임무 관계
 	private Map<Integer, WorkerJob> workerJobMap = new HashMap<Integer, WorkerJob>();
+	//일꾼과 건설일꾼 배정
 	private Map<Integer, UnitType> workerBuildingTypeMap = new HashMap<Integer, UnitType>();
-	private Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
+	//CC에 배정된 일꾼 수
+	public Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
+	//Gas 에 배정된 일꾼 수
 	private Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
+	//작업중인 광물 ????
 	private Map<Integer, Unit> workerDepotMap = new HashMap<Integer, Unit>();
+	//이동중인 일꾼과 목적지
 	private Map<Integer, WorkerMoveData> workerMoveMap = new HashMap<Integer, WorkerMoveData>();
-	private Map<Integer, Unit> workerMineralAssignment = new HashMap<Integer, Unit>();
+	//일꾼과 미네랄 간의 배정 관계
+	public Map<Integer, Unit> workerMineralAssignment = new HashMap<Integer, Unit>();
+	//미네랄에 배정된 일꾼의 수
+	public Map<Integer, Integer> workersOnMineralPatch = new HashMap<Integer, Integer>();
+	//미네랄 일꾼
 	private Map<Integer, Unit> workerMineralMap = new HashMap<Integer, Unit>();
+	//Gas 일꾼 
 	private Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
+	//수리중인 일꾼 
 	private Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	
 	private CommandUtil commandUtil = new CommandUtil();
@@ -164,7 +175,7 @@ public class WorkerData {
 	public void setWorkerJob(Unit unit, WorkerJob job, Unit jobUnit)
 	{
 		if (unit == null) { return; }
-
+		
 		/*
 		if (job == Idle)
 		{
@@ -174,10 +185,9 @@ public class WorkerData {
 		
 		clearPreviousJob(unit);
 		workerJobMap.put(unit.getID(), job);
-
 		if (job == WorkerJob.Minerals)
 		{
-			// increase the number of workers assigned to this nexus
+			// 커멘드 센터에 연결된 일꾼 수 증가
 			if(depotWorkerCount.get(jobUnit.getID()) == null)
 			{
 				depotWorkerCount.put(jobUnit.getID(), 1);
@@ -193,8 +203,7 @@ public class WorkerData {
 	        Unit mineralToMine = getMineralToMine(unit);
 	        workerMineralAssignment.put(unit.getID(), mineralToMine);
 	        addToMineralPatch(mineralToMine, 1);
-
-			// right click the mineral to start mining
+	        
 	        commandUtil.rightClick(unit, mineralToMine);
 		}
 		else if (job == WorkerJob.Gas)
@@ -233,10 +242,13 @@ public class WorkerData {
 	    }
 		else if (job == WorkerJob.Scout)
 		{
-
+			System.out.println("정찰이다다다다다");
 		}
 	    else if (job == WorkerJob.Build)
 	    {
+	    }else if (job == WorkerJob.Move)
+	    {
+	    	
 	    }
 	}
 
@@ -281,6 +293,7 @@ public class WorkerData {
 
 		if (previousJob == WorkerJob.Minerals)
 		{
+			//System.out.println("workerDepotMap.get(unit.getID()) : " + workerDepotMap.get(unit.getID()));
 			if(workerDepotMap.get(unit.getID()) != null)
 			{
 				if (depotWorkerCount.get(workerDepotMap.get(unit.getID()).getID()) != null) {
@@ -298,6 +311,7 @@ public class WorkerData {
 		}
 		else if (previousJob == WorkerJob.Gas)
 		{
+			System.out.println("gas 다다다다다다다");
 			refineryWorkerCount.put(workerRefineryMap.get(unit.getID()).getID(), refineryWorkerCount.get(workerRefineryMap.get(unit.getID()).getID()) - 1);
 			workerRefineryMap.remove(unit.getID()); // C++ : workerRefineryMap.erase(unit);
 		}
@@ -311,10 +325,8 @@ public class WorkerData {
 		}
 		else if (previousJob == WorkerJob.Move)
 		{
-			workerMoveMap.remove(unit.getID()); // C++ : workerMoveMap.erase(unit);
+		
 		}
-
-		workerJobMap.remove(unit.getID()); // C++ : workerJobMap.erase(unit);
 	}
 
 	public final int getNumWorkers()
@@ -520,31 +532,61 @@ public class WorkerData {
 		Unit bestMineral = null;
 		double bestDist = 100000000;
 	    double bestNumAssigned = 10000000;
-
+	    int lowSCV = 10;
+	    int workerCnt = depotWorkerCount.get(depot.getID());
+	    int minCnt = 0;
+	    
 		if (depot != null)
 		{
+			//se-min.park
 	        List<Unit> mineralPatches = getMineralPatchesNearDepot(depot);
-
+	        minCnt = mineralPatches.size();
+	        if( workerCnt > minCnt){
+	        	bestDist = 0;
+	        }
+	        for (Unit mineral : mineralPatches){
+	        	lowSCV = workersOnMineralPatch.get(mineral.getID());
+	        	//System.out.println("mineralPatches : " + mineralPatches.size());
+	        }
 			for (Unit mineral : mineralPatches)
 			{
 					double dist = mineral.getDistance(depot);
 	                double numAssigned = workersOnMineralPatch.get(mineral.getID());
-
-	                if (numAssigned < bestNumAssigned)
-	                {
-	                    bestMineral = mineral;
-	                    bestDist = dist;
-	                    bestNumAssigned = numAssigned;
+	                if( workerCnt <= minCnt){
+	                	if (numAssigned < bestNumAssigned)
+		                {
+		                    bestMineral = mineral;
+		                    bestDist = dist;
+		                    bestNumAssigned = numAssigned;
+		                }
+						else if (numAssigned == bestNumAssigned)
+						{
+							if (dist < bestDist)
+		                    {
+		                        bestMineral = mineral;
+		                        bestDist = dist;
+		                        bestNumAssigned = numAssigned;
+		                    }
+						}
+	                }else{
+	                	if (numAssigned < bestNumAssigned)
+		                {
+		                    bestMineral = mineral;
+		                    bestDist = dist;
+		                    bestNumAssigned = numAssigned;
+		                }
+						else if (numAssigned == bestNumAssigned)
+						{
+							if (dist > bestDist)
+		                    {
+		                        bestMineral = mineral;
+		                        bestDist = dist;
+		                        bestNumAssigned = numAssigned;
+		                    }
+						}
 	                }
-					else if (numAssigned == bestNumAssigned)
-					{
-						if (dist < bestDist)
-	                    {
-	                        bestMineral = mineral;
-	                        bestDist = dist;
-	                        bestNumAssigned = numAssigned;
-	                    }
-					}
+	                
+	                
 			
 			}
 		}

@@ -5,19 +5,23 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Order;
+import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import bwta.Region;
 import pre.MapGrid;
 import pre.UnitInfo;
+import pre.combat.SpiderMineManger;
 import pre.combat.Squad;
 import pre.combat.SquadData;
 import pre.combat.SquadOrder;
-import pre.combat.SquadOrder.SqaudOrderType;
+import pre.combat.VultureTravelManager;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
 import pre.util.MicroUtils;
@@ -26,15 +30,29 @@ public class CombatManager {
 
 	private static final int IDLE_PRIORITY = 0;
 	private static final int ATTACK_PRIORITY = 2;
-	private static final int BASE_DEFENSE_PRIORITY = 3;
-	private static final int SCOUT_DEFENSE_PRIORITY = 4;
+	private static final int CHECKER_PRIORITY = 3;
+	private static final int WATCHER_PRIORITY = 4;
+	private static final int BASE_DEFENSE_PRIORITY = 5;
+	private static final int SCOUT_DEFENSE_PRIORITY = 6;
 	
 	private List<Unit> combatUnits = new ArrayList<>();
 	private SquadData squadData = new SquadData();
 
 	private boolean initialized = false;
-	private boolean goAggressive = false; // TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
 	
+	// TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
+	public enum CombatStrategy { DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, READY_TO_ATTACK, ATTACK_ENEMY };
+	
+	private CombatStrategy combatStrategy;
+	
+	public CombatStrategy getCombatStrategy() {
+		return combatStrategy;
+	}
+
+	public void setCombatStrategy(CombatStrategy combatStrategy) {
+		this.combatStrategy = combatStrategy;
+	}
+
 	private static CombatManager instance = new CombatManager();
 	
 	private CombatManager() {
@@ -44,28 +62,23 @@ public class CombatManager {
 	public static CombatManager Instance() {
 		return instance;
 	}
-	
-	public boolean getAggressive() {
-		return goAggressive;
-	}
-
-	public void setAggressive(boolean goAggressive) {
-		this.goAggressive = goAggressive;
-	}
 
 	public void initSquads() {
 		
-		SquadOrder idleOrder = new SquadOrder(SqaudOrderType.IDLE, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 100, "Chill out");
+		combatStrategy = CombatStrategy.DEFENCE_INSIDE;
+		
+		SquadOrder idleOrder = new SquadOrder(SquadOrderType.IDLE, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 100, "Chill out");
 		squadData.putSquad(new Squad("Idle", idleOrder, IDLE_PRIORITY));
 		
-		SquadOrder enemyScoutDefense = new SquadOrder(SqaudOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 600, "Get the scout");
+		SquadOrder enemyScoutDefense = new SquadOrder(SquadOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 600, "Get the scout");
 		squadData.putSquad(new Squad("ScoutDefense", enemyScoutDefense, SCOUT_DEFENSE_PRIORITY));
 		
-		SquadOrder attackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(null), 800, "Attack enemy base");
+		SquadOrder attackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(null), 800, "Attack enemy base");
 		squadData.putSquad(new Squad("MainAttack", attackOrder, ATTACK_PRIORITY));
-		squadData.putSquad(new Squad("Flying", attackOrder, ATTACK_PRIORITY));
+//		squadData.putSquad(new Squad("Flying", attackOrder, ATTACK_PRIORITY));
 
-		// TODO SQAUD 추가 가능
+		SquadOrder watcherOrder = new SquadOrder(SquadOrderType.WATCH, getAttackPosition(null), 800, "Over Watcher");
+		squadData.putSquad(new Squad("Watcher", watcherOrder, WATCHER_PRIORITY));
 		
 		initialized = true;
 	}
@@ -87,9 +100,18 @@ public class CombatManager {
 			updateScoutDefenseSquad();
 			updateBaseDefenseSquads();
 			updateAttackSquads();
+			updateWatcherSquad();
+			updateCheckerSquad();
+			
+			SpiderMineManger.Instance().update();
+			VultureTravelManager.Instance().update();
 		}
 		else if (frame8 % 4 == 2) {
 			doComsatScan();
+		}
+		
+		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
+			squadData.printSquadInfo();
 		}
 		
 		squadData.update();
@@ -121,7 +143,8 @@ public class CombatManager {
 	}
 	
 	private Position getMainAttackLocation(Squad squad) {
-		if (!goAggressive) {
+		
+		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
 			// We are guaranteed to always have a main base location, even if it has been destroyed.
 			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
@@ -133,9 +156,32 @@ public class CombatManager {
 				}
 			}
 			return base.getPosition();
+			
+		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+			Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+			for (BaseLocation occupied : occupiedBases) {
+				if (occupied == firstExpansion) {
+					choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+					break;
+				}
+			}
+			return choke.getCenter();
+			
+		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
+			Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+			return readyToAttack;
+			
+		} else { //if (combatStrategy == CombatStrategy.ATTACK) { 
+		    Position enemyPosition = getAttackPosition(squad);
+		    return enemyPosition;
+		    
 		}
-
-	    // What stuff the squad can attack.
+	}
+	
+	private Position getAttackPosition(Squad squad) {
+		// What stuff the squad can attack.
 		boolean canAttackAir = true;
 		boolean canAttackGround = true;
 		if (squad != null) {
@@ -179,8 +225,7 @@ public class CombatManager {
 
 		// Third choice: Attack visible enemy units.
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.getType() == UnitType.Zerg_Larva ||
-				!CommandUtil.IsValidUnit(unit) || !unit.isVisible()) {
+			if (unit.getType() == UnitType.Zerg_Larva || !CommandUtil.IsValidUnit(unit, false, true) || !unit.isVisible()) {
 				continue;
 			}
 
@@ -193,6 +238,42 @@ public class CombatManager {
 		return MapGrid.Instance().getLeastExplored();
 	}
 	
+	private Position watchersPosition(Squad squad) {
+		Player enemyPlayer = InformationManager.Instance().enemyPlayer;
+		
+		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(enemyPlayer);
+		if (enemyBaseLocation != null) {
+			boolean expansionOccupied = false;
+			BaseLocation expansionBase = InformationManager.Instance().getFirstExpansionLocation(enemyPlayer);
+			for (BaseLocation occupied : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer)) {
+				if (expansionBase.equals(occupied)) {
+					expansionOccupied = true;
+					break;
+				}
+			}
+			if (expansionOccupied) {
+				if (!InformationManager.Instance().getMapSpecificInformation().notUseReadyToAttackPosition()) {
+					Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(enemyPlayer);
+					if (readyToAttack != null) {
+						return readyToAttack;
+					}
+				} else {
+					Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(enemyPlayer);
+					if (secondChoke != null) {
+						return secondChoke.getCenter();
+					}
+				}
+			} else {
+				Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(enemyPlayer);
+				if (secondChoke != null) {
+					return secondChoke.getCenter();
+				} 
+			}
+		}
+		
+		return getMainAttackLocation(squad);
+	}
+
 	private void updateIdleSquad() {
 		Squad squad = squadData.getSquad("Idle");
 		
@@ -276,7 +357,7 @@ public class CombatManager {
 				continue;
 	        } else {
 	        	if (squad == null) {
-	        		SquadOrder squadOrder = new SquadOrder(SqaudOrderType.DEFEND, regionCenter, 32 * 25, "Defend region");
+	        		SquadOrder squadOrder = new SquadOrder(SquadOrderType.DEFEND, regionCenter, 32 * 25, "Defend region");
 	        		squadData.putSquad(new Squad(squadName, squadOrder, BASE_DEFENSE_PRIORITY));
 	        	}
 	        }
@@ -392,26 +473,29 @@ public class CombatManager {
 	
 	private void updateAttackSquads() {
 	    Squad mainAttackSquad = squadData.getSquad("MainAttack");
-	    Squad flyingSquad = squadData.getSquad("Flying");
+//	    Squad flyingSquad = squadData.getSquad("Flying");
 
 		for (Unit unit : combatUnits) {
-			if (squadData.canAssignUnitToSquad(unit, flyingSquad)
-				  && unit.getType() == UnitType.Terran_Wraith
-				  || unit.getType() == UnitType.Terran_Valkyrie
-				  || unit.getType() == UnitType.Terran_Battlecruiser) {
-				squadData.assignUnitToSquad(unit, flyingSquad);
-			}
-	        else if (!unit.getType().isWorker() && squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
+//			if (squadData.canAssignUnitToSquad(unit, flyingSquad)
+//				  && unit.getType() == UnitType.Terran_Wraith
+//				  || unit.getType() == UnitType.Terran_Valkyrie
+//				  || unit.getType() == UnitType.Terran_Battlecruiser) {
+//				squadData.assignUnitToSquad(unit, flyingSquad);
+//			} else
+	        if (!unit.getType().isWorker() && squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
 				squadData.assignUnitToSquad(unit, mainAttackSquad);// 배슬, 드랍십도 포함됨
 	        }
 	    }
 
-	    SquadOrder mainAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
-	    mainAttackSquad.setOrder(mainAttackOrder);
+		if (mainAttackSquad.getOrder().getType() != SquadOrderType.BATTLE) {
+			SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
+		    mainAttackSquad.setOrder(mainAttackOrder);
+		}
 
-	    SquadOrder flyingAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(flyingSquad), 800, "Attack enemy base");
-		flyingSquad.setOrder(flyingAttackOrder);
-		
+//		if (flyingSquad.getOrder().getType() != SqaudOrderType.BATTLE) {
+//		    SquadOrder flyingAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(flyingSquad), 800, "Attack enemy base");
+//			flyingSquad.setOrder(flyingAttackOrder);
+//		}
 	}
 	
 	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers) {
@@ -442,6 +526,87 @@ public class CombatManager {
 		}
 
 		return closestDefender;
+	}
+
+
+    int watcherMaxNum = 1; // TODO 변동 숫자 
+	char checkerIdx = 'A'; // TODO 이거 수정필요
+	int maxCheckerSquadNum = 1; // TODO 변동 숫자 
+	int checkcerMaxNum = 1; // TODO 변동 숫자 
+	
+	private void updateWatcherSquad() {
+	    Squad watcherSquad = squadData.getSquad("Watcher");
+
+		if (combatStrategy != CombatStrategy.ATTACK_ENEMY) {
+			for (Unit unit : combatUnits) {
+		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, watcherSquad)) {
+					if (watcherSquad.getUnitSet().size() < watcherMaxNum) {
+						squadData.assignUnitToSquad(unit, watcherSquad);
+		        	}
+		        }
+		    }
+		}
+
+		SquadOrder watchOrder = new SquadOrder(SquadOrderType.WATCH, watchersPosition(watcherSquad), 800, "Over Watcher");
+		watcherSquad.setOrder(watchOrder);
+	}
+	
+	private void updateCheckerSquad() {
+		List<Squad> checkerSquads = squadData.getSquadList("Checker");
+		
+		// 대기중(inactive)인 checker squad에 unit을 할당한다.
+		// 활동중(active) 상태인 checker는 이미 돌아다니고 있으니 병력 할당을 하지 않는다.
+		for (Unit unit : combatUnits) {
+			for (Squad squad : checkerSquads) {
+				if (squad.getOrder().getType() == SquadOrderType.CHECK_ACTIVE) {
+					// active squad의 병력이 모두 죽었다면 squad를 삭제한다.
+					if (squad.getUnitSet().size() == 0) {
+						squadData.removeSquad(squad.getName());
+						VultureTravelManager.Instance().getSquadSiteMap().remove(squad.getName());
+					}
+					continue;
+				}
+				
+				// unit을 할당한다.
+		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, squad)) {
+		        	if (squad.getUnitSet().size() < checkcerMaxNum) {
+						squadData.assignUnitToSquad(unit, squad);
+		        	}
+		        }
+		        
+		        // 최대 숫자만큼 unit이 할당되었으니 active 상태로 변경한다.
+		        // 전투상태이면 inactive -> active 변경
+		        if (squad.getUnitSet().size() >= checkcerMaxNum || combatStrategy == CombatStrategy.ATTACK_ENEMY) {
+		        	squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
+		        }
+		    }
+		}
+		
+		boolean inactiveSquadExist = false;
+		for (Squad squad : checkerSquads) {
+			if (squad.getOrder().getType() == SquadOrderType.CHECK_ACTIVE) {
+				BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName());
+				Position orderPosition = null;
+	        	if (baseLocation != null) {
+	        		orderPosition = baseLocation.getPosition();
+	        	} else {
+	        		orderPosition = getMainAttackLocation(squad);
+	        	}
+	        	squad.getOrder().setPosition(orderPosition);
+			} else {
+				inactiveSquadExist = true;
+			}
+		}
+		
+		if (!inactiveSquadExist && combatStrategy != CombatStrategy.ATTACK_ENEMY) {
+			// 새로운 checker squad를 생성한다. 전투상태이면 스쿼드를 생성하지 않는다.
+			if (checkerSquads.size() < maxCheckerSquadNum) {
+	    		SquadOrder squadOrder = new SquadOrder(SquadOrderType.CHECK_INACTIVE, getMainAttackLocation(null), 100, "Check it out");
+	    		Squad newCheckerSquad = new Squad("Checker " + checkerIdx++, squadOrder, CHECKER_PRIORITY);
+	    		squadData.putSquad(newCheckerSquad);
+			}
+		}
+		
 	}
 
 }

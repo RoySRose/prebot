@@ -1,6 +1,8 @@
 package pre.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +25,8 @@ import bwta.Region;
 import pre.UnitData;
 import pre.UnitInfo;
 import pre.main.MyBotModule;
+import pre.util.MapSpecificInformation;
+import pre.util.MapSpecificInformation.MAP;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
 /// 현재 게임 상황정보는 BWAPI::Broodwar 를 조회하여 파악할 수 있지만, 과거 게임 상황정보는 BWAPI::Broodwar 를 통해 조회가 불가능하기 때문에 InformationManager에서 별도 관리하도록 합니다<br>
@@ -58,6 +62,14 @@ public class InformationManager {
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
+	
+	// 나머지 멀티 location (가까운 순으로 sorting)
+	private Map<Player, List<BaseLocation>> otherExpansionLocations = new HashMap<Player, List<BaseLocation>>();
+	
+	/// 센터 진출로
+	private Map<Player, Position> readyToAttackPosition = new HashMap<Player, Position>();
+	
+	private MapSpecificInformation mapSpecificInformation = null;
 
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
@@ -100,8 +112,14 @@ public class InformationManager {
 		secondChokePoint.put(selfPlayer, null);
 		secondChokePoint.put(enemyPlayer, null);
 
-		updateChokePointAndExpansionLocation();
+		otherExpansionLocations.put(selfPlayer, new ArrayList<BaseLocation>());
+		otherExpansionLocations.put(enemyPlayer, new ArrayList<BaseLocation>());
 		
+		readyToAttackPosition.put(selfPlayer, null);
+		readyToAttackPosition.put(enemyPlayer, null);
+
+		updateMapSpecificInformation();
+		updateChokePointAndExpansionLocation();
 	}
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
@@ -386,8 +404,10 @@ public class InformationManager {
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(selfPlayer, chokepoint);
+						this.updateReadyToAttackPosition(selfPlayer, chokepoint);
 					}
 				}
+				this.updateOtherExpansionLocation(sourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(selfPlayer, new Boolean(false));
 		}
@@ -421,12 +441,96 @@ public class InformationManager {
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(enemyPlayer, chokepoint);
+						this.updateReadyToAttackPosition(enemyPlayer, chokepoint);
 					}
 				}
+				this.updateOtherExpansionLocation(sourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
 		}
 	}
+	
+	class BaseDistance {
+		BaseDistance(BaseLocation base, double distance) {
+			this.base = base;
+			this.distance = distance;
+		}
+		BaseLocation base;
+		double distance;
+	}
+	
+	public void updateOtherExpansionLocation(BaseLocation baseLocation) {
+		
+		final BaseLocation myBase = mainBaseLocations.get(selfPlayer);
+		final BaseLocation myFirstExpansion = firstExpansionLocation.get(selfPlayer);
+		
+		final BaseLocation enemyBase = mainBaseLocations.get(enemyPlayer);
+		final BaseLocation enemyFirstExpansion = firstExpansionLocation.get(enemyPlayer);
+		
+		if (myBase == null || myFirstExpansion == null || enemyBase == null || enemyFirstExpansion == null) {
+			return;
+		}
+
+		otherExpansionLocations.get(selfPlayer).clear();
+		otherExpansionLocations.get(enemyPlayer).clear();
+		
+		int islandCnt = 0;
+		int mainBaseCnt = 0;
+		for (BaseLocation base : BWTA.getBaseLocations()) {
+			if (base.isIsland()) {
+				islandCnt++;
+				continue;
+			}
+			// BaseLocation을 equal로 비교하면 오류가 있을 수 있다.
+			if (base.getPosition().equals(myBase.getPosition()) || base.getPosition().equals(myFirstExpansion.getPosition())
+					|| base.getPosition().equals(enemyBase.getPosition()) || base.getPosition().equals(enemyFirstExpansion.getPosition())) {
+				mainBaseCnt++;
+				continue;
+			}
+			if (base.minerals() < 1000) {
+				continue;
+			}
+			otherExpansionLocations.get(selfPlayer).add(base);
+			otherExpansionLocations.get(enemyPlayer).add(base);
+		}
+		System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " + mainBaseCnt);
+		
+		Collections.sort(otherExpansionLocations.get(selfPlayer), new Comparator<BaseLocation>() {
+			@Override public int compare(BaseLocation base1, BaseLocation base2) {
+				BaseLocation srcBase = myFirstExpansion;
+				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
+			}
+		});
+		Collections.sort(otherExpansionLocations.get(enemyPlayer), new Comparator<BaseLocation>() {
+			@Override public int compare(BaseLocation base1, BaseLocation base2) {
+				BaseLocation srcBase = enemyFirstExpansion;
+				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
+			}
+		});
+	}
+	
+	public void updateReadyToAttackPosition(Player player, Chokepoint chokepoint) {
+		int approachDist = 300;
+		
+		Position secondChokePosition = chokepoint.getCenter();
+		Position center = new Position(2048, 2048); // 128x128 맵의 센터
+
+		int x = center.getX() - secondChokePosition.getX();
+		int y = center.getY() - secondChokePosition.getY();
+	    double radian = Math.atan2(y, x);
+
+	    while (approachDist > 0) {
+		    Position approachVector = new Position((int)(approachDist * Math.cos(radian)), (int)(approachDist * Math.sin(radian)));
+		    Position position = new Position (secondChokePosition.getX() + approachVector.getX(), secondChokePosition.getY() + approachVector.getY());
+		    if (position.isValid() && BWTA.getRegion(position) != null
+		    		&& MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8)) {
+				readyToAttackPosition.put(player, position);
+				break;
+		    }
+		    approachDist += 10;
+	    }
+	}
+	
 
 	public void updateOccupiedRegions(Region region, Player player) {
 		// if the region is valid (flying buildings may be in null regions)
@@ -541,6 +645,16 @@ public class InformationManager {
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	public Chokepoint getSecondChokePoint(Player player) {
 		return secondChokePoint.get(player);
+	}
+
+	/// 해당 Player (아군 or 적군) 의 Main BaseLocation과 First Expansion을 제외한 BaseLocation을 가까운 순으로 정렬하여 리턴합니다		 
+	public List<BaseLocation> getOtherExpansionLocations(Player player) {
+		return otherExpansionLocations.get(player);
+	}
+
+	/// 센터 진출로 포지션을 리턴한다. 헌터에서 썼다가 결과는 책임못진다. insaneojw
+	public Position getReadyToAttackPosition(Player player) {
+		return readyToAttackPosition.get(player);
 	}
 
 	/// 해당 UnitType 이 전투 유닛인지 리턴합니다
@@ -736,5 +850,78 @@ public class InformationManager {
 //		} else {
 //			return UnitType.None;
 //		}
+	}
+	
+	public void updateMapSpecificInformation() {
+		List<BaseLocation> startingBase = new ArrayList<>();
+		MAP candiMapByPosition = null;
+		for (BaseLocation base : BWTA.getStartLocations()) {
+			if (base.isStartLocation()) {
+				startingBase.add(base);
+			}
+		}
+		
+		// position으로 map 판단
+		final int posFighting[][] = new int[][]{{288, 3760}, {288, 240}, {3808, 272}, {3808, 3792}};
+		final int posLost[][] = new int[][]{{288, 2832}, {928, 3824}, {3808, 912}, {1888, 240}};
+		if (startingBase.size() == 8) {
+			candiMapByPosition = MAP.TheHunters;
+		} else if (startingBase.size() == 4) {
+			Position basePos = mainBaseLocations.get(selfPlayer).getPosition();
+			for (int[] pos : posFighting) {
+				if (basePos.equals(new Position(pos[0], pos[1]))) {
+					candiMapByPosition = MAP.FightingSpririts;
+					break;
+				}
+			}
+			if (candiMapByPosition == null) {
+				for (int[] pos : posLost) {
+					if (basePos.equals(new Position(pos[0], pos[1]))) {
+						candiMapByPosition = MAP.LostTemple;
+						break;
+					}
+				}
+			}
+		} else {
+			candiMapByPosition = MAP.Unknown;
+		}
+		
+		// name으로 map 판단
+		MAP candiMapByName = null;
+		String mapName = MyBotModule.Broodwar.mapFileName().toUpperCase();
+		if (mapName.matches(".*HUNT.*")) {
+			candiMapByName = MAP.TheHunters;
+		} else if (mapName.matches(".*LOST.*") || mapName.matches(".*TEMPLE.*")) {
+			candiMapByName = MAP.LostTemple;
+		} else if (mapName.matches(".*FIGHT.*") || mapName.matches(".*SPIRIT.*")) {
+			candiMapByName = MAP.FightingSpririts;
+		} else {
+			candiMapByName = MAP.Unknown;
+		}
+
+		// 최종 결정
+		MAP mapDecision = MAP.LostTemple;
+		if (candiMapByPosition == candiMapByName) {
+			mapDecision = candiMapByPosition;
+			System.out.println("map : " + candiMapByPosition + "(100%)");
+		} else {
+			if (candiMapByPosition != MAP.Unknown) {
+				mapDecision = candiMapByPosition;
+				System.out.println("map : " + mapDecision + "(mapByName is -> " + candiMapByName + ")");
+			} else if (candiMapByName != MAP.Unknown) {
+				mapDecision = candiMapByName;
+				System.out.println("map : " + mapDecision + "(mapByPosition is -> " + candiMapByPosition + ")");
+			}
+		}
+
+		MapSpecificInformation tempMapInfo = new MapSpecificInformation();
+		tempMapInfo.setMap(mapDecision);
+		tempMapInfo.setStartingBaseLocation(startingBase);
+		
+		mapSpecificInformation = tempMapInfo;
+	}
+	
+	public MapSpecificInformation getMapSpecificInformation() {
+		return mapSpecificInformation;
 	}
 }

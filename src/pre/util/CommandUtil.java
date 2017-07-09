@@ -1,5 +1,6 @@
 package pre.util;
 import bwapi.Position;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
@@ -9,6 +10,33 @@ import bwapi.WeaponType;
 import pre.main.MyBotModule;
 
 public class CommandUtil {
+	
+	public static void patrolMove(Unit attacker, final Position targetPosition)
+	{
+		// Position 객체에 대해서는 == 가 아니라 equals() 로 비교해야 합니다		
+		if (attacker == null || !targetPosition.isValid())
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (attacker.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || attacker.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = attacker.getLastCommand();
+
+		// if we've already told this unit to attack this target, ignore this command
+		if (currentCommand.getUnitCommandType() == UnitCommandType.Patrol &&	currentCommand.getTargetPosition().equals(targetPosition))
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		attacker.patrol(targetPosition);
+	}
 
 	public static void attackUnit(Unit attacker, Unit target)
 	{
@@ -115,6 +143,32 @@ public class CommandUtil {
 		unit.rightClick(target);
 	}
 
+	public static void rightClick(Unit unit, Position position)
+	{
+		if (unit == null || position == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) // unit.isAttackFrame()이 너무 길어서 hit and run이 안되어 주석으로 제거
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Unit) && (position.equals(currentCommand.getTargetPosition())))
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		unit.rightClick(position);
+	}
+
 	public static void repair(Unit unit, Unit target)
 	{
 		if (unit == null || target == null)
@@ -139,6 +193,31 @@ public class CommandUtil {
 
 		// if nothing prevents it, attack the target
 		unit.repair(target);
+	}
+	
+	public static void useTechPosition(Unit unit, TechType tech, Position position)
+	{
+		if (unit == null || tech == null || position == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || unit.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Use_Tech_Position) && (currentCommand.getTargetPosition().equals(position)))
+		{
+			return;
+		}
+
+		unit.useTech(tech, position);
 	}
 
 	public static boolean IsCombatUnit(Unit unit)
@@ -177,6 +256,30 @@ public class CommandUtil {
 		if (unit.isCompleted()
 			&& unit.getHitPoints() > 0
 			&& unit.exists()
+			&& unit.getType() != UnitType.Unknown
+			&& unit.getPosition().isValid())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public static boolean IsValidUnit(Unit unit, boolean completed, boolean detected)
+	{
+		if (unit == null) {
+			return false;
+		}
+		if (completed && !unit.isCompleted()) {
+			return false;
+		}
+		if (detected && !unit.isDetected()) {
+			return false;
+		}
+
+		if (unit.exists()
 			&& unit.getType() != UnitType.Unknown
 			&& unit.getPosition().isValid())
 		{

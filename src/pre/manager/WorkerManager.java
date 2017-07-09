@@ -1,4 +1,6 @@
 package pre.manager;
+import java.util.List;
+
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
@@ -6,6 +8,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import pre.Config;
 import pre.WorkerData;
 import pre.WorkerMoveData;
@@ -35,11 +38,13 @@ public class WorkerManager {
 	public void update() {
 
 		// 1초에 1번만 실행한다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-
+		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0) return;
+		
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
+		updatework();
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
@@ -57,7 +62,6 @@ public class WorkerManager {
 			{
 				continue;
 			}
-
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다 
 			if ( worker.isIdle() )
 			{
@@ -66,6 +70,7 @@ public class WorkerManager {
 					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move)
 					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout))  
 				{
+					
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
 				}
 			}
@@ -129,7 +134,6 @@ public class WorkerManager {
 		for (Unit worker : workerData.getWorkers())
 		{
 			if (worker == null) continue;
-
 			// if worker's job is idle 
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default )
 			{
@@ -139,16 +143,149 @@ public class WorkerManager {
 		}
 	}
 
+	private void updatework() {
+		
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		/*
+		 * se-min.park
+		 * CC간 일꾼 재배 치 위해 체크 (CC당 일꾼수가 > 미네랄 * 2 일때 멀티 일꾼으로 지원 보냄(멀티 또한 미네랄 * 2 보다 작을 때) 
+		 */
+		Unit overDepot = null; //미네랄 * 2보다 많이 할당된 CC
+		Unit lessDepot = null; //미네랄 * 2보다 저게 할당된 CC
+		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots())
+		{
+			if (depot == null) continue;
+//			int workerCnt = workerData.depotWorkerCount.get(depot.getID());
+			int workerCnt = workerData.getNumAssignedWorkers(depot);
+			List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
+			//System.out.println("workerCnt : " + workerCnt + " mineralPatches.size() : " + mineralPatches.size());
+			if(workerCnt > mineralPatches.size()*2){
+				overDepot = depot;
+			}else if(workerCnt < mineralPatches.size()*2){
+				lessDepot = depot;
+			}
+
+		}	
+		for (Unit worker : workerData.getWorkers())
+		{
+			if (!worker.isCompleted())
+			{
+				continue;
+			}
+			//workerMineralMap = new HashMap<Integer, Unit>();
+			
+			if(worker.isGatheringMinerals()){
+				/*
+				 * se-min.park 일꾼재배치
+				 */
+				int maxSCV = 0;
+				int lowSCV = 10000;
+				int sCvCnt = 0;	
+				
+				
+				/*
+				 * CC간 일꾼 재배치 
+				 */
+				if(overDepot != null && lessDepot != null){
+					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(overDepot);
+					for (Unit mineral : mineralPatches){
+//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
+						int workerCnt = workerData.getNumAssignedWorkers(overDepot);
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
+						
+						if(maxSCV < sCvCnt){
+							maxSCV = sCvCnt;
+						}
+						if(lowSCV > sCvCnt){
+							lowSCV = sCvCnt;
+						}
+			        	//System.out.println("mineralPatches : " + mineralPatches.size());
+			        }
+					for (Unit mineral : mineralPatches){
+//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
+						int workerCnt = workerData.depotWorkerCount.get(overDepot);
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
+						if(sCvCnt == maxSCV && workerCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals()){
+							setMineralWorker(worker,lessDepot);
+							continue;
+						}
+					}
+					
+				}else{
+					Unit depot = workerData.getWorkerDepot(worker);
+					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
+					for (Unit mineral : mineralPatches){
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
+						//System.out.println("maxSCV : " + maxSCV + " sCV ; " + sCvCnt);
+						if(maxSCV < sCvCnt){
+							maxSCV = sCvCnt;
+						}
+						if(lowSCV > sCvCnt){
+							lowSCV = sCvCnt;
+						}
+			        	//System.out.println("mineralPatches : " + mineralPatches.size());
+			        }
+					for (Unit mineral : mineralPatches){
+						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
+						if(sCvCnt+2 <= maxSCV){
+							setMineralWorker(worker);
+							continue;
+						}
+			        	//System.out.println("mineralPatches : " + mineralPatches.size());
+			        }
+				}
+				
+				
+				/*
+				 * 일꾼 재배치 위한 로직 끝
+				 */
+				//int plangetmineral = workerData.workerMineralAssignment.get(worker.getID()).getID();
+				Unit tempMineral = workerData.workerMineralAssignment.get(worker.getID());
+				
+				int planGetMineral = tempMineral.getID();
+				
+				int realGetMineral = 0;
+				if(worker.getOrderTarget() != null){
+					realGetMineral = worker.getOrderTarget().getID();
+				}
+				if(worker.isCarryingMinerals() == true || worker.getOrderTarget()  == null){
+					continue;
+				}
+				if(planGetMineral != realGetMineral){
+					//System.out.println(" realgetmineral:" + realgetmineral +"changing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					worker.gather(tempMineral);
+					realGetMineral = worker.getOrderTarget().getID();
+					//commandUtil.rightClick(worker, temp);
+				}
+				
+				
+				
+				//System.out.print(" isMoving:" + worker.isMoving());
+				//System.out.println(" realgetmineral:" + realgetmineral + " plangetmineral:" + plangetmineral);
+				
+				//worker.
+	//			if(workerData.workerMineralMap != null){
+	//				System.out.print("getmineral2:" + workerData.workerMineralMap.get(worker.getID()).getID());
+	//			}
+				//System.out.print(" getmineral:" + workerData.getMineralToMine(worker).getID());
+				//System.out.print(" isgather:" + worker.isGatheringMinerals());
+				//System.out.println(" iscarry:" + worker.isCarryingMinerals());
+				// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
+			}
+		}	
+	}
+
+
 	public void handleMoveWorkers()
 	{
 		// for each of our workers
 		for (Unit worker : workerData.getWorkers())
 		{
 			if (worker == null) continue;
-
 			// if it is a move worker
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move)
 			{
+				System.out.println(" worker : " + worker.getID() + " workerData.getWorkerJob(worker) : " + workerData.getWorkerJob(worker));
 				WorkerMoveData data = workerData.getWorkerMoveData(worker);
 
 				// 목적지에 도착한 경우 이동 명령을 해제한다
@@ -260,8 +397,8 @@ public class WorkerManager {
 		if (unit == null) return;
 
 		// check if there is a mineral available to send the worker to
+		/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
 		Unit depot = getClosestResourceDepotFromWorker(unit);
-
 		// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
 		if (depot != null)
 		{
@@ -270,6 +407,24 @@ public class WorkerManager {
 		}
 	}
 	
+	/*
+	 * se-min.park 멀티 일꾼 재분배 위해 추가.
+	 */
+	/// 해당 일꾼 유닛 unit 의 WorkerJob 값를 Mineral 로 변경합니다
+		public void setMineralWorker(Unit unit,Unit depot)
+		{
+			if (unit == null) return;
+
+			// check if there is a mineral available to send the worker to
+			/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
+			// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
+			if (depot != null && depot.isCompleted())
+			{
+				// update workerData with the new job
+				workerData.setWorkerJob(unit, WorkerData.WorkerJob.Minerals, depot);
+			}
+		}
+		
 	/// target 으로부터 가장 가까운 Mineral 일꾼 유닛을 리턴합니다
 	public Unit getClosestMineralWorkerTo(Position target)
 	{
@@ -337,7 +492,7 @@ public class WorkerManager {
 	public void setIdleWorker(Unit unit)
 	{
 		if (unit == null) return;
-
+	
 		workerData.setWorkerJob(unit, WorkerData.WorkerJob.Idle, (Unit)null);
 	}
 
@@ -354,7 +509,7 @@ public class WorkerManager {
 		{
 			if (unit == null) continue;
 			
-			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals)
+			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals && !unit.isCarryingMinerals())
 			{
 				double distance = unit.getDistance(refinery);
 				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
@@ -410,13 +565,16 @@ public class WorkerManager {
 				}
 			}
 
-			// Move / Idle Worker 가 없을때, 다른 Worker 중에서 차출한다 
+			// Move / Idle Worker 가 없을때, 다른 Worker 중에서 차출한다
+			/*
+			 * se-min.park 가스가 미네랄보다 건설예정 위치에 가까울경우 gas 들고 있는 일꾼이 추출됨(로직에서 isGatheringGas false 처리 되어잇음에도 감...그래서 Gas 일꾼에서 안빼는걸로 변경) 
+			 */
 			if (unit.isCompleted() 
-				&& (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build))
+				&& (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Gas && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build))
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
+				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ) && !closestMiningWorker.isCarryingGas())
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMiningWorker = unit;
@@ -425,11 +583,12 @@ public class WorkerManager {
 				}
 			}
 		}
-		
+		//System.out.println("closestMovingWorker ; " + closestMovingWorker.getID() + " closestMiningWorker L : " + closestMiningWorker.getID());
 		Unit chosenWorker = closestMovingWorker != null ? closestMovingWorker : closestMiningWorker;
 
 		// if the worker exists (one may not have been found in rare cases)
-		if (chosenWorker != null && setJobAsConstructionWorker)
+		// 미네랄 or 가스 안옮기는 애로 설정
+		if (chosenWorker != null && setJobAsConstructionWorker && chosenWorker.isCarryingMinerals() == false && chosenWorker.isCarryingGas() == false)
 		{
 			workerData.setWorkerJob(chosenWorker, WorkerData.WorkerJob.Build, buildingType);
 		}
@@ -468,6 +627,7 @@ public class WorkerManager {
 
 	
 	// get a worker which will move to a current location
+	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
 	public Unit chooseMoveWorkerClosestTo(Position p)
 	{
 		// set up the pointer
@@ -496,7 +656,7 @@ public class WorkerManager {
 		return closestWorker;
 	}
 
-	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
+	/// position 에서 가장 가까운 Mineral 혹은 Idle 일꾼 유닛들 중에서 Move 임무를 수행할 일꾼 유닛을 정해서 리턴합니다??????
 	public void setMoveWorker(Unit worker, int mineralsNeeded, int gasNeeded, Position p)
 	{
 		// set up the pointer
