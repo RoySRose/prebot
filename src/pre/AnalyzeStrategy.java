@@ -179,7 +179,7 @@ public class AnalyzeStrategy {
 		int mutal_chk = 0;
 		int ultra_chk = 0;
 		
-		System.out.println("Analyze start");
+		//System.out.println("Analyze start");
 		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Zergling, InformationManager.Instance().enemyPlayer) >= 1){
 			ling_chk  = 1;
 		}
@@ -197,7 +197,6 @@ public class AnalyzeStrategy {
 		
 		
 		StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic);
-		System.out.println("Analyze start");
 		
 //		//basic
 //		if(저그 히드라 조건 충족하면){

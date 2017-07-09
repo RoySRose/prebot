@@ -44,7 +44,7 @@ public class WorkerManager {
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
-		updatework();
+		//updatework();
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();

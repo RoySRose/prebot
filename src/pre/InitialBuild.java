@@ -168,7 +168,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				//19 찍어놓고 1벌쳐

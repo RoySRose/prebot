@@ -629,18 +629,24 @@ public class StrategyManager {
 		if(Config.BuildQueueDebugYN){
 			System.out.print("@@@@@@@@Frame : " + MyBotModule.Broodwar.getFrameCount() + ", ");
 		}
+		
+		if(MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 4){
+			return;
+		}
+		
 		if (!tempbuildQueue.isEmpty()) {
 			currentItem= tempbuildQueue.getHighestPriorityItem();
 			while(true){
 				if(Config.BuildQueueDebugYN){
 					System.out.println("picked: "+ currentItem.metaType.getName());
 				}
-				if(currentItem.blocking == true){
-					break;
-				}
 				if(currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
 					return;
 				}
+				if(currentItem.blocking == true){
+					break;
+				}
+				
 				if(tempbuildQueue.canSkipCurrentItem() == true){
 					tempbuildQueue.skipCurrentItem();
 				}else{
@@ -687,6 +693,7 @@ public class StrategyManager {
 				if(currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop && unit.getAddon() == null ){
 					continue;
 				}
+				//필요하려나?
 				if(currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
 					if(unit.getAddon() != null && unit.getAddon().isCompleted() == true){
 						continue;
@@ -1020,16 +1027,19 @@ public class StrategyManager {
 			}
 		}
 	
+		if (MyBotModule.Broodwar.getFrameCount() % 240 == 0){
+			System.out.println("Current Attack Point: " + point);
+		}
 		//@@@@@@ 일단 공격 중이라면......
-		if(point > 120){// 팩토리 유닛이 50마리(즉 스타 인구수 200 일때)
+		if(point > 120){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 		}else{
 			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
 				if(point < 40){//@@@@@@ 후반부터는 상대 죽인수가 의미가 없어지기 때문에.... defence 기준을 다르게 잡아야한다.
-					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 				}
 			}else{
-				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
 		}
 	}
@@ -1075,7 +1085,7 @@ public class StrategyManager {
 			// 돈이 800 넘으면 멀티하기
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 					+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
-				if( MyBotModule.Broodwar.self().minerals() > 800 && getFacUnits() > 40){
+				if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40){
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
