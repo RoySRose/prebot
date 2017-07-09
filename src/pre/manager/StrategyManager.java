@@ -18,6 +18,7 @@ import pre.InitialBuild;
 import pre.MetaType;
 import pre.WorkerData;
 import pre.main.MyBotModule;
+import pre.manager.CombatManager.CombatStrategy;
 import pre.manager.StrategyManager.Strategys;
 import pre.util.CommandUtil;
 import pre.util.MicroUtils;
@@ -41,8 +42,7 @@ public class StrategyManager {
 	private static StrategyManager instance = new StrategyManager();
 
 	private CommandUtil commandUtil = new CommandUtil();
-
-	private boolean isFullScaleAttackStarted;
+	
 	private boolean isInitialBuildOrderFinished;
 	
 	private boolean previousStrategyStatus;
@@ -108,7 +108,7 @@ public class StrategyManager {
 	
 	
 	public StrategyManager() {
-		isFullScaleAttackStarted = false;
+		
 		isInitialBuildOrderFinished = false;
 		CurrentStrategyBasic = Strategys.valueOf("zergBasic");
 		CurrentStrategyException = StrategysException.valueOf("Temp");
@@ -301,7 +301,7 @@ public class StrategyManager {
 	public void update() {
 		
 		//@@@@@@ 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
-		if ((MyBotModule.Broodwar.getFrameCount() < 5000 && MyBotModule.Broodwar.getFrameCount() % 2 == 0)
+		if ((MyBotModule.Broodwar.getFrameCount() < 5000 && MyBotModule.Broodwar.getFrameCount() % 4 == 0)
 				||(MyBotModule.Broodwar.getFrameCount() > 5000 && MyBotModule.Broodwar.getFrameCount() % 24 == 0)) {
 			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
@@ -310,32 +310,39 @@ public class StrategyManager {
 			isInitialBuildOrderFinished = true;
 		}
 		
-		executeWorkerTraining();
-		executeSupplyManagement();
+		// 1초에 한번만 실행
+		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
+			executeSupplyManagement();
+		}
+		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
+			executeExpansion();
+		}
 		
-//		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-//		{
-//			if (unit == null) continue;
-//			if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
-//				System.out.println("FAC unit trainig " + unit.isTraining());
-//				System.out.println("FAC unit isaddon " + unit.getAddon());
-//			}
-// 		}
+		
+		if (isInitialBuildOrderFinished == true) {
+			if (MyBotModule.Broodwar.getFrameCount() % 119 == 0){
+				executeCombat();
+			}
+		}
+		
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0){
+			executeWorkerTraining();
 			executeCombatUnitTrainingBlocked();
-			executeCombatUnitTraining();
+
+			if (isInitialBuildOrderFinished == true) {
+				executeCombatUnitTraining();
+			}
 			executeExeptionalCombatUnitTraining();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
 		}
-			
-		//executeCombat();
 		
 		if (isInitialBuildOrderFinished == false) {
-			executeAddFactoryInit();
+			if (MyBotModule.Broodwar.getFrameCount() % 24 == 0){
+				executeAddFactoryInit();
+			}
 		}else if (MyBotModule.Broodwar.getFrameCount() % 120 == 0 && isInitialBuildOrderFinished == true) { //5초에 한번 팩토리 추가 여부 결정
 			executeAddFactory();
 		}
-		
 	}
 
 	
@@ -343,17 +350,11 @@ public class StrategyManager {
 	public void executeWorkerTraining() {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
-		/*@@@@@@ 살려야될듯?
-		if (isInitialBuildOrderFinished == false) {
-			return;
-		}
-		*/
-//		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
-//			//System.out.println("tot_mineral_self: "+ tot_mineral_self);
+//		if (isInitialBuildOrderFinished == false) {
 //			return;
 //		}
+		
 		int tot_mineral_self = 0 ;
-		//@@@@@@@ 자주 안돌게 위에꺼로 몇초에 한번씩만 실행하게끔 해야할듯
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
@@ -366,24 +367,13 @@ public class StrategyManager {
 					tot_mineral_self += minerals;
 				}
 			}
+			
  		}
 
 		//@@@@@@ mineral 이 50 이하이고 scv 도 0 이면 다른고 취소하고 해야되는 로직 입력 필요. 만약 여기 안 넣을꺼면 미네랄 50을 걸어도 되고.. 아니면.... 흠....
 		//@@@@@@ 현재 mineral 이 50이하인데 scv 가 0 일때 현재 빌드중인거 취소해야하는 만약 취소할것이 없다면!!! 총공격 모드!! 삽입해야되지 않을까
-//		if (MyBotModule.Broodwar.self().minerals() < 50) {
-//			int workerCount = MyBotModule.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType());
-//						
-//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-//				if (unit.getType().isResourceDepot()) {
-//					if (unit.isTraining()) {
-//						workerCount += unit.getTrainingQueue().size();
-//					}
-//				}
-//			}
-//			
-//			if(workerCount == 0){
-//				CurrentStrategyStatus = "FullAttackALLIn";
-//			}
+//		if (MyBotModule.Broodwar.getFrameCount() < 6000 && MyBotModule.Broodwar.self().minerals() < 50 ) {//어차피 저거 이후로는 총 공격이다.
+//				
 //		}
 
 		//@@@@@@ 이거 만약 highest 가 blocking 안하는 애 인데 두번째 애가 블로킹일때는.. scv가 넘겨서 못 만들거 같은데............................. 오히려 안 바꾸는게 초반에 큰 문제를 안 일으킬수도 있고....
@@ -418,7 +408,6 @@ public class StrategyManager {
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 									}else{
 										// 빌드큐에 일꾼 생산이 1개는 있도록 한다
-										//System.out.println("why am i here");
 										if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
 											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 										}
@@ -426,7 +415,6 @@ public class StrategyManager {
 								}
 							}
 						}
-						
 					}
 				}
 			}
@@ -439,11 +427,6 @@ public class StrategyManager {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		if (isInitialBuildOrderFinished == false) {
-			return;
-		}
-
-		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
 			return;
 		}
 
@@ -532,7 +515,6 @@ public class StrategyManager {
 		}
 	}
 	
-	
 	public void executeAddFactory() {
 		
 		int CCcnt = 0;
@@ -566,6 +548,7 @@ public class StrategyManager {
 			maxFaccnt = 8;
 		}
 		
+		//@@@@@@ fac 만들고 있을때 빌드큐에서 빠지고 construrction 큐에 들어가는데.. 같이 볼필요 없을까?
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0) {
 			if(Faccnt == 0){
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -611,7 +594,7 @@ public class StrategyManager {
 		}
 	}
 	
-	boolean isFacUnit(BuildOrderItem currentItem){
+	public boolean isFacUnit(BuildOrderItem currentItem){
 		
 		if(currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
 			return true;
@@ -625,6 +608,18 @@ public class StrategyManager {
 		return false;
 	}
 	
+	public int getFacUnits(){
+		
+		int tot=0;
+		
+		tot = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture)
+				+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+				+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+				+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+		
+		return tot*4; //인구수 기준이므로
+	}
+
 	public void executeCombatUnitTrainingBlocked() {
 		
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -775,17 +770,12 @@ public class StrategyManager {
 						}
 					}
 				}
-				
 			}
  		}
 	}
 	
 	public void executeCombatUnitTraining() {
 
-		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
-		if (isInitialBuildOrderFinished == false) {
-			return;
-		}
 		int Faccnt = 0;
 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -829,14 +819,278 @@ public class StrategyManager {
 	public void executeExeptionalCombatUnitTraining() {
 		//@@@@@@ 사이언스 베슬이나 발키리 하는 로직
 	}
-
-	public void executeCombat() {
-//		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 5) {
-//			CombatManager.Instance().setAggressive(true);
-//		} else {
-//			CombatManager.Instance().setAggressive(false);
-//		}
+	
+	public int getTotDeadCombatUnits(){
+		
+		int res =0;
+		int tot =0;
+		int totscv = 0;
+		int totmarine = 0;
+		
+		tot = MyBotModule.Broodwar.self().deadUnitCount();
+		totmarine = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
+		totscv = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_SCV);
+		
+		res = tot - totmarine - totscv;
+		res = res*2 + totmarine;
+		
+		return res*2;//스타에서는 두배
 	}
+	
+	public int getTotKilledCombatUnits(){
+		
+		int res = 0;
+		int tot = 0;
+		
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
+			int totworker = 0;
+			int totbio = 0;
+			
+			tot = MyBotModule.Broodwar.self().killedUnitCount();
+			totbio = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Marine)
+					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Firebat)
+					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Medic);
+			totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_SCV);
+
+			res = tot - totbio - totworker;
+			res = res*2 + totbio;
+			
+			return res*2;
+			
+		}else if (InformationManager.Instance().enemyRace == Race.Zerg) {
+			
+			int totworker = 0;
+			int totzerling = 0;
+			int tothydra = 0;
+			int totmutal = 0;
+			int totoverload = 0;
+			
+			//tot = MyBotModule.Broodwar.self().killedUnitCount(UnitType.AllUnits);
+			totzerling = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Zergling);
+			tothydra = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Hydralisk);
+			totmutal = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Mutalisk);
+			totoverload = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
+			//totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Drone);
+
+			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3;
+			return res; //저그는 저글링 때문에 이미 2배 함
+			
+		}else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+			int totworker = 0;
+			
+			tot = MyBotModule.Broodwar.self().killedUnitCount();
+			totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Probe);
+
+			res = tot - totworker;
+			res = res*2;
+			
+			return res*2;
+		}else{
+			return 0;
+		}
+		
+	}
+
+	
+
+	public boolean enemymulting(){
+		int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType());
+
+		if (cnt > 0){
+			return true;
+		}
+		return false;
+	}
+	
+	
+	//@@@@@@ 상대방 신규 멀티를 찾았을때 공격 여부 한번더 돌려야함(상대 멀티 진행 여부 판단해야되므로
+	public void executeCombat() {
+		
+		int point = 0;
+		int selfbasecnt = 0;
+		int enemeybasecnt = 0;
+		boolean allaware = InformationManager.Instance().isReceivingEveryMultiInfo();
+		
+		//@@@@@@ 아군은 돌아가기 시작하고 scv 특정 수 이상 붙은 컴맨드만 쳐야 하지 않나?
+		selfbasecnt = InformationManager.Instance().getOccupiedBaseLocationsCnt(InformationManager.Instance().selfPlayer);
+		enemeybasecnt = InformationManager.Instance().getOccupiedBaseLocationsCnt(InformationManager.Instance().enemyPlayer);
+		//CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
+		
+		//공통 예외 상황
+		if(getFacUnits() > 280 || MyBotModule.Broodwar.self().supplyUsed() > 392){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK);
+		}
+		if(MyBotModule.Broodwar.getFrameCount() > 8000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 7){//@@@@@@5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK); //@@@@@@ 올인에 대한거 하나 만들어야 겠다... 올인이면 공격 취소도 하면 안되므로..
+		}
+		
+		//종족별 예외 상황
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
+			
+		}
+		if (InformationManager.Instance().enemyRace == Race.Protoss) {
+			//앞마당 photo
+			//캐리어
+			//본진 photo
+			//다크템, 시타델)
+		}
+		if (InformationManager.Instance().enemyRace == Race.Zerg) {
+			//triple hatchery
+		}
+		
+		//공통 기본 로직, 팩토리 유닛 50마리 기준 유닛 Kill Death 상황에 따라 변경.
+		
+		int deadcombatunit = getTotDeadCombatUnits();
+		int killedcombatunit = getTotKilledCombatUnits();
+		int totworkerdead = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_SCV);
+		int totworkerkilled = MyBotModule.Broodwar.self().killedUnitCount(InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace));
+		int totaldeadunit = MyBotModule.Broodwar.self().deadUnitCount();
+		int totalkilledunit = MyBotModule.Broodwar.self().deadUnitCount();
+		
+		int myunit = getFacUnits();
+		
+		if(MyBotModule.Broodwar.getFrameCount() < 20000){ //약 시작 ~ 15분까지
+			point += (totworkerkilled - totworkerdead) *2* (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
+			point += (killedcombatunit - deadcombatunit);
+			
+		}else if(MyBotModule.Broodwar.getFrameCount() < 40000){ //약 15분 ~ 28분까지  // 여기서부턴 시간보다.... 현재 전체 규모수가 중요할듯?
+			point += (totworkerkilled - totworkerdead)*2* (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
+			point += (killedcombatunit - deadcombatunit)* (-MyBotModule.Broodwar.getFrameCount()/20000.0 + 2.0);
+			
+			if(selfbasecnt > 1 && enemeybasecnt > 1){
+				if(allaware ==true){
+					if (InformationManager.Instance().enemyRace == Race.Terran) {			
+						double temp = (selfbasecnt - enemeybasecnt)/1000.0-20; //멀티 하나당 frame 에 따라서 최고 20점
+						if(temp < -20){ //최소 점수 존재
+							temp = -20;
+						}
+						point += temp;
+					}else{
+						double temp = (selfbasecnt+1 - enemeybasecnt)/1000.0-20; //저그 프로는 하나 정도 내주고 계산
+						if(temp < -20){ //최소 점수 존재
+							temp = -20;
+						}
+						point += temp;
+					}
+				}
+			}else if(selfbasecnt > 1 && enemeybasecnt == 1){
+				point += 20;
+			}
+		
+		}else{ //28분 ~ 종료시까지
+			//point += (killedcombatunit - deadcombatunit);
+			if(selfbasecnt > 1 && enemeybasecnt > 1){
+				if(allaware ==true){
+					if (InformationManager.Instance().enemyRace == Race.Terran) {			
+						double temp = (selfbasecnt - enemeybasecnt) * 20; //멀티 하나당 20점
+						if(temp < -20){ //최소 점수 존재
+							temp = -20;
+						}
+						point += temp;
+					}else{
+						double temp = (selfbasecnt+1 - enemeybasecnt) * 20; //멀티 하나당 20점
+						if(temp < -20){ //최소 점수 존재
+							temp = -20;
+						}
+						point += temp;
+					}
+				}
+			}else if(selfbasecnt > 1 && enemeybasecnt == 1){
+				point += 20;
+			}
+		}
+		
+		//내 팩토리 유닛 인구수 만큼 추가
+		point += myunit;
+		
+		//상대가 멀티를 짓는중이라면?
+		if(enemymulting() ==true){
+			point += 10;
+		}
+		
+		//죽인수 - 죽은수 가  현재 내 유닛의 일정 비율이 넘으면 가산점
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
+			if( myunit > 80 && killedcombatunit-deadcombatunit > myunit/4 ){
+				point += 20;
+			}
+		}else{
+			if( myunit > 80 && killedcombatunit-deadcombatunit > myunit/3 ){
+				point += 20;
+			}
+		}
+	
+		//@@@@@@ 일단 공격 중이라면......
+		if(point > 120){// 팩토리 유닛이 50마리(즉 스타 인구수 200 일때)
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK);
+		}else{
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK){
+				if(point < 40){//@@@@@@ 후반부터는 상대 죽인수가 의미가 없어지기 때문에.... defence 기준을 다르게 잡아야한다.
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
+				}
+			}else{
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
+			}
+		}
+	}
+	
+	public void executeExpansion() {
+		
+		int CCcnt = 0;
+		int MaxCCcount = 5;
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
+				if(WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit) > 5){
+					CCcnt++;
+				}
+			}
+ 		}
+		
+		//앞마당 전
+		if(CCcnt == 1){
+			if (isInitialBuildOrderFinished == false) {
+				return;
+			}
+			if( MyBotModule.Broodwar.self().minerals() > 500 && getFacUnits() > 40){
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
+			}
+			if( MyBotModule.Broodwar.getFrameCount() > 8000 && MyBotModule.Broodwar.self().minerals() > 400){
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
+			}
+			
+		}
+		
+		//앞마당 이후
+		if(CCcnt >= 2 && CCcnt <= MaxCCcount){
+			
+			// 돈이 800 넘으면 멀티하기
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+					+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+				if( MyBotModule.Broodwar.self().minerals() > 800 && getFacUnits() > 40){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+				}
+			}
+			//공격시 돈 400 넘으면 멀티하기
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK){
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					if( MyBotModule.Broodwar.self().minerals() > 400){
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+					}
+				}
+			}
+			
+		}
+	}
+	
 
 	/*
 	public void executeCombat() {

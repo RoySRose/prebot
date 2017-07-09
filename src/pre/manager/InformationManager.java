@@ -22,6 +22,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.MapGrid;
 import pre.UnitData;
 import pre.UnitInfo;
 import pre.main.MyBotModule;
@@ -35,9 +36,11 @@ public class InformationManager {
 	private static InformationManager instance = new InformationManager();
 
 	public Player selfPlayer;		///< 아군 Player		
-	public Player enemyPlayer;		///< 아군 Player의 종족		
-	public Race selfRace;			///< 적군 Player		
+	public Player enemyPlayer;		///< 적군 Player		
+	public Race selfRace;			///< 아군 Player의 종족
 	public Race enemyRace;			///< 적군 Player의 종족  
+
+	private boolean isReceivingEveryMultiInfo;
 
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -84,6 +87,8 @@ public class InformationManager {
 		enemyPlayer = MyBotModule.Broodwar.enemy();
 		selfRace = selfPlayer.getRace();
 		enemyRace = enemyPlayer.getRace();
+		
+		isReceivingEveryMultiInfo = false;
 
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -128,6 +133,7 @@ public class InformationManager {
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
 			updateBaseLocationInfo();
+			setEveryMultiInfo();
 		}
 	}
 
@@ -319,9 +325,9 @@ public class InformationManager {
 		// _occupiedBaseLocations 중에서 _mainBaseLocations 를 선정한다
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(enemyPlayer).getTilePosition()), enemyPlayer) == false) {
-				for (BaseLocation loaction : occupiedBaseLocations.get(enemyPlayer)) {
-					if (existsPlayerBuildingInRegion(BWTA.getRegion(loaction.getTilePosition()),enemyPlayer)) {
-						mainBaseLocations.put(enemyPlayer, loaction);
+				for (BaseLocation location : occupiedBaseLocations.get(enemyPlayer)) {
+					if (existsPlayerBuildingInRegion(BWTA.getRegion(location.getTilePosition()),enemyPlayer)) {
+						mainBaseLocations.put(enemyPlayer, location);
 						mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));				
 						break;
 					}
@@ -333,9 +339,9 @@ public class InformationManager {
 		// _occupiedBaseLocations 중에서 _mainBaseLocations 를 선정한다
 		if (mainBaseLocations.get(selfPlayer) != null) {
 			if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(selfPlayer).getTilePosition()), selfPlayer) == false) {
-				for (BaseLocation loaction : occupiedBaseLocations.get(selfPlayer)) {
-					if (existsPlayerBuildingInRegion(BWTA.getRegion(loaction.getTilePosition()), selfPlayer)) {
-						mainBaseLocations.put(selfPlayer, loaction);
+				for (BaseLocation location : occupiedBaseLocations.get(selfPlayer)) {
+					if (existsPlayerBuildingInRegion(BWTA.getRegion(location.getTilePosition()), selfPlayer)) {
+						mainBaseLocations.put(selfPlayer, location);
 						mainBaseLocationChanged.put(selfPlayer, new Boolean(true));				
 						break;
 					}
@@ -375,6 +381,95 @@ public class InformationManager {
 		updateChokePointAndExpansionLocation();
 	}
 
+	public void setEveryMultiInfo() {
+		
+		if (mainBaseLocations.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
+			BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
+			for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+			{
+				if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())) continue;
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+				//적군 베이스도 아닐때
+				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,10) == true) continue;
+				
+//				occupiedBaseLocations.
+				
+//				System.out.print("targetBaseLocationX : " + targetBaseLocation.getTilePosition().getX());
+//				System.out.println(", targetBaseLocationY : " + targetBaseLocation.getTilePosition().getY());
+//				
+//				System.out.println("getduration: "+ MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()));
+				if (MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()) > 8000)
+				{
+					isReceivingEveryMultiInfo = false;
+//					System.out.println("isReceivingEveryMultiInfo1: " + isReceivingEveryMultiInfo);
+					return;
+				}
+			}
+			isReceivingEveryMultiInfo = true;
+//			System.out.println("isReceivingEveryMultiInfo2: " + isReceivingEveryMultiInfo);
+		}else{
+			isReceivingEveryMultiInfo = false;
+//			System.out.println("isReceivingEveryMultiInfo3: " + isReceivingEveryMultiInfo);
+		}
+	}
+	public BaseLocation getNextExpansionLocation() {
+		
+		BaseLocation res = null;
+		
+//		long startTime = 0;
+//		startTime = System.currentTimeMillis();
+	
+		if (mainBaseLocations.get(selfPlayer) != null && firstExpansionLocation.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
+			BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
+			BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
+			
+//			long currentTime = System.currentTimeMillis();
+//			System.out.println("###start" + " : " + (currentTime - startTime) + " millisec");
+//			startTime = currentTime;
+//			int num = 1;
+			
+			double tempDistance;
+			double sourceDistance;
+			double closestDistance = 1000000000;
+			
+			for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+			{
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+				if (firstExpansionLocation.get(enemyPlayer) != null){
+					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition())) continue;
+				}
+				if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
+				if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,4) == true) continue;
+				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,4) == true) continue;
+				
+//				currentTime = System.currentTimeMillis();
+//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
+//				startTime = currentTime;
+				
+//				sourceDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
+//				tempDistance = sourceDistance - BWTA.getGroundDistance(enemyBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
+				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+				
+				if (tempDistance < closestDistance && sourceDistance > 0) {
+					closestDistance = tempDistance;
+					res = targetBaseLocation;
+				}
+//				currentTime = System.currentTimeMillis();
+//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
+//				startTime = currentTime;
+//				num++;
+			}
+			
+//			currentTime = System.currentTimeMillis();
+//			System.out.println("###end" + " : " + (currentTime - startTime) + " millisec");
+//			startTime = currentTime;			
+		}
+		return res;
+	}
+	
 	public void updateChokePointAndExpansionLocation() {
 		if (mainBaseLocationChanged.get(selfPlayer).booleanValue() == true) {
 		
@@ -553,23 +648,28 @@ public class InformationManager {
 		if (baseLocation == null) {
 			return false;
 		}
-
 		// 반지름 10 (TilePosition 단위) 이면 거의 화면 가득이다
-		int maxRadius = 10;
-
+		if(radius > 10){
+			radius = 10;
+		}
+		
 		if (unitData.get(player) != null) {
 			Iterator<Integer> it = unitData.get(player).getUnitAndUnitInfoMap().keySet().iterator();
 
-			// for (const auto & kv : _unitData[player].getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
 				if (ui.getType().isBuilding()) {
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
 
-					if (buildingPosition.getX() >= baseLocation.getTilePosition().getX() - maxRadius
-							&& buildingPosition.getX() <= baseLocation.getTilePosition().getX() + maxRadius
-							&& buildingPosition.getY() >= baseLocation.getTilePosition().getY() - maxRadius
-							&& buildingPosition.getY() <= baseLocation.getTilePosition().getY() + maxRadius) {
+//					System.out.print("buildingPositionX : " + buildingPosition.getX());
+//					System.out.println(", buildingPositionY : " + buildingPosition.getY());
+//					System.out.print("baseLocationX : " + baseLocation.getTilePosition().getX());
+//					System.out.println(", baseLocationY : " + baseLocation.getTilePosition().getY());
+					
+					if (buildingPosition.getX() >= baseLocation.getTilePosition().getX() - radius
+							&& buildingPosition.getX() <= baseLocation.getTilePosition().getX() + radius
+							&& buildingPosition.getY() >= baseLocation.getTilePosition().getY() - radius
+							&& buildingPosition.getY() <= baseLocation.getTilePosition().getY() + radius) {
 						return true;
 					}
 				}
@@ -657,6 +757,17 @@ public class InformationManager {
 		return readyToAttackPosition.get(player);
 	}
 
+	//모든 멀티가 확인된 상태인지 확인
+	public boolean isReceivingEveryMultiInfo() {
+		return isReceivingEveryMultiInfo;
+	}
+	
+	//점령한 베이스 개수 확인
+	public int getOccupiedBaseLocationsCnt(Player player) {
+		return occupiedBaseLocations.get(player).size();
+	}
+	
+	
 	/// 해당 UnitType 이 전투 유닛인지 리턴합니다
 	public final boolean isCombatUnitType(UnitType type) {
 		if (type == UnitType.Zerg_Lurker /* || type == UnitType.Protoss_Dark_Templar*/) {
@@ -751,15 +862,15 @@ public class InformationManager {
 
 	// 해당 종족의 UnitType 중 ResourceDepot 기능을 하는 UnitType을 리턴합니다
 	public UnitType getBasicResourceDepotBuildingType(Race race) {
-//		if (race == Race.Protoss) {
-//			return UnitType.Protoss_Nexus;
-//		} else if (race == Race.Terran) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Nexus;
+		} else if (race == Race.Terran) {
 			return UnitType.Terran_Command_Center;
-//		} else if (race == Race.Zerg) {
-//			return UnitType.Zerg_Hatchery;
-//		} else {
-//			return UnitType.None;
-//		}
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Hatchery;
+		} else {
+			return UnitType.None;
+		}
 	}
 
 	// 해당 종족의 UnitType 중 Refinery 기능을 하는 UnitType을 리턴합니다
@@ -787,15 +898,15 @@ public class InformationManager {
 
 	// 해당 종족의 UnitType 중 Worker 에 해당하는 UnitType을 리턴합니다
 	public UnitType getWorkerType(Race race) {
-//		if (race == Race.Protoss) {
-//			return UnitType.Protoss_Probe;
-//		} else if (race == Race.Terran) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Probe;
+		} else if (race == Race.Terran) {
 			return UnitType.Terran_SCV;
-//		} else if (race == Race.Zerg) {
-//			return UnitType.Zerg_Drone;
-//		} else {
-//			return UnitType.None;
-//		}
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Drone;
+		} else {
+			return UnitType.None;
+		}
 	}
 
 	// 해당 종족의 UnitType 중 SupplyProvider 기능을 하는 UnitType을 리턴합니다
