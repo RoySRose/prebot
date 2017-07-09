@@ -859,6 +859,22 @@ public class WorkerManager {
 	{
 		return workerData.getNumMineralWorkers();	
 	}
+	
+	//농봉상태 일꾼 유닛 숫자 리턴
+	public int getNumNongBongMWorkers() 
+	{
+		return workerData.getNumNongBongMWorkers();	
+	}
+	
+	public int getNumNongBongGWorkers() 
+	{
+		return workerData.getNumNongBongGWorkers();	
+	}
+	
+	public int getNumNongBongGSWorkers() 
+	{
+		return workerData.getNumNongBongGSWorkers();	
+	}
 
 	/// idle 상태인 일꾼 유닛 unit 의 숫자를 리턴합니다
 	public int getNumIdleWorkers() 
