@@ -79,8 +79,9 @@ public class StrategyManager {
 		,terranBasic_DropShip
 		,terranBasic_NoSearch
 		,terranBasic_ReverseRush
-		, Init} //기본 전략 나열
-	public enum StrategysException { zergException_FastLurker
+		} //기본 전략 나열
+	public enum StrategysException {
+		zergException_FastLurker
 		,zergException_Guardian
 		,zergException_HydraWave
 		,zergException_NongBong
@@ -96,7 +97,7 @@ public class StrategyManager {
 		,terranException_CheeseRush
 		,terranException_NuClear
 		,terranException_Wraith
-		,Init, Temp} //예외 전략 나열, 예외가 아닐때는 무조건 Init 으로 
+		,Init} //예외 전략 나열, 예외가 아닐때는 무조건 Init 으로 
 
 	/// static singleton 객체를 리턴합니다
 	public static StrategyManager Instance() {
@@ -320,7 +321,7 @@ public class StrategyManager {
 		
 		
 		if (isInitialBuildOrderFinished == true) {
-			if (MyBotModule.Broodwar.getFrameCount() % 119 == 0){
+			if (MyBotModule.Broodwar.getFrameCount() % 120 == 0){// info 의 멀티 체크가 120 에 돈다 
 				executeCombat();
 			}
 		}
@@ -918,10 +919,10 @@ public class StrategyManager {
 		
 		//공통 예외 상황
 		if(getFacUnits() > 280 || MyBotModule.Broodwar.self().supplyUsed() > 392){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK);
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 		}
 		if(MyBotModule.Broodwar.getFrameCount() > 8000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 7){//@@@@@@5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK); //@@@@@@ 올인에 대한거 하나 만들어야 겠다... 올인이면 공격 취소도 하면 안되므로..
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY); //@@@@@@ 올인에 대한거 하나 만들어야 겠다... 올인이면 공격 취소도 하면 안되므로..
 		}
 		
 		//종족별 예외 상황
@@ -1021,9 +1022,9 @@ public class StrategyManager {
 	
 		//@@@@@@ 일단 공격 중이라면......
 		if(point > 120){// 팩토리 유닛이 50마리(즉 스타 인구수 200 일때)
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK);
+			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 		}else{
-			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK){
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
 				if(point < 40){//@@@@@@ 후반부터는 상대 죽인수가 의미가 없어지기 때문에.... defence 기준을 다르게 잡아야한다.
 					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
 				}
@@ -1079,7 +1080,7 @@ public class StrategyManager {
 				}
 			}
 			//공격시 돈 400 넘으면 멀티하기
-			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK){
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if( MyBotModule.Broodwar.self().minerals() > 400){

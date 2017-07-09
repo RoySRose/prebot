@@ -114,12 +114,12 @@ public class Config {
 	public static final int[] vultureratio = new int[] {0,5,0,0,2,0,0,5,0,0,5,9,2,9,10,8,3,0,8,9,10}; //기본전략 벌쳐 비, 예 vultureratio[0] 은 BasicvsZerg 에서의 비율
 	public static final int[] tankratio    = new int[] {2,5,2,3,2,2,2,6,2,1,6,3,3,3,2,2,3,3,2,2,2}; //기본전략 탱크 비
 	public static final int[] goliathratio = new int[] {10,2,10,9,8,10,10,2,10,11,1,0,7,0,0,2,6,9,2,1,0}; //기본전략 골리앗 비
-	public static final int[] wgt          = new int[] {1,2,3}; //기본전략 우선순위 1벌쳐, 2탱크, 3골리앗
+	public static final int[] wgt          = new int[] {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}; //기본전략 우선순위 1벌쳐, 2탱크, 3골리앗
 
-	public static final int[] vultureratioexception = new int[] {6,0,0,0,7,0,6,2,9,9,8,7,7,10,8,3}; //예외전략 벌쳐 비, 예 vultureratio[0] 은 
-	public static final int[] tankratioexception    = new int[] {0,2,3,2,3,2,3,2,3,3,3,3,3,2,2,3}; //예외전략 탱크 비
-	public static final int[] goliathratioexception = new int[] {6,10,8,10,2,10,3,8,0,0,1,2,2,0,2,7}; //예외전략 골리앗 비
-	public static final int[] wgtexception          = new int[] {1,1,1}; //예외전략 우선순위 1벌쳐, 2탱크, 3골리앗	
+	public static final int[] vultureratioexception = new int[] {6,0,0,0,7,0,6,2,9,9,8,7,7,10,8,3,1}; //예외전략 벌쳐 비, 예 vultureratio[0] 은 
+	public static final int[] tankratioexception    = new int[] {0,2,3,2,3,2,3,2,3,3,3,3,3,2,2,3,1}; //예외전략 탱크 비
+	public static final int[] goliathratioexception = new int[] {6,10,8,10,2,10,3,8,0,0,1,2,2,0,2,7,1}; //예외전략 골리앗 비
+	public static final int[] wgtexception          = new int[] {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}; //예외전략 우선순위 1벌쳐, 2탱크, 3골리앗	
 	
 	
 }
