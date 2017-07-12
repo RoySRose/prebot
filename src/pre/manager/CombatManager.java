@@ -460,7 +460,7 @@ public class CombatManager {
 
 			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
-				if (defenderToAdd.getType().isWorker()) {
+				if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
 					WorkerManager.Instance().setCombatWorker(defenderToAdd);
 				}
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);

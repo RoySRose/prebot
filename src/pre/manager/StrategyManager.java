@@ -318,7 +318,13 @@ public class StrategyManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
 			executeExpansion();
 		}
-		
+//		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
+//			executeAddRefinery();
+//		}
+//		if(MyBotModule.Broodwar.getFrameCount() % 167 == 0) {
+//			executeUpgrade();
+//		}
+			
 		
 		if (isInitialBuildOrderFinished == true) {
 			if (MyBotModule.Broodwar.getFrameCount() % 120 == 0){// info 의 멀티 체크가 120 에 돈다 
@@ -427,9 +433,9 @@ public class StrategyManager {
 	public void executeSupplyManagement() {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
-		if (isInitialBuildOrderFinished == false) {
-			return;
-		}
+//		if (isInitialBuildOrderFinished == false) {
+//			return;
+//		}
 
 		// 게임에서는 서플라이 값이 200까지 있지만, BWAPI 에서는 서플라이 값이 400까지 있다
 		// 저글링 1마리가 게임에서는 서플라이를 0.5 차지하지만, BWAPI 에서는 서플라이를 1 차지한다
@@ -454,18 +460,30 @@ public class StrategyManager {
 				}
 			}
 			
-			if(MyBotModule.Broodwar.getFrameCount()<14000){
+			int Faccnt=0;
+			int CCcnt=0;
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if (unit == null) continue;
+				if (unit.getType() == UnitType.Terran_Factory){
+					Faccnt ++;
+				}
+				if (unit.getType().isResourceDepot() && unit.isCompleted()){
+					CCcnt++;
+				}
+			}
+						
+			if(MyBotModule.Broodwar.getFrameCount()<14000 || (Faccnt <= 3 && CCcnt == 1)){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨
 				if(barrackflag==true && factoryflag==false){
 					supplyMargin = 6;
 				}else if(factoryflag==true){
 					supplyMargin = 6+4*fac_cnt;
 				}
-			}else if(MyBotModule.Broodwar.getFrameCount()>14000 && MyBotModule.Broodwar.getFrameCount()<28000){
-				supplyMargin = 8+4*fac_cnt;
+			}else if((MyBotModule.Broodwar.getFrameCount()>14000 && MyBotModule.Broodwar.getFrameCount()<28000) || (Faccnt > 3 && CCcnt == 2)){
+				supplyMargin = 8+6*fac_cnt;
 			}else{
-				supplyMargin = 12+4*fac_cnt;
+				supplyMargin = 12+7*fac_cnt;
 			}
-			
 			
 			
 			// currentSupplyShortage 를 계산한다
@@ -546,8 +564,8 @@ public class StrategyManager {
 			//@@@@@@ 헌터이면 팩이 7? 6?
 			maxFaccnt = 6;
 		}else if(CCcnt >= 3){
-			maxFaccnt = 8;
-		}
+			maxFaccnt = 9;
+		}//@@@@@@ fac 7 8 9 는 다른 자리에?
 		
 		//@@@@@@ fac 만들고 있을때 빌드큐에서 빠지고 construrction 큐에 들어가는데.. 같이 볼필요 없을까?
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0) {
@@ -1043,6 +1061,54 @@ public class StrategyManager {
 			}
 		}
 	}
+	
+	public void executeAddRefinery() {
+	
+		//이거는 update() 쪽에서 10초에 한번씩만 돌아도 될거 같고. // frame 239마다. 
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
+				if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) >= 6){ //해당 컴맨드의 미네랄 채취 일꾼이 6마리 이상일때
+					//해당 위치에 refinery 가 있거나 만들고 있으면 continue 해야하고
+					//해당 지역에 refinery 만든다..... 이거를 어떻게 처리할지? 위치 어떻게 처리할지
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null) == 0) {
+//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//					}
+					//해당 지역이라는걸 처리하는거 찾는게 관건일듯.
+				}
+			}
+ 		}
+	}
+	
+//	public void executeUpgrade() {
+//		
+//		//업그레이드 순서.... 정하고 (심플하게 종족별로 정하자)
+//
+//		//순서대로 이미 하고 있으면 continue
+//		//buildqueue 에 있으면 패스  machine shop 기준 포문 돌면서 넣으면 될듯
+//		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//		{
+//			MetaType test;
+//			
+//			test.getUpgradeType().Terran_Vehicle_Weapons; //공업
+//			test.getUpgradeType().Terran_Vehicle_Plating; //방업
+//			test.getUpgradeType().Charon_Boosters; // 골리앗 사거리 업?
+//			test.getUpgradeType().Ion_Thrusters; //벌쳐 스피드업 맞지?
+//			test.getTechType().Tank_Siege_Mode; // 시즈모드
+//			test.getTechType().Spider_Mines; //마인
+//			
+//			if (unit == null) continue;
+//			if (unit.getType() == UnitType.Terran_Machine_Shop && unit.isCompleted()){
+//				//아래 if 조건에 mineral gas 가 1.5배? 또는 2배 정도 있으면 업그레이드 하는거로....
+//				if (BuildManager.Instance().buildQueue.getItemCount(업그레이드 할놈, null) == 0
+//						&& test.mineralPrice() * 1.5< MyBotModule.Broodwar.self().minerals()) {// 빌드 큐에 없으면
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(업그레이드 할놈,여기는 null 해 될듯???, false); //false 로 해도 될듯. 업그레이드를 필수로 무조건 두고 갈정도는 아니니/
+//				}
+//			}
+// 		}
+//	}
+	
 	
 	public void executeExpansion() {
 		
