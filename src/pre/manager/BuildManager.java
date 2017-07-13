@@ -759,7 +759,7 @@ public class BuildManager {
 
 			// 건물이나 유닛의 경우
 			if (currentItem.metaType.isUnit()) {
-				UnitType unitType = currentItem.metaType.getUnitType();
+				UnitType unitType = currentItem.metaType.getUnitType();//TODO 가스가 필요한 건물이면서 현재 refinery 가 없으면 짓는다
 				final Map<UnitType, Integer> requiredUnits = unitType.requiredUnits();
 
 				Iterator<UnitType> it = requiredUnits.keySet().iterator();

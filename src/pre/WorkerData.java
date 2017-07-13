@@ -242,7 +242,6 @@ public class WorkerData {
 	    }
 		else if (job == WorkerJob.Scout)
 		{
-			System.out.println("정찰이다다다다다");
 		}
 	    else if (job == WorkerJob.Build)
 	    {
@@ -311,7 +310,6 @@ public class WorkerData {
 		}
 		else if (previousJob == WorkerJob.Gas)
 		{
-			System.out.println("gas 다다다다다다다");
 			refineryWorkerCount.put(workerRefineryMap.get(unit.getID()).getID(), refineryWorkerCount.get(workerRefineryMap.get(unit.getID()).getID()) - 1);
 			workerRefineryMap.remove(unit.getID()); // C++ : workerRefineryMap.erase(unit);
 		}
