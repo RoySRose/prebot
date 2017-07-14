@@ -24,6 +24,7 @@ import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.manager.WorkerManager;
 import pre.util.CommandUtil;
+import pre.util.MicroSet;
 import pre.util.MicroUtils;
 
 public class Squad {
@@ -92,41 +93,28 @@ public class Squad {
 		List<Unit> tanks = microTank.getUnits();
 		Position centerOfTanks = null;
 		int squadAreaRange = 0;
-		if (!tanks.isEmpty()) {
+		if (tanks.size() >= MicroSet.Common.TANK_SQUAD_SIZE) {
 			centerOfTanks = MicroUtils.centerOfUnits(tanks);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 		} else {
 			centerOfTanks = MicroUtils.centerOfUnits(unitSet);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 		}
-		microScv.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microMarine.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microVulture.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microTank.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microGoliath.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microWraith.setSquadAreaRange(centerOfTanks, squadAreaRange);
-		microVessel.setSquadAreaRange(centerOfTanks, squadAreaRange);
+		microScv.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microMarine.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microVulture.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microTank.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microGoliath.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microWraith.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microVessel.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
 		
-//		if (needToRegroup) {
-//			Position regroupPosition = calcRegroupPosition();
-//			
-//			microScv.regroup(regroupPosition);
-//			microMarine.regroup(regroupPosition);
-//			microVulture.regroup(regroupPosition);
-//			microTank.regroup(regroupPosition);
-//			microGoliath.regroup(regroupPosition);
-//			microWraith.regroup(regroupPosition);
-//			microVessel.regroup(regroupPosition);
-//		} else {
-			
-		microScv.execute(order);
-		microMarine.execute(order);
-		microVulture.execute(order);
-		microTank.execute(order);
-		microGoliath.execute(order);
-		microWraith.execute(order);
-		microVessel.execute(order);
-//		}
+		microScv.execute();
+		microMarine.execute();
+		microVulture.execute();
+		microTank.execute();
+		microGoliath.execute();
+		microWraith.execute();
+		microVessel.execute();
 	}
 	
 	

@@ -10,7 +10,6 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Chokepoint;
 import pre.MapGrid;
-import pre.combat.SquadOrder.SquadOrderType;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.util.CommandUtil;
@@ -43,18 +42,16 @@ public class MicroTank extends MicroManager {
 		
 		// 탱크는 전투의 중심이다. 명령의 상태를 BATTLE로 바꾸어 이니시에이팅한다.
 		if (tankTargets.isEmpty()) {
-			if (order.getType() == SquadOrderType.BATTLE) {
-				order.setType(SquadOrderType.ATTACK);
+			if (initiatedFrame > 0) {
 				MyBotModule.Broodwar.sendText("battle finished!");
+				initiatedFrame = 0;
 			}
-			initiatedFrame = 0;
 			for (Unit tank : tanks) { moveIt(tank); } // 적이 있을 없을 경우, orderPosition으로 이동
 			return;
 		}
 
-		if (order.getType() == SquadOrderType.ATTACK && initiatedFrame == 0 && tanks.size() >= INITIATE_SIZE) {
+		if (initiatedFrame == 0 && tanks.size() >= INITIATE_SIZE) {
 			MyBotModule.Broodwar.sendText("initiate!");
-			order.setType(SquadOrderType.BATTLE);
 			initiatedFrame = MyBotModule.Broodwar.getFrameCount();
 		}
 		
@@ -226,7 +223,10 @@ public class MicroTank extends MicroManager {
 					}
 				}
 			} else {
-				// TODO 시즈 위치 조절
+				if (tank.isIdle()) {
+					Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), squadRange / 2);
+					CommandUtil.attackMove(tank, randomPosition);
+				}
 			}
 		} else {
 			// 아직 도착하지 못했을때

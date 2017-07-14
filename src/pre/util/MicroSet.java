@@ -27,7 +27,7 @@ public class MicroSet {
 		public static int maxNumCheckerSquad = 1;
 
 		public static int assignedFrame = 30 * 24; // 30초
-		public static int visitFrame = 60 * 24; // 45초
+		public static int visitFrame = 45 * 24; // 45초
 		
 		public static String getCheckerSquadPostFix() {
 			return "[" + String.valueOf(postFixNum++) + "]";
@@ -44,6 +44,8 @@ public class MicroSet {
 	}
 	
 	public static class Common {
+		public static final int TANK_SQUAD_SIZE = 2;
+		public static final int TANK_COVERAGE = 100;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 	}
 	

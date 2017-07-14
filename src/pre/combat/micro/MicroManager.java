@@ -14,6 +14,7 @@ import pre.util.CommandUtil;
 
 public abstract class MicroManager {
 	private List<Unit> units = new ArrayList<>();
+	private List<Unit> nearbyEnemies = new ArrayList<>();
 
 	public List<Unit> getUnits() {
 		return units;
@@ -22,35 +23,45 @@ public abstract class MicroManager {
 		this.units = units;
 	}
 
+	public List<Unit> getNearbyEnemies() {
+		return nearbyEnemies;
+	}
+	public void setNearbyEnemies(List<Unit> nearbyEnemies) {
+		this.nearbyEnemies = nearbyEnemies;
+	}
+
 	protected SquadOrder order;
 	protected Position squadCenter = null;
 	protected int squadRange = 0;
+	protected int tankSize = 0;
 	
 	
 	protected abstract void executeMicro(List<Unit> targets);
 	
-	public void execute(SquadOrder inputOrder) {
-		// Nothing to do if we have no units.
-		if (units.isEmpty()) {
-			return;
-		}
-
+	public void setMicroInformation(SquadOrder inputOrder, Position squadCenter, int squadRange, int tankSize) {
 		order = inputOrder;
-		
-		// If we have no combat order (attack or defend), we're done.
-		if (!order.isCombatOrder()) {
+		if (units.isEmpty() || !order.isCombatOrder()) {
 			return;
 		}
 
-		List<Unit> nearbyEnemies = new ArrayList<>();
+		this.nearbyEnemies.clear();
 		MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
-
+		
 		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
-		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.BATTLE || order.getType() == SquadOrderType.WATCH
-				|| order.getType() == SquadOrderType.CHECK_INACTIVE || order.getType() == SquadOrderType.CHECK_ACTIVE) {
+		if (order.getType() != SquadOrderType.DEFEND) {
 			for (Unit unit : units) {
 				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange(), false, true);
 			}
+		}
+		
+		this.squadCenter = squadCenter;
+		this.squadRange = squadRange;
+		this.tankSize = tankSize;
+	}
+	
+	public void execute() {
+		if (units.isEmpty() || !order.isCombatOrder()) {
+			return;
 		}
 
 		executeMicro(nearbyEnemies);
@@ -74,11 +85,6 @@ public abstract class MicroManager {
 //			}
 	        CommandUtil.attackMove(unit, squadCenter);
 		}
-	}
-	
-	public void setSquadAreaRange(Position squadCenter, int squadRange) {
-		this.squadCenter = squadCenter;
-		this.squadRange = squadRange;
 	}
 	
 	public boolean awayFromChokePoint(Unit unit) {
@@ -109,7 +115,7 @@ public abstract class MicroManager {
 	
 	public boolean inUnityThereIsStrength(Unit unit) {
 		
-		if (unit.getDistance(squadCenter) > squadRange - 100) {
+		if (unit.getDistance(squadCenter) > squadRange) {
         	CommandUtil.move(unit, squadCenter);
         	return true;
 		}

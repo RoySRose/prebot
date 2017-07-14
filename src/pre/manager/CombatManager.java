@@ -21,8 +21,8 @@ import pre.combat.SpiderMineManger;
 import pre.combat.Squad;
 import pre.combat.SquadData;
 import pre.combat.SquadOrder;
-import pre.combat.VultureTravelManager;
 import pre.combat.SquadOrder.SquadOrderType;
+import pre.combat.VultureTravelManager;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
 import pre.util.MicroSet;
@@ -253,6 +253,7 @@ public class CombatManager {
 					break;
 				}
 			}
+			// readyToAttack position 또는 second chokepoint
 			if (expansionOccupied) {
 				if (!InformationManager.Instance().getMapSpecificInformation().notUseReadyToAttackPosition()) {
 					Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(enemyPlayer);
@@ -489,10 +490,8 @@ public class CombatManager {
 	        }
 	    }
 
-		if (mainAttackSquad.getOrder().getType() != SquadOrderType.BATTLE) {
-			SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
-		    mainAttackSquad.setOrder(mainAttackOrder);
-		}
+		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), 800, "Attack enemy base");
+	    mainAttackSquad.setOrder(mainAttackOrder);
 
 //		if (flyingSquad.getOrder().getType() != SqaudOrderType.BATTLE) {
 //		    SquadOrder flyingAttackOrder = new SquadOrder(SqaudOrderType.ATTACK, getMainAttackLocation(flyingSquad), 800, "Attack enemy base");
@@ -595,39 +594,31 @@ public class CombatManager {
 			return;
 		}
 		
-		boolean battleNow = false;
-		Squad mainAttackSquad = squadData.getSquad("MainAttack");
-		if (mainAttackSquad.getOrder().getType() == SquadOrderType.BATTLE) { // 주력이 싸우고 있으면
-			battleNow = true;
-		}
-		
 		// 1. 대기중 스쿼드에 병력 할당
 		// 대기중(inactive)인 checker squad에 unit을 할당한다.
 		// 활동중(active, arrive) 상태인 checker는 이미 돌아다니고 있으니 병력 할당을 하지 않는다.
-		if (!battleNow) {
-			for (Unit unit : combatUnits) {
-				for (Squad squad : checkerSquads) {
-					if (squad.getOrder().getType() != SquadOrderType.CHECK_INACTIVE) {
-						continue;
-					}
-					
-					// unit을 할당한다.
-			        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, squad)) {
-			        	if (squad.getUnitSet().size() < MicroSet.Vulture.maxNumChecker) {
-							squadData.assignUnitToSquad(unit, squad);
-			        	}
-			        }
-			        
-			        // 최대 숫자만큼 unit이 할당되었으니 active 상태로 변경한다.
-			        // 전투상태이면 inactive -> active 변경
-			        if (squad.getUnitSet().size() >= MicroSet.Vulture.maxNumChecker) {
-			        	BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName()); // 이동할 지역이 있어야 ACTIVE로 변경한다.
-			        	if (baseLocation != null) {
-				        	squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
-			        	}
-			        }
-			    }
-			}
+		for (Unit unit : combatUnits) {
+			for (Squad squad : checkerSquads) {
+				if (squad.getOrder().getType() != SquadOrderType.CHECK_INACTIVE) {
+					continue;
+				}
+				
+				// unit을 할당한다.
+		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, squad)) {
+		        	if (squad.getUnitSet().size() < MicroSet.Vulture.maxNumChecker) {
+						squadData.assignUnitToSquad(unit, squad);
+		        	}
+		        }
+		        
+		        // 최대 숫자만큼 unit이 할당되었으니 active 상태로 변경한다.
+		        // 전투상태이면 inactive -> active 변경
+		        if (squad.getUnitSet().size() >= MicroSet.Vulture.maxNumChecker) {
+		        	BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName(), true); // 이동할 지역이 있어야 ACTIVE로 변경한다.
+		        	if (baseLocation != null) {
+			        	squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
+		        	}
+		        }
+		    }
 		}
 		
 		// 2. 스쿼드 제거 및 이동지점 설정
@@ -645,7 +636,7 @@ public class CombatManager {
 				continue;
 			}
 
-			BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName());
+			BaseLocation baseLocation = VultureTravelManager.Instance().getBestTravelSite(squad.getName(), true);
 			Position orderPosition = null;
 			
 			if (baseLocation == null) {
@@ -656,19 +647,16 @@ public class CombatManager {
         	squad.getOrder().setPosition(orderPosition);
 
 			// 이동할 곳이 없이 공격스쿼드 지점으로 돌아왔다면 스쿼드를 없앤다.
-        	if (squad.getOrder().getType() == SquadOrderType.CHECK_ARRIVE) {
-        		if(orderPosition.getDistance(getMainAttackLocation(squad)) <= 500) {
-    				squadData.removeSquad(squad.getName());
-        		} else {
-        			squad.getOrder().setType(SquadOrderType.CHECK_ACTIVE);
-        		}
-        	}
+    		if(orderPosition.getDistance(getMainAttackLocation(squad)) <= 500) {
+				squadData.removeSquad(squad.getName());
+    		}
 		}
 
 		// 3. 새로운 inactive checker squad를 생성한다.
-		if (!battleNow) {
-			if (!inactiveSquadExist && checkerSquads.size() < MicroSet.Vulture.maxNumCheckerSquad) {
-	    		SquadOrder squadOrder = new SquadOrder(SquadOrderType.CHECK_INACTIVE, getMainAttackLocation(null), 100, "Check it out");
+		if (!inactiveSquadExist && checkerSquads.size() < MicroSet.Vulture.maxNumCheckerSquad) {
+			BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite("DUMMY VULTURE BROTHERS", false);
+			if (travelBase != null) {
+				SquadOrder squadOrder = new SquadOrder(SquadOrderType.CHECK_INACTIVE, getMainAttackLocation(null), 100, "Check it out");
 	    		Squad newCheckerSquad = new Squad("Checker " + MicroSet.Vulture.getCheckerSquadPostFix(), squadOrder, CHECKER_PRIORITY);
 	    		squadData.putSquad(newCheckerSquad);
 			}

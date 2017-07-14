@@ -28,38 +28,41 @@ public class MicroVulture extends MicroManager {
 		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
 		
 		KitingOption kitingOption = new KitingOption();
-		kitingOption.setGoalPosition(order.getPosition());
 		
-		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.BATTLE || order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
+		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
 			kitingOption.setCooltimeAlwaysAttack(true);
 			kitingOption.setUnitedKiting(true);
 			kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+			kitingOption.setGoalPosition(squadCenter);
 			
 		} else if (order.getType() == SquadOrderType.WATCH) { // 회피가 아주 좋은 설정(상대병력 감시용 - watcher : 회피를 자신의 base로 한다)
 			kitingOption.setCooltimeAlwaysAttack(false);
 			kitingOption.setUnitedKiting(false);
 			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
 			kitingOption.setSpecialSquadType(1);
 			
 		} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) { // 회피가 아주 좋은 설정(정찰견제용 - checker)
 			kitingOption.setCooltimeAlwaysAttack(false);
 			kitingOption.setUnitedKiting(false);
 			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
 			kitingOption.setSpecialSquadType(2);
 			
 		} else { // 회피가 좋은 설정
 			kitingOption.setCooltimeAlwaysAttack(false);
 			kitingOption.setUnitedKiting(false);
 			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
 		}
 
 		for (Unit vulture : vultures) {
-			if (order.getType() == SquadOrderType.BATTLE && awayFromChokePoint(vulture)) {
-				continue;
-			}
-			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(vulture)) {
-				continue;
-			}
+//			if (order.getType() == SquadOrderType.BATTLE && awayFromChokePoint(vulture)) {
+//				continue;
+//			}
+//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(vulture)) {
+//				continue;
+//			}
 			Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
 			if (positionToMine != null) { // 마인매설
 				CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
@@ -68,6 +71,24 @@ public class MicroVulture extends MicroManager {
 			
 			Unit target = getTarget(vulture, vultureTargets);
 			if (target != null) {
+				// 탱크 중심의 부대는 탱크 중심으로 뭉쳐야 한다.
+				if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) {
+//					System.out.println("where is siege tank");
+					if (tankSize >= MicroSet.Common.TANK_SQUAD_SIZE) {
+						List<Unit> tankMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Tank_Mode);
+						List<Unit> seigeMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Siege_Mode);
+						
+						if (tankMode.isEmpty() && seigeMode.isEmpty()) {
+							kitingOption.setCooltimeAlwaysAttack(false);
+							kitingOption.setUnitedKiting(false);
+							kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+							kitingOption.setGoalPosition(squadCenter);
+//							System.out.println("no siege here");
+						} else {
+//							System.out.println("fight with siege");
+						}
+					}
+				}
 				MicroUtils.preciseKiting(vulture, target, kitingOption);
 				
 			} else {
@@ -97,10 +118,6 @@ public class MicroVulture extends MicroManager {
 					CommandUtil.attackMove(vulture, order.getPosition());
 					
 				} else { // 목적지 도착
-					if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
-						order.setType(SquadOrderType.CHECK_ARRIVE); // CombatManager에 목적지에 도착한걸 알려주기 위함
-					}
-					
 					if (vulture.isIdle() || vulture.isBraking()) {
 						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange);
 						CommandUtil.attackMove(vulture, randomPosition);
