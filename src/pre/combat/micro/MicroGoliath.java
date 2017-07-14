@@ -4,7 +4,6 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
-import pre.combat.SquadOrder.SquadOrderType;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
 import pre.util.MicroSet.FleeAngle;
@@ -27,12 +26,12 @@ public class MicroGoliath extends MicroManager {
 		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 		
 		for (Unit goliath : goliaths) {
-			if (order.getType() != SquadOrderType.BATTLE && awayFromChokePoint(goliath)) {
-				continue;
-			}
-			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(goliath)) {
-				continue;
-			}
+//			if (order.getType() != SquadOrderType.BATTLE && awayFromChokePoint(goliath)) {
+//				continue;
+//			}
+//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(goliath)) {
+//				continue;
+//			}
 			
 			Unit target = getTarget(goliath, goliathTargets);
 			if (target != null) {

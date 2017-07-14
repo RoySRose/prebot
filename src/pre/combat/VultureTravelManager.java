@@ -67,7 +67,7 @@ public class VultureTravelManager {
 					System.out.println("change travel site");
 					BaseLocation currentBase = squadSiteMap.get(relatedSquadName).baseLocation;
 					squadSiteMap.remove(relatedSquadName);
-					getBestTravelSite(relatedSquadName, currentBase); // travelSite 변경
+					getBestTravelSite(relatedSquadName, currentBase, true); // travelSite 변경
 				}
 			}
 		}
@@ -77,12 +77,12 @@ public class VultureTravelManager {
 	// 1. 방문한지 가장 오래된 location으로 이동
 	// 2. 방문한지 가장 오래된 장소가 복수개이면(아예 정찰이 안된) 할당된지 가장 오래된 location으로 이동
 	// 3. 방문 및 할당된지 동일하게 오래된 장소가 복수개이면, 가까운 곳부터 간다. (currentBase에서 가장 가까운 곳, squadName만 입력받는 경우 적 앞마당에서 가장 가까운 곳)
-	public BaseLocation getBestTravelSite(String squadName) {
+	public BaseLocation getBestTravelSite(String squadName, boolean realAssign) {
 		BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-		return getBestTravelSite(squadName, firstExpansion);
+		return getBestTravelSite(squadName, firstExpansion, realAssign);
 	}
 	
-	public BaseLocation getBestTravelSite(String squadName, BaseLocation currentBase) {
+	public BaseLocation getBestTravelSite(String squadName, BaseLocation currentBase, boolean realAssign) {
 		if (!initialized) {
 			return null;
 		}
@@ -120,10 +120,10 @@ public class VultureTravelManager {
 		
 		if (bestTravelSite != null) {
 			bestTravelSite.assignedFrame = currentFrame;
-			squadSiteMap.put(squadName, bestTravelSite);
+			if (realAssign) squadSiteMap.put(squadName, bestTravelSite);
 			return bestTravelSite.baseLocation;
 		} else {
-			squadSiteMap.remove(squadName);
+			if (realAssign) squadSiteMap.remove(squadName);
 			return null;
 		}
 	}
