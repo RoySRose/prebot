@@ -380,6 +380,43 @@ public class InformationManager {
 
 		updateChokePointAndExpansionLocation();
 	}
+	
+	public List<UnitInfo> getEnemyBuildingUnitsNear(Unit myunit, int radius, boolean canAttack, boolean ground, boolean air)
+	{
+		List<UnitInfo> units = new ArrayList<>();
+		
+		Iterator<Integer> it = null;
+		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		
+		
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
+			if(ui != null){
+				if(myunit.getDistance(ui.getLastPosition()) > radius){
+					continue;
+				}
+				if(ui.getType().isBuilding()){
+					if (canAttack != true){
+						units.add(ui);
+					}else{
+						if(ground){
+							if(ui.getType().groundWeapon() != WeaponType.None){
+								units.add(ui);
+							}
+						}
+						if(air){
+							if(ui.getType().airWeapon() != WeaponType.None){
+								units.add(ui);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return units;
+	}
+	
 
 	public void setEveryMultiInfo() {
 		
@@ -441,8 +478,8 @@ public class InformationManager {
 					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition())) continue;
 				}
 				if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
-				if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,4) == true) continue;
-				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,4) == true) continue;
+				if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
 				
 //				currentTime = System.currentTimeMillis();
 //				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");

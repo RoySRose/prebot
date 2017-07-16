@@ -160,11 +160,10 @@ public class UnitData {
 		}
 
 		// If the unit is a building and we can currently see its position and it is not there
-		if (ui.getType().isBuilding() && MyBotModule.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32) && !ui.getUnit().isVisible())
+		if (ui.getType().isBuilding() && MyBotModule.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32) && !ui.getUnit().isTargetable())
 		{
 			return true;
 		}
-
 		return false;
 	}
 
