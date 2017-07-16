@@ -152,6 +152,7 @@ public class WorkerManager {
 		 */
 		Unit overDepot = null; //미네랄 * 2보다 많이 할당된 CC
 		Unit lessDepot = null; //미네랄 * 2보다 저게 할당된 CC
+		
 		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots())
 		{
 			if (depot == null) continue;
@@ -168,6 +169,9 @@ public class WorkerManager {
 		}	
 		for (Unit worker : workerData.getWorkers())
 		{
+			if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout){
+				continue;
+			}
 			if (!worker.isCompleted())
 			{
 				continue;
@@ -203,7 +207,7 @@ public class WorkerManager {
 			        }
 					for (Unit mineral : mineralPatches){
 //						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
-						int workerCnt = workerData.depotWorkerCount.get(overDepot);
+						int workerCnt = workerData.getNumAssignedWorkers(overDepot);
 						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
 						if(sCvCnt == maxSCV && workerCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals()){
 							setMineralWorker(worker,lessDepot);
@@ -213,6 +217,7 @@ public class WorkerManager {
 					
 				}else{
 					Unit depot = workerData.getWorkerDepot(worker);
+					if (depot == null) continue;
 					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
 					for (Unit mineral : mineralPatches){
 						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
@@ -285,7 +290,6 @@ public class WorkerManager {
 			// if it is a move worker
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move)
 			{
-				System.out.println(" worker : " + worker.getID() + " workerData.getWorkerJob(worker) : " + workerData.getWorkerJob(worker));
 				WorkerMoveData data = workerData.getWorkerMoveData(worker);
 
 				// 목적지에 도착한 경우 이동 명령을 해제한다
@@ -487,6 +491,42 @@ public class WorkerManager {
 
 		return closestDepot;
 	}
+	
+	/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
+		public Unit getClosestEnemyResourceDepotFromWorker(Unit worker)
+		{
+			if (worker == null) return null;
+
+			Unit closestDepot = null;
+			double closestDistance = 0;
+
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+			{
+				if (unit == null) continue;
+				
+				// 가장 가까운, 일꾼수가 꽉 차지않은, 완성된 ResourceDepot (혹은 Lair 나 Hive로 변형중인 건물)을 찾는다
+				if (unit.getType().isResourceDepot()
+					&& (unit.isCompleted() || unit.getType() == UnitType.Zerg_Lair || unit.getType() == UnitType.Zerg_Hive) )
+				{
+					double distance = unit.getDistance(worker);
+
+					// 일단 여러 ResourceDepot 중 하나는 선택되도록 한다
+					if (closestDepot == null)
+					{
+						closestDepot = unit;
+						closestDistance = distance;
+					}
+					// 더 가까운 ResourceDepot 이 있고, 일꾼 수가 꽉 차지 않았다면 거기 가도록 한다
+					else if (distance < closestDistance) 
+					{
+						closestDepot = unit;
+						closestDistance = distance;
+					}
+				}
+			}
+
+			return closestDepot;
+		}
 
 	/// 해당 일꾼 유닛 unit 의 WorkerJob 값를 Idle 로 변경합니다
 	public void setIdleWorker(Unit unit)
@@ -556,7 +596,7 @@ public class WorkerManager {
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
+				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ) && unit.isCarryingMinerals() == false)
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMovingWorker = unit;
@@ -607,9 +647,13 @@ public class WorkerManager {
 			{
 				continue;
 			}
+			if(worker.isCarryingMinerals()){
+        		continue;
+        	}
 			// if it is a scout worker
 	        if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout) 
 			{
+	        	
 				return worker;
 			}
 		}
@@ -644,8 +688,10 @@ public class WorkerManager {
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
-				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
-				{
+				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ) ){
+					if(unit.isCarryingMinerals()){
+						continue;
+					}
 					closestWorker = unit;
 					closestDistance = distance;
 				}
@@ -669,7 +715,7 @@ public class WorkerManager {
 			if (unit == null) continue;
 			
 			// only consider it if it's a mineral worker or idle worker
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle))
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle)&& !unit.isCarryingMinerals())
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
@@ -704,6 +750,7 @@ public class WorkerManager {
 		{
 			double dist = unit.getDistance(worker);
 
+			//if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
 			if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
@@ -719,7 +766,7 @@ public class WorkerManager {
 	{
 		if (worker == null) return;
 
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
+		//workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
 	}
 
 	/// 모든 Combat 일꾼 유닛에 대해 임무를 해제합니다

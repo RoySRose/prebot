@@ -9,7 +9,9 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
+import bwta.BaseLocation;
 import pre.main.MyBotModule;
+import pre.manager.InformationManager;
 import pre.util.CommandUtil;
 
 public class WorkerData {
@@ -40,7 +42,7 @@ public class WorkerData {
 	//CC에 배정된 일꾼 수
 	public Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
 	//Gas 에 배정된 일꾼 수
-	private Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
+	public Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
 	//작업중인 광물 ????
 	private Map<Integer, Unit> workerDepotMap = new HashMap<Integer, Unit>();
 	//이동중인 일꾼과 목적지
@@ -238,7 +240,6 @@ public class WorkerData {
 	    }
 		else if (job == WorkerJob.Scout)
 		{
-			System.out.println("정찰이다다다다다");
 		}
 	    else if (job == WorkerJob.Build)
 	    {
@@ -307,7 +308,6 @@ public class WorkerData {
 		}
 		else if (previousJob == WorkerJob.Gas)
 		{
-			System.out.println("gas 다다다다다다다");
 			refineryWorkerCount.put(workerRefineryMap.get(unit.getID()).getID(), refineryWorkerCount.get(workerRefineryMap.get(unit.getID()).getID()) - 1);
 			workerRefineryMap.remove(unit.getID()); // C++ : workerRefineryMap.erase(unit);
 		}
@@ -413,10 +413,10 @@ public class WorkerData {
 	{
 	    // if there are minerals near the depot, add them to the set
 		List<Unit> mineralsNearDepot = new ArrayList<Unit>();
-
+		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
 	    int radius = 320;
-
 	    for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+//	    for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
 			{
@@ -428,16 +428,21 @@ public class WorkerData {
 	    if (mineralsNearDepot.isEmpty())
 	    {
 	        for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+//	    	for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		    {
+	        	/*if(unit.getDistance(enemyBaseLocation) < radius)
+	        		continue;*/
 			    if ((unit.getType() == UnitType.Resource_Mineral_Field))
 			    {
-	                mineralsNearDepot.add(unit);
+			    	if(unit.getDistance(depot) < unit.getDistance(depot))
+			    		mineralsNearDepot.add(unit);
 			    }
 		    }
 	    }
 
 	    return mineralsNearDepot;
 	}
+	
 
 	public int getMineralsNearDepot(Unit depot)
 	{
