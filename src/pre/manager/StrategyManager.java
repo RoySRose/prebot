@@ -1126,7 +1126,7 @@ public class StrategyManager {
  		}
 		
 		//앞마당 전
-		if(CCcnt == 1){
+		if(CCcnt == 1){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
 			if (isInitialBuildOrderFinished == false) {
 				return;
 			}
@@ -1168,79 +1168,6 @@ public class StrategyManager {
 		}
 	}
 	
-
-	/*
-	public void executeCombat() {
-
-		// 공격 모드가 아닐 때에는 전투유닛들을 아군 진영 길목에 집결시켜서 방어
-		if (isFullScaleAttackStarted == false) {
-			Chokepoint firstChokePoint = BWTA.getNearestChokepoint(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getTilePosition());
-
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if (unit.getType() == InformationManager.Instance().getBasicCombatUnitType() && unit.isIdle()) {
-					commandUtil.attackMove(unit, firstChokePoint.getCenter());
-				}
-			}
-
-			// 전투 유닛이 2개 이상 생산되었고, 적군 위치가 파악되었으면 총공격 모드로 전환
-			if (MyBotModule.Broodwar.self().completedUnitCount(InformationManager.Instance().getBasicCombatUnitType()) > 2) {
-				if (InformationManager.Instance().enemyPlayer != null
-					&& InformationManager.Instance().enemyRace != Race.Unknown  
-					&& InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer).size() > 0) {				
-					isFullScaleAttackStarted = true;
-				}
-			}
-		}
-		// 공격 모드가 되면, 모든 전투유닛들을 적군 Main BaseLocation 로 공격 가도록 합니다
-		else {
-			//std.cout << "enemy OccupiedBaseLocations : " << InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance()._enemy).size() << std.endl;
-			
-			if (InformationManager.Instance().enemyPlayer != null
-					&& InformationManager.Instance().enemyRace != Race.Unknown 
-					&& InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer).size() > 0) 
-			{					
-				// 공격 대상 지역 결정
-				BaseLocation targetBaseLocation = null;
-				double closestDistance = 100000000;
-
-				for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-					double distance = BWTA.getGroundDistance(
-						InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getTilePosition(), 
-						baseLocation.getTilePosition());
-
-					if (distance < closestDistance) {
-						closestDistance = distance;
-						targetBaseLocation = baseLocation;
-					}
-				}
-
-				if (targetBaseLocation != null) {
-					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-						// 건물은 제외
-						if (unit.getType().isBuilding()) {
-							continue;
-						}
-						// 모든 일꾼은 제외
-						if (unit.getType().isWorker()) {
-							continue;
-						}
-											
-						// canAttack 유닛은 attackMove Command 로 공격을 보냅니다
-						if (unit.canAttack()) {
-							
-							if (unit.isIdle()) {
-								commandUtil.attackMove(unit, targetBaseLocation.getPosition());
-							}
-						} 
-					}
-				}
-			}
-		}
-	}
-	*/
-	
-	//jafkdlsjflkaslfljksd
-
 	public void executeNongBong() {
 		if (MyBotModule.Broodwar.getFrameCount() % 3 != 0) {
 			//System.out.println("tot_mineral_self: "+ tot_mineral_self);

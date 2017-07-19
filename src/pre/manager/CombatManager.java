@@ -36,6 +36,7 @@ public class CombatManager {
 	private static final int WATCHER_PRIORITY = 4;
 	private static final int BASE_DEFENSE_PRIORITY = 5;
 	private static final int SCOUT_DEFENSE_PRIORITY = 6;
+	private static final int WRAITH_PRIORITY = 100;
 	
 	private List<Unit> combatUnits = new ArrayList<>();
 	private SquadData squadData = new SquadData();
@@ -82,6 +83,9 @@ public class CombatManager {
 		SquadOrder watcherOrder = new SquadOrder(SquadOrderType.WATCH, getAttackPosition(null), 800, "Over Watcher");
 		squadData.putSquad(new Squad("Watcher", watcherOrder, WATCHER_PRIORITY));
 		
+		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), 800, "Wraith");
+		squadData.putSquad(new Squad("Wraith", wraithOrder, WRAITH_PRIORITY));
+		
 		initialized = true;
 	}
 	
@@ -102,8 +106,9 @@ public class CombatManager {
 			updateScoutDefenseSquad();
 			updateBaseDefenseSquads();
 			updateAttackSquads();
-			updateWatcherSquad();
-			updateCheckerSquad();
+			updateWraithSquad();
+			//updateWatcherSquad();
+			//updateCheckerSquad();
 			
 			SpiderMineManger.Instance().update();
 			VultureTravelManager.Instance().update();
@@ -527,6 +532,19 @@ public class CombatManager {
 		}
 
 		return closestDefender;
+	}
+	
+	private void updateWraithSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
+		Squad wraithSquad = squadData.getSquad("Wraith");
+		
+		for (Unit unit : combatUnits) {
+	        if (unit.getType() == UnitType.Terran_Wraith && squadData.canAssignUnitToSquad(unit, wraithSquad)) {
+				squadData.assignUnitToSquad(unit, wraithSquad);// 레이스만
+	        }
+	    }
+		
+		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(wraithSquad), UnitType.Terran_Wraith.sightRange(), "Wraith");
+		wraithSquad.setOrder(wraithOrder);
 	}
 	
 	private void updateWatcherSquad() {

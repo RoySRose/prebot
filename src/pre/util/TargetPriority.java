@@ -79,12 +79,29 @@ public class TargetPriority {
 		return priorityMap;
 	}
 	
+	/*
+	private static Map<UnitType, Integer> inputBuildingPriorityWraith(Race race, Map<UnitType, Integer> priorityMap, int startPriority) {
+		if (race == Race.Terran) {
+			priorityMap.put(UnitType.Terran_Supply_Depot, 		startPriority);
+			priorityMap.put(UnitType.Terran_Armory,				startPriority -= PRIORITY_GAP);
+			priorityMap.put(UnitType.Terran_Factory,			startPriority -= PRIORITY_GAP);
+			priorityMap.put(UnitType.Terran_Starport,			startPriority -= PRIORITY_GAP);
+			priorityMap.put(UnitType.Terran_Missile_Turret,		startPriority -= PRIORITY_GAP);
+			priorityMap.put(UnitType.Terran_Bunker,				startPriority -= PRIORITY_GAP);
+			
+		}
+		return priorityMap;
+	}
+	*/
+	
+	
 	static {
 
 		Map<UnitType, Integer> vulturePriorityMap = new HashMap<>();
 		Map<UnitType, Integer> tankModePriorityMap = new HashMap<>();
 		Map<UnitType, Integer> siegeModePriorityMap = new HashMap<>();
 		Map<UnitType, Integer> goliathPriorityMap = new HashMap<>();
+		Map<UnitType, Integer> wraithPriorityMap = new HashMap<>();
 
 		// 벌처 vs 테란
 		int inputPriority = PRIORITY_MAX;
@@ -270,13 +287,30 @@ public class TargetPriority {
 		goliathPriorityMap.put(UnitType.Zerg_Larva,						inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Zerg_Egg,						inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap = inputBuildingPriority(Race.Zerg, goliathPriorityMap, inputPriority - PRIORITY_GAP);
-		
 
+		// 레이스 vs 테란
+		inputPriority = PRIORITY_MAX;
+		wraithPriorityMap.put(UnitType.Terran_Wraith,						inputPriority);
+		wraithPriorityMap.put(UnitType.Terran_SCV,							inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Siege_Tank_Siege_Mode,		inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Siege_Tank_Tank_Mode,			inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Vulture,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Vulture_Spider_Mine, 			inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Firebat,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Medic,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Ghost,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Marine,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Firebat,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Vulture,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap.put(UnitType.Terran_Goliath,						inputPriority -= PRIORITY_GAP);
+		wraithPriorityMap = inputBuildingPriority(Race.Terran, wraithPriorityMap, inputPriority - PRIORITY_GAP);
+				
 		// 맵 준비 끝
 		PRIORITY_MAP.put(UnitType.Terran_Vulture, vulturePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, tankModePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Siege_Tank_Siege_Mode, siegeModePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Goliath, goliathPriorityMap);
+		PRIORITY_MAP.put(UnitType.Terran_Wraith, wraithPriorityMap);
 	}
 
 }
