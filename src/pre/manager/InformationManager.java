@@ -417,6 +417,43 @@ public class InformationManager {
 		return units;
 	}
 	
+	public List<UnitInfo> getEnemyBuildingUnitsNear(Position myunit, int radius, boolean canAttack, boolean ground, boolean air)
+	{
+		List<UnitInfo> units = new ArrayList<>();
+		
+		Iterator<Integer> it = null;
+		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		
+		
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
+			if(ui != null){
+				if(myunit.getDistance(ui.getLastPosition()) > radius){
+					continue;
+				}
+				if(ui.getType().isBuilding()){
+					if (canAttack != true){
+						units.add(ui);
+					}else{
+						if(ground){
+							if(ui.getType().groundWeapon() != WeaponType.None){
+								units.add(ui);
+							}
+						}
+						if(air){
+							if(ui.getType().airWeapon() != WeaponType.None){
+								units.add(ui);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return units;
+	}
+	
+	
 
 	public void setEveryMultiInfo() {
 		

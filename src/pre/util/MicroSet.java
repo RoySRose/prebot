@@ -123,6 +123,7 @@ public class MicroSet {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Vulture, WIDE_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, NARROW_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Goliath, NARROW_ANGLE);
+			FLEE_ANGLE_MAP.put(UnitType.Terran_Wraith, WIDE_ANGLE);
 		}
 	}
 	
