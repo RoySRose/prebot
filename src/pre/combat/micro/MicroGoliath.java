@@ -1,10 +1,12 @@
 package pre.combat.micro;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
 import pre.util.CommandUtil;
+import pre.util.KitingOption;
+import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
 import pre.util.TargetPriority;
 
@@ -15,29 +17,38 @@ public class MicroGoliath extends MicroManager {
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> goliaths = getUnits();
-
-		// figure out targets
-		List<Unit> goliathTargets = new ArrayList<>();
-		for (Unit target : targets) {
-			if (target.isVisible() && !target.isStasised()) {
-				goliathTargets.add(target);
-			}
-		}
+		List<Unit> goliathTargets = MicroUtils.filterTargets(targets, true);
 		
-		if (!goliathTargets.isEmpty()) {
-			for (Unit goliath : goliaths) {
-				Unit target = getTarget(goliath, goliathTargets);
-				MicroUtils.preciseKiting(goliath, target, true, true, order.getPosition());
-			}
+		KitingOption kitingOption = new KitingOption();
+		kitingOption.setCooltimeAlwaysAttack(true);
+		kitingOption.setUnitedKiting(true);
+		kitingOption.setGoalPosition(order.getPosition());
+		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+		
+		for (Unit goliath : goliaths) {
+//			if (order.getType() != SquadOrderType.BATTLE && awayFromChokePoint(goliath)) {
+//				continue;
+//			}
+//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(goliath)) {
+//				continue;
+//			}
 			
-		} else {
-			for (Unit goliath : goliaths) {
-				if (goliath.getDistance(order.getPosition()) > 100) {
+			Unit target = getTarget(goliath, goliathTargets);
+			if (target != null) {
+				MicroUtils.preciseKiting(goliath, target, kitingOption);
+			} else {
+				// if we're not near the order position, go there
+				if (goliath.getDistance(order.getPosition()) > squadRange) {
 					CommandUtil.attackMove(goliath, order.getPosition());
+				} else {
+					if (goliath.isIdle()) {
+						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), squadRange);
+						CommandUtil.attackMove(goliath, randomPosition);
+					}
 				}
 			}
 		}
-
+		
 //		if (!goliathTargets.isEmpty()) {
 //
 //			for (Unit goliath : goliaths) {
@@ -105,7 +116,7 @@ public class MicroGoliath extends MicroManager {
 		int bestTargetScore = -999999;
 
 		for (Unit target : targets) {
-			int priorityScore = getAttackPriority(rangedUnit, target); // 우선순위 점수
+			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
 			int distanceScore = 0; // 거리 점수
 			int hitPointScore = 0; // HP 점수
 			
@@ -116,9 +127,9 @@ public class MicroGoliath extends MicroManager {
 			distanceScore -= rangedUnit.getDistance(target) / 5;
 	        hitPointScore -= target.getHitPoints() / 10;
 			
-			int score = priorityScore + distanceScore + hitPointScore;
-			if (score > bestTargetScore) {
-				bestTargetScore = score;
+			int totalScore = priorityScore + distanceScore + hitPointScore;
+			if (totalScore > bestTargetScore) {
+				bestTargetScore = totalScore;
 				bestTarget = target;
 			}
 		}
@@ -126,11 +137,6 @@ public class MicroGoliath extends MicroManager {
 		return bestTarget;
 	}
 	
-	private int getAttackPriority(Unit rangedUnit, Unit target) {
-		return TargetPriority.getPriority(rangedUnit.getType(), target.getType());
-	}
-	
-//	
 //	private List<List<Unit>> divedToGroup(List<Unit> goliaths, int groupMax) {
 //		List<List<Unit>> goliathGroups = new ArrayList<>();
 //

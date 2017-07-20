@@ -46,6 +46,7 @@ public class WorkerManager {
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
+
 		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 		updatework();
 		handleMoveWorkers();
@@ -937,6 +938,22 @@ public class WorkerManager {
 	public int getNumMineralWorkers() 
 	{
 		return workerData.getNumMineralWorkers();	
+	}
+	
+	//농봉상태 일꾼 유닛 숫자 리턴
+	public int getNumNongBongMWorkers() 
+	{
+		return workerData.getNumNongBongMWorkers();	
+	}
+	
+	public int getNumNongBongGWorkers() 
+	{
+		return workerData.getNumNongBongGWorkers();	
+	}
+	
+	public int getNumNongBongGSWorkers() 
+	{
+		return workerData.getNumNongBongGSWorkers();	
 	}
 
 	/// idle 상태인 일꾼 유닛 unit 의 숫자를 리턴합니다

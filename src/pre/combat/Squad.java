@@ -12,7 +12,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import pre.UnitData;
 import pre.UnitInfo;
-import pre.combat.SquadOrder.SqaudOrderType;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.combat.micro.MicroGoliath;
 import pre.combat.micro.MicroMarine;
 import pre.combat.micro.MicroScv;
@@ -24,6 +24,8 @@ import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.manager.WorkerManager;
 import pre.util.CommandUtil;
+import pre.util.MicroSet;
+import pre.util.MicroUtils;
 
 public class Squad {
 	
@@ -79,29 +81,43 @@ public class Squad {
 		if (unitSet.isEmpty()) {
 			return;
 		}
+
+//		boolean needToRegroup = false; //needsToRegroup();
+//		if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
+//			needToRegroup = needsToRegroupChecker();
+//		}
 		
-		boolean needToRegroup = needsToRegroup();
-		
-		if (needToRegroup) {
-			Position regroupPosition = calcRegroupPosition();
-			
-			microScv.regroup(regroupPosition);
-			microMarine.regroup(regroupPosition);
-			microVulture.regroup(regroupPosition);
-			microTank.regroup(regroupPosition);
-			microGoliath.regroup(regroupPosition);
-			microWraith.regroup(regroupPosition);
-			microVessel.regroup(regroupPosition);
+		// * 공격스쿼드 : 탱크가 주력인 메카닉의 경우, 탱크 중심으로 squad지역을 설정해 유닛이 분산되지 않도록 한다.
+		// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
+		// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
+		List<Unit> tanks = microTank.getUnits();
+		Position centerOfTanks = null;
+		int squadAreaRange = 0;
+		if (tanks.size() >= MicroSet.Common.TANK_SQUAD_SIZE) {
+			centerOfTanks = MicroUtils.centerOfUnits(tanks);
+			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 		} else {
-			microScv.execute(order);
-			microMarine.execute(order);
-			microVulture.execute(order);
-			microTank.execute(order);
-			microGoliath.execute(order);
-			microWraith.execute(order);
-			microVessel.execute(order);
+			centerOfTanks = MicroUtils.centerOfUnits(unitSet);
+			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 		}
+		microScv.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microMarine.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microVulture.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microTank.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microGoliath.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microWraith.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microVessel.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		
+		microScv.execute();
+		microMarine.execute();
+		microVulture.execute();
+		microTank.execute();
+		microGoliath.execute();
+		microWraith.execute();
+		microVessel.execute();
 	}
+	
+	
 	
 	private void updateUnits() {
 		setAllUnits();
@@ -213,12 +229,30 @@ public class Squad {
 		unitSet.clear();
 	}
 	
+	
+	private boolean needsToRegroupChecker() {
+		if (unitSet.isEmpty()) {
+			return false;
+		}
+		Unit leader = MicroUtils.leaderOfUnit(unitSet, order.getPosition());
+		for (Unit unit : unitSet) {
+			if (unit.getID() == leader.getID()) {
+				continue;
+			}
+			if (leader.getDistance(unit) > 500) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	private boolean needsToRegroup() {
 		if (unitSet.isEmpty()) {
 			return false;
 		}
 
-		if (order.getType() != SqaudOrderType.ATTACK) {
+		if (order.getType() != SquadOrderType.ATTACK) {
 			return false;
 		}
 
@@ -359,6 +393,10 @@ public class Squad {
 		}
 		
 		return regroup;
+	}
+	@Override
+	public String toString() {
+		return "Squad [name=" + name + ", order=" + order + ", unitSet.size()=" + unitSet.size() + "]";
 	}
 	
 }

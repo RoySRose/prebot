@@ -3,11 +3,51 @@ package pre.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import pre.main.MyBotModule;
+import pre.manager.InformationManager;
 
 public class MicroSet {
+
+//	public static class FreeKitingRadius {
+//		public static final int MARINE = (int) (UnitType.Terran_Marine.topSpeed() * UnitType.Terran_Marine.groundWeapon().damageCooldown() * 0.8);
+//		public static final int VULTURE = (int) (UnitType.Terran_Vulture.topSpeed() * UnitType.Terran_Vulture.groundWeapon().damageCooldown() * 0.8);
+//		public static final int GOLIATH = (int) (UnitType.Terran_Goliath.topSpeed() * UnitType.Terran_Goliath.groundWeapon().damageCooldown() * 0.8);
+//		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
+//	}
+	
+	public static class Vulture {
+		// TODO 변동 값
+		public static int mineNumPerPosition = 1;
+		
+	    public static int maxNumWatcher = 3; 
+		public static int maxNumChecker = 1;
+		public static int maxNumCheckerSquad = 1;
+
+		public static int assignedFrame = 30 * 24; // 30초
+		public static int visitFrame = 45 * 24; // 45초
+		
+		public static String getCheckerSquadPostFix() {
+			return "[" + String.valueOf(postFixNum++) + "]";
+		}
+		private static int postFixNum = 0; // TODO 이거 수정필요
+		
+		
+		// 마인 매설 관련 상수
+		public static final int MINE_EXACT_RADIUS = 10;
+		public static final int MINE_SPREAD_RADIUS = 500;
+
+		public static final int MINE_BETWEEN_DIST = 50;
+		public static final int RESV_EXPIRE_FRAME = 24 * 3;
+	}
+	
+	public static class Common {
+		public static final int TANK_SQUAD_SIZE = 2;
+		public static final int TANK_COVERAGE = 100;
+		public static final int ARRIVE_DECISION_RANGE = 100;
+	}
 	
 	public static class Network {
 		public static final int LATENCY = MyBotModule.Broodwar.getLatency();
@@ -16,6 +56,9 @@ public class MicroSet {
 	public static class Upgrade {
 		private static boolean vultureSpeedUpgrade = false;
 		private static boolean goliathAttkRangeUpgrade = false;
+		
+		private static boolean siegeModeUpgrade = false;
+		private static boolean spiderMineUpgrade = false;
 		
 		public static double getUpgradeAdvantageAmount(UpgradeType upgrade) {
 			if (upgrade == UpgradeType.Ion_Thrusters) {
@@ -35,8 +78,28 @@ public class MicroSet {
 					return 3.0 * 24.0;
 				}
 			}
-			
 			return 0.0;
+		}
+		
+		public static boolean hasResearched(TechType tech) {
+			if (tech == TechType.Tank_Siege_Mode) {
+				if (siegeModeUpgrade) {
+					return true;
+				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Tank_Siege_Mode)) {
+					siegeModeUpgrade = true;
+					MyBotModule.Broodwar.sendText("Siege Mode Upgraded!");
+					return true;
+				}
+			} else if (tech == TechType.Spider_Mines) {
+				if (spiderMineUpgrade) {
+					return true;
+				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Spider_Mines)) {
+					spiderMineUpgrade = true;
+					MyBotModule.Broodwar.sendText("Spider Mines Upgraded!");
+					return true;
+				} 
+			}
+			return false;
 		}
 	}
 	
@@ -55,12 +118,14 @@ public class MicroSet {
 		public static final Map<UnitType, Integer[]> FLEE_ANGLE_MAP = new HashMap<>();
 		public static final Integer[] NARROW_ANGLE = { -5, +5, -10, +10, -15, +15 };
 		public static final Integer[] WIDE_ANGLE = { -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
+		public static final Integer[] EIGHT_360_ANGLE = {45, 90, 135, 180, 225, 270, 315, 360};
 		
 		static {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Marine, WIDE_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Vulture, WIDE_ANGLE);
-			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, WIDE_ANGLE);
+			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, NARROW_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Goliath, NARROW_ANGLE);
+			FLEE_ANGLE_MAP.put(UnitType.Terran_Wraith, WIDE_ANGLE);
 		}
 	}
 	

@@ -1,6 +1,8 @@
 package pre.combat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
@@ -23,6 +25,20 @@ public class SquadData {
 
 	public Squad getSquad(String squadName) {
 		return squads.get(squadName);
+	}
+
+	public Squad removeSquad(String squadName) {
+		return squads.remove(squadName);
+	}
+
+	public List<Squad> getSquadList(String squadName) {
+		List<Squad> squadList = new ArrayList<>();
+		for (Squad squad : squads.values()) {
+			if (squad.getName().startsWith(squadName)) {
+				squadList.add(squad);
+			}
+		}
+		return squadList;
 	}
 
 	public Squad getUnitSquad(Unit unit) {
@@ -57,8 +73,14 @@ public class SquadData {
 	public void printSquadInfo() {
 		for (String squadName : squads.keySet()) {
 			Squad squad = squads.get(squadName);
-			System.out.println("[" + squad.getName() + "]\nSIZE: " + squad.getUnitSet().size() + "\nORDER: " + squad.getOrder());
+			System.out.println("[" + squad.getName() + "] SIZE: " + squad.getUnitSet().size() + "\nORDER: " + squad.getOrder());
 		}
 		System.out.println();
 	}
+
+	@Override
+	public String toString() {
+		return "SquadData [squads=" + squads + "]";
+	}
+	
 }

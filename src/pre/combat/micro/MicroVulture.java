@@ -1,34 +1,127 @@
 package pre.combat.micro;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Position;
+import bwapi.TechType;
 import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Region;
+import pre.MapGrid;
+import pre.combat.SpiderMineManger;
+import pre.combat.SquadOrder.SquadOrderType;
+import pre.manager.InformationManager;
 import pre.util.CommandUtil;
+import pre.util.KitingOption;
+import pre.util.MicroSet;
+import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
+import pre.util.TargetPriority;
 
 public class MicroVulture extends MicroManager {
-
+	
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> vultures = getUnits();
-
-		// figure out targets
-		List<Unit> vultureTargets = new ArrayList<>();
-		for (Unit target : targets) {
-			if (target.isVisible() && !target.isFlying() & !target.isStasised()) {
-				vultureTargets.add(target);
-			}
+		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
+		
+		KitingOption kitingOption = new KitingOption();
+		
+		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
+			kitingOption.setCooltimeAlwaysAttack(true);
+			kitingOption.setUnitedKiting(true);
+			kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+			kitingOption.setGoalPosition(squadCenter);
+			
+		} else if (order.getType() == SquadOrderType.WATCH) { // 회피가 아주 좋은 설정(상대병력 감시용 - watcher : 회피를 자신의 base로 한다)
+			kitingOption.setCooltimeAlwaysAttack(false);
+			kitingOption.setUnitedKiting(false);
+			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
+			kitingOption.setSpecialSquadType(1);
+			
+		} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) { // 회피가 아주 좋은 설정(정찰견제용 - checker)
+			kitingOption.setCooltimeAlwaysAttack(false);
+			kitingOption.setUnitedKiting(false);
+			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
+			kitingOption.setSpecialSquadType(2);
+			
+		} else { // 회피가 좋은 설정
+			kitingOption.setCooltimeAlwaysAttack(false);
+			kitingOption.setUnitedKiting(false);
+			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+			kitingOption.setGoalPosition(order.getPosition());
 		}
 
 		for (Unit vulture : vultures) {
+//			if (order.getType() == SquadOrderType.BATTLE && awayFromChokePoint(vulture)) {
+//				continue;
+//			}
+//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(vulture)) {
+//				continue;
+//			}
+			Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
+			if (positionToMine != null) { // 마인매설
+				CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
+				continue;
+			}
+			
 			Unit target = getTarget(vulture, vultureTargets);
 			if (target != null) {
-				MicroUtils.preciseKiting(vulture, target, false, false, order.getPosition());
+				// 탱크 중심의 부대는 탱크 중심으로 뭉쳐야 한다.
+				if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) {
+//					System.out.println("where is siege tank");
+					if (tankSize >= MicroSet.Common.TANK_SQUAD_SIZE) {
+						List<Unit> tankMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Tank_Mode);
+						List<Unit> seigeMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Siege_Mode);
+						
+						if (tankMode.isEmpty() && seigeMode.isEmpty()) {
+							kitingOption.setCooltimeAlwaysAttack(false);
+							kitingOption.setUnitedKiting(false);
+							kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+							kitingOption.setGoalPosition(squadCenter);
+//							System.out.println("no siege here");
+						} else {
+//							System.out.println("fight with siege");
+						}
+					}
+				}
+				MicroUtils.preciseKiting(vulture, target, kitingOption);
+				
 			} else {
-				// if we're not near the order position, go there
-				if (vulture.getDistance(order.getPosition()) > 100) {
+				if (order.getType() == SquadOrderType.WATCH) {
+					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
+					if (position == null) {
+						BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+						Region baseRegion = BWTA.getRegion(base.getPosition());
+						Region vultureRegion = BWTA.getRegion(vulture.getPosition());
+						
+						if (baseRegion != vultureRegion) {
+							position = SpiderMineManger.Instance().getPositionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.mineNumPerPosition);
+						}
+					}
+					if (position != null) {
+						continue;
+					}
+					
+				} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
+					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
+					if (position != null) {
+						continue;
+					}
+				}
+				
+				if (vulture.getDistance(order.getPosition()) > squadRange) {
 					CommandUtil.attackMove(vulture, order.getPosition());
+					
+				} else { // 목적지 도착
+					if (vulture.isIdle() || vulture.isBraking()) {
+						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange);
+						CommandUtil.attackMove(vulture, randomPosition);
+					}
 				}
 			}
 		}
@@ -37,16 +130,42 @@ public class MicroVulture extends MicroManager {
 	private Unit getTarget(Unit rangedUnit, List<Unit> targets) {
 		Unit bestTarget = null;
 		int bestTargetScore = -999999;
-//		int hitPointScore = 0; // HP 점수
 
 		for (Unit target : targets) {
-			int priorityScore = getAttackPriority(rangedUnit, target);
-			int distanceScore = 0 - rangedUnit.getDistance(target) / 50;           // 0..map size in pixels
-
-			int score = priorityScore + distanceScore;
-
-			if (score > bestTargetScore) {
-				bestTargetScore = score;
+			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
+			
+			int distanceScore = 0; // 거리 점수
+			int hitPointScore = 0; // HP 점수
+			int dangerousScore = 0; // 위험한 새끼 점수
+			
+			if (rangedUnit.isInWeaponRange(target)) {
+				distanceScore += 100;
+			}
+			
+			int siegeMinRange = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+			if (target.getType().groundWeapon().maxRange() <= siegeMinRange) {
+				List<Unit> nearUnits = MapGrid.Instance().getUnitsNear(target.getPosition(), siegeMinRange, true, false, null);
+				for (Unit unit : nearUnits) {
+					if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+						dangerousScore += 100; // 시즈에 붙어있는 적은 죽여야 한다.
+					} else {
+						dangerousScore += 10;
+					}
+				}
+			}
+			
+			distanceScore -= rangedUnit.getDistance(target) / 5;
+	        hitPointScore -= target.getHitPoints() / 10;
+			
+	        int totalScore = 0;
+	        if (order.getType() == SquadOrderType.WATCH) {
+	        	totalScore = distanceScore;
+	        } else {
+	        	totalScore = priorityScore + distanceScore + hitPointScore + dangerousScore;
+	        }
+	        
+	        if (totalScore > bestTargetScore) {
+				bestTargetScore = totalScore;
 				bestTarget = target;
 			}
 		}
@@ -54,219 +173,39 @@ public class MicroVulture extends MicroManager {
 		return bestTarget;
 	}
 	
-	
-//	private Unit getTarget(Unit rangedUnit, List<Unit> targets) {
-//		int bestScore = -999999;
-//		Unit bestTarget = null;
+//	private Position findPositionToMine(Unit vulture) {
+//		if (vulture.getSpiderMineCount() <= 0) {
+//			return null;
+//		}
+//		
+//		Position positionToMine = null;
 //
-//		for (Unit target : targets) {
-//			int priority = getAttackPriority(rangedUnit, target);     // 0..12
-//			int range    = rangedUnit.getDistance(target);           // 0..map size in pixels
-//			int toGoal   = target.getDistance(order.getPosition());  // 0..map size in pixels
-//
-//			// Let's say that 1 priority step is worth 160 pixels (5 tiles).
-//			// We care about unit-target range and target-order position distance.
-//			int score = 5 * 32 * priority - range - toGoal/2;
-//
-//			// Adjust for special features.
-//			// This could adjust for relative speed and direction, so that we don't chase what we can't catch.
-//			if (rangedUnit.isInWeaponRange(target)) {
-//				score += 4 * 32;
-//			} else if (!target.isMoving()) {
-//				if (target.isSieged() || target.getOrder() == Order.Sieging || target.getOrder() == Order.Unsieging) {
-//					score += 48;
-//				} else {
-//					score += 24;
+//		BaseLocation nearestBase = BWTA.getNearestBaseLocation(vulture.getPosition());
+//		if (vulture.getDistance(nearestBase.getPosition()) < 500) {
+//			boolean nearestBaseOccupied = false;	
+//			for (BaseLocation base : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
+//				if (base.equals(nearestBase)) {
+//					nearestBaseOccupied = true;
+//					break;
 //				}
-//			} else if (target.isBraking()) {
-//				score += 16;
-//			} else if (target.getType().topSpeed() >= rangedUnit.getType().topSpeed()) {
-//				score -= 5 * 32;
 //			}
 //			
-//			// Prefer targets that are already hurt.
-//			if (target.getType().getRace() == Race.Protoss && target.getShields() == 0) {
-//				score += 32;
-//			} else if (target.getHitPoints() < target.getType().maxHitPoints()) {
-//				score += 24;
-//			}
-//
-//			if (score > bestScore) {
-//				bestScore = score;
-//				bestTarget = target;
+//			if (!nearestBaseOccupied) {
+//				int x = nearestBase.getPosition().getX() + (int)(Math.random() % 20);
+//				int y = nearestBase.getPosition().getY() + (int)(Math.random() % 20);
+//				positionToMine = new Position(x, y);
+//				
+//				List<Unit> mines = MapGrid.Instance().getUnitsNear(positionToMine, 50, true, false, UnitType.Terran_Vulture_Spider_Mine);
+//				if (mines.size() < 3) {
+//					return positionToMine;
+//				}
 //			}
 //		}
 //		
-//		return bestTarget;
+//		
+//		int x = vulture.getX() / 10 * 10;
+//		int y = vulture.getY() / 10 * 10;
+//		positionToMine = new Position (x, y);
+//		return positionToMine;
 //	}
-	
-
-	//TODO 이거
-	private int getAttackPriority(Unit rangedUnit, Unit target) {
-		
-		return 0;
-
-//		UnitType rangedType = rangedUnit.getType();
-//		UnitType targetType = target.getType();
-//		
-//		int priority = 0;
-//		if (rangedType == UnitType.Terran_Marine) {
-//			priority = getMarinePriority();
-//		}
-
-//		// An addon other than a completed comsat is boring.
-//		// TODO should also check that it is attached
-//		if (targetType.isAddon() && !(targetType == BWAPI::UnitTypes::Terran_Comsat_Station && target->isCompleted()))
-//		{
-//			return 1;
-//		}
-		
-		
-//	    // if the target is building something near our base something is fishy
-//	    BWAPI::Position ourBasePosition = BWAPI::Position(InformationManager::Instance().getMyMainBaseLocation()->getPosition());
-//		if (target->getDistance(ourBasePosition) < 1200) {
-//			if (target->getType().isWorker() && (target->isConstructing() || target->isRepairing()))
-//			{
-//				return 12;
-//			}
-//			if (target->getType().isBuilding())
-//			{
-//				return 12;
-//			}
-//		}
-//	    
-//		if (rangedType.isFlyer()) {
-//			// Exceptions if we're a flyer (other than scourge, which is handled above).
-//			if (targetType == BWAPI::UnitTypes::Zerg_Scourge)
-//			{
-//				return 12;
-//			}
-//		}
-//		else
-//		{
-//			// Exceptions if we're a ground unit.
-//			if (targetType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine && !target->isBurrowed() ||
-//				targetType == BWAPI::UnitTypes::Zerg_Infested_Terran)
-//			{
-//				return 12;
-//			}
-//		}
-//
-//		if (targetType == BWAPI::UnitTypes::Protoss_High_Templar)
-//		{
-//			return 12;
-//		}
-//
-//		// Short circuit: Give bunkers a lower priority to reduce bunker obsession.
-//		if (targetType == BWAPI::UnitTypes::Terran_Bunker)
-//		{
-//			return 9;
-//		}
-//
-//		// Threats can attack us. Exception: Workers are not threats.
-//		if (UnitUtil::CanAttack(targetType, rangedType) && !targetType.isWorker())
-//		{
-//			// Enemy unit which is far enough outside its range is lower priority than a worker.
-//			if (rangedUnit->getDistance(target) > 64 + UnitUtil::GetAttackRange(target, rangedUnit))
-//			{
-//				return 8;
-//			}
-//			return 10;
-//		}
-//		// Droppers are as bad as threats. They may be loaded and are often isolated and safer to attack.
-//		if (targetType == BWAPI::UnitTypes::Terran_Dropship ||
-//			targetType == BWAPI::UnitTypes::Protoss_Shuttle)
-//		{
-//			return 10;
-//		}
-//		// Also as bad are other dangerous things.
-//		if (targetType == BWAPI::UnitTypes::Terran_Science_Vessel ||
-//			targetType == BWAPI::UnitTypes::Zerg_Scourge)
-//		{
-//			return 10;
-//		}
-//		// Next are workers.
-//		if (targetType.isWorker()) 
-//		{
-//	        if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture)
-//	        {
-//	            return 11;
-//	        }
-//			// Repairing or blocking a choke makes you critical.
-//			if (target->isRepairing() || unitNearChokepoint(target))
-//			{
-//				return 11;
-//			}
-//			// SCVs constructing are also important.
-//			if (target->isConstructing())
-//			{
-//				return 10;
-//			}
-//
-//	  		return 9;
-//		}
-//		// Important combat units that we may not have targeted above (esp. if we're a flyer).
-//		if (targetType == BWAPI::UnitTypes::Protoss_Carrier ||
-//			targetType == BWAPI::UnitTypes::Protoss_Reaver || 
-//			targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
-//			targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
-//		{
-//			return 8;
-//		}
-//		// Nydus canal is the most important building to kill.
-//		if (targetType == BWAPI::UnitTypes::Zerg_Nydus_Canal)
-//		{
-//			return 8;
-//		}
-//		// Spellcasters are as important as key buildings.
-//		// Also remember to target other non-threat combat units.
-//		if (targetType.isSpellcaster() ||
-//			targetType.groundWeapon() != BWAPI::WeaponTypes::None ||
-//			targetType.airWeapon() != BWAPI::WeaponTypes::None)
-//		{
-//			return 7;
-//		}
-//		// Templar tech and spawning pool are more important.
-//		if (targetType == BWAPI::UnitTypes::Protoss_Templar_Archives)
-//		{
-//			return 7;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Zerg_Spawning_Pool)
-//		{
-//			return 7;
-//		}
-//		// Don't forget the nexus/cc/hatchery.
-//		if (targetType.isResourceDepot())
-//		{
-//			return 6;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Protoss_Pylon)
-//		{
-//			return 5;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Terran_Factory || targetType == BWAPI::UnitTypes::Terran_Armory)
-//		{
-//			return 5;
-//		}
-//		// Downgrade unfinished/unpowered buildings, with exceptions.
-//		if (targetType.isBuilding() &&
-//			(!target->isCompleted() || !target->isPowered()) &&
-//			!(	targetType.isResourceDepot() ||
-//				targetType.groundWeapon() != BWAPI::WeaponTypes::None ||
-//				targetType.airWeapon() != BWAPI::WeaponTypes::None ||
-//				targetType == BWAPI::UnitTypes::Terran_Bunker))
-//		{
-//			return 2;
-//		}
-//		if (targetType.gasPrice() > 0)
-//		{
-//			return 4;
-//		}
-//		if (targetType.mineralPrice() > 0)
-//		{
-//			return 3;
-//		}
-//		// Finally everything else.
-//		return 1;
-	}
 }

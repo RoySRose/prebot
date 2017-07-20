@@ -17,98 +17,303 @@ public class InitialBuild {
 	
 	
 	public void setInitialBuildOrder() {
+		String map_name = MyBotModule.Broodwar.mapFileName();
 		
+		//System.out.println("map_name ===>>>> " + map_name);
 		
-		//@@@@@@ 상대 종족에 따른 initial build 를 따져봐야된다.
+		if(map_name.contains("Hunter")){
+			map_name = "Hunter";
+		}else if(map_name.contains("Lost")){
+			map_name = "Lotem";
+		}else if(map_name.contains("Spirit")){
+			map_name = "Spirit";
+		}
+			
+		
+
+		//@@@@@@ 맵과 상대 종족에 따른 initial build 를 따져봐야된다.
+		//테란전 플토전은 벙커 없이 가자
 		
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			if(map_name.equals("Hunter")){
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//10 scv 찍고 배럭
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//12 scv 찍고 가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//14 scv 찍고 서플
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				
+				/*벙커없이 간다.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//현재 14scv - 1정찰 / 10 미네랄 / 3가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+
+				//15 찍어놓고 팩토리
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//19 찍어놓고 1벌쳐
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Vulture,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
 			
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			if(map_name.equals("Spirit")){
+			
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//10 scv 찍고 배럭
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//12 scv 찍고 가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//14 scv 찍고 서플
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				
+				/*벙커없이 간다.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//현재 14scv - 1정찰 / 10 미네랄 / 3가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+	
+				//15 찍어놓고 팩토리
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//19 찍어놓고 1벌쳐
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Vulture,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+			}
 
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			if(map_name.equals("Spirit")){
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//10 scv 찍고 배럭
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//12 scv 찍고 가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//14 scv 찍고 서플
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				
+				/*벙커없이 간다.
+				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+				//현재 14scv - 1정찰 / 10 미네랄 / 3가스
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+	
+				//15 찍어놓고 팩토리
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				//19 찍어놓고 1벌쳐
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Vulture,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+			}
 
 		}else{
 		
-			//@@@@@@ 현재 아래는 가장 기본 빌드(최초 소스)
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(
-					InformationManager.Instance().getBasicSupplyProviderUnitType(),
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//테란전 8서플
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			/*BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//10배럭 - 서플완성 scv 정찰
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//13가스
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//현재 14scv - 1정찰 / 10 미네랄 / 3가스
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//15팩토리
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 			/*

@@ -5,13 +5,16 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwta.BWTA;
+import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.combat.SquadOrder;
-import pre.combat.SquadOrder.SqaudOrderType;
+import pre.combat.SquadOrder.SquadOrderType;
 import pre.util.CommandUtil;
 
 public abstract class MicroManager {
 	private List<Unit> units = new ArrayList<>();
+	private List<Unit> nearbyEnemies = new ArrayList<>();
 
 	public List<Unit> getUnits() {
 		return units;
@@ -19,33 +22,46 @@ public abstract class MicroManager {
 	public void setUnits(List<Unit> units) {
 		this.units = units;
 	}
-	
+
+	public List<Unit> getNearbyEnemies() {
+		return nearbyEnemies;
+	}
+	public void setNearbyEnemies(List<Unit> nearbyEnemies) {
+		this.nearbyEnemies = nearbyEnemies;
+	}
+
 	protected SquadOrder order;
+	protected Position squadCenter = null;
+	protected int squadRange = 0;
+	protected int tankSize = 0;
+	
+	
 	protected abstract void executeMicro(List<Unit> targets);
 	
-	public void execute(SquadOrder inputOrder) {
-		// Nothing to do if we have no units.
-		if (units.isEmpty()) {
-			return;
-		}
-
+	public void setMicroInformation(SquadOrder inputOrder, Position squadCenter, int squadRange, int tankSize) {
 		order = inputOrder;
-		
-		// If we have no combat order (attack or defend), we're done.
-		if (!order.isCombatOrder()) {
+		if (units.isEmpty() || !order.isCombatOrder()) {
 			return;
 		}
 
-		// Discover enemies within region of interest.
-		List<Unit> nearbyEnemies = new ArrayList<>();
-		
+		this.nearbyEnemies.clear();
 		MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
-
-		// For attack but not defense, also include enemies near our units.
-		if (order.getType() == SqaudOrderType.ATTACK) {
+		
+		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
+		if (order.getType() != SquadOrderType.DEFEND) {
 			for (Unit unit : units) {
 				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange(), false, true);
 			}
+		}
+		
+		this.squadCenter = squadCenter;
+		this.squadRange = squadRange;
+		this.tankSize = tankSize;
+	}
+	
+	public void execute() {
+		if (units.isEmpty() || !order.isCombatOrder()) {
+			return;
 		}
 
 		executeMicro(nearbyEnemies);
@@ -62,11 +78,49 @@ public abstract class MicroManager {
 			// A unit whose retreat path is blocked by enemies should do something else, at least attack-move.
 //			if (unitDistanceFromBase > regroupDistanceFromBase) {
 //	            UnitUtils.move(unit, ourBasePosition); } else
-	        if (unit.getDistance(regroupPosition) > 96) {
-				CommandUtil.move(unit, regroupPosition);
-			} else {
-				CommandUtil.attackMove(unit, unit.getPosition());
-			}
+//	        if (unit.getDistance(regroupPosition) > 96) {
+//				CommandUtil.move(unit, regroupPosition);
+//			} else {
+//				CommandUtil.attackMove(unit, unit.getPosition());
+//			}
+	        CommandUtil.attackMove(unit, squadCenter);
 		}
 	}
+	
+	public boolean awayFromChokePoint(Unit unit) {
+		
+		boolean nearChokepoint = false;
+		boolean nearChokePointIsOrderPosition = false;
+        for (Chokepoint choke : BWTA.getChokepoints()) {
+            if (choke.getCenter().getDistance(unit.getPosition()) < 64) {
+            	nearChokepoint = true;
+                if (choke.getDistance(order.getPosition()) < 64) {
+                	nearChokePointIsOrderPosition = true;
+                }
+                break;
+            }
+        }
+		
+        if (nearChokepoint) {
+        	if (nearChokePointIsOrderPosition) {
+        		CommandUtil.move(unit, BWTA.getRegion(order.getPosition()).getCenter());
+        	} else {
+	        	CommandUtil.move(unit, order.getPosition());
+        	}
+        	return true;
+        }
+        
+        return false;
+	}
+	
+	public boolean inUnityThereIsStrength(Unit unit) {
+		
+		if (unit.getDistance(squadCenter) > squadRange) {
+        	CommandUtil.move(unit, squadCenter);
+        	return true;
+		}
+		
+		return false;
+	}
+	
 }

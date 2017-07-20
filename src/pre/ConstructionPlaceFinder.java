@@ -178,7 +178,15 @@ public class ConstructionPlaceFinder {
 					desiredPosition = getBuildLocationNear(buildingType, tempChokePoint.getCenter().toTilePosition());
 				}
 				break;
+				
+			case NextExpansionPoint:
+				tempBaseLocation = InformationManager.Instance().getNextExpansionLocation();
+				if (tempBaseLocation != null) {
+					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
+				}
+				break;
 			}
+			
 		}
 
 		return desiredPosition;
@@ -562,8 +570,10 @@ public class ConstructionPlaceFinder {
 
 			if (refineryAlreadyBuilt == false)
 			{
-				double thisDistance = BWTA.getGroundDistance(geyserPos.toTilePosition(), seedPosition);
+				//double thisDistance = BWTA.getGroundDistance(geyserPos.toTilePosition(), seedPosition);
 
+				double thisDistance = MapTools.Instance().getGroundDistance(geyserPos, seedPosition.toPosition());
+				
 				if (thisDistance < minGeyserDistanceFromSeedPosition)
 				{
 					//std::cout << " selected " << std::endl;

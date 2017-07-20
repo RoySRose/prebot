@@ -86,12 +86,12 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(80, 60);
+			drawBuildOrderQueueOnScreen(5, 60);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
 		if (Config.DrawProductionInfo) {
-			drawBuildStatusOnScreen(200, 60);
+			drawBuildStatusOnScreen(120, 60);
 		}
 
 		// 건물 건설 큐. 건물 건설 상황
@@ -114,7 +114,7 @@ public class UXManager {
 
 		if (Config.DrawWorkerInfo) {
 			// 각 일꾼들의 임무 상황
-			drawWorkerStateOnScreen(5, 60);
+			drawWorkerStateOnScreen(260, 60);
 
 			// 베이스캠프당 일꾼 수
 			drawWorkerCountOnMap();
