@@ -4,6 +4,7 @@ import java.util.List;
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.Region;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -15,6 +16,7 @@ import pre.WorkerMoveData;
 import pre.WorkerData.WorkerJob;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
+import pre.util.MicroUtils;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
@@ -44,6 +46,7 @@ public class WorkerManager {
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
+		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 		updatework();
 		handleMoveWorkers();
 		handleCombatWorkers();
@@ -152,18 +155,45 @@ public class WorkerManager {
 		 */
 		Unit overDepot = null; //미네랄 * 2보다 많이 할당된 CC
 		Unit lessDepot = null; //미네랄 * 2보다 저게 할당된 CC
-		
+		boolean underAttak = false;
 		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots())
 		{
 			if (depot == null) continue;
-//			int workerCnt = workerData.depotWorkerCount.get(depot.getID());
+			
 			int workerCnt = workerData.getNumAssignedWorkers(depot);
 			List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
-			//System.out.println("workerCnt : " + workerCnt + " mineralPatches.size() : " + mineralPatches.size());
-			if(workerCnt > mineralPatches.size()*2){
+			if(workerCnt > mineralPatches.size()*2 ){
 				overDepot = depot;
 			}else if(workerCnt < mineralPatches.size()*2){
-				lessDepot = depot;
+					boolean visialble = false;
+					for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+					{
+						if(unit.isVisible()){
+//							commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
+							visialble = true;
+							continue;
+							
+						}
+					}
+					if(visialble == false)
+						lessDepot = depot;
+					/*
+				for (Unit worker : workerData.getWorkers())
+				{
+					if(workerData.getWorkerDepot(worker).getID() == depot.getID()){
+						Unit target = getClosestEnemyUnitFromWorker(worker);
+						if (target != null || depot.isUnderAttack())
+						{
+							underAttak = true;
+						}
+					}
+				}
+				System.out.println("underAttak : " + underAttak);
+				if(!underAttak){
+					lessDepot = depot;
+				}else
+					continue;
+				*/
 			}
 
 		}	
@@ -190,6 +220,7 @@ public class WorkerManager {
 				/*
 				 * CC간 일꾼 재배치 
 				 */
+				
 				if(overDepot != null && lessDepot != null){
 					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(overDepot);
 					for (Unit mineral : mineralPatches){
@@ -207,9 +238,10 @@ public class WorkerManager {
 			        }
 					for (Unit mineral : mineralPatches){
 //						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
-						int workerCnt = workerData.getNumAssignedWorkers(overDepot);
+						int overDepotCnt = workerData.getNumAssignedWorkers(overDepot);
+						int lessDepotCnt = workerData.getNumAssignedWorkers(lessDepot);
 						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						if(sCvCnt == maxSCV && workerCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals()){
+						if(sCvCnt == maxSCV && overDepotCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals() && overDepotCnt > lessDepotCnt){
 							setMineralWorker(worker,lessDepot);
 							continue;
 						}
