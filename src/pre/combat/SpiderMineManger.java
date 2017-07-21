@@ -63,7 +63,7 @@ public class SpiderMineManger {
 //			MicroSet.Vulture.maxNumWatcher = 50;
 //			MicroSet.Vulture.maxNumCheckerSquad = 1;
 			MicroSet.Vulture.maxNumChecker = vultureCount / 4; // 3대1 비율이다.
-			System.out.println("vultureCount / maxNumChecker : " + vultureCount + " / " + MicroSet.Vulture.maxNumChecker);
+//			System.out.println("vultureCount / maxNumChecker : " + vultureCount + " / " + MicroSet.Vulture.maxNumChecker);
 		}
 		
 	}

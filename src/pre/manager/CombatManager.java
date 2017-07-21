@@ -14,7 +14,6 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
-import pre.MapGrid;
 import pre.MapTools;
 import pre.UnitInfo;
 import pre.combat.SpiderMineManger;
@@ -238,14 +237,16 @@ public class CombatManager {
 		}
 
 		// Fourth choice: We can't see anything so explore the map attacking along the way
-		return MapGrid.Instance().getLeastExplored();
+		//Position leastExplored = MapGrid.Instance().getLeastExplored(); TODO 렉 유발요소 확인 필요
+		//return leastExplored;
+		return null;
 	}
 	
 	private Position getNextChokePosition(Squad squad) {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 	    
-		if (enemyBaseLocation != null && enemyFirstChoke != null) {
+		if (squad.getName().equals("MainAttack") && enemyBaseLocation != null && enemyFirstChoke != null) {
 			if (squad.getUnitSet().isEmpty()) {
 				currTargetChoke = null;
 				return null;
@@ -297,13 +298,12 @@ public class CombatManager {
 		    		currTargetChoke = nextChoke;
 		    	}
 		    }
-			if (currTargetChoke != null) {
-				return currTargetChoke.getCenter();
-			} else {
-				return null;
-			}
 		}
-	    return null;
+		if (currTargetChoke != null) {
+			return currTargetChoke.getCenter();
+		} else {
+			return null;
+		}
 	}
 	
 	private Position watchersPosition(Squad squad) {

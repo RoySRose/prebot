@@ -15,6 +15,7 @@ import pre.combat.SpiderMineManger;
 import pre.combat.SquadOrder.SquadOrderType;
 import pre.combat.VultureTravelManager;
 import pre.manager.InformationManager;
+import pre.util.CombatExpectation;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
 import pre.util.MicroSet;
@@ -28,15 +29,22 @@ public class MicroVulture extends MicroManager {
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> vultures = getUnits();
 		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
-		boolean saveCondition = MicroUtils.unitSaveCondition(vultures, vultureTargets); // TODO
+		boolean victoryExpect = CombatExpectation.expectVulture(vultures, targets); // TODO
 		
 		KitingOption kitingOption = new KitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
 		kitingOption.setUnitedKiting(false);
 		kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
 		kitingOption.setGoalPosition(order.getPosition());
-		kitingOption.setSaveThisUnit(saveCondition ? true : false); // 싸워야할때는 싸운다.
-		kitingOption.setRetreatToBase(order.getType() == SquadOrderType.WATCH ? true : false); // 회피가 아주 좋은 설정(병력감시 - watcher : 회피를 자신의 base로 한다)
+		
+		if (victoryExpect) { // 싸우면 걍 이기는 각
+			kitingOption.setSaveThisUnit(false);
+			kitingOption.setRetreatToBase(false);
+			
+		} else { //
+			kitingOption.setSaveThisUnit(true);
+			kitingOption.setRetreatToBase(order.getType() == SquadOrderType.WATCH ? true : false); // 회피가 아주 좋은 설정(병력감시 - watcher : 회피를 자신의 base로 한다)
+		}
 
 		for (Unit vulture : vultures) {
 			

@@ -167,9 +167,9 @@ public class MicroUtils {
 				WeaponType nearEnemyWeapon = rangedUnit.isFlying() ? ui.getType().airWeapon() : ui.getType().groundWeapon();
 				int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
 				double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
-				double backOffDist = ui.getType().isBuilding() ? 550.0 : 0.0;
+				double backOffDist = ui.getType().isBuilding() ? 300.0 : 0.0;
 				
-				if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 36 + backOffDist) {
+				if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 48 + backOffDist) {
 					saveUnitMode = true;
 					break;
 				}
@@ -190,7 +190,7 @@ public class MicroUtils {
 			
 			// 1. 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
 			// 2. 카이팅
-			if (MyBotModule.Broodwar.enemy().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
+			if (MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
 				haveToAttack = true;
 			} else {
 				double distanceToTarget = rangedUnit.getDistance(target);
@@ -464,10 +464,6 @@ public class MicroUtils {
 			}
 		}
 		return newTargets;
-	}
-	
-	public static boolean unitSaveCondition(List<Unit> vulture, List<Unit> targets) { // TODO
-		return true;
 	}
 	
 	public static Position centerOfUnits(List<Unit> units) {
