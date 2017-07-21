@@ -85,13 +85,8 @@ public class ConstructionPlaceFinder {
 				// 스타크래프트 좌표계 : 오른쪽으로 갈수록 x 가 증가 (데카르트 좌표계와 동일). 아래로 갈수록 y가 증가 (y축만 데카르트 좌표계와 반대)
 				// 삼각함수 값은 데카르트 좌표계에서 계산하므로, vy를 부호 반대로 해서 각도 t 값을 구함 
 
-				// MainBaseLocation 이 null 이거나, ChokePoint 가 null 이면, MainBaseLocation 주위에서 가능한 곳을 리턴한다
-				if (tempBaseLocation == null ) {
-					//std::cout << "q";
-					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
-					break;
-				}
-				else if (tempChokePoint == null) {
+				// FirstChokePoint 가 null 이면, MainBaseLocation 주위에서 가능한 곳을 리턴한다
+				if (tempChokePoint == null) {
 					//std::cout << "r";
 					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
 					break;
@@ -535,11 +530,39 @@ public class ConstructionPlaceFinder {
 		TilePosition closestGeyser = TilePosition.None;
 		double minGeyserDistanceFromSeedPosition = 100000000;
 
-		// for each geyser
+		//TODO BASICBOT 1.1 버젼의 가스 처리다.. 확인해 봐야함.
+//		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
+//		{
+//			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
+//			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
+//			Position geyserPos = geyser.getInitialPosition();
+//			TilePosition geyserTilePos = geyser.getInitialTilePosition();
+//
+//			// 이미 예약되어있는가
+//			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
+//				continue;
+//			}
+//
+//			// geyser->getType() 을 하면, Unknown 이거나, Resource_Vespene_Geyser 이거나, Terran_Refinery 와 같이 건물명이 나오고, 
+//			// 건물이 파괴되어도 자동으로 Resource_Vespene_Geyser 로 돌아가지 않는다
+//			// geyser 위치에 있는 유닛들에 대해 isRefinery() 로 체크를 해봐야 한다
+//
+//			// seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는가
+//			// Fighting Spirit 맵처럼 seedPosition 으로부터 동일한 거리 내에 geyser 가 여러개 있을 수 있는 경우 Refinery 건물을 짓기 위해서는 seedPosition 을 정확하게 입력해야 한다
+//			double thisDistance = geyserTilePos.getDistance(seedPosition);
+//			
+//			if (thisDistance <= 16 && thisDistance < minGeyserDistanceFromSeedPosition)
+//			{
+//				minGeyserDistanceFromSeedPosition = thisDistance;
+//				closestGeyser = geyser.getInitialTilePosition();
+//			}
+//		}
+		
+		// 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
 		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
 		{
-			// geyser->getType() 을 하면, Unknown 이거나, Resource_Vespene_Geyser 이거나, Terran_Refinery 와 같이 건물명이 나오고, 
-			// 건물이 파괴되어도 자동으로 Resource_Vespene_Geyser 로 돌아가지 않는다
+			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
+			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
 
 			Position geyserPos = geyser.getInitialPosition();
 			TilePosition geyserTilePos = geyser.getInitialTilePosition();

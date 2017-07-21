@@ -37,6 +37,7 @@ public class CombatManager {
 	private static final int BASE_DEFENSE_PRIORITY = 5;
 	private static final int SCOUT_DEFENSE_PRIORITY = 6;
 	private static final int WRAITH_PRIORITY = 100;
+	private static final int VESSEL_PRIORITY = 101;
 	
 	private List<Unit> combatUnits = new ArrayList<>();
 	private SquadData squadData = new SquadData();
@@ -86,6 +87,9 @@ public class CombatManager {
 		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), 800, "Wraith");
 		squadData.putSquad(new Squad("Wraith", wraithOrder, WRAITH_PRIORITY));
 		
+		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 600, "Vessel");
+		squadData.putSquad(new Squad("Vessel", vesselOrder, VESSEL_PRIORITY));
+		
 		initialized = true;
 	}
 	
@@ -107,6 +111,7 @@ public class CombatManager {
 			updateBaseDefenseSquads();
 			updateAttackSquads();
 			updateWraithSquad();
+			updateVesselSquad(); //AttackSquads 뒤에
 			//updateWatcherSquad();
 			//updateCheckerSquad();
 			
@@ -115,6 +120,9 @@ public class CombatManager {
 		}
 		else if (frame8 % 4 == 2) {
 			doComsatScan();
+		}
+		if(MyBotModule.Broodwar.getFrameCount() > 50){
+			setCombatStrategy(CombatStrategy.ATTACK_ENEMY); 
 		}
 		
 //		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
@@ -180,10 +188,12 @@ public class CombatManager {
 			Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
 			return readyToAttack;
 			
-		} else { //if (combatStrategy == CombatStrategy.ATTACK) { 
-		    Position enemyPosition = getAttackPosition(squad);
+		} else { //if (combatStrategy == CombatStrategy.ATTACK) {
+			
+			//if()
+			
+			Position enemyPosition = getAttackPosition(squad);
 		    return enemyPosition;
-		    
 		}
 	}
 	
@@ -291,7 +301,7 @@ public class CombatManager {
 			}
 		}
 	}
-	
+
 	private void updateScoutDefenseSquad() {
 		bwta.BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 		bwta.Region myRegion = base.getRegion();
@@ -545,6 +555,49 @@ public class CombatManager {
 		
 		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(wraithSquad), UnitType.Terran_Wraith.sightRange(), "Wraith");
 		wraithSquad.setOrder(wraithOrder);
+	}
+	
+	private void updateVesselSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
+		Squad vesselSquad = squadData.getSquad("Vessel");
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+	        if (unit.getType() == UnitType.Terran_Science_Vessel && squadData.canAssignUnitToSquad(unit, vesselSquad)) {
+	        	
+	        	System.out.println("assign vessel : " + unit.getID());
+				squadData.assignUnitToSquad(unit, vesselSquad);// 레이스만
+	        }
+	    }
+		
+//		NONE, IDLE, WATCH, ATTACK, DEFEND, HOLD,
+//		CHECK_INACTIVE, CHECK_ACTIVE
+		SquadOrder vesselOrder = null;
+	
+		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+		} else if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
+				
+			if(squadData.getSquad("MainAttack") != null){
+				List<Unit> units = squadData.getSquad("MainAttack").getUnitSet();
+				
+				if(units.size()>0){
+					Unit leader = MicroUtils.leaderOfUnit(units, getAttackPosition(vesselSquad));
+					
+					System.out.println("Leader ID: " + leader.getID() );
+					
+					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				}
+			}else{
+				System.out.println("unit empty?");
+				vesselOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+			}
+		}
+		
+		
+		vesselSquad.setOrder(vesselOrder);
 	}
 	
 	private void updateWatcherSquad() {
