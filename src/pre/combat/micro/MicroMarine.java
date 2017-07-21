@@ -59,6 +59,8 @@ public class MicroMarine extends MicroManager {
 		Unit bestTarget = null;
 
 		for (Unit target : targets) {
+			if (!target.isDetected()) continue;
+			
 			int priority = getAttackPriority(rangedUnit, target);     // 0..12
 			int range    = rangedUnit.getDistance(target);           // 0..map size in pixels
 			int toGoal   = target.getDistance(order.getPosition());  // 0..map size in pixels

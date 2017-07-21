@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import bwapi.Player;
 import bwapi.Position;
@@ -209,7 +208,7 @@ public class InformationManager {
 
 
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
-	public void getNearbyForce(Vector<UnitInfo> unitInfo, Position p, Player player, int radius) {
+	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
 		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
 
 		// for each unit we know about for that player
@@ -239,6 +238,41 @@ public class InformationManager {
 				unitInfo.add(ui);
 			}
 		}
+	}
+	
+	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
+	public List<UnitInfo> getNearbyForce(Position p, Player player, int radius) {
+		List<UnitInfo> unitInfo = new ArrayList<>();
+		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
+
+		// for each unit we know about for that player
+		// for (final Unit kv :
+		// getUnitData(player).getUnits().keySet().iterator()){
+		while (it.hasNext()) {
+			final UnitInfo ui = getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
+
+			// if it's a combat unit we care about
+			// and it's finished!
+			if (isCombatUnitType(ui.getType()) && ui.isCompleted()) {
+				// determine its attack range
+				int range = 0;
+				if (ui.getType().groundWeapon() != WeaponType.None) {
+					range = ui.getType().groundWeapon().maxRange() + 40;
+				}
+
+				// if it can attack into the radius we care about
+				if (ui.getLastPosition().getDistance(p) <= (radius + range)) {
+					// add it to the vector
+					// C++ : unitInfo.push_back(ui);
+					unitInfo.add(ui);
+				}
+			} else if (ui.getType().isDetector() && ui.getLastPosition().getDistance(p) <= (radius + 250)) {
+				// add it to the vector
+				// C++ : unitInfo.push_back(ui);
+				unitInfo.add(ui);
+			}
+		}
+		return unitInfo;
 	}
 
 	/// 해당 Player (아군 or 적군) 의 해당 UnitType 유닛 숫자를 리턴합니다 (훈련/건설 중인 유닛 숫자까지 포함)

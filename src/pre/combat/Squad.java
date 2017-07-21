@@ -91,22 +91,22 @@ public class Squad {
 		// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
 		// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
 		List<Unit> tanks = microTank.getUnits();
-		Position centerOfTanks = null;
+		Position centerOfUnits = null;
 		int squadAreaRange = 0;
 		if (tanks.size() >= MicroSet.Common.TANK_SQUAD_SIZE) {
-			centerOfTanks = MicroUtils.centerOfUnits(tanks);
+			centerOfUnits = MicroUtils.centerOfUnits(tanks);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 		} else {
-			centerOfTanks = MicroUtils.centerOfUnits(unitSet);
+			centerOfUnits = MicroUtils.centerOfUnits(unitSet);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 		}
-		microScv.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microMarine.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microVulture.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microTank.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microGoliath.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microWraith.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microVessel.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		microScv.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microMarine.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microVulture.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microTank.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microGoliath.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microWraith.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
+		microVessel.setMicroInformation(order, centerOfUnits, squadAreaRange, tanks.size());
 		
 		microScv.execute();
 		microMarine.execute();

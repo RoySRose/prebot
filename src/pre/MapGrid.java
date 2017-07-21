@@ -234,10 +234,10 @@ public class MapGrid {
 			}
 		}
 
-//		final int x0 = Math.max((center.getX() - radius) / cellSize, 0);
-//		final int x1 = Math.min((center.getX() + radius) / cellSize, cols-1);
-//		final int y0 = Math.max((center.getY() - radius) / cellSize, 0);
-//		final int y1 = Math.min((center.getY() + radius) / cellSize, rows-1);
+//		final int x0 = Math.max((position.getX() - radius) / cellSize, 0);
+//		final int x1 = Math.min((position.getX() + radius) / cellSize, cols-1);
+//		final int y0 = Math.max((position.getY() - radius) / cellSize, 0);
+//		final int y1 = Math.min((position.getY() + radius) / cellSize, rows-1);
 //		final int radiusSq = radius * radius;
 //		for (int y = y0; y <= y1; ++y)
 //		{
@@ -251,12 +251,12 @@ public class MapGrid {
 //				{
 //					for (Unit unit : cell.ourUnits)
 //					{
-//						Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
+//						Position d = new Position(unit.getPosition().getX() - position.getX(), unit.getPosition().getY() - position.getY());
 //						if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
 //						{
-//							if (!units.getLoadedUnits().contains(unit))
+//							if (!units.contains(unit))
 //							{
-//								units.getLoadedUnits().add(unit);
+//								units.add(unit);
 //							}
 //						}
 //					}
@@ -267,12 +267,12 @@ public class MapGrid {
 //					{
 //						if (unit.getType() != UnitType.Unknown && unit.isVisible())
 //						{
-//							Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
+//							Position d = new Position(unit.getPosition().getX() - position.getX(), unit.getPosition().getY() - position.getY());
 //							if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
 //							{
-//								if (!units.getLoadedUnits().contains(unit))
+//								if (!units.contains(unit))
 //								{
-//									units.getLoadedUnits().add(unit);
+//									units.add(unit);
 //								}
 //							}
 //						}
@@ -299,6 +299,55 @@ public class MapGrid {
 			}
 		}
 		return units;
+
+//		List<Unit> units = new ArrayList<>();
+//		final int x0 = Math.max((position.getX() - radius) / cellSize, 0);
+//		final int x1 = Math.min((position.getX() + radius) / cellSize, cols-1);
+//		final int y0 = Math.max((position.getY() - radius) / cellSize, 0);
+//		final int y1 = Math.min((position.getY() + radius) / cellSize, rows-1);
+//		final int radiusSq = radius * radius;
+//		for (int y = y0; y <= y1; ++y)
+//		{
+//			for (int x = x0; x <= x1; ++x)
+//			{
+//				int row = y;
+//				int col = x;
+//
+//				GridCell cell = getCellByIndex(row, col);
+//				if (ourUnits)
+//				{
+//					for (Unit unit : cell.ourUnits)
+//					{
+//						Position d = new Position(unit.getPosition().getX() - position.getX(), unit.getPosition().getY() - position.getY());
+//						if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
+//						{
+//							if ((unitType == null || unit.getType() == unitType) && !units.contains(unit))
+//							{
+//								units.add(unit);
+//							}
+//						}
+//					}
+//				}
+//				if (oppUnits)
+//				{
+//					for (Unit unit : cell.oppUnits) 
+//					{
+//						if (unit.getType() != UnitType.Unknown && unit.isVisible())
+//						{
+//							Position d = new Position(unit.getPosition().getX() - position.getX(), unit.getPosition().getY() - position.getY());
+//							if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
+//							{
+//								if ((unitType == null || unit.getType() == unitType) && !units.contains(unit))
+//								{
+//									units.add(unit);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return units;
 	}
 	
 	// The bot scanned the given position. Record it so we don't scan the same position
