@@ -45,12 +45,16 @@ public abstract class MicroManager {
 		}
 
 		this.nearbyEnemies.clear();
-		MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 		
 		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
-		if (order.getType() != SquadOrderType.DEFEND) {
+//		List<UnitInfo> unitInfoList = new ArrayList<>();
+		if (order.getType() == SquadOrderType.DEFEND) {
+//			InformationManager.Instance().getNearbyForce(unitInfoList, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
+			MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
+		} else {
 			for (Unit unit : units) {
-				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange(), false, true);
+//				InformationManager.Instance().getNearbyForce(unitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, unit.getType().sightRange() + 500);
+				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange() + 500, false, true);
 			}
 		}
 		
@@ -121,6 +125,10 @@ public abstract class MicroManager {
 		}
 		
 		return false;
+	}
+	
+	public boolean inTheSquad(Unit unit) { // TODO
+		return true;
 	}
 	
 }
