@@ -1,6 +1,7 @@
 package pre.combat;
 
 import bwapi.Position;
+import bwapi.Unit;
 
 public class SquadOrder {
 	
@@ -14,12 +15,22 @@ public class SquadOrder {
 	private Position position;
 	private int radius;
 	private String status;
+	private Unit unitleader;
+	
+	public SquadOrder(SquadOrderType type, Position position, int radius, String status, Unit unitleader) {
+		this.type = type;
+		this.position = position;
+		this.radius = radius;
+		this.status = status;
+		this.unitleader = unitleader; 
+	}
 	
 	public SquadOrder(SquadOrderType type, Position position, int radius, String status) {
 		this.type = type;
 		this.position = position;
 		this.radius = radius;
 		this.status = status;
+		this.unitleader = null; 
 	}
 	
 	public SquadOrderType getType() {
@@ -27,6 +38,12 @@ public class SquadOrder {
 	}
 	public void setType(SquadOrderType type) {
 		this.type = type;
+	}
+	public Unit getUnitLeader() {
+		return unitleader;
+	}
+	public void setUnitLeader(Unit unitleader) {
+		this.unitleader = unitleader;
 	}
 	public Position getPosition() {
 		return position;
