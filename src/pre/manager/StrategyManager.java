@@ -4,9 +4,11 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitCommandType;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -102,6 +104,7 @@ public class StrategyManager {
 		,terranBasic_DropShip
 		,terranBasic_NoSearch
 		,terranBasic_ReverseRush
+		//,terranBasicBio
 		} //기본 전략 나열
 	public enum StrategysException {
 		zergException_FastLurker
@@ -335,60 +338,56 @@ public class StrategyManager {
 	public void update() {
 		
 		//@@@@@@ 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
-		if ((MyBotModule.Broodwar.getFrameCount() < 5000 && MyBotModule.Broodwar.getFrameCount() % 4 == 0)
-				||(MyBotModule.Broodwar.getFrameCount() > 5000 && MyBotModule.Broodwar.getFrameCount() % 24 == 0)) {
-			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
-		}
-
+//		if ((MyBotModule.Broodwar.getFrameCount() < 5000 && MyBotModule.Broodwar.getFrameCount() % 4 == 0)
+//				||(MyBotModule.Broodwar.getFrameCount() > 5000 && MyBotModule.Broodwar.getFrameCount() % 24 == 0)) {
+//			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+//		}
+//
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
 			isInitialBuildOrderFinished = true;
 		}
-		
-		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
-			executeSupplyManagement();
-		}
-		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
-			executeExpansion();
-		}
+//		
+//		// 1초에 한번만 실행
+//		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
+//			executeSupplyManagement();
+//		}
+//		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
+//			executeExpansion();
+//		}
 //		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
 //			executeAddRefinery();
 //		}
-//		if(MyBotModule.Broodwar.getFrameCount() % 167 == 0) {
-//			executeUpgrade();
-//		}
+		if(isInitialBuildOrderFinished){
+			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
+				executeUpgrade();
+				executeResearch();
+			}
+		}
 			
 		
-		if (isInitialBuildOrderFinished == true) {
-			if (MyBotModule.Broodwar.getFrameCount() % 120 == 0){// info 의 멀티 체크가 120 에 돈다 
-				executeCombat();
-			}
-		}
-		
-		
-		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0){
-			executeWorkerTraining();
-			executeCombatUnitTrainingBlocked();
-
-			if (isInitialBuildOrderFinished == true) {
-				executeCombatUnitTraining();
-			}
-			executeExeptionalCombatUnitTraining();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
-		}
-		
-		if (isInitialBuildOrderFinished == false) {
-			if (MyBotModule.Broodwar.getFrameCount() % 24 == 0){
-				executeAddFactoryInit();
-			}
-		}else if (MyBotModule.Broodwar.getFrameCount() % 120 == 0 && isInitialBuildOrderFinished == true) { //5초에 한번 팩토리 추가 여부 결정
-			executeAddFactory();
-		}
-		
-		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
-		// 경기 결과 파일 Save / Load 및 로그파일 Save 예제 추가
-		// 이번 게임의 로그를 남깁니다
-		//saveGameLog();
-		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
+//		if (isInitialBuildOrderFinished == true) {
+//			if (MyBotModule.Broodwar.getFrameCount() % 120 == 0){// info 의 멀티 체크가 120 에 돈다 
+//				executeCombat();
+//			}
+//		}
+//		
+//		if (isInitialBuildOrderFinished == false) {
+//			if (MyBotModule.Broodwar.getFrameCount() % 24 == 0){
+//				executeAddFactoryInit();
+//			}
+//		}else if (MyBotModule.Broodwar.getFrameCount() % 120 == 0 && isInitialBuildOrderFinished == true) { //5초에 한번 팩토리 추가 여부 결정
+//			executeAddFactory();
+//		}
+//		
+//		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0){
+//			executeWorkerTraining();
+//			executeCombatUnitTrainingBlocked();
+//
+//			if (isInitialBuildOrderFinished == true) {
+//				executeCombatUnitTraining();
+//			}
+//			//ResondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+//		}
 	}
 
 	
@@ -861,7 +860,7 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode, null) +
 				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath, null);
 
-		//@@@@@@ 들어가는 선 조건이 있어야 하지 않을지.... 매번 팩토리 다 볼수는 없지 않나????????? 겉에 루프가 없어도 될거 같은데 나중에 실험해 보자.. 한 프레임에 한번만 들어와서 팩토리 하나만 하고 break 하고 다음에 빈거 또 하겠지?
+		//TODO 들어가는 선 조건이 있어야 하지 않을지.... 매번 팩토리 다 볼수는 없지 않나????????? 겉에 루프가 없어도 될거 같은데 나중에 실험해 보자.. 한 프레임에 한번만 들어와서 팩토리 하나만 하고 break 하고 다음에 빈거 또 하겠지?
 		for(int i=0; i< Faccnt - currentinbuildqueuecnt; i++){
 			selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
 			if(Config.BuildQueueDebugYN){
@@ -879,10 +878,6 @@ public class StrategyManager {
 				}				
 			}
 		}
-	}
-	
-	public void executeExeptionalCombatUnitTraining() {
-		//@@@@@@ 사이언스 베슬이나 발키리 하는 로직
 	}
 	
 	public int getTotDeadCombatUnits(){
@@ -1120,33 +1115,190 @@ public class StrategyManager {
  		}
 	}
 	
-//	public void executeUpgrade() {
-//		
-//		//업그레이드 순서.... 정하고 (심플하게 종족별로 정하자)
-//
-//		//순서대로 이미 하고 있으면 continue
-//		//buildqueue 에 있으면 패스  machine shop 기준 포문 돌면서 넣으면 될듯
-//		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-//		{
-//			MetaType test;
-//			
-//			test.getUpgradeType().Terran_Vehicle_Weapons; //공업
-//			test.getUpgradeType().Terran_Vehicle_Plating; //방업
-//			test.getUpgradeType().Charon_Boosters; // 골리앗 사거리 업?
-//			test.getUpgradeType().Ion_Thrusters; //벌쳐 스피드업 맞지?
-//			test.getTechType().Tank_Siege_Mode; // 시즈모드
-//			test.getTechType().Spider_Mines; //마인
-//			
-//			if (unit == null) continue;
-//			if (unit.getType() == UnitType.Terran_Machine_Shop && unit.isCompleted()){
-//				//아래 if 조건에 mineral gas 가 1.5배? 또는 2배 정도 있으면 업그레이드 하는거로....
-//				if (BuildManager.Instance().buildQueue.getItemCount(업그레이드 할놈, null) == 0
-//						&& test.mineralPrice() * 1.5< MyBotModule.Broodwar.self().minerals()) {// 빌드 큐에 없으면
-//					BuildManager.Instance().buildQueue.queueAsLowestPriority(업그레이드 할놈,여기는 null 해 될듯???, false); //false 로 해도 될듯. 업그레이드를 필수로 무조건 두고 갈정도는 아니니/
-//				}
+	public void executeUpgrade() {
+
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			
+			if (unit.getType() == UnitType.Terran_Armory && unit.isCompleted() && unit.canUpgrade()){
+				//Fac Unit 18 마리 이상 되면 1단계 업그레이드 시도
+				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) ==0 && getFacUnits() > 72 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons) 
+						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
+					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
+					}
+				}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) ==0 && getFacUnits() > 72 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)
+						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
+					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+					}
+				}
+				//Fac Unit 30 마리 이상, 일정 이상의 자원 2단계
+				else if(getFacUnits() > 120 && MyBotModule.Broodwar.self().minerals()> 500 && MyBotModule.Broodwar.self().gas()> 300 ){
+					
+					if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){
+						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
+						}
+					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
+						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+						}
+					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){//3단계
+						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
+						}
+					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
+						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+						}
+					}else{
+						boolean Science_Facility = false;
+						boolean Starport = false;
+						boolean Starport_complete = false;
+						
+						for (Unit structure : MyBotModule.Broodwar.self().getUnits()){
+							if (structure.getType() == UnitType.Terran_Science_Facility){
+								Science_Facility = true;
+							}
+							if (structure.getType() == UnitType.Terran_Starport){
+								Starport = true;
+								if(structure.isCompleted()){
+									Starport_complete = true;
+								}
+							}
+						}
+					
+						if(Starport == false){//Fac 은 무조건 있다고 본다. 
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							}
+						}else if(Science_Facility== false && Starport_complete){
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							} 
+						}
+					}
+				}
+			}
+ 		}
+	}
+	
+	public void executeResearch() {
+		
+		if(getFacUnits() < 32) return;
+			
+		boolean VS = MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false;;
+		boolean VM = MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines);
+		boolean TS = MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode);
+		boolean GR = MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1 ? true : false;
+		
+		if(VS&&VM&&TS&&GR) return; // 4개 모두 완료이면
+		
+		MetaType vultureSpeed = new MetaType(UpgradeType.Ion_Thrusters);
+		MetaType vultureMine = new MetaType(TechType.Spider_Mines);
+		MetaType TankSiegeMode = new MetaType(TechType.Tank_Siege_Mode);
+		MetaType GoliathRange = new MetaType(UpgradeType.Charon_Boosters);
+		
+		MetaType vsZerg[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
+		boolean vsZergbool[] = new boolean[]{VM, VS, TS, GR};
+		MetaType vsZergMutal[] = new MetaType[]{vultureMine, vultureSpeed, GoliathRange, TankSiegeMode};
+		boolean vsZergMutalbool[] = new boolean[]{VM, VS, GR, TS};
+		MetaType vsTerran[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
+		boolean vsTerranbool[] = new boolean[]{VM, VS, TS, GR};
+		MetaType vsTerranBio[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
+		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
+		MetaType vsProtoss[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
+		boolean vsProtossbool[] = new boolean[]{TS, VM, VS, GR};
+		
+		MetaType[] Current = null;
+		boolean[] Currentbool = null;
+		boolean air = true;
+		boolean terranBio = false;
+		
+		if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss){
+			Current = vsProtoss;
+			Currentbool = vsProtossbool;
+			air = false;
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
+				if(unit.getType() == UnitType.Protoss_Stargate
+						|| unit.getType() == UnitType.Protoss_Arbiter
+						|| unit.getType() == UnitType.Protoss_Carrier
+						|| unit.getType() == UnitType.Protoss_Corsair
+						|| unit.getType() == UnitType.Protoss_Scout
+						|| unit.getType() == UnitType.Protoss_Arbiter_Tribunal
+						|| unit.getType() == UnitType.Protoss_Fleet_Beacon
+						|| unit.getType() == UnitType.Protoss_Shuttle
+						){
+					air = true;
+				}
+			}
+		}else if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+//			if(CurrentStrategyBasic == Strategys.terranBasicBio){
+//				Current = vsTerranBio;
+//				Currentbool = vsTerranBiobool;
+//				terranBio = true;
+//			}else{
+				Current = vsTerran;
+				Currentbool = vsTerranbool;
 //			}
-// 		}
-//	}
+			air = false;
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
+				if(unit.getType() == UnitType.Terran_Starport
+						|| unit.getType() == UnitType.Terran_Science_Facility
+						|| unit.getType() == UnitType.Terran_Dropship
+						|| unit.getType() == UnitType.Terran_Science_Vessel
+						|| unit.getType() == UnitType.Terran_Wraith
+						|| unit.getType() == UnitType.Terran_Battlecruiser
+						|| unit.getType() == UnitType.Terran_Physics_Lab
+						){
+					air = true;
+				}
+			}
+		}else {
+			if(CurrentStrategyBasic == Strategys.zergBasic_LingMutal
+					|| CurrentStrategyBasic == Strategys.zergBasic_Mutal
+					){
+				Current = vsZergMutal;
+				Currentbool = vsZergMutalbool;
+			}else{
+				Current = vsZerg;
+				Currentbool = vsZergbool;
+			}
+		}
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			
+			if (unit.getType() == UnitType.Terran_Machine_Shop && unit.isCompleted() && unit.canUpgrade()){
+				if(Currentbool == null) return;
+				for(int i = 0; i<4; i++){
+					if(Currentbool[i] == true){
+						continue;
+					}else{
+						if(i==3 && Current[3].getUpgradeType() == UpgradeType.Charon_Boosters){
+							if(!air){
+								continue;
+							}
+						}
+						if(terranBio && i==2 && Current[2].getTechType() == TechType.Spider_Mines){
+							if((getFacUnits() > 48 && MyBotModule.Broodwar.self().minerals()> 300 && MyBotModule.Broodwar.self().gas()> 200) || getFacUnits() > 100 ){
+								
+							}else{
+								continue;
+							}
+						}
+						if(BuildManager.Instance().buildQueue.getItemCount(Current[i]) == 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], true);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
 	
 	
 	public void executeExpansion() {
