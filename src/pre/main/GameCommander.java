@@ -1,5 +1,6 @@
 package pre.main;
 import bwapi.Player;
+import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import pre.MapGrid;
@@ -76,6 +77,8 @@ public class GameCommander {
 
 			if ( isToFindError) System.out.print("c");
 
+			
+	/*
 			// economy and base managers
 			// 일꾼 유닛에 대한 명령 (자원 채취, 이동 정도) 지시 및 정리
 			WorkerManager.Instance().update();
@@ -104,7 +107,7 @@ public class GameCommander {
 			// 전략적 판단 및 유닛 컨트롤
 			StrategyManager.Instance().update();
 			timeLagCheck("StrategyManager");
-
+*/
 			if ( isToFindError) System.out.print("h)");
 			
 			CombatManager.Instance().update();
@@ -124,9 +127,9 @@ public class GameCommander {
 	///  유닛(건물/지상유닛/공중유닛)이 Destroy 될 때 발생하는 이벤트를 처리합니다
 	public void onUnitDestroy(Unit unit) {
 		// ResourceDepot 및 Worker 에 대한 처리
-		WorkerManager.Instance().onUnitDestroy(unit);
+		//WorkerManager.Instance().onUnitDestroy(unit);
 
-		InformationManager.Instance().onUnitDestroy(unit); 
+		//InformationManager.Instance().onUnitDestroy(unit); 
 	}
 	
 	/// 유닛(건물/지상유닛/공중유닛)이 Morph 될 때 발생하는 이벤트를 처리합니다<br>
@@ -135,7 +138,7 @@ public class GameCommander {
 		InformationManager.Instance().onUnitMorph(unit);
 
 		// Zerg 종족 Worker 의 Morph 에 대한 처리
-		WorkerManager.Instance().onUnitMorph(unit);
+		//WorkerManager.Instance().onUnitMorph(unit);
 	}
 
 	/// 유닛(건물/지상유닛/공중유닛)의 소속 플레이어가 바뀔 때 발생하는 이벤트를 처리합니다<br>
@@ -146,13 +149,16 @@ public class GameCommander {
 
 		InformationManager.Instance().onUnitRenegade(unit);
 	}
-
+	
+	// 일꾼 탄생/파괴 등에 대한 업데이트 로직 버그 수정 : onUnitShow 가 아니라 onUnitComplete 에서 처리하도록 수정
 	/// 유닛(건물/지상유닛/공중유닛)의 하던 일 (건물 건설, 업그레이드, 지상유닛 훈련 등)이 끝났을 때 발생하는 이벤트를 처리합니다
 	public void onUnitComplete(Unit unit)
 	{
 		InformationManager.Instance().onUnitComplete(unit);
+		// ResourceDepot 및 Worker 에 대한 처리
+		WorkerManager.Instance().onUnitComplete(unit);
 	}
-	
+
 	/// 유닛(건물/지상유닛/공중유닛)이 Discover 될 때 발생하는 이벤트를 처리합니다<br>
 	/// 아군 유닛이 Create 되었을 때 라든가, 적군 유닛이 Discover 되었을 때 발생합니다
 	public void onUnitDiscover(Unit unit) {
@@ -163,13 +169,14 @@ public class GameCommander {
 	public void onUnitEvade(Unit unit) {
 	}	
 
+	// 일꾼 탄생/파괴 등에 대한 업데이트 로직 버그 수정 : onUnitShow 가 아니라 onUnitComplete 에서 처리하도록 수정
 	/// 유닛(건물/지상유닛/공중유닛)이 Show 될 때 발생하는 이벤트를 처리합니다<br>
 	/// 아군 유닛이 Create 되었을 때 라든가, 적군 유닛이 Discover 되었을 때 발생합니다
 	public void onUnitShow(Unit unit) { 
 		InformationManager.Instance().onUnitShow(unit); 
-
+		
 		// ResourceDepot 및 Worker 에 대한 처리
-		WorkerManager.Instance().onUnitShow(unit);
+		//WorkerManager.Instance().onUnitShow(unit);
 	}
 
 	/// 유닛(건물/지상유닛/공중유닛)이 Hide 될 때 발생하는 이벤트를 처리합니다<br>
@@ -177,7 +184,21 @@ public class GameCommander {
 	public void onUnitHide(Unit unit) {
 		InformationManager.Instance().onUnitHide(unit); 
 	}
-	
+
+	// onNukeDetect, onPlayerLeft, onSaveGame 이벤트를 처리할 수 있도록 메소드 추가
+
+	/// 핵미사일 발사가 감지되었을 때 발생하는 이벤트를 처리합니다
+	public void onNukeDetect(Position target){
+	}
+
+	/// 다른 플레이어가 대결을 나갔을 때 발생하는 이벤트를 처리합니다
+	public void onPlayerLeft(Player player){
+	}
+
+	/// 게임을 저장할 때 발생하는 이벤트를 처리합니다
+	public void onSaveGame(String gameName){
+	}		
+
 	/// 텍스트를 입력 후 엔터를 하여 다른 플레이어들에게 텍스트를 전달하려 할 때 발생하는 이벤트를 처리합니다
 	public void onSendText(String text){
 	}

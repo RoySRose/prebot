@@ -7,6 +7,9 @@ import bwapi.UnitType;
 /// 봇 프로그램 설정
 public class Config {
 	
+	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
+	// 봇 이름 및 파일 경로 기본값 변경
+
 	/// 봇 이름
 	public static final String BotName = "NoNameBot";
 	/// 봇 개발자 이름
@@ -15,11 +18,13 @@ public class Config {
 	
 	
 	/// 로그 파일 이름
-	public static String LogFilename = "log.txt";
+	public static String LogFilename = BotName + "_LastGameLog.dat";
 	/// 읽기 파일 경로
-	public static String ReadDirectory = "bwapi-data\\AI\\MyBot\\read\\";
+	public static String ReadDirectory = "bwapi-data\\read\\";
 	/// 쓰기 파일 경로
-	public static String WriteDirectory = "bwapi-data\\AI\\MyBot\\write\\";		
+	public static String WriteDirectory = "bwapi-data\\write\\";		
+
+	// BasicBot 1.1 Patch End //////////////////////////////////////////////////	
 
 	
 	

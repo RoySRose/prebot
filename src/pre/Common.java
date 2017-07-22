@@ -12,10 +12,10 @@ import pre.main.MyBotModule;
 public class Common {
 
 	/// 로그 유틸
-	public void appendTextToFile(final String logFile, final String msg)
+	public static void appendTextToFile(final String logFile, final String msg)
 	{
 		try {
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(msg), true))  ;
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(logFile), true))  ;
 			bos.write(msg.getBytes());
 			bos.flush();
 			bos.close();
@@ -27,10 +27,10 @@ public class Common {
 	}
 
 	/// 로그 유틸
-	public void overwriteToFile(final String logFile, final String msg)
+	public static void overwriteToFile(final String logFile, final String msg)
 	{
 		try {
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(msg)))  ;
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(logFile)))  ;
 			bos.write(msg.getBytes());
 			bos.flush();
 			bos.close();
@@ -42,7 +42,7 @@ public class Common {
 	}
 
 	/// 파일 유틸 - 텍스트 파일을 읽어들인다
-	public String readFile(final String filename)
+	public static String readFile(final String filename)
 	{
 		BufferedInputStream bis;
 		StringBuilder sb = null;
