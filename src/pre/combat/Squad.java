@@ -214,7 +214,7 @@ public class Squad {
 		microTank.setUnits(tankUnits);
 		microGoliath.setUnits(goliathUnits);
 		microWraith.setUnits(wraithUnits);
-		microVessel.setUnits(tankUnits);
+		microVessel.setUnits(vesselUnits);
 		
 	}
 	
