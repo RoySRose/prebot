@@ -5,6 +5,7 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitCommandType;
 import bwapi.UnitType;
@@ -16,7 +17,9 @@ import pre.AnalyzeStrategy;
 import pre.BuildOrderItem;
 import pre.BuildOrderQueue;
 import pre.Config;
+import pre.ConstructionPlaceFinder;
 import pre.InitialBuild;
+import pre.MapGrid;
 import pre.MetaType;
 import pre.WorkerData;
 import pre.main.MyBotModule;
@@ -342,29 +345,31 @@ public class StrategyManager {
 //				||(MyBotModule.Broodwar.getFrameCount() > 5000 && MyBotModule.Broodwar.getFrameCount() % 24 == 0)) {
 //			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 //		}
-//
+////
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
+			if(isInitialBuildOrderFinished == false){
+				MyBotModule.Broodwar.printf("Initial Build Finished");
+			}
 			isInitialBuildOrderFinished = true;
+			
 		}
-//		
+////		
 //		// 1초에 한번만 실행
 //		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
 //			executeSupplyManagement();
 //		}
-//		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
-//			executeExpansion();
-//		}
-//		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
-//			executeAddRefinery();
-//		}
-		if(isInitialBuildOrderFinished){
-			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
-				executeUpgrade();
-				executeResearch();
-			}
+		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) {
+			executeExpansion();
 		}
-			
-		
+		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
+			executeAddRefinery();
+		}
+//		if(isInitialBuildOrderFinished){
+//			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
+//				executeUpgrade();
+//				executeResearch();
+//			}
+//		}
 //		if (isInitialBuildOrderFinished == true) {
 //			if (MyBotModule.Broodwar.getFrameCount() % 120 == 0){// info 의 멀티 체크가 120 에 돈다 
 //				executeCombat();
@@ -1096,25 +1101,6 @@ public class StrategyManager {
 		}
 	}
 	
-	public void executeAddRefinery() {
-	
-		//이거는 update() 쪽에서 10초에 한번씩만 돌아도 될거 같고. // frame 239마다. 
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			if (unit == null) continue;
-			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
-				if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) >= 6){ //해당 컴맨드의 미네랄 채취 일꾼이 6마리 이상일때
-					//해당 위치에 refinery 가 있거나 만들고 있으면 continue 해야하고
-					//해당 지역에 refinery 만든다..... 이거를 어떻게 처리할지? 위치 어떻게 처리할지
-//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null) == 0) {
-//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-//					}
-					//해당 지역이라는걸 처리하는거 찾는게 관건일듯.
-				}
-			}
- 		}
-	}
-	
 	public void executeUpgrade() {
 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -1300,21 +1286,62 @@ public class StrategyManager {
 		}
 	}
 	
-	
-	public void executeExpansion() {
+	public void executeAddRefinery() {
 		
-		int CCcnt = 0;
-		int MaxCCcount = 5;
-		
+		//이거는 updat() 쪽에서 10초에 한번씩만 돌아도 될거 같고. // frame 239마다. 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
 			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
-				if(WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit) > 5){
-					CCcnt++;
+				
+				boolean refineryAlreadyBuilt = false; 
+				for (Unit Refinery : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 300)){
+					if (Refinery == null) continue;
+					if(Refinery.getType() == UnitType.Terran_Refinery){
+						refineryAlreadyBuilt = true;
+						break;
+					}
+				}
+				if(refineryAlreadyBuilt ==false){
+					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
+					if(findGeyser != null){
+						if (findGeyser.getDistance(unit.getTilePosition())*32 > 300){
+							continue;
+						}
+						if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 5)
+							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
+							}
+					}
 				}
 			}
  		}
+	}
+	
+	public void executeExpansion() {
+		
+		if(MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center)>0){
+			return;
+		}
+		
+		int MaxCCcount = 4;
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			int tempCC =0 ;
+			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
+				if(WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit) > 5){
+					tempCC++;
+				}
+			}
+			if(tempCC >= MaxCCcount){
+				return;
+			}
+ 		}
+		
+		int CCcnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		
 		
 		//앞마당 전
 		if(CCcnt == 1){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
@@ -1324,6 +1351,7 @@ public class StrategyManager {
 			if( MyBotModule.Broodwar.self().minerals() > 500 && getFacUnits() > 40){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					MyBotModule.Broodwar.printf("Build First CC");
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				}
 			}
@@ -1343,6 +1371,7 @@ public class StrategyManager {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 					+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 				if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40){
+					MyBotModule.Broodwar.printf("Build Next CC1");
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
@@ -1351,6 +1380,7 @@ public class StrategyManager {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if( MyBotModule.Broodwar.self().minerals() > 400){
+						MyBotModule.Broodwar.printf("Build Next CC2");
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 					}
 				}
