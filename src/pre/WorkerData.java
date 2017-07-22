@@ -32,10 +32,13 @@ public class WorkerData {
 		NongBongAT	///< 농봉 공격중 상태
 	};
 	
+	/// 미네랄 숫자 대비 미네랄 일꾼 숫자의 적정 비율
+	double mineralAndMineralWorkerRatio;						
+	
 	/// 일꾼 목록
-	private List<Unit> workers = new ArrayList<Unit>();
+	private ArrayList<Unit> workers = new ArrayList<Unit>();
 	/// ResourceDepot 목록
-	private List<Unit> depots = new ArrayList<Unit>();
+	private ArrayList<Unit> depots = new ArrayList<Unit>();
 	
 	//일꾼 유닛과 임무 관계
 	private Map<Integer, WorkerJob> workerJobMap = new HashMap<Integer, WorkerJob>();
@@ -64,7 +67,10 @@ public class WorkerData {
 	
 	public WorkerData() 
 	{
-	     for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+		// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
+		mineralAndMineralWorkerRatio = 2;
+		
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field))
 			{
@@ -80,6 +86,79 @@ public class WorkerData {
 	
 	public void workerDestroyed(Unit unit)
 	{
+		
+		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
+
+		// workers, depotWorkerCount, refineryWorkerCount 등 자료구조에서 사망한 일꾼 정보를 제거합니다
+		for (Iterator<Unit> it = workers.iterator(); it.hasNext(); ) {
+			Unit worker = it.next();
+
+			if (worker == null ) {			
+				workers.remove(worker);
+			}
+			else {
+				if (worker.getType().isWorker() == false || worker.getPlayer() != MyBotModule.Broodwar.self() 
+						|| worker.exists() == false || worker.getHitPoints() == 0) {
+									
+					clearPreviousJob(worker);
+
+					// worker의 previousJob 이 잘못 설정되어있는 경우에 대해 정리합니다
+					if (workerMineralMap.containsKey(worker.getID())) {
+						workerMineralMap.remove(worker.getID());
+					}
+					if (workerDepotMap.containsKey(worker.getID())) {
+						workerDepotMap.remove(worker.getID());
+					}
+					if (workerRefineryMap.containsKey(worker.getID())) {
+						workerRefineryMap.remove(worker.getID());
+					}
+					if (workerRepairMap.containsKey(worker.getID())) {
+						workerRepairMap.remove(worker.getID());
+					}
+					if (workerMoveMap.containsKey(worker.getID())) {
+						workerMoveMap.remove(worker.getID());
+					}
+					if (workerBuildingTypeMap.containsKey(worker.getID())) {
+						workerBuildingTypeMap.remove(worker.getID());
+					}
+					if (workerMineralAssignment.containsKey(worker.getID())) {
+						workerMineralAssignment.remove(worker.getID());
+					}
+					if (workerJobMap.containsKey(worker.getID())) {
+						workerJobMap.remove(worker.getID());
+					}
+
+					// depotWorkerCount 를 다시 셉니다
+					for (Unit depot : depots) {
+						int count = 0;
+						for (Map.Entry<Integer, Unit> entry : workerDepotMap.entrySet())
+						{
+							if (entry.getValue().getID() == depot.getID() ) {
+								count++;
+							}
+						}
+						depotWorkerCount.put(depot.getID(), count);
+					}
+
+					// refineryWorkerCount 를 다시 셉니다
+					for (Map.Entry<Integer, Integer> entry1 : refineryWorkerCount.entrySet()) {
+						int refineryID = entry1.getKey();
+						int count = 0;
+						for (Map.Entry<Integer, Unit> entry2 : workerRefineryMap.entrySet())
+						{
+							if (refineryID == entry2.getValue().getID() ) {
+								count++;
+							}
+						}
+						refineryWorkerCount.put(refineryID, count);
+					}
+
+					workers.remove(worker);
+				}
+			}
+		}
+		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
+		
 		if (unit == null) { return; }
 
 		clearPreviousJob(unit);
@@ -440,7 +519,11 @@ public class WorkerData {
 		int assignedWorkers = getNumAssignedWorkers(depot);
 		int mineralsNearDepot = getMineralsNearDepot(depot);
 
-		if (assignedWorkers >= mineralsNearDepot * 3)
+		// 충분한 수의 미네랄 일꾼 수를 얼마로 정할 것인가 : 
+		// (근처 미네랄 수) * 1.5배 ~ 2배 정도가 적당
+		// 근처 미네랄 수가 8개 라면, 일꾼 8마리여도 좋지만, 12마리면 조금 더 채취가 빠르다. 16마리면 충분하다. 24마리면 너무 많은 숫자이다.
+		// 근처 미네랄 수가 0개 인 ResourceDepot은, 이미 충분한 수의 미네랄 일꾼이 꽉 차있는 것이다
+		if (assignedWorkers >= (int)(mineralsNearDepot * mineralAndMineralWorkerRatio))
 		{
 			return true;
 		}
@@ -480,6 +563,7 @@ public class WorkerData {
 	    return mineralsNearDepot;
 	}
 
+	/// ResourceDepot 반경 200 point 이내의 미네랄 덩이 수를 반환합니다
 	public int getMineralsNearDepot(Unit depot)
 	{
 		if (depot == null) { return 0; }
