@@ -29,22 +29,13 @@ public class MicroVulture extends MicroManager {
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> vultures = getUnits();
 		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
-		boolean victoryExpect = CombatExpectation.expectVulture(vultures, targets); // TODO
 		
-		KitingOption kitingOption = new KitingOption();
-		kitingOption.setCooltimeAlwaysAttack(false);
-		kitingOption.setUnitedKiting(false);
-		kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
-		kitingOption.setGoalPosition(order.getPosition());
-		
-		if (victoryExpect) { // 싸우면 걍 이기는 각
-			kitingOption.setSaveThisUnit(false);
-			kitingOption.setRetreatToBase(false);
-			
-		} else { //
-			kitingOption.setSaveThisUnit(true);
-			kitingOption.setRetreatToBase(order.getType() == SquadOrderType.WATCH ? true : false); // 회피가 아주 좋은 설정(병력감시 - watcher : 회피를 자신의 base로 한다)
-		}
+		final boolean cooltimeAlwaysAttack = false;
+		final boolean unitedKiting = false;
+		final Integer[] fleeAngle = FleeAngle.WIDE_ANGLE;
+		final Position retreatPosition = order.getType() == SquadOrderType.WATCH ?
+				InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition() : order.getPosition();
+		final boolean saveUnit = CombatExpectation.expectVultureVictory(vultures, targets) ? false : true; // 싸우면 걍 이기는 각인지 TODO 안보이는 적 고려
 
 		for (Unit vulture : vultures) {
 			
@@ -54,17 +45,12 @@ public class MicroVulture extends MicroManager {
 				CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
 				continue;
 			}
-			
-			// checker 벌처들은 각각의 orderPosition을 가진다.
-			if (order.getType() == SquadOrderType.CHECK) {
-				BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
-				if (travelBase != null) {
-					kitingOption.setGoalPosition(travelBase.getPosition());
-				}
-			}
-			
+
 			Unit target = getTarget(vulture, vultureTargets);
+			
 			if (target != null) {
+				KitingOption kitingOption = new KitingOption(cooltimeAlwaysAttack, unitedKiting, retreatPosition, fleeAngle, saveUnit);
+				
 				List<Unit> nearTanks = new ArrayList<>();
 				List<Unit> nearGoliaths = new ArrayList<>();
 				List<Unit> nearVultures = new ArrayList<>();
@@ -88,26 +74,25 @@ public class MicroVulture extends MicroManager {
 				// 탱크, 골리앗이 근처에 있으면 쿨타임이 돌아올때 무조건 때린다.
 				// TODO 예외케이스 확인 필요 (초반 질럿 다수 등)
 				if (centerPosition != null) {
+					kitingOption.setSaveUnit(false);
 					kitingOption.setCooltimeAlwaysAttack(true);
 					kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 					kitingOption.setGoalPosition(centerPosition);
-					kitingOption.setSaveThisUnit(false);
-					kitingOption.setRetreatToBase(false);
 				} else {
 					// 자신이 차지한 지역에서는 적극적으로 싸워야 한다.
 					Region region = BWTA.getRegion(vulture.getPosition());
 					for (Region occupied : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
 						if (region == occupied) {
-							kitingOption.setSaveThisUnit(false);
-							kitingOption.setRetreatToBase(false);
+							kitingOption.setSaveUnit(false);
 							break;
 						}
 					}
 				}
+
 				MicroUtils.preciseKiting(vulture, target, kitingOption);
 				
 			} else {
-				// 마인매설 위치 체크
+				// 1. 마인매설 위치 체크
 				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture);
 				if (order.getType() == SquadOrderType.WATCH) {
 					if (minePosition == null) {
@@ -117,15 +102,33 @@ public class MicroVulture extends MicroManager {
 						}
 					}
 				}
-				if (minePosition == null) {
-					if (vulture.getDistance(kitingOption.getGoalPosition()) > squadRange) {
-						CommandUtil.attackMove(vulture, kitingOption.getGoalPosition());
-						
-					} else { // 목적지 도착
-						if (vulture.isIdle() || vulture.isBraking()) {
-							Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange / 2);
-							CommandUtil.attackMove(vulture, randomPosition);
-						}
+				if (minePosition != null) { // 매설할 마인이 있다면 종료
+					continue;
+				}
+				
+				// 2. 근처 적이 없을 때의, 이동지역 설정
+				// watcher : 목표지역(적base)으로 이동. 앞에 보이지 않는 적이 있으면 본진base로 후퇴.
+				// checker : 각각의 목표지역(travelBase)으로 이동.
+				Position movePosition = order.getPosition();
+				if (order.getType() == SquadOrderType.WATCH) { // watcher 보이지 않는 적에 대한 후퇴.
+					if (MicroUtils.inEnemyAttackRange(vulture)) {
+						movePosition = retreatPosition;
+					}
+				} else if (order.getType() == SquadOrderType.CHECK) { // checker 벌처들은 각각의 orderPosition을 가진다.
+					BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+					if (travelBase != null) {
+						movePosition = travelBase.getPosition();
+					}
+				}
+				
+				// 이동지역까지 attackMove로 간다.
+				if (vulture.getDistance(movePosition) > squadRange) {
+					CommandUtil.attackMove(vulture, movePosition);
+					
+				} else { // 목적지 도착
+					if (vulture.isIdle() || vulture.isBraking()) {
+						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange / 2);
+						CommandUtil.attackMove(vulture, randomPosition);
 					}
 				}
 			}

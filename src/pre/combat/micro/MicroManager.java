@@ -7,9 +7,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.Chokepoint;
-import pre.MapGrid;
 import pre.combat.SquadOrder;
-import pre.combat.SquadOrder.SquadOrderType;
 import pre.util.CommandUtil;
 
 public abstract class MicroManager {
@@ -38,26 +36,13 @@ public abstract class MicroManager {
 	
 	protected abstract void executeMicro(List<Unit> targets);
 	
-	public void setMicroInformation(SquadOrder inputOrder, Position squadCenter, int squadRange, int tankSize) {
+	public void setMicroInformation(SquadOrder inputOrder, List<Unit> nearbyEnemies, Position squadCenter, int squadRange, int tankSize) {
 		order = inputOrder;
 		if (units.isEmpty() || !order.isCombatOrder()) {
 			return;
 		}
-
-		this.nearbyEnemies.clear();
 		
-		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
-//		List<UnitInfo> unitInfoList = new ArrayList<>();
-		if (order.getType() == SquadOrderType.DEFEND) {
-//			InformationManager.Instance().getNearbyForce(unitInfoList, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
-			MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
-		} else {
-			for (Unit unit : units) {
-//				InformationManager.Instance().getNearbyForce(unitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, unit.getType().sightRange() + 500);
-				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange() + 500, false, true);
-			}
-		}
-		
+		this.nearbyEnemies = nearbyEnemies;
 		this.squadCenter = squadCenter;
 		this.squadRange = squadRange;
 		this.tankSize = tankSize;

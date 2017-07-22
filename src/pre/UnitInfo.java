@@ -16,6 +16,7 @@ public class UnitInfo {
 	private Position lastPosition;
 	private UnitType type;
 	private boolean completed;
+	private int updateFrame;
 
 	public UnitInfo()
 	{
@@ -26,6 +27,7 @@ public class UnitInfo {
 		lastPosition = Position.None;
 		type = UnitType.None;
 		completed = false;
+		updateFrame = 0;
 	}
 
 	public UnitType getType() {
@@ -92,6 +94,14 @@ public class UnitInfo {
 		this.completed = completed;
 	}
 	
+	public int getUpdateFrame() {
+		return updateFrame;
+	}
+
+	public void setUpdateFrame(int updateFrame) {
+		this.updateFrame = updateFrame;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
