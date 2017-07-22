@@ -195,9 +195,8 @@ public class CombatManager {
 			
 			//if()
 			
-		    Position enemyPosition = getAttackPosition(squad);
+			Position enemyPosition = getAttackPosition(squad);
 		    return enemyPosition;
-		    
 		}
 	}
 	
@@ -622,7 +621,19 @@ public class CombatManager {
 //		NONE, IDLE, WATCH, ATTACK, DEFEND, HOLD,
 //		CHECK_INACTIVE, CHECK_ACTIVE
 		SquadOrder vesselOrder = null;
-	
+//		
+//		Unit invisibleEnemyUnit = null;
+//		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+//			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+//				// At most one scan per call. We don't check whether it succeeds.
+//				invisibleEnemyUnit = unit;
+//				break;
+//			}
+//		}
+//		
+//		if(invisibleEnemyUnit != null){
+//			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, invisibleEnemyUnit.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+//		}else{
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
 			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
@@ -630,6 +641,47 @@ public class CombatManager {
 		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
 			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 		} else if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
+			if(squadData.getSquad("MainAttack") != null){
+				List<Unit> units = squadData.getSquad("MainAttack").getUnitSet();
+				if(units.size()>0){
+					Unit leader = MicroUtils.leaderOfUnit(units, getAttackPosition(vesselSquad));
+					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				}
+			}else{
+				vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+			}
+		}
+			
+		
+		vesselSquad.setOrder(vesselOrder);
+	}
+	
+	private void updateWatcherSquad() {
+	    Squad watcherSquad = squadData.getSquad("Watcher");
+
+		if (combatStrategy != CombatStrategy.ATTACK_ENEMY) {
+			
+			Map<Integer, List<Unit>> vutureMapBySpiderMine = new HashMap<>();
+			for (Unit unit : combatUnits) {
+		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, watcherSquad)) {
+		        	int spiderMineCount = unit.getSpiderMineCount();
+		        	List<Unit> vultureList = vutureMapBySpiderMine.get(spiderMineCount);
+		        	if (vultureList == null) {
+		        		vultureList = new ArrayList<>();
+		        	}
+		        	vultureList.add(unit);
+		        	vutureMapBySpiderMine.put(spiderMineCount, vultureList);
+		        }
+		    }
+			
+			if (watcherSquad.getUnitSet().size() > 0) {
+				boolean clearSquad = true;
+				for (Unit unit : watcherSquad.getUnitSet()) {
+					if (unit.getSpiderMineCount() > 0) {
+						clearSquad = false;
+						break;
+					}
+				}
 				
 			if(squadData.getSquad("MainAttack") != null){
 				List<Unit> units = squadData.getSquad("MainAttack").getUnitSet();

@@ -118,11 +118,9 @@ public class MicroWraith extends MicroManager {
 				//mostDangerBuildingcheck = mostDangerousTarget;
 			}
 			
-			System.out.println("========================Frame : " +MyBotModule.Broodwar.getFrameCount());
-			
 			boolean fleeing = false;
 			if(mostDangerousBuildingTarget != null){			
-				System.out.println("Wraith ID: " + wraith.getID() + "In dangerous fogged "+ mostDangerousBuildingTarget.getType());
+//				System.out.println("Wraith ID: " + wraith.getID() + "In dangerous fogged "+ mostDangerousBuildingTarget.getType());
 				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) 
 						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
 						+ wraithCheckSpeed +  adjustment)	{
@@ -130,8 +128,8 @@ public class MicroWraith extends MicroManager {
 					Position fleePosition = getFleePosition(wraith, mostDangerousBuildingTarget.getLastPosition(), (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					wraith.move(fleePosition);
 					fleeing = true;
-					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
-					System.out.println("flee fogged building,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
+//					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
+//					System.out.println("flee fogged building,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
 				}
 			}
 			
@@ -141,26 +139,25 @@ public class MicroWraith extends MicroManager {
 				if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret){
 					temp = wraithCheckSpeed * 3;
 				}
-				System.out.println("Wraith ID: " + wraith.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
+//				System.out.println("Wraith ID: " + wraith.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
 				if(mostDangerousTarget.isInWeaponRange(wraith) || (wraith.getDistance(mostDangerousTarget) 
 						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
 						+ wraithCheckSpeed + temp)
 						){
-					System.out.println("flee shown");
+//					System.out.println("flee shown");
 					//System.out.println("It's "+ mostDangerousTarget.getType() + " Danger and changing");
 					Position fleePosition = getFleePosition(wraith, mostDangerousTarget, (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					wraith.move(fleePosition);
 					fleeing = true;
-					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
-					System.out.println("flee shown unit,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
+//					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
+//					System.out.println("flee shown unit,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
 				}
 			}
 			
 			if(!fleeing){
-				System.out.println("attacking!!");
 				Unit target = getTarget(wraith, wraithTargets);
 				if (target != null && !fleeing) {
-					System.out.println("attacking target: " + target.getType());
+//					System.out.println("attacking target: " + target.getType());
 					MicroUtils.preciseKiting(wraith, target, kitingOption);
 				}else {
 					// if we're not near the order position, go there
