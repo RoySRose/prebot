@@ -659,53 +659,6 @@ public class CombatManager {
 	private void updateWatcherSquad() {
 	    Squad watcherSquad = squadData.getSquad("Watcher");
 
-		if (combatStrategy != CombatStrategy.ATTACK_ENEMY) {
-			
-			Map<Integer, List<Unit>> vutureMapBySpiderMine = new HashMap<>();
-			for (Unit unit : combatUnits) {
-		        if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, watcherSquad)) {
-		        	int spiderMineCount = unit.getSpiderMineCount();
-		        	List<Unit> vultureList = vutureMapBySpiderMine.get(spiderMineCount);
-		        	if (vultureList == null) {
-		        		vultureList = new ArrayList<>();
-		        	}
-		        	vultureList.add(unit);
-		        	vutureMapBySpiderMine.put(spiderMineCount, vultureList);
-		        }
-		    }
-			
-			if (watcherSquad.getUnitSet().size() > 0) {
-				boolean clearSquad = true;
-				for (Unit unit : watcherSquad.getUnitSet()) {
-					if (unit.getSpiderMineCount() > 0) {
-						clearSquad = false;
-						break;
-					}
-				}
-				
-			if(squadData.getSquad("MainAttack") != null){
-				List<Unit> units = squadData.getSquad("MainAttack").getUnitSet();
-				
-				if(units.size()>0){
-					Unit leader = MicroUtils.leaderOfUnit(units, getAttackPosition(vesselSquad));
-					
-					System.out.println("Leader ID: " + leader.getID() );
-					
-					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-				}
-			}else{
-				System.out.println("unit empty?");
-				vesselOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-			}
-		}
-		
-		
-		vesselSquad.setOrder(vesselOrder);
-	}
-	
-	private void updateWatcherSquad() {
-	    Squad watcherSquad = squadData.getSquad("Watcher");
-
 		for (Unit unit : combatUnits) {
 			if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, watcherSquad)) {
 				squadData.assignUnitToSquad(unit, watcherSquad);
