@@ -35,7 +35,7 @@ public class MicroVulture extends MicroManager {
 		final Integer[] fleeAngle = FleeAngle.WIDE_ANGLE;
 		final Position retreatPosition = order.getType() == SquadOrderType.WATCH ?
 				InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition() : order.getPosition();
-		final boolean saveUnit = CombatExpectation.expectVultureVictory(vultures, targets) ? false : true; // 싸우면 걍 이기는 각인지 TODO 안보이는 적 고려
+		final boolean saveUnit = CombatExpectation.expectVultureVictory(vultures, targets) ? false : true; // 싸우면 걍 이기는 각인지
 
 		for (Unit vulture : vultures) {
 			
@@ -93,12 +93,16 @@ public class MicroVulture extends MicroManager {
 				
 			} else {
 				// 1. 마인매설 위치 체크
-				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture);
+				int spiderMineNumPerPosition = MicroSet.Vulture.spiderMineNumPerPosition;
+				if (order.getType() == SquadOrderType.GUERILLA) {
+					spiderMineNumPerPosition *= 2;
+				}
+				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, spiderMineNumPerPosition);
 				if (order.getType() == SquadOrderType.WATCH) {
 					if (minePosition == null) {
 						BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 						if (BWTA.getRegion(base.getPosition()) != BWTA.getRegion(vulture.getPosition())) {
-							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition);
+							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, spiderMineNumPerPosition);
 						}
 					}
 				}
@@ -111,7 +115,7 @@ public class MicroVulture extends MicroManager {
 				// checker : 각각의 목표지역(travelBase)으로 이동.
 				Position movePosition = order.getPosition();
 				if (order.getType() == SquadOrderType.WATCH) { // watcher 보이지 않는 적에 대한 후퇴.
-					if (MicroUtils.inEnemyAttackRange(vulture)) {
+					if (!MicroUtils.isSafePlace(vulture)) {
 						movePosition = retreatPosition;
 					}
 				} else if (order.getType() == SquadOrderType.CHECK) { // checker 벌처들은 각각의 orderPosition을 가진다.

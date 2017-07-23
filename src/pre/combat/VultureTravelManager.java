@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Unit;
 import bwta.BaseLocation;
+import pre.UnitInfo;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
+import pre.util.CombatExpectation;
 import pre.util.MicroSet;
 
 public class VultureTravelManager {
@@ -92,7 +95,7 @@ public class VultureTravelManager {
 			return site.baseLocation;
 		}
 		
-		int longestVisitPassedFrame = MicroSet.Vulture.visitFrame;
+		int longestVisitPassedFrame = MicroSet.Vulture.CHECKER_INTERVAL_FRAME;
 		double shortestDistance = 999999.0;
 		
 		TravelSite bestTravelSite = null;
@@ -115,7 +118,6 @@ public class VultureTravelManager {
 		}
 		
 		if (bestTravelSite != null) {
-			bestTravelSite.assignedFrame = currentFrame;
 			vultureSiteMap.put(vultureId, bestTravelSite);
 			return bestTravelSite.baseLocation;
 		} else {
@@ -123,21 +125,58 @@ public class VultureTravelManager {
 			return null;
 		}
 	}
+	
+	// 1) 게릴라지역은 적군이 존재하는 travelSites이어야 한다.
+	// 2) 게릴라지격은 guerillaFrame이(타깃으로 결정된 frame) 일정시간 이상 지났어야 한다.(게릴라로 벌처가 계속 소모되는 것을 방지하기 위함)
+	// 3) 일꾼이 많으면 우선순위가 높다. 병력이 많으면 우선순위가 낮다.(특히 방어타워가 많으면)
+	public BaseLocation getBestGuerillaSite(List<Unit> assignableVultures) {
+		int vulturePower = CombatExpectation.getVulturePower(assignableVultures);
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
+		
+		int bestScore = 0;
+		TravelSite bestTravelSite = null;
+		
+		for (TravelSite travelSite : travelSites) {
+			if (currFrame - travelSite.guerillaFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
+				continue;
+			}
 
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(travelSite.baseLocation.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
+			if (enemiesInfo.isEmpty()) { // 적군이 존재하지 않음
+				continue;
+			}
+			
+			// 안개속의 적 구성을 가늠해 게릴라 타게팅이 가능한지 확인한다.			
+			int enemyPower = CombatExpectation.getEnemyPowerByUnitInfo(enemiesInfo);
+			int score = CombatExpectation.getGuerillaScoreByUnitInfo(enemiesInfo);
+			
+			if (vulturePower > enemyPower && score > bestScore) {
+				bestScore = score;
+				bestTravelSite = travelSite;
+			}
+		}
+		
+		if (bestTravelSite != null) {
+			bestTravelSite.guerillaFrame = currFrame;
+			return bestTravelSite.baseLocation;
+		} else {
+			return null;
+		}
+	}
 }
 
 class TravelSite {
-	TravelSite(BaseLocation baseLocation, int visitFrame, int assignedFrame) {
+	TravelSite(BaseLocation baseLocation, int visitFrame, int guerillaFrame) {
 		this.baseLocation = baseLocation;
 		this.visitFrame = visitFrame;
-		this.assignedFrame = assignedFrame;
+		this.guerillaFrame = guerillaFrame;
 	}
 	BaseLocation baseLocation;
 	int visitFrame;
-	int assignedFrame;
+	int guerillaFrame;
 
 	@Override
 	public String toString() {
-		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", assignedFrame=" + assignedFrame + "]";
+		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", guerillaFrame=" + guerillaFrame + "]";
 	}
 }

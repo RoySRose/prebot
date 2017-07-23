@@ -114,6 +114,13 @@ public class UnitInfo {
         return true;
     }
 
+	@Override
+	public String toString() {
+		return "UnitInfo [unitID=" + unitID + ", lastHealth=" + lastHealth + ", lastShields=" + lastShields
+				+ ", player=" + player + ", unit=" + unit + ", lastPosition=" + lastPosition + ", type=" + type
+				+ ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
+	}
+
 	
 //		const bool operator == (BWAPI::Unit unit) const
 //		{

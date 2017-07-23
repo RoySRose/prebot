@@ -33,6 +33,42 @@ public class SpiderMineManger {
 		return instance;
 	}
 	
+	// TODO goodPositions 단계적으로 변화. ex) 초반에는 세번째, 네번째 멀티, 그 후에는 점차 증가 
+	public void init() {
+		if (!MicroSet.Upgrade.hasResearched(TechType.Spider_Mines)) {
+			return;
+		}
+
+		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
+//		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+		
+		Position enemyReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
+		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+//		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+//		Position center = new Position(2048, 2048); // 128x128 맵의 센터
+//		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer); // region이 좋음
+		
+		if (!otherBases.isEmpty() && enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
+			mineReservedMap = new HashMap<>();
+			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
+			
+			// 3rd 멀티지역
+			for (BaseLocation base : otherBases) {
+				goodPositions.add(base.getPosition());
+			}
+			
+			// 공격준비지역
+//			goodPositions.add(myReadyToAttackPos);
+			goodPositions.add(enemyReadyToAttackPos);
+			goodPositions.add(enemyFirstExpansion.getPosition());
+//			goodPositions.add(enemyFirstChoke.getCenter());
+			goodPositions.add(enemySecondChoke.getCenter());
+			
+			initialized = true;
+		}
+	}
+	
 	public void update() {
 		if (!initialized) {
 			init();
@@ -80,43 +116,7 @@ public class SpiderMineManger {
 		}
 	}
 	
-	
-	public void init() {
-		if (!MicroSet.Upgrade.hasResearched(TechType.Spider_Mines)) {
-			return;
-		}
-
-		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
-//		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-		
-		Position enemyReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
-		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-//		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-		Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-//		Position center = new Position(2048, 2048); // 128x128 맵의 센터
-//		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer); // region이 좋음
-		
-		if (!otherBases.isEmpty() && enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
-			mineReservedMap = new HashMap<>();
-			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
-			
-			// 3rd 멀티지역
-			for (BaseLocation base : otherBases) {
-				goodPositions.add(base.getPosition());
-			}
-			
-			// 공격준비지역
-//			goodPositions.add(myReadyToAttackPos);
-			goodPositions.add(enemyReadyToAttackPos);
-			goodPositions.add(enemyFirstExpansion.getPosition());
-//			goodPositions.add(enemyFirstChoke.getCenter());
-			goodPositions.add(enemySecondChoke.getCenter());
-			
-			initialized = true;
-		}
-	}
-	
-	public Position goodPositionToMine(Unit vulture) {
+	public Position goodPositionToMine(Unit vulture, int mineNumberPerPosition) {
 		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
 			return null;
 		}
@@ -126,12 +126,9 @@ public class SpiderMineManger {
 		Position nearestGoodPosition = null;
 		for (Position position : goodPositions) {
 			int distance = vulture.getDistance(position);
-			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS) {
-				boolean isSafe = MicroUtils.isSafePlace(nearestGoodPosition);
-				if (isSafe) {
-					nearestDistance = distance;
-					nearestGoodPosition = position;
-				}
+			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position)) {
+				nearestDistance = distance;
+				nearestGoodPosition = position;
 			}
 		}
 		
@@ -140,7 +137,7 @@ public class SpiderMineManger {
 			return null;
 		}
 		
-		return positionToMine(vulture, nearestGoodPosition, true, MicroSet.Vulture.spiderMineNumPerPosition);
+		return positionToMine(vulture, nearestGoodPosition, true, mineNumberPerPosition);
 	}
 	
 	public Position positionToMine(Unit vulture, Position position, boolean exactOneEssential, int mineNumberPerPosition) {
