@@ -126,7 +126,7 @@ public class SpiderMineManger {
 		Position nearestGoodPosition = null;
 		for (Position position : goodPositions) {
 			int distance = vulture.getDistance(position);
-			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position)) {
+			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position, true)) {
 				nearestDistance = distance;
 				nearestGoodPosition = position;
 			}
@@ -152,7 +152,7 @@ public class SpiderMineManger {
 			if (spiderMinesInExactRadius.size() == 0) {
 				for (int i = 0; i < 3; i++) {
 					Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_EXACT_RADIUS);
-					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
+					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
 						mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 						return minePosition;
 					}
@@ -165,7 +165,7 @@ public class SpiderMineManger {
 		if (spiderMinesInSpreadRadius.size() + numOfMineReserved(position, MicroSet.Vulture.MINE_SPREAD_RADIUS) < mineNumberPerPosition) {
 			for (int i = 0; i < 3; i++) {
 				Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_SPREAD_RADIUS);
-				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
+				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
 					mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 					return minePosition;
 				}
