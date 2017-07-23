@@ -124,10 +124,6 @@ public class CombatManager {
 		else if (CommonUtils.executeOncePerFrame(4, 1)) {
 			doComsatScan();
 		}
-//		if(MyBotModule.Broodwar.getFrameCount() > 50){
-//			setCombatStrategy(CombatStrategy.ATTACK_ENEMY); 
-//		}
-		
 //		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
 //			squadData.printSquadInfo();
 //		}
