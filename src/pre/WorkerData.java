@@ -8,7 +8,6 @@ import java.util.Map;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.Unitset;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
 
@@ -47,7 +46,7 @@ public class WorkerData {
 	//CC에 배정된 일꾼 수
 	public Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
 	//Gas 에 배정된 일꾼 수
-	private Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
+	public Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
 	//작업중인 광물 ????
 	private Map<Integer, Unit> workerDepotMap = new HashMap<Integer, Unit>();
 	//이동중인 일꾼과 목적지
@@ -162,7 +161,7 @@ public class WorkerData {
 		if (unit == null) { return; }
 
 		clearPreviousJob(unit);
-		workers.remove(unit); // C++ : workers.erase(unit);
+		workers.remove(unit); // C++ : workers.erase(unit);*/
 	}
 
 	// WorkerJob::Idle 로 일단 추가한다
@@ -511,7 +510,8 @@ public class WorkerData {
 //		}
 		return WorkerJob.Default;
 	}
-
+	//1.1 추가 함수
+	
 	public boolean depotHasEnoughMineralWorkers(Unit depot)
 	{
 		if (depot == null) { return false; }
@@ -537,10 +537,9 @@ public class WorkerData {
 	{
 	    // if there are minerals near the depot, add them to the set
 		List<Unit> mineralsNearDepot = new ArrayList<Unit>();
-
 	    int radius = 320;
-
 	    for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+//	    for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
 			{
@@ -552,10 +551,14 @@ public class WorkerData {
 	    if (mineralsNearDepot.isEmpty())
 	    {
 	        for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+//	    	for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		    {
+	        	/*if(unit.getDistance(enemyBaseLocation) < radius)
+	        		continue;*/
 			    if ((unit.getType() == UnitType.Resource_Mineral_Field))
 			    {
-	                mineralsNearDepot.add(unit);
+			    	//if(unit.getDistance(depot) < unit.getDistance(depot))
+			    		mineralsNearDepot.add(unit);
 			    }
 		    }
 	    }
@@ -572,7 +575,7 @@ public class WorkerData {
 
 		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 		{
-			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 200)
+			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320)
 			{
 				mineralsNearDepot++;
 			}

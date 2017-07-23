@@ -114,8 +114,6 @@ public class StrategyManager {
 	public Strategys LastCurrentStrategyBasic = null;
 	public StrategysException LastCurrentStrategyException = null;
 	
-	public Strategys LastCurrentStrategyBasic = null;
-	public StrategysException LastCurrentStrategyException = null;
 	public int GRIDpoint=0;
 	
 	public StrategyManager() {
