@@ -87,7 +87,7 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(5, 75);
+			drawBuildOrderQueueOnScreen(5, 90);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
@@ -186,6 +186,10 @@ public class UXManager {
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "FacUnits : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 65, y, "" + white + StrategyManager.Instance().getFacUnits());
 		y += 11;
 	}
 

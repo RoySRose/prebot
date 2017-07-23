@@ -114,8 +114,6 @@ public class StrategyManager {
 	public Strategys LastCurrentStrategyBasic = null;
 	public StrategysException LastCurrentStrategyException = null;
 	
-	public Strategys LastCurrentStrategyBasic = null;
-	public StrategysException LastCurrentStrategyException = null;
 	public int GRIDpoint=0;
 	
 	public StrategyManager() {
@@ -174,7 +172,6 @@ public class StrategyManager {
 		
 		InitialBuild.Instance().setInitialBuildOrder();	
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
-		setCurrentStrategyBasic(Strategys.zergBasic_Mutal);
 	}
 
 	///  경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다

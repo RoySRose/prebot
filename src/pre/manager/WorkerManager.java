@@ -754,7 +754,7 @@ public class WorkerManager {
 		}
 	}
 
-	/*
+	
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트합니다
 	public void onUnitShow(Unit unit)
 	{
