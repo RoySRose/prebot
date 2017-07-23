@@ -14,8 +14,10 @@ public class SquadData {
 	private Map<String, Squad> squads = new HashMap<>();
 	
 	public void update() {
+//		LagTest lag = new LagTest(0);
 		for (String squadName : squads.keySet()) {
 			squads.get(squadName).update();
+//			lag.test(squadName + ", " + squads.get(squadName).getUnitSet().size());
 		}
 	}
 	

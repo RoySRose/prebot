@@ -1,15 +1,12 @@
 package pre.combat;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
-import bwta.BaseLocation;
 import pre.MapGrid;
 import pre.UnitData;
 import pre.UnitInfo;
@@ -53,7 +50,7 @@ public class Squad {
 	private MicroVessel microVessel = new MicroVessel();
 
 	private List<Unit> unitSet = new ArrayList<>();
-	private Map<Integer, Boolean> nearEnemy = new HashMap<>();
+//	private Map<Integer, Boolean> nearEnemy = new HashMap<>();
 
 	public String getName() {
 		return name;
@@ -114,6 +111,11 @@ public class Squad {
 			}
 		}
 		
+//		System.out.println("** Squad = " + name);
+//		System.out.println("vulture : " + microVulture.getUnits().size());
+//		System.out.println("tank : " + microTank.getUnits().size());
+//		System.out.println("goliath : " + microGoliath.getUnits().size());
+		
 		microScv.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
 		microMarine.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
 		microVulture.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
@@ -131,11 +133,9 @@ public class Squad {
 		microVessel.execute();
 	}
 	
-	
-	
 	private void updateUnits() {
 		setAllUnits();
-		setNearEnemyUnits();
+//		setNearEnemyUnits();
 		addUnitsToMicroManagers();
 	}
 	
@@ -154,16 +154,16 @@ public class Squad {
 		unitSet = validUnits;
 	}
 	
-	public void setNearEnemyUnits() {
-		nearEnemy.clear();
-		
-		for (Unit unit : unitSet) {
-			if (!unit.exists() || unit.isLoaded()) {
-				continue;
-			}
-			nearEnemy.put(unit.getID(), unitNearEnemy(unit));
-		}
-	}
+//	public void setNearEnemyUnits() {
+//		nearEnemy.clear();
+//		
+//		for (Unit unit : unitSet) {
+//			if (!unit.exists() || unit.isLoaded()) {
+//				continue;
+//			}
+//			nearEnemy.put(unit.getID(), unitNearEnemy(unit));
+//		}
+//	}
 	
 	public boolean unitNearEnemy(Unit unit) {
 //		List<Unit> enemyNear = MapGrid.Instance().getUnitsNear(unit.getPosition(), 400, false, true);
@@ -373,41 +373,42 @@ public class Squad {
 //		return closest;
 //	}
 	
-	private Position calcRegroupPosition() {
-		Position regroup = null;
-
-		int minDist = 100000;
-		for (Unit unit : unitSet) {
-			if (!nearEnemy.get(unit.getID()) && !unit.getType().isDetector() && !unit.isLoaded()) {
-				int dist = unit.getDistance(order.getPosition());
-				if (dist < minDist) {
-					minDist = dist;
-					regroup = unit.getPosition();
-				}
-			}
-		}
-
-		// Failing that, retreat to a base we own.
-		if (regroup == null) {
-			// Retreat to the main base (guaranteed not null, even if the buildings were destroyed).
-			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-
-			// If the natural has been taken, retreat there instead.
-			BaseLocation natural = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-			if (natural != null) {
-				List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-				for (BaseLocation b : occupiedBases) {
-					if (b == natural) {
-						base = natural;
-						break;
-					}
-				}
-			}
-			return BWTA.getRegion(base.getTilePosition()).getCenter();
-		}
-		
-		return regroup;
-	}
+//	private Position calcRegroupPosition() {
+//		Position regroup = null;
+//
+//		int minDist = 100000;
+//		for (Unit unit : unitSet) {
+//			if (!nearEnemy.get(unit.getID()) && !unit.getType().isDetector() && !unit.isLoaded()) {
+//				int dist = unit.getDistance(order.getPosition());
+//				if (dist < minDist) {
+//					minDist = dist;
+//					regroup = unit.getPosition();
+//				}
+//			}
+//		}
+//
+//		// Failing that, retreat to a base we own.
+//		if (regroup == null) {
+//			// Retreat to the main base (guaranteed not null, even if the buildings were destroyed).
+//			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+//
+//			// If the natural has been taken, retreat there instead.
+//			BaseLocation natural = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+//			if (natural != null) {
+//				List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+//				for (BaseLocation b : occupiedBases) {
+//					if (b == natural) {
+//						base = natural;
+//						break;
+//					}
+//				}
+//			}
+//			return BWTA.getRegion(base.getTilePosition()).getCenter();
+//		}
+//		
+//		return regroup;
+//	}
+	
 	@Override
 	public String toString() {
 		return "Squad [name=" + name + ", order=" + order + ", unitSet.size()=" + unitSet.size() + "]";
