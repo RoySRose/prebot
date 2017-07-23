@@ -78,7 +78,7 @@ public class GameCommander {
 			if ( isToFindError) System.out.print("c");
 
 			
-	/*
+	
 			// economy and base managers
 			// 일꾼 유닛에 대한 명령 (자원 채취, 이동 정도) 지시 및 정리
 			WorkerManager.Instance().update();
@@ -107,7 +107,7 @@ public class GameCommander {
 			// 전략적 판단 및 유닛 컨트롤
 			StrategyManager.Instance().update();
 			timeLagCheck("StrategyManager");
-*/
+
 			if ( isToFindError) System.out.print("h)");
 			
 			CombatManager.Instance().update();
@@ -127,9 +127,9 @@ public class GameCommander {
 	///  유닛(건물/지상유닛/공중유닛)이 Destroy 될 때 발생하는 이벤트를 처리합니다
 	public void onUnitDestroy(Unit unit) {
 		// ResourceDepot 및 Worker 에 대한 처리
-		//WorkerManager.Instance().onUnitDestroy(unit);
+		WorkerManager.Instance().onUnitDestroy(unit);
 
-		//InformationManager.Instance().onUnitDestroy(unit); 
+		InformationManager.Instance().onUnitDestroy(unit); 
 	}
 	
 	/// 유닛(건물/지상유닛/공중유닛)이 Morph 될 때 발생하는 이벤트를 처리합니다<br>

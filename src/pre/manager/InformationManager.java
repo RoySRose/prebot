@@ -21,6 +21,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
 import pre.UnitData;
 import pre.UnitInfo;
@@ -130,7 +131,7 @@ public class InformationManager {
 	public void update() {
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
 		}
@@ -530,18 +531,10 @@ public class InformationManager {
 	public BaseLocation getNextExpansionLocation() {
 		
 		BaseLocation res = null;
-		
-//		long startTime = 0;
-//		startTime = System.currentTimeMillis();
 	
 		if (mainBaseLocations.get(selfPlayer) != null && firstExpansionLocation.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
 			BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
 			BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
-			
-//			long currentTime = System.currentTimeMillis();
-//			System.out.println("###start" + " : " + (currentTime - startTime) + " millisec");
-//			startTime = currentTime;
-//			int num = 1;
 			
 			double tempDistance;
 			double sourceDistance;
@@ -558,12 +551,13 @@ public class InformationManager {
 				if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
 				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
 				
-//				currentTime = System.currentTimeMillis();
-//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
-//				startTime = currentTime;
+				TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
+				if(findGeyser != null){
+					if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
+						continue;
+					}
+				}
 				
-//				sourceDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
-//				tempDistance = sourceDistance - BWTA.getGroundDistance(enemyBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
 				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
 				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
 				
@@ -571,15 +565,29 @@ public class InformationManager {
 					closestDistance = tempDistance;
 					res = targetBaseLocation;
 				}
-//				currentTime = System.currentTimeMillis();
-//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
-//				startTime = currentTime;
-//				num++;
 			}
 			
-//			currentTime = System.currentTimeMillis();
-//			System.out.println("###end" + " : " + (currentTime - startTime) + " millisec");
-//			startTime = currentTime;			
+			if(res ==null){
+				for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+				{
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+					if (firstExpansionLocation.get(enemyPlayer) != null){
+						if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition())) continue;
+					}
+					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
+					
+					sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+					tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+					
+					if (tempDistance < closestDistance && sourceDistance > 0) {
+						closestDistance = tempDistance;
+						res = targetBaseLocation;
+					}
+				}
+			}
 		}
 		return res;
 	}
