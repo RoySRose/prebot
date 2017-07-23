@@ -9,23 +9,18 @@ import bwapi.Color;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
-import bwapi.UnitType;
-import bwapi.Unitset;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import pre.Config;
 import pre.MapTools;
 import pre.WorkerData;
-import pre.combat.micro.MicroManager;
-import pre.combat.micro.MicroScv;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
-import pre.util.MicroUtils;
 
 /// 게임 초반에 일꾼 유닛 중에서 정찰 유닛을 하나 지정하고, 정찰 유닛을 이동시켜 정찰을 수행하는 class<br>
 /// 적군의 BaseLocation 위치를 알아내는 것까지만 개발되어있습니다
-public class ScoutManager extends MicroManager{
+public class ScoutManager{
 
 	private Unit currentScoutUnit;
 	private int currentScoutStatus;
@@ -53,7 +48,7 @@ public class ScoutManager extends MicroManager{
 	private boolean gasRush = false; //보류
 	private boolean finishGasRush = false; //보류
 	private boolean distrubMineral = false; //미네랄 겐세이
-	private String distrubFlag = "false"; //미네랄 겐세이 하다 공격받음 겐세이 중지 
+	private boolean distrubFlag = false; //미네랄 겐세이 하다 공격받음 겐세이 중지 
 	
 	
 	private List<Unit> units = new ArrayList<>();
@@ -137,7 +132,7 @@ public class ScoutManager extends MicroManager{
 		int scoutHP = currentScoutUnit.getHitPoints() + currentScoutUnit.getShields();
 		if(scoutHP < preScoutHP){
 			distrubMineral = false;
-			distrubFlag = "stop";
+			distrubFlag = false;
 			return;
 		}
 		if(!currentScoutUnit.isGatheringMinerals()){
@@ -283,16 +278,13 @@ public class ScoutManager extends MicroManager{
 					//정찰 유닛이 공격받고 있으면
 					if(scoutHP < preScoutHP){
 						scoutUnderAttack = true;
-						distrubFlag = "true";
+						distrubFlag = true;
 					}
 					//정찰 유닛이 공격받지 않고 있고 범위안에 적이 없으면.
 					if (!currentScoutUnit.isUnderAttack() && !enemyWorkerInRadius())
 			        {
 				        scoutUnderAttack = false;
 			        }
-					if (!currentScoutUnit.isUnderAttack() && !enemyWorkerInRadius())
-					{
-					}
 					// if the scout is in the enemy region
 					if (scoutInRangeOfenemy)
 					{	
@@ -309,7 +301,7 @@ public class ScoutManager extends MicroManager{
 									currentScoutFreeToVertexIndex = -1;
 									
 									//currentScoutUnit.attack(closestWorker);
-									 if(("true").equals(distrubFlag)){
+									 if(distrubFlag){
 										 preScoutHP = scoutHP;
 										 distrubMineral = true;
 										 commandUtil.move(currentScoutUnit,closestWorker.getPosition());
@@ -349,21 +341,6 @@ public class ScoutManager extends MicroManager{
 			        }
 					
 					
-					/*else{
-						//적 유닛이 많을때 문제 잇으려나??
-						if(currentScoutUnit.isAttacking()){
-							return;
-						}
-						for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
-							if(unit.getType().isWorker()){
-								currentScoutUnit.attack(unit);
-							}else
-								continue;
-						}
-					
-						currentScoutStatus = ScoutStatus.NoScout.ordinal();
-						currentScoutTargetPosition = myBaseLocation.getPosition();
-					}*/
 				}
 			}	
 		}
@@ -384,6 +361,7 @@ public class ScoutManager extends MicroManager{
 	{
 		Unit enemyWorker = null;
 		double maxDist = 0;
+		double closestDist = 100000000;
 
 		Unit geyser = getEnemyGeyser();
 		
@@ -404,13 +382,18 @@ public class ScoutManager extends MicroManager{
 		{
 			if (unit.getType().isWorker())
 			{
-				double dist = unit.getDistance(geyser);
-
+//				double dist = unit.getDistance(geyser);
+				double dist = unit.getDistance(currentScoutUnit.getPosition());
+				if (enemyWorker == null || (dist < closestDist))
+	            {
+					enemyWorker = unit;
+	            }
+				/*
 				if (dist < 1000 && dist > maxDist)
 				{
 					maxDist = dist;
 					enemyWorker = unit;
-				}
+				}*/
 			}
 		}
 
@@ -686,11 +669,5 @@ public class ScoutManager extends MicroManager{
 	public Vector<Position> getEnemyRegionVertices()
 	{
 		return enemyBaseRegionVertices;
-	}
-
-	@Override
-	protected void executeMicro(List<Unit> targets) {
-		// TODO Auto-generated method stub
-		
 	}
 }

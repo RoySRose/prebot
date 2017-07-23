@@ -1,10 +1,9 @@
 package pre.manager;
 import java.util.List;
 
-import bwapi.Color;
+import bwapi.Color; 
 import bwapi.Position;
 import bwapi.Race;
-import bwapi.Region;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -13,10 +12,8 @@ import bwta.BaseLocation;
 import pre.Config;
 import pre.WorkerData;
 import pre.WorkerMoveData;
-import pre.WorkerData.WorkerJob;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
-import pre.util.MicroUtils;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
@@ -47,11 +44,21 @@ public class WorkerManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 
+		//relocationCCtoCCWorkers();
+		//relocationWorkers();
 		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 		updatework();
+		//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
+	}
+	
+	public void relocationWorkers() 
+	{
+		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
+			if (depot == null) continue;
+		}
 	}
 	
 	public void updateWorkerStatus() 
@@ -149,55 +156,6 @@ public class WorkerManager {
 
 	private void updatework() {
 		
-		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		/*
-		 * se-min.park
-		 * CC간 일꾼 재배 치 위해 체크 (CC당 일꾼수가 > 미네랄 * 2 일때 멀티 일꾼으로 지원 보냄(멀티 또한 미네랄 * 2 보다 작을 때) 
-		 */
-		Unit overDepot = null; //미네랄 * 2보다 많이 할당된 CC
-		Unit lessDepot = null; //미네랄 * 2보다 저게 할당된 CC
-		boolean underAttak = false;
-		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots())
-		{
-			if (depot == null) continue;
-			
-			int workerCnt = workerData.getNumAssignedWorkers(depot);
-			List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
-			if(workerCnt > mineralPatches.size()*2 ){
-				overDepot = depot;
-			}else if(workerCnt < mineralPatches.size()*2){
-					boolean visialble = false;
-					for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
-					{
-						if(unit.isVisible()){
-//							commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-							visialble = true;
-							continue;
-							
-						}
-					}
-					if(visialble == false)
-						lessDepot = depot;
-					/*
-				for (Unit worker : workerData.getWorkers())
-				{
-					if(workerData.getWorkerDepot(worker).getID() == depot.getID()){
-						Unit target = getClosestEnemyUnitFromWorker(worker);
-						if (target != null || depot.isUnderAttack())
-						{
-							underAttak = true;
-						}
-					}
-				}
-				System.out.println("underAttak : " + underAttak);
-				if(!underAttak){
-					lessDepot = depot;
-				}else
-					continue;
-				*/
-			}
-
-		}	
 		for (Unit worker : workerData.getWorkers())
 		{
 			if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout){
@@ -218,68 +176,9 @@ public class WorkerManager {
 				int sCvCnt = 0;	
 				
 				
-				/*
-				 * CC간 일꾼 재배치 
-				 */
-				
-				if(overDepot != null && lessDepot != null){
-					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(overDepot);
-					for (Unit mineral : mineralPatches){
-//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
-						int workerCnt = workerData.getNumAssignedWorkers(overDepot);
-						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						
-						if(maxSCV < sCvCnt){
-							maxSCV = sCvCnt;
-						}
-						if(lowSCV > sCvCnt){
-							lowSCV = sCvCnt;
-						}
-			        	//System.out.println("mineralPatches : " + mineralPatches.size());
-			        }
-					for (Unit mineral : mineralPatches){
-//						int workerCnt = workerData.depotWorkerCount.get(overDepot.getID());
-						int overDepotCnt = workerData.getNumAssignedWorkers(overDepot);
-						int lessDepotCnt = workerData.getNumAssignedWorkers(lessDepot);
-						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						if(sCvCnt == maxSCV && overDepotCnt > mineralPatches.size()*2 && !worker.isCarryingMinerals() && overDepotCnt > lessDepotCnt){
-							setMineralWorker(worker,lessDepot);
-							continue;
-						}
-					}
-					
-				}else{
-					Unit depot = workerData.getWorkerDepot(worker);
-					if (depot == null) continue;
-					List<Unit> mineralPatches = workerData.getMineralPatchesNearDepot(depot);
-					for (Unit mineral : mineralPatches){
-						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						//System.out.println("maxSCV : " + maxSCV + " sCV ; " + sCvCnt);
-						if(maxSCV < sCvCnt){
-							maxSCV = sCvCnt;
-						}
-						if(lowSCV > sCvCnt){
-							lowSCV = sCvCnt;
-						}
-			        	//System.out.println("mineralPatches : " + mineralPatches.size());
-			        }
-					for (Unit mineral : mineralPatches){
-						sCvCnt = workerData.workersOnMineralPatch.get(mineral.getID());
-						if(sCvCnt+2 <= maxSCV){
-							setMineralWorker(worker);
-							continue;
-						}
-			        	//System.out.println("mineralPatches : " + mineralPatches.size());
-			        }
-				}
-				
-				
-				/*
-				 * 일꾼 재배치 위한 로직 끝
-				 */
-				//int plangetmineral = workerData.workerMineralAssignment.get(worker.getID()).getID();
 				Unit tempMineral = workerData.workerMineralAssignment.get(worker.getID());
-				
+				if(tempMineral == null)
+					continue;
 				int planGetMineral = tempMineral.getID();
 				
 				int realGetMineral = 0;
@@ -295,20 +194,6 @@ public class WorkerManager {
 					realGetMineral = worker.getOrderTarget().getID();
 					//commandUtil.rightClick(worker, temp);
 				}
-				
-				
-				
-				//System.out.print(" isMoving:" + worker.isMoving());
-				//System.out.println(" realgetmineral:" + realgetmineral + " plangetmineral:" + plangetmineral);
-				
-				//worker.
-	//			if(workerData.workerMineralMap != null){
-	//				System.out.print("getmineral2:" + workerData.workerMineralMap.get(worker.getID()).getID());
-	//			}
-				//System.out.print(" getmineral:" + workerData.getMineralToMine(worker).getID());
-				//System.out.print(" isgather:" + worker.isGatheringMinerals());
-				//System.out.println(" iscarry:" + worker.isCarryingMinerals());
-				// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
 			}
 		}	
 	}
@@ -466,8 +351,9 @@ public class WorkerManager {
 	public Unit getClosestMineralWorkerTo(Position target)
 	{
 		Unit closestUnit = null;
-		double closestDist = 100000;
-
+//		double closestDist = 100000; //1.0
+		double closestDist = 100000000; //1.1
+		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit.isCompleted()
@@ -489,78 +375,109 @@ public class WorkerManager {
 	}
 
 	/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
+
 	public Unit getClosestResourceDepotFromWorker(Unit worker)
 	{
+	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
+	// 멀티 기지간 일꾼 숫자 리밸런싱이 잘 일어나도록 버그 수정
 		if (worker == null) return null;
 
 		Unit closestDepot = null;
-		double closestDistance = 0;
+		double closestDistance = 1000000000;
+		
+		// 완성된, 공중에 떠있지 않고 땅에 정착해있는, ResourceDepot 혹은 Lair 나 Hive로 변형중인 Hatchery 중에서
+		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
+		// 둘째로 가까운 곳을 찾는다
 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
-			
-			// 가장 가까운, 일꾼수가 꽉 차지않은, 완성된 ResourceDepot (혹은 Lair 나 Hive로 변형중인 건물)을 찾는다
-			if (unit.getType().isResourceDepot()
-				&& (unit.isCompleted() || unit.getType() == UnitType.Zerg_Lair || unit.getType() == UnitType.Zerg_Hive) )
-			{
-				double distance = unit.getDistance(worker);
 
-				// 일단 여러 ResourceDepot 중 하나는 선택되도록 한다
-				if (closestDepot == null)
-				{
-					closestDepot = unit;
-					closestDistance = distance;
-				}
-				// 더 가까운 ResourceDepot 이 있고, 일꾼 수가 꽉 차지 않았다면 거기 가도록 한다
-				else if (distance < closestDistance
-					&& workerData.depotHasEnoughMineralWorkers(unit) == false) 
-				{
-					closestDepot = unit;
-					closestDistance = distance;
+			if (unit.getType().isResourceDepot()
+					&& (unit.isCompleted() || unit.getType() == UnitType.Zerg_Lair || unit.getType() == UnitType.Zerg_Hive) 
+					&& unit.isLifted() == false)
+			{
+				if (workerData.depotHasEnoughMineralWorkers(unit) == false) {
+					if(isCheckEnemy(unit) == true){
+						continue;
+					}
+					double distance = unit.getDistance(worker);
+					if (closestDistance > distance) {
+						closestDepot = unit;
+						closestDistance = distance;
+					}
 				}
 			}
 		}
-
-		return closestDepot;
-	}
-	
-	/// 해당 일꾼 유닛 unit 으로부터 가장 가까운 ResourceDepot 건물을 리턴합니다
-		public Unit getClosestEnemyResourceDepotFromWorker(Unit worker)
-		{
-			if (worker == null) return null;
-
-			Unit closestDepot = null;
-			double closestDistance = 0;
-
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+		// 모든 ResourceDepot 이 다 일꾼수가 꽉 차있거나, 완성된 ResourceDepot 이 하나도 없고 건설중이라면, 
+		// ResourceDepot 주위에 미네랄이 남아있는 곳 중에서 가까운 곳이 선택되도록 한다
+		if (closestDepot == null) {
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if (unit == null) continue;
-				
-				// 가장 가까운, 일꾼수가 꽉 차지않은, 완성된 ResourceDepot (혹은 Lair 나 Hive로 변형중인 건물)을 찾는다
-				if (unit.getType().isResourceDepot()
-					&& (unit.isCompleted() || unit.getType() == UnitType.Zerg_Lair || unit.getType() == UnitType.Zerg_Hive) )
-				{
-					double distance = unit.getDistance(worker);
 
-					// 일단 여러 ResourceDepot 중 하나는 선택되도록 한다
-					if (closestDepot == null)
-					{
-						closestDepot = unit;
-						closestDistance = distance;
+				if (unit.getType().isResourceDepot())
+				{
+					if (workerData.getMineralsNearDepot(unit) > 0) {
+						if(isCheckEnemy(unit) == true){
+							continue;
+						}
+						double distance = unit.getDistance(worker);
+						if (closestDistance > distance) {
+							closestDepot = unit;
+							closestDistance = distance;
+						}
 					}
-					// 더 가까운 ResourceDepot 이 있고, 일꾼 수가 꽉 차지 않았다면 거기 가도록 한다
-					else if (distance < closestDistance) 
-					{
+				}
+			}
+		}
+		// 모든 ResourceDepot 주위에 미네랄이 하나도 없다면, 일꾼에게 가장 가까운 곳을 선택한다  
+		if (closestDepot == null) {
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if (unit == null) continue;
+				if (unit.getType().isResourceDepot())
+				{
+					if(isCheckEnemy(unit) == true){
+						continue;
+					}
+					double distance = unit.getDistance(worker);
+					if (closestDistance > distance) {
 						closestDepot = unit;
 						closestDistance = distance;
 					}
 				}
-			}
-
-			return closestDepot;
+			}			
 		}
+		
+		
+		
+		return closestDepot;
+		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 
+	} 
+
+	/// 해당 지역에 공격유닛이 잇는지 판단
+	public boolean isCheckEnemy(Unit depot)
+	{
+		int unitCnt = 0;
+		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		//본진일때는 무조건 false
+		if (myBaseLocation == null || depot.getDistance(myBaseLocation.getPosition()) < 5 * Config.TILE_SIZE)
+			return false;
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+		{
+			if(unit.isVisible() && unit.getDistance(depot) < 200 && unit.getType().canAttack()){
+				unitCnt++;
+//				commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
+				if(unitCnt > 8){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	/// 해당 일꾼 유닛 unit 의 WorkerJob 값를 Idle 로 변경합니다
 	public void setIdleWorker(Unit unit)
 	{
@@ -576,7 +493,8 @@ public class WorkerManager {
 		if (refinery == null) return null;
 
 		Unit closestWorker = null;
-		double closestDistance = 0;
+		//double closestDistance = 0;
+		double closestDistance = 100000000;
 
 		for (Unit unit : workerData.getWorkers())
 		{
@@ -613,8 +531,11 @@ public class WorkerManager {
 		// variables to hold the closest worker of each type to the building
 		Unit closestMovingWorker = null;
 		Unit closestMiningWorker = null;
-		double closestMovingWorkerDistance = 0;
-		double closestMiningWorkerDistance = 0;
+		//double closestMovingWorkerDistance = 0;
+		//double closestMiningWorkerDistance = 0;
+		double closestMovingWorkerDistance = 100000000;
+		double closestMiningWorkerDistance = 100000000; 
+
 
 		// look through each worker that had moved there first
 		for (Unit unit : workerData.getWorkers())
@@ -709,7 +630,9 @@ public class WorkerManager {
 	{
 		// set up the pointer
 		Unit closestWorker = null;
-		double closestDistance = 0;
+//		double closestDistance = 0;
+		double closestDistance = 100000000;
+
 
 		// for each worker we currently have
 		for (Unit unit : workerData.getWorkers())
@@ -740,7 +663,8 @@ public class WorkerManager {
 	{
 		// set up the pointer
 		Unit closestWorker = null;
-		double closestDistance = 0;
+//		double closestDistance = 0;
+		double closestDistance = 100000000;
 
 		// for each worker we currently have
 		for (Unit unit : workerData.getWorkers())
@@ -830,18 +754,12 @@ public class WorkerManager {
 	public void onUnitMorph(Unit unit)
 	{
 		if (unit == null) return;
-
-		// if something morphs into a worker, add it
-		if (unit.getType().isWorker() && unit.getPlayer() == MyBotModule.Broodwar.self() && unit.getHitPoints() >= 0)
-		{
-			workerData.addWorker(unit);
-		}
-
 		// if something morphs into a building, it was a worker (Zerg Drone)
 		if (unit.getType().isBuilding() && unit.getPlayer() == MyBotModule.Broodwar.self() && unit.getPlayer().getRace() == Race.Zerg)
 		{
 			// 해당 worker 를 workerData 에서 삭제한다
 			workerData.workerDestroyed(unit);
+			rebalanceWorkers();
 		}
 	}
 
@@ -868,7 +786,31 @@ public class WorkerManager {
 		}
 
 	}
-
+	
+	// onUnitComplete 메소드 추가
+	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트합니다	
+	/// Terran_SCV, Protoss_Probe 유닛 훈련이 끝나서 탄생할 경우, 	
+	/// Zerg_Drone 유닛이 탄생하는 경우,	
+	/// Zerg_Drone 유닛이 건물로 Morph 가 끝나서 건물이 완성되는 경우,	
+	/// Zerg_Drone 유닛의 Zerg_Extractor 건물로의 Morph 를 취소시켜서 Zerg_Drone 유닛이 새롭게 탄생하는 경우	
+	/// 호출됩니다	
+	public void onUnitComplete(Unit unit)	
+	{		
+		if (unit == null) 
+			return;		
+		// ResourceDepot 건물이 신규 생성되면, 자료구조 추가 처리를 한 후, rebalanceWorkers 를 한다		
+		if (unit.getType().isResourceDepot() && unit.getPlayer() == MyBotModule.Broodwar.self())	
+		{			
+			workerData.addDepot(unit);
+			rebalanceWorkers();
+		}		
+		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다. 		
+		if (unit.getType().isWorker() && unit.getPlayer() == MyBotModule.Broodwar.self() && unit.getHitPoints() >= 0)
+		{			
+			workerData.addWorker(unit);
+			rebalanceWorkers();
+		}
+	}
 	// 일하고있는 resource depot 에 충분한 수의 mineral worker 들이 지정되어 있다면, idle 상태로 만든다
 	// idle worker 에게 mineral job 을 부여할 때, mineral worker 가 부족한 resource depot 으로 이동하게 된다  
 	public void rebalanceWorkers()
@@ -897,17 +839,18 @@ public class WorkerManager {
 	public void onUnitDestroy(Unit unit) 
 	{
 		if (unit == null) return;
-
+		// ResourceDepot 건물이 파괴되면, 자료구조 삭제 처리를 한 후, 일꾼들을 Idle 상태로 만들어 rebalanceWorkers 한 효과가 나게 한다
 		if (unit.getType().isResourceDepot() && unit.getPlayer() == MyBotModule.Broodwar.self())
 		{
 			workerData.removeDepot(unit);
 		}
-
+		// 일꾼이 죽으면, 자료구조 삭제 처리를 한 후, rebalanceWorkers 를 한다
 		if (unit.getType().isWorker() && unit.getPlayer() == MyBotModule.Broodwar.self()) 
 		{
 			workerData.workerDestroyed(unit);
+			rebalanceWorkers();
 		}
-
+		// 미네랄을 다 채취하면 rebalanceWorkers를 한다
 		if (unit.getType() == UnitType.Resource_Mineral_Field)
 		{
 			rebalanceWorkers();
