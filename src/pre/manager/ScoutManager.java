@@ -29,19 +29,15 @@ public class ScoutManager{
 		MovingToAnotherBaseLocation,	///< 적군의 BaseLocation 이 미발견된 상태에서 정찰 유닛을 이동시키고 있는 상태
 		MoveAroundEnemyBaseLocation   	///< 적군의 BaseLocation 이 발견된 상태에서 정찰 유닛을 이동시키고 있는 상태
 	};
-	private WorkerData workerData = new WorkerData();
 	private BaseLocation currentScoutTargetBaseLocation = null;
 	private Vector<Position> enemyBaseRegionVertices = new Vector<Position>();
 	private int currentScoutFreeToVertexIndex = -1;
 	private Position currentScoutTargetPosition = Position.None;
 
 	private CommandUtil commandUtil = new CommandUtil();
-	private WorkerManager workerManager = new WorkerManager();
 	private MapTools mapTools = new MapTools();
-	private InformationManager informationManager = new InformationManager();
 	
 	private static ScoutManager instance = new ScoutManager();
-	private String distrub;
 	
 	private int preScoutHP = 0;
 	private boolean scoutUnderAttack = false;
@@ -80,39 +76,6 @@ public class ScoutManager{
 		// 참고로, scoutUnit 의 이동에 의해 발견된 정보를 처리하는 것은 InformationManager.update() 에서 수행함
 	}
 
-	private void checkUnit() {
-		// TODO Auto-generated method stub
-		if(currentScoutUnit == null)
-			return;
-//		if(currentScoutUnit.isUnderAttack()){
-				Unit firstBuilding = null;
-
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-				{
-					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false)
-					{
-						firstBuilding = unit;
-						break;
-					}
-				}
-				boolean visialble = false;
-				if(currentScoutUnit.isUnderAttack()){ 
-					for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
-					{
-						commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-						if(unit.isVisible()){
-//							commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-							visialble = true;
-							
-						}
-					}
-				}
-				if(visialble == true){
-					commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-				}else if(visialble == false){
-					distrub = "true";
-				}
-	}
 	
 	private void updateScoutUnit() {
 		// TODO Auto-generated method stub
@@ -536,7 +499,7 @@ public class ScoutManager{
 					int y1 = tp.getY() * 32 + 2;
 					int x2 = (tp.getX() + 1) * 32 - 2;
 					int y2 = (tp.getY() + 1) * 32 - 2;
-					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
+					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + MapTools.Instance().getGroundDistance(tp.toPosition(), basePosition));
 					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
 				}
 
