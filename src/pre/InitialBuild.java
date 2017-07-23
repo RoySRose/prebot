@@ -7,6 +7,7 @@ import bwapi.UpgradeType;
 import pre.main.MyBotModule;
 import pre.manager.BuildManager;
 import pre.manager.InformationManager;
+import pre.util.MapSpecificInformation.MAP;
 
 /// 봇 프로그램 설정
 public class InitialBuild {
@@ -19,17 +20,17 @@ public class InitialBuild {
 	
 	
 	public void setInitialBuildOrder() {
-		String map_name = MyBotModule.Broodwar.mapFileName();
+		//String map_name = MyBotModule.Broodwar.mapFileName();
 		
 		//System.out.println("map_name ===>>>> " + map_name);
 		
-		if(map_name.contains("Hunter")){
+		/*if(map_name.contains("Hunter")){
 			map_name = "Hunter";
 		}else if(map_name.contains("Lost")){
 			map_name = "Lotem";
 		}else if(map_name.contains("Spirit")){
 			map_name = "Spirit";
-		}
+		}*/
 			
 		
 
@@ -39,7 +40,7 @@ public class InitialBuild {
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 			
 			
-			if(!map_name.equals("Hunter")){
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				//헌터 아닌맵 테란전
 
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
@@ -135,7 +136,7 @@ public class InitialBuild {
 				
 				
 
-			}else if(map_name.equals("Hunter")){
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//테란전 헌터
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -240,7 +241,7 @@ public class InitialBuild {
 			
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
 			
-			if(!map_name.equals("Hunter")){
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 			//헌터 아닌맵
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -319,7 +320,7 @@ public class InitialBuild {
 				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Charon_Boosters,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
 				
-			}else{
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터저그전
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -422,7 +423,7 @@ public class InitialBuild {
 
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
 			
-			if(!map_name.equals("Hunter")){
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -490,7 +491,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				
-			}else if(map_name.equals("Hunter")){
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터플토전
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -588,7 +589,7 @@ public class InitialBuild {
 
 		}else{ 
 			//랜덤은 저그 따라 가기
-			if(!map_name.equals("Hunter")){
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 			//헌터 아닌맵
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -667,7 +668,7 @@ public class InitialBuild {
 				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Charon_Boosters,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
 				
-			}else{
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터저그전
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);

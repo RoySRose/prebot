@@ -113,7 +113,7 @@ public class AnalyzeStrategy {
 				//엔지니어링 베이가 있다면, 기본전략으로 대응하고, 본진에 터렛만 추가.
 				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Shuttle);
 				
-				//RespondToStrategy.instance().enemy_shuttle = true;
+//				RespondToStrategy.instance().enemy_shuttle = true;
 				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) >= 1){
 					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 				}
@@ -226,15 +226,25 @@ public class AnalyzeStrategy {
 		}
 		
 		if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks, InformationManager.Instance().enemyPlayer) >= 2){
+				//2배럭이면 바이오닉
+				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_Bionic);
+			}
+			//팩이 배럭보다 많거나, 팩이 3개 이상일경우 기본으로 변경
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks, InformationManager.Instance().enemyPlayer) <= InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, InformationManager.Instance().enemyPlayer)
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks, InformationManager.Instance().enemyPlayer) >= 3){
+				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic);
+			}
+			
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Starport, InformationManager.Instance().enemyPlayer) == 1
 				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, InformationManager.Instance().enemyPlayer) >= 1){
 				//공중 유닛에 대한 대응
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-				//RespondToStrategy.instance().enemy_wraith = true;
+//				RespondToStrategy.instance().enemy_wraith = true;
 			}else if(InformationManager.Instance().getNumUnits(UnitType.Terran_Starport, InformationManager.Instance().enemyPlayer) >= 2){
 				//스타포트 다수에 대한 대응
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-				//RespondToStrategy.instance().enemy_wraith = true;
+//				RespondToStrategy.instance().enemy_wraith = true;
 			}
 			
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Dropship, InformationManager.Instance().enemyPlayer) >= 3){
@@ -350,7 +360,7 @@ public class AnalyzeStrategy {
 				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
 							 && enemyUnitsInRegion.get(enemy).getDistance(theBunker) < 100){ 
-						 StrategyManager.Instance().NongBong_At_Unit = enemyUnitsInRegion.get(enemy);
+						 NongbongScv.Instance().NongBong_At_Unit = enemyUnitsInRegion.get(enemy);
 						 nongbong_cnt ++;
 					 }
 				 }
@@ -374,7 +384,7 @@ public class AnalyzeStrategy {
 				if( cntHatchery >= 1 ){
 					//다른 해처리도 일반 적인 럴커 준비. 컴셋과 엔지니어링 베이가 있다면 이미 준비 끝.
 					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
-					//RespondToStrategy.instance().enemy_lurker = true;
+//					RespondToStrategy.instance().enemy_lurker = true;
 					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
 						&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0){
 						//컴셋스테이션O , 엔지니어링 베이 O 면 일단 럴커 대비는 된것으로.
@@ -383,7 +393,7 @@ public class AnalyzeStrategy {
 				}else{
 					//1레어 라면 패스트 럴커로 인식. 마인업까지 포함되어야 한다.
 					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_FastLurker);
-					//RespondToStrategy.instance().enemy_lurker = true;
+//					RespondToStrategy.instance().enemy_lurker = true;
 					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
 							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0
 							&& MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)){
