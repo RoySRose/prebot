@@ -21,13 +21,6 @@ import pre.util.MicroUtils;
 
 /// 봇 프로그램 설정
 public class AnalyzeStrategy {
-	public String basicStrategyOld = "";
-	
-	public String basicStrategyNew = "";
-	
-	public String exceptionStrategyOld= "";
-	
-	public String exceptionStrategyNew= "";
 
 	private static AnalyzeStrategy instance = new AnalyzeStrategy();
 	
@@ -46,19 +39,6 @@ public class AnalyzeStrategy {
 		}else{
 			AnalyzeVsZerg();
 		}
-		basicStrategyNew = StrategyManager.Instance().getCurrentStrategyBasic().toString();
-		if(!basicStrategyNew.equals(basicStrategyOld)){
-			//새로 바뀐 전략이 있다면 표시
-			System.out.println("basicStrategyNew ==>>  " +basicStrategyNew + "    ///    " + "basicStrategyOld ==>> " + basicStrategyOld);
-			basicStrategyOld = basicStrategyNew;
-		}
-		exceptionStrategyNew = StrategyManager.Instance().getCurrentStrategyException().toString();
-		if(!exceptionStrategyNew.equals(exceptionStrategyOld)){
-			//새로 바뀐 전략이 있다면 표시
-			System.out.println("exceptionStrategyNew ==>>  " +exceptionStrategyNew + "    ///    " + "exceptionStrategyOld ==>> " + exceptionStrategyOld);
-			exceptionStrategyOld = exceptionStrategyNew;
-		}
-
 	}
 	
 	public void AnalyzeEnemyStrategyInit() {
