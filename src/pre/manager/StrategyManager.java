@@ -111,10 +111,11 @@ public class StrategyManager {
 
 	private Strategys CurrentStrategyBasic = null;
 	private StrategysException CurrentStrategyException = null;
+	public Strategys LastCurrentStrategyBasic = null;
+	public StrategysException LastCurrentStrategyException = null;
 	
 	
 	public StrategyManager() {
-		
 		isInitialBuildOrderFinished = false;
 		CurrentStrategyBasic = Strategys.zergBasic;
 		CurrentStrategyException = StrategysException.Init;
@@ -126,6 +127,7 @@ public class StrategyManager {
 			MyBotModule.Broodwar.printf("==setting ratio==");
 			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
 			MyBotModule.Broodwar.printf("wgt:" + wgt);
+			LastCurrentStrategyBasic = CurrentStrategyBasic;
 		}
 		CurrentStrategyBasic = strategy;
 		setCombatUnitRatio();
@@ -136,6 +138,7 @@ public class StrategyManager {
 			MyBotModule.Broodwar.printf("==setting ratio==");
 			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
 			MyBotModule.Broodwar.printf("wgt:" + wgt);
+			LastCurrentStrategyException = CurrentStrategyException;
 		}
 		
 		CurrentStrategyException = strategy;
@@ -157,9 +160,10 @@ public class StrategyManager {
 		// 과거 게임 기록을 로딩합니다
 		//loadGameRecordList();
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
-				
-		//setCombatUnitRatio();
+
+		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		
 		InitialBuild.Instance().setInitialBuildOrder();	
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
 	}
@@ -182,14 +186,13 @@ public class StrategyManager {
 			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
-		
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
 			if(isInitialBuildOrderFinished == false){
 				MyBotModule.Broodwar.printf("Initial Build Finished");
 			}
 			isInitialBuildOrderFinished = true;
 		}
-		
+
 		// 1초에 한번만 실행
 		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0) {
 			executeSupplyManagement();
@@ -222,7 +225,7 @@ public class StrategyManager {
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0){
 			executeWorkerTraining();
-			//executeCombatUnitTrainingBlocked();
+			executeCombatUnitTrainingBlocked();
 
 			if (isInitialBuildOrderFinished == true) {
 				executeCombatUnitTraining();

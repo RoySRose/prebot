@@ -217,7 +217,7 @@ public class InitialBuild {
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				//나가면서 확장 커맨드				
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				//시즈모드
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Tank_Siege_Mode);
 				//scv				
@@ -293,7 +293,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//19 찍어놓고 1벌쳐
@@ -368,9 +368,9 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//17, 18scv 찍고 2팩토리
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -395,7 +395,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//19 찍어놓고 1벌쳐
@@ -426,27 +426,27 @@ public class InitialBuild {
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//10 scv 찍고 배럭
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
 				 * BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);*/
@@ -455,15 +455,15 @@ public class InitialBuild {
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//14 scv 찍고 서플
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//마린
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -474,20 +474,20 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//19 찍어놓고 1벌쳐
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Vulture,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				
@@ -641,7 +641,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//19 찍어놓고 1벌쳐
@@ -716,9 +716,9 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getBasicSupplyProviderUnitType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//17, 18scv 찍고 2팩토리
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -743,7 +743,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				//19 찍어놓고 1벌쳐
