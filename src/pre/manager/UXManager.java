@@ -87,12 +87,12 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(5, 60);
+			drawBuildOrderQueueOnScreen(5, 75);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
 		if (Config.DrawProductionInfo) {
-			drawBuildStatusOnScreen(120, 60);
+			//drawBuildStatusOnScreen(120, 60);
 		}
 
 		// 건물 건설 큐. 건물 건설 상황
@@ -164,22 +164,29 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Time : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
 		MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
-		y += 12;
+		y += 11;
 		
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + (StrategyManager.Instance().getCurrentStrategyException()== StrategysException.Init ? StrategyManager.Instance().getCurrentStrategyBasic() : "X")
 				+" <-- "+ StrategyManager.Instance().LastCurrentStrategyBasic);
-		y += 12;
+		y += 11;
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current EXStrategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().LastCurrentStrategyException );
-		y += 12;
+		y += 11;
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 72, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
-		y += 12;
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
+		y += 11;
 		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().GRIDpoint);
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
+		y += 11;
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다

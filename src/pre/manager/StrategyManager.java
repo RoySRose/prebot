@@ -114,6 +114,9 @@ public class StrategyManager {
 	public Strategys LastCurrentStrategyBasic = null;
 	public StrategysException LastCurrentStrategyException = null;
 	
+	public Strategys LastCurrentStrategyBasic = null;
+	public StrategysException LastCurrentStrategyException = null;
+	public int GRIDpoint=0;
 	
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
@@ -124,25 +127,30 @@ public class StrategyManager {
 	public void setCurrentStrategyBasic(Strategys strategy) {
 		if(CurrentStrategyBasic != strategy){
 			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
+			LastCurrentStrategyBasic = CurrentStrategyBasic; 
+		}
+		CurrentStrategyBasic = strategy;
+		setCombatUnitRatio();
+		if(LastCurrentStrategyBasic != CurrentStrategyBasic){
 			MyBotModule.Broodwar.printf("==setting ratio==");
 			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
 			MyBotModule.Broodwar.printf("wgt:" + wgt);
 			LastCurrentStrategyBasic = CurrentStrategyBasic;
 		}
-		CurrentStrategyBasic = strategy;
-		setCombatUnitRatio();
 	}
 	public void setCurrentStrategyException(StrategysException strategy) {
 		if(CurrentStrategyException != strategy){
 			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
-			MyBotModule.Broodwar.printf("==setting ratio==");
-			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
-			MyBotModule.Broodwar.printf("wgt:" + wgt);
 			LastCurrentStrategyException = CurrentStrategyException;
 		}
 		
 		CurrentStrategyException = strategy;
 		setCombatUnitRatio();
+		if(LastCurrentStrategyException != CurrentStrategyException){
+			MyBotModule.Broodwar.printf("==setting ratio==");
+			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
+			MyBotModule.Broodwar.printf("wgt:" + wgt);
+		}
 	}
 	public Strategys getCurrentStrategyBasic() {
 		return CurrentStrategyBasic;
@@ -166,6 +174,7 @@ public class StrategyManager {
 		
 		InitialBuild.Instance().setInitialBuildOrder();	
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
+		setCurrentStrategyBasic(Strategys.zergBasic_Mutal);
 	}
 
 	///  경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다
@@ -181,10 +190,10 @@ public class StrategyManager {
 	public void update() {
 		
 		//TODO 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
-		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
-				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
-			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
-		}
+//		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
+//				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
+//			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+//		}
 		
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
 			if(isInitialBuildOrderFinished == false){
@@ -381,11 +390,11 @@ public class StrategyManager {
 							}
 							if (currentItem == null){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-							}else if(currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
+							}else if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
 								if(workerCount < 4){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 								}else{
-									if(currentItem.blocking == true && MyBotModule.Broodwar.self().minerals() > currentItem.metaType.getUnitType().mineralPrice()+50 ){
+									if(currentItem.metaType.isUnit() && currentItem.blocking == true && MyBotModule.Broodwar.self().minerals() > currentItem.metaType.getUnitType().mineralPrice()+50 ){
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 									}else{
 										// 빌드큐에 일꾼 생산이 1개는 있도록 한다
@@ -613,6 +622,8 @@ public class StrategyManager {
 		
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
 		BuildOrderItem currentItem = null; 
+		Boolean goliathInTheQueue = false;
+		Boolean tankInTheQueue = false;
 		
 		if(MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 4){
 			return;
@@ -620,10 +631,18 @@ public class StrategyManager {
 		if (!tempbuildQueue.isEmpty()) {
 			currentItem= tempbuildQueue.getHighestPriorityItem();
 			while(true){
-				if(Config.BuildQueueDebugYN){
-					System.out.println("picked: "+ currentItem.metaType.getName());
+				
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
+					goliathInTheQueue = true;
 				}
-				if(currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+					tankInTheQueue = true;
+				}
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+					return;
+				}
+				
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
 					return;
 				}
 				if(currentItem.blocking == true){
@@ -631,13 +650,18 @@ public class StrategyManager {
 				}
 				if(tempbuildQueue.canSkipCurrentItem() == true){
 					tempbuildQueue.skipCurrentItem();
-				}else{
-					return;
+				}
+				else{
+					break;
 				}
 				currentItem = tempbuildQueue.getNextItem();
 			}
 		}else{
 			return;
+		}
+		
+		if(Config.BuildQueueDebugYN){
+			System.out.println("picked: "+ currentItem.metaType.getName());
 		}
 		
 		boolean isarmoryexists = false;
@@ -665,16 +689,16 @@ public class StrategyManager {
 				}
 				
 				//TODO else 가 들어가야할까. addon 있는놈일때는 신겨 안쓰게끔?
-				if(currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop && unit.getAddon() == null ){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop && unit.getAddon() == null ){
 					continue;
 				}
 				//필요하려나?
-				if(currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
 					if(unit.getAddon() != null && unit.getAddon().isCompleted() == true){
 						continue;
 					}
 				}
-				if(currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
 					if(isarmoryexists){
 						continue;
 					}
@@ -697,8 +721,8 @@ public class StrategyManager {
 					System.out.print(", selected:" + selected);
 				}
 				
-				if(currentItem.metaType.getUnitType()!=selected){
-					if(selected == UnitType.Terran_Siege_Tank_Tank_Mode){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType()!=selected){
+					if(selected == UnitType.Terran_Siege_Tank_Tank_Mode && tankInTheQueue == false){
 						if(unit.getAddon() != null && unit.getAddon().isCompleted() == true){
 							if(currentItem.metaType.mineralPrice()+selected.mineralPrice() < MyBotModule.Broodwar.self().minerals() &&
 									currentItem.metaType.gasPrice()+selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
@@ -709,7 +733,7 @@ public class StrategyManager {
 								eventually_vulture = false;
 							}
 						}
-					}else if(selected == UnitType.Terran_Goliath){
+					}else if(selected == UnitType.Terran_Goliath && goliathInTheQueue == false){
 						if(Config.BuildQueueDebugYN){
 							System.out.print(", isarmoryexists:" + isarmoryexists);
 						}
@@ -987,9 +1011,6 @@ public int getTotKilledCombatUnits(){
 			}
 		}
 	
-		if (MyBotModule.Broodwar.getFrameCount() % 240 == 0){
-			System.out.println("Current Attack Point: " + point);
-		}
 		//TODO 일단 공격 중이라면......
 		if(point > 120){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
@@ -1002,6 +1023,7 @@ public int getTotKilledCombatUnits(){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
 		}
+		GRIDpoint = point;
 	}
 	
 	public void executeUpgrade() {
