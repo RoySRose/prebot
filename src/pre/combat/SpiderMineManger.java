@@ -14,7 +14,6 @@ import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
-import pre.util.CommonUtils;
 import pre.util.MicroSet;
 import pre.util.MicroUtils;
 
@@ -75,7 +74,7 @@ public class SpiderMineManger {
 			return;
 		}
 		
-		// 1. 만료 매설 만료시간 관리 
+		// 만료 매설 만료시간 관리 
 		List<Integer> expiredList = new ArrayList<>();
 		for (Integer unitId : mineReservedMap.keySet()) {
 			MineReserved mineReserved = mineReservedMap.get(unitId);
@@ -87,19 +86,6 @@ public class SpiderMineManger {
 		}
 		for (Integer unitId : expiredList) {
 			mineReservedMap.remove(unitId);
-		}
-		
-		
-		// 2. 벌처 정책 조정(각 주요 포인트 매설 마인수, checker수)
-		if (CommonUtils.executeOncePerFrame(48, 0)) {
-			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
-			
-			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 8 + 1;
-
-//			MicroSet.Vulture.maxNumWatcher = 50;
-//			MicroSet.Vulture.maxNumCheckerSquad = 1;
-			MicroSet.Vulture.maxNumChecker = vultureCount / 4; // 3대1 비율이다.
-//			System.out.println("vultureCount / maxNumChecker : " + vultureCount + " / " + MicroSet.Vulture.maxNumChecker);
 		}
 		
 	}

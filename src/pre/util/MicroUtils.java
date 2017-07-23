@@ -76,7 +76,7 @@ public class MicroUtils {
 				}
 			}
 			
-			if (ui.getType().isWorker() || typeCanAttackGround(ui.getType())) {
+			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {
 				continue;
 			}
 			

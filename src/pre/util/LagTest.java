@@ -2,7 +2,8 @@ package pre.util;
 
 public class LagTest {
 
-	private static final long DEFAULT_WARN_DURATION = 30;
+//	private static final int CONSOLE_OUT_FRAME = 24 * 10;
+	private static final long DEFAULT_WARN_DURATION = 50;
 	private static final String ROOT_PACKAGE = "pre.";
 	
 	private String name;
@@ -30,13 +31,25 @@ public class LagTest {
 	}
 
 	public void test() {
-		test(null);
+//		if(!CommonUtils.executeOncePerFrame(CONSOLE_OUT_FRAME, 0)) {
+//			return;
+//		}
+		
+		long currentTime = System.currentTimeMillis();
+		String section = "line" + new Throwable().getStackTrace()[1].getLineNumber();
+		if (currentTime - startTime > warnDuration) {
+			System.out.println("### " + name + "." + section + " : " + (currentTime - startTime) + " millisec");
+		}
+		startTime = currentTime;
 	}
 	
 	public void test(String tag) {
+//		if(!CommonUtils.executeOncePerFrame(CONSOLE_OUT_FRAME, 0)) {
+//			return;
+//		}
+		
 		long currentTime = System.currentTimeMillis();
-		String section = "line" + new Throwable().getStackTrace()[1].getLineNumber();
-		if (tag != null) { section += " *" + tag; }
+		String section = "line" + new Throwable().getStackTrace()[1].getLineNumber() + " *" + tag;
 		if (currentTime - startTime > warnDuration) {
 			System.out.println("### " + name + "." + section + " : " + (currentTime - startTime) + " millisec");
 		}

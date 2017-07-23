@@ -49,7 +49,14 @@ public class CombatManager {
 	}
 
 	public void setCombatStrategy(CombatStrategy combatStrategy) {
-		this.combatStrategy = combatStrategy;
+		if (this.combatStrategy != combatStrategy) {
+			MyBotModule.Broodwar.sendText("combatStrategy changed : " + combatStrategy);
+			this.combatStrategy = combatStrategy;
+		}
+		
+		if (combatStrategy != CombatStrategy.ATTACK_ENEMY) {
+			currTargetChoke = null;
+		}
 	}
 
 	private static CombatManager instance = new CombatManager();
@@ -117,9 +124,9 @@ public class CombatManager {
 		else if (CommonUtils.executeOncePerFrame(4, 1)) {
 			doComsatScan();
 		}
-		if(MyBotModule.Broodwar.getFrameCount() > 50){
-			setCombatStrategy(CombatStrategy.ATTACK_ENEMY); 
-		}
+//		if(MyBotModule.Broodwar.getFrameCount() > 50){
+//			setCombatStrategy(CombatStrategy.ATTACK_ENEMY); 
+//		}
 		
 //		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
 //			squadData.printSquadInfo();
@@ -246,7 +253,7 @@ public class CombatManager {
 
 		    Position squadPosition = MicroUtils.centerOfUnits(squad.getUnitSet());
 		    Position enemyFirstChokePosition = enemyFirstChoke.getCenter();
-		    if (squadPosition.getDistance(enemyFirstChokePosition) < 320) { // 적의 first chokePoint 도착
+		    if (squadPosition.getDistance(enemyFirstChokePosition) < 500) { // 적의 first chokePoint 도착
 		    	return enemyBaseLocation.getPosition(); // TODO 언덕 위로 올라가는 것에 대한 판단. 상대의 주력병력을 소모시키전에 언덕위로 진입하는 것은 위험할 수 있다.
 		    }
 
@@ -266,7 +273,7 @@ public class CombatManager {
 
 		    // 현재의 chokepoint에 도착했다고 판단되면 next chokepoint를 찾는다.
 		    // next chokepoint는 최단거리 상에 있는 가장 가까운 chokepoint이다.
-		    if (squadPosition.getDistance(currTargetChoke) < 320) {
+		    if (squadPosition.getDistance(currTargetChoke) < 500) {
 			    if (squadPosition.equals(currTargetChoke)) {
 			    	return null;
 			    }
@@ -638,7 +645,7 @@ public class CombatManager {
 			}
 		}
 	    
-		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getMainAttackLocation(checkerSquad), Combat.CHECKER_RADIUS, "Over Watcher");
+		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getMainAttackLocation(checkerSquad), Combat.CHECKER_RADIUS, "Check it out");
 		checkerSquad.setOrder(checkerOrder);
 	}
 	
