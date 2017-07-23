@@ -87,7 +87,7 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Vulture);//3벌쳐는 나가고 탱크는 대기
 				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);
 				queueBuild(true, UnitType.Terran_Supply_Depot);
-				queueBuild(true, UnitType.Terran_Command_Center);// 나가면서 확장 커맨드
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);// 나가면서 확장 커맨드
 				queueBuild(TechType.Tank_Siege_Mode);//시즈모드
 				queueBuild(false, UnitType.Terran_SCV);//scv
 				queueBuild(true, UnitType.Terran_Supply_Depot);//서플
@@ -111,7 +111,7 @@ public class InitialBuild {
 				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Factory);//15 찍어놓고 팩토리
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Command_Center);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -148,7 +148,7 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Armory);
 				queueBuild(true, UnitType.Terran_Factory);
-				queueBuild(true, UnitType.Terran_Command_Center);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuild(false, UnitType.Terran_SCV);
@@ -180,7 +180,7 @@ public class InitialBuild {
 				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Factory);//16 찍어놓고 팩토리
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Command_Center);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuild(false, UnitType.Terran_SCV);
@@ -232,7 +232,7 @@ public class InitialBuild {
 				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Factory);//15 찍어놓고 팩토리
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Command_Center);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -269,7 +269,7 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Armory);
 				queueBuild(true, UnitType.Terran_Factory);
-				queueBuild(true, UnitType.Terran_Command_Center);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuild(false, UnitType.Terran_SCV);
@@ -290,6 +290,11 @@ public class InitialBuild {
 		for (UnitType type : types) {
 			bq.queueAsLowestPriority(type, defaultSeedPosition, blocking);
 		}
+	}
+	
+	private void queueBuildSeed(boolean blocking, UnitType type, SeedPositionStrategy seedPosition) {
+		BuildOrderQueue bq = BuildManager.Instance().buildQueue;
+		bq.queueAsLowestPriority(type, seedPosition, blocking);
 	}
 	
 	private void queueBuild(TechType type) {
