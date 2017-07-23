@@ -209,35 +209,8 @@ public class InformationManager {
 
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
 	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
-		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
-
-		// for each unit we know about for that player
-		// for (final Unit kv :
-		// getUnitData(player).getUnits().keySet().iterator()){
-		while (it.hasNext()) {
-			final UnitInfo ui = getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
-
-			// if it's a combat unit we care about
-			// and it's finished!
-			if (isCombatUnitType(ui.getType()) && ui.isCompleted()) {
-				// determine its attack range
-				int range = 0;
-				if (ui.getType().groundWeapon() != WeaponType.None) {
-					range = ui.getType().groundWeapon().maxRange() + 40;
-				}
-
-				// if it can attack into the radius we care about
-				if (ui.getLastPosition().getDistance(p) <= (radius + range)) {
-					// add it to the vector
-					// C++ : unitInfo.push_back(ui);
-					unitInfo.add(ui);
-				}
-			} else if (ui.getType().isDetector() && ui.getLastPosition().getDistance(p) <= (radius + 250)) {
-				// add it to the vector
-				// C++ : unitInfo.push_back(ui);
-				unitInfo.add(ui);
-			}
-		}
+		List<UnitInfo> addUnitInfo = getNearbyForce(p, player, radius);
+		unitInfo.addAll(addUnitInfo);
 	}
 	
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
