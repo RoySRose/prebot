@@ -18,6 +18,29 @@ public class MicroSet {
 //		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
 //	}
 	
+	public static class Combat {
+		public static final int IDLE_PRIORITY = 0;
+		public static final int ATTACK_PRIORITY = 2;
+		public static final int WATCHER_PRIORITY = 3;
+		public static final int CHECKER_PRIORITY = 4;
+		public static final int GUERILLA_PRIORITY = 5;
+		public static final int BASE_DEFENSE_PRIORITY = 6;
+		public static final int SCOUT_DEFENSE_PRIORITY = 7;
+		public static final int WRAITH_PRIORITY = 100;
+		public static final int VESSEL_PRIORITY = 101;
+		
+		public static final int IDLE_RADIUS = 100;
+		public static final int ATTACK_RADIUS = 600;
+		public static final int WATCHER_RADIUS = 400;
+		public static final int CHECKER_RADIUS = 400;
+		public static final int GUERILLA_RADIUS = 400;
+		public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
+		public static final int SCOUT_DEFENSE_RADIUS = 600;
+		public static final int WRAITH_RADIUS = 800;
+		public static final int VESSEL_RADIUS = 600;
+	}
+	
+	
 	public static class Vulture {
 		public static final int GEURILLA_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_POWER = 150;

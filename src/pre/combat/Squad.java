@@ -109,8 +109,8 @@ public class Squad {
 			MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 		} else {
 			for (Unit unit : unitSet) {
-//				InformationManager.Instance().getNearbyForce(unitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, unit.getType().sightRange() + 500);
-				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange() + 500, false, true);
+//				InformationManager.Instance().getNearbyForce(unitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
+				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), order.getRadius(), false, true);
 			}
 		}
 		

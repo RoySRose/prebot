@@ -94,7 +94,7 @@ public class SpiderMineManger {
 		if (CommonUtils.executeOncePerFrame(48, 0)) {
 			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
 			
-			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 10 + 1;
+			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 8 + 1;
 
 //			MicroSet.Vulture.maxNumWatcher = 50;
 //			MicroSet.Vulture.maxNumCheckerSquad = 1;
