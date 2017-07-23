@@ -15,12 +15,89 @@ import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.Region;
 import pre.MapGrid;
+import pre.UnitInfo;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroSet.Network;
 
 public class MicroUtils {
+	
+	public static boolean isSafePlace(Unit rangedUnit) {
+		boolean isSafe = true;
+		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(rangedUnit.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
+		
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
+		for (UnitInfo ui : nearEnemisUnitInfos) {
+			Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID()); // 보이는 적에 대한 조건
+			if (unit != null && unit.getType() != UnitType.Unknown) {
+				if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) { // 완성되지 않은 타워는 까도 된다.
+					continue;
+				}
+			}
+			
+			if (ui.getType().isWorker() || MyBotModule.Broodwar.getDamageFrom(ui.getType(), rangedUnit.getType()) == 0) {
+				continue;
+			}
+			
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+				continue;
+			}
+			
+			double distanceToNearEnemy = rangedUnit.getDistance(ui.getLastPosition());
+			WeaponType nearEnemyWeapon = rangedUnit.isFlying() ? ui.getType().airWeapon() : ui.getType().groundWeapon();
+			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
+			double backOffDist = ui.getType().isBuilding() ? MicroSet.Common.DEF_TOWER_BACKOFF_DIST : 0.0;
+			
+			 // 근처의 모든 적에 대해 안전거리 확보 : 안전거리 = 사정거리 + topSpeed() * 24 (적이 1.0초 이동거리)
+			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
+				isSafe = false;
+				break;
+			}
+		}
+		
+		return isSafe;
+	}
+	
+	 // (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
+	public static boolean isSafePlace(Position position, boolean safeMine) {
+		boolean isSafe = true;
+		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
+		
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
+		for (UnitInfo ui : nearEnemisUnitInfos) {
+			if (!safeMine) {
+				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
+				if (unit != null && unit.getType() != UnitType.Unknown) {
+					if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
+						continue;
+					}
+				}
+			}
+			
+			if (ui.getType().isWorker() || typeCanAttackGround(ui.getType())) {
+				continue;
+			}
+			
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+				continue;
+			}
+			
+			double distanceToNearEnemy = position.getDistance(ui.getLastPosition());
+			WeaponType nearEnemyWeapon = ui.getType().groundWeapon();
+			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
+			double backOffDist = ui.getType().isBuilding() ? MicroSet.Common.DEF_TOWER_BACKOFF_DIST : 0.0;
+			
+			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
+				isSafe = false;
+				break;
+			}
+		}
+		
+		return isSafe;
+	}
 	
 	public static boolean smartScan(Position targetPosition) {
 		if (targetPosition.isValid()) {
@@ -131,100 +208,93 @@ public class MicroUtils {
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
 				!CommandUtil.IsValidUnit(target, false, true)) {
-			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
+//			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
 			return;
 		}
 
 		boolean cooltimeAlwaysAttack = kitingOption.isCooltimeAlwaysAttack();
 		boolean unitedKiting = kitingOption.isUnitedKiting();
-		Position goalPosition = kitingOption.getGoalPosition();
 		Integer[] fleeAngle = kitingOption.getFleeAngle();
-		int specialSquadType = kitingOption.getSpecialSquadType();
+		Position goalPosition = kitingOption.getGoalPosition();
+		boolean saveUnit = kitingOption.isSaveUnit();
 
 		boolean survivalInstinct = !killedByNShot(rangedUnit, target, 1) && killedByNShot(target, rangedUnit, 2); // 생존본능(딸피)
-		if (survivalInstinct || groundUnitFreeKiting(rangedUnit, (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8))) {
-			unitedKiting = false;
-			fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
-		}
-		if (specialSquadType > 0) { // 특수 벌처가 자신의 지역에서 싸우는데 커맨드로 회피하거나 심하게 사리는 이상한 행동을 하지 않도록 한다. 
-			Region rangedUnitRegion = BWTA.getRegion(rangedUnit.getPosition());
-			for (Region region : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
-				if (region == rangedUnitRegion) {
-					specialSquadType = 0;
-					break;
-				}
-			}
-		}
-
+		boolean haveToAttack = false;
+		
 		// rangedUnit, target 각각의 지상/공중 무기를 선택
 		WeaponType rangedUnitWeapon = target.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
-
-		// 무기 사정거리
-		double weaponUpgradeRange = 0;
-		if (rangedUnit.getType() == UnitType.Terran_Goliath && rangedUnitWeapon.targetsAir()) { // 골리앗 무기 업그레이드된 경우 사정거리++
-			weaponUpgradeRange += MicroSet.Upgrade.getUpgradeAdvantageAmount(UpgradeType.Charon_Boosters);
-		}
 		
-		// 1. 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
-		// 2. 카이팅
-		if (rangedUnitWeapon.maxRange() + weaponUpgradeRange <= targetWeapon.maxRange()) {
-			CommandUtil.attackUnit(rangedUnit, target);
+		// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
+		if (saveUnit && !MicroUtils.isSafePlace(rangedUnit)) {
+			haveToAttack = false;
+			
+		} else if (target.getType().isBuilding()
+				|| MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
+			haveToAttack = true;
 			
 		} else {
 			double distanceToTarget = rangedUnit.getDistance(target);
-			double distanceToAttack = distanceToTarget - (rangedUnitWeapon.maxRange() + weaponUpgradeRange); // 거리(pixel)
+			double distanceToAttack = distanceToTarget - MyBotModule.Broodwar.enemy().weaponMaxRange(rangedUnitWeapon); // 거리(pixel)
 			int timeToCatch = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
 			
 			// 명령에 대한 지연시간(latency)을 더한다.
 			timeToCatch += Network.LATENCY * 2; // 후퇴해야 하는 경우, 지연시간을 더하면 도망을 더 늦게갈 수도 있다. if (distanceToAttack > 0) // TODO 조절가능
-
+	
 			int currentCooldown = rangedUnit.isStartingAttack() ? rangedUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
 					: (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
 			
-			// 1. 공격
+			// [카이팅시 공격조건]
 			//  - 상대가 때리기 위해 거리를 좁혀야 할때(currentCooldown <= timeToCatch)
 			//  - 쿨타임이 되었을때 (cooltimeAlwaysAttack && currentCooldown) (파라미터로 설정가능)
-			//  - 타깃이 건물일 경우
-			// 2. 회피
-			//  - getFleePosition을 통해 최적의 회피지역을 선정하여 이동한다.
-			//  - watcher, checker인 경우는 안전하게 회피
-			boolean haveToAttack = false;
-			if (specialSquadType > 0 && distanceToTarget <= targetWeapon.maxRange() + target.getType().topSpeed() * 36) { // watcer 안전거리확보 : target.getType().topSpeed() * 36 (적이 1.5초 이동거리)
-				haveToAttack = false;
-			} else if (target.getType().isBuilding()) {
-				haveToAttack = true;
-			} else if (currentCooldown <= timeToCatch) {
+			if (currentCooldown <= timeToCatch) {
 				haveToAttack = true;
 			} else if (!survivalInstinct && cooltimeAlwaysAttack && currentCooldown == 0) {
 				haveToAttack = true;
 			}
+		}
+		
+		// 공격 또는 회피
+		if (haveToAttack) {
+			// TODO P컨이 잘안되어 사용하지 않는다.
+//			double rad = Math.atan2(vulture.getPosition().getY() - target.getPosition().getY()
+//					, vulture.getPosition().getX() - target.getPosition().getX());
+//			Position enemyFrontVec = new Position((int)(5 * Math.cos(rad)), (int)(5 * Math.sin(rad)));
+//			int pConX = target.getPosition().getX() + enemyFrontVec.getX();
+//			int pConY = target.getPosition().getY() + enemyFrontVec.getY();
+//			Position pConPos = new Position(pConX, pConY);
+//			CommandUtil.patrolMove(vulture, pConPos);
+			CommandUtil.attackUnit(rangedUnit, target);
 			
-			if (haveToAttack) {
-				// TODO P컨이 잘안되어 사용하지 않는다.
-//			    double rad = Math.atan2(vulture.getPosition().getY() - target.getPosition().getY()
-//			    		, vulture.getPosition().getX() - target.getPosition().getX());
-//			    Position enemyFrontVec = new Position((int)(5 * Math.cos(rad)), (int)(5 * Math.sin(rad)));
-//				int pConX = target.getPosition().getX() + enemyFrontVec.getX();
-//				int pConY = target.getPosition().getY() + enemyFrontVec.getY();
-//				Position pConPos = new Position(pConX, pConY);
-//				CommandUtil.patrolMove(vulture, pConPos);
-				CommandUtil.attackUnit(rangedUnit, target);
-				
-			} else {
-				double rangedUnitSpeed = rangedUnit.getType().topSpeed() * 24.0; // 1초(24frame)에 몇 pixel가는지
-				if (rangedUnit.getType() == UnitType.Terran_Vulture) {
-					rangedUnitSpeed += MicroSet.Upgrade.getUpgradeAdvantageAmount(UpgradeType.Ion_Thrusters);
-				}
-				
-				// 회피지역을 선정한다.
-				Position fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle);
-				if (specialSquadType == 1) { // watcher는 본진방향으로 후퇴한다.
-					fleePosition = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition();
-				}
-				
-				CommandUtil.rightClick(rangedUnit, fleePosition);
+		} else {
+			// 피가 거의 없거나, 근처에 아군이 거의 없으면(쿨타운시간동안 이동할수 있는 거리 * 0.8) 회피설정을 높힌다.
+			if (survivalInstinct || groundUnitFreeKiting(rangedUnit, (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8))) {
+				unitedKiting = false;
+				fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
 			}
+			double rangedUnitSpeed = rangedUnit.getType().topSpeed() * 24.0; // 1초(24frame)에 몇 pixel가는지
+			if (rangedUnit.getType() == UnitType.Terran_Vulture) {
+				rangedUnitSpeed += MicroSet.Upgrade.getUpgradeAdvantageAmount(UpgradeType.Ion_Thrusters);
+			}
+			
+			// getFleePosition을 통해 최적의 회피지역을 선정한다.
+			Position fleePosition = null;
+			if (saveUnit) {
+				double saveRadian = rangedUnit.getAngle(); // 유닛의 현재 각
+			    Position saveFleeVector = new Position((int)(rangedUnitSpeed * Math.cos(saveRadian)), (int)(rangedUnitSpeed * Math.sin(saveRadian))); // 이동벡터
+				Position saveMovePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX(), rangedUnit.getPosition().getY() + saveFleeVector.getY()); // 회피지점
+				Position saveMiddlePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX() / 2, rangedUnit.getPosition().getY() + saveFleeVector.getY() / 2); // 회피중간지점
+				int risk = riskOfFleePosition(rangedUnit.getType(), saveMovePosition, (int) rangedUnitSpeed, true); // 회피지점에서의 예상위험도
+				
+				// 본진찍고 회피하는 것이 안전한가?
+				if (risk < 10 && isValidGroundPosition(saveMovePosition) && saveMiddlePosition.isValid() && BWTA.getRegion(saveMiddlePosition) != null) {
+					fleePosition = goalPosition;
+				}
+			}
+			if (fleePosition == null) {
+				fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle);
+			}
+			CommandUtil.rightClick(rangedUnit, fleePosition);
 		}
 	}
 	
@@ -244,7 +314,7 @@ public class MicroUtils {
 		int reverseY = rangedUnit.getPosition().getY() - target.getPosition().getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 	    
-		Position safePosition = null;
+		Position safePosition = null; // 0.0 means the unit is facing east.
 		int minimumRisk = 99999;
 		int minimumDistanceToGoal = 99999;
 
@@ -269,9 +339,8 @@ public class MicroUtils {
 					safePosition =  movePosition;
 					minimumRisk = risk;
 					minimumDistanceToGoal = distanceToGoal;
-				} else { // 회피각 조절
-					fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 				}
+				fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
 //		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
@@ -452,26 +521,36 @@ public class MicroUtils {
 			return null;
 		}
 
-		int unitCount = units.size();
-		int x = 0;
-		int y = 0;
-		for (Unit unit : units) {
-			Position pos = unit.getPosition();
-			if (pos.isValid()) {
-				x += pos.getX();
-				y += pos.getY();
+		// 너무 멀리떨어진 유닛은 제외하고 다시 계산한다.
+		Position centerPosition = null;
+		for (int i = 0; i < 2; i++) {
+			int unitCount = 0;
+			int x = 0;
+			int y = 0;
+			for (Unit unit : units) {
+				if (centerPosition != null && unit.getDistance(centerPosition) > 1000) {
+					continue;
+				}
+				Position pos = unit.getPosition();
+				if (pos.isValid()) {
+					x += pos.getX();
+					y += pos.getY();
+					unitCount++;
+				}
+			}
+			if (unitCount > 0) {
+				centerPosition = new Position(x / unitCount, y / unitCount);
 			}
 		}
 		
-		Position centerPosition = new Position(x / unitCount, y / unitCount);
-		if (isValidGroundPosition(centerPosition)) {
-			return centerPosition;
-		} else {
+		
+		if (!isValidGroundPosition(centerPosition)) {
 			Position tempPosition = null;
 			for (int i = 0; i < 3; i++) {
 				tempPosition = randomPosition(centerPosition, 100);
 				if (isValidGroundPosition(tempPosition)) {
-					return tempPosition;
+					centerPosition = tempPosition;
+					break;
 				}
 			}
 		}

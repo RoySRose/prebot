@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import bwapi.Color;
 import bwapi.Unit;
 import bwapi.UnitType;
 import pre.main.MyBotModule;
@@ -68,6 +67,7 @@ public class UnitData {
 
 		UnitInfo ui = unitAndUnitInfoMap.get(unit.getID());
 		ui.setUnit(unit);
+		ui.setUpdateFrame(MyBotModule.Broodwar.getFrameCount());
 		ui.setPlayer(unit.getPlayer());
 		ui.setLastPosition(unit.getPosition());
 		ui.setLastHealth(unit.getHitPoints());

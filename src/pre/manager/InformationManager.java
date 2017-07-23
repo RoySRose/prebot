@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import bwapi.Player;
 import bwapi.Position;
@@ -22,6 +21,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
 import pre.UnitData;
 import pre.UnitInfo;
@@ -131,7 +131,7 @@ public class InformationManager {
 	public void update() {
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
 		}
@@ -209,7 +209,14 @@ public class InformationManager {
 
 
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
-	public void getNearbyForce(Vector<UnitInfo> unitInfo, Position p, Player player, int radius) {
+	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
+		List<UnitInfo> addUnitInfo = getNearbyForce(p, player, radius);
+		unitInfo.addAll(addUnitInfo);
+	}
+	
+	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
+	public List<UnitInfo> getNearbyForce(Position p, Player player, int radius) {
+		List<UnitInfo> unitInfo = new ArrayList<>();
 		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
 
 		// for each unit we know about for that player
@@ -239,6 +246,7 @@ public class InformationManager {
 				unitInfo.add(ui);
 			}
 		}
+		return unitInfo;
 	}
 
 	/// 해당 Player (아군 or 적군) 의 해당 UnitType 유닛 숫자를 리턴합니다 (훈련/건설 중인 유닛 숫자까지 포함)
@@ -321,15 +329,21 @@ public class InformationManager {
 			}
 		}
 
-		// enemy의 mainBaseLocations을 발견한 후, 그곳에 있는 건물을 모두 파괴한 경우
-		// _occupiedBaseLocations 중에서 _mainBaseLocations 를 선정한다
 		if (mainBaseLocations.get(enemyPlayer) != null) {
-			if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(enemyPlayer).getTilePosition()), enemyPlayer) == false) {
-				for (BaseLocation location : occupiedBaseLocations.get(enemyPlayer)) {
-					if (existsPlayerBuildingInRegion(BWTA.getRegion(location.getTilePosition()),enemyPlayer)) {
-						mainBaseLocations.put(enemyPlayer, location);
-						mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));				
-						break;
+			
+			// 적 MainBaseLocation 업데이트 로직 버그 수정
+			// 적군의 빠른 앞마당 건물 건설 + 아군의 가장 마지막 정찰 방문의 경우, 
+			// enemy의 mainBaseLocations를 방문안한 상태에서는 건물이 하나도 없다고 판단하여 mainBaseLocation 을 변경하는 현상이 발생해서
+			// enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.  
+			if (MyBotModule.Broodwar.isExplored(mainBaseLocations.get(enemyPlayer).getTilePosition())) {
+		
+				if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(enemyPlayer).getTilePosition()), enemyPlayer) == false) {
+					for (BaseLocation loaction : occupiedBaseLocations.get(enemyPlayer)) {
+						if (existsPlayerBuildingInRegion(BWTA.getRegion(loaction.getTilePosition()),enemyPlayer)) {
+							mainBaseLocations.put(enemyPlayer, loaction);
+							mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));				
+							break;
+						}
 					}
 				}
 			}
@@ -490,18 +504,10 @@ public class InformationManager {
 	public BaseLocation getNextExpansionLocation() {
 		
 		BaseLocation res = null;
-		
-//		long startTime = 0;
-//		startTime = System.currentTimeMillis();
 	
 		if (mainBaseLocations.get(selfPlayer) != null && firstExpansionLocation.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
 			BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
 			BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
-			
-//			long currentTime = System.currentTimeMillis();
-//			System.out.println("###start" + " : " + (currentTime - startTime) + " millisec");
-//			startTime = currentTime;
-//			int num = 1;
 			
 			double tempDistance;
 			double sourceDistance;
@@ -518,12 +524,13 @@ public class InformationManager {
 				if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
 				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
 				
-//				currentTime = System.currentTimeMillis();
-//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
-//				startTime = currentTime;
+				TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
+				if(findGeyser != null){
+					if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
+						continue;
+					}
+				}
 				
-//				sourceDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
-//				tempDistance = sourceDistance - BWTA.getGroundDistance(enemyBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
 				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
 				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
 				
@@ -531,15 +538,29 @@ public class InformationManager {
 					closestDistance = tempDistance;
 					res = targetBaseLocation;
 				}
-//				currentTime = System.currentTimeMillis();
-//				System.out.println("###" + num + " : " + (currentTime - startTime) + " millisec");
-//				startTime = currentTime;
-//				num++;
 			}
 			
-//			currentTime = System.currentTimeMillis();
-//			System.out.println("###end" + " : " + (currentTime - startTime) + " millisec");
-//			startTime = currentTime;			
+			if(res ==null){
+				for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+				{
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+					if (firstExpansionLocation.get(enemyPlayer) != null){
+						if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition())) continue;
+					}
+					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
+					
+					sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+					tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+					
+					if (tempDistance < closestDistance && sourceDistance > 0) {
+						closestDistance = tempDistance;
+						res = targetBaseLocation;
+					}
+				}
+			}
 		}
 		return res;
 	}

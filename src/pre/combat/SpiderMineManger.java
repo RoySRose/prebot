@@ -14,6 +14,7 @@ import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
+import pre.util.CommonUtils;
 import pre.util.MicroSet;
 import pre.util.MicroUtils;
 
@@ -32,11 +33,49 @@ public class SpiderMineManger {
 		return instance;
 	}
 	
+	// TODO goodPositions 단계적으로 변화. ex) 초반에는 세번째, 네번째 멀티, 그 후에는 점차 증가 
+	public void init() {
+		if (!MicroSet.Upgrade.hasResearched(TechType.Spider_Mines)) {
+			return;
+		}
+
+		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
+//		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+		
+		Position enemyReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
+		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+//		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+//		Position center = new Position(2048, 2048); // 128x128 맵의 센터
+//		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer); // region이 좋음
+		
+		if (!otherBases.isEmpty() && enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
+			mineReservedMap = new HashMap<>();
+			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
+			
+			// 3rd 멀티지역
+			for (BaseLocation base : otherBases) {
+				goodPositions.add(base.getPosition());
+			}
+			
+			// 공격준비지역
+//			goodPositions.add(myReadyToAttackPos);
+			goodPositions.add(enemyReadyToAttackPos);
+			goodPositions.add(enemyFirstExpansion.getPosition());
+//			goodPositions.add(enemyFirstChoke.getCenter());
+			goodPositions.add(enemySecondChoke.getCenter());
+			
+			initialized = true;
+		}
+	}
+	
 	public void update() {
 		if (!initialized) {
 			init();
 			return;
 		}
+		
+		// 1. 만료 매설 만료시간 관리 
 		List<Integer> expiredList = new ArrayList<>();
 		for (Integer unitId : mineReservedMap.keySet()) {
 			MineReserved mineReserved = mineReservedMap.get(unitId);
@@ -46,10 +85,23 @@ public class SpiderMineManger {
 			}
 //			MyBotModule.Broodwar.drawCircleScreen(mineReserved.positionToMine, 100, Color.White);
 		}
-		
 		for (Integer unitId : expiredList) {
 			mineReservedMap.remove(unitId);
 		}
+		
+		
+		// 2. 벌처 정책 조정(각 주요 포인트 매설 마인수, checker수)
+		if (CommonUtils.executeOncePerFrame(48, 0)) {
+			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
+			
+			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 10 + 1;
+
+//			MicroSet.Vulture.maxNumWatcher = 50;
+//			MicroSet.Vulture.maxNumCheckerSquad = 1;
+			MicroSet.Vulture.maxNumChecker = vultureCount / 4; // 3대1 비율이다.
+//			System.out.println("vultureCount / maxNumChecker : " + vultureCount + " / " + MicroSet.Vulture.maxNumChecker);
+		}
+		
 	}
 
 	public Position getPositionReserved(Unit vulture) {
@@ -64,44 +116,7 @@ public class SpiderMineManger {
 		}
 	}
 	
-	
-	public void init() {
-		if (!MicroSet.Upgrade.hasResearched(TechType.Spider_Mines)) {
-			return;
-		}
-
-		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
-		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-		
-		Position enemyReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
-		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-		Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-//		Position center = new Position(2048, 2048); // 128x128 맵의 센터
-//		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer); // region이 좋음
-		
-		if (!otherBases.isEmpty() && myReadyToAttackPos != null && enemyReadyToAttackPos != null
-				&& enemyFirstExpansion != null && enemyFirstChoke != null && enemySecondChoke != null) {
-			mineReservedMap = new HashMap<>();
-			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
-			
-			// 3rd 멀티지역
-			for (BaseLocation base : otherBases) {
-				goodPositions.add(base.getPosition());
-			}
-			
-			// 공격준비지역
-			goodPositions.add(myReadyToAttackPos);
-			goodPositions.add(enemyReadyToAttackPos);
-			goodPositions.add(enemyFirstExpansion.getPosition());
-			goodPositions.add(enemyFirstChoke.getCenter());
-			goodPositions.add(enemySecondChoke.getCenter());
-			
-			initialized = true;
-		}
-	}
-	
-	public Position getGoodPositionToMine(Unit vulture) {
+	public Position goodPositionToMine(Unit vulture, int mineNumberPerPosition) {
 		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
 			return null;
 		}
@@ -111,7 +126,7 @@ public class SpiderMineManger {
 		Position nearestGoodPosition = null;
 		for (Position position : goodPositions) {
 			int distance = vulture.getDistance(position);
-			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS) {
+			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position, true)) {
 				nearestDistance = distance;
 				nearestGoodPosition = position;
 			}
@@ -122,21 +137,22 @@ public class SpiderMineManger {
 			return null;
 		}
 		
-		return getPositionToMine(vulture, nearestGoodPosition, true, MicroSet.Vulture.mineNumPerPosition);
+		return positionToMine(vulture, nearestGoodPosition, true, mineNumberPerPosition);
 	}
 	
-	public Position getPositionToMine(Unit vulture, Position position, boolean exactOneEssential, int mineNumberPerPosition) {
+	public Position positionToMine(Unit vulture, Position position, boolean exactOneEssential, int mineNumberPerPosition) {
 		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
 			return null;
 		}
 		
-		// 거의 정확한 position에 마인이 매설되어 있는지 체크한다. 없으면 무조건 매설(확장 방해를 위해 정확한 위치에 하나는 있어야 한다.)
+		// 거의 정확한 position에 마인이 매설되어 있는지 체크한다.
+		// 없으면 무조건 매설 (확장 체크 및 방해 용도로 정확한 위치에 하나가 매설되어야 한다.)
 		if (exactOneEssential) {
 			List<Unit> spiderMinesInExactRadius = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine);
 			if (spiderMinesInExactRadius.size() == 0) {
 				for (int i = 0; i < 3; i++) {
 					Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_EXACT_RADIUS);
-					if (noProblemToMine(minePosition)) { // 문제없다면 없다면 매설
+					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
 						mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 						return minePosition;
 					}
@@ -149,7 +165,7 @@ public class SpiderMineManger {
 		if (spiderMinesInSpreadRadius.size() + numOfMineReserved(position, MicroSet.Vulture.MINE_SPREAD_RADIUS) < mineNumberPerPosition) {
 			for (int i = 0; i < 3; i++) {
 				Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_SPREAD_RADIUS);
-				if (noProblemToMine(minePosition)) {
+				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
 					mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 					return minePosition;
 				}
@@ -159,16 +175,19 @@ public class SpiderMineManger {
 	}
 	
 	private boolean noProblemToMine(Position position) {
+		// 아미 가까운 곳에 마인 매설이예약되었다.
 		for (MineReserved mineReserved : mineReservedMap.values()) {
 			if (position.getDistance(mineReserved.positionToMine) <= MicroSet.Vulture.MINE_BETWEEN_DIST) {
 				return false;
 			}
 		}
 		
+		// 마인을 심을 수 있는 장소가 아니다.
 		if (!MicroUtils.isValidGroundPosition(position)) {
 			return false;
 		}
 		
+		// 해당 지역에 마인이 매설되어 있다.
 		if (MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, true, UnitType.Terran_Vulture_Spider_Mine).size() > 0) {
 			return false;
 		}

@@ -1,5 +1,6 @@
 package pre.combat.micro;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -12,7 +13,9 @@ import bwta.Region;
 import pre.MapGrid;
 import pre.combat.SpiderMineManger;
 import pre.combat.SquadOrder.SquadOrderType;
+import pre.combat.VultureTravelManager;
 import pre.manager.InformationManager;
+import pre.util.CombatExpectation;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
 import pre.util.MicroSet;
@@ -27,99 +30,108 @@ public class MicroVulture extends MicroManager {
 	    List<Unit> vultures = getUnits();
 		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
 		
-		KitingOption kitingOption = new KitingOption();
-		
-		if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) { // 한타 설정
-			kitingOption.setCooltimeAlwaysAttack(true);
-			kitingOption.setUnitedKiting(true);
-			kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
-			kitingOption.setGoalPosition(squadCenter);
-			
-		} else if (order.getType() == SquadOrderType.WATCH) { // 회피가 아주 좋은 설정(상대병력 감시용 - watcher : 회피를 자신의 base로 한다)
-			kitingOption.setCooltimeAlwaysAttack(false);
-			kitingOption.setUnitedKiting(false);
-			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
-			kitingOption.setGoalPosition(order.getPosition());
-			kitingOption.setSpecialSquadType(1);
-			
-		} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) { // 회피가 아주 좋은 설정(정찰견제용 - checker)
-			kitingOption.setCooltimeAlwaysAttack(false);
-			kitingOption.setUnitedKiting(false);
-			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
-			kitingOption.setGoalPosition(order.getPosition());
-			kitingOption.setSpecialSquadType(2);
-			
-		} else { // 회피가 좋은 설정
-			kitingOption.setCooltimeAlwaysAttack(false);
-			kitingOption.setUnitedKiting(false);
-			kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
-			kitingOption.setGoalPosition(order.getPosition());
-		}
+		final boolean cooltimeAlwaysAttack = false;
+		final boolean unitedKiting = false;
+		final Integer[] fleeAngle = FleeAngle.WIDE_ANGLE;
+		final Position retreatPosition = order.getType() == SquadOrderType.WATCH ?
+				InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition() : order.getPosition();
+		final boolean saveUnit = CombatExpectation.expectVultureVictory(vultures, targets) ? false : true; // 싸우면 걍 이기는 각인지
 
 		for (Unit vulture : vultures) {
-//			if (order.getType() == SquadOrderType.BATTLE && awayFromChokePoint(vulture)) {
-//				continue;
-//			}
-//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(vulture)) {
-//				continue;
-//			}
+			
+			// 마인매설이 예약된 벌처라면 매설실행
 			Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
-			if (positionToMine != null) { // 마인매설
+			if (positionToMine != null) {
 				CommandUtil.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
 				continue;
 			}
-			
+
 			Unit target = getTarget(vulture, vultureTargets);
+			
 			if (target != null) {
-				// 탱크 중심의 부대는 탱크 중심으로 뭉쳐야 한다.
-				if (order.getType() == SquadOrderType.ATTACK || order.getType() == SquadOrderType.CHECK_INACTIVE) {
-//					System.out.println("where is siege tank");
-					if (tankSize >= MicroSet.Common.TANK_SQUAD_SIZE) {
-						List<Unit> tankMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Tank_Mode);
-						List<Unit> seigeMode = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, UnitType.Terran_Siege_Tank_Siege_Mode);
-						
-						if (tankMode.isEmpty() && seigeMode.isEmpty()) {
-							kitingOption.setCooltimeAlwaysAttack(false);
-							kitingOption.setUnitedKiting(false);
-							kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
-							kitingOption.setGoalPosition(squadCenter);
-//							System.out.println("no siege here");
-						} else {
-//							System.out.println("fight with siege");
+				KitingOption kitingOption = new KitingOption(cooltimeAlwaysAttack, unitedKiting, retreatPosition, fleeAngle, saveUnit);
+				
+				List<Unit> nearTanks = new ArrayList<>();
+				List<Unit> nearGoliaths = new ArrayList<>();
+				List<Unit> nearVultures = new ArrayList<>();
+				List<Unit> units = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, null);
+				for (Unit unit : units) {
+					if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+						nearTanks.add(unit);
+					} else if (unit.getType() == UnitType.Terran_Goliath) {
+						nearGoliaths.add(unit);
+					} else if (unit.getType() == UnitType.Terran_Vulture) {
+						nearVultures.add(unit);
+					}
+				}
+				Position centerPosition = null;
+				if (!nearTanks.isEmpty()) {
+					centerPosition = MicroUtils.centerOfUnits(nearTanks);
+				} else if (!nearGoliaths.isEmpty()) {
+					centerPosition = MicroUtils.centerOfUnits(nearGoliaths);
+				}
+				
+				// 탱크, 골리앗이 근처에 있으면 쿨타임이 돌아올때 무조건 때린다.
+				// TODO 예외케이스 확인 필요 (초반 질럿 다수 등)
+				if (centerPosition != null) {
+					kitingOption.setSaveUnit(false);
+					kitingOption.setCooltimeAlwaysAttack(true);
+					kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+					kitingOption.setGoalPosition(centerPosition);
+				} else {
+					// 자신이 차지한 지역에서는 적극적으로 싸워야 한다.
+					Region region = BWTA.getRegion(vulture.getPosition());
+					for (Region occupied : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
+						if (region == occupied) {
+							kitingOption.setSaveUnit(false);
+							break;
 						}
 					}
 				}
+
 				MicroUtils.preciseKiting(vulture, target, kitingOption);
 				
 			} else {
+				// 1. 마인매설 위치 체크
+				int spiderMineNumPerPosition = MicroSet.Vulture.spiderMineNumPerPosition;
+				if (order.getType() == SquadOrderType.GUERILLA) {
+					spiderMineNumPerPosition *= 2;
+				}
+				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, spiderMineNumPerPosition);
 				if (order.getType() == SquadOrderType.WATCH) {
-					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
-					if (position == null) {
+					if (minePosition == null) {
 						BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-						Region baseRegion = BWTA.getRegion(base.getPosition());
-						Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-						
-						if (baseRegion != vultureRegion) {
-							position = SpiderMineManger.Instance().getPositionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.mineNumPerPosition);
+						if (BWTA.getRegion(base.getPosition()) != BWTA.getRegion(vulture.getPosition())) {
+							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, spiderMineNumPerPosition);
 						}
 					}
-					if (position != null) {
-						continue;
+				}
+				if (minePosition != null) { // 매설할 마인이 있다면 종료
+					continue;
+				}
+				
+				// 2. 근처 적이 없을 때의, 이동지역 설정
+				// watcher : 목표지역(적base)으로 이동. 앞에 보이지 않는 적이 있으면 본진base로 후퇴.
+				// checker : 각각의 목표지역(travelBase)으로 이동.
+				Position movePosition = order.getPosition();
+				if (order.getType() == SquadOrderType.WATCH) { // watcher 보이지 않는 적에 대한 후퇴.
+					if (!MicroUtils.isSafePlace(vulture)) {
+						movePosition = retreatPosition;
 					}
-					
-				} else if (order.getType() == SquadOrderType.CHECK_ACTIVE) {
-					Position position = SpiderMineManger.Instance().getGoodPositionToMine(vulture);
-					if (position != null) {
-						continue;
+				} else if (order.getType() == SquadOrderType.CHECK) { // checker 벌처들은 각각의 orderPosition을 가진다.
+					BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+					if (travelBase != null) {
+						movePosition = travelBase.getPosition();
 					}
 				}
 				
-				if (vulture.getDistance(order.getPosition()) > squadRange) {
-					CommandUtil.attackMove(vulture, order.getPosition());
+				// 이동지역까지 attackMove로 간다.
+				if (vulture.getDistance(movePosition) > squadRange) {
+					CommandUtil.attackMove(vulture, movePosition);
 					
 				} else { // 목적지 도착
 					if (vulture.isIdle() || vulture.isBraking()) {
-						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange);
+						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange / 2);
 						CommandUtil.attackMove(vulture, randomPosition);
 					}
 				}
@@ -132,6 +144,8 @@ public class MicroVulture extends MicroManager {
 		int bestTargetScore = -999999;
 
 		for (Unit target : targets) {
+			if (!target.isDetected()) continue;
+			
 			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
 			
 			int distanceScore = 0; // 거리 점수
@@ -172,40 +186,4 @@ public class MicroVulture extends MicroManager {
 		
 		return bestTarget;
 	}
-	
-//	private Position findPositionToMine(Unit vulture) {
-//		if (vulture.getSpiderMineCount() <= 0) {
-//			return null;
-//		}
-//		
-//		Position positionToMine = null;
-//
-//		BaseLocation nearestBase = BWTA.getNearestBaseLocation(vulture.getPosition());
-//		if (vulture.getDistance(nearestBase.getPosition()) < 500) {
-//			boolean nearestBaseOccupied = false;	
-//			for (BaseLocation base : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-//				if (base.equals(nearestBase)) {
-//					nearestBaseOccupied = true;
-//					break;
-//				}
-//			}
-//			
-//			if (!nearestBaseOccupied) {
-//				int x = nearestBase.getPosition().getX() + (int)(Math.random() % 20);
-//				int y = nearestBase.getPosition().getY() + (int)(Math.random() % 20);
-//				positionToMine = new Position(x, y);
-//				
-//				List<Unit> mines = MapGrid.Instance().getUnitsNear(positionToMine, 50, true, false, UnitType.Terran_Vulture_Spider_Mine);
-//				if (mines.size() < 3) {
-//					return positionToMine;
-//				}
-//			}
-//		}
-//		
-//		
-//		int x = vulture.getX() / 10 * 10;
-//		int y = vulture.getY() / 10 * 10;
-//		positionToMine = new Position (x, y);
-//		return positionToMine;
-//	}
 }

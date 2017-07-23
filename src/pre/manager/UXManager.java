@@ -30,6 +30,7 @@ import pre.UnitInfo;
 import pre.WorkerData;
 import pre.ConstructionTask.ConstructionStatus;
 import pre.main.MyBotModule;
+import pre.manager.StrategyManager.StrategysException;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
@@ -86,12 +87,12 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(5, 60);
+			drawBuildOrderQueueOnScreen(5, 75);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
 		if (Config.DrawProductionInfo) {
-			drawBuildStatusOnScreen(120, 60);
+			//drawBuildStatusOnScreen(120, 60);
 		}
 
 		// 건물 건설 큐. 건물 건설 상황
@@ -143,25 +144,49 @@ public class UXManager {
 			int mouseX = MyBotModule.Broodwar.getMousePosition().getX() + MyBotModule.Broodwar.getScreenPosition().getX();
 			int mouseY = MyBotModule.Broodwar.getMousePosition().getY() + MyBotModule.Broodwar.getScreenPosition().getY();
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/Config.TILE_SIZE) + ", " +  (int)(mouseY/Config.TILE_SIZE) + ")");
+			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int)(mouseX) + ", " +  (int)(mouseY) + ")");
 		}
 
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
 	public void drawGameInformationOnScreen(int x, int y) {
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Players : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 50, y, MyBotModule.Broodwar.self().getTextColor() + MyBotModule.Broodwar.self().getName() + "(" + InformationManager.Instance().selfRace + ") " + white + " vs.  " + 
-				InformationManager.Instance().enemyPlayer.getTextColor() + InformationManager.Instance().enemyPlayer.getName() + "(" + InformationManager.Instance().enemyRace + ")");
-		y += 12;
-
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Map : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 50, y, white + MyBotModule.Broodwar.mapFileName() + " (" + MyBotModule.Broodwar.mapWidth() + " x " +  MyBotModule.Broodwar.mapHeight() + " size)");
-		MyBotModule.Broodwar.setTextSize();
-		y += 12;
+//		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Players : ");
+//		MyBotModule.Broodwar.drawTextScreen(x + 50, y, MyBotModule.Broodwar.self().getTextColor() + MyBotModule.Broodwar.self().getName() + "(" + InformationManager.Instance().selfRace + ") " + white + " vs.  " + 
+//				InformationManager.Instance().enemyPlayer.getTextColor() + InformationManager.Instance().enemyPlayer.getName() + "(" + InformationManager.Instance().enemyRace + ")");
+//		y += 12;
+//
+//		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Map : ");
+//		MyBotModule.Broodwar.drawTextScreen(x + 50, y, white + MyBotModule.Broodwar.mapFileName() + " (" + MyBotModule.Broodwar.mapWidth() + " x " +  MyBotModule.Broodwar.mapHeight() + " size)");
+//		MyBotModule.Broodwar.setTextSize();
+//		y += 12;
 
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Time : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
 		MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
+		y += 11;
+		
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + (StrategyManager.Instance().getCurrentStrategyException()== StrategysException.Init ? StrategyManager.Instance().getCurrentStrategyBasic() : "X")
+				+" <-- "+ StrategyManager.Instance().LastCurrentStrategyBasic);
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current EXStrategy : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().LastCurrentStrategyException );
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().GRIDpoint);
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
+		y += 11;
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다

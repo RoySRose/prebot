@@ -10,6 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import pre.MapGrid;
 import pre.UnitData;
 import pre.UnitInfo;
 import pre.combat.SquadOrder.SquadOrderType;
@@ -91,22 +92,35 @@ public class Squad {
 		// TODO 1. 로템 센터 지형물 등에 낑기어 탱크자체가 분산되는 현상
 		// TODO 2. 골리앗 중심 부대에도 문제가 없는지 확인 필요
 		List<Unit> tanks = microTank.getUnits();
-		Position centerOfTanks = null;
+		Position centerOfUnits = null;
 		int squadAreaRange = 0;
 		if (tanks.size() >= MicroSet.Common.TANK_SQUAD_SIZE) {
-			centerOfTanks = MicroUtils.centerOfUnits(tanks);
+			centerOfUnits = MicroUtils.centerOfUnits(tanks);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Siege_Tank_Tank_Mode, unitSet.size());
 		} else {
-			centerOfTanks = MicroUtils.centerOfUnits(unitSet);
+			centerOfUnits = MicroUtils.centerOfUnits(unitSet);
 			squadAreaRange = MicroUtils.calcArriveDecisionRange(UnitType.Terran_Vulture, unitSet.size()); // 유닛별 시야 : SCV:224, 저글링:160, 벌처:256, 탱크:320, 배틀크루져:352
 		}
-		microScv.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microMarine.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microVulture.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microTank.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microGoliath.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microWraith.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
-		microVessel.setMicroInformation(order, centerOfTanks, squadAreaRange, tanks.size());
+		
+		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
+		List<Unit> nearbyEnemies = new ArrayList<>();
+		if (order.getType() == SquadOrderType.DEFEND) {
+//			InformationManager.Instance().getNearbyForce(unitInfoList, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
+			MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
+		} else {
+			for (Unit unit : unitSet) {
+//				InformationManager.Instance().getNearbyForce(unitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, unit.getType().sightRange() + 500);
+				MapGrid.Instance().getUnitsNear(nearbyEnemies, unit.getPosition(), unit.getType().sightRange() + 500, false, true);
+			}
+		}
+		
+		microScv.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microMarine.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microVulture.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microTank.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microGoliath.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microWraith.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
+		microVessel.setMicroInformation(order, nearbyEnemies, centerOfUnits, squadAreaRange, tanks.size());
 		
 		microScv.execute();
 		microMarine.execute();
@@ -200,7 +214,7 @@ public class Squad {
 		microTank.setUnits(tankUnits);
 		microGoliath.setUnits(goliathUnits);
 		microWraith.setUnits(wraithUnits);
-		microVessel.setUnits(tankUnits);
+		microVessel.setUnits(vesselUnits);
 		
 	}
 	

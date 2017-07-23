@@ -351,9 +351,8 @@ public class WorkerManager {
 	public Unit getClosestMineralWorkerTo(Position target)
 	{
 		Unit closestUnit = null;
-//		double closestDist = 100000; //1.0
-		double closestDist = 100000000; //1.1
-		
+		double closestDist = 100000000;
+
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit.isCompleted()
@@ -378,17 +377,16 @@ public class WorkerManager {
 
 	public Unit getClosestResourceDepotFromWorker(Unit worker)
 	{
-	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
-	// 멀티 기지간 일꾼 숫자 리밸런싱이 잘 일어나도록 버그 수정
+		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
+		// 멀티 기지간 일꾼 숫자 리밸런싱이 잘 일어나도록 버그 수정
 		if (worker == null) return null;
 
 		Unit closestDepot = null;
 		double closestDistance = 1000000000;
-		
+
 		// 완성된, 공중에 떠있지 않고 땅에 정착해있는, ResourceDepot 혹은 Lair 나 Hive로 변형중인 Hatchery 중에서
 		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
 		// 둘째로 가까운 곳을 찾는다
-
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
@@ -493,7 +491,6 @@ public class WorkerManager {
 		if (refinery == null) return null;
 
 		Unit closestWorker = null;
-		//double closestDistance = 0;
 		double closestDistance = 100000000;
 
 		for (Unit unit : workerData.getWorkers())
@@ -531,11 +528,8 @@ public class WorkerManager {
 		// variables to hold the closest worker of each type to the building
 		Unit closestMovingWorker = null;
 		Unit closestMiningWorker = null;
-		//double closestMovingWorkerDistance = 0;
-		//double closestMiningWorkerDistance = 0;
 		double closestMovingWorkerDistance = 100000000;
-		double closestMiningWorkerDistance = 100000000; 
-
+		double closestMiningWorkerDistance = 100000000;
 
 		// look through each worker that had moved there first
 		for (Unit unit : workerData.getWorkers())
@@ -630,9 +624,7 @@ public class WorkerManager {
 	{
 		// set up the pointer
 		Unit closestWorker = null;
-//		double closestDistance = 0;
 		double closestDistance = 100000000;
-
 
 		// for each worker we currently have
 		for (Unit unit : workerData.getWorkers())
@@ -663,7 +655,6 @@ public class WorkerManager {
 	{
 		// set up the pointer
 		Unit closestWorker = null;
-//		double closestDistance = 0;
 		double closestDistance = 100000000;
 
 		// for each worker we currently have
@@ -754,7 +745,7 @@ public class WorkerManager {
 	public void onUnitMorph(Unit unit)
 	{
 		if (unit == null) return;
-		// if something morphs into a building, it was a worker (Zerg Drone)
+
 		if (unit.getType().isBuilding() && unit.getPlayer() == MyBotModule.Broodwar.self() && unit.getPlayer().getRace() == Race.Zerg)
 		{
 			// 해당 worker 를 workerData 에서 삭제한다
@@ -763,6 +754,7 @@ public class WorkerManager {
 		}
 	}
 
+	/*
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트합니다
 	public void onUnitShow(Unit unit)
 	{
@@ -784,7 +776,6 @@ public class WorkerManager {
 		{
 			rebalanceWorkers();
 		}
-
 	}
 	
 	// onUnitComplete 메소드 추가
@@ -836,6 +827,7 @@ public class WorkerManager {
 	}
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트합니다
+
 	public void onUnitDestroy(Unit unit) 
 	{
 		if (unit == null) return;

@@ -42,7 +42,7 @@ public class MicroGoliath extends MicroManager {
 					CommandUtil.attackMove(goliath, order.getPosition());
 				} else {
 					if (goliath.isIdle()) {
-						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), squadRange);
+						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), squadRange / 2);
 						CommandUtil.attackMove(goliath, randomPosition);
 					}
 				}
@@ -116,6 +116,8 @@ public class MicroGoliath extends MicroManager {
 		int bestTargetScore = -999999;
 
 		for (Unit target : targets) {
+			if (!target.isDetected()) continue;
+			
 			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
 			int distanceScore = 0; // 거리 점수
 			int hitPointScore = 0; // HP 점수

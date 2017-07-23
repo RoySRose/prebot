@@ -19,21 +19,15 @@ public class MicroSet {
 //	}
 	
 	public static class Vulture {
-		// TODO 변동 값
-		public static int mineNumPerPosition = 1;
-		
-	    public static int maxNumWatcher = 3; 
-		public static int maxNumChecker = 1;
-		public static int maxNumCheckerSquad = 1;
+		public static final int GEURILLA_RADIUS = 400;
+		public static final int GEURILLA_EXTRA_POWER = 150;
+		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 30초
+		public static final int CHECKER_INTERVAL_FRAME = 40 * 24; // 40초
 
-		public static int assignedFrame = 30 * 24; // 30초
-		public static int visitFrame = 45 * 24; // 45초
-		
-		public static String getCheckerSquadPostFix() {
-			return "[" + String.valueOf(postFixNum++) + "]";
-		}
-		private static int postFixNum = 0; // TODO 이거 수정필요
-		
+		// TODO 변동 값
+	    public static int maxNumWatcher = 50;
+		public static int maxNumChecker = 0;
+		public static int spiderMineNumPerPosition = 1;
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;
@@ -43,14 +37,30 @@ public class MicroSet {
 		public static final int RESV_EXPIRE_FRAME = 24 * 3;
 	}
 	
+	public static class Tank {
+		public static final int SIEGE_MODE_MIN_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+		public static final int SIEGE_MODE_MAX_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
+		public static final int TANK_MODE_RANGE = UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange();
+
+		public static final int SIEGE_MODE_INNER_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().innerSplashRadius();
+		public static final int SIEGE_MODE_MEDIAN_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().medianSplashRadius();
+		public static final int SIEGE_MODE_OUTER_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().outerSplashRadius();
+		
+		public static final int SIEGE_LINK_DISTANCE = 300;
+		public static final int SIEGE_ARRANGE_DISTANCE = 150;
+		public static final int INITIATE_SIZE = 1;
+	}
+	
 	public static class Common {
+		public static final double DEF_TOWER_BACKOFF_DIST = 200.0;
+		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int TANK_COVERAGE = 100;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 	}
 	
 	public static class Network {
-		public static final int LATENCY = MyBotModule.Broodwar.getLatency();
+		public static final int LATENCY = MyBotModule.Broodwar.getLatency(); // LAN (UDP) : 5
 	}
 	
 	public static class Upgrade {
@@ -126,6 +136,7 @@ public class MicroSet {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, NARROW_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Goliath, NARROW_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Wraith, WIDE_ANGLE);
+			FLEE_ANGLE_MAP.put(UnitType.Terran_Science_Vessel, NARROW_ANGLE);
 		}
 	}
 	

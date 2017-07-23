@@ -220,6 +220,39 @@ public class CommandUtil {
 		unit.useTech(tech, position);
 	}
 
+	public static void useTechTarget(Unit unit, TechType tech, Unit target)
+	{
+		if (unit == null || tech == null || target == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || unit.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		
+//		if(currentCommand.getTarget() != null && currentCommand.getUnitCommandType() == UnitCommandType.Use_Tech_Unit){
+//			System.out.println(currentCommand.getTarget().getID());
+//			System.out.println(target.getID());
+//			System.out.println(currentCommand.getTarget());
+//			System.out.println(target);
+//		}
+		
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Use_Tech_Unit) && (currentCommand.getTarget().getID() == target.getID()))//TODO getunitcommand 가 move 일때 gettarget.getid 가 fatal error 난다 위에 주석 참고
+		{
+			return;
+		}
+
+		unit.useTech(tech, target);
+	}
+	
 	public static boolean IsCombatUnit(Unit unit)
 	{
 		if (unit == null)

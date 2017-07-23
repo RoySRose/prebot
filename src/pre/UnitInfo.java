@@ -16,6 +16,7 @@ public class UnitInfo {
 	private Position lastPosition;
 	private UnitType type;
 	private boolean completed;
+	private int updateFrame;
 
 	public UnitInfo()
 	{
@@ -26,6 +27,7 @@ public class UnitInfo {
 		lastPosition = Position.None;
 		type = UnitType.None;
 		completed = false;
+		updateFrame = 0;
 	}
 
 	public UnitType getType() {
@@ -92,6 +94,14 @@ public class UnitInfo {
 		this.completed = completed;
 	}
 	
+	public int getUpdateFrame() {
+		return updateFrame;
+	}
+
+	public void setUpdateFrame(int updateFrame) {
+		this.updateFrame = updateFrame;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -103,6 +113,13 @@ public class UnitInfo {
 
         return true;
     }
+
+	@Override
+	public String toString() {
+		return "UnitInfo [unitID=" + unitID + ", lastHealth=" + lastHealth + ", lastShields=" + lastShields
+				+ ", player=" + player + ", unit=" + unit + ", lastPosition=" + lastPosition + ", type=" + type
+				+ ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
+	}
 
 	
 //		const bool operator == (BWAPI::Unit unit) const

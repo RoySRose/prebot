@@ -1,25 +1,35 @@
 package pre.combat;
 
 import bwapi.Position;
+import bwapi.Unit;
 
 public class SquadOrder {
 	
 	// ATTACK <-> BATTLE 스위칭 관계, 전투중인 경우 상태가 BATTLE로 바뀐다.
 	public enum SquadOrderType {
-		NONE, IDLE, WATCH, ATTACK, DEFEND, HOLD,
-		CHECK_INACTIVE, CHECK_ACTIVE
+		NONE, IDLE, ATTACK, DEFEND, HOLD, WATCH, CHECK, GUERILLA
 	}
 	
 	private SquadOrderType type;
 	private Position position;
 	private int radius;
 	private String status;
+	private Unit unitleader;
+	
+	public SquadOrder(SquadOrderType type, Position position, int radius, String status, Unit unitleader) {
+		this.type = type;
+		this.position = position;
+		this.radius = radius;
+		this.status = status;
+		this.unitleader = unitleader; 
+	}
 	
 	public SquadOrder(SquadOrderType type, Position position, int radius, String status) {
 		this.type = type;
 		this.position = position;
 		this.radius = radius;
 		this.status = status;
+		this.unitleader = null; 
 	}
 	
 	public SquadOrderType getType() {
@@ -27,6 +37,12 @@ public class SquadOrder {
 	}
 	public void setType(SquadOrderType type) {
 		this.type = type;
+	}
+	public Unit getUnitLeader() {
+		return unitleader;
+	}
+	public void setUnitLeader(Unit unitleader) {
+		this.unitleader = unitleader;
 	}
 	public Position getPosition() {
 		return position;
