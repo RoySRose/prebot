@@ -61,16 +61,18 @@ public class MicroUtils {
 	}
 	
 	 // (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
-	public static boolean isSafePlace(Position position) {
+	public static boolean isSafePlace(Position position, boolean safeMine) {
 		boolean isSafe = true;
 		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
 		
 		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo ui : nearEnemisUnitInfos) {
-			Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
-			if (unit != null && unit.getType() != UnitType.Unknown) {
-				if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
-					continue;
+			if (!safeMine) {
+				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
+				if (unit != null && unit.getType() != UnitType.Unknown) {
+					if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
+						continue;
+					}
 				}
 			}
 			
