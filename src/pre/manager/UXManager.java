@@ -26,6 +26,7 @@ import pre.Config;
 import pre.ConstructionPlaceFinder;
 import pre.ConstructionTask;
 import pre.MapGrid;
+import pre.MapTools;
 import pre.UnitInfo;
 import pre.WorkerData;
 import pre.ConstructionTask.ConstructionStatus;
@@ -1035,7 +1036,7 @@ public class UXManager {
 							currentScoutTargetDistance = (int)(scoutUnit.getPosition().getDistance(scoutMoveTo));
 						}
 						else {
-							currentScoutTargetDistance = BWTA.getGroundDistance(scoutUnit.getTilePosition(), scoutMoveTo.toTilePosition());
+							currentScoutTargetDistance = MapTools.Instance().getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
 						}
 	
 						MyBotModule.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / Config.TILE_SIZE + ", " + scoutMoveTo.getY() / Config.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
