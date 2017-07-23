@@ -14,6 +14,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.MapGrid;
 import pre.MapTools;
 import pre.UnitInfo;
 import pre.combat.SpiderMineManger;
@@ -23,6 +24,7 @@ import pre.combat.SquadOrder;
 import pre.combat.SquadOrder.SquadOrderType;
 import pre.combat.VultureTravelManager;
 import pre.main.MyBotModule;
+import pre.util.CombatExpectation;
 import pre.util.CommandUtil;
 import pre.util.CommonUtils;
 import pre.util.MicroSet;
@@ -34,8 +36,9 @@ public class CombatManager {
 	private static final int ATTACK_PRIORITY = 2;
 	private static final int WATCHER_PRIORITY = 3;
 	private static final int CHECKER_PRIORITY = 4;
-	private static final int BASE_DEFENSE_PRIORITY = 5;
-	private static final int SCOUT_DEFENSE_PRIORITY = 6;
+	private static final int GUERILLA_PRIORITY = 5;
+	private static final int BASE_DEFENSE_PRIORITY = 6;
+	private static final int SCOUT_DEFENSE_PRIORITY = 7;
 	private static final int WRAITH_PRIORITY = 100;
 	private static final int VESSEL_PRIORITY = 101;
 
@@ -117,6 +120,7 @@ public class CombatManager {
 			updateVesselSquad(); //AttackSquads 뒤에
 			updateWatcherSquad();
 			updateCheckerSquad();
+			updateGuerillaSquad();
 			
 			SpiderMineManger.Instance().update();
 			VultureTravelManager.Instance().update();
@@ -695,6 +699,93 @@ public class CombatManager {
 	    
 		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getMainAttackLocation(checkerSquad), 800, "Over Watcher");
 		checkerSquad.setOrder(checkerOrder);
+	}
+	
+	private void updateGuerillaSquad() {
+		
+		List<Unit> assignableVultures = new ArrayList<>();
+		for (Unit unit : combatUnits) {
+			if (unit.getType() == UnitType.Terran_Vulture) {
+				Squad unitSquad = squadData.getUnitSquad(unit);
+				if (unitSquad == null || GUERILLA_PRIORITY > unitSquad.getPriority()) {
+					assignableVultures.add(unit);
+				}
+			}
+		}
+		int vulturePower = CombatExpectation.getVulturePower(assignableVultures);
+		
+		// 1. Travel Site에 대한 처리
+		BaseLocation bestGuerillaSite = VultureTravelManager.Instance().getBestGuerillaSite(assignableVultures);
+		if (bestGuerillaSite != null) {
+			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(bestGuerillaSite.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
+			int enemyPower = CombatExpectation.getEnemyPowerByUnitInfo(enemiesInfo);
+			
+			if (vulturePower > enemyPower) {
+				String squadName = "Guerilla_" + bestGuerillaSite.getPosition().toString();
+				Squad guerillaSquad = squadData.getSquad(squadName);
+				// 게릴라 스쿼드 생성(포지션 별)
+				if (guerillaSquad == null) {
+	        		SquadOrder squadOrder = new SquadOrder(SquadOrderType.GUERILLA, bestGuerillaSite.getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, "Let's get it on");
+	        		guerillaSquad = new Squad(squadName, squadOrder, GUERILLA_PRIORITY);
+	        		squadData.putSquad(guerillaSquad);
+	        	}
+        		// 게릴라 유닛이 남아 있다면 더 할당하지 않는다.
+				if (!guerillaSquad.getUnitSet().isEmpty()) {
+					System.out.println("guerilla units already exist");
+        		} else {
+        			for (Unit assignableVulture : assignableVultures) {
+    					squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
+    					int squadPower = CombatExpectation.getVulturePower(guerillaSquad.getUnitSet());
+    					if (squadPower > enemyPower + MicroSet.Vulture.GEURILLA_EXTRA_POWER) { 
+    						break; // 충분한 파워
+    					}
+    				}
+        			System.out.println("guerilla squad created!");
+        			System.out.println(" - unit size : " + guerillaSquad.getUnitSet().size());
+        			System.out.println(" - position  : " + bestGuerillaSite.getPosition());
+        		}
+			} else {
+				System.out.println("not the best guerilla site");
+			}
+		}
+		
+		// TODO 2. base가 아닌 지역에 대한 처리
+		
+		// 게릴라 임무 종료 조건
+		// 1. 게릴라 지역이 clear 되었다.
+		// 2. 현재 병력으로 이길수 없다.
+		List<Squad> guerillaSquads = squadData.getSquadList("Guerilla");
+		for (Squad squad : guerillaSquads) {
+			if (squad.getUnitSet().isEmpty()) {
+				continue;
+			}
+			
+			if (MyBotModule.Broodwar.isVisible(squad.getOrder().getPosition().toTilePosition())) {
+				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, null);
+				if (enemies.isEmpty()) {
+					System.out.println("guerillaSquads " + squad.getName() + " clear : no enemy");
+					squad.clear();
+					continue;
+				}
+			}
+			
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
+			boolean willWin = CombatExpectation.expectVultureVictoryByUnitInfo(squad.getUnitSet(), enemiesInfo);
+			if (!willWin) {
+				System.out.println("guerillaSquads " + squad.getName() + " clear : mission impossilbe");
+				squad.clear();
+				continue;
+			}
+
+			int guerillaScore = CombatExpectation.getGuerillaScoreByUnitInfo(enemiesInfo);
+			if (guerillaScore <= 0) {
+				System.out.println("guerillaSquads " + squad.getName() + " clear : worthless");
+				squad.clear();
+				continue;
+			}
+		}
+		
 	}
 
 }

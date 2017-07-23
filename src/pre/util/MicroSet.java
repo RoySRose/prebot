@@ -19,14 +19,10 @@ public class MicroSet {
 //	}
 	
 	public static class Vulture {
-
-		public static int assignedFrame = 30 * 24; // 30초
-		public static int visitFrame = 45 * 24; // 45초
-		
-		public static String getCheckerSquadPostFix() {
-			return "[" + String.valueOf(postFixNum++) + "]";
-		}
-		private static int postFixNum = 0; // TODO 이거 수정필요
+		public static final int GEURILLA_RADIUS = 400;
+		public static final int GEURILLA_EXTRA_POWER = 150;
+		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 30초
+		public static final int CHECKER_INTERVAL_FRAME = 40 * 24; // 40초
 
 		// TODO 변동 값
 	    public static int maxNumWatcher = 50;
@@ -56,6 +52,8 @@ public class MicroSet {
 	}
 	
 	public static class Common {
+		public static final double DEF_TOWER_BACKOFF_DIST = 200.0;
+		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int TANK_COVERAGE = 100;
 		public static final int ARRIVE_DECISION_RANGE = 100;

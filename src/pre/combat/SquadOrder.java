@@ -7,7 +7,7 @@ public class SquadOrder {
 	
 	// ATTACK <-> BATTLE 스위칭 관계, 전투중인 경우 상태가 BATTLE로 바뀐다.
 	public enum SquadOrderType {
-		NONE, IDLE, ATTACK, DEFEND, HOLD, WATCH, CHECK
+		NONE, IDLE, ATTACK, DEFEND, HOLD, WATCH, CHECK, GUERILLA
 	}
 	
 	private SquadOrderType type;

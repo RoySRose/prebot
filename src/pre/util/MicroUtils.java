@@ -23,8 +23,78 @@ import pre.util.MicroSet.Network;
 
 public class MicroUtils {
 	
-	public static boolean isSafePlace(Position position) { // TODO position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
-		return true;
+	public static boolean isSafePlace(Unit rangedUnit) {
+		boolean isSafe = true;
+		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(rangedUnit.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
+		
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
+		for (UnitInfo ui : nearEnemisUnitInfos) {
+			Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID()); // 보이는 적에 대한 조건
+			if (unit != null && unit.getType() != UnitType.Unknown) {
+				if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) { // 완성되지 않은 타워는 까도 된다.
+					continue;
+				}
+			}
+			
+			if (ui.getType().isWorker() || MyBotModule.Broodwar.getDamageFrom(ui.getType(), rangedUnit.getType()) == 0) {
+				continue;
+			}
+			
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+				continue;
+			}
+			
+			double distanceToNearEnemy = rangedUnit.getDistance(ui.getLastPosition());
+			WeaponType nearEnemyWeapon = rangedUnit.isFlying() ? ui.getType().airWeapon() : ui.getType().groundWeapon();
+			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
+			double backOffDist = ui.getType().isBuilding() ? MicroSet.Common.DEF_TOWER_BACKOFF_DIST : 0.0;
+			
+			 // 근처의 모든 적에 대해 안전거리 확보 : 안전거리 = 사정거리 + topSpeed() * 24 (적이 1.0초 이동거리)
+			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
+				isSafe = false;
+				break;
+			}
+		}
+		
+		return isSafe;
+	}
+	
+	 // (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
+	public static boolean isSafePlace(Position position) {
+		boolean isSafe = true;
+		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
+		
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
+		for (UnitInfo ui : nearEnemisUnitInfos) {
+			Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
+			if (unit != null && unit.getType() != UnitType.Unknown) {
+				if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
+					continue;
+				}
+			}
+			
+			if (ui.getType().isWorker() || typeCanAttackGround(ui.getType())) {
+				continue;
+			}
+			
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+				continue;
+			}
+			
+			double distanceToNearEnemy = position.getDistance(ui.getLastPosition());
+			WeaponType nearEnemyWeapon = ui.getType().groundWeapon();
+			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
+			double backOffDist = ui.getType().isBuilding() ? MicroSet.Common.DEF_TOWER_BACKOFF_DIST : 0.0;
+			
+			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
+				isSafe = false;
+				break;
+			}
+		}
+		
+		return isSafe;
 	}
 	
 	public static boolean smartScan(Position targetPosition) {
@@ -154,7 +224,7 @@ public class MicroUtils {
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
 		// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
-		if (saveUnit && MicroUtils.inEnemyAttackRange(rangedUnit)) {
+		if (saveUnit && !MicroUtils.isSafePlace(rangedUnit)) {
 			haveToAttack = false;
 			
 		} else if (target.getType().isBuilding()
@@ -208,11 +278,15 @@ public class MicroUtils {
 			// getFleePosition을 통해 최적의 회피지역을 선정한다.
 			Position fleePosition = null;
 			if (saveUnit) {
-				int enemyCount = MapGrid.Instance().getUnitsNear(rangedUnit.getPosition(), (int) rangedUnitSpeed, false, true, null).size();
-				if (enemyCount < 3) {
+				double saveRadian = rangedUnit.getAngle(); // 유닛의 현재 각
+			    Position saveFleeVector = new Position((int)(rangedUnitSpeed * Math.cos(saveRadian)), (int)(rangedUnitSpeed * Math.sin(saveRadian))); // 이동벡터
+				Position saveMovePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX(), rangedUnit.getPosition().getY() + saveFleeVector.getY()); // 회피지점
+				Position saveMiddlePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX() / 2, rangedUnit.getPosition().getY() + saveFleeVector.getY() / 2); // 회피중간지점
+				int risk = riskOfFleePosition(rangedUnit.getType(), saveMovePosition, (int) rangedUnitSpeed, true); // 회피지점에서의 예상위험도
+				
+				// 본진찍고 회피하는 것이 안전한가?
+				if (risk < 10 && isValidGroundPosition(saveMovePosition) && saveMiddlePosition.isValid() && BWTA.getRegion(saveMiddlePosition) != null) {
 					fleePosition = goalPosition;
-				} else {
-					System.out.println("goalPosition is not safe : " + enemyCount);
 				}
 			}
 			if (fleePosition == null) {
@@ -238,7 +312,7 @@ public class MicroUtils {
 		int reverseY = rangedUnit.getPosition().getY() - target.getPosition().getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 	    
-		Position safePosition = null;
+		Position safePosition = null; // 0.0 means the unit is facing east.
 		int minimumRisk = 99999;
 		int minimumDistanceToGoal = 99999;
 
@@ -331,36 +405,6 @@ public class MicroUtils {
 			}
 		}
 		return risk;
-	}
-	
-	public static boolean inEnemyAttackRange(Unit rangedUnit) {
-		
-		boolean dangerous = false;
-		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(rangedUnit.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
-		
-		int currFrame = MyBotModule.Broodwar.getFrameCount();
-		for (UnitInfo ui : nearEnemisUnitInfos) { // 근처의 모든 적에 대해 안전거리 확보 : 안전거리 = 사정거리 + topSpeed() * 36 (적이 1.5초 이동거리)
-			if (ui.getType().isWorker() || MyBotModule.Broodwar.getDamageFrom(ui.getType(), rangedUnit.getType()) == 0) {
-				continue;
-			}
-			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) / 24 > 10) {
-				continue;
-			}
-			
-			double distanceToNearEnemy = rangedUnit.getDistance(ui.getLastPosition());
-			WeaponType nearEnemyWeapon = rangedUnit.isFlying() ? ui.getType().airWeapon() : ui.getType().groundWeapon();
-			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
-			double enmeyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
-			double backOffDist = ui.getType().isBuilding() ? 250.0 : 0.0;
-			
-			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
-				dangerous = true;
-				break;
-			}
-		}
-		
-		return dangerous;
 	}
 
 	// * 참조사이트: http://yc0345.tistory.com/45
