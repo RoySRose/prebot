@@ -115,5 +115,10 @@ public abstract class MicroManager {
 	public boolean inTheSquad(Unit unit) { // TODO
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "MicroManager [units.size()=" + units.size() + ", nearbyEnemies=" + nearbyEnemies + ", order=" + order
+				+ ", squadCenter=" + squadCenter + ", squadRange=" + squadRange + ", tankSize=" + tankSize + "]";
+	}
 	
 }

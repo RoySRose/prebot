@@ -51,6 +51,14 @@ public class MicroVulture extends MicroManager {
 			if (target != null) {
 				KitingOption kitingOption = new KitingOption(cooltimeAlwaysAttack, unitedKiting, retreatPosition, fleeAngle, saveUnit);
 				
+				// checker 벌처들은 각각의 orderPosition을 가진다.
+				if (order.getType() == SquadOrderType.CHECK) {
+					BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+					if (travelBase != null) {
+						kitingOption.setGoalPosition(travelBase.getPosition());
+					}
+				}
+
 				List<Unit> nearTanks = new ArrayList<>();
 				List<Unit> nearGoliaths = new ArrayList<>();
 				List<Unit> nearVultures = new ArrayList<>();
@@ -88,15 +96,13 @@ public class MicroVulture extends MicroManager {
 						}
 					}
 				}
-
+				
 				MicroUtils.preciseKiting(vulture, target, kitingOption);
+//				CommandUtil.attackUnit(vulture, target);
 				
 			} else {
 				// 1. 마인매설 위치 체크
 				int spiderMineNumPerPosition = MicroSet.Vulture.spiderMineNumPerPosition;
-				if (order.getType() == SquadOrderType.GUERILLA) {
-					spiderMineNumPerPosition *= 2;
-				}
 				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, spiderMineNumPerPosition);
 				if (order.getType() == SquadOrderType.WATCH) {
 					if (minePosition == null) {

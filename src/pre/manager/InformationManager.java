@@ -23,6 +23,7 @@ import bwta.Chokepoint;
 import bwta.Region;
 import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
+import pre.MapTools;
 import pre.UnitData;
 import pre.UnitInfo;
 import pre.main.MyBotModule;
@@ -589,7 +590,7 @@ public class InformationManager {
 				{
 					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
 	
-					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
+					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), targetBaseLocation.getPosition());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						firstExpansionLocation.put(selfPlayer, targetBaseLocation);
@@ -600,7 +601,8 @@ public class InformationManager {
 				for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
 					if ( chokepoint.getCenter().equals(firstChokePoint.get(selfPlayer).getCenter())) continue;
 	
-					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition());
+					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), chokepoint.getPoint());
+//					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition()); //욱스가 주석 남기라고 함
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(selfPlayer, chokepoint);
@@ -626,7 +628,7 @@ public class InformationManager {
 				{
 					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
 	
-					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), targetBaseLocation.getTilePosition());
+					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), targetBaseLocation.getPosition());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						firstExpansionLocation.put(enemyPlayer, targetBaseLocation);
@@ -637,7 +639,8 @@ public class InformationManager {
 				for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
 					if ( chokepoint.getCenter().equals(firstChokePoint.get(enemyPlayer).getCenter())) continue;
 	
-					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition());
+					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), chokepoint.getPoint());
+//					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						secondChokePoint.put(enemyPlayer, chokepoint);
