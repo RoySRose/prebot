@@ -100,11 +100,12 @@ public class MicroUtils {
 	}
 	
 	public static boolean smartScan(Position targetPosition) {
-		if (targetPosition.isValid()) {
-			MyBotModule.Broodwar.sendText("SmartScan : bad position");
-			return false;
-		}
+//		if (targetPosition.isValid()) {
+//			MyBotModule.Broodwar.sendText("SmartScan : bad position");
+//			return false;
+//		}
 		if (MapGrid.Instance().scanIsActiveAt(targetPosition)) {
+			MyBotModule.Broodwar.sendText("SmartScan : last scan still on");
 			return false;
 		}
 
@@ -113,9 +114,7 @@ public class MicroUtils {
 		int maxEnergy = 49;      // anything greater is enough energy for a scan
 		Unit comsat = null;
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (unit.getType() == UnitType.Terran_Comsat_Station &&
-				unit.getEnergy() > maxEnergy &&
-				unit.canUseTech(TechType.Scanner_Sweep, targetPosition)) {
+			if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() > maxEnergy &&	unit.canUseTech(TechType.Scanner_Sweep, targetPosition)) {
 				maxEnergy = unit.getEnergy();
 				comsat = unit;
 			}

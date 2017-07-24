@@ -26,6 +26,7 @@ import pre.Config;
 import pre.ConstructionPlaceFinder;
 import pre.ConstructionTask;
 import pre.MapGrid;
+import pre.MapTools;
 import pre.UnitInfo;
 import pre.WorkerData;
 import pre.ConstructionTask.ConstructionStatus;
@@ -87,7 +88,7 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(5, 90);
+			drawBuildOrderQueueOnScreen(500, 20);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
@@ -782,7 +783,7 @@ public class UXManager {
 		
 		for(int i=0 ; i<tempQueue.length ; i++){
 			BuildOrderItem currentItem = (BuildOrderItem)tempQueue[i];
-			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), white + currentItem.metaType.getName() + " " + currentItem.blocking);
+			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + white + currentItem.metaType.getName());
 			itemCount++;
 			if (itemCount >= 24) break;
 		}
@@ -1035,7 +1036,7 @@ public class UXManager {
 							currentScoutTargetDistance = (int)(scoutUnit.getPosition().getDistance(scoutMoveTo));
 						}
 						else {
-							currentScoutTargetDistance = BWTA.getGroundDistance(scoutUnit.getTilePosition(), scoutMoveTo.toTilePosition());
+							currentScoutTargetDistance = MapTools.Instance().getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
 						}
 	
 						MyBotModule.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / Config.TILE_SIZE + ", " + scoutMoveTo.getY() / Config.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);

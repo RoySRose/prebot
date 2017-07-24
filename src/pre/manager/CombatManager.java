@@ -8,6 +8,8 @@ import bwapi.Order;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TechType;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -17,6 +19,7 @@ import bwta.Region;
 import pre.MapGrid;
 import pre.MapTools;
 import pre.UnitInfo;
+import pre.MapGrid.GridCell;
 import pre.combat.SpiderMineManger;
 import pre.combat.Squad;
 import pre.combat.SquadData;
@@ -92,10 +95,10 @@ public class CombatManager {
 		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getAttackPosition(null), 800, "Check it out");
 		squadData.putSquad(new Squad("Checker", checkerOrder, CHECKER_PRIORITY));
 		
-		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), 800, "Wraith");
+		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), 800, "Wraith Fighter");
 		squadData.putSquad(new Squad("Wraith", wraithOrder, WRAITH_PRIORITY));
 		
-		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 600, "Vessel");
+		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), 600, "Vessel Helper");
 		squadData.putSquad(new Squad("Vessel", vesselOrder, VESSEL_PRIORITY));
 		
 		initialized = true;
@@ -125,7 +128,7 @@ public class CombatManager {
 			SpiderMineManger.Instance().update();
 			VultureTravelManager.Instance().update();
 		}
-		else if (CommonUtils.executeOncePerFrame(4, 1)) {
+		else if (CommonUtils.executeOncePerFrame(47, 0)) {
 			doComsatScan();
 		}
 //		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
@@ -150,14 +153,120 @@ public class CombatManager {
 			return;
 		}
 		
-		// Does the enemy have undetected cloaked units that we may be able to engage?
+		// 상대 클록 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-				// At most one scan per call. We don't check whether it succeeds.
-				MicroUtils.smartScan(unit.getPosition());
-				break;
+				
+				//주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로 넘어간다
+				List<Unit> nearvessel = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Science_Vessel.sightRange()*2, true, false, UnitType.Terran_Science_Vessel);
+				if(nearvessel!= null){
+					Unit neareasetvessel = null;
+					int closestDistToVessel = 100000;
+					for (Unit vessel : nearvessel) {
+						int tempdist = unit.getDistance(vessel);
+						if(tempdist < closestDistToVessel){
+							neareasetvessel = vessel;
+							closestDistToVessel = tempdist;
+						}
+					}
+					if(neareasetvessel !=null){
+						List<Unit> nearallies = MapGrid.Instance().getUnitsNear(neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
+						if(nearallies !=null && nearallies.size() > 2){
+							MyBotModule.Broodwar.printf("Vessel : I'm going! wait a sec!!");
+							break;//베슬이 올것으로 예상됨
+						}
+					}
+				}
+				
+				if(InformationManager.Instance().enemyRace == Race.Protoss){
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Protoss_Dark_Templar.sightRange(), true, false, null);
+					int faccnt = 0;
+					for(Unit facunit : myUnits){
+						if(facunit.getType() == UnitType.Terran_Vulture||facunit.getType() == UnitType.Terran_Goliath||facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+							faccnt++;
+						}
+					}
+					if(faccnt > 3){
+						MicroUtils.smartScan(unit.getPosition());
+						return;
+					}
+				}else if(InformationManager.Instance().enemyRace == Race.Zerg){
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Zerg_Lurker.sightRange(), true, false, null);
+					int faccnt = 0;
+					for(Unit facunit : myUnits){
+						if(facunit.getType() == UnitType.Terran_Vulture||facunit.getType() == UnitType.Terran_Goliath||facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+							faccnt++;
+						}
+					}
+					if(faccnt > 4){
+						MicroUtils.smartScan(unit.getPosition());
+						return;
+					}
+				}else{
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Wraith.sightRange(), true, false, UnitType.Terran_Goliath);
+					if(myUnits.size() > 1){
+						MicroUtils.smartScan(unit.getPosition());
+						return;
+					}
+				}
 			}
 		}
+		
+		Unit comsat = null;
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() == 200) {
+				comsat = unit;
+			}
+		}
+		if (comsat != null) {
+			
+			Player enemyPlayer = MyBotModule.Broodwar.enemy();
+			Player selfPlayer = MyBotModule.Broodwar.enemy();
+			//find place
+			List<TilePosition> scanArea = new ArrayList<TilePosition>();
+			
+			if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+				scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
+			}
+			if(InformationManager.Instance().getFirstChokePoint(enemyPlayer)!=null){
+				scanArea.add(InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
+			}
+			if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+				scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
+			}
+			if(InformationManager.Instance().getSecondChokePoint(enemyPlayer)!=null){
+				scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter().toTilePosition());
+			}
+			if(InformationManager.Instance().getSecondChokePoint(selfPlayer)!=null){
+				scanArea.add(InformationManager.Instance().getSecondChokePoint(selfPlayer).getCenter().toTilePosition());
+			}
+			if(InformationManager.Instance().getIslandBaseLocations() !=null ){
+				for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
+					scanArea.add(islands.getTilePosition());
+				}
+			}
+			
+			TilePosition target = null;
+			int scantime = 1000000;
+			if(scanArea!= null){
+				for (TilePosition scans : scanArea) {
+					if(MyBotModule.Broodwar.isVisible(scans)){
+						continue;
+					}
+					int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
+					if(scantime > tempscantime){
+						target = scans;
+						scantime = tempscantime;
+					}
+				}
+			}		
+			
+			if(target!= null){
+				MapGrid.Instance().scanAtPosition(target.toPosition());
+				comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+			}
+		}
+		
 	}
 	
 	private Position getMainAttackLocation(Squad squad) {
@@ -236,7 +345,7 @@ public class CombatManager {
 		}
 
 		// Fourth choice: We can't see anything so explore the map attacking along the way
-		//Position leastExplored = MapGrid.Instance().getLeastExplored(); TODO 렉 유발요소 확인 필요
+		//Position leastExplored = MapGrid.Instance().getLeastExplored(); //TODO 렉 유발요소 확인 필요
 		//return leastExplored;
 		return null;
 	}
@@ -598,12 +707,15 @@ public class CombatManager {
 		Squad wraithSquad = squadData.getSquad("Wraith");
 		
 		for (Unit unit : combatUnits) {
+			if(unit == null){
+				continue;
+			}
 	        if (unit.getType() == UnitType.Terran_Wraith && squadData.canAssignUnitToSquad(unit, wraithSquad)) {
 				squadData.assignUnitToSquad(unit, wraithSquad);// 레이스만
 	        }
 	    }
 		
-		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(wraithSquad), UnitType.Terran_Wraith.sightRange(), "Wraith");
+		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(wraithSquad), UnitType.Terran_Wraith.sightRange(), "Wraith");
 		wraithSquad.setOrder(wraithOrder);
 	}
 	
@@ -611,48 +723,36 @@ public class CombatManager {
 		Squad vesselSquad = squadData.getSquad("Vessel");
 		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if(unit == null){
+				continue;
+			}
 	        if (unit.getType() == UnitType.Terran_Science_Vessel && squadData.canAssignUnitToSquad(unit, vesselSquad)) {
-	        	
-	        	System.out.println("assign vessel : " + unit.getID());
-				squadData.assignUnitToSquad(unit, vesselSquad);// 레이스만
+				squadData.assignUnitToSquad(unit, vesselSquad);// 베슬만
 	        }
 	    }
 		
-//		NONE, IDLE, WATCH, ATTACK, DEFEND, HOLD,
-//		CHECK_INACTIVE, CHECK_ACTIVE
 		SquadOrder vesselOrder = null;
-//		
-//		Unit invisibleEnemyUnit = null;
-//		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-//			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-//				// At most one scan per call. We don't check whether it succeeds.
-//				invisibleEnemyUnit = unit;
-//				break;
-//			}
-//		}
-//		
-//		if(invisibleEnemyUnit != null){
-//			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, invisibleEnemyUnit.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-//		}else{
+
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 		} else if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
+			
 			if(squadData.getSquad("MainAttack") != null){
 				List<Unit> units = squadData.getSquad("MainAttack").getUnitSet();
-				if(units.size()>0){
-					Unit leader = MicroUtils.leaderOfUnit(units, getAttackPosition(vesselSquad));
+				if(units!= null){
+					Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(vesselSquad));//TODO attack position vesselsquad 기준이 맞나?
 					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				}else{
+					vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 				}
 			}else{
-				vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 			}
 		}
-			
-		
 		vesselSquad.setOrder(vesselOrder);
 	}
 	

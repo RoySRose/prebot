@@ -41,6 +41,10 @@ public class MapGrid {
 			return timeLastVisited;
 		}
 		
+		public int getTimeLastScan() {
+			return timeLastScan;
+		}
+
 	};
 	
 	private int cellSize;
