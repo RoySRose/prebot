@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Order;
+import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
