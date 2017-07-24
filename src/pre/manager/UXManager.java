@@ -88,7 +88,7 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(5, 90);
+			drawBuildOrderQueueOnScreen(500, 20);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
@@ -783,7 +783,7 @@ public class UXManager {
 		
 		for(int i=0 ; i<tempQueue.length ; i++){
 			BuildOrderItem currentItem = (BuildOrderItem)tempQueue[i];
-			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), white + currentItem.metaType.getName() + " " + currentItem.blocking);
+			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + white + currentItem.metaType.getName());
 			itemCount++;
 			if (itemCount >= 24) break;
 		}

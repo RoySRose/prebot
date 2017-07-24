@@ -58,7 +58,8 @@ public class MicroVessel extends MicroManager {
 			int closestDistToVessel = 100000;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 				if (unit.isVisible() && unit.isDetected() && unit.getPosition().isValid()) {
-					if(unit.getType() == UnitType.Protoss_Dark_Templar){
+					if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker
+							|| unit.getType() == UnitType.Terran_Wraith || unit.getType() == UnitType.Terran_Ghost){
 						int tempdist = unit.getDistance(sVessel);
 						if(tempdist < closestDistToVessel){
 							invisibleEnemyUnit = unit;
@@ -86,7 +87,6 @@ public class MicroVessel extends MicroManager {
 			if(invisibleEnemyUnit != null){
 				List<Unit> nearallies = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
 				if(nearallies.size() > 2){
-					System.out.println("invisibleEnemy : "+ invisibleEnemyUnit.getID());
 					order.setPosition(invisibleEnemyUnit.getPosition());//움직이시오.
 				}
 			}
@@ -124,9 +124,6 @@ public class MicroVessel extends MicroManager {
 					mostDangercheck = temp;
 				}
 			}
-			System.out.println("========================Frame : " +MyBotModule.Broodwar.getFrameCount());
-			
-			
 			
 			boolean fleeing = false;
 			if(mostDangerousTarget != null){
@@ -150,7 +147,6 @@ public class MicroVessel extends MicroManager {
 			}
 			
 			if(!fleeing){
-				System.out.println(order.getPosition());
 				sVessel.move(order.getPosition());
 			} 
 		}

@@ -78,6 +78,8 @@ public class InformationManager {
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
 
+	private List<BaseLocation> islandBaseLocations = new ArrayList<BaseLocation>();
+
 	/// static singleton 객체를 리턴합니다
 	public static InformationManager Instance() {
 		return instance;
@@ -106,6 +108,14 @@ public class InformationManager {
 		if (mainBaseLocations.get(selfPlayer) != null) {
 			updateOccupiedRegions(BWTA.getRegion(mainBaseLocations.get(selfPlayer).getTilePosition()),
 				MyBotModule.Broodwar.self());
+		}
+		
+		BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
+		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+		{
+			if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())){
+				islandBaseLocations.add(targetBaseLocation);
+			}
 		}
 
 		mainBaseLocations.put(enemyPlayer, null);
@@ -808,6 +818,10 @@ public class InformationManager {
 		return false;
 	}
 
+	//지도상 섬지역
+	public List<BaseLocation> getIslandBaseLocations() {
+		return islandBaseLocations;
+	}
 	/// 해당 Player (아군 or 적군) 의 모든 유닛 목록 (가장 최근값) UnitAndUnitInfoMap 을 리턴합니다<br>	 
 	/// 파악된 정보만을 리턴하기 때문에 적군의 정보는 틀린 값일 수 있습니다
 	public final Map<Integer, UnitInfo> getUnitAndUnitInfoMap(Player player) {
