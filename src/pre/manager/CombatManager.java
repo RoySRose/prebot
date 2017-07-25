@@ -43,6 +43,9 @@ public class CombatManager {
 
 	private boolean initialized = false;
 	
+	//se-min.park 마린 나왔을떈 일꾼이 정찰 일꾼 신경 안쓰도록 변수 추가
+	private boolean attackUnit = false;
+		
 	// TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
 	public enum CombatStrategy { DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, READY_TO_ATTACK, ATTACK_ENEMY };
 	
@@ -429,24 +432,36 @@ public class CombatManager {
 	    }
 		
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
-	    boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
+		if(enemyUnitsInRegion == null)
+			return;
+		boolean assignScoutDefender = false;
+		for (Unit workers : enemyUnitsInRegion) {
+			if(workers.getType().isWorker() && workers.isAttacking()){
+				assignScoutDefender = true;
+			} // 일꾼이 내 지역에서 돌아다닌다.
+		}
+//		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
-		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");		
-	    if (scoutDefenseSquad.isEmpty() && assignScoutDefender) {
-	    	Unit enemyWorker = enemyUnitsInRegion.get(0);
-	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
-	        
-            if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
-			    WorkerManager.Instance().setCombatWorker(workerDefender);
-			    squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
-            }
-	    	
+		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");	
+	    if (scoutDefenseSquad.isEmpty() && assignScoutDefender && attackUnit == false) {
+	    	int workerDefendersNeeded = 0;
+	    	while(workerDefendersNeeded < enemyUnitsInRegion.size()){
+		    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
+		        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
+		        
+	            if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
+				    WorkerManager.Instance().setCombatWorker(workerDefender);
+				    squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
+	            }
+	            workerDefendersNeeded++;
+	    	}
 	    } else if (!scoutDefenseSquad.isEmpty() && !assignScoutDefender) {
 	    	scoutDefenseSquad.clear();
 	    }
 	}
 	
-	private void updateBaseDefenseSquads() {
+	
+private void updateBaseDefenseSquads() {
 		
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		Region enemyRegion = null;
@@ -532,10 +547,11 @@ public class CombatManager {
 		}
 		
 	}
+		
 	
 	private Unit findClosestWorkerToTarget(Unit enemyWorker) {
 		Unit closestMineralWorker = null;
-		int closestDist = 600 + 128;
+		int closestDist = 1000 + 128;
 		for (Unit unit : combatUnits) {
 			if (unit.getType().isWorker() && WorkerManager.Instance().isMineralWorker(unit)) {
 				int dist = unit.getDistance(enemyWorker);
@@ -580,10 +596,12 @@ public class CombatManager {
 			// if we find a valid flying defender, add it to the squad
 			if (defenderToAdd != null) {
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
+				attackUnit = true;
 				flyingDefendersAdded++;
 			}
 			// otherwise we'll never find another one so break out of this loop
 			else {
+				attackUnit = false;
 				break;
 			}
 		}
@@ -595,19 +613,21 @@ public class CombatManager {
 
 			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
-				if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
+				/*if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
 					WorkerManager.Instance().setCombatWorker(defenderToAdd);
-				}
+				}*/
+				attackUnit = true;
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
 				groundDefendersAdded++;
 			}
 			// otherwise we'll never find another one so break out of this loop
 			else {
+				attackUnit = false;
 				break;
 			}
 		}
+		
 	}
-	
 	private void updateAttackSquads() {
 	    Squad mainAttackSquad = squadData.getSquad("MainAttack");
 

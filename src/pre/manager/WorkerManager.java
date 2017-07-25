@@ -44,21 +44,12 @@ public class WorkerManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 
-		//relocationCCtoCCWorkers();
-		//relocationWorkers();
 		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 		updatework();
 		//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
-	}
-	
-	public void relocationWorkers() 
-	{
-		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
-			if (depot == null) continue;
-		}
 	}
 	
 	public void updateWorkerStatus() 
@@ -714,7 +705,7 @@ public class WorkerManager {
 	{
 		if (worker == null) return;
 
-		//workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
+		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
 	}
 
 	/// 모든 Combat 일꾼 유닛에 대해 임무를 해제합니다
