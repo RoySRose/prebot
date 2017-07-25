@@ -112,9 +112,15 @@ public class WorkerManager {
 			// refinery 가 건설 completed 되었으면,
 			if (unit.getType().isRefinery() && unit.isCompleted() )
 			{
+				int closestDist = 300;
+				for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
+					int dist = unit.getDistance(depot);
+					if (dist > closestDist) {
+						return;
+					}
+				}
 				// get the number of workers currently assigned to it
 				int numAssigned = workerData.getNumAssignedWorkers(unit);
-
 				// if it's less than we want it to be, fill 'er up
 				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
 				for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i)
@@ -128,7 +134,6 @@ public class WorkerManager {
 			}
 		}
 	}
-
 	/// Idle 일꾼을 Mineral 일꾼으로 만듭니다
 	public void handleIdleWorkers() 
 	{
