@@ -43,9 +43,6 @@ public class CombatManager {
 
 	private boolean initialized = false;
 	
-	//se-min.park 마린 나왔을떈 일꾼이 정찰 일꾼 신경 안쓰도록 변수 추가
-	private boolean attackUnit = false;
-		
 	// TODO 어느 시점을 공격타이밍으로 가져갈 것인가? 공격 타이밍마다 다른 공격 패턴 사용 가능성
 	public enum CombatStrategy { DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, READY_TO_ATTACK, ATTACK_ENEMY };
 	
@@ -434,6 +431,10 @@ public class CombatManager {
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if(enemyUnitsInRegion == null)
 			return;
+		//7마리 이상이면 능봉으로 넘아감
+		if(enemyUnitsInRegion.size() > 6)
+			return;
+				
 		int assignScoutDefender = 0;
 		for (Unit workers : enemyUnitsInRegion) {
 			if(workers.getType().isWorker() && workers.isAttacking()){
@@ -442,15 +443,16 @@ public class CombatManager {
 		}
 //		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
+		
 		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");
-		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
+//		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
     	int workerDefendersNeeded = 0;
     	while(workerDefendersNeeded < assignScoutDefender){
 	    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
 	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
 	        if(workerDefender == null)
 	        	return;
-	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && defenderToAdd == null && workerDefender != null) {
+	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && workerDefender != null) {
 	        	if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
 	        		WorkerManager.Instance().setCombatWorker(workerDefender);
 	        		squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
@@ -571,6 +573,7 @@ private void updateBaseDefenseSquads() {
 		return closestMineralWorker;
 	}
 	
+	
 	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers) {
 		// if there's nothing left to defend, clear the squad
 		if (flyingDefendersNeeded <= 0 && groundDefendersNeeded <= 0) {
@@ -599,12 +602,10 @@ private void updateBaseDefenseSquads() {
 			// if we find a valid flying defender, add it to the squad
 			if (defenderToAdd != null) {
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
-//				attackUnit = true;
 				flyingDefendersAdded++;
 			}
 			// otherwise we'll never find another one so break out of this loop
 			else {
-//				attackUnit = false;
 				break;
 			}
 		}
@@ -619,13 +620,11 @@ private void updateBaseDefenseSquads() {
 				/*if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
 					WorkerManager.Instance().setCombatWorker(defenderToAdd);
 				}*/
-//				attackUnit = true;
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
 				groundDefendersAdded++;
 			}
 			// otherwise we'll never find another one so break out of this loop
 			else {
-//				attackUnit = false;
 				break;
 			}
 		}

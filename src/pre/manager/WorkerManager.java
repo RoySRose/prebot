@@ -113,13 +113,16 @@ public class WorkerManager {
 			//se-min.park 가스 근처 300범위 안에 cc없으면 일꾼 안보내도록 추가 
 			if (unit.getType().isRefinery() && unit.isCompleted() )
 			{
-				int closestDist = 300;
+				int closestDist = 320;
+				boolean existNearRefinery = false;
 				for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
 					int dist = unit.getDistance(depot);
-					if (dist > closestDist) {
-						return;
+					if (dist < closestDist) {
+						existNearRefinery = true;
 					}
 				}
+				if(!existNearRefinery)
+					return;
 				// get the number of workers currently assigned to it
 				int numAssigned = workerData.getNumAssignedWorkers(unit);
 				// if it's less than we want it to be, fill 'er up
@@ -811,7 +814,7 @@ public class WorkerManager {
 			}
 
 			Unit depot = workerData.getWorkerDepot(worker);
-
+			
 			if (depot != null && workerData.depotHasEnoughMineralWorkers(depot))
 			{
 				workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
