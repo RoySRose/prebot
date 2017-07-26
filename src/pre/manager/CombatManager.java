@@ -1,4 +1,3 @@
-<<<<<<< src/pre/manager/CombatManager.java
 package pre.manager;
 
 import java.util.ArrayList;
