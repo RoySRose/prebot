@@ -3,95 +3,243 @@ package pre.combat.micro;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.DamageType;
 import bwapi.Order;
+import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
+import bwapi.UnitSizeType;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
+import bwapi.WeaponType;
+import bwta.BWTA;
+import pre.MapGrid;
+import pre.combat.Squad;
+import pre.main.MyBotModule;
+import pre.manager.CombatManager;
+import pre.manager.InformationManager;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
+import pre.util.MicroSet;
 import pre.util.MicroUtils;
 import pre.util.MicroSet.FleeAngle;
+import pre.util.MicroSet.Network;
 
 public class MicroMarine extends MicroManager {
 
 	@Override
 	protected void executeMicro(List<Unit> targets) {
-	    List<Unit> rangedUnits = getUnits();
-
-		// The set of potential targets.
-		List<Unit> rangedUnitTargets = new ArrayList<>();
-		for (Unit target : targets) {
-			if (target.isVisible() && target.isDetected() &&
-					target.getType() != UnitType.Zerg_Larva &&
-					target.getType() != UnitType.Zerg_Egg &&
-					!target.isStasised()) {
-				rangedUnitTargets.add(target);
+	    List<Unit> marines = getUnits();
+	    Unit bunker = null; 
+	    Unit CC = null;
+	    
+	    if(targets.size() == 0){
+			return;
+		}
+	    	
+//		List<Unit> targets = new ArrayList<>();
+//		for (Unit target : targets) {
+//			if (target.isVisible() && target.isDetected() &&
+//					target.getType() != UnitType.Zerg_Larva &&
+//					target.getType() != UnitType.Zerg_Egg &&
+//					!target.isStasised()) {
+//				targets.add(target);
+//			}
+//		}
+		
+//		if(targets.size() == 0){
+//			return;
+//		}
+	    	
+		boolean DontGoFar = true;
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+			if(unit.getType() == UnitType.Terran_Bunker && unit.isCompleted()){
+				bunker = unit;
+			}
+			if(unit.isUnderAttack()){
+				DontGoFar = false;
+			}
+			if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted()){
+				CC = unit;
 			}
 		}
 		
+		
 		KitingOption kitingOption = new KitingOption();
-		kitingOption.setCooltimeAlwaysAttack(true);
-		kitingOption.setUnitedKiting(true);
+		kitingOption.setCooltimeAlwaysAttack(false);
+		kitingOption.setUnitedKiting(true); //TODO 같이 가 좋으까?
 		kitingOption.setGoalPosition(order.getPosition());
-		kitingOption.setFleeAngle(FleeAngle.WIDE_ANGLE);
+		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
+		kitingOption.setSaveUnit(false);
 
-		boolean kiteWithRangedUnits = true;
-		for (Unit rangedUnit : rangedUnits) {
-			Unit target = getTarget(rangedUnit, rangedUnitTargets);
-			if (target != null) {
-				if (kiteWithRangedUnits) {
-					MicroUtils.preciseKiting(rangedUnit, target, kitingOption);
+		boolean kiteWithmarines = true;
+		
+	
+		//벙커가 없는 경우 행동 
+		if(bunker == null){
+			Unit mineral = getClosestMineral(CC);			
+			kitingOption.setGoalPosition(mineral.getPosition());
+			//kitingOption.setSaveUnit(false);
+			kitingOption.setCooltimeAlwaysAttack(true);
+			
+			for (Unit marine : marines) {
+				
+				Unit target = getTarget(marine, targets);
+				if(target != null){
 					
-				} else {
-					CommandUtil.attackUnit(rangedUnit, target);
+					if(marine.getDistance(target) < 50){
+						DontGoFar= false;
+					}
+					
+					if(DontGoFar){
+						if(marine.getDistance(mineral) > 80){
+							marine.move(mineral.getPosition());
+						}
+					}else{
+						if (target != null) {
+							if (kiteWithmarines) {
+								MicroUtils.preciseKiting(marine, target, kitingOption, false);
+							} 
+						}
+					}
+				}else{
+					// if we're not near the order position, go there
+					if (marine.getDistance(order.getPosition()) > 80) {
+						CommandUtil.move(marine, order.getPosition());
+					}
 				}
-			} else {
-				// if we're not near the order position, go there
-				if (rangedUnit.getDistance(order.getPosition()) > 100) {
-					CommandUtil.attackMove(rangedUnit, order.getPosition());
+			}
+		}else{//벙커가 있으면
+			kitingOption.setGoalPosition(bunker.getPosition());
+			for (Unit marine : marines) {
+				Unit target = getTarget(marine, targets);
+				if(target != null){
+					
+					if(marine.getType().maxHitPoints() < 11){
+						kitingOption.setSaveUnit(true);
+					}else{
+						kitingOption.setSaveUnit(false);
+					}
+				
+	//				if(marine.getDistance(target) < marine.getType().groundWeapon().maxRange()/2){
+						//kitingOption.setCooltimeAlwaysAttack(false);
+	//				}else{
+	//					kitingOption.setCooltimeAlwaysAttack(true);
+	//				}
+					
+							
+		//			System.out.println("====================================");
+	//				System.out.println("marine attackrange : " + marine.getType().groundWeapon().maxRange());
+	//				System.out.println("marine attackrange : " + MyBotModule.Broodwar.self().weaponMaxRange(WeaponType.Gauss_Rifle));
+	//				System.out.println("bunker attackrange : " + bunker.getType().groundWeapon().maxRange());
+	//				System.out.println("marine " + marine.getID() + " far from bunker : " + marine.getDistance(bunker) + " and far from target : " + marine.getDistance(target));
+		//			System.out.println("target " + target.getID() + " is far from bunker : " + target.getDistance(bunker));
+		//			System.out.println("enemy in range of bunker :" + bunker.isInWeaponRange(target));
+					
+					
+						if(marine.getHitPoints() < 6){
+							bunker.load(marine);
+							continue;
+						}
+						
+						
+	//					if(marine.getDistance(bunker) < marine.getType().groundWeapon().maxRange()*1/2){
+	//						kitingOption.setCooltimeAlwaysAttack(true);
+	//					}
+						if(DontGoFar){
+							if(marine.getDistance(bunker) > 120){
+								marine.move(bunker.getPosition());
+							}
+							if(marine.getHitPoints() < 11){
+								if(marine.getDistance(bunker) > 50){
+									marine.move(bunker.getPosition());
+								}
+							}
+						}else{
+							if(marine.getDistance(target) <= marine.getType().groundWeapon().maxRange()*3/4 && bunker.getDistance(target) <= 160){
+								
+								if(marine.getDistance(bunker) < 30 ){
+									bunker.load(marine);
+								}else{
+		//							System.out.println("marine moving");
+									marine.move(bunker.getPosition());
+								}
+								//marine.move(bunker.getPosition());
+							}else{
+								if (target != null) {
+									if (kiteWithmarines) {
+										MicroUtils.preciseKiting(marine, target, kitingOption, true);
+									} 
+								}
+							}
+						}
+				}else{
+					// if we're not near the order position, go there
+					if (marine.getDistance(order.getPosition()) > 40) {
+						CommandUtil.move(marine, order.getPosition());
+					}
 				}
 			}
 		}
 	}
 	
-	private Unit getTarget(Unit rangedUnit, List<Unit> targets) {
+	
+	public Unit getClosestMineral(Unit depot)
+	{
+		double bestDist = 99999;
+		Unit bestMineral = null;
+		
+		for (Unit mineral : MyBotModule.Broodwar.getAllUnits()){
+			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(depot) < 320){
+				double dist = mineral.getDistance(depot);
+				if (dist < bestDist){
+                    bestMineral = mineral;
+                    bestDist = dist;
+                }
+			}
+		}
+	    return bestMineral;
+	}
+	
+	private Unit getTarget(Unit marine, List<Unit> targets) {
 		int bestScore = -999999;
 		Unit bestTarget = null;
 
 		for (Unit target : targets) {
 			if (!target.isDetected()) continue;
 			
-			int priority = getAttackPriority(rangedUnit, target);     // 0..12
-			int range    = rangedUnit.getDistance(target);           // 0..map size in pixels
+			//int priority = 0;   // 0..12
+			int range    = marine.getDistance(target);           // 0..map size in pixels
 			int toGoal   = target.getDistance(order.getPosition());  // 0..map size in pixels
 
 			// Let's say that 1 priority step is worth 160 pixels (5 tiles).
 			// We care about unit-target range and target-order position distance.
-			int score = 5 * 32 * priority - range - toGoal/2;
+			//int score = 5 * 32 * priority - range - toGoal/2;
+			int score =  - range - toGoal/2;
 
 			// Adjust for special features.
 			// This could adjust for relative speed and direction, so that we don't chase what we can't catch.
-			if (rangedUnit.isInWeaponRange(target)) {
+			if (marine.isInWeaponRange(target)) {
 				score += 4 * 32;
 			} else if (!target.isMoving()) {
-				if (target.isSieged() || target.getOrder() == Order.Sieging || target.getOrder() == Order.Unsieging) {
-					score += 48;
-				} else {
-					score += 24;
-				}
+				score += 24;
 			} else if (target.isBraking()) {
 				score += 16;
-			} else if (target.getType().topSpeed() >= rangedUnit.getType().topSpeed()) {
+			} else if (target.getType().topSpeed() >= marine.getType().topSpeed()) {
 				score -= 5 * 32;
 			}
 			
 			// Prefer targets that are already hurt.
-			if (target.getType().getRace() == Race.Protoss && target.getShields() == 0) {
-				score += 32;
-			} else if (target.getHitPoints() < target.getType().maxHitPoints()) {
-				score += 24;
-			}
-
+//			if (target.getType().getRace() == Race.Protoss && target.getShields() == 0) {
+//				score += 32;
+//			} else if (target.getHitPoints() < target.getType().maxHitPoints()) {
+//				score += 24;
+//			}
+			
+			score += (target.getType().maxHitPoints() + target.getType().maxShields() - target.getHitPoints() + target.getShields())
+					/ target.getType().maxHitPoints() + target.getType().maxShields() * 32;  
+			
 			if (score > bestScore) {
 				bestScore = score;
 				bestTarget = target;
@@ -101,174 +249,70 @@ public class MicroMarine extends MicroManager {
 		return bestTarget;
 	}
 	
+	public static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle, Boolean bunker) {
+		int reverseX = rangedUnit.getPosition().getX() - target.getPosition().getX(); // 타겟과 반대로 가는 x양
+		int reverseY = rangedUnit.getPosition().getY() - target.getPosition().getY(); // 타겟과 반대로 가는 y양
+	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
+	    
+		Position safePosition = null; // 0.0 means the unit is facing east.
+		int minimumRisk = 99999;
+		int minimumDistanceToGoal = 99999;
+		double maximumdistanceToTarget = 0;
 
-	//TODO 이거
-	private int getAttackPriority(Unit rangedUnit, Unit target) {
+//		Integer[] FLEE_ANGLE = MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType()); // MicroData.FleeAngle에 저장된 유닛타입에 따른 회피 각 범위(골리앗 새끼들은 뚱뚱해서 각이 넓으면 지들끼리 낑김)
+		Integer[] FLEE_ANGLE = fleeAngle != null ? fleeAngle : MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType());
+		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
+		int moveCalcSize = moveDistPerSec; // 이동 회피지점의 거리 = 유닛의 초당이동거리
+		if(!bunker){
+			moveCalcSize = moveDistPerSec/4;
+		}
+		while (safePosition == null && moveCalcSize > 10) {
+			for(int i = 0 ; i< FLEE_ANGLE.length; i ++) {
+			    Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
+				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
+				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
+				
+				int risk = MicroUtils.riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize, unitedKiting); // 회피지점에서의 예상위험도
+				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
+				double distanceToTarget = movePosition.getDistance(target.getPosition());
+				
+				if(bunker){
+					risk += distanceToGoal;
+					// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
+					if (MicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
+							&& (risk < minimumRisk || (risk == minimumRisk && distanceToGoal < minimumDistanceToGoal))) {
+						
+						safePosition =  movePosition;
+						minimumRisk = risk;
+						minimumDistanceToGoal = distanceToGoal;
+					}
+				}else{
+					if (MicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
+							&& (risk < minimumRisk || (risk == minimumRisk && distanceToTarget > maximumdistanceToTarget))) {
+						
+						safePosition =  movePosition;
+						minimumRisk = risk;
+						maximumdistanceToTarget = distanceToTarget;
+					}
+				}
+				fleeRadianAdjust = MicroUtils.rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
+		    }
+			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
+//		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
+		    	moveCalcSize = moveCalcSize * 2;
+		    	
+		    	if (moveCalcSize <= 10 && FLEE_ANGLE.equals(FleeAngle.NARROW_ANGLE)) { // 회피지역이 없을 경우 2) 각 범위를 넓힘
+					FLEE_ANGLE = FleeAngle.WIDE_ANGLE;
+					unitedKiting = false;
+					moveCalcSize = moveDistPerSec;
+				}
+			}
+		}
+		if (safePosition == null) { // 회피지역이 없을 경우 3) 목표지점으로 간다. 이 경우는 거의 없다.
+			safePosition = goalPosition;
+		}
 		
-		return 0;
-
-//		UnitType rangedType = rangedUnit.getType();
-//		UnitType targetType = target.getType();
-//		
-//		int priority = 0;
-//		if (rangedType == UnitType.Terran_Marine) {
-//			priority = getMarinePriority();
-//		}
-
-//		// An addon other than a completed comsat is boring.
-//		// TODO should also check that it is attached
-//		if (targetType.isAddon() && !(targetType == BWAPI::UnitTypes::Terran_Comsat_Station && target->isCompleted()))
-//		{
-//			return 1;
-//		}
-		
-		
-//	    // if the target is building something near our base something is fishy
-//	    BWAPI::Position ourBasePosition = BWAPI::Position(InformationManager::Instance().getMyMainBaseLocation()->getPosition());
-//		if (target->getDistance(ourBasePosition) < 1200) {
-//			if (target->getType().isWorker() && (target->isConstructing() || target->isRepairing()))
-//			{
-//				return 12;
-//			}
-//			if (target->getType().isBuilding())
-//			{
-//				return 12;
-//			}
-//		}
-//	    
-//		if (rangedType.isFlyer()) {
-//			// Exceptions if we're a flyer (other than scourge, which is handled above).
-//			if (targetType == BWAPI::UnitTypes::Zerg_Scourge)
-//			{
-//				return 12;
-//			}
-//		}
-//		else
-//		{
-//			// Exceptions if we're a ground unit.
-//			if (targetType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine && !target->isBurrowed() ||
-//				targetType == BWAPI::UnitTypes::Zerg_Infested_Terran)
-//			{
-//				return 12;
-//			}
-//		}
-//
-//		if (targetType == BWAPI::UnitTypes::Protoss_High_Templar)
-//		{
-//			return 12;
-//		}
-//
-//		// Short circuit: Give bunkers a lower priority to reduce bunker obsession.
-//		if (targetType == BWAPI::UnitTypes::Terran_Bunker)
-//		{
-//			return 9;
-//		}
-//
-//		// Threats can attack us. Exception: Workers are not threats.
-//		if (UnitUtil::CanAttack(targetType, rangedType) && !targetType.isWorker())
-//		{
-//			// Enemy unit which is far enough outside its range is lower priority than a worker.
-//			if (rangedUnit->getDistance(target) > 64 + UnitUtil::GetAttackRange(target, rangedUnit))
-//			{
-//				return 8;
-//			}
-//			return 10;
-//		}
-//		// Droppers are as bad as threats. They may be loaded and are often isolated and safer to attack.
-//		if (targetType == BWAPI::UnitTypes::Terran_Dropship ||
-//			targetType == BWAPI::UnitTypes::Protoss_Shuttle)
-//		{
-//			return 10;
-//		}
-//		// Also as bad are other dangerous things.
-//		if (targetType == BWAPI::UnitTypes::Terran_Science_Vessel ||
-//			targetType == BWAPI::UnitTypes::Zerg_Scourge)
-//		{
-//			return 10;
-//		}
-//		// Next are workers.
-//		if (targetType.isWorker()) 
-//		{
-//	        if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture)
-//	        {
-//	            return 11;
-//	        }
-//			// Repairing or blocking a choke makes you critical.
-//			if (target->isRepairing() || unitNearChokepoint(target))
-//			{
-//				return 11;
-//			}
-//			// SCVs constructing are also important.
-//			if (target->isConstructing())
-//			{
-//				return 10;
-//			}
-//
-//	  		return 9;
-//		}
-//		// Important combat units that we may not have targeted above (esp. if we're a flyer).
-//		if (targetType == BWAPI::UnitTypes::Protoss_Carrier ||
-//			targetType == BWAPI::UnitTypes::Protoss_Reaver || 
-//			targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
-//			targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
-//		{
-//			return 8;
-//		}
-//		// Nydus canal is the most important building to kill.
-//		if (targetType == BWAPI::UnitTypes::Zerg_Nydus_Canal)
-//		{
-//			return 8;
-//		}
-//		// Spellcasters are as important as key buildings.
-//		// Also remember to target other non-threat combat units.
-//		if (targetType.isSpellcaster() ||
-//			targetType.groundWeapon() != BWAPI::WeaponTypes::None ||
-//			targetType.airWeapon() != BWAPI::WeaponTypes::None)
-//		{
-//			return 7;
-//		}
-//		// Templar tech and spawning pool are more important.
-//		if (targetType == BWAPI::UnitTypes::Protoss_Templar_Archives)
-//		{
-//			return 7;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Zerg_Spawning_Pool)
-//		{
-//			return 7;
-//		}
-//		// Don't forget the nexus/cc/hatchery.
-//		if (targetType.isResourceDepot())
-//		{
-//			return 6;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Protoss_Pylon)
-//		{
-//			return 5;
-//		}
-//		if (targetType == BWAPI::UnitTypes::Terran_Factory || targetType == BWAPI::UnitTypes::Terran_Armory)
-//		{
-//			return 5;
-//		}
-//		// Downgrade unfinished/unpowered buildings, with exceptions.
-//		if (targetType.isBuilding() &&
-//			(!target->isCompleted() || !target->isPowered()) &&
-//			!(	targetType.isResourceDepot() ||
-//				targetType.groundWeapon() != BWAPI::WeaponTypes::None ||
-//				targetType.airWeapon() != BWAPI::WeaponTypes::None ||
-//				targetType == BWAPI::UnitTypes::Terran_Bunker))
-//		{
-//			return 2;
-//		}
-//		if (targetType.gasPrice() > 0)
-//		{
-//			return 4;
-//		}
-//		if (targetType.mineralPrice() > 0)
-//		{
-//			return 3;
-//		}
-//		// Finally everything else.
-//		return 1;
+	    return safePosition;
 	}
-
+	
 }

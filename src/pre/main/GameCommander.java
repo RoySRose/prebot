@@ -65,7 +65,7 @@ public class GameCommander {
 			WorkerManager.Instance().update();
 			lag.test("MapGrid");
 			if ( isToFindError) System.out.print("d");
-
+			
 			// 빌드오더큐를 관리하며, 빌드오더에 따라 실제 실행(유닛 훈련, 테크 업그레이드 등)을 지시한다.
 			BuildManager.Instance().update();
 			lag.test("BuildManager");

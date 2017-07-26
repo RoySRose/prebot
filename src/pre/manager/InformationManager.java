@@ -42,6 +42,8 @@ public class InformationManager {
 	public Race enemyRace;			///< 적군 Player의 종족  
 
 	private boolean isReceivingEveryMultiInfo;
+	public boolean EarlyDefenseNeeded;
+	public boolean ScoutDefenseNeeded;
 
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -92,7 +94,9 @@ public class InformationManager {
 		enemyRace = enemyPlayer.getRace();
 		
 		isReceivingEveryMultiInfo = false;
-
+		EarlyDefenseNeeded = true;
+		ScoutDefenseNeeded = true;
+		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
 		
@@ -145,6 +149,20 @@ public class InformationManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
+			if(EarlyDefenseNeeded){
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+						EarlyDefenseNeeded = false;
+					}
+				}
+			}
+			if(ScoutDefenseNeeded){
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+						ScoutDefenseNeeded = false;
+					}
+				}
+			}
 		}
 	}
 
@@ -696,7 +714,7 @@ public class InformationManager {
 			otherExpansionLocations.get(selfPlayer).add(base);
 			otherExpansionLocations.get(enemyPlayer).add(base);
 		}
-		System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " + mainBaseCnt);
+		//System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " + mainBaseCnt);
 		
 		Collections.sort(otherExpansionLocations.get(selfPlayer), new Comparator<BaseLocation>() {
 			@Override public int compare(BaseLocation base1, BaseLocation base2) {
