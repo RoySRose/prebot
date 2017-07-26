@@ -21,10 +21,10 @@ import pre.manager.StrategyManager.Strategys;
 import pre.manager.StrategyManager.StrategysException;
 import pre.util.MicroUtils;
 
-/// �? ?��로그?�� ?��?��
+/// 봇 프로그램 설정
 public class RespondToStrategy {
 	
-	//?��로킹 ?��?��?�� ???�� ??�?
+	//클로킹 유닛에 대한 대처
 	public boolean enemy_dark_templar = false;
 	public boolean enemy_lurker = false;
 	public boolean enemy_wraith = false;
@@ -33,10 +33,10 @@ public class RespondToStrategy {
 	
 	public boolean enemy_shuttle = false;
 	
-	//초반 ?��?�� 건설?�� ???�� 체크
+	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
-	//?��?��체크
+	//유닛체크
 	public boolean chk_scv = false;
 	public boolean chk_marine = false;
 	public boolean chk_goliath = false;
@@ -159,32 +159,32 @@ public class RespondToStrategy {
 		
 		
 		
-		//enemy_dark_templar & enemy_lurker & enemy_wraith ?��로킹 ?��?��?�� ???�� ??�?
+		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
 		if(enemy_dark_templar || enemy_wraith || enemy_lurker){
-			//System.out.println("?��로킹 ?��?�� ??�?================");
-			//?��?��?��?��?�� ?���??��?���? 베이까�??�� 짓고 갈거?���?�?.
-			//?��?��?�� ?��?��?�� ?��?��?�� ?��?��?�� ???�� ??비이?��. 고로 ?���? ?��베에 ???�� 컨트롤�? ?��?��.
-			//마인?�� ?���?
-			//컴셋까�?�? �??���??��.
+			//System.out.println("클로킹 유닛 대비================");
+			//이니셜에서 엔지니어링 베이까지는 짓고 갈거이므로.
+			//익셉션 다크는 패스트 다크에 대한 대비이다. 고로 아직 사베에 대한 컨트롤은 없다.
+			//마인업 하고
+			//컴셋까지만 지어준다.
 			
-			/*마인?? ?��?�� ?��?��
+			/*마인은 일단 패스
 			 * if(!InformationManager.Instance().selfPlayer.hasResearched(TechType.Spider_Mines) && BuildManager.Instance().buildQueue.getItemCount(TechType.Spider_Mines) < 1){
-				//마인개발?�� ?��?��?��?���?, 빌드?��?��?�� ?��?���?
+				//마인개발이 안되어있고, 빌드큐에도 없다면
 				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Machine_Shop, InformationManager.Instance().selfPlayer) < 1){
 						//&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop) < 1){
-					//�??��졌거?�� �??���?�? ?��?�� 머신?��?�� ?��?���?
+					//지어졌거나 지어지고 있는 머신샵이 없다면
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop) < 1){
-						//빌드?��?�� 머신?��?�� ?��?���? 바로 만들?���?
+						//빌드큐에 머신샵이 없다면 바로 만들도록
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}else{
-					//머신?��?�� ?��거나 만들?���?�? ?��?���?
+					//머신샵이 있거나 만들어지고 있다면
 					if(BuildManager.Instance().buildQueue.getItemCount(TechType.Spider_Mines) < 1){
 						int chk_cnt = 0;
 						for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
 							if (unit.getType() == UnitType.Terran_Machine_Shop && unit.canResearch() && chk_cnt == 0){
-								//머신?��?�� 비어?��?���? ?��?���?
+								//머신샵이 비어있는게 있다면
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(TechType.Spider_Mines, true);
 								chk_cnt = 1;
 								break;
@@ -201,17 +201,17 @@ public class RespondToStrategy {
 
 			
 			if(!chk_comsat_station){
-				//컴셋?�� ?��?���?
+				//컴셋이 없다면
 				if(!chk_academy){
-					//?��카데미�? ?��?���?
+					//아카데미가 없다면
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) < 1){
-						//�??��졌거?�� 건설중인�? ?��?��?�� 빌드?��?��?�� ?��?���? ?��카데미�?? 빌드?��?�� ?��?��
+						//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Academy,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}else{
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1){
-						//빌드?��?�� 컴셋?�� ?��?��?��, ?��카데미�? ?��?��?��?��?��면빌?��?��?�� 컴셋 ?��?��
+						//빌드큐에 컴셋이 없는데, 아카데미가 완성되었다면빌드큐에 컴셋 입력
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station,
@@ -222,17 +222,17 @@ public class RespondToStrategy {
 			}
 			
 			if(!chk_engineering_bay){
-				//System.out.println("?��베없?��");
-				//?��베�? ?��?���?
+				//System.out.println("엔베없다");
+				//엔베가 없다면
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1){
-					//�??��졌거?�� 건설중인�? ?��?��?�� 빌드?��?��?�� ?��?���? ?��카데미�?? 빌드?��?�� ?��?��
+					//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					System.out.println("?���? 빌드?�� ?��?��");
+					System.out.println("엔베 빌드큐 입력");
 				}
 			}else{
-				//?��베�? ?��?���?
-				//System.out.println("?��베있?��!!!!!!!!!!!!!!!!!!");
+				//엔베가 있다면
+				//System.out.println("엔베있다!!!!!!!!!!!!!!!!!!");
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret) < 1){
 					if(chk_turret == 0){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
@@ -287,56 +287,56 @@ public class RespondToStrategy {
 				}
 			}
 			
-			/*베슬?? ?��?�� 주석처리. ?��?��조건 ?��?���?�? ?���?.
-			//베슬?�� ?��?�� 로직
+			/*베슬은 일단 주석처리. 특정조건 정해지면 넣기.
+			//베슬을 위한 로직
 			if(chk_factory){
-				//?��?�� ?��?��리�? ?��?��?��?���?
-				//if(){ ?���?분�? ?��?��조건?�� ?��?���??�� ?��?��.
+				//일단 팩토리가 있어야하고
+				//if(){ 이부분은 특정조건이 들어가야 한다.
 				if(!chk_starport){
-					//?��???��?���? ?��?���?
+					//스타포트가 없다면
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) < 1){
-						//빌드?���? 체크?���? ?��?���?
+						//빌드큐를 체크하고 없다면
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Starport.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Starport.gasPrice()){
-							//�??��?? 미네?��?�� 충분?��?���?
+							//가스와 미네랄이 충분하다면
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Starport,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 					}
 					
 				}else{
-					//?��???��?���? ?��?���?
+					//스타포트가 있다면
 					if(!chk_control_tower){
-						//컨트�? ???���? ?��?���?
+						//컨트롤 타워가 없다면
 						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) < 1){
-							//빌드?���? 체크?���?
+							//빌드큐를 체크하고
 							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Control_Tower.mineralPrice() 
 									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Control_Tower.gasPrice()){
-								//�??��?? 미네?��?�� 충분?��?���?
+								//가스와 미네랄이 충분하다면
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower,
 										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							}
 						}
 					}else{
-						//컨트�? ???���? ?��?���?
+						//컨트롤 타워가 있다면
 						if(!chk_science_facility){
-							//?��?��?��?�� ?��?��리티�? ?��?���?
+							//사이언스 퍼실리티가 없다면
 							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) < 1){
-								//빌드?���? 체크?���?
+								//빌드큐를 체크하고
 								if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Science_Facility.mineralPrice() 
 										&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Science_Facility.gasPrice()){
-									//�??��?? 미네?��?�� 충분?��?���?
+									//가스와 미네랄이 충분하다면
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Science_Facility,
 											BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 								}
 							}
 						}else{
-							//?��?��?��?�� ?��?��리티�? ?��?���?
+							//사이언스 퍼실리티가 있다면
 							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Vessel) < 1){
-								//빌드?���? 체크?���?
+								//빌드큐를 체크하고
 								if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Science_Vessel.mineralPrice() 
 										&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Science_Vessel.gasPrice()){
-									//�??��?? 미네?��?�� 충분?��?���?
+									//가스와 미네랄이 충분하다면
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Science_Vessel,
 											BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 								}
@@ -349,10 +349,10 @@ public class RespondToStrategy {
 		//enemy_dark_templar end
 		
 		/*
-		 * ?��?�� �??��?��?? 보류
+		 * 일단 가디언은 보류
 		//zergException_Guardian start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_Guardian){
-			//�??��?�� ??�?
+			//가디언 대비
 			enemy_dark_templar = true;
 		}
 		//zergException_Guardian end
@@ -363,14 +363,14 @@ public class RespondToStrategy {
 		}
 		
 		if(enemy_shuttle){
-			//?��?? ??�?
+			//셔틀 대비
 			if(!chk_engineering_bay){
-				//?���??��?���? 베이�? ?��?���?
+				//엔지니어링 베이가 없다면
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1){
-					//빌드?���? 체크?���?
+					//빌드큐를 체크하고
 					/*if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Engineering_Bay.mineralPrice()){ 
-						//미네?��?�� 충분?��?���?
-						 * ?��베는 미네?�� 체크 ?��?���?(?��?�� 미네?�� ?��?��?���? ?��?�� �??��?�� ?��?���?) 
+						//미네랄이 충분하다면
+						 * 엔베는 미네랄 체크 안하고(단순 미네랄 유닛이고 후딱 지어야 하니까) 
 						 */
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -378,7 +378,7 @@ public class RespondToStrategy {
 				}
 			}
 			if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ShuttleMix){
-				//?��????�? 중에. ?��?�� ?��???�� 보면. 골리?�� 추�?
+				//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
 				if(!chk_armory){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
@@ -393,7 +393,7 @@ public class RespondToStrategy {
 		
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			if(!chk_armory){
-				//?��?��?�� ?��머리?�� ?��겠�?�? ?��쨌든 ?��?���?
+				//당연히 아머리는 있겠지만 어쨌든 없다면
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
 					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
 							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
@@ -402,52 +402,52 @@ public class RespondToStrategy {
 					}
 				}
 			}
-			//?��머리?? ?��???��?��?�� 별개�? 체크?���? ?��?��?�� 건설?��?�� ?��?��.
+			//아머리와 스타포트는 별개로 체크하고 동시에 건설할수 있다.
 			if(!chk_starport){
-				//?��???��?���? ?��?���?
+				//스타포트가 없다면
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) < 1){
-					//빌드?���? 체크?���? ?��?���?
+					//빌드큐를 체크하고 없다면
 					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Starport.mineralPrice() 
 							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Starport.gasPrice()){
-						//�??��?? 미네?��?�� 충분?��?���?
+						//가스와 미네랄이 충분하다면
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Starport,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}
 				
 			}else{
-				//?��???��?���? ?��?���?
+				//스타포트가 있다면
 				if(!chk_control_tower){
-					//컨트�? ???���? ?��?���?
+					//컨트롤 타워가 없다면
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) < 1){
-						//빌드?���? 체크?���?
+						//빌드큐를 체크하고
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Control_Tower.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Control_Tower.gasPrice()){
-							//�??��?? 미네?��?�� 충분?��?���?
+							//가스와 미네랄이 충분하다면
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 					}
 				}else{
-					//컨트�? ???���? ?��?���?
+					//컨트롤 타워가 있다면
 					if(!chk_valkyrie){
-						//발키리�? ?��?���?
+						//발키리가 없다면
 						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie) < 1){
-							//빌드?���? 체크?���?
+							//빌드큐를 체크하고
 							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Valkyrie.mineralPrice() 
 									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Valkyrie.gasPrice()){
-								//�??��?? 미네?��?�� 충분?��?���?
+								//가스와 미네랄이 충분하다면
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Valkyrie,
 										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							}
 						}
 					}else{
-						//발키리�? ?��?���?
+						//발키리가 있다면
 						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Valkyrie) < 6){
-							//발키�? ?���? 체크?��?�� 6기�? ?��?��?���?(?��?�� 6�?)
+							//발키리 수를 체크해서 6기가 안된다면(일단 6기)
 							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Valkyrie.mineralPrice() 
 									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Valkyrie.gasPrice()){
-								//�??��?? 미네?��?�� 충분?��?���?
+								//가스와 미네랄이 충분하다면
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Valkyrie,
 										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							}
