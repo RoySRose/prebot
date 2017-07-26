@@ -68,10 +68,11 @@ public class AnalyzeStrategy {
 		}*/
 		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
 				&& MyBotModule.Broodwar.getFrameCount() < 7000)
+				//||MyBotModule.Broodwar.getDamageFrom(UnitType.Protoss_Dark_Templar, toType, fromPlayer)
 				// 약  5분 안쪽으로 템플러 아카이브를 발견하거나				
-				||(MyBotModule.Broodwar.getFrameCount() > 5500 &&
+				/*||(MyBotModule.Broodwar.getFrameCount() > 5500 &&
 							InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer)
-							+InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) < 4)
+							+InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) < 4)*/
 				//약 4분이 넘어갈떄 질럿 + 드래군의 수가 4기 미만일경우(정찰이 안된경우나 마찬가지)
 				//|| (InformationManager.Instance().getNumUnits(UnitType., InformationManager.Instance().enemyPlayer) >= 1)
 				//다크에 공격당한다면
