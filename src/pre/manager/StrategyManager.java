@@ -509,9 +509,10 @@ public class StrategyManager {
 			}
  		}
 		if(aca){
-			for (Unit command : MyBotModule.Broodwar.self().getUnits())
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
-				if(command.getAddon() == null){
+				if(unit == null) continue;
+				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null) 
 							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
