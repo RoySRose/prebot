@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import bwapi.Color;
+import bwapi.Order;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
@@ -68,10 +69,12 @@ public class AnalyzeStrategy {
 		}*/
 		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
 				&& MyBotModule.Broodwar.getFrameCount() < 7000)
+				//|| InformationManager.Instance().enemyPlayer.allUnitCount(UnitType.)
+				//||MyBotModule.Broodwar.getDamageFrom(UnitType.Protoss_Dark_Templar, toType, fromPlayer)
 				// 약  5분 안쪽으로 템플러 아카이브를 발견하거나				
-				||(MyBotModule.Broodwar.getFrameCount() > 5500 &&
+				/*||(MyBotModule.Broodwar.getFrameCount() > 5500 &&
 							InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer)
-							+InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) < 4)
+							+InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) < 4)*/
 				//약 4분이 넘어갈떄 질럿 + 드래군의 수가 4기 미만일경우(정찰이 안된경우나 마찬가지)
 				//|| (InformationManager.Instance().getNumUnits(UnitType., InformationManager.Instance().enemyPlayer) >= 1)
 				//다크에 공격당한다면
@@ -85,6 +88,18 @@ public class AnalyzeStrategy {
 					// 엔지니어링 베이까지 이니셜에 넣을계획
 					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 				}
+		}
+		
+		
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 다크 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+			}
+			//아카데미가 있다면 init으로
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
 		}
 		
 		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Robotics_Facility, InformationManager.Instance().enemyPlayer) >= 1){
@@ -203,6 +218,17 @@ public class AnalyzeStrategy {
 		
 		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().enemyPlayer) >= 20){
 			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
+		}
+		
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 클로킹 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
+			}
+			//아카데미가 있다면 init으로
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
 		}
 		
 		if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
@@ -391,6 +417,17 @@ public class AnalyzeStrategy {
 			}
 
 		}//end hydra exception
+		
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 클로킹 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
+			}
+			//아카데미가 있다면 init으로
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
+		}
 		
 		//start guardian exception
 		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) >= 1
