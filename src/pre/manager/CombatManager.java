@@ -506,6 +506,15 @@ public class CombatManager {
 		if(enemyUnitsInRegion.size() == 0){
 			return;
 		}
+		boolean onlyworker = true;
+		for (Unit target : enemyUnitsInRegion){
+			if(target.getType().isBuilding() ==false && !target.getType().isWorker() == false){
+				onlyworker= false;
+			}
+		}
+		if(onlyworker){
+			return;
+		}
 		
 		Unit CC = null;
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
