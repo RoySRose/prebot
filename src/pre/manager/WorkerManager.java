@@ -44,21 +44,12 @@ public class WorkerManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 
-		//relocationCCtoCCWorkers();
-		//relocationWorkers();
 		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 		updatework();
 		//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
-	}
-	
-	public void relocationWorkers() 
-	{
-		for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
-			if (depot == null) continue;
-		}
 	}
 	
 	public void updateWorkerStatus() 
@@ -119,11 +110,21 @@ public class WorkerManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			// refinery 가 건설 completed 되었으면,
+			//se-min.park 가스 근처 300범위 안에 cc없으면 일꾼 안보내도록 추가 
 			if (unit.getType().isRefinery() && unit.isCompleted() )
 			{
+				int closestDist = 320;
+				boolean existNearRefinery = false;
+				for (Unit depot : WorkerManager.Instance().getWorkerData().getDepots()){
+					int dist = unit.getDistance(depot);
+					if (dist < closestDist) {
+						existNearRefinery = true;
+					}
+				}
+				if(!existNearRefinery)
+					return;
 				// get the number of workers currently assigned to it
 				int numAssigned = workerData.getNumAssignedWorkers(unit);
-
 				// if it's less than we want it to be, fill 'er up
 				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
 				for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i)
@@ -137,7 +138,6 @@ public class WorkerManager {
 			}
 		}
 	}
-
 	/// Idle 일꾼을 Mineral 일꾼으로 만듭니다
 	public void handleIdleWorkers() 
 	{
@@ -714,7 +714,7 @@ public class WorkerManager {
 	{
 		if (worker == null) return;
 
-		//workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
+		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit)null);
 	}
 
 	/// 모든 Combat 일꾼 유닛에 대해 임무를 해제합니다
@@ -814,7 +814,7 @@ public class WorkerManager {
 			}
 
 			Unit depot = workerData.getWorkerDepot(worker);
-
+			
 			if (depot != null && workerData.depotHasEnoughMineralWorkers(depot))
 			{
 				workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);

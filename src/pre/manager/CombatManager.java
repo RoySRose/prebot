@@ -429,24 +429,44 @@ public class CombatManager {
 	    }
 		
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
-	    boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
+		if(enemyUnitsInRegion == null)
+			return;
+		//7마리 이상이면 능봉으로 넘아감
+		if(enemyUnitsInRegion.size() > 6)
+			return;
+				
+		int assignScoutDefender = 0;
+		for (Unit workers : enemyUnitsInRegion) {
+			if(workers.getType().isWorker() && workers.isAttacking()){
+				assignScoutDefender++;
+			} // 일꾼이 내 지역에서 돌아다닌다.
+		}
+//		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
-		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");		
-	    if (scoutDefenseSquad.isEmpty() && assignScoutDefender) {
-	    	Unit enemyWorker = enemyUnitsInRegion.get(0);
+		
+		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");
+//		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
+    	int workerDefendersNeeded = 0;
+    	while(workerDefendersNeeded < assignScoutDefender){
+	    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
 	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
-	        
-            if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
-			    WorkerManager.Instance().setCombatWorker(workerDefender);
-			    squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
-            }
-	    	
-	    } else if (!scoutDefenseSquad.isEmpty() && !assignScoutDefender) {
-	    	scoutDefenseSquad.clear();
-	    }
+	        if(workerDefender == null)
+	        	return;
+	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && workerDefender != null) {
+	        	if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
+	        		WorkerManager.Instance().setCombatWorker(workerDefender);
+	        		squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
+	        	}
+	        }
+            workerDefendersNeeded++;
+    	}
+    	if (!scoutDefenseSquad.isEmpty() && assignScoutDefender == 0) {
+		   	scoutDefenseSquad.clear();
+		}
 	}
 	
-	private void updateBaseDefenseSquads() {
+	
+private void updateBaseDefenseSquads() {
 		
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		Region enemyRegion = null;
@@ -532,10 +552,11 @@ public class CombatManager {
 		}
 		
 	}
+		
 	
 	private Unit findClosestWorkerToTarget(Unit enemyWorker) {
 		Unit closestMineralWorker = null;
-		int closestDist = 600 + 128;
+		int closestDist = 1000 + 128;
 		for (Unit unit : combatUnits) {
 			if (unit.getType().isWorker() && WorkerManager.Instance().isMineralWorker(unit)) {
 				int dist = unit.getDistance(enemyWorker);
@@ -551,6 +572,7 @@ public class CombatManager {
 		
 		return closestMineralWorker;
 	}
+	
 	
 	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers) {
 		// if there's nothing left to defend, clear the squad
@@ -595,9 +617,9 @@ public class CombatManager {
 
 			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
-				if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
+				/*if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
 					WorkerManager.Instance().setCombatWorker(defenderToAdd);
-				}
+				}*/
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
 				groundDefendersAdded++;
 			}
@@ -606,8 +628,8 @@ public class CombatManager {
 				break;
 			}
 		}
+		
 	}
-	
 	private void updateAttackSquads() {
 	    Squad mainAttackSquad = squadData.getSquad("MainAttack");
 
