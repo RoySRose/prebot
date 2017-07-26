@@ -20,6 +20,7 @@ import pre.Config;
 import pre.ConstructionPlaceFinder;
 import pre.InitialBuild;
 import pre.MetaType;
+import pre.RespondToStrategy;
 import pre.WorkerData;
 import pre.main.MyBotModule;
 import pre.manager.CombatManager.CombatStrategy;
@@ -236,7 +237,11 @@ public class StrategyManager {
 			if (isInitialBuildOrderFinished == true) {
 				executeCombatUnitTraining();
 			}
-			//ResondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+
+		}
+		
+		if (MyBotModule.Broodwar.getFrameCount() % 95 == 0){//약 4초에 한번
+			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
 		}
 	}
 	
