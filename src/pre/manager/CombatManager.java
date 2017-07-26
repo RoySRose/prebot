@@ -508,7 +508,7 @@ public class CombatManager {
 		}
 		boolean onlyworker = true;
 		for (Unit target : enemyUnitsInRegion){
-			if(target.getType().isBuilding() ==false && !target.getType().isWorker() == false){
+			if(target.getType().isBuilding() ==false && target.getType().isWorker() == false){
 				onlyworker= false;
 			}
 		}
