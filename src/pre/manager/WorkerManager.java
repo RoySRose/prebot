@@ -110,6 +110,7 @@ public class WorkerManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			// refinery 가 건설 completed 되었으면,
+			//se-min.park 가스 근처 300범위 안에 cc없으면 일꾼 안보내도록 추가 
 			if (unit.getType().isRefinery() && unit.isCompleted() )
 			{
 				int closestDist = 300;

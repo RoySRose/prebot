@@ -442,23 +442,25 @@ public class CombatManager {
 		}
 //		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
-		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");	
+		Squad scoutDefenseSquad = squadData.getSquad("ScoutDefense");
 		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
-		
-	    if (scoutDefenseSquad.isEmpty() && assignScoutDefender > 0 && defenderToAdd == null) {
-	    	int workerDefendersNeeded = 0;
-	    	while(workerDefendersNeeded < assignScoutDefender){
-		    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
-		        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
-	            if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
-				    WorkerManager.Instance().setCombatWorker(workerDefender);
-				    squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
-	            }
-	            workerDefendersNeeded++;
-	    	}
-	    } else if (!scoutDefenseSquad.isEmpty() && assignScoutDefender <= 0) {
-	    	scoutDefenseSquad.clear();
-	    }
+    	int workerDefendersNeeded = 0;
+    	while(workerDefendersNeeded < assignScoutDefender){
+	    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
+	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker);
+	        if(workerDefender == null)
+	        	return;
+	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && defenderToAdd == null && workerDefender != null) {
+	        	if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
+	        		WorkerManager.Instance().setCombatWorker(workerDefender);
+	        		squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
+	        	}
+	        }
+            workerDefendersNeeded++;
+    	}
+    	if (!scoutDefenseSquad.isEmpty() && assignScoutDefender == 0) {
+		   	scoutDefenseSquad.clear();
+		}
 	}
 	
 	
@@ -659,9 +661,9 @@ private void updateBaseDefenseSquads() {
 			int dist = unit.getDistance(pos);
 
 			// Pull workers only if requested, and not from distant bases.
-			/*if (unit.getType().isWorker() && (!pullWorkers || dist > 1000)) {
+			if (unit.getType().isWorker() && (!pullWorkers || dist > 1000)) {
 	            continue;
-	        }*/
+	        }
 
 			if (dist < minDistance) {
 	            closestDefender = unit;
