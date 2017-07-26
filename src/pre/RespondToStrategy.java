@@ -71,7 +71,7 @@ public class RespondToStrategy {
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 
-			if (unit.getType() == UnitType.Terran_SCV) {
+			if (unit.getType() == UnitType.Terran_SCV ) {
 				chk_scv = true;
 			}
 			if (unit.getType() == UnitType.Terran_Marine) {
@@ -210,12 +210,15 @@ public class RespondToStrategy {
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}else{
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1){
-						//빌드큐에 컴셋이 없는데, 아카데미가 완성되었다면빌드큐에 컴셋 입력
-						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
-								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) > 0){ 
+						//아카데미가 완성되었고
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1){
+							//빌드큐에 컴셋이 없는데, 아카데미가 완성되었다면빌드큐에 컴셋 입력
+							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
+									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station,
+										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							}
 						}
 					}
 				}
@@ -233,57 +236,60 @@ public class RespondToStrategy {
 			}else{
 				//엔베가 있다면
 				//System.out.println("엔베있다!!!!!!!!!!!!!!!!!!");
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret) < 1){
-					if(chk_turret == 0){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0){
+					//엔베가 완성이 되었다면
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret) < 1){
+						if(chk_turret == 0){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							
+							chk_turret ++;
+						}
 						
-						chk_turret ++;
-					}
-					
-					if(chk_turret == 1){
-						BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-						List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-						for (BaseLocation occupied : occupiedBases) {
-							if (occupied == firstExpansion) {
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.SecondChokePoint, true);
-								//break;
-								chk_turret ++;
+						if(chk_turret == 1){
+							BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+							List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+							for (BaseLocation occupied : occupiedBases) {
+								if (occupied == firstExpansion) {
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, true);
+									//break;
+									chk_turret ++;
+								}
 							}
 						}
+						
+						//Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+						
+						/*else if(chk_turret == 1){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+							chk_turret ++;
+						}else if(chk_turret == 2){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+							chk_turret ++;
+						}else if(chk_turret == 3){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.MainBaseBackYard, true);
+							//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
+							chk_turret ++;
+						}*/
+						/*else if(chk_turret == 4){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.MainBaseBackYard, true);
+							//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.MainBaseBackYard);
+							chk_turret ++;
+						}else if(chk_turret == 5){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+									BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+							//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.FirstChokePoint);
+							chk_turret ++;
+						}*/
 					}
-					
-					//Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
-					
-					/*else if(chk_turret == 1){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-						chk_turret ++;
-					}else if(chk_turret == 2){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-						chk_turret ++;
-					}else if(chk_turret == 3){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.MainBaseBackYard, true);
-						//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
-						chk_turret ++;
-					}*/
-					/*else if(chk_turret == 4){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.MainBaseBackYard, true);
-						//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.MainBaseBackYard);
-						chk_turret ++;
-					}else if(chk_turret == 5){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-						//InitialBuild.Instance().queueBuildSeed(false, UnitType.Terran_Missile_Turret, BuildOrderItem.SeedPositionStrategy.FirstChokePoint);
-						chk_turret ++;
-					}*/
 				}
 			}
 			
@@ -417,39 +423,31 @@ public class RespondToStrategy {
 				
 			}else{
 				//스타포트가 있다면
-				if(!chk_control_tower){
-					//컨트롤 타워가 없다면
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) < 1){
-						//빌드큐를 체크하고
-						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Control_Tower.mineralPrice() 
-								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Control_Tower.gasPrice()){
-							//가스와 미네랄이 충분하다면
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						}
-					}
-				}else{
-					//컨트롤 타워가 있다면
-					if(!chk_valkyrie){
-						//발키리가 없다면
-						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie) < 1){
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0){
+					//스타포트가 건설이 되어있다면
+					if(!chk_control_tower){
+						//컨트롤 타워가 없다면
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) < 1){
 							//빌드큐를 체크하고
-							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Valkyrie.mineralPrice() 
-									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Valkyrie.gasPrice()){
+							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Control_Tower.mineralPrice() 
+									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Control_Tower.gasPrice()){
 								//가스와 미네랄이 충분하다면
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Valkyrie,
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower,
 										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							}
 						}
 					}else{
-						//발키리가 있다면
-						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Valkyrie) < 6){
-							//발키리 수를 체크해서 6기가 안된다면(일단 6기)
-							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Valkyrie.mineralPrice() 
-									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Valkyrie.gasPrice()){
-								//가스와 미네랄이 충분하다면
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Valkyrie,
-										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						//컨트롤 타워가 있다면
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Control_Tower) > 0){
+							//건설된 컨트롤 타워가 있다면
+							if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Valkyrie) < 6){
+								//발키리 수를 체크해서 6기가 안된다면(일단 6기)
+								if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Valkyrie.mineralPrice() 
+										&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Valkyrie.gasPrice()){
+									//가스와 미네랄이 충분하다면
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Valkyrie,
+											BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+								}
 							}
 						}
 					}

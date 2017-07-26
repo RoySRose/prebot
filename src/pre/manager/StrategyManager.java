@@ -188,10 +188,10 @@ public class StrategyManager {
 	public void update() {
 		
 		//TODO 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
-//		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
-//				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
-//			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
-//		}
+		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
+				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
+			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		}
 		
 		if (BuildManager.Instance().buildQueue.isEmpty()) {
 			if(isInitialBuildOrderFinished == false){
