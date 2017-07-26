@@ -16,6 +16,7 @@ import bwta.BWTA;
 import bwta.Region;
 import pre.MapGrid;
 import pre.UnitInfo;
+import pre.combat.micro.MicroMarine;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.util.MicroSet.FleeAngle;
@@ -203,6 +204,9 @@ public class MicroUtils {
 	 * rangeUnit은 target에 대한 카이팅을 한다.
 	 */
 	public static void preciseKiting(Unit rangedUnit, Unit target, KitingOption kitingOption) {
+		preciseKiting(rangedUnit, target, kitingOption, null);
+	}
+	public static void preciseKiting(Unit rangedUnit, Unit target, KitingOption kitingOption, Boolean bunker) {
 		// 유닛 유효성 검사
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
@@ -291,7 +295,12 @@ public class MicroUtils {
 				}
 			}
 			if (fleePosition == null) {
-				fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle);
+
+				if(rangedUnit.getType() == UnitType.Terran_Marine){
+					fleePosition = MicroMarine.getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle, bunker);
+				}else{
+					fleePosition = getFleePosition(rangedUnit, target, (int) rangedUnitSpeed, unitedKiting, goalPosition, fleeAngle);
+				}
 			}
 			CommandUtil.rightClick(rangedUnit, fleePosition);
 		}

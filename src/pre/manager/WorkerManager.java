@@ -161,6 +161,9 @@ public class WorkerManager {
 			if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout){
 				continue;
 			}
+			if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
+				continue;
+			}
 			if (!worker.isCompleted())
 			{
 				continue;
@@ -189,10 +192,8 @@ public class WorkerManager {
 					continue;
 				}
 				if(planGetMineral != realGetMineral){
-					//System.out.println(" realgetmineral:" + realgetmineral +"changing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					worker.gather(tempMineral);
 					realGetMineral = worker.getOrderTarget().getID();
-					//commandUtil.rightClick(worker, temp);
 				}
 			}
 		}	
@@ -854,6 +855,13 @@ public class WorkerManager {
 		if (worker == null) return false;
 
 		return workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle;
+	}
+	
+	public boolean isCombatWorker(Unit worker)
+	{
+		if (worker == null) return false;
+
+		return workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle;
 	}
 
 	public boolean isScoutWorker(Unit worker)

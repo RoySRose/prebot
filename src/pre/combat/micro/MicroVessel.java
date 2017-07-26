@@ -59,7 +59,7 @@ public class MicroVessel extends MicroManager {
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 				if (unit.isVisible() && unit.isDetected() && unit.getPosition().isValid()) {
 					if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker
-							|| unit.getType() == UnitType.Terran_Wraith || unit.getType() == UnitType.Terran_Ghost){
+							|| unit.getType() == UnitType.Terran_Wraith || unit.getType() == UnitType.Terran_Ghost || unit.getType() == UnitType.Protoss_Arbiter){
 						int tempdist = unit.getDistance(sVessel);
 						if(tempdist < closestDistToVessel){
 							invisibleEnemyUnit = unit;
