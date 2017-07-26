@@ -387,6 +387,8 @@ public class StrategyManager {
 							}
 							if (currentItem == null){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+							}else if(currentItem.metaType.getUnitType() != UnitType.Terran_Comsat_Station){
+								return;
 							}else if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
 								if(workerCount < 4){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
@@ -495,6 +497,28 @@ public class StrategyManager {
 				+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Refinery)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Refinery, null) == 0){
 			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+		}
+		
+		boolean aca =false;
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			if (unit.getType() == UnitType.Terran_Academy && unit.isCompleted()){
+				aca = true;
+				break;
+			}
+ 		}
+		if(aca){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if(unit == null) continue;
+				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null) 
+							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
+					}
+				}
+	 		}
 		}
 	}
 	
