@@ -79,7 +79,7 @@ public class SpiderMineManger {
 		for (Integer unitId : mineReservedMap.keySet()) {
 			MineReserved mineReserved = mineReservedMap.get(unitId);
 			if (mineReserved.reservedFrame + MicroSet.Vulture.RESV_EXPIRE_FRAME < MyBotModule.Broodwar.getFrameCount()) { // 5초 지났으면 삭제
-				System.out.println("expired mine position : " + mineReserved.positionToMine);
+				//System.out.println("expired mine position : " + mineReserved.positionToMine);
 				expiredList.add(unitId);
 			}
 //			MyBotModule.Broodwar.drawCircleScreen(mineReserved.positionToMine, 100, Color.White);

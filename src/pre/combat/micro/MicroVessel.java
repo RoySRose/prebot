@@ -131,18 +131,18 @@ public class MicroVessel extends MicroManager {
 				if(!mostDangerousTarget.getType().isBuilding()){
 					temp = sVesselCheckSpeed * 3;
 				}
-				System.out.println("sVessel ID: " + sVessel.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
+				//System.out.println("sVessel ID: " + sVessel.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
 				if(mostDangerousTarget.isInWeaponRange(sVessel) || (sVessel.getDistance(mostDangerousTarget) 
 						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
 						+ sVesselCheckSpeed + temp)
 						){
-					System.out.println("flee shown");
+					//System.out.println("flee shown");
 					//System.out.println("It's "+ mostDangerousTarget.getType() + " Danger and changing");
 					Position fleePosition = getFleePosition(sVessel, mostDangerousTarget, (int) sVesselCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					sVessel.move(fleePosition);
 					fleeing = true;
-					System.out.println("sVessel current,  X:" + sVessel.getX() + ", Y:" + sVessel.getY());
-					System.out.println("flee shown unit,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
+					//System.out.println("sVessel current,  X:" + sVessel.getX() + ", Y:" + sVessel.getY());
+					//System.out.println("flee shown unit,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
 				}
 			}
 			
@@ -188,9 +188,9 @@ public class MicroVessel extends MicroManager {
 				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
 				if(rangedUnit.getID() == 102){
-				System.out.print("fleeVector: " + fleeVector.toString());
-				System.out.print("movePosition: " + movePosition.toString());
-				System.out.print("middlePosition: " + middlePosition.toString());
+				//System.out.print("fleeVector: " + fleeVector.toString());
+				//System.out.print("movePosition: " + movePosition.toString());
+				//System.out.print("middlePosition: " + middlePosition.toString());
 				}
 				
 				double risk = 0;

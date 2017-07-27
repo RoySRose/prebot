@@ -38,18 +38,19 @@ public class WorkerManager {
 
 		// 1초에 1번만 실행한다
 		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-		if (MyBotModule.Broodwar.getFrameCount() % 6 == 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 3 == 0){
 		
-		updateWorkerStatus();
-		handleGasWorkers();
-		handleIdleWorkers();
-
-		//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
-		updatework();
-		//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
-		handleMoveWorkers();
-		handleCombatWorkers();
-		handleRepairWorkers();
+			updateWorkerStatus();
+			handleGasWorkers();
+			handleIdleWorkers();
+	
+			//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
+			updatework();
+			//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
+			handleMoveWorkers();
+			handleCombatWorkers();
+			handleRepairWorkers();
+		}
 	}
 	
 	public void updateWorkerStatus() 

@@ -193,7 +193,7 @@ public class StrategyManager {
 			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
-		if (BuildManager.Instance().buildQueue.isEmpty()) {
+		if (!isInitialBuildOrderFinished && BuildManager.Instance().buildQueue.isEmpty()) {
 			if(isInitialBuildOrderFinished == false){
 				MyBotModule.Broodwar.printf("Initial Build Finished");
 			}
@@ -383,28 +383,25 @@ public class StrategyManager {
 			
 			if (workerCount < 70 && workerCount < maxworkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if (unit.getType().isResourceDepot()) {
-						if (unit.isCompleted() && unit.isTraining() == false) {
-							
-							BuildOrderItem currentItem = null;
-							if(BuildManager.Instance().buildQueue.isEmpty() == false){
-								currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
-							}
-							if (currentItem == null){
+					if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
+						BuildOrderItem currentItem = null;
+						if(BuildManager.Instance().buildQueue.isEmpty() == false){
+							currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
+						}
+						if (currentItem == null){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+						}else if(currentItem.metaType.getUnitType() == UnitType.Terran_Comsat_Station){
+							return;
+						}else if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
+							if(workerCount < 4){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-							}else if(currentItem.metaType.getUnitType() != UnitType.Terran_Comsat_Station){
-								return;
-							}else if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
-								if(workerCount < 4){
+							}else{
+								if(currentItem.metaType.isUnit() && currentItem.blocking == true && MyBotModule.Broodwar.self().minerals() > currentItem.metaType.getUnitType().mineralPrice()+50 ){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 								}else{
-									if(currentItem.metaType.isUnit() && currentItem.blocking == true && MyBotModule.Broodwar.self().minerals() > currentItem.metaType.getUnitType().mineralPrice()+50 ){
-										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-									}else{
-										// 빌드큐에 일꾼 생산이 1개는 있도록 한다
-										if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
-											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-										}
+									// 빌드큐에 일꾼 생산이 1개는 있도록 한다
+									if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
+										BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 									}
 								}
 							}
@@ -441,6 +438,7 @@ public class StrategyManager {
 			
 			int Faccnt=0;
 			int CCcnt=0;
+			int facFullOperating =0;
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if (unit == null) continue;
@@ -450,18 +448,23 @@ public class StrategyManager {
 				if (unit.getType().isResourceDepot() && unit.isCompleted()){
 					CCcnt++;
 				}
+				if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
+					if(unit.isTraining() == true){
+						facFullOperating++;
+					}
+				}
 			}
 						
-			if(MyBotModule.Broodwar.getFrameCount()<14000 || (Faccnt <= 3 && CCcnt == 1)){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨
+			if(MyBotModule.Broodwar.getFrameCount()<6000 || (Faccnt <= 3 && CCcnt == 1)){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨
 				if(barrackflag==true && factoryflag==false){
-					supplyMargin = 6;
+					supplyMargin = 5;
 				}else if(factoryflag==true){
-					supplyMargin = 6+4*fac_cnt;
+					supplyMargin = 5+4*fac_cnt+facFullOperating*2;
 				}
-			}else if((MyBotModule.Broodwar.getFrameCount()>14000 && MyBotModule.Broodwar.getFrameCount()<28000) || (Faccnt > 3 && CCcnt == 2)){
-				supplyMargin = 8+6*fac_cnt;
+			}else if((MyBotModule.Broodwar.getFrameCount()>=6000 && MyBotModule.Broodwar.getFrameCount()<10000) || (Faccnt > 3 && CCcnt == 2)){
+				supplyMargin = 8+6*fac_cnt+facFullOperating*2;
 			}else{
-				supplyMargin = 12+7*fac_cnt;
+				supplyMargin = 12+8*fac_cnt+facFullOperating*2;
 			}
 			
 			// currentSupplyShortage 를 계산한다
@@ -533,6 +536,7 @@ public class StrategyManager {
 		int maxFaccnt = 0;
 		int Faccnt = 0;
 		int MachineShopcnt = 0;
+		boolean facFullOperating = true;
 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
@@ -542,6 +546,14 @@ public class StrategyManager {
 			}
 			if (unit.getType() == UnitType.Terran_Factory){
 				Faccnt ++;
+			}
+			if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
+				if(unit.isTraining() == false){
+					facFullOperating = false;
+				}
+			}
+			if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted() == false){
+				facFullOperating = false;
 			}
 			if (unit.getType() == UnitType.Terran_Machine_Shop){
 				MachineShopcnt ++;
@@ -565,11 +577,18 @@ public class StrategyManager {
 			maxFaccnt = 9;
 		}
 		
+		int additonalmin = 0;
+		int additonalgas = 0;
+		if(facFullOperating == true){
+			additonalmin = (Faccnt-1)*40;
+			additonalgas = (Faccnt-1)*20;
+		}
+		
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0) {
 			if(Faccnt == 0){
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}else if(Faccnt <= maxFaccnt){
-				if(MyBotModule.Broodwar.self().minerals() > 200 + Faccnt*80 && MyBotModule.Broodwar.self().gas() > 100 + Faccnt * 50){
+				if(MyBotModule.Broodwar.self().minerals() > 250 + additonalmin && MyBotModule.Broodwar.self().gas() > 130 + additonalgas){
 					if(Faccnt <= 4){
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					}else if(Faccnt <= 5){
@@ -658,16 +677,19 @@ public class StrategyManager {
 			currentItem= tempbuildQueue.getHighestPriorityItem();
 			while(true){
 				
+				
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
 					goliathInTheQueue = true;
 				}
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
 					tankInTheQueue = true;
 				}
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot){
+					return;
+				}
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
 					return;
 				}
-				
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
 					return;
 				}
@@ -1124,14 +1146,26 @@ public int getTotKilledCombatUnits(){
 	
 	public void executeResearch() {
 		
-		if(getFacUnits() < 32) return;
+		
 			
-		boolean VS = MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false;;
-		boolean VM = MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines);
-		boolean TS = MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode);
-		boolean GR = MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1 ? true : false;
+		boolean VS = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false)
+				||(MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Ion_Thrusters) ? true : false);
+		boolean VM = (MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines))
+				||(MyBotModule.Broodwar.self().isResearching(TechType.Spider_Mines));
+		boolean TS = (MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode))
+				||(MyBotModule.Broodwar.self().isResearching(TechType.Tank_Siege_Mode));
+		boolean GR = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1 ? true : false)
+				||(MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Charon_Boosters) ? true : false);
 		
 		if(VS&&VM&&TS&&GR) return; // 4개 모두 완료이면
+		
+		int currentResearched =0;
+		if(VS){	currentResearched++;}
+		if(VM){	currentResearched++;}
+		if(TS){	currentResearched++;}
+		if(GR){	currentResearched++;}
+		
+		if(getFacUnits() < 32 && currentResearched!=0 && !(MyBotModule.Broodwar.self().minerals()> 200 && MyBotModule.Broodwar.self().gas()> 200)) return;
 		
 		MetaType vultureSpeed = new MetaType(UpgradeType.Ion_Thrusters);
 		MetaType vultureMine = new MetaType(TechType.Spider_Mines);
@@ -1216,7 +1250,7 @@ public int getTotKilledCombatUnits(){
 						continue;
 					}else{
 						if(i==3 && Current[3].getUpgradeType() == UpgradeType.Charon_Boosters){
-							if(!air){
+							if(!air && !(MyBotModule.Broodwar.self().minerals()> 300 && MyBotModule.Broodwar.self().gas()> 300)){
 								continue;
 							}
 						}

@@ -149,16 +149,26 @@ public class InformationManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
-			if(EarlyDefenseNeeded){
+		}
+		
+		if(EarlyDefenseNeeded){
+			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
 						EarlyDefenseNeeded = false;
 					}
 				}
 			}
-			if(ScoutDefenseNeeded){
+		}
+		if(ScoutDefenseNeeded){
+			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+						ScoutDefenseNeeded = false;
+					}
+				}
+				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+					if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
 						ScoutDefenseNeeded = false;
 					}
 				}

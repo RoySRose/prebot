@@ -61,16 +61,17 @@ public class ScoutManager{
 	public void update()
 	{
 		// 1초에 6번만 실행합니다
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 13 == 0){
 		
-		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
-		assignScoutIfNeeded();
-		if(!distrubMineral){
-			moveScoutUnit();
-		}else{
-			distrubMineral();
-			if (MyBotModule.Broodwar.getFrameCount() % 22 == 0) updateScoutUnit();
-			
+			// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
+			assignScoutIfNeeded();
+			if(!distrubMineral){
+				moveScoutUnit();
+			}else{
+				distrubMineral();
+				if (MyBotModule.Broodwar.getFrameCount() % 22 == 0) updateScoutUnit();
+				
+			}
 		}
 
 		// 참고로, scoutUnit 의 이동에 의해 발견된 정보를 처리하는 것은 InformationManager.update() 에서 수행함

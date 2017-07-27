@@ -113,7 +113,7 @@ public class CombatManager {
 			return;
 		}
 
-		if (CommonUtils.executeOncePerFrame(8, 0)) {
+		if (CommonUtils.executeOncePerFrame(7, 0)) {
 			
 		//System.out.println("frame : " + MyBotModule.Broodwar.getFrameCount());
 			updateIdleSquad();
@@ -137,14 +137,16 @@ public class CombatManager {
 			SpiderMineManger.Instance().update();
 			VultureTravelManager.Instance().update();
 		}
-		else if (CommonUtils.executeOncePerFrame(47, 0)) {
+		if (CommonUtils.executeOncePerFrame(47, 0)) {
 			doComsatScan();
 		}
 //		if (MyBotModule.Broodwar.getFrameCount() % (24*10) == 0) {
 //			squadData.printSquadInfo();
 //		}
 		
-		squadData.update();
+		if (CommonUtils.executeOncePerFrame(5, 0)) {
+			squadData.update();
+		}
 	}
 	
 	private void updateBunker() {
@@ -180,7 +182,6 @@ public class CombatManager {
 			boolean bunkerOut = true;
 			if (enemyUnitsInRegion != null) {
 				Unit target = closestTarget(bunker, enemyUnitsInRegion);
-				System.out.println("target " + target.getID() + " is far from bunker : " + target.getDistance(bunker));
 				if(bunker.getDistance(target) <= 160){
 					bunkerOut = false;
 				}
@@ -951,7 +952,7 @@ public class CombatManager {
 	        	}
         		// 게릴라 유닛이 남아 있다면 더 할당하지 않는다.
 				if (!guerillaSquad.getUnitSet().isEmpty()) {
-					System.out.println("guerilla units already exist");
+					//System.out.println("guerilla units already exist");
         		} else {
         			for (Unit assignableVulture : assignableVultures) {
     					squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
@@ -960,12 +961,12 @@ public class CombatManager {
     						break; // 충분한 파워
     					}
     				}
-        			System.out.println("guerilla squad created!");
-        			System.out.println(" - unit size : " + guerillaSquad.getUnitSet().size());
-        			System.out.println(" - position  : " + bestGuerillaSite.getPosition());
+        			//System.out.println("guerilla squad created!");
+        			//System.out.println(" - unit size : " + guerillaSquad.getUnitSet().size());
+        			//System.out.println(" - position  : " + bestGuerillaSite.getPosition());
         		}
 			} else {
-				System.out.println("not the best guerilla site");
+				//System.out.println("not the best guerilla site");
 			}
 		}
 		
@@ -983,7 +984,7 @@ public class CombatManager {
 			if (MyBotModule.Broodwar.isVisible(squad.getOrder().getPosition().toTilePosition())) {
 				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, null);
 				if (enemies.isEmpty()) {
-					System.out.println("guerillaSquads " + squad.getName() + " clear : no enemy");
+					//System.out.println("guerillaSquads " + squad.getName() + " clear : no enemy");
 					squad.clear();
 					continue;
 				}
@@ -992,14 +993,14 @@ public class CombatManager {
 			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
 			boolean willWin = CombatExpectation.expectVultureVictoryByUnitInfo(squad.getUnitSet(), enemiesInfo);
 			if (!willWin) {
-				System.out.println("guerillaSquads " + squad.getName() + " clear : mission impossilbe");
+				//System.out.println("guerillaSquads " + squad.getName() + " clear : mission impossilbe");
 				squad.clear();
 				continue;
 			}
 
 			int guerillaScore = CombatExpectation.getGuerillaScoreByUnitInfo(enemiesInfo);
 			if (guerillaScore <= 0) {
-				System.out.println("guerillaSquads " + squad.getName() + " clear : worthless");
+				//System.out.println("guerillaSquads " + squad.getName() + " clear : worthless");
 				squad.clear();
 				continue;
 			}
