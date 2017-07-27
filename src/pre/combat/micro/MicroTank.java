@@ -21,33 +21,40 @@ import pre.util.TargetPriority;
 
 public class MicroTank extends MicroManager {
 	
-	private int initiatedFrame = 0;
+	private int initFrame = 0;
+	private Unit initTarget = null;
 
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 		List<Unit> tanks = getUnits();
 		List<Unit> tankTargets = MicroUtils.filterTargets(targets, false);
 		
-		// 탱크는 전투의 중심이다. 명령의 상태를 BATTLE로 바꾸어 이니시에이팅한다.
 		if (tankTargets.isEmpty()) {
-			if (initiatedFrame > 0) {
-				MyBotModule.Broodwar.sendText("battle finished!");
-				initiatedFrame = 0;
+			if (initFrame > 0) {
+				initFrame = 0;
+				initTarget = null;
 			}
-			for (Unit tank : tanks) { moveIt(tank); } // 적이 있을 없을 경우, orderPosition으로 이동
+			// 적이 있을 없을 경우, orderPosition으로 이동
+			for (Unit tank : tanks) {
+				// 도착판정거리 : 유닛시야 + 유닛타입별 개체수에 비례하는 로그값 (ex: 320pixel(시즈시야) + 25 * log12)
+				// 해당 값은 MicroSet.Tank.SIEGE_ARRANGE_DISTANCE 이상이어야 한다 시즈의 sight만 해도 320라 작을 수가 없다.
+				int tankAreaDist = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tanks.size()) * 10);
+				moveIt(tank, tankAreaDist);
+			}
 			return;
 		}
-
-		if (initiatedFrame == 0 && tanks.size() >= MicroSet.Tank.INITIATE_SIZE) {
-			MyBotModule.Broodwar.sendText("initiate!");
-			initiatedFrame = MyBotModule.Broodwar.getFrameCount();
-		}
 		
+		// 이니시에이팅한다.
+		if (initFrame == 0) {
+			MyBotModule.Broodwar.sendText("initiate!");
+			initFrame = MyBotModule.Broodwar.getFrameCount();
+			initTarget = tankTargets.get(0);
+		}
 
 		KitingOption kitingOption = new KitingOption();
 		kitingOption.setCooltimeAlwaysAttack(true);
 		kitingOption.setUnitedKiting(true);
-		kitingOption.setGoalPosition(squadCenter);
+		kitingOption.setGoalPosition(order.getPosition());
 		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 		
 		for (Unit tank : tanks) {
@@ -119,13 +126,16 @@ public class MicroTank extends MicroManager {
 							}
 						}
 					}
-					
+
 					if (targetIsFree) {
-						List<Unit> ourUnits = MapGrid.Instance().getUnitsNear(target.getPosition(), target.getType().groundWeapon().maxRange(), true, false, null);
-						if (!ourUnits.isEmpty()) {
-							tank.unsiege();
-						}
+						tank.unsiege();
 					}
+//					if (targetIsFree) {
+//						List<Unit> ourUnits = MapGrid.Instance().getUnitsNear(target.getPosition(), target.getType().groundWeapon().maxRange(), true, false, null);
+//						if (!ourUnits.isEmpty()) {
+//							tank.unsiege();
+//						}
+//					}
 					
 				} else {
 					// 4. 유효범위내에 적이 있다
@@ -144,7 +154,7 @@ public class MicroTank extends MicroManager {
 					}
 					MicroUtils.preciseKiting(tank, target, kitingOption);
 					
-				} else if (initiatedFrame == MyBotModule.Broodwar.getFrameCount() && tank.getDistance(squadCenter) <= squadRange) {
+				} else if (initFrame == MyBotModule.Broodwar.getFrameCount() && tank.getDistance(initTarget) <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 150) {
 					// 1. 이니시에이트
 					tank.siege();
 					
@@ -155,13 +165,12 @@ public class MicroTank extends MicroManager {
 					
 				} else {
 					List<Unit> targetsInSiegeRange = MapGrid.Instance().getUnitsNear(tank.getPosition(), MicroSet.Tank.SIEGE_MODE_MAX_RANGE, false, true, null);
-					
+
 					if (!targetsInSiegeRange.isEmpty()) {
 						// 3. 탱크모드로는 때릴 적이 없고, 시즈범위내에  적이 있다
-						
 						Unit target = getTarget(tank, targetsInSiegeRange, true);
+						// 밀리유닛이면 걍 퉁퉁포로 무빙샷(시즈모드로 타깃을 정하여 splash때문에 target이 null이 될 수 있다. 이때도 퉁퉁포)
 						// 포격할 수 있는 거리이면 시즈모드로 변경.
-						// 밀리유닛이면 걍 퉁퉁포로 무빙샷(시즈모드로 타깃을 정하여 splash때문에 target이 null이 될 수 있다.)
 						if (target == null || target.getType().groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) {
 							target = getTarget(tank, targetsInSiegeRange, false);
 							MicroUtils.preciseKiting(tank, target, kitingOption);
@@ -170,14 +179,11 @@ public class MicroTank extends MicroManager {
 						}
 						
 					} else {
-						// 4. 시즈모드 범위에도 때릴 적이 적이 없다.
+						// 4. 시즈모드 범위에도 때릴 적이 적이 없을때
+						// 연결된 거리의 시즈가 타격할 적이 있으면 시즈모드한다.
 						boolean shouldSiege = false;
-						List<Unit> linkedTanks = MapGrid.Instance().getUnitsNear(tank.getPosition(), MicroSet.Tank.SIEGE_LINK_DISTANCE, true, false, null);
+						List<Unit> linkedTanks = MapGrid.Instance().getUnitsNear(tank.getPosition(), MicroSet.Tank.SIEGE_LINK_DISTANCE, true, false, UnitType.Terran_Siege_Tank_Siege_Mode);
 						for (Unit linkedTank : linkedTanks) {
-							if (linkedTank.getType() != UnitType.Terran_Siege_Tank_Siege_Mode) {
-								continue;
-							}
-							
 							List<Unit> targetsInLinkedSiegeRange = MapGrid.Instance().getUnitsNear(linkedTank.getPosition(), MicroSet.Tank.SIEGE_MODE_MAX_RANGE, false, true, null);
 							if (!targetsInLinkedSiegeRange.isEmpty()) {
 								shouldSiege = true;
@@ -198,24 +204,24 @@ public class MicroTank extends MicroManager {
 	}
 	
 	
-	private void moveIt(Unit tank) {
-		if (tank.getDistance(order.getPosition()) <= squadRange) {
-			// 도착했다면 시즈모드
-			if (tank.canSiege()) {
-				Position positionToSiege = findPositionToSiege();
-				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) <= 50) {
-						tank.siege();
-					} else {
-						CommandUtil.attackMove(tank, positionToSiege);
-					}
-				}
-			} else {
-				if (tank.isIdle()) {
-					Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), squadRange / 2);
-					CommandUtil.attackMove(tank, randomPosition);
+	private void moveIt(Unit tank, int siegeAreaDist) {
+		// 도착했다면 시즈모드
+		if (tank.getDistance(order.getPosition()) <= siegeAreaDist && tank.canSiege()) {
+			Position positionToSiege = findPositionToSiege(siegeAreaDist);
+			if (positionToSiege != null) {
+				if (tank.getDistance(positionToSiege) <= 50) {
+					tank.siege();
+				} else {
+					CommandUtil.attackMove(tank, positionToSiege);
 				}
 			}
+			
+		} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
+			if (tank.isIdle()) {
+				Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), order.getRadius());
+				CommandUtil.attackMove(tank, randomPosition);
+			}
+			
 		} else {
 			// 아직 도착하지 못했을때
             if (tank.canUnsiege()) {
@@ -226,18 +232,17 @@ public class MicroTank extends MicroManager {
 		}
 	}
 	
-	private Position findPositionToSiege() {
+	private Position findPositionToSiege(int siegeAreaDist) {
 		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
-		double radian = 0.0;
 		
 		int seigeNumLimit = 1;
-		int distanceBetweenTanks = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
+		int distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
 		
 		while (seigeNumLimit < 10) {
-			while (distanceBetweenTanks < squadRange) {
+			while (distanceFromOrderPosition < siegeAreaDist) {
 				for (Integer angle : MicroSet.FleeAngle.EIGHT_360_ANGLE) {
-					double radianAdjust = MicroUtils.rotate(radian, angle);
-				    Position fleeVector = new Position((int)(distanceBetweenTanks * Math.cos(radianAdjust)), (int)(distanceBetweenTanks * Math.sin(radianAdjust)));
+					double radianAdjust = MicroUtils.rotate(0.0, angle);
+				    Position fleeVector = new Position((int)(distanceFromOrderPosition * Math.cos(radianAdjust)), (int)(distanceFromOrderPosition * Math.sin(radianAdjust)));
 				    int x = order.getPosition().getX() + fleeVector.getX();
 				    int y = order.getPosition().getY() + fleeVector.getY();
 				    
@@ -246,22 +251,23 @@ public class MicroTank extends MicroManager {
 							&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
 				    	
 				    	if (choke.getCenter().getDistance(movePosition) >= 128) {
-				    		int siegeCount = 0;
-					  		siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
+				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
 							if (siegeCount < seigeNumLimit) {
 								return movePosition;
 							} 
 				    	}
 				    }
 				}
-				if (distanceBetweenTanks <= MicroSet.Tank.SIEGE_ARRANGE_DISTANCE) {
-					distanceBetweenTanks -= 50;
-				} else if (distanceBetweenTanks <= 0) {
-					distanceBetweenTanks = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE + 50;
+				
+				if (distanceFromOrderPosition <= 0) {
+					distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE + 50;
+				} else if (distanceFromOrderPosition <= MicroSet.Tank.SIEGE_ARRANGE_DISTANCE) {
+					distanceFromOrderPosition -= 50;
 				} else {
-					distanceBetweenTanks += 50;
+					distanceFromOrderPosition += 50;
 				}
 			}
+			distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
 			seigeNumLimit++;
 		}
 		

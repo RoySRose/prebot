@@ -38,11 +38,11 @@ public class MicroGoliath extends MicroManager {
 				MicroUtils.preciseKiting(goliath, target, kitingOption);
 			} else {
 				// if we're not near the order position, go there
-				if (goliath.getDistance(order.getPosition()) > squadRange) {
+				if (goliath.getDistance(order.getPosition()) > order.getRadius()) {
 					CommandUtil.attackMove(goliath, order.getPosition());
 				} else {
 					if (goliath.isIdle()) {
-						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), squadRange / 2);
+						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), order.getRadius());
 						CommandUtil.attackMove(goliath, randomPosition);
 					}
 				}

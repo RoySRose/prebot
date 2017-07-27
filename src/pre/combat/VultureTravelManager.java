@@ -82,7 +82,7 @@ public class VultureTravelManager {
 		if (CommonUtils.executeOncePerFrame(48, 0)) {
 			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
 			
-			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 8 + 1;
+			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 4 + 1;
 
 			int checkerNum = vultureCount / 4; // 3대1 비율이다.
 			MicroSet.Vulture.maxNumChecker = checkerNum >= 5 ? 5 : checkerNum; // 정찰벌처 최대 5기

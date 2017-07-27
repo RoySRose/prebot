@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.DamageType;
+import bwapi.Pair;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TechType;
@@ -228,12 +229,12 @@ public class MicroUtils {
 		WeaponType rangedUnitWeapon = target.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
-		// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
 		if (saveUnit && !MicroUtils.isSafePlace(rangedUnit)) {
 			haveToAttack = false;
-			
+
 		} else if (target.getType().isBuilding()
 				|| MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
+			// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
 			haveToAttack = true;
 			
 		} else {
@@ -287,7 +288,7 @@ public class MicroUtils {
 			    Position saveFleeVector = new Position((int)(rangedUnitSpeed * Math.cos(saveRadian)), (int)(rangedUnitSpeed * Math.sin(saveRadian))); // 이동벡터
 				Position saveMovePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX(), rangedUnit.getPosition().getY() + saveFleeVector.getY()); // 회피지점
 				Position saveMiddlePosition = new Position(rangedUnit.getPosition().getX() + saveFleeVector.getX() / 2, rangedUnit.getPosition().getY() + saveFleeVector.getY() / 2); // 회피중간지점
-				int risk = riskOfFleePosition(rangedUnit.getType(), saveMovePosition, (int) rangedUnitSpeed, true); // 회피지점에서의 예상위험도
+				int risk = riskOfFleePosition(rangedUnit.getType(), saveMovePosition, (int) rangedUnitSpeed, false); // 회피지점에서의 예상위험도
 				
 				// 본진찍고 회피하는 것이 안전한가?
 				if (risk < 10 && isValidGroundPosition(saveMovePosition) && saveMiddlePosition.isValid() && BWTA.getRegion(saveMiddlePosition) != null) {
@@ -337,16 +338,26 @@ public class MicroUtils {
 				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
 				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
-				int risk = riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize, unitedKiting); // 회피지점에서의 예상위험도
+				int risk = riskOfFleePosition(rangedUnit.getType(), movePosition, MicroSet.RiskRadius.getRiskRadius(rangedUnit.getType()), unitedKiting); // 회피지점에서의 예상위험도
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
 
 				// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
-				if (isValidGroundPosition(movePosition) && middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
+ 				if (isValidGroundPosition(movePosition)
+ 						&& isValidGroundPosition(middlePosition)
+						&& MyBotModule.Broodwar.hasPath(rangedUnit.getPosition(), movePosition)
+//						&& middlePosition.isValid() && BWTA.getRegion(middlePosition) != null
 						&& (risk < minimumRisk || (risk == minimumRisk && distanceToGoal < minimumDistanceToGoal))) {
-					
-					safePosition =  movePosition;
-					minimumRisk = risk;
-					minimumDistanceToGoal = distanceToGoal;
+ 					
+ 					Region regionSrc = BWTA.getRegion(rangedUnit.getPosition());
+ 					Region regionDst = BWTA.getRegion(movePosition);
+ 					Pair<Region, Region> regions = BWTA.getNearestChokepoint(rangedUnit.getPosition()).getRegions();
+ 					if ((regionSrc == regionDst)
+ 							|| (regions.first == regionSrc && regions.second == regionDst)
+ 							|| (regions.first == regionDst && regions.second == regionSrc)) {
+ 						safePosition =  movePosition;
+ 						minimumRisk = risk;
+ 						minimumDistanceToGoal = distanceToGoal;
+ 					}
 				}
 				fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 		    }
@@ -365,7 +376,7 @@ public class MicroUtils {
 		if (safePosition == null) { // 회피지역이 없을 경우 3) 목표지점으로 간다. 이 경우는 거의 없다.
 			safePosition = goalPosition;
 		}
-		
+//		MyBotModule.Broodwar.drawCircleMap(safePosition, 5, Color.Red, true);
 	    return safePosition;
 	}
 	
@@ -568,16 +579,6 @@ public class MicroUtils {
 	public static boolean isValidGroundPosition(Position position) {
 		return position.isValid() && BWTA.getRegion(position) != null && MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8);
 		
-	}
-	
-	public static int calcArriveDecisionRange(UnitType unitType, int numOfUnits) {
-		
-		// 도착판정거리 : 유닛시야 + 유닛타입별 개체수에 비례하는 로그값 (ex: 320pixel(시즈시야) + 25 * log12)
-		int arriveDecisionRange = unitType.sightRange();
-		if (numOfUnits > 0) {
-			arriveDecisionRange += Math.log(numOfUnits) * 25;
-		}
-		return arriveDecisionRange;
 	}
 	
 	public static Position randomPosition(Position sourcePosition, int dist) {
