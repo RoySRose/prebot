@@ -161,7 +161,7 @@ public class MicroWraith extends MicroManager {
 					MicroUtils.preciseKiting(wraith, target, kitingOption);
 				}else {
 					// if we're not near the order position, go there
-					if (wraith.getDistance(order.getPosition()) > squadRange) {
+					if (wraith.getDistance(order.getPosition()) > order.getRadius()) {
 						CommandUtil.attackMove(wraith, order.getPosition());
 					} else {
 						if (wraith.isIdle()) {

@@ -5,8 +5,6 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
-import bwta.BWTA;
-import bwta.Chokepoint;
 import pre.combat.SquadOrder;
 import pre.util.CommandUtil;
 
@@ -30,13 +28,12 @@ public abstract class MicroManager {
 
 	protected SquadOrder order;
 	protected Position squadCenter = null;
-	protected int squadRange = 0;
 	protected int tankSize = 0;
 	
 	
 	protected abstract void executeMicro(List<Unit> targets);
 	
-	public void setMicroInformation(SquadOrder inputOrder, List<Unit> nearbyEnemies, Position squadCenter, int squadRange, int tankSize) {
+	public void setMicroInformation(SquadOrder inputOrder, List<Unit> nearbyEnemies, Position squadCenter) {
 		order = inputOrder;
 		if (units.isEmpty() || !order.isCombatOrder()) {
 			return;
@@ -44,8 +41,6 @@ public abstract class MicroManager {
 		
 		this.nearbyEnemies = nearbyEnemies;
 		this.squadCenter = squadCenter;
-		this.squadRange = squadRange;
-		this.tankSize = tankSize;
 	}
 	
 	public void execute() {
@@ -76,49 +71,14 @@ public abstract class MicroManager {
 		}
 	}
 	
-	public boolean awayFromChokePoint(Unit unit) {
-		
-		boolean nearChokepoint = false;
-		boolean nearChokePointIsOrderPosition = false;
-        for (Chokepoint choke : BWTA.getChokepoints()) {
-            if (choke.getCenter().getDistance(unit.getPosition()) < 64) {
-            	nearChokepoint = true;
-                if (choke.getDistance(order.getPosition()) < 64) {
-                	nearChokePointIsOrderPosition = true;
-                }
-                break;
-            }
-        }
-		
-        if (nearChokepoint) {
-        	if (nearChokePointIsOrderPosition) {
-        		CommandUtil.move(unit, BWTA.getRegion(order.getPosition()).getCenter());
-        	} else {
-	        	CommandUtil.move(unit, order.getPosition());
-        	}
-        	return true;
-        }
-        
-        return false;
-	}
-	
-	public boolean inUnityThereIsStrength(Unit unit) {
-		
-		if (unit.getDistance(squadCenter) > squadRange) {
-        	CommandUtil.move(unit, squadCenter);
-        	return true;
-		}
-		
-		return false;
-	}
-	
 	public boolean inTheSquad(Unit unit) { // TODO
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "MicroManager [units.size()=" + units.size() + ", nearbyEnemies=" + nearbyEnemies + ", order=" + order
-				+ ", squadCenter=" + squadCenter + ", squadRange=" + squadRange + ", tankSize=" + tankSize + "]";
+				+ ", squadCenter=" + squadCenter + ", tankSize=" + tankSize + "]";
 	}
 	
 }

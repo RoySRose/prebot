@@ -30,13 +30,13 @@ public class MicroSet {
 		public static final int VESSEL_PRIORITY = 101;
 		
 		public static final int IDLE_RADIUS = 100;
-		public static final int ATTACK_RADIUS = 600;
-		public static final int WATCHER_RADIUS = 400;
-		public static final int CHECKER_RADIUS = 400;
-		public static final int GUERILLA_RADIUS = 400;
+		public static final int ATTACK_RADIUS = 300;
+		public static final int WATCHER_RADIUS = 600;
+		public static final int CHECKER_RADIUS = 600;
+		public static final int GUERILLA_RADIUS = 300;
 		public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
 		public static final int SCOUT_DEFENSE_RADIUS = 600;
-		public static final int WRAITH_RADIUS = 800;
+		public static final int WRAITH_RADIUS = 300;
 		public static final int VESSEL_RADIUS = 600;
 	}
 	
@@ -69,9 +69,8 @@ public class MicroSet {
 		public static final int SIEGE_MODE_MEDIAN_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().medianSplashRadius();
 		public static final int SIEGE_MODE_OUTER_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().outerSplashRadius();
 		
-		public static final int SIEGE_LINK_DISTANCE = 300;
+		public static final int SIEGE_LINK_DISTANCE = 250;
 		public static final int SIEGE_ARRANGE_DISTANCE = 150;
-		public static final int INITIATE_SIZE = 1;
 	}
 	
 	public static class Common {
@@ -80,6 +79,36 @@ public class MicroSet {
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int TANK_COVERAGE = 100;
 		public static final int ARRIVE_DECISION_RANGE = 100;
+	}
+	 
+	public static class RiskRadius {
+		public static int getRiskRadius(UnitType unitType) {
+			Integer radius = RISK_RADIUS_MAP.get(unitType);
+			if (radius == null) {
+				MyBotModule.Broodwar.sendText("radius is null");
+				return RISK_RADIUS_DEFAULT;
+			}
+			return radius;
+		}
+		
+		private static Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
+
+		public static final int RISK_RADIUS_DEFAULT = 150;
+		public static final int RISK_RADIUS_VULTURE = 190;
+		public static final int RISK_RADIUS_VUTRURE_SPEED = 220;
+		public static final int RISK_RADIUS_TANK = 150;
+		public static final int RISK_RADIUS_GOLIATH = 150;
+		public static final int RISK_RADIUS_WRAITH = 220;
+		public static final int RISK_RADIUS_VESSEL = 150;
+		
+		static {
+			RISK_RADIUS_MAP.put(UnitType.Terran_Marine, RISK_RADIUS_VULTURE);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, RISK_RADIUS_VUTRURE_SPEED);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, RISK_RADIUS_TANK);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Goliath, RISK_RADIUS_GOLIATH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Wraith, RISK_RADIUS_WRAITH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Science_Vessel, RISK_RADIUS_VESSEL);
+		}
 	}
 	
 	public static class Network {

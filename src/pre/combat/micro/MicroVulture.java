@@ -132,12 +132,12 @@ public class MicroVulture extends MicroManager {
 				}
 				
 				// 이동지역까지 attackMove로 간다.
-				if (vulture.getDistance(movePosition) > squadRange) {
+				if (vulture.getDistance(movePosition) > order.getRadius()) {
 					CommandUtil.attackMove(vulture, movePosition);
 					
 				} else { // 목적지 도착
 					if (vulture.isIdle() || vulture.isBraking()) {
-						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), squadRange / 2);
+						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), order.getRadius());
 						CommandUtil.attackMove(vulture, randomPosition);
 					}
 				}
@@ -178,11 +178,11 @@ public class MicroVulture extends MicroManager {
 	        hitPointScore -= target.getHitPoints() / 10;
 			
 	        int totalScore = 0;
-	        if (order.getType() == SquadOrderType.WATCH) {
-	        	totalScore = distanceScore;
-	        } else {
+//	        if (order.getType() == SquadOrderType.WATCH) {
+//	        	totalScore = distanceScore;
+//	        } else {
 	        	totalScore = priorityScore + distanceScore + hitPointScore + dangerousScore;
-	        }
+//	        }
 	        
 	        if (totalScore > bestTargetScore) {
 				bestTargetScore = totalScore;
