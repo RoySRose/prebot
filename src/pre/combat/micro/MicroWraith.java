@@ -309,19 +309,10 @@ public class MicroWraith extends MicroManager {
 				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
 				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
-				if(rangedUnit.getID() == 102){
-				System.out.print("fleeVector: " + fleeVector.toString());
-				System.out.print("movePosition: " + movePosition.toString());
-				System.out.print("middlePosition: " + middlePosition.toString());
-				}
-				
 				double risk = 0;
 				risk = riskOfFleePositionAir(rangedUnit, movePosition, moveCalcSize, unitedKiting, fromUnit); // 회피지점에서의 예상위험도
 				
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
-				if(rangedUnit.getID() == 102){
-				System.out.println("risk:" + risk);
-				}
 				// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
 				// 변경사항. 기존과 같이 전체를 확인하다가 만족스러운 곳이 있으면 회피 지점이 아닌 전체를 모두 확인하고 가장 좋은 자리를 가지고 간다.
 				if (risk < 100 && isValidPosition(rangedUnit, movePosition)
@@ -340,7 +331,6 @@ public class MicroWraith extends MicroManager {
 			}
 		}
 		if (safePosition == null) { // 회피지역이 없을 경우 3) 목표지점으로 간다. 이 경우는 거의 없다.
-			System.out.println("couldn't find any?");
 			safePosition = goalPosition;
 		}
 		

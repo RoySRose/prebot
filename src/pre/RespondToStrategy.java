@@ -231,7 +231,6 @@ public class RespondToStrategy {
 					//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					System.out.println("엔베 빌드큐 입력");
 				}
 			}else{
 				//엔베가 있다면

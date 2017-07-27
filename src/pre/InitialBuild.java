@@ -172,16 +172,11 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
-				 * queueBuild(false, UnitType.Terran_SCV);*/
+				queueBuild(true, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Supply_Depot);//14 scv 찍고 서플
 				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Bunker);//15 scv 찍고 벙커, 마린
 				queueBuild(true, UnitType.Terran_Marine);
-				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Factory);//16 찍어놓고 팩토리
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
@@ -190,7 +185,33 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Machine_Shop);
 				
-			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+			}
+//			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
+//				queueBuild(true, UnitType.Terran_SCV);
+//				/*12가스를 위해 주석처리 13가스 하려면 풀어주면 됨.
+//				 * queueBuild(false, UnitType.Terran_SCV);*/
+//				queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				//queueBuild(true, UnitType.Terran_Supply_Depot);//14 scv 찍고 서플
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Bunker);//15 scv 찍고 벙커, 마린
+//				queueBuild(true, UnitType.Terran_Marine);
+//				/*queueBuild(true, UnitType.Terran_Marine);*/
+//				queueBuild(true, UnitType.Terran_Factory);//16 찍어놓고 팩토리
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Machine_Shop);
+//				
+//			}
+			
+			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터플토전
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Supply_Depot);//9scv 찍어놓고 서플
@@ -200,6 +221,7 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Barracks);//11 scv 찍고 배럭
 				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
 						BWTA.getRegion(EntranceBlocking.Instance().barrackX,EntranceBlocking.Instance().barrackY).getPoint().toTilePosition(),true);*/
+				queueBuild(true, UnitType.Terran_SCV);//10 scv
 				queueBuild(true, UnitType.Terran_Refinery);//배럭 찍고 가스
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);//14scv
 				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린

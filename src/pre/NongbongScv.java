@@ -50,7 +50,7 @@ public class NongbongScv {
 		
 		if(NongBong_Chk < 8){
 			//미네랄 클릭 8회 미만 - 8회째는 다음 미네랄 클릭으로 간다
-			System.out.println("mineral Right_Click ==>>> " + NongBong_Chk + " times !!!!!!!!!!!!!");
+			//System.out.println("mineral Right_Click ==>>> " + NongBong_Chk + " times !!!!!!!!!!!!!");
 			int mineral_chk = 0;
 			if(NongBong_Chk  == 0){
 				// 농봉에 사용할 scv는 미네랄 일꾼 -2
@@ -60,9 +60,9 @@ public class NongbongScv {
 					NongBong_InfoWorker = worker;
 				}
 				depot = WorkerManager.Instance().getWorkerData().getWorkerDepot(NongBong_InfoWorker) ;
-				System.out.println("depot ==>>>>>>>> " + depot);
+				//System.out.println("depot ==>>>>>>>> " + depot);
 				mineralPatches = WorkerManager.Instance().getWorkerData().getMineralPatchesNearDepot(depot);
-				System.out.println(" 미네랄 개수 =====>>>>  " + mineralPatches.size());
+				//System.out.println(" 미네랄 개수 =====>>>>  " + mineralPatches.size());
 				
 				int radius = 320;
 				for (Unit unit : MyBotModule.Broodwar.getAllUnits())
@@ -89,17 +89,17 @@ public class NongbongScv {
 			}
 			mineral_chk = 0;
 			for (Unit worker :  WorkerManager.Instance().getWorkerData().getWorkers()){
-				System.out.println("getNumMineralWorkers() ==>>> " + WorkerManager.Instance().getNumMineralWorkers());
+				//System.out.println("getNumMineralWorkers() ==>>> " + WorkerManager.Instance().getNumMineralWorkers());
 				//전체 미네랄 일꾼 -2 만큼만 농봉에 사용하자
 				if(NongBong_Cnt > mineral_chk){
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals && NongBong_Chk == 0){
-						System.out.println("goto Minerals!!!!!!!!!!!! ==>>>>>>> " + worker.getID());
+						//System.out.println("goto Minerals!!!!!!!!!!!! ==>>>>>>> " + worker.getID());
 						CommandUtil.rightClick(worker, NongBong_FirstMineral);
 						WorkerManager.Instance().getWorkerData().setWorkerJob(worker, WorkerData.WorkerJob.NongBongM, (Unit)null);
 						mineral_chk ++;
 					}
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.NongBongM && NongBong_Chk != 0){
-						System.out.println("goto Minerals NongBongM!!!!!!!!!!!! ==>>>>>>> " + worker.getID());
+						//System.out.println("goto Minerals NongBongM!!!!!!!!!!!! ==>>>>>>> " + worker.getID());
 						CommandUtil.rightClick(worker, NongBong_FirstMineral);
 						mineral_chk ++;
 					}
