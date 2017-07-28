@@ -41,9 +41,14 @@ public class InformationManager {
 	public Race selfRace;			///< 아군 Player의 종족
 	public Race enemyRace;			///< 적군 Player의 종족  
 
-	private boolean isReceivingEveryMultiInfo;
-	public boolean EarlyDefenseNeeded;
-	public boolean ScoutDefenseNeeded;
+	private boolean ReceivingEveryMultiInfo;
+
+	private boolean EarlyDefenseNeeded;
+	private boolean ScoutDefenseNeeded;
+	
+	private boolean FirstScoutAlive;
+	private boolean ScoutStart;
+	
 
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -93,9 +98,11 @@ public class InformationManager {
 		selfRace = selfPlayer.getRace();
 		enemyRace = enemyPlayer.getRace();
 		
-		isReceivingEveryMultiInfo = false;
+		ReceivingEveryMultiInfo = false;
 		EarlyDefenseNeeded = true;
 		ScoutDefenseNeeded = true;
+		FirstScoutAlive = false;
+		ScoutStart = false;
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -144,35 +151,47 @@ public class InformationManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+		
 		updateUnitsInfo();
+		if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
+			updateCurrentStatusInfo();
+		}
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
 		}
 		
+		
+	}
+
+	private void updateCurrentStatusInfo() {
 		if(EarlyDefenseNeeded){
-			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-						EarlyDefenseNeeded = false;
-					}
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+					EarlyDefenseNeeded = false;
 				}
 			}
 		}
 		if(ScoutDefenseNeeded){
-			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-						ScoutDefenseNeeded = false;
-					}
-				}
-				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-					if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
-						ScoutDefenseNeeded = false;
-					}
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+					ScoutDefenseNeeded = false;
 				}
 			}
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
+					ScoutDefenseNeeded = false;
+				}
+			}
+		}
+		if(ScoutStart == false && WorkerManager.Instance().getScoutWorker() != null){
+			ScoutStart = true;
+			FirstScoutAlive = true;
+		}
+			
+		if(ScoutStart == true && FirstScoutAlive == true && WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0){
+			FirstScoutAlive = false;
 		}
 	}
 
@@ -528,16 +547,16 @@ public class InformationManager {
 //				System.out.println("getduration: "+ MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()));
 				if (MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()) > 8000)
 				{
-					isReceivingEveryMultiInfo = false;
-//					System.out.println("isReceivingEveryMultiInfo1: " + isReceivingEveryMultiInfo);
+					ReceivingEveryMultiInfo = false;
+//					System.out.println("ReceivingEveryMultiInfo1: " + ReceivingEveryMultiInfo);
 					return;
 				}
 			}
-			isReceivingEveryMultiInfo = true;
-//			System.out.println("isReceivingEveryMultiInfo2: " + isReceivingEveryMultiInfo);
+			ReceivingEveryMultiInfo = true;
+//			System.out.println("ReceivingEveryMultiInfo2: " + ReceivingEveryMultiInfo);
 		}else{
-			isReceivingEveryMultiInfo = false;
-//			System.out.println("isReceivingEveryMultiInfo3: " + isReceivingEveryMultiInfo);
+			ReceivingEveryMultiInfo = false;
+//			System.out.println("ReceivingEveryMultiInfo3: " + ReceivingEveryMultiInfo);
 		}
 	}
 	public BaseLocation getNextExpansionLocation() {
@@ -899,7 +918,16 @@ public class InformationManager {
 
 	//모든 멀티가 확인된 상태인지 확인
 	public boolean isReceivingEveryMultiInfo() {
-		return isReceivingEveryMultiInfo;
+		return ReceivingEveryMultiInfo;
+	}
+	public boolean isEarlyDefenseNeeded() {
+		return EarlyDefenseNeeded;
+	}
+	public boolean isScoutDefenseNeeded() {
+		return ScoutDefenseNeeded;
+	}
+	public boolean isFirstScoutAlive() {
+		return FirstScoutAlive;
 	}
 	
 	//점령한 베이스 개수 확인

@@ -67,7 +67,7 @@ public class Config {
 	/// 건물과 건물간 띄울 최소한의 간격 - Terran_Supply_Depot 건물의 경우
 	public static int BuildingSupplyDepotSpacing = 0;
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 0; 
+	public static int BuildingDefenseTowerSpacing = 2; 
 	
 	
 	
@@ -85,7 +85,7 @@ public class Config {
 	/// 화면 표시 여부 - 유닛 HitPoint
 	public static boolean DrawUnitHealthBars = true;
 	/// 화면 표시 여부 - 유닛 통계
-	public static boolean DrawEnemyUnitInfo = false;
+	public static boolean DrawEnemyUnitInfo = true;
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
 	public static boolean DrawUnitTargetInfo = true;
 
@@ -93,19 +93,19 @@ public class Config {
 	public static boolean DrawProductionInfo = true;
 
 	/// 화면 표시 여부 - 건물 Construction 상황
-	public static boolean DrawBuildingInfo = true;
+	public static boolean DrawBuildingInfo = false;
 	/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
 	public static boolean DrawReservedBuildingTiles = false;
 	
 	/// 화면 표시 여부 - 정찰 상태
 	public static boolean DrawScoutInfo = true;
 	/// 화면 표시 여부 - 일꾼 목록
-	public static boolean DrawWorkerInfo = true;
+	public static boolean DrawWorkerInfo = false;
 	
 	/// 화면 표시 여부 - 마우스 커서	
 	public static boolean DrawMouseCursorInfo = true;
 	
-	public static boolean BuildQueueDebugYN = false;
+	public static boolean BuildQueueDebugYN = true;
 	
 
 	public static final Color ColorLineTarget = Color.White;

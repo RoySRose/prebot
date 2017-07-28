@@ -117,10 +117,10 @@ public class CombatManager {
 			
 		//System.out.println("frame : " + MyBotModule.Broodwar.getFrameCount());
 			updateIdleSquad();
-			if(InformationManager.Instance().ScoutDefenseNeeded){
+			if(InformationManager.Instance().isScoutDefenseNeeded()){
 				updateScoutDefenseSquad();
 			}
-			if(InformationManager.Instance().EarlyDefenseNeeded){
+			if(InformationManager.Instance().isEarlyDefenseNeeded()){
 				updateEarlyDefenseSquad();
 			}else{
 				updateBunker();//TODO 이거 여기 자리가 맞는지와 base defense 위에 있어야 벙커에 마지막에 들어가서 마무리 되는건지.....

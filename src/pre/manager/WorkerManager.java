@@ -38,14 +38,17 @@ public class WorkerManager {
 
 		// 1초에 1번만 실행한다
 		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-		if (MyBotModule.Broodwar.getFrameCount() % 3 == 0){
+		if (MyBotModule.Broodwar.getFrameCount() % 19 == 0){
 		
 			updateWorkerStatus();
 			handleGasWorkers();
 			handleIdleWorkers();
-	
+		}
+		if (MyBotModule.Broodwar.getFrameCount() % 3 == 0){//TODO 5,7 을 고려해 보자.
 			//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
 			updatework();
+		}
+		if (MyBotModule.Broodwar.getFrameCount() % 19 == 0){
 			//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 			handleMoveWorkers();
 			handleCombatWorkers();
@@ -546,7 +549,7 @@ public class WorkerManager {
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ) && unit.isCarryingMinerals() == false)
+				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMovingWorker = unit;
@@ -560,11 +563,17 @@ public class WorkerManager {
 			 * se-min.park 가스가 미네랄보다 건설예정 위치에 가까울경우 gas 들고 있는 일꾼이 추출됨(로직에서 isGatheringGas false 처리 되어잇음에도 감...그래서 Gas 일꾼에서 안빼는걸로 변경) 
 			 */
 			if (unit.isCompleted() 
-				&& (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Gas && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build))
+				&& (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move 
+				&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle 
+				&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Gas 
+				&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build
+				&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Scout
+				&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Combat
+				))
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ) && !closestMiningWorker.isCarryingGas())
+				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMiningWorker = unit;
@@ -578,7 +587,7 @@ public class WorkerManager {
 
 		// if the worker exists (one may not have been found in rare cases)
 		// 미네랄 or 가스 안옮기는 애로 설정
-		if (chosenWorker != null && setJobAsConstructionWorker && chosenWorker.isCarryingMinerals() == false && chosenWorker.isCarryingGas() == false)
+		if (chosenWorker != null && setJobAsConstructionWorker)
 		{
 			workerData.setWorkerJob(chosenWorker, WorkerData.WorkerJob.Build, buildingType);
 		}
@@ -603,7 +612,6 @@ public class WorkerManager {
 			// if it is a scout worker
 	        if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout) 
 			{
-	        	
 				return worker;
 			}
 		}
