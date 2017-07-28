@@ -36,7 +36,7 @@ public class RespondToStrategy {
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
-	//유닛체크
+	//유닛체크values()
 	public boolean chk_scv = false;
 	public boolean chk_marine = false;
 	public boolean chk_goliath = false;
@@ -131,10 +131,8 @@ public class RespondToStrategy {
 			if (unit.getType() == UnitType.Terran_Science_Facility) {
 				chk_science_facility = true;
 			}
-			
-			
-			
 		}
+		
 		
 		//protossException_Dark start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Dark){

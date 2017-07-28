@@ -75,7 +75,8 @@ public class UXManager {
 		drawGameInformationOnScreen(5, 5);
 
 		if (Config.DrawEnemyUnitInfo) {
-			drawUnitStatisticsOnScreen(400, 20);
+			drawUnitStatisticsOnScreen1(400, 20);
+			drawUnitStatisticsOnScreen(300, 80);
 		}
 
 		if (Config.DrawBWTAInfo) {
@@ -137,7 +138,7 @@ public class UXManager {
 			drawUnitTargetOnMap();
 
 			// 미사일, 럴커의 보이지않는 공격등을 표시
-			drawBulletsOnMap();
+			//drawBulletsOnMap();
 		}
 		
 		// draw tile position of mouse cursor
@@ -372,7 +373,7 @@ public class UXManager {
 	}
 
 	/// UnitType 별 통계 정보를 Screen 에 표시합니다
-	public void drawUnitStatisticsOnScreen(int x, int y) {
+	public void drawUnitStatisticsOnScreen1(int x, int y) {
 		int currentY = y;
 
 		// 아군이 입은 피해 누적값
@@ -413,12 +414,17 @@ public class UXManager {
 		{
 			MyBotModule.Broodwar.drawTextScreen(x, currentY, brown + " Enemy Loss:" + white +" Minerals: " + red + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + white + " Gas: " + teal + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
 		}
+	}	
+		
+	public void drawUnitStatisticsOnScreen(int x, int y) {
 			
+		int currentY = y;
+		
 		// 적군의 UnitType 별 파악된 Unit 숫자를 표시
 		MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 20, white + " UNIT NAME");
-		MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
-		MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
-		MyBotModule.Broodwar.drawTextScreen(x + 190, currentY + 20, white + " Alive");
+		//MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
+		//MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
+		MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Alive");
 
 		int yspace = 0;
 		
@@ -457,9 +463,9 @@ public class UXManager {
 				if (numUnits > 0)
 				{
 					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), tempUnitName);
-					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "" + numUnits);
+//					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
+//					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}
@@ -503,9 +509,9 @@ public class UXManager {
 				if (numUnits > 0)
 				{
 					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), tempUnitName);
-					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "" + numUnits);
+					//MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
+					//MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}
