@@ -62,10 +62,16 @@ public class RespondToStrategy {
 	 
 	private static RespondToStrategy instance = new RespondToStrategy();
 	
-	public static RespondToStrategy instance() {
+	public static RespondToStrategy Instance() {
 		return instance;
 	}
-	
+	public boolean needOfEngineeringBay() {
+		
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_shuttle){
+			return true;
+		}
+		return false;
+	}
 
 	public void update() {
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
