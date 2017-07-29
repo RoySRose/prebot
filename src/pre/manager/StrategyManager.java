@@ -3,10 +3,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
-import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
@@ -22,7 +20,6 @@ import pre.ConstructionPlaceFinder;
 import pre.InitialBuild;
 import pre.MetaType;
 import pre.RespondToStrategy;
-import pre.WorkerData;
 import pre.main.MyBotModule;
 import pre.manager.CombatManager.CombatStrategy;
 import pre.util.CommandUtil;
@@ -224,10 +221,10 @@ public class StrategyManager {
 		}
 		
 		if (isInitialBuildOrderFinished == false) {
-			if (MyBotModule.Broodwar.getFrameCount() % 23 == 0){//23변경 조심 executeAddRefinery() 에서 23의 배수가 되어야함
+			if (MyBotModule.Broodwar.getFrameCount() % 23 == 0){
 				executeAddBuildingInit();
 			}
-		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0 && isInitialBuildOrderFinished == true) { //5초에 한번 팩토리 추가 여부 결정
+		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0) { //5초에 한번 팩토리 추가 여부 결정
 			executeAddFactory();
 		}
 		
@@ -240,14 +237,16 @@ public class StrategyManager {
 			}
 
 		}
-		
-		if (MyBotModule.Broodwar.getFrameCount() % 95 == 0){//약 4초에 한번
-			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
-		}
 		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
-			executeAddRefinery(); 
-			executeAddComsat();
+			executeSustainBuilding();
 		}
+		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
+			executeFly();
+		}
+		if (MyBotModule.Broodwar.getFrameCount() % 37 == 0){//약 4초에 한번
+			RespondToStrategy.Instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
+		}
+		
 	}
 	
 	public static int least(double a, double b, double c, int checker){
@@ -559,6 +558,125 @@ public class StrategyManager {
 				}
 			}
 		}
+	}
+	
+	public void executeSustainBuilding() {
+		
+		boolean aca = false;
+		boolean acaComplete = false;
+		boolean barrack = false;
+		boolean engineering = false;
+		
+	
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit == null) continue;
+			//가스 start
+			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
+				
+				Unit geyserAround = null;
+				
+				boolean refineryAlreadyBuilt = false; 
+				for (Unit unitsAround: MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 300)){
+					if (unitsAround == null) continue;
+					if(unitsAround.getType() == UnitType.Terran_Refinery 
+							|| unitsAround.getType() == UnitType.Zerg_Extractor 
+							|| unitsAround.getType() == UnitType.Protoss_Assimilator){
+						refineryAlreadyBuilt = true;
+						break;
+					}			
+					if(unitsAround.getType() == UnitType.Resource_Vespene_Geyser){
+						geyserAround = unitsAround;
+					}
+				}
+				
+				if(isInitialBuildOrderFinished == false && geyserAround != null){
+					if(InformationManager.Instance().getMyfirstGas() !=null){
+						if(geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())){
+							continue;
+						}
+					}
+				}
+				
+				if(refineryAlreadyBuilt ==false){
+					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
+					if(findGeyser != null){
+						if (findGeyser.getDistance(unit.getTilePosition())*32 > 300){
+							continue;
+						}
+						if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 5){
+							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
+							}
+						}
+					}
+				}
+			}
+			//가스 end
+			//컴샛 start
+			if(unit.getType() == UnitType.Terran_Academy){
+				aca = true;
+				if(unit.isCompleted()){
+					acaComplete = true;
+				}
+			}
+			//컴샛 end
+			
+			//barrack start
+			if(unit.getType() == UnitType.Terran_Barracks){
+				barrack = true;
+			}
+			//barrack end
+			
+			//engineering start
+			if(unit.getType() == UnitType.Terran_Engineering_Bay){
+				engineering = true;
+			}
+			//engineering end
+ 		}
+		
+		//컴샛 start
+		if(acaComplete){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if(unit == null) continue;
+				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null) 
+							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
+					}
+				}
+	 		}
+		}
+		int CC=0;
+		if(aca == false){
+			CC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+			
+			if(CC>2){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
+				}
+			}
+		}
+		//컴샛 end
+		
+		//barrack start
+		if(barrack == false  && isInitialBuildOrderFinished == true){
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0) {
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
+			}
+		}
+		//barrack end
+		
+		//engineering start
+		if(engineering == false && RespondToStrategy.Instance().needOfEngineeringBay()){
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0) {
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
+			}
+		}
+		//engineering end
+		
+		
 	}
 	
 	public void executeAddFactory() {
@@ -1310,95 +1428,6 @@ public class StrategyManager {
 		}
 	}
 	
-	public void executeAddComsat() {
-		boolean aca = false;
-		boolean acaComplete = false;
-		
-		
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			if(unit == null) continue;
-			if(unit.getType() == UnitType.Terran_Academy){
-				aca = true;
-				if(unit.isCompleted()){
-					acaComplete = true;
-				}
-			}
- 		}
-		
-		if(acaComplete){
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-			{
-				if(unit == null) continue;
-				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null){
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null) 
-							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
-					}
-				}
-	 		}
-		}
-		int CC=0;
-		if(aca == false){
-			CC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-			
-			if(CC>2){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
-				}
-			}
-		}
-	}
-	
-	public void executeAddRefinery() {
-		
-		//이거는 updat() 쪽에서 10초에 한번씩만 돌아도 될거 같고. // frame 239마다. 
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			if (unit == null) continue;
-			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
-				
-				Unit geyserAround = null;
-				
-				boolean refineryAlreadyBuilt = false; 
-				for (Unit unitsAround: MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 300)){
-					if (unitsAround == null) continue;
-					if(unitsAround.getType() == UnitType.Terran_Refinery 
-							|| unitsAround.getType() == UnitType.Zerg_Extractor 
-							|| unitsAround.getType() == UnitType.Protoss_Assimilator){
-						refineryAlreadyBuilt = true;
-						break;
-					}			
-					if(unitsAround.getType() == UnitType.Resource_Vespene_Geyser){
-						geyserAround = unitsAround;
-					}
-				}
-				
-				if(isInitialBuildOrderFinished == false && geyserAround != null){
-					if(InformationManager.Instance().getMyfirstGas() !=null){
-						if(geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())){
-							continue;
-						}
-					}
-				}
-				
-				if(refineryAlreadyBuilt ==false){
-					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
-					if(findGeyser != null){
-						if (findGeyser.getDistance(unit.getTilePosition())*32 > 300){
-							continue;
-						}
-						if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 5){
-							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
-							}
-						}
-					}
-				}
-			}
- 		}
-	}
-	
 	public void executeExpansion() {
 		
 		if(MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center)>0){
@@ -1471,6 +1500,18 @@ public class StrategyManager {
 		}
 	}
 
+	private void executeFly() {
+		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+					unit.lift();
+				}
+	 		}
+		}
+	}
+
+	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 경기 결과 파일 Save / Load 및 로그파일 Save 예제 추가
 
