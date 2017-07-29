@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.StreamPrintService;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -21,6 +23,8 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import pre.BuildOrderItem;
+import pre.BuildOrderQueue;
 import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
 import pre.MapTools;
@@ -49,7 +53,11 @@ public class InformationManager {
 	private boolean FirstScoutAlive;
 	private boolean ScoutStart;
 	
-
+	private Unit myfirstGas;
+	private Unit gasRushEnemyRefi;
+	private boolean gasRushed;
+	private boolean checkGasRush;
+	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
 	/// 건물 여부를 기준으로 파악하기 때문에 부적절하게 판단할수도 있습니다 
@@ -103,6 +111,10 @@ public class InformationManager {
 		ScoutDefenseNeeded = true;
 		FirstScoutAlive = false;
 		ScoutStart = false;
+		myfirstGas = null;
+		gasRushEnemyRefi = null;
+		gasRushed = false;
+		checkGasRush = true;
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -145,6 +157,7 @@ public class InformationManager {
 		readyToAttackPosition.put(selfPlayer, null);
 		readyToAttackPosition.put(enemyPlayer, null);
 
+		updateFirstGasInformation();
 		updateMapSpecificInformation();
 		updateChokePointAndExpansionLocation();
 	}
@@ -190,9 +203,60 @@ public class InformationManager {
 			FirstScoutAlive = true;
 		}
 			
-		if(ScoutStart == true && FirstScoutAlive == true && WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0){
+		if(ScoutStart == true && FirstScoutAlive == true  && WorkerManager.Instance().getScoutWorker() != null 
+				&& WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0){
 			FirstScoutAlive = false;
 		}
+		if(checkGasRush == true){
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+				if(unit.getType() == UnitType.Terran_Refinery && unit.isCompleted()){
+					if(myfirstGas.getPosition().equals(unit.getPosition())){
+						checkGasRush = false;//가스 러쉬 위험 끝
+					}
+				}
+			}
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
+				if(unit.getType() == getRefineryBuildingType(enemyRace)){
+					if(myfirstGas.getPosition().equals(unit.getPosition())){
+						gasRushed = true;//가스 러쉬 당함
+						gasRushEnemyRefi = unit;
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) > 0){
+
+							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+							BuildOrderItem currentItem = null; 
+							
+							if (!tempbuildQueue.isEmpty()) {
+								currentItem= tempbuildQueue.getHighestPriorityItem();
+								while(true){
+									if(currentItem.metaType.isUnit() == true && currentItem.metaType.isRefinery()){
+										tempbuildQueue.removeCurrentItem();
+										break;
+									}else if(tempbuildQueue.canGetNextItem() == true){
+										tempbuildQueue.PointToNextItem();
+										currentItem = tempbuildQueue.getItem();
+									}else{
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if(gasRushed == true && gasRushEnemyRefi != null){
+				if(gasRushEnemyRefi == null || gasRushEnemyRefi.getHitPoints() <= 0 || gasRushEnemyRefi.isTargetable() == false){
+					gasRushed = false;//가스 러쉬 위험 끝
+					System.out.println("gas rush finished");
+//					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+//					}
+				}
+			}
+		}
+//		private boolean GasRushed;
+//		private boolean CheckGasRush;
 	}
 
 	/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
@@ -929,6 +993,12 @@ public class InformationManager {
 	public boolean isFirstScoutAlive() {
 		return FirstScoutAlive;
 	}
+	public boolean isGasRushed() {
+		return gasRushed;
+	}
+	public Unit getMyfirstGas() {
+		return myfirstGas;
+	}
 	
 	//점령한 베이스 개수 확인
 	public int getOccupiedBaseLocationsCnt(Player player) {
@@ -1048,15 +1118,15 @@ public class InformationManager {
 
 	// 해당 종족의 UnitType 중 Refinery 기능을 하는 UnitType을 리턴합니다
 	public UnitType getRefineryBuildingType(Race race) {
-//		if (race == Race.Protoss) {
-//			return UnitType.Protoss_Assimilator;
-//		} else if (race == Race.Terran) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Assimilator;
+		} else if (race == Race.Terran) {
 			return UnitType.Terran_Refinery;
-//		} else if (race == Race.Zerg) {
-//			return UnitType.Zerg_Extractor;
-//		} else {
-//			return UnitType.None;
-//		}
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Extractor;
+		} else {
+			return UnitType.None;
+		}
 	}
 
 	// 해당 종족의 UnitType 중 Worker 에 해당하는 UnitType을 리턴합니다
@@ -1131,6 +1201,11 @@ public class InformationManager {
 //		}
 	}
 	
+	public void updateFirstGasInformation() {
+		if(selfPlayer!= null && getMainBaseLocation(selfPlayer)!= null && getMainBaseLocation(selfPlayer).getGeysers().size() > 0){
+			myfirstGas = getMainBaseLocation(selfPlayer).getGeysers().get(0);
+		}
+	}
 	public void updateMapSpecificInformation() {
 		List<BaseLocation> startingBase = new ArrayList<>();
 		MAP candiMapByPosition = null;

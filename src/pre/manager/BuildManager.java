@@ -201,7 +201,7 @@ public class BuildManager {
 			else if (buildQueue.canSkipCurrentItem()) {
 				// skip it and get the next one
 				buildQueue.skipCurrentItem();
-				currentItem = buildQueue.getNextItem();
+				currentItem = buildQueue.getItem();
 			} else {
 				// so break out
 				break;
