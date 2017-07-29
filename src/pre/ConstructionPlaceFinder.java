@@ -67,7 +67,7 @@ public class ConstructionPlaceFinder {
 			int vx, vy;
 			double d, t;
 			int bx, by;
-
+			
 			switch (seedPositionStrategy) {
 
 			case MainBaseLocation:
@@ -178,6 +178,18 @@ public class ConstructionPlaceFinder {
 				tempBaseLocation = InformationManager.Instance().getNextExpansionLocation();
 				if (tempBaseLocation != null) {
 					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
+				}else{
+					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+				}
+				break;
+				
+			case NextSupplePoint:
+				tempTilePosition = InformationManager.Instance().getNextSuppleLocation();
+				if (tempTilePosition != null) {
+					System.out.println("I choose here: " + tempTilePosition.toString());
+					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				}else{
+					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
 				}
 				break;
 			}
@@ -229,22 +241,23 @@ public class ConstructionPlaceFinder {
 		if (buildingType.isResourceDepot()) {
 			buildingGapSpace = Config.BuildingResourceDepotSpacing;		
 		}
-		else if (buildingType == UnitType.Protoss_Pylon) {
-			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
-			
-			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
-			if (numPylons < 3) {
-				buildingGapSpace = Config.BuildingPylonEarlyStageSpacing;
-			}
-			else {
-				buildingGapSpace = Config.BuildingPylonSpacing;
-			}
-		}
+//		else if (buildingType == UnitType.Protoss_Pylon) {
+//			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
+//			
+//			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
+//			if (numPylons < 3) {
+//				buildingGapSpace = Config.BuildingPylonEarlyStageSpacing;
+//			}
+//			else {
+//				buildingGapSpace = Config.BuildingPylonSpacing;
+//			}
+//		}
 		else if (buildingType == UnitType.Terran_Supply_Depot) {
 			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
 		}
-		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
-			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
+//		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
+//			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
+		else if (buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Terran_Bunker) {
 			buildingGapSpace = Config.BuildingDefenseTowerSpacing;
 		}
 
@@ -924,5 +937,29 @@ public class ConstructionPlaceFinder {
 	public Set<TilePosition> getTilesToAvoid() {
 		return tilesToAvoid;
 	}
-	
+
+	public void setTilesToAvoidFac(Unit unit) {
+		
+		int fromx = unit.getTilePosition().getX()-1;
+		int fromy = unit.getTilePosition().getY()-1;
+		
+		if(fromx<0){
+			fromx=0;
+		}
+		if(fromy<0){
+			fromy =0;
+		}
+		
+		for (int x = fromx; x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		{
+			for (int y = fromy ; y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
+			{
+				if((x==fromx + 6 || x==fromx + 7) && y == fromy){
+					continue;
+				}
+				TilePosition temp = new TilePosition(x,y);
+				tilesToAvoid.add(temp);
+			}
+		}
+	}
 }

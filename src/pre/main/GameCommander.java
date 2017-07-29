@@ -3,6 +3,8 @@ import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
+import bwapi.UnitType;
+import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
 import pre.manager.BuildManager;
 import pre.manager.CombatManager;
@@ -134,6 +136,10 @@ public class GameCommander {
 		InformationManager.Instance().onUnitComplete(unit);
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
+		
+		if(unit.getType() == UnitType.Terran_Factory){
+			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
+		}
 	}
 
 	/// 유닛(건물/지상유닛/공중유닛)이 Discover 될 때 발생하는 이벤트를 처리합니다<br>
