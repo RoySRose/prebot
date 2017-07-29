@@ -167,6 +167,53 @@ public class InitialBuild {
 
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
 			
+//			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				queueBuildSeed(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+//				
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
+//				
+//				
+//				
+//
+//			}
+			
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
@@ -228,11 +275,11 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Marine);
 				queueBuild(false, UnitType.Terran_SCV);//SCV
 				queueBuild(true, UnitType.Terran_Factory);//팩
-				queueBuild(true, UnitType.Terran_Supply_Depot);//서플
+				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
 				queueBuild(false, UnitType.Terran_SCV);//scv
 				queueBuild(true, UnitType.Terran_Factory);//팩
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
-				queueBuild(true, UnitType.Terran_Supply_Depot);//서플
+				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
 				queueBuild(true, UnitType.Terran_Machine_Shop);//머신샵
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
 				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크
