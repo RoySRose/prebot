@@ -72,16 +72,10 @@ public class AnalyzeStrategy {
 				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
 			}
 			
-			//게이트가 없이 포지더블이나 생더블
-			//FirstExpansionLocation
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway, InformationManager.Instance().enemyPlayer) < 1){
-				if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge, InformationManager.Instance().enemyPlayer) >= 1){
-					selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
-				}
-			}
 			
-			BaseLocation tempBaseLocation =InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
+
+			
+			/*BaseLocation tempBaseLocation =InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
         	//Position tempPosition;
         	
         	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
@@ -97,7 +91,19 @@ public class AnalyzeStrategy {
 	     				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
 	     			 }
      			 }
+			}*/
+		}
+		
+		
+		if(MyBotModule.Broodwar.getFrameCount() < 2000 && InformationManager.Instance().isFirstScoutAlive()){
+			//게이트가 없이 포지더블이나 생더블
+			//FirstExpansionLocation
+			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge, InformationManager.Instance().enemyPlayer) >= 1
+				||MyBotModule.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >1 ){
+				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
 			}
+
 		}
 		
 		
