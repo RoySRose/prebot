@@ -75,7 +75,8 @@ public class UXManager {
 		drawGameInformationOnScreen(5, 5);
 
 		if (Config.DrawEnemyUnitInfo) {
-			drawUnitStatisticsOnScreen(400, 20);
+			drawUnitStatisticsOnScreen1(400, 15);
+			drawUnitStatisticsOnScreen2(370, 50);
 		}
 
 		if (Config.DrawBWTAInfo) {
@@ -88,7 +89,7 @@ public class UXManager {
 
 		// 빌드오더큐 : 빌드 실행 전
 		if (Config.DrawProductionInfo) {
-			drawBuildOrderQueueOnScreen(500, 20);
+			drawBuildOrderQueueOnScreen(500, 50);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
@@ -137,7 +138,7 @@ public class UXManager {
 			drawUnitTargetOnMap();
 
 			// 미사일, 럴커의 보이지않는 공격등을 표시
-			drawBulletsOnMap();
+			//drawBulletsOnMap();
 		}
 		
 		// draw tile position of mouse cursor
@@ -372,7 +373,7 @@ public class UXManager {
 	}
 
 	/// UnitType 별 통계 정보를 Screen 에 표시합니다
-	public void drawUnitStatisticsOnScreen(int x, int y) {
+	public void drawUnitStatisticsOnScreen1(int x, int y) {
 		int currentY = y;
 
 		// 아군이 입은 피해 누적값
@@ -413,12 +414,17 @@ public class UXManager {
 		{
 			MyBotModule.Broodwar.drawTextScreen(x, currentY, brown + " Enemy Loss:" + white +" Minerals: " + red + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + white + " Gas: " + teal + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
 		}
+	}	
+		
+	public void drawUnitStatisticsOnScreen2(int x, int y) {
 			
+		int currentY = y;
+		
 		// 적군의 UnitType 별 파악된 Unit 숫자를 표시
-		MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 20, white + " UNIT NAME");
-		MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
-		MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
-		MyBotModule.Broodwar.drawTextScreen(x + 190, currentY + 20, white + " Alive");
+		MyBotModule.Broodwar.drawTextScreen(x,		 currentY, white + " UNIT NAME");
+		//MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
+		//MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, currentY, white + " Alive");
 
 		int yspace = 0;
 		
@@ -450,16 +456,21 @@ public class UXManager {
 			while(it.hasNext())
 			{
 				tempUnitName = it.next();
+				
 				int numCreatedUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumCreatedUnits(tempUnitName);
 				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumDeadUnits(tempUnitName);
 				int numUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumUnits(tempUnitName);
 	
+				String displayname = tempUnitName.replace("Protoss", "P");
+				displayname = displayname.replace("Terran", "T");
+				displayname = displayname.replace("Zerg", "Z");
+				
 				if (numUnits > 0)
 				{
-					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), tempUnitName);
-					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "" + numUnits);
+					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
+//					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
+//					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}
@@ -500,12 +511,15 @@ public class UXManager {
 				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumDeadUnits(tempUnitName);
 				int numUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumUnits(tempUnitName);
 	
+				String temp2 = "Terran";
+				String displayname = tempUnitName.replace(temp2, "T");
+				
 				if (numUnits > 0)
 				{
-					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), tempUnitName);
-					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					MyBotModule.Broodwar.drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "" + numUnits);
+					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
+					//MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
+					//MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}

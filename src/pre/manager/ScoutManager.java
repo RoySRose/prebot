@@ -158,8 +158,10 @@ public class ScoutManager{
 					{
 						// set unit as scout unit
 						currentScoutUnit = unit;
-						if(currentScoutUnit.isCarryingMinerals())
-							return;
+						if(currentScoutUnit!= null){
+							if(currentScoutUnit.isCarryingMinerals())
+								return;
+						}
 						WorkerManager.Instance().setScoutWorker(currentScoutUnit);
 
 						// 참고로, 일꾼의 정찰 임무를 해제하려면, 다음과 같이 하면 된다

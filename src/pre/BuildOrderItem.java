@@ -23,7 +23,8 @@ public class BuildOrderItem {
 		FirstExpansionLocation,		///< 아군 첫번째 앞마당
 		SecondChokePoint,			///< 아군 두번째 길목
 		SeedPositionSpecified,		///< 별도 지정 위치
-		NextExpansionPoint    		///< 다음 멀티 위치
+		NextExpansionPoint,    		///< 다음 멀티 위치
+		NextSupplePoint    			///< 다음 서플 위치
 	};
 	
 	public SeedPositionStrategy seedLocationStrategy;	///< 건설위치 초안 결정 정책

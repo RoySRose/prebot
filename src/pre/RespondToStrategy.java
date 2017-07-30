@@ -36,7 +36,7 @@ public class RespondToStrategy {
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
-	//유닛체크
+	//유닛체크values()
 	public boolean chk_scv = false;
 	public boolean chk_marine = false;
 	public boolean chk_goliath = false;
@@ -62,10 +62,16 @@ public class RespondToStrategy {
 	 
 	private static RespondToStrategy instance = new RespondToStrategy();
 	
-	public static RespondToStrategy instance() {
+	public static RespondToStrategy Instance() {
 		return instance;
 	}
-	
+	public boolean needOfEngineeringBay() {
+		
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_shuttle){
+			return true;
+		}
+		return false;
+	}
 
 	public void update() {
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
@@ -131,10 +137,8 @@ public class RespondToStrategy {
 			if (unit.getType() == UnitType.Terran_Science_Facility) {
 				chk_science_facility = true;
 			}
-			
-			
-			
 		}
+		
 		
 		//protossException_Dark start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Dark){

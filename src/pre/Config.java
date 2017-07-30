@@ -57,9 +57,9 @@ public class Config {
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static int WorkersPerRefinery = 3;
 	/// 건물과 건물간 띄울 최소한의 간격 - 일반적인 건물의 경우
-	public static int BuildingSpacing = 2;
+	public static int BuildingSpacing = 1;
 	/// 건물과 건물간 띄울 최소한의 간격 - ResourceDepot 건물의 경우 (Nexus, Hatchery, Command Center)
-	public static int BuildingResourceDepotSpacing = 0;
+	public static int BuildingResourceDepotSpacing = 1;
 	/// 건물과 건물간 띄울 최소한의 간격 - Protoss_Pylon 건물의 경우 - 게임 초기에
 	public static int BuildingPylonEarlyStageSpacing = 4;
 	/// 건물과 건물간 띄울 최소한의 간격 - Protoss_Pylon 건물의 경우 - 게임 초기 이후에
@@ -85,7 +85,7 @@ public class Config {
 	/// 화면 표시 여부 - 유닛 HitPoint
 	public static boolean DrawUnitHealthBars = true;
 	/// 화면 표시 여부 - 유닛 통계
-	public static boolean DrawEnemyUnitInfo = false;
+	public static boolean DrawEnemyUnitInfo = true;
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
 	public static boolean DrawUnitTargetInfo = true;
 
@@ -93,14 +93,14 @@ public class Config {
 	public static boolean DrawProductionInfo = true;
 
 	/// 화면 표시 여부 - 건물 Construction 상황
-	public static boolean DrawBuildingInfo = true;
+	public static boolean DrawBuildingInfo = false;
 	/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
 	public static boolean DrawReservedBuildingTiles = false;
 	
 	/// 화면 표시 여부 - 정찰 상태
 	public static boolean DrawScoutInfo = true;
 	/// 화면 표시 여부 - 일꾼 목록
-	public static boolean DrawWorkerInfo = true;
+	public static boolean DrawWorkerInfo = false;
 	
 	/// 화면 표시 여부 - 마우스 커서	
 	public static boolean DrawMouseCursorInfo = true;

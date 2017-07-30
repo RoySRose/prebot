@@ -59,7 +59,7 @@ public class BuildOrderQueue {
 	}
 
 	/// returns the highest priority item
-	public BuildOrderItem getNextItem() 
+	public BuildOrderItem getItem() 
 	{
 		// TODO : assert 제거
 		//assert(queue.size() - 1 - numSkippedItems >= 0);
@@ -71,6 +71,28 @@ public class BuildOrderQueue {
 		return (BuildOrderItem)tempArr[numSkippedItems];
 	}
 
+	public boolean canGetNextItem() 
+	{
+		// does the queue have more elements
+		boolean bigEnough = queue.size() > (int)(1 + numSkippedItems);
+
+		if (!bigEnough) 
+		{
+			return false;
+		}
+
+		// this tells us if we can skip
+		return true;
+	}
+	public void PointToNextItem() 
+	{
+		// make sure we can skip
+		if (canGetNextItem()) {
+			// skip it
+			numSkippedItems++;
+		}
+	}
+	
 	/// BuildOrderQueue에 해당 type 의 Item 이 몇 개 존재하는지 리턴한다. queryTilePosition 을 입력한 경우, 건물에 대해서 추가 탐색한다
 	public int getItemCount(MetaType queryType, TilePosition queryTilePosition)
 	{

@@ -3,7 +3,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import bwapi.Race;
@@ -21,7 +20,6 @@ import pre.ConstructionPlaceFinder;
 import pre.InitialBuild;
 import pre.MetaType;
 import pre.RespondToStrategy;
-import pre.WorkerData;
 import pre.main.MyBotModule;
 import pre.manager.CombatManager.CombatStrategy;
 import pre.util.CommandUtil;
@@ -125,30 +123,22 @@ public class StrategyManager {
 	
 	public void setCurrentStrategyBasic(Strategys strategy) {
 		if(CurrentStrategyBasic != strategy){
-//			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
+			MyBotModule.Broodwar.printf("Set Strategy: " + strategy);
 			LastCurrentStrategyBasic = CurrentStrategyBasic; 
-		}
-		CurrentStrategyBasic = strategy;
-		setCombatUnitRatio();
-		if(LastCurrentStrategyBasic != CurrentStrategyBasic){
-//			MyBotModule.Broodwar.printf("==setting ratio==");
-//			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
-//			MyBotModule.Broodwar.printf("wgt:" + wgt);
-			LastCurrentStrategyBasic = CurrentStrategyBasic;
+			CurrentStrategyBasic = strategy;
+			setCombatUnitRatio();
+			
+			MyBotModule.Broodwar.printf("vul:tank:goli, wgt = " + vultureratio+" : " +tankratio+" : "+goliathratio + ", " + wgt);
 		}
 	}
 	public void setCurrentStrategyException(StrategysException strategy) {
 		if(CurrentStrategyException != strategy){
-//			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
+			MyBotModule.Broodwar.printf("Set StrategyEX: " + strategy);
 			LastCurrentStrategyException = CurrentStrategyException;
-		}
-		
-		CurrentStrategyException = strategy;
-		setCombatUnitRatio();
-		if(LastCurrentStrategyException != CurrentStrategyException){
-//			MyBotModule.Broodwar.printf("==setting ratio==");
-//			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
-//			MyBotModule.Broodwar.printf("wgt:" + wgt);
+			CurrentStrategyException = strategy;
+			setCombatUnitRatio();
+
+			MyBotModule.Broodwar.printf("vul:tank:goli, wgt = " + vultureratio+" : " +tankratio+" : "+goliathratio + ", " + wgt);
 		}
 	}
 	public Strategys getCurrentStrategyBasic() {
@@ -186,7 +176,18 @@ public class StrategyManager {
 	
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
-		
+//		if (enemyBaseRegionVertices.isEmpty()) {
+//			ScoutManager.Instance().calculateEnemyRegionVertices();
+//			System.out.println(ScoutManager.Instance().enemyBaseRegionVertices.toString());
+//		}
+//			
+//		BaseLocation sourceBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+//		
+//		System.out.println("sourceBaseLocationPoint : " + sourceBaseLocation.getPoint());
+//		System.out.println("sourceBaseLocationP : " + sourceBaseLocation.getPosition());
+//		System.out.println("sourceBaseLocationTP : " + sourceBaseLocation.getTilePosition());
+//		System.out.println("sourceBaseLocationP : " + sourceBaseLocation.getRegion().getCenter());
+
 		//TODO 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
 		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
 				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
@@ -207,10 +208,7 @@ public class StrategyManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 233 == 0) {
 			executeExpansion();
 		}
-		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
-			executeAddRefinery();
-		}
-		if(isInitialBuildOrderFinished){
+		if(isInitialBuildOrderFinished == true){
 			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
 				executeUpgrade();
 				executeResearch();
@@ -226,7 +224,7 @@ public class StrategyManager {
 			if (MyBotModule.Broodwar.getFrameCount() % 23 == 0){
 				executeAddBuildingInit();
 			}
-		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0 && isInitialBuildOrderFinished == true) { //5초에 한번 팩토리 추가 여부 결정
+		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0) { //5초에 한번 팩토리 추가 여부 결정
 			executeAddFactory();
 		}
 		
@@ -239,10 +237,16 @@ public class StrategyManager {
 			}
 
 		}
-		
-		if (MyBotModule.Broodwar.getFrameCount() % 95 == 0){//약 4초에 한번
-			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
+		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
+			executeSustainBuilding();
 		}
+		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
+			executeFly();
+		}
+		if (MyBotModule.Broodwar.getFrameCount() % 37 == 0){//약 4초에 한번
+			RespondToStrategy.Instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
+		}
+		
 	}
 	
 	public static int least(double a, double b, double c, int checker){
@@ -292,17 +296,17 @@ public class StrategyManager {
 		double tempb = 0;
 		double tempc = 0;
 		if(ratea == 0){
-			tempa = 1.0/0.000001*tota;	
+			tempa = 99999999;	
 		}else{
 			tempa = 1.0/ratea*tota;
 		}
 		if(rateb == 0){
-			tempb = 1.0/0.000001*totb;	
+			tempb = 99999999;	
 		}else{
 			tempb = 1.0/rateb*totb;
 		}
 		if(ratec == 0){
-			tempc = 1.0/0.000001*totc;	
+			tempc = 99999999;	
 		}else{
 			tempc = 1.0/ratec*totc;
 		}
@@ -317,37 +321,37 @@ public class StrategyManager {
 	}
 	
 	private int GetCurrentTot(UnitType checkunit) {
-		int cnt;
-		cnt = BuildManager.Instance().buildQueue.getItemCount(checkunit) + 
+		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + 
 				 MyBotModule.Broodwar.self().allUnitCount(checkunit);
 		
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (unit.getType() == UnitType.Terran_Factory) {
-				if (unit.isTraining()) {
-					cnt += unit.getTrainingQueue().size();//TODO trainingqueue 에 모가 있는지를 알수가 없다.
-				}
-			}
-		}
-		return cnt;
+//		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//			if (unit.getType() == UnitType.Terran_Factory) {
+//				if (unit.isTraining() &&  unit.get) {
+//					cnt += unit.getTrainingQueue().size();//TODO trainingqueue 에 모가 있는지를 알수가 없다.
+//				}
+//			}
+//		}
 	}
 	
 	private int GetCurrentTotBlocked(UnitType checkunit) {
-		int cnt;
-		cnt =  MyBotModule.Broodwar.self().allUnitCount(checkunit);
+		return  MyBotModule.Broodwar.self().allUnitCount(checkunit);
 		
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (unit.getType() == UnitType.Terran_Factory) {
-				if (unit.isTraining()) {
-					cnt += unit.getTrainingQueue().size();
-				}
-			}
-		}
-		return cnt;
+//		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//			if (unit.getType() == UnitType.Terran_Factory && unit.isTraining()) {
+//				if(unit.getTrainingQueue() != null && unit.getTrainingQueue().size() > 0 && unit.getTrainingQueue().){
+//					cnt ++;
+//				}
+//			}
+//		}
 	}
 	
 	// 일꾼 계속 추가 생산
 	public void executeWorkerTraining() {
 
+		if(MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 2){
+			return;
+		}
+		
 		int tot_mineral_self = 0 ;
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
@@ -414,6 +418,28 @@ public class StrategyManager {
 
 	//부족한 인구수 충원
 	public void executeSupplyManagement() {
+		
+		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+		BuildOrderItem checkItem = null; 
+
+		if (!tempbuildQueue.isEmpty()) {
+			checkItem= tempbuildQueue.getHighestPriorityItem();
+			while(true){
+				if(checkItem.blocking == true){
+					break;
+				}
+				if(tempbuildQueue.canSkipCurrentItem() == true){
+					tempbuildQueue.skipCurrentItem();
+				}else{
+					break;
+				}
+				checkItem = tempbuildQueue.getItem();
+			}
+			if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot){
+				return;
+			}
+		}
+		
 		// 게임에서는 서플라이 값이 200까지 있지만, BWAPI 에서는 서플라이 값이 400까지 있다
 		// 저글링 1마리가 게임에서는 서플라이를 0.5 차지하지만, BWAPI 에서는 서플라이를 1 차지한다
 		if (MyBotModule.Broodwar.self().supplyTotal() <= 400) {
@@ -456,7 +482,7 @@ public class StrategyManager {
 			}
 						
 			if(MyBotModule.Broodwar.getFrameCount()<6000 || (Faccnt <= 3 && CCcnt == 1)){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨
-				if(barrackflag==true && factoryflag==false){
+				if(factoryflag==false && barrackflag==true){
 					supplyMargin = 5;
 				}else if(factoryflag==true){
 					supplyMargin = 5+4*fac_cnt+facFullOperating*2;
@@ -488,7 +514,11 @@ public class StrategyManager {
 						}
 					}
 					if (isToEnqueue) {
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getBasicSupplyProviderUnitType()), true);
+						if(InformationManager.Instance().getMainBaseSuppleLimit() <= MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Supply_Depot)){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
+						}else{
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
 					}
 				}
 			}
@@ -496,27 +526,117 @@ public class StrategyManager {
 	}
 
 	public void executeAddBuildingInit() {
+		//팩토리
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) 
 				+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) < InitFaccnt) {
 			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 		}
+		//가스
 		if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null) 
 				+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Refinery)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Refinery, null) == 0){
-			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+			if(InformationManager.Instance().isGasRushed() == false){
+				int barrack=0;
+				int supple=0;
+				int scv=0;
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+				{
+					if (unit == null) continue;
+					if (unit.getType() == UnitType.Terran_Barracks){
+						barrack++;
+					}
+					if (unit.getType() == UnitType.Terran_Supply_Depot  && unit.isCompleted()){
+						supple++;
+					}
+					if (unit.getType() == UnitType.Terran_SCV && unit.isCompleted()){
+						scv++;
+					}
+		 		}
+				if(barrack > 0 && supple > 0 && scv>10){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				}
+			}
 		}
+	}
+	
+	public void executeSustainBuilding() {
 		
-		boolean aca =false;
+		boolean aca = false;
+		boolean acaComplete = false;
+		boolean barrack = false;
+		boolean engineering = false;
+		
+	
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
-			if (unit.getType() == UnitType.Terran_Academy && unit.isCompleted()){
-				aca = true;
-				break;
+			//가스 start
+			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
+				
+				Unit geyserAround = null;
+				
+				boolean refineryAlreadyBuilt = false; 
+				for (Unit unitsAround: MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 300)){
+					if (unitsAround == null) continue;
+					if(unitsAround.getType() == UnitType.Terran_Refinery 
+							|| unitsAround.getType() == UnitType.Zerg_Extractor 
+							|| unitsAround.getType() == UnitType.Protoss_Assimilator){
+						refineryAlreadyBuilt = true;
+						break;
+					}			
+					if(unitsAround.getType() == UnitType.Resource_Vespene_Geyser){
+						geyserAround = unitsAround;
+					}
+				}
+				
+				if(isInitialBuildOrderFinished == false && geyserAround != null){
+					if(InformationManager.Instance().getMyfirstGas() !=null){
+						if(geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())){
+							continue;
+						}
+					}
+				}
+				
+				if(refineryAlreadyBuilt ==false){
+					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
+					if(findGeyser != null){
+						if (findGeyser.getDistance(unit.getTilePosition())*32 > 300){
+							continue;
+						}
+						if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 5){
+							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
+							}
+						}
+					}
+				}
 			}
+			//가스 end
+			//컴샛 start
+			if(unit.getType() == UnitType.Terran_Academy){
+				aca = true;
+				if(unit.isCompleted()){
+					acaComplete = true;
+				}
+			}
+			//컴샛 end
+			
+			//barrack start
+			if(unit.getType() == UnitType.Terran_Barracks){
+				barrack = true;
+			}
+			//barrack end
+			
+			//engineering start
+			if(unit.getType() == UnitType.Terran_Engineering_Bay){
+				engineering = true;
+			}
+			//engineering end
  		}
-		if(aca){
+		
+		//컴샛 start
+		if(acaComplete){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if(unit == null) continue;
@@ -528,6 +648,35 @@ public class StrategyManager {
 				}
 	 		}
 		}
+		int CC=0;
+		if(aca == false){
+			CC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+			
+			if(CC>2){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
+				}
+			}
+		}
+		//컴샛 end
+		
+		//barrack start
+		if(barrack == false  && isInitialBuildOrderFinished == true){
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0) {
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
+			}
+		}
+		//barrack end
+		
+		//engineering start
+		if(engineering == false && RespondToStrategy.Instance().needOfEngineeringBay()){
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0) {
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
+			}
+		}
+		//engineering end
+		
+		
 	}
 	
 	public void executeAddFactory() {
@@ -587,11 +736,11 @@ public class StrategyManager {
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0) {
 			if(Faccnt == 0){
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			}else if(Faccnt <= maxFaccnt){
+			}else if(Faccnt < maxFaccnt){
 				if(MyBotModule.Broodwar.self().minerals() > 250 + additonalmin && MyBotModule.Broodwar.self().gas() > 130 + additonalgas){
-					if(Faccnt <= 4){
+					if(Faccnt <= 5){
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-					}else if(Faccnt <= 5){
+					}else if(Faccnt <= 6){
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 					}else{
 						BaseLocation bestlocation =null;
@@ -613,10 +762,11 @@ public class StrategyManager {
 				}
 			}
 		}
-		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
-			if(MachineShopcnt + 2 < Faccnt ){//TODO 2개 차이나게 유지해도 되려나?
-				if(MyBotModule.Broodwar.self().minerals() > 50 && MyBotModule.Broodwar.self().gas() > 50){
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		if( MachineShopcnt < 4 && MachineShopcnt + 2 < Faccnt){
+			if(MyBotModule.Broodwar.self().minerals() > 50 && MyBotModule.Broodwar.self().gas() > 50){
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop, true);
 				}
 			}
 		}
@@ -639,6 +789,13 @@ public class StrategyManager {
 			tankratio = Config.tankratioexception[CurrentStrategyException.ordinal()];
 			goliathratio = Config.goliathratioexception[CurrentStrategyException.ordinal()];
 			wgt = Config.wgtexception[CurrentStrategyException.ordinal()];
+			
+			if(vultureratio == 0 && tankratio == 0 && goliathratio == 0){
+				vultureratio = Config.vultureratio[CurrentStrategyBasic.ordinal()];
+				tankratio = Config.tankratio[CurrentStrategyBasic.ordinal()];
+				goliathratio = Config.goliathratio[CurrentStrategyBasic.ordinal()];
+				wgt = Config.wgt[CurrentStrategyBasic.ordinal()];
+			}
 		}
 	}
 	public int getFacUnits(){
@@ -690,7 +847,7 @@ public class StrategyManager {
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
 					return;
 				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_SCV){
 					return;
 				}
 				if(currentItem.blocking == true){
@@ -698,11 +855,10 @@ public class StrategyManager {
 				}
 				if(tempbuildQueue.canSkipCurrentItem() == true){
 					tempbuildQueue.skipCurrentItem();
-				}
-				else{
+				}else{
 					break;
 				}
-				currentItem = tempbuildQueue.getNextItem();
+				currentItem = tempbuildQueue.getItem();
 			}
 		}else{
 			return;
@@ -740,15 +896,14 @@ public class StrategyManager {
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop && unit.getAddon() == null ){
 					continue;
 				}
-				//필요하려나?
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
-					if(unit.getAddon() != null && unit.getAddon().isCompleted() == true){
+					if(unit.getAddon() != null && unit.getAddon().isCompleted() != true){
 						continue;
 					}
 				}
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
 					if(isarmoryexists){
-						continue;
+						break;
 					}
 				}
 				
@@ -825,16 +980,6 @@ public class StrategyManager {
 	
 	public void executeCombatUnitTraining() {
 
-		int Faccnt = 0;
-
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			if (unit == null) continue;
-			if (unit.getType() == UnitType.Terran_Factory){
-				Faccnt ++;
-			}
- 		}
-		
 		int tot_vulture = GetCurrentTot(UnitType.Terran_Vulture);
 		int tot_tank = GetCurrentTot(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTot(UnitType.Terran_Siege_Tank_Siege_Mode);
 		int tot_goliath = GetCurrentTot(UnitType.Terran_Goliath);
@@ -844,21 +989,15 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode, null) +
 				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath, null);
 
-		for(int i=0; i< Faccnt - currentinbuildqueuecnt; i++){
+		if(currentinbuildqueuecnt == 0){
 			selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
-			if(Config.BuildQueueDebugYN){
-				System.out.println("selected:" + selected);
-			}
+			
 			
 			if(selected.mineralPrice() < MyBotModule.Broodwar.self().minerals() &&	selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
+				if(Config.BuildQueueDebugYN){
+					System.out.println("queue in selected by basic:" + selected);
+				}
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-				if(selected == UnitType.Terran_Siege_Tank_Tank_Mode){
-					tot_tank++;
-				}else if(selected == UnitType.Terran_Goliath){
-					tot_goliath++;
-				}else if(selected == UnitType.Terran_Vulture){
-					tot_vulture++;
-				}				
 			}
 		}
 	}
@@ -880,7 +1019,7 @@ public class StrategyManager {
 		return res*2;//스타에서는 두배
 	}
 	
-public int getTotKilledCombatUnits(){
+	public int getTotKilledCombatUnits(){
 		
 		int res = 0;
 		int tot = 0;
@@ -934,7 +1073,7 @@ public int getTotKilledCombatUnits(){
 	}
 
 	public boolean enemymulting(){
-		int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType());
+		int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
 
 		if (cnt > 0){
 			return true;
@@ -1262,45 +1401,31 @@ public int getTotKilledCombatUnits(){
 							}
 						}
 						if(BuildManager.Instance().buildQueue.getItemCount(Current[i]) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], true);
+							UpgradeType tempU = null;
+							if(Current[i].isUpgrade()){
+								boolean booster = false;
+								for (Unit unitcheck : MyBotModule.Broodwar.self().getUnits())
+								{
+									if(unitcheck.getType() == UnitType.Terran_Armory && unitcheck.isCompleted()){
+										booster = true;
+									}
+								}
+								tempU = Current[i].getUpgradeType();
+								if(tempU == UpgradeType.Charon_Boosters && booster == false){
+									 return;
+								}
+							}
+							if(currentResearched==0){
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], true);
+							}else{
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], false);
+							}
 						}
 						break;
 					}
 				}
 			}
 		}
-	}
-	
-	public void executeAddRefinery() {
-		
-		//이거는 updat() 쪽에서 10초에 한번씩만 돌아도 될거 같고. // frame 239마다. 
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			if (unit == null) continue;
-			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
-				
-				boolean refineryAlreadyBuilt = false; 
-				for (Unit Refinery : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 300)){
-					if (Refinery == null) continue;
-					if(Refinery.getType() == UnitType.Terran_Refinery){
-						refineryAlreadyBuilt = true;
-						break;
-					}
-				}
-				if(refineryAlreadyBuilt ==false){
-					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
-					if(findGeyser != null){
-						if (findGeyser.getDistance(unit.getTilePosition())*32 > 300){
-							continue;
-						}
-						if(WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 5)
-							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
-									BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
-							}
-					}
-				}
-			}
- 		}
 	}
 	
 	public void executeExpansion() {
@@ -1310,30 +1435,30 @@ public int getTotKilledCombatUnits(){
 		}
 		
 		int MaxCCcount = 4;
+		int CCcnt =0 ;
 		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
-			int tempCC =0 ;
 			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() ){
-				if(WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit) > 5){
-					tempCC++;
+				if(WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit) > 6){
+					CCcnt++;
 				}
 			}
-			if(tempCC >= MaxCCcount){
+			if(CCcnt >= MaxCCcount){
 				return;
 			}
  		}
 		
-		int CCcnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int RealCCcnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 		
 		
 		//앞마당 전
-		if(CCcnt == 1){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
+		if(CCcnt == 1 && RealCCcnt < 2){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
 			if (isInitialBuildOrderFinished == false) {
 				return;
 			}
-			if( MyBotModule.Broodwar.self().minerals() > 500 && getFacUnits() > 40){
+			if((MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40) || (getFacUnits() > 60 && GRIDpoint > 60 && MyBotModule.Broodwar.self().minerals() > 400)){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					MyBotModule.Broodwar.printf("Build First Expansion");
@@ -1353,10 +1478,10 @@ public int getTotKilledCombatUnits(){
 		//앞마당 이후
 		if(CCcnt >= 2 && CCcnt <= MaxCCcount){
 			
-			// 돈이 800 넘으면 멀티하기
+			// 돈이 500 넘으면 멀티하기
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 					+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
-				if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40){
+				if( MyBotModule.Broodwar.self().minerals() > 500 && getFacUnits() > 60){
 					MyBotModule.Broodwar.printf("Build Next Expansion");
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
@@ -1375,6 +1500,18 @@ public int getTotKilledCombatUnits(){
 		}
 	}
 
+	private void executeFly() {
+		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+					unit.lift();
+				}
+	 		}
+		}
+	}
+
+	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 경기 결과 파일 Save / Load 및 로그파일 Save 예제 추가
 

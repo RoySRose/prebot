@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.StreamPrintService;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -20,7 +22,10 @@ import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import bwta.Polygon;
 import bwta.Region;
+import pre.BuildOrderItem;
+import pre.BuildOrderQueue;
 import pre.ConstructionPlaceFinder;
 import pre.MapGrid;
 import pre.MapTools;
@@ -41,10 +46,20 @@ public class InformationManager {
 	public Race selfRace;			///< 아군 Player의 종족
 	public Race enemyRace;			///< 적군 Player의 종족  
 
-	private boolean isReceivingEveryMultiInfo;
-	public boolean EarlyDefenseNeeded;
-	public boolean ScoutDefenseNeeded;
+	private boolean ReceivingEveryMultiInfo;
 
+	private boolean EarlyDefenseNeeded;
+	private boolean ScoutDefenseNeeded;
+	
+	private boolean FirstScoutAlive;
+	private boolean ScoutStart;
+	
+	private Unit myfirstGas;
+	private Unit gasRushEnemyRefi;
+	private boolean gasRushed;
+	private boolean checkGasRush;
+	private int MainBaseSuppleLimit;
+	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
 	/// 건물 여부를 기준으로 파악하기 때문에 부적절하게 판단할수도 있습니다 
@@ -93,9 +108,16 @@ public class InformationManager {
 		selfRace = selfPlayer.getRace();
 		enemyRace = enemyPlayer.getRace();
 		
-		isReceivingEveryMultiInfo = false;
+		ReceivingEveryMultiInfo = false;
 		EarlyDefenseNeeded = true;
 		ScoutDefenseNeeded = true;
+		FirstScoutAlive = false;
+		ScoutStart = false;
+		myfirstGas = null;
+		gasRushEnemyRefi = null;
+		gasRushed = false;
+		checkGasRush = true;
+		MainBaseSuppleLimit =0;
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -114,10 +136,11 @@ public class InformationManager {
 				MyBotModule.Broodwar.self());
 		}
 		
-		BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
+//		BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
 		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
 		{
-			if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())){
+//			if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())){
+			if(targetBaseLocation.isIsland()){
 				islandBaseLocations.add(targetBaseLocation);
 			}
 		}
@@ -138,42 +161,122 @@ public class InformationManager {
 		readyToAttackPosition.put(selfPlayer, null);
 		readyToAttackPosition.put(enemyPlayer, null);
 
+		updateFirstGasInformation();
 		updateMapSpecificInformation();
 		updateChokePointAndExpansionLocation();
+		checkTileForSupply();
+	}
+
+	private void checkTileForSupply() {
+
+		int MainBaseSpaceForSup =0;
+		Polygon temp= getMainBaseLocation(selfPlayer).getRegion().getPolygon();
+		for(int y=0; y<128 ; y++){
+			for(int x=0; x<128 ; x++){
+				Position test2 = new Position(x*32+16,y*32+16);
+				if(temp.isInside(test2)){
+					MainBaseSpaceForSup++;
+				}
+			}
+		}
+		MainBaseSuppleLimit =  (int)((MainBaseSpaceForSup - 106)/30);
 	}
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+		
 		updateUnitsInfo();
+		if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
+			updateCurrentStatusInfo();
+		}
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
 			setEveryMultiInfo();
 		}
 		
+		
+	}
+
+	private void updateCurrentStatusInfo() {
 		if(EarlyDefenseNeeded){
-			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-						EarlyDefenseNeeded = false;
-					}
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+					EarlyDefenseNeeded = false;
 				}
 			}
 		}
 		if(ScoutDefenseNeeded){
-			if(MyBotModule.Broodwar.getFrameCount() % 8 == 0) {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-						ScoutDefenseNeeded = false;
-					}
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
+					ScoutDefenseNeeded = false;
 				}
-				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-					if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
-						ScoutDefenseNeeded = false;
-					}
+			}
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
+					ScoutDefenseNeeded = false;
 				}
 			}
 		}
+		if(ScoutStart == false && WorkerManager.Instance().getScoutWorker() != null){
+			ScoutStart = true;
+			FirstScoutAlive = true;
+		}
+			
+		if(ScoutStart == true && FirstScoutAlive == true  && WorkerManager.Instance().getScoutWorker() != null 
+				&& WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0){
+			FirstScoutAlive = false;
+		}
+		if(checkGasRush == true){
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+				if(unit.getType() == UnitType.Terran_Refinery && unit.isCompleted() && myfirstGas !=null){
+					if(myfirstGas.getPosition().equals(unit.getPosition())){
+						checkGasRush = false;//가스 러쉬 위험 끝
+					}
+				}
+			}
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
+				if(unit.getType() == getRefineryBuildingType(enemyRace) && myfirstGas !=null){
+					if(myfirstGas.getPosition().equals(unit.getPosition())){
+						gasRushed = true;//가스 러쉬 당함
+						gasRushEnemyRefi = unit;
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) > 0){
+
+							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+							BuildOrderItem currentItem = null; 
+							
+							if (!tempbuildQueue.isEmpty()) {
+								currentItem= tempbuildQueue.getHighestPriorityItem();
+								while(true){
+									if(currentItem.metaType.isUnit() == true && currentItem.metaType.isRefinery()){
+										tempbuildQueue.removeCurrentItem();
+										break;
+									}else if(tempbuildQueue.canGetNextItem() == true){
+										tempbuildQueue.PointToNextItem();
+										currentItem = tempbuildQueue.getItem();
+									}else{
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if(gasRushed == true && gasRushEnemyRefi != null){
+				if(gasRushEnemyRefi == null || gasRushEnemyRefi.getHitPoints() <= 0 || gasRushEnemyRefi.isTargetable() == false){
+					gasRushed = false;//가스 러쉬 위험 끝
+					System.out.println("gas rush finished");
+//					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+//					}
+				}
+			}
+		}
+//		private boolean GasRushed;
+//		private boolean CheckGasRush;
 	}
 
 	/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
@@ -532,16 +635,16 @@ public class InformationManager {
 //				System.out.println("getduration: "+ MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()));
 				if (MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()) > 8000)
 				{
-					isReceivingEveryMultiInfo = false;
-//					System.out.println("isReceivingEveryMultiInfo1: " + isReceivingEveryMultiInfo);
+					ReceivingEveryMultiInfo = false;
+//					System.out.println("ReceivingEveryMultiInfo1: " + ReceivingEveryMultiInfo);
 					return;
 				}
 			}
-			isReceivingEveryMultiInfo = true;
-//			System.out.println("isReceivingEveryMultiInfo2: " + isReceivingEveryMultiInfo);
+			ReceivingEveryMultiInfo = true;
+//			System.out.println("ReceivingEveryMultiInfo2: " + ReceivingEveryMultiInfo);
 		}else{
-			isReceivingEveryMultiInfo = false;
-//			System.out.println("isReceivingEveryMultiInfo3: " + isReceivingEveryMultiInfo);
+			ReceivingEveryMultiInfo = false;
+//			System.out.println("ReceivingEveryMultiInfo3: " + ReceivingEveryMultiInfo);
 		}
 	}
 	public BaseLocation getNextExpansionLocation() {
@@ -558,6 +661,10 @@ public class InformationManager {
 			
 			for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
 			{
+				if(targetBaseLocation.isStartLocation() == false){
+					continue;
+				}
+				
 				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
 				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
 				if (firstExpansionLocation.get(enemyPlayer) != null){
@@ -595,6 +702,35 @@ public class InformationManager {
 					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
 					if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
 					
+					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
+					if(findGeyser != null){
+						if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
+							continue;
+						}
+					}
+					
+					sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+					tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+					
+					if (tempDistance < closestDistance && sourceDistance > 0) {
+						closestDistance = tempDistance;
+						res = targetBaseLocation;
+					}
+				}
+			}
+			
+			if(res ==null){
+				for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+				{
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+					if (firstExpansionLocation.get(enemyPlayer) != null){
+						if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition())) continue;
+					}
+					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
+					
 					sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
 					tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
 					
@@ -608,6 +744,67 @@ public class InformationManager {
 		return res;
 	}
 	
+
+	public TilePosition getNextSuppleLocation() {
+		
+		TilePosition res = null;
+		
+		if(occupiedBaseLocations.size() > 0){
+			for (BaseLocation targetBaseLocation : occupiedBaseLocations.get(selfPlayer))
+			{
+				if(targetBaseLocation.isStartLocation() == false){
+					continue;
+				}
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+				if(targetBaseLocation.isStartLocation() == true){
+					res = targetBaseLocation.getTilePosition();
+				}
+			}
+		}
+		
+//		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
+//		if(res==null && enemyBaseLocation != null){
+//			
+//			double tempDistance;
+//			double sourceDistance;
+//			double closestDistance = 1000000000;
+//			BaseLocation tempBaseLocation = null;
+//			
+//			BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
+//			
+//			for (BaseLocation targetBaseLocation :  BWTA.getBaseLocations())
+//			{
+//				if(targetBaseLocation.isStartLocation() == false){
+//					continue;
+//				}
+//
+//				boolean pass = false;
+//				for (BaseLocation myBaseLocation : occupiedBaseLocations.get(selfPlayer))
+//				{
+//					if (targetBaseLocation.getTilePosition().equals(myBaseLocation.getTilePosition())){
+//						pass = true;
+//						break;
+//					}
+//				}
+//				if(pass){
+//					continue;
+//				}
+//				
+//				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+//				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+//				
+//				if (tempDistance < closestDistance && sourceDistance > 0) {
+//					closestDistance = tempDistance;
+//					tempBaseLocation = targetBaseLocation;
+//				}
+//			}
+//			System.out.println("in supple get from other");
+//			res = new TilePosition(tempBaseLocation.getX() - (tempBaseLocation.getX() - tempBaseLocation.getRegion().getCenter().getX())*2,  tempBaseLocation.getY() - (tempBaseLocation.getY() - tempBaseLocation.getRegion().getCenter().getY())*2);
+//		}
+		return res;
+	}
+
 	public void updateChokePointAndExpansionLocation() {
 		if (mainBaseLocationChanged.get(selfPlayer).booleanValue() == true) {
 		
@@ -903,7 +1100,25 @@ public class InformationManager {
 
 	//모든 멀티가 확인된 상태인지 확인
 	public boolean isReceivingEveryMultiInfo() {
-		return isReceivingEveryMultiInfo;
+		return ReceivingEveryMultiInfo;
+	}
+	public boolean isEarlyDefenseNeeded() {
+		return EarlyDefenseNeeded;
+	}
+	public boolean isScoutDefenseNeeded() {
+		return ScoutDefenseNeeded;
+	}
+	public boolean isFirstScoutAlive() {
+		return FirstScoutAlive;
+	}
+	public boolean isGasRushed() {
+		return gasRushed;
+	}
+	public Unit getMyfirstGas() {
+		return myfirstGas;
+	}
+	public int getMainBaseSuppleLimit() {
+		return MainBaseSuppleLimit;
 	}
 	
 	//점령한 베이스 개수 확인
@@ -1024,15 +1239,15 @@ public class InformationManager {
 
 	// 해당 종족의 UnitType 중 Refinery 기능을 하는 UnitType을 리턴합니다
 	public UnitType getRefineryBuildingType(Race race) {
-//		if (race == Race.Protoss) {
-//			return UnitType.Protoss_Assimilator;
-//		} else if (race == Race.Terran) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Assimilator;
+		} else if (race == Race.Terran) {
 			return UnitType.Terran_Refinery;
-//		} else if (race == Race.Zerg) {
-//			return UnitType.Zerg_Extractor;
-//		} else {
-//			return UnitType.None;
-//		}
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Extractor;
+		} else {
+			return UnitType.None;
+		}
 	}
 
 	// 해당 종족의 UnitType 중 Worker 에 해당하는 UnitType을 리턴합니다
@@ -1107,6 +1322,11 @@ public class InformationManager {
 //		}
 	}
 	
+	public void updateFirstGasInformation() {
+		if(selfPlayer!= null && getMainBaseLocation(selfPlayer)!= null && getMainBaseLocation(selfPlayer).getGeysers().size() > 0){
+			myfirstGas = getMainBaseLocation(selfPlayer).getGeysers().get(0);
+		}
+	}
 	public void updateMapSpecificInformation() {
 		List<BaseLocation> startingBase = new ArrayList<>();
 		MAP candiMapByPosition = null;
