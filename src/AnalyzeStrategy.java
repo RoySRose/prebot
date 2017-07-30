@@ -3,11 +3,13 @@
 import java.util.List;
 
 import bwapi.Order;
+import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import bwta.Region;
 
 /// 봇 프로그램 설정
@@ -49,123 +51,260 @@ public class AnalyzeStrategy {
 
 
 	private void AnalyzeVsProtoss() {
+		StrategyManager.StrategysException selectedSE = null;
+		//StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		
-		
-		/*if(StrategyManager.Instance().getCurrentStrategyBasic().equals(StrategyManager.Strategys.protossBasic_Templer) && !StrategyManager.Strategys.values().equals(StrategyManager.Strategys.protossBasic_Carrier)){
+		/*if(StrategyManager.Instance().getCurrentStrategyBasic().equals(StrategyManager.Strategys.protossBasic_Templar) && !StrategyManager.Strategys.values().equals(StrategyManager.Strategys.protossBasic_Carrier)){
 			
-			//String test = StrategyManager.Strategys.protossBasic_Templer;
+			//String test = StrategyManager.Strategys.protossBasic_Templar;
 			//캐리어와 템플러 대비 기본이 아니라면 일반 기본으로
 			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic); // 이런식으로 기본 전략 세팅가능
 		}*/
-		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
-				&& MyBotModule.Broodwar.getFrameCount() < 7000)
-				//|| InformationManager.Instance().enemyPlayer.allUnitCount(UnitType.)
-				//||MyBotModule.Broodwar.getDamageFrom(UnitType.Protoss_Dark_Templar, toType, fromPlayer)
-				// 약  5분 안쪽으로 템플러 아카이브를 발견하거나				
-				/*||(MyBotModule.Broodwar.getFrameCount() > 5500 &&
-							InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer)
-							+InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) < 4)*/
-				//약 4분이 넘어갈떄 질럿 + 드래군의 수가 4기 미만일경우(정찰이 안된경우나 마찬가지)
-				//|| (InformationManager.Instance().getNumUnits(UnitType., InformationManager.Instance().enemyPlayer) >= 1)
-				//다크에 공격당한다면
- 
-				){
-
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
-				//RespondToStrategy.instance().enemy_dark_templar = true;
-				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
-					// 아카데미가 있다면 exit
-					// 엔지니어링 베이까지 이니셜에 넣을계획
-					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				}
-		}
 		
-		
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			//인비저블 유닛이 있다면 일단 다크 로직
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+		if(MyBotModule.Broodwar.getFrameCount() < 4300 && InformationManager.Instance().isFirstScoutAlive()){
+			//4300 프레임이전에
+			if(
+				(InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway, InformationManager.Instance().enemyPlayer) >= 2
+				&&InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator, InformationManager.Instance().enemyPlayer) < 1	)
+				||(InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway, InformationManager.Instance().enemyPlayer) >= 2
+				&&InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core, InformationManager.Instance().enemyPlayer) < 1	)){
+				//어시밀레이터나 코어전에 2게이트라면 질럿 푸시
+				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
 			}
-			//아카데미가 있다면 init으로
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-			}
-		}
-		
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Robotics_Facility, InformationManager.Instance().enemyPlayer) >= 1){
-			//로보틱스를 발견하면, 터렛으로 본진대비
 			
-				//엔지니어링 베이가 있다면, 기본전략으로 대응하고, 본진에 터렛만 추가.
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Shuttle);
-				
-//				RespondToStrategy.instance().enemy_shuttle = true;
-				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) >= 1){
-					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				}
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) >= 1){
-				//셔틀을 발견한건 익셉션 처리로. 셔틀 대비 골리앗만 추가.
-				//셔틀대비 골리앗 비율이 맞다면 넘어간다.
-				//로직 추가할것. 생각중
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_ShuttleMix);
-				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) / InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) >= 2){
-					//셔틀 1대에 골리앗 2기정도 추가
-					//완료되면 exit
-					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				}
-			}
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Robotics_Support_Bay, InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Protoss_Reaver, InformationManager.Instance().enemyPlayer) >= 1){
-				//셔틀을 발견한건 익셉션 처리로. 셔틀 대비 골리앗만 추가.
-				//본진 방어가 되면 넘어간다. 로직 추가할것.
-				//이건 exit 조건을 본진에 방어병력이 있는 지로 판단해야 하는데 애매해서 일단 넘겼음
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Reaver);
+			
+
+			
+			/*BaseLocation tempBaseLocation =InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
+        	//Position tempPosition;
+        	
+        	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+	              Region enemyMultiRegion = null; 
+	              
+			if (tempBaseLocation != null) {
+				enemyMultiRegion = tempBaseLocation.getRegion();
+		              List<Unit> MultiRegion = MicroUtils.getUnitsInRegion(enemyMultiRegion, InformationManager.Instance().enemyPlayer);
+
+		              
+     			 for(int doublenex_cnt = 0; doublenex_cnt < MultiRegion.size(); doublenex_cnt ++){
+	     			 if(MultiRegion.get(doublenex_cnt).getType().equals(UnitType.Protoss_Nexus)){
+	     				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
+	     			 }
+     			 }
+			}*/
+		}
+		
+		
+		if(MyBotModule.Broodwar.getFrameCount() < 2000 && InformationManager.Instance().isFirstScoutAlive()){
+			//게이트가 없이 포지더블이나 생더블
+			//FirstExpansionLocation
+			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge, InformationManager.Instance().enemyPlayer) >= 1
+				||MyBotModule.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >1 ){
+				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
 			}
 
 		}
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer) >= 1){
+		
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_ZealotPush){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) >=3){
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_DoubleNexus){
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY  && StrategyManager.Instance().MyunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		
+
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer) >= 1
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
 			//스카웃은 큰 위협이 안되므로, 골리앗만 맞춰줄것
 			
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
+			selectedSE = StrategyManager.StrategysException.protossException_Scout;
+			
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_Scout){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
 				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
+		}
+		
+		
+		
+		
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) >= 1
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) / InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) < 1){
+			//셔틀을 발견한건 익셉션 처리로. 셔틀 대비 골리앗만 추가.
+			//셔틀대비 골리앗 비율이 맞다면 넘어간다.
+			//로직 추가할것. 생각중
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_ShuttleMix);
+			selectedSE = StrategyManager.StrategysException.protossException_ShuttleMix;
 			
 		}
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8){
-			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
-			
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+		if(selectedSE == StrategyManager.StrategysException.protossException_ShuttleMix){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) / InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) >= 1){
+				//셔틀 1대에 골리앗 2기정도 추가
+				//완료되면 exit
+				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}
 		
-		//프로토스는 특히 베이직이 단순한데 질럿 드래군 하템 비율에 따라 맞춰주면 되고
-		//다템이나 아비터 / 캐리어 올인에 대한 익셉션만 처리하면된다.c
-		if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
-			//익셉션이 아니라면 기본전략 체크
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Protoss_High_Templar, InformationManager.Instance().enemyPlayer) >= 1){
-				if(!StrategyManager.StrategysException.values().equals(StrategyManager.Strategys.protossBasic_Carrier)){
-					//캐리어 대비 로직에 템플러 대비로직이 포함되어있으므로(사이언스베슬, EMP)
-					//캐리어 대비중인경우는 전략을 바꾸지 않는다.
-					StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic_Templer);
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Robotics_Support_Bay, InformationManager.Instance().enemyPlayer) >= 1
+			||InformationManager.Instance().getNumUnits(UnitType.Protoss_Reaver, InformationManager.Instance().enemyPlayer) >= 1){
+			//셔틀을 발견한건 익셉션 처리로. 셔틀 대비 골리앗만 추가.
+			//본진 방어가 되면 넘어간다. 로직 추가할것.
+			//이건 exit 조건을 본진에 방어병력이 있는 지로 판단해야 하는데 애매해서 일단 넘겼음
+			
+							
+			selectedSE = StrategyManager.StrategysException.protossException_Reaver;
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Reaver);
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_Reaver){
+			Position tempBaseLocation = null;
+			boolean mainBaseTurret = false;
+			
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Command_Center){
+					tempBaseLocation = unit.getPosition();
+				}
+				int mainBaseTurret_cnt = 0;
+				if (tempBaseLocation != null) {
+					List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation, 300);
+			              
+	     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+		     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+		     				 //System.out.println("Turret Exists at Main Base Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		     				
+		     				mainBaseTurret_cnt ++ ; 
+		     				//break;
+		     			 }
+	     			 }
+	     			 if(mainBaseTurret_cnt >= 3){
+	     				 System.out.println("방어 터렛 3기 이상");
+	     				 mainBaseTurret = true;
+	     				selectedSE = StrategyManager.StrategysException.Init;
+	     				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+	     			 }
 				}
 			}
+		}
+		
+		
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
 			
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Stargate, InformationManager.Instance().enemyPlayer) >= 1
-				//캐리어 대비 전략
-				&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Fleet_Beacon, InformationManager.Instance().enemyPlayer) >= 1){
-				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic_Carrier);
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
+			selectedSE = StrategyManager.StrategysException.protossException_CarrierMany;
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_CarrierMany){
+		
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		
+		//다크템플러 exception
+		//아카데미로 체크하지 않는다.
+		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
+				&& MyBotModule.Broodwar.getFrameCount() < 7000) || InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar, InformationManager.Instance().enemyPlayer) >= 1
+				){
+
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+				selectedSE = StrategyManager.StrategysException.protossException_Dark;
+				//RespondToStrategy.instance().enemy_dark_templar = true;
+				//컴셋 마나가 부족할수 있으므로 필수 조건은 터렛으로
+				//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+		}
+		//잠시주석처리
+		//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
+			//아카데미가 없다면
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 다크 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+				selectedSE = StrategyManager.StrategysException.protossException_Dark;
 			}
 		}
 
 		
+		if(selectedSE == StrategyManager.StrategysException.protossException_Dark){
+			BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+        	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
+        	//Position tempPosition;
+        	
+        	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+	              Region myRegion = null; 
+	              
+	           boolean mainBaseTurret = false;
+	           boolean	firstChokeTurret = false;
+            	
+			if (tempBaseLocation != null) {
+				myRegion = tempBaseLocation.getRegion();
+		              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
+		              
+     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				 //System.out.println("Turret Exists at Main Base Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				mainBaseTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			
+			if (tempChokePoint != null) {
+				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+				
+				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				//System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				firstChokeTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			if(mainBaseTurret && firstChokeTurret){
+				selectedSE = StrategyManager.StrategysException.Init;
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
+			
+		}
+		
+		if(selectedSE != null){
+			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
+		}
+		
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Stargate, InformationManager.Instance().enemyPlayer) >= 1
+			//캐리어 대비 전략
+			&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Fleet_Beacon, InformationManager.Instance().enemyPlayer) >= 1){
+			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic_Carrier);
+		}
+			
+			
+			
+			
 	}
 	
 	private void AnalyzeVsTerran() {
+		StrategyManager.StrategysException selectedSE = null;
+		StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		//치즈러시 대비
 		int nongbong_cnt = 0;
 		Unit enemy_bunker = null;
@@ -189,7 +328,8 @@ public class AnalyzeStrategy {
 		//벌쳐가 없는 상태에서 상대 유닛이 내본진에 5기 이상있다면 농봉이다
 		if(InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture) < 1
 			&& nongbong_cnt >= 5){
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_CheeseRush);
+			SE = StrategyManager.StrategysException.terranException_CheeseRush;
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_CheeseRush);
 		}
 		//벌쳐가 있거나 마린이 있다면 농봉없이 벙커짓고 막자.
 		//단 치즈러쉬가 와서 벙커를 짓고 있다면 농봉상태 유지
@@ -197,7 +337,8 @@ public class AnalyzeStrategy {
 				||nongbong_cnt <= 4 && InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Marine) > 2){
 			//인구수대비 해제된 상태에서 적 벙커가 없다면 농봉해제. 아니라면 유지.
 			if(enemy_bunker == null){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				SE = StrategyManager.StrategysException.Init;
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
 		}
 		
@@ -206,22 +347,32 @@ public class AnalyzeStrategy {
 			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_NuClear);
 		}*/
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().enemyPlayer) >= 20){
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-		}
-		
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			//인비저블 유닛이 있다면 일단 클로킹 로직
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-			}
-			//아카데미가 있다면 init으로
+		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().enemyPlayer) >= 20
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
+			SE = StrategyManager.StrategysException.terranException_Wraith;
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				SE = StrategyManager.StrategysException.Init;
+			}
+		}
+		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
+		//아카데미가 일단 없을때
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				//인비저블 유닛이 있다면 일단 클로킹 로직
+				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
+					SE = StrategyManager.StrategysException.terranException_Wraith;
+				}
+				//아카데미가 있다면 init으로
+				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+					SE = StrategyManager.StrategysException.Init;
+				}
 			}
 		}
 		
-		if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
+		//if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks, InformationManager.Instance().enemyPlayer) >= 2){
 				//2배럭이면 바이오닉
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_Bionic);
@@ -256,15 +407,17 @@ public class AnalyzeStrategy {
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_BattleCruiser);
 			}
 			
-		
+			
 		}
 
 		//exception 상태가 아닐때는 Init 으로
 		//StrategyManager.Instance().setCurrentStrategyException("Init");
 		
-	}
+	//}
 	
 	private void AnalyzeVsZerg() {
+		StrategyManager.StrategysException selectedSE = null;
+		StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		int cntHatchery = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hatchery, InformationManager.Instance().enemyPlayer);
 		int cntLair = InformationManager.Instance().getNumUnits(UnitType.Zerg_Lair, InformationManager.Instance().enemyPlayer);
 		int cntHive = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer);
@@ -322,9 +475,12 @@ public class AnalyzeStrategy {
 		Region myRegion = base.getRegion();
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if (enemyUnitsInRegion.size() >= 4){
-			//내 본진에 저글링이 4마리 이상이고
+			System.out.println("적 유닛 4이상 난입");
+			
+			//내 본진에 적유닛이 4마리 이상이고(드론 저글링 오버로드 일수 있음)
+			//haveBunker = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Bunker);
 			for (Unit unit : MyBotModule.Broodwar.getAllUnits()){
-				if(unit.getType() == UnitType.Terran_Bunker){
+				if(unit.getType() == UnitType.Terran_Bunker && unit.isCompleted()){
 					haveBunker ++;
 					theBunker = unit;
 				}
@@ -343,31 +499,44 @@ public class AnalyzeStrategy {
 			}
 			//벙커가 없는 경우.
 			if(haveBunker == 0){
+				System.out.println("벙커없다.");
 				 for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
 							 && enemyUnitsInRegion.get(enemy).getDistance(theCommand) < 200){ 
 						 nongbong_cnt ++;
 					 }
 				 }
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_NongBong);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_NongBong);
+				 SE = StrategyManager.StrategysException.zergException_NongBong;
+				//농봉 되는순간 호출
 			}
 			// 벙커가 1개인데 마린이 2 미만인 경우
 			if(haveBunker == 1 && haveMarine < 2){
 				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
-							 && enemyUnitsInRegion.get(enemy).getDistance(theBunker) < 100){ 
+							 && enemyUnitsInRegion.get(enemy).getDistance(theBunker) < 100){
 						 NongbongScv.Instance().NongBong_At_Unit = enemyUnitsInRegion.get(enemy);
 						 nongbong_cnt ++;
 					 }
 				 }
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_NongBong);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_NongBong);
+				SE = StrategyManager.StrategysException.zergException_NongBong;
+				
 			}
 			
 		}
-		if(StrategyManager.Instance().getCurrentStrategyException() ==  StrategyManager.StrategysException.zergException_NongBong  && nongbong_cnt < 3){
+		if(StrategyManager.Instance().getCurrentStrategyException() ==  StrategyManager.StrategysException.zergException_NongBong  && nongbong_cnt < 4){
 			//본진 저글링이 3미만 이라면 농봉을 안타고 init으로 exit
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			SE = StrategyManager.StrategysException.Init;
+			//Exception 이 init 이 되는순간 농봉 체크 변수 초기화
+			NongbongScv.Instance().NongBong_Chk = 0;
 		}
+		
+		/*if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_NongBong){
+			//농봉은 즉각 반응
+			NongbongScv.Instance().executeNongBong();
+		}*/
 		
 		//end zergException_NongBong
 		
@@ -379,16 +548,26 @@ public class AnalyzeStrategy {
 				//레어가 있고
 				if( cntHatchery >= 1 ){
 					//다른 해처리도 일반 적인 럴커 준비. 컴셋과 엔지니어링 베이가 있다면 이미 준비 끝.
-					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
+					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) < 1
+							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) < 1){
+						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
+						SE = StrategyManager.StrategysException.zergException_PrepareLurker;
+					}
 //					RespondToStrategy.instance().enemy_lurker = true;
 					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
 						&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0){
 						//컴셋스테이션O , 엔지니어링 베이 O 면 일단 럴커 대비는 된것으로.
-						StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+						SE = StrategyManager.StrategysException.Init;
 					}
 				}else{
 					//1레어 라면 패스트 럴커로 인식. 마인업까지 포함되어야 한다.
-					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_FastLurker);
+					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) < 1
+							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) < 1
+							&& !MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)){
+						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_FastLurker);
+						SE = StrategyManager.StrategysException.zergException_FastLurker;
+					}
 //					RespondToStrategy.instance().enemy_lurker = true;
 					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
 							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0
@@ -396,52 +575,70 @@ public class AnalyzeStrategy {
 						//엔지니어링 베이 O
 						//컴셋 스테이션 O
 						//마인업그레이드 O
-						StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);	
+						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+						SE = StrategyManager.StrategysException.Init;
 					}
 				}
 				
 			}else{
 				//레어가 없는 상태로 히드라덴이라면 히드라 웨이브로 일단 맞춘다.
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic_HydraWave);
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				SE = StrategyManager.StrategysException.Init;
 			}
 
 		}//end hydra exception
 		
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			//인비저블 유닛이 있다면 일단 클로킹 로직
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
-			}
-			//아카데미가 있다면 init으로
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
+			//아카데미가 없을때만 클로킹 유닛 체크
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				//인비저블 유닛이 있다면 일단 클로킹 로직
+				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
+					SE = StrategyManager.StrategysException.zergException_PrepareLurker;
+				}
+				//아카데미가 있다면 init으로
+				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+					SE = StrategyManager.StrategysException.Init;
+				}
 			}
 		}
 		
 		//start guardian exception
-		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) >= 1
-			||InformationManager.Instance().getNumUnits(UnitType.Zerg_Greater_Spire, InformationManager.Instance().enemyPlayer) >= 1){
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_Guardian);
+		if(
+			(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) >= 1
+			||InformationManager.Instance().getNumUnits(UnitType.Zerg_Greater_Spire, InformationManager.Instance().enemyPlayer) >= 1)
+			&&
+			(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().selfPlayer) < 5
+			&&Math.ceil(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) /3) < InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().selfPlayer))
+				
+				){
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_Guardian);
+			SE = StrategyManager.StrategysException.zergException_Guardian;
 
 			//그레이터 스파이어 or 가디언을 발견할 경우
 			//레이스가 round(가디언/3) or 5기를 만족한다면 exit
 			
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().selfPlayer) == 5
 					||Math.ceil(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) /3) >= InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith, InformationManager.Instance().selfPlayer) ){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				SE = StrategyManager.StrategysException.Init;
 					
 			}
 		}
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer) >=1){
+		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer) >=1
+			&& InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) < 4){
 			// 하이브 발견. 하이테크 시에는 베슬 4기 이상 추가
 			// 이걸로 디파일러 까지 배제가능
-			StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_HighTech);
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_HighTech);
+			SE = StrategyManager.StrategysException.zergException_HighTech;
 			
 			//
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) > 3){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				SE = StrategyManager.StrategysException.Init;
 			}
 		}
 		

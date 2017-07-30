@@ -86,6 +86,8 @@ public class StrategyManager {
 		,protossException_Scout
 		,protossException_Shuttle
 		,protossException_ShuttleMix
+		,protossException_ZealotPush
+		,protossException_DoubleNexus
 		,terranException_CheeseRush
 		,terranException_NuClear
 		,terranException_Wraith
@@ -235,7 +237,8 @@ public class StrategyManager {
 			executeFly();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 37 == 0){//약 4초에 한번
-			RespondToStrategy.Instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로			
+			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
 	}
@@ -666,7 +669,7 @@ public class StrategyManager {
 		//barrack end
 		
 		//engineering start
-		if(engineering == false && RespondToStrategy.Instance().needOfEngineeringBay()){
+		if(engineering == false && RespondToStrategy.instance().needOfEngineeringBay()){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
 			}
