@@ -54,6 +54,14 @@ public class RespondToStrategy {
 		return instance;
 	}
 	
+public boolean needOfEngineeringBay() {
+		
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_shuttle){
+			return true;
+		}
+		return false;
+	}
+	
 	public void update() {
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
