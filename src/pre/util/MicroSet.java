@@ -18,6 +18,16 @@ public class MicroSet {
 //		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
 //	}
 	
+	public static class SquadName {
+
+		public static final String IDLE = "Idle";
+		public static final String SCOUT_DEFENSE = "ScoutDefense";
+		public static final String MAIN_ATTACK = "MainAttack";
+		public static final String BASE_DEFENSE_ = "BaseDefense_";
+		public static final String CHECKER = "Checker";
+		public static final String GUERILLA_ = "Guerilla_";
+	}
+	
 	public static class Combat {
 		public static final int IDLE_PRIORITY = 0;
 		public static final int ATTACK_PRIORITY = 2;
@@ -31,7 +41,7 @@ public class MicroSet {
 		
 		public static final int IDLE_RADIUS = 100;
 		public static final int ATTACK_RADIUS = 300;
-		public static final int WATCHER_RADIUS = 600;
+		public static final int WATCHER_RADIUS = 500;
 		public static final int CHECKER_RADIUS = 600;
 		public static final int GUERILLA_RADIUS = 300;
 		public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
@@ -45,7 +55,7 @@ public class MicroSet {
 		public static final int GEURILLA_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_POWER = 150;
 		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 30초
-		public static final int CHECKER_INTERVAL_FRAME = 40 * 24; // 40초
+		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 40초
 
 		// TODO 변동 값
 	    public static int maxNumWatcher = 50;
@@ -57,6 +67,7 @@ public class MicroSet {
 		public static final int MINE_SPREAD_RADIUS = 500;
 
 		public static final int MINE_BETWEEN_DIST = 50;
+		public static final int MINE_REMOVE_TANK_DIST = 100;
 		public static final int RESV_EXPIRE_FRAME = 24 * 3;
 	}
 	
@@ -75,9 +86,10 @@ public class MicroSet {
 	
 	public static class Common {
 		public static final double DEF_TOWER_BACKOFF_DIST = 200.0;
+		public static final double DEF_TOWER_BACKOFF_DIST_TANK = 100.0;
 		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;
-		public static final int TANK_COVERAGE = 100;
+		public static final int TANK_COVERAGE = 200;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 	}
 	 

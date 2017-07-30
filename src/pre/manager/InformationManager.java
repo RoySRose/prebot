@@ -349,16 +349,15 @@ public class InformationManager {
 		unitData.get(unit.getPlayer()).removeUnit(unit);
 	}
 
-
-	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
-	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
-		List<UnitInfo> addUnitInfo = getNearbyForce(p, player, radius);
-		unitInfo.addAll(addUnitInfo);
-	}
-	
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
 	public List<UnitInfo> getNearbyForce(Position p, Player player, int radius) {
 		List<UnitInfo> unitInfo = new ArrayList<>();
+		getNearbyForce(unitInfo, p, player, radius);
+		return unitInfo;
+	}
+	
+	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
+	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
 		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
 
 		// for each unit we know about for that player
@@ -366,6 +365,9 @@ public class InformationManager {
 		// getUnitData(player).getUnits().keySet().iterator()){
 		while (it.hasNext()) {
 			final UnitInfo ui = getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
+			if (unitInfo.contains(ui)) {
+				continue;
+			}
 
 			// if it's a combat unit we care about
 			// and it's finished!
@@ -383,12 +385,14 @@ public class InformationManager {
 					unitInfo.add(ui);
 				}
 			} else if (ui.getType().isDetector() && ui.getLastPosition().getDistance(p) <= (radius + 250)) {
+				if (unitInfo.contains(ui)) {
+					continue;
+				}
 				// add it to the vector
 				// C++ : unitInfo.push_back(ui);
 				unitInfo.add(ui);
 			}
 		}
-		return unitInfo;
 	}
 
 	/// 해당 Player (아군 or 적군) 의 해당 UnitType 유닛 숫자를 리턴합니다 (훈련/건설 중인 유닛 숫자까지 포함)

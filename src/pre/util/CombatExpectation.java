@@ -103,7 +103,7 @@ public class CombatExpectation {
 			if (VULTURE_TARGET.get(targetInfo.getType()) == null) {
 				continue;
 			}
-			if (!targetInfo.getType().isBuilding() && (currFrame - targetInfo.getUpdateFrame()) / 24 > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!targetInfo.getType().isBuilding() && (currFrame - targetInfo.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
 				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
 			}
 			
@@ -160,7 +160,7 @@ public class CombatExpectation {
 		int score = 0;
 		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo eui : enemiesInfo) {
-			if (!eui.getType().isBuilding() && (currFrame - eui.getUpdateFrame()) / 24 > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!eui.getType().isBuilding() && (currFrame - eui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
 				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
 			}
 			

@@ -5,10 +5,8 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
 import pre.MapGrid;
 import pre.UnitInfo;
-import pre.combat.SquadOrder.SquadOrderType;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
 import pre.util.CommandUtil;
@@ -30,7 +28,7 @@ public class MicroWraith extends MicroManager {
 	    List<Unit> wraiths = getUnits();
 		List<Unit> wraithTargets = MicroUtils.filterTargets(targets, true);
 		
-		KitingOption kitingOption = new KitingOption();
+		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
 		kitingOption.setUnitedKiting(false);
 		kitingOption.setGoalPosition(order.getPosition());

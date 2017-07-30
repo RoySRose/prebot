@@ -15,7 +15,6 @@ import pre.manager.InformationManager;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
 import pre.util.MicroSet;
-import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
 import pre.util.TargetPriority;
 
@@ -51,11 +50,8 @@ public class MicroTank extends MicroManager {
 			initTarget = tankTargets.get(0);
 		}
 
-		KitingOption kitingOption = new KitingOption();
-		kitingOption.setCooltimeAlwaysAttack(true);
-		kitingOption.setUnitedKiting(true);
+		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setGoalPosition(order.getPosition());
-		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 		
 		for (Unit tank : tanks) {
 //	        boolean tankNearChokepoint = false; 
@@ -103,10 +99,9 @@ public class MicroTank extends MicroManager {
 					// 3. 유효범위내에 적이 없고, 적이 최대범위보다 멀리 있다
 					// (범위 밖의 적에 대해서 시즈를 푸는 것은 신중해야 한다.)
 					
-					// 자리를 잡았을 때, 시즈를 푸는 것은 위험하다. 
-//					if (tank.getDistance(squadCenter) <= squadRange) {
-//						return;
-//					}
+					if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
+						continue; // order position에서는 시즈를 풀지 않는다.
+					}
 					
 					boolean targetIsFree = true; // target이 시즈포격에서 자유로운가
 					Unit closestTank = tank;
@@ -126,8 +121,8 @@ public class MicroTank extends MicroManager {
 							}
 						}
 					}
-
-					if (targetIsFree) {
+					
+					if (targetIsFree && MyBotModule.Broodwar.getFrameCount() - initFrame > 8) {
 						tank.unsiege();
 					}
 //					if (targetIsFree) {

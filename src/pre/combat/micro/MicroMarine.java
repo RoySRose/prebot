@@ -1,29 +1,17 @@
 package pre.combat.micro;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import bwapi.DamageType;
-import bwapi.Order;
 import bwapi.Position;
-import bwapi.Race;
 import bwapi.Unit;
-import bwapi.UnitSizeType;
 import bwapi.UnitType;
-import bwapi.UpgradeType;
-import bwapi.WeaponType;
 import bwta.BWTA;
-import pre.MapGrid;
-import pre.combat.Squad;
 import pre.main.MyBotModule;
-import pre.manager.CombatManager;
-import pre.manager.InformationManager;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
 import pre.util.MicroSet;
-import pre.util.MicroUtils;
 import pre.util.MicroSet.FleeAngle;
-import pre.util.MicroSet.Network;
+import pre.util.MicroUtils;
 
 public class MicroMarine extends MicroManager {
 
@@ -66,12 +54,12 @@ public class MicroMarine extends MicroManager {
 		}
 		
 		
-		KitingOption kitingOption = new KitingOption();
+		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
 		kitingOption.setUnitedKiting(true); //TODO 같이 가 좋으까?
 		kitingOption.setGoalPosition(order.getPosition());
 		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
-		kitingOption.setSaveUnit(false);
+		kitingOption.setHaveToFlee(false);
 
 		boolean kiteWithmarines = true;
 		
@@ -117,9 +105,9 @@ public class MicroMarine extends MicroManager {
 				if(target != null){
 					
 					if(marine.getType().maxHitPoints() < 11){
-						kitingOption.setSaveUnit(true);
+						kitingOption.setHaveToFlee(true);
 					}else{
-						kitingOption.setSaveUnit(false);
+						kitingOption.setHaveToFlee(false);
 					}
 				
 	//				if(marine.getDistance(target) < marine.getType().groundWeapon().maxRange()/2){

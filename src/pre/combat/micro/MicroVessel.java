@@ -9,8 +9,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import pre.MapGrid;
-import pre.combat.SquadOrder;
-import pre.combat.SquadOrder.SquadOrderType;
 import pre.main.MyBotModule;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
@@ -27,7 +25,7 @@ public class MicroVessel extends MicroManager {
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> sVessels = getUnits();
 		
-		KitingOption kitingOption = new KitingOption();
+		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
 		kitingOption.setUnitedKiting(false);
 		kitingOption.setGoalPosition(order.getPosition());

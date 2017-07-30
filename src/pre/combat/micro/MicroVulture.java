@@ -82,7 +82,7 @@ public class MicroVulture extends MicroManager {
 				// 탱크, 골리앗이 근처에 있으면 쿨타임이 돌아올때 무조건 때린다.
 				// TODO 예외케이스 확인 필요 (초반 질럿 다수 등)
 				if (centerPosition != null) {
-					kitingOption.setSaveUnit(false);
+					kitingOption.setHaveToFlee(false);
 					kitingOption.setCooltimeAlwaysAttack(true);
 					kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 					kitingOption.setGoalPosition(centerPosition);
@@ -91,7 +91,7 @@ public class MicroVulture extends MicroManager {
 					Region region = BWTA.getRegion(vulture.getPosition());
 					for (Region occupied : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
 						if (region == occupied) {
-							kitingOption.setSaveUnit(false);
+							kitingOption.setHaveToFlee(false);
 							break;
 						}
 					}
