@@ -411,10 +411,10 @@ public boolean needOfEngineeringBay() {
 					boolean mainBaseTurret = false;
 					
 					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-						Position tempBaseLocation = unit.getPosition();
+						Position tempBaseLocation = null;
 						if(unit.getType() == UnitType.Terran_Command_Center){
 							System.out.println("방어해야할 커맨드가 있따.");
-							
+							tempBaseLocation = unit.getPosition();
 						}
 						int mainBaseTurret_cnt = 0;
 						if (tempBaseLocation != null) {
@@ -431,7 +431,7 @@ public boolean needOfEngineeringBay() {
 			     			 if(mainBaseTurret_cnt >= 3){
 			     				 System.out.println("방어 터렛 3기 이상");
 			     				 mainBaseTurret = true;
-			     				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			     				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			     			 }else{
 			     				System.out.println("방어 터렛 3기 미만");
 		     					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1){
