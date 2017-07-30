@@ -122,32 +122,62 @@ public class AnalyzeStrategy {
 			}
 		}
 		
-		if(SE != StrategyManager.StrategysException.protossException_Dark){
-			//이미 익셉션 다크 로직이면 볼 필요가 없음
-			if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
-					&& MyBotModule.Broodwar.getFrameCount() < 7000) || InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar, InformationManager.Instance().enemyPlayer) >= 1
-					){
-	
-					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
-					selectedSE = StrategyManager.StrategysException.protossException_Dark;
-					//RespondToStrategy.instance().enemy_dark_templar = true;
-					//컴셋 마나가 부족할수 있으므로 필수 조건은 터렛으로
-					//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
+		
+
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer) >= 1
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
+			//스카웃은 큰 위협이 안되므로, 골리앗만 맞춰줄것
+			
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
+			selectedSE = StrategyManager.StrategysException.protossException_Scout;
+			
+		}
+		
+		if(SE == StrategyManager.StrategysException.protossException_Scout){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
+		}
+		
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
+			
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
+			selectedSE = StrategyManager.StrategysException.protossException_CarrierMany;
+		}
+		
+		if(SE == StrategyManager.StrategysException.protossException_CarrierMany){
+		
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				//selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		//다크템플러 exception
+		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
+				&& MyBotModule.Broodwar.getFrameCount() < 7000) || InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar, InformationManager.Instance().enemyPlayer) >= 1
+				){
+
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+				selectedSE = StrategyManager.StrategysException.protossException_Dark;
+				//RespondToStrategy.instance().enemy_dark_templar = true;
+				//컴셋 마나가 부족할수 있으므로 필수 조건은 터렛으로
+				//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
 		}
 		//잠시주석처리
 		//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
 			//아카데미가 없다면
-		if(SE != StrategyManager.StrategysException.protossException_Dark){
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-				//인비저블 유닛이 있다면 일단 다크 로직
-				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
-					selectedSE = StrategyManager.StrategysException.protossException_Dark;
-				}
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 다크 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+				selectedSE = StrategyManager.StrategysException.protossException_Dark;
 			}
 		}
 
+		
 		if(SE == StrategyManager.StrategysException.protossException_Dark){
 			BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
         	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
@@ -197,50 +227,6 @@ public class AnalyzeStrategy {
 		if(selectedSE != null){
 			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
 		}
-		//여기까지 Exception 체크 끝
-
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer) >= 1
-			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
-			//스카웃은 큰 위협이 안되므로, 골리앗만 맞춰줄것
-			
-			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
-			selectedSE = StrategyManager.StrategysException.protossException_Scout;
-			
-		}
-		
-		if(SE == StrategyManager.StrategysException.protossException_Scout){
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-			}
-		}
-		
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8
-			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
-			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
-			
-			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
-			selectedSE = StrategyManager.StrategysException.protossException_CarrierMany;
-		}
-		
-		if(SE == StrategyManager.StrategysException.protossException_CarrierMany){
-		
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				//selectedSE = StrategyManager.StrategysException.Init;
-			}
-		}
-		
-		//프로토스는 특히 베이직이 단순한데 질럿 드래군 하템 비율에 따라 맞춰주면 되고
-		//다템이나 아비터 / 캐리어 올인에 대한 익셉션만 처리하면된다.c
-		
-		/*if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
-			||InformationManager.Instance().getNumUnits(UnitType.Protoss_High_Templar, InformationManager.Instance().enemyPlayer) >= 1){
-			if(!StrategyManager.Strategys.values().equals(StrategyManager.Strategys.protossBasic_Carrier)){
-				//캐리어 대비 로직에 템플러 대비로직이 포함되어있으므로(사이언스베슬, EMP)
-				//캐리어 대비중인경우는 전략을 바꾸지 않는다.
-				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic_Templar);
-			}
-		}*/
 		
 		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Stargate, InformationManager.Instance().enemyPlayer) >= 1
 			//캐리어 대비 전략
