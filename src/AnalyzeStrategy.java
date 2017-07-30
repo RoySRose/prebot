@@ -137,21 +137,7 @@ public class AnalyzeStrategy {
 			}
 		}
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8
-			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
-			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
-			
-			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
-			selectedSE = StrategyManager.StrategysException.protossException_CarrierMany;
-		}
 		
-		if(selectedSE == StrategyManager.StrategysException.protossException_CarrierMany){
-		
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				//selectedSE = StrategyManager.StrategysException.Init;
-			}
-		}
 		
 		
 		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle, InformationManager.Instance().enemyPlayer) >= 1
@@ -213,6 +199,22 @@ public class AnalyzeStrategy {
 			}
 		}
 		
+		
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 8
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+			//캐리어가 8기 이상일때부터 대비시작. 고스트 & 락다운 준비
+			
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_CarrierMany);
+			selectedSE = StrategyManager.StrategysException.protossException_CarrierMany;
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_CarrierMany){
+		
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Ghost, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) / 2){
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
 		
 		
 		//다크템플러 exception
