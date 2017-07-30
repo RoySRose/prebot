@@ -79,7 +79,7 @@ public class VultureTravelManager {
 		}
 		
 		// 2. 벌처 정책 조정(각 주요 포인트 매설 마인수, checker수)
-		if (CommonUtils.executeOncePerFrame(48, 0)) {
+		if (CommonUtils.executeRotation(0, 48)) {
 			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
 			
 			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 4 + 1;

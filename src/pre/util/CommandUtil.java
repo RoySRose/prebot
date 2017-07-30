@@ -300,15 +300,15 @@ public class CommandUtil {
 		}
 	}
 	
-	public static boolean IsValidUnit(Unit unit, boolean completed, boolean detected)
+	public static boolean IsValidUnit(Unit unit, boolean excludeIncomplete, boolean excludeUndetected)
 	{
 		if (unit == null) {
 			return false;
 		}
-		if (completed && !unit.isCompleted()) {
+		if (excludeIncomplete && !unit.isCompleted()) {
 			return false;
 		}
-		if (detected && !unit.isDetected()) {
+		if (excludeUndetected && !unit.isDetected()) {
 			return false;
 		}
 

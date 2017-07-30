@@ -33,14 +33,13 @@ public abstract class MicroManager {
 	
 	protected abstract void executeMicro(List<Unit> targets);
 	
-	public void setMicroInformation(SquadOrder inputOrder, List<Unit> nearbyEnemies, Position squadCenter) {
+	public void setMicroInformation(SquadOrder inputOrder, List<Unit> nearbyEnemies) {
 		order = inputOrder;
 		if (units.isEmpty() || !order.isCombatOrder()) {
 			return;
 		}
 		
 		this.nearbyEnemies = nearbyEnemies;
-		this.squadCenter = squadCenter;
 	}
 	
 	public void execute() {

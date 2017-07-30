@@ -6,7 +6,6 @@ import bwapi.Position;
 import bwapi.Unit;
 import pre.util.CommandUtil;
 import pre.util.KitingOption;
-import pre.util.MicroSet.FleeAngle;
 import pre.util.MicroUtils;
 import pre.util.TargetPriority;
 
@@ -19,11 +18,8 @@ public class MicroGoliath extends MicroManager {
 	    List<Unit> goliaths = getUnits();
 		List<Unit> goliathTargets = MicroUtils.filterTargets(targets, true);
 		
-		KitingOption kitingOption = new KitingOption();
-		kitingOption.setCooltimeAlwaysAttack(true);
-		kitingOption.setUnitedKiting(true);
+		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setGoalPosition(order.getPosition());
-		kitingOption.setFleeAngle(FleeAngle.NARROW_ANGLE);
 		
 		for (Unit goliath : goliaths) {
 //			if (order.getType() != SquadOrderType.BATTLE && awayFromChokePoint(goliath)) {

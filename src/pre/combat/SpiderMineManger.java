@@ -14,11 +14,13 @@ import bwta.Chokepoint;
 import pre.MapGrid;
 import pre.main.MyBotModule;
 import pre.manager.InformationManager;
+import pre.util.CommandUtil;
 import pre.util.MicroSet;
 import pre.util.MicroUtils;
 
 public class SpiderMineManger {
-	
+
+	private Map<Integer, MineRemoveReserved> mineRemoveMap;
 	private Map<Integer, MineReserved> mineReservedMap;
 	private List<Position> goodPositions;
 
@@ -50,6 +52,8 @@ public class SpiderMineManger {
 		
 		if (!otherBases.isEmpty() && enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
 			mineReservedMap = new HashMap<>();
+			mineRemoveMap = new HashMap<>();
+			
 			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
 			
 			// 3rd 멀티지역
@@ -64,6 +68,7 @@ public class SpiderMineManger {
 //			goodPositions.add(enemyFirstChoke.getCenter());
 			goodPositions.add(enemySecondChoke.getCenter());
 			
+			// 제거해야되는 마인리스트
 			initialized = true;
 		}
 	}
@@ -78,7 +83,7 @@ public class SpiderMineManger {
 		List<Integer> expiredList = new ArrayList<>();
 		for (Integer unitId : mineReservedMap.keySet()) {
 			MineReserved mineReserved = mineReservedMap.get(unitId);
-			if (mineReserved.reservedFrame + MicroSet.Vulture.RESV_EXPIRE_FRAME < MyBotModule.Broodwar.getFrameCount()) { // 5초 지났으면 삭제
+			if (mineReserved.reservedFrame + MicroSet.Vulture.RESV_EXPIRE_FRAME < MyBotModule.Broodwar.getFrameCount()) {
 				//System.out.println("expired mine position : " + mineReserved.positionToMine);
 				expiredList.add(unitId);
 			}
@@ -88,6 +93,30 @@ public class SpiderMineManger {
 			mineReservedMap.remove(unitId);
 		}
 		
+		// 만료 제거 만료시간 관리
+		List<Integer> expiredRemoveList = new ArrayList<>();
+		for (Integer unitId : mineRemoveMap.keySet()) {
+			MineRemoveReserved removeReserved = mineRemoveMap.get(unitId);
+			if (removeReserved.reservedFrame + MicroSet.Vulture.RESV_EXPIRE_FRAME < MyBotModule.Broodwar.getFrameCount()) {
+				expiredRemoveList.add(unitId);
+			}
+		}
+		for (Integer unitId : expiredRemoveList) {
+			mineRemoveMap.remove(unitId);
+		}
+	}
+	
+	public void addRemoveList(Unit siegeTank) {
+		if (siegeTank.getType() != UnitType.Terran_Siege_Tank_Siege_Mode) {
+			return;
+		}
+		
+		List<Unit> nearMineList = MapGrid.Instance().getUnitsNear(siegeTank.getPosition(), MicroSet.Vulture.MINE_REMOVE_TANK_DIST, true, false, UnitType.Terran_Vulture_Spider_Mine);
+		for (Unit mine : nearMineList) {
+			if (mineRemoveMap.get(mine.getID()) == null) {
+				mineRemoveMap.put(mine.getID(), new MineRemoveReserved(mine, MyBotModule.Broodwar.getFrameCount()));
+			}
+		}
 	}
 
 	public Position getPositionReserved(Unit vulture) {
@@ -100,6 +129,29 @@ public class SpiderMineManger {
 		} else {
 			return null;
 		}
+	}
+	
+	public void cancelMineReserve(Unit vulture) {
+		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
+			return;
+		}
+		mineReservedMap.remove(vulture.getID());
+	}
+	
+	public boolean removeMine(Unit vulture) {
+		if (!initialized || vulture == null) {
+			return false;
+		}
+		
+		for (Integer mineId : mineRemoveMap.keySet()) {
+			MineRemoveReserved removeReserved = mineRemoveMap.get(mineId);
+			if (CommandUtil.IsValidUnit(removeReserved.mine)
+					&& vulture.getDistance(removeReserved.mine.getPosition()) < UnitType.Terran_Vulture.groundWeapon().maxRange()) {
+				CommandUtil.attackUnit(vulture, removeReserved.mine);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public Position goodPositionToMine(Unit vulture, int mineNumberPerPosition) {
@@ -123,7 +175,13 @@ public class SpiderMineManger {
 			return null;
 		}
 		
-		return positionToMine(vulture, nearestGoodPosition, true, mineNumberPerPosition);
+		boolean exactOneEssential = true;
+		List<Unit> unitsOnTile = MyBotModule.Broodwar.getUnitsOnTile(nearestGoodPosition.toTilePosition());
+		if (!unitsOnTile.isEmpty()) {
+			exactOneEssential = false;
+		}
+		
+		return positionToMine(vulture, nearestGoodPosition, exactOneEssential, mineNumberPerPosition);
 	}
 	
 	public Position positionToMine(Unit vulture, Position position, boolean exactOneEssential, int mineNumberPerPosition) {
@@ -207,3 +265,16 @@ class MineReserved {
 	}
 }
 
+class MineRemoveReserved {
+	MineRemoveReserved(Unit mine, int reservedFrame) {
+		this.mine = mine;
+		this.reservedFrame = reservedFrame;
+	}
+	Unit mine;
+	int reservedFrame;
+
+	@Override
+	public String toString() {
+		return "MineRemoveReserved [mine=" + mine + ", reservedFrame=" + reservedFrame + "]";
+	}
+}

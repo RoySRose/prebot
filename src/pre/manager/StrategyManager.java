@@ -125,30 +125,30 @@ public class StrategyManager {
 	
 	public void setCurrentStrategyBasic(Strategys strategy) {
 		if(CurrentStrategyBasic != strategy){
-			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
+//			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
 			LastCurrentStrategyBasic = CurrentStrategyBasic; 
 		}
 		CurrentStrategyBasic = strategy;
 		setCombatUnitRatio();
 		if(LastCurrentStrategyBasic != CurrentStrategyBasic){
-			MyBotModule.Broodwar.printf("==setting ratio==");
-			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
-			MyBotModule.Broodwar.printf("wgt:" + wgt);
+//			MyBotModule.Broodwar.printf("==setting ratio==");
+//			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
+//			MyBotModule.Broodwar.printf("wgt:" + wgt);
 			LastCurrentStrategyBasic = CurrentStrategyBasic;
 		}
 	}
 	public void setCurrentStrategyException(StrategysException strategy) {
 		if(CurrentStrategyException != strategy){
-			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
+//			MyBotModule.Broodwar.printf("Setting CurrentStrategyException: " + strategy);
 			LastCurrentStrategyException = CurrentStrategyException;
 		}
 		
 		CurrentStrategyException = strategy;
 		setCombatUnitRatio();
 		if(LastCurrentStrategyException != CurrentStrategyException){
-			MyBotModule.Broodwar.printf("==setting ratio==");
-			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
-			MyBotModule.Broodwar.printf("wgt:" + wgt);
+//			MyBotModule.Broodwar.printf("==setting ratio==");
+//			MyBotModule.Broodwar.printf("vul:tank:goli = " + vultureratio+" : " +tankratio+" : "+goliathratio);
+//			MyBotModule.Broodwar.printf("wgt:" + wgt);
 		}
 	}
 	public Strategys getCurrentStrategyBasic() {
