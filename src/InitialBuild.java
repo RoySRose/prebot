@@ -220,6 +220,7 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Marine);
 				queueBuild(true, UnitType.Terran_Factory);//16 찍어놓고 팩토리
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐

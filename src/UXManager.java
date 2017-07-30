@@ -152,10 +152,10 @@ public class UXManager {
 //		MyBotModule.Broodwar.setTextSize();
 //		y += 12;
 
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Time : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
-		MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
-		y += 11;
+//		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Time : ");
+//		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
+//		MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
+//		y += 11;
 		
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
@@ -170,17 +170,22 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
 		y += 11;
-		
+
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "MyunitPoint : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().MyunitPoint);
+		y += 11;
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "ExpansionPoint : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 80, y, "" + white + StrategyManager.Instance().ExpansionPoint);
+		y += 11;
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "UnitPoint(FacUnits) : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 95, y, "" + white + StrategyManager.Instance().UnitPoint);
+		y += 11;
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().GRIDpoint);
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().Attackpoint);
 		y += 11;
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
-		y += 11;
-		
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "FacUnits : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 65, y, "" + white + StrategyManager.Instance().getFacUnits());
 		y += 11;
 	}
 
