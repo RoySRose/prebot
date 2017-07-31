@@ -11,6 +11,7 @@ public class GameCommander {
 
 	/// 디버깅용 플래그 : 어느 Manager 가 에러를 일으키는지 알기위한 플래그
 	private boolean isToFindError = false;
+	private LagObserver logObserver = new LagObserver();
 	
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onStart() 
@@ -20,6 +21,7 @@ public class GameCommander {
 			return;
 		}
 		StrategyManager.Instance().onStart();
+		logObserver.start();
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다
@@ -81,6 +83,9 @@ public class GameCommander {
 			CombatManager.Instance().update();
 			lag.test("CombatManager");
 			if ( isToFindError) System.out.print("i)");
+			
+			long cost = logObserver.observe();
+			logObserver.adjustment(cost);
 
 		} catch (Exception e) {
 			e.printStackTrace();

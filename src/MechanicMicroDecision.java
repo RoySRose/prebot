@@ -2,32 +2,43 @@
 
 import java.util.List;
 
+import bwapi.Player;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 
 public class MechanicMicroDecision {
 
-
 	public static MechanicMicroDecision makeDecisionToDoNothing() {
-		return new MechanicMicroDecision(-1, null);
+		return new MechanicMicroDecision(-1);
 	}
 	public static MechanicMicroDecision makeDecisionToStop() {
-		return new MechanicMicroDecision(0, null);
+		return new MechanicMicroDecision(0);
 	}
-	public static MechanicMicroDecision makeDecisionToFlee(UnitInfo targetInfo) {
-		return new MechanicMicroDecision(0, targetInfo);
+	public static MechanicMicroDecision makeDecisionToFlee(Position enemyPosition) {
+		return new MechanicMicroDecision(0, enemyPosition);
 	}
 	public static MechanicMicroDecision makeDecisionToKiting(UnitInfo targetInfo) {
 		return new MechanicMicroDecision(1, targetInfo);
 	}
 	public static MechanicMicroDecision makeDecisionToGo() {
-		return new MechanicMicroDecision(2, null);
+		return new MechanicMicroDecision(2);
 	}
 	public static MechanicMicroDecision makeDecisionToChange() {
-		return new MechanicMicroDecision(3, null);
+		return new MechanicMicroDecision(3);
 	}
 	
+	private MechanicMicroDecision(int decision) {
+		this.decision = decision;
+	}
+	private MechanicMicroDecision(int decision, Position enemyPosition) {
+		this.decision = decision;
+		this.enemyPosition = enemyPosition;
+	}
+	private MechanicMicroDecision(int decision, UnitInfo targetInfo) {
+		this.decision = decision;
+		this.targetInfo = targetInfo;
+	}
 	public int getDecision() {
 		return decision;
 	}
@@ -37,14 +48,13 @@ public class MechanicMicroDecision {
 	// 시즈모드 -> 0: stop, 1: kiting(attack unit), 2: go, 3:change
 	private int decision; 
 	private UnitInfo targetInfo;
-	
-	private MechanicMicroDecision(int decision, UnitInfo targetInfo) {
-		this.decision = decision;
-		this.targetInfo = targetInfo;
-	}
+	private Position enemyPosition;
 	
 	public UnitInfo getTargetInfo() {
 		return targetInfo;
+	}
+	public Position getEnemyPosition() {
+		return enemyPosition;
 	}
 	
 	public static MechanicMicroDecision makeDecisionForSiegeMode(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<Unit> tanks, SquadOrder order) {
@@ -161,7 +171,12 @@ public class MechanicMicroDecision {
 		
 		
 	}
+	
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo) {
+		return makeDecision(mechanicUnit, enemiesInfo, false);
+	}
+	
+	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, boolean saveUnit) {
 		
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -182,13 +197,19 @@ public class MechanicMicroDecision {
 				enemyUnitType = enemy.getType();
 			}
 			
+			if (enemy == null && !enemyUnitType.isBuilding()
+					&& MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME) {
+				continue;
+			}
+			
 			if (enemyIsComplete) {
 				int enemyGroundWeaponRange = 0;
 				if (enemyUnitType == UnitType.Zerg_Sunken_Colony
 						|| enemyUnitType == UnitType.Protoss_Photon_Cannon
 						|| enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| enemyUnitType == UnitType.Terran_Bunker
-						|| (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed())) {
+						|| (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed())
+						|| (saveUnit && allRangeUnitType(MyBotModule.Broodwar.enemy(), enemyUnitType))) {
 					
 					enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();
 					if (enemyUnitType == UnitType.Terran_Bunker) {
@@ -196,17 +217,26 @@ public class MechanicMicroDecision {
 					}
 					
 					double distanceToNearEnemy = mechanicUnit.getDistance(enemyPosition);
-					double safeDistance = enemyGroundWeaponRange + (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode ?
-							MicroSet.Common.DEF_TOWER_BACKOFF_DIST_TANK : MicroSet.Common.DEF_TOWER_BACKOFF_DIST);
+					double safeDistance = enemyGroundWeaponRange;
+					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode) {
+						safeDistance += MicroSet.Common.BACKOFF_DIST_SIEGE_TANK;
+						
+					} else if ((enemyUnitType == UnitType.Zerg_Sunken_Colony
+							|| enemyUnitType == UnitType.Protoss_Photon_Cannon
+							|| enemyUnitType == UnitType.Terran_Bunker)
+							&& mechanicUnit.getType() != UnitType.Terran_Siege_Tank_Siege_Mode // 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
+							) {
+						safeDistance += MicroSet.Common.BACKOFF_DIST_DEF_TOWER;
+						
+					} else {
+						safeDistance += MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY;
+						
+					}
+					
 					if (distanceToNearEnemy < safeDistance) {
-						return MechanicMicroDecision.makeDecisionToFlee(enemyInfo);
+						return MechanicMicroDecision.makeDecisionToFlee(enemyPosition);
 					}
 				}
-			}
-
-			if (enemy == null && !enemyUnitType.isBuilding()
-					&& MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME) {
-				continue;
 			}
 			
 			// 우선순위 점수 : 유닛 우선순위 맵
@@ -254,8 +284,14 @@ public class MechanicMicroDecision {
 			return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
 		}
 	}
+	
+	public static boolean allRangeUnitType(Player player, UnitType unitType) { // 아칸 이상부터는 레인지 어택이라고 할까
+		return player.weaponMaxRange(unitType.groundWeapon()) > UnitType.Protoss_Archon.groundWeapon().maxRange();
+	}
+	
 	@Override
 	public String toString() {
-		return "Decision [decision=" + decision + ", targetInfo=" + targetInfo + "]";
+		return "MechanicMicroDecision [decision=" + decision + ", targetInfo=" + targetInfo + ", enemyPosition="
+				+ enemyPosition + "]";
 	}
 }

@@ -286,7 +286,7 @@ public class CommandUtil {
 		}
 
 		if (unit.isCompleted()
-			&& unit.getHitPoints() > 0
+			&& (unit.getHitPoints() > 0 || !unit.isDetected())
 			&& unit.exists()
 			&& unit.getType() != UnitType.Unknown
 			&& unit.getPosition().isValid())

@@ -11,33 +11,44 @@ import bwta.BaseLocation;
 
 public class MechanicMicroVulture extends MechanicMicroAbstract {
 
-	private SquadOrder order;
-	private List<UnitInfo> enemiesInfo;
-	private List<Unit> notVultureUnitList;
+	private SquadOrder order = null;
+	private List<UnitInfo> enemiesInfo = new ArrayList<>();
+	
+	private List<Unit> notVultureUnitList = new ArrayList<>();
+	private boolean saveUnit = false;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
-		this.enemiesInfo = enemiesInfo;
+		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList) {
-		this.notVultureUnitList = new ArrayList<>();
+	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, boolean saveUnit) {
+		this.notVultureUnitList.clear();
 		this.notVultureUnitList.addAll(tankList);
 		this.notVultureUnitList.addAll(goliathList);
+		this.saveUnit = saveUnit;
 	}
 	
 	public void executeMechanicMicro(Unit vulture) {
-		if (!CommonUtils.executeUnitRotation(vulture, 5)) {
+		if (!CommonUtils.executeUnitRotation(vulture, LagObserver.groupsize())) {
 			return;
 		}
+
+		if (saveUnit) {
+			for (Unit notVultureUnit : notVultureUnitList) {
+				if (vulture.getDistance(notVultureUnit) < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
+					saveUnit = false;
+					break;
+				}
+			}
+		}
 		
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo); // 0: flee, 1: kiting, 2: attack
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, saveUnit); // 0: flee, 1: kiting, 2: attack
 
 		KitingOption kOpt = KitingOption.vultureKitingOption();
 		Position retreatPosition = order.getPosition();
 		switch (decision.getDecision()) {
-		case 0: // flee
-			kOpt.setHaveToFlee(true);
+		case 0: // flee 아예 싸울 생각이 없는 도망 : 성큰, 캐논, 시즈 등 접근금지, 또는 regroup 시
 			if (order.getType() == SquadOrderType.WATCH || order.getType() == SquadOrderType.CHECK) {
 				BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 				if (myBase != null) {
@@ -45,7 +56,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				}
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
+			MicroUtils.preciseFlee(vulture, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
@@ -63,17 +74,14 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 					retreatPosition = travelBase.getPosition();
 				}
 			}
-			kOpt.setGoalPosition(retreatPosition);
 			for (Unit notVultureUnit : notVultureUnitList) {
-				if (vulture.getDistance(notVultureUnit) < MicroSet.Common.TANK_COVERAGE) {
-					kOpt.setCooltimeAlwaysAttack(true);
-					kOpt.setUnitedKiting(true);
-					kOpt.setGoalPosition(notVultureUnit.getPosition());
-					kOpt.setFleeAngle(MicroSet.FleeAngle.NARROW_ANGLE);
-					kOpt.setHaveToFlee(false);
+				if (vulture.getDistance(notVultureUnit) < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
+					kOpt = KitingOption.defaultKitingOption();
+					retreatPosition = notVultureUnit.getPosition();
 					break;
 				}
 			}
+			kOpt.setGoalPosition(retreatPosition);
 			MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
 			break;
 			

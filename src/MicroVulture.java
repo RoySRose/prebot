@@ -23,7 +23,6 @@ public class MicroVulture extends MicroManager {
 		final Integer[] fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
 		final Position retreatPosition = order.getType() == SquadOrderType.WATCH ?
 				InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer).getPosition() : order.getPosition();
-		final boolean saveUnit = CombatExpectation.expectVultureVictory(vultures, targets) ? false : true; // 싸우면 걍 이기는 각인지
 
 		for (Unit vulture : vultures) {
 			
@@ -37,7 +36,7 @@ public class MicroVulture extends MicroManager {
 			Unit target = getTarget(vulture, vultureTargets);
 			
 			if (target != null) {
-				KitingOption kitingOption = new KitingOption(cooltimeAlwaysAttack, unitedKiting, retreatPosition, fleeAngle, saveUnit);
+				KitingOption kitingOption = new KitingOption(cooltimeAlwaysAttack, unitedKiting, fleeAngle, retreatPosition);
 				
 				// checker 벌처들은 각각의 orderPosition을 가진다.
 				if (order.getType() == SquadOrderType.CHECK) {
@@ -50,7 +49,7 @@ public class MicroVulture extends MicroManager {
 				List<Unit> nearTanks = new ArrayList<>();
 				List<Unit> nearGoliaths = new ArrayList<>();
 				List<Unit> nearVultures = new ArrayList<>();
-				List<Unit> units = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.TANK_COVERAGE, true, false, null);
+				List<Unit> units = MapGrid.Instance().getUnitsNear(vulture.getPosition(), MicroSet.Common.MAIN_SQUAD_COVERAGE, true, false, null);
 				for (Unit unit : units) {
 					if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
 						nearTanks.add(unit);
@@ -70,7 +69,6 @@ public class MicroVulture extends MicroManager {
 				// 탱크, 골리앗이 근처에 있으면 쿨타임이 돌아올때 무조건 때린다.
 				// TODO 예외케이스 확인 필요 (초반 질럿 다수 등)
 				if (centerPosition != null) {
-					kitingOption.setHaveToFlee(false);
 					kitingOption.setCooltimeAlwaysAttack(true);
 					kitingOption.setFleeAngle(MicroSet.FleeAngle.NARROW_ANGLE);
 					kitingOption.setGoalPosition(centerPosition);
@@ -79,7 +77,6 @@ public class MicroVulture extends MicroManager {
 					Region region = BWTA.getRegion(vulture.getPosition());
 					for (Region occupied : InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer)) {
 						if (region == occupied) {
-							kitingOption.setHaveToFlee(false);
 							break;
 						}
 					}
