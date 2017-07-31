@@ -198,7 +198,7 @@ public class StrategyManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0) {
 			executeSupplyManagement();
 		}
-		if (MyBotModule.Broodwar.getFrameCount() % 233 == 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 43 == 0) {
 			executeExpansion();
 		}
 		if(isInitialBuildOrderFinished == true){
@@ -568,6 +568,7 @@ public class StrategyManager {
 		boolean acaComplete = false;
 		boolean barrack = false;
 		boolean engineering = false;
+		boolean timeaca = false;
 		
 	
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -613,6 +614,14 @@ public class StrategyManager {
 						}
 					}
 				}
+				
+				if (MyBotModule.Broodwar.getFrameCount() > 15000 && unit.getType() == UnitType.Terran_Academy && unit.isCompleted() ){
+					timeaca = true;
+				}
+			}
+			
+			if(timeaca){
+				
 			}
 			//가스 end
 			//컴샛 start
@@ -652,10 +661,13 @@ public class StrategyManager {
 		}
 		int CC=0;
 		if(aca == false){
-			CC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+			CC = MyBotModule.Broodwar.self().completedUnitCount((UnitType.Terran_Command_Center));
 			
-			if(CC>2){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0) {
+			if(CC>2 || MyBotModule.Broodwar.getFrameCount() > 15000){
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0 
+						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
+					MyBotModule.Broodwar.printf("make academy since we have many CC");
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
 				}
 			}
@@ -664,7 +676,9 @@ public class StrategyManager {
 		
 		//barrack start
 		if(barrack == false  && isInitialBuildOrderFinished == true){
-			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0) {
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
+				MyBotModule.Broodwar.printf("make barrack because no barrack");
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
 			}
 		}
@@ -672,7 +686,9 @@ public class StrategyManager {
 		
 		//engineering start
 		if(engineering == false && RespondToStrategy.instance().needOfEngineeringBay()){
-			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0) {
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
+				MyBotModule.Broodwar.printf("make Engin because no Engin");
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
 			}
 		}
@@ -1179,11 +1195,11 @@ public class StrategyManager {
 		
 		//if(selfbasecnt > enemybasecnt){ //약 시작 ~ 15분까지
 		if(MyBotModule.Broodwar.getFrameCount() < 20000){ //약 시작 ~ 15분까지
-			unitPoint += (totworkerkilled - totworkerdead) *2 * (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
+			unitPoint += (totworkerkilled - totworkerdead) * (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
 			unitPoint += (killedcombatunit - deadcombatunit);
 			
 		}else if(MyBotModule.Broodwar.getFrameCount() < 40000){ //약 15분 ~ 28분까지  // 여기서부턴 시간보다.... 현재 전체 규모수가 중요할듯?
-			unitPoint += (totworkerkilled - totworkerdead)*2* (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
+			unitPoint += (totworkerkilled - totworkerdead) * (-MyBotModule.Broodwar.getFrameCount()/40000.0*3.0 + 3.0);
 			unitPoint += (killedcombatunit - deadcombatunit)* (-MyBotModule.Broodwar.getFrameCount()/20000.0 + 2.0);
 		}
 		
