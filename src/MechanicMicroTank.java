@@ -1,5 +1,6 @@
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -14,14 +15,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	private SquadOrder order;
 	private List<UnitInfo> enemiesInfo;
 	
-	private List<Unit> tankList;
-	private List<Unit> goliathList;
-	private int initFrame;
-	private int siegeModeSpreadRadius;
+	private List<Unit> tankList = new ArrayList<>();
+	private List<Unit> goliathList = new ArrayList<>();
+	private int initFrame = 0;
+	private int siegeModeSpreadRadius = 200;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
-		this.enemiesInfo = enemiesInfo;
+		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
 	}
 	
 	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int initFrame) {
@@ -32,7 +33,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	public void executeMechanicMicro(Unit tank) {
-		if (!CommonUtils.executeUnitRotation(tank, 5)) {
+		if (!CommonUtils.executeUnitRotation(tank, LagObserver.groupsize())) {
 			return;
 		}
 		
@@ -44,7 +45,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	private void executeSiegeMode(Unit tank) {
-		if (initFrame + 10 >= MyBotModule.Broodwar.getFrameCount()) {
+		if (initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
 			return;
 		}
 		
@@ -67,8 +68,11 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			
 		case 2: // go
 			Position movePosition = order.getPosition();
-			if (tank.canUnsiege() && tank.getDistance(movePosition) > order.getRadius()) {
-				tank.unsiege();
+			if (tank.canUnsiege()) {
+				Chokepoint nearChoke = BWTA.getNearestChokepoint(tank.getPosition());
+				if(tank.getDistance(movePosition) > order.getRadius() || tank.getDistance(nearChoke.getCenter()) < 150) {
+					tank.unsiege();
+				}
 			}
 			break;
 			
@@ -81,7 +85,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	private void executeTankMode(Unit tank) {
-		if (initFrame + 10 >= MyBotModule.Broodwar.getFrameCount()) {
+		if (initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
 			tank.siege();
 			return;
 		}
@@ -90,14 +94,13 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(tank, enemiesInfo); // 0: flee, 1: kiting, 2: go, 3: change
 		switch (decision.getDecision()) {
 		case 0: // flee
-			kOpt.setHaveToFlee(true);
 			Position retreatPosition = order.getPosition();
 			BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			if (myBase != null) {
 				retreatPosition = myBase.getPosition();
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
+			MicroUtils.preciseFlee(tank, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
@@ -184,12 +187,24 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				    Position movePosition = new Position(x, y);
 				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
 							&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
+				    	if (choke.getCenter().getDistance(movePosition) < 150) {
+				    		continue;
+				    	}
+				    	boolean addOnPosition = false;
+				    	Position pos = new Position(movePosition.getX() - 30, movePosition.getY() - 30);
+				    	List<Unit> buildings = MapGrid.Instance().getUnitsNear(pos, 100, true, false, null);
+				    	for (Unit building : buildings) {
+				    		if (building.getType().canBuildAddon()) {
+				    			addOnPosition = true;
+				    			break;
+				    		}
+				    	}
 				    	
-				    	if (choke.getCenter().getDistance(movePosition) >= 128) {
+				    	if (!addOnPosition) {
 				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
 							if (siegeCount < seigeNumLimit) {
 								return movePosition;
-							} 
+							}
 				    	}
 				    }
 				}

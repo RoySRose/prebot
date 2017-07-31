@@ -17,6 +17,16 @@ public class SquadData {
 			squads.get(squadName).update();
 //			lag.test(squadName + ", " + squads.get(squadName).getUnitSet().size());
 		}
+		
+//		if (CommonUtils.executeRotation(0, 42)){
+//			System.out.println("[SQUAD INFO]");
+//			for (String squadName : squads.keySet()) {
+//				Squad sq = squads.get(squadName);
+//				if (sq.getUnitSet().size() > 0) {
+//					System.out.println(sq);
+//				}
+//			}
+//		}
 	}
 	
 	public void putSquad(Squad squad) {

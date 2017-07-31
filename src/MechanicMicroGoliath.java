@@ -1,5 +1,6 @@
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -8,8 +9,8 @@ import bwta.BaseLocation;
 
 public class MechanicMicroGoliath extends MechanicMicroAbstract {
 
-	private SquadOrder order;
-	private List<UnitInfo> enemiesInfo;
+	private SquadOrder order = null;
+	private List<UnitInfo> enemiesInfo = new ArrayList<>();
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
@@ -17,7 +18,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 	}
 	
 	public void executeMechanicMicro(Unit goliath) {
-		if (!CommonUtils.executeUnitRotation(goliath, 5)) {
+		if (!CommonUtils.executeUnitRotation(goliath, LagObserver.groupsize())) {
 			return;
 		}
 		
@@ -26,7 +27,6 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		KitingOption kOpt = KitingOption.defaultKitingOption();
 		switch (decision.getDecision()) {
 		case 0: // flee
-			kOpt.setHaveToFlee(true);
 			Position retreatPosition = order.getPosition();
 			BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			if (myBase != null) {
@@ -39,7 +39,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		case 1: // kiting
 			Position kitingGoalPosition = order.getPosition();
 			kOpt.setGoalPosition(kitingGoalPosition);
-			MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+			MicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 2: // attack move

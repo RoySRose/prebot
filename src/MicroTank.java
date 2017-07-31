@@ -237,7 +237,7 @@ public class MicroTank extends MicroManager {
 				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
 							&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
 				    	
-				    	if (choke.getCenter().getDistance(movePosition) >= 128) {
+				    	if (choke.getCenter().getDistance(movePosition) >= 150) {
 				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
 							if (siegeCount < seigeNumLimit) {
 								return movePosition;

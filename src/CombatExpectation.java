@@ -21,26 +21,18 @@ public class CombatExpectation {
 	private static final int BONUS_LEG_ENHANCEMENTS = 10;
 	private static final int BONUS_SINGULARITY_CHARGE = 30;
 
-	public static boolean expectVultureVictory(List<Unit> vultures, List<Unit> targets) {
+	public static boolean expect(List<Unit> vultures, List<Unit> targets) {
 		int vulturePower = getVulturePower(vultures);
-		int enemyPower = getEnemyPower(targets);
+		int enemyPower = enemyPower(targets);
 		boolean winExpected = vulturePower >= enemyPower;
-//		System.out.println("vulturePower : " + vulturePower);
-//		System.out.println("enemyPower   : " + enemyPower);
-//		System.out.println("winExpected  : " + winExpected);
-		
 		return winExpected;
 	}
 	
 	
-	public static boolean expectVultureVictoryByUnitInfo(List<Unit> vultures, List<UnitInfo> targets) {
+	public static boolean expectByUnitInfo(List<Unit> vultures, List<UnitInfo> targets) {
 		int vulturePower = getVulturePower(vultures);
-		int enemyPower = getEnemyPowerByUnitInfo(targets);
+		int enemyPower = enemyPowerByUnitInfo(targets);
 		boolean winExpected = vulturePower >= enemyPower;
-//		System.out.println("vulturePower : " + vulturePower);
-//		System.out.println("enemyPower   : " + enemyPower);
-//		System.out.println("winExpected  : " + winExpected);
-		
 		return winExpected;
 	}
 
@@ -61,10 +53,10 @@ public class CombatExpectation {
 	// 히드라 한기 최대 점수 : 150점(업그레이드시 200점)
 	// 질럿 한기 최대 점수 : 20점(업그레이드시 30점)
 	// 드라군 한기 최대 점수 : 300점(업그레이드시 330점)
-	public static int getEnemyPower(List<Unit> targets) {
+	public static int enemyPower(List<Unit> targets) {
 		int enemyPower = 0;
 		for (Unit target : targets) {
-			if (VULTURE_TARGET.get(target.getType()) == null) {
+			if (!target.isCompleted() || VULTURE_TARGET.get(target.getType()) == null) {
 				continue;
 			}
 			enemyPower += VULTURE_TARGET.get(target.getType());
@@ -93,12 +85,14 @@ public class CombatExpectation {
 		return enemyPower;
 	}
 	
-	public static int getEnemyPowerByUnitInfo(List<UnitInfo> targets) {
+	public static int enemyPowerByUnitInfo(List<UnitInfo> targets) {
 		int enemyPower = 0;
 		
 		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo targetInfo : targets) {
-			if (VULTURE_TARGET.get(targetInfo.getType()) == null) {
+			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+			
+			if ((target != null && !target.isCompleted()) || VULTURE_TARGET.get(targetInfo.getType()) == null) {
 				continue;
 			}
 			if (!targetInfo.getType().isBuilding() && (currFrame - targetInfo.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
@@ -134,7 +128,7 @@ public class CombatExpectation {
 		return enemyPower;
 	}
 	
-	public static int getGuerillaScore(List<Unit> enemis) {
+	public static int guerillaScore(List<Unit> enemis) {
 		int score = 0;
 		for (Unit unit : enemis) {
 			if (unit.getType().isResourceDepot()) {
@@ -154,7 +148,7 @@ public class CombatExpectation {
 		return score;
 	}
 	
-	public static int getGuerillaScoreByUnitInfo(List<UnitInfo> enemiesInfo) {
+	public static int guerillaScoreByUnitInfo(List<UnitInfo> enemiesInfo) {
 		int score = 0;
 		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo eui : enemiesInfo) {
@@ -162,21 +156,25 @@ public class CombatExpectation {
 				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
 			}
 			
-			if (eui.getType().isResourceDepot()) {
+			if (eui.getType().isResourceDepot()) { // 자원채취한다 100점
 				score += 100;
-			} else if (eui.getType().isWorker()) {
+			} else if (eui.getType().isWorker()) { // 일꾼있다 100점
 				score += 100;
 			} else if (eui.getType().isBuilding() && !eui.getType().canAttack()) {
 				score += 20;
-			} else if (eui.getType().groundWeapon().maxRange() < MicroSet.Tank.SIEGE_MODE_MIN_RANGE) {
+			} else if (eui.getType().groundWeapon().maxRange() < MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 유닛 10점
 				score += 10;
-			} else if (!eui.getType().isFlyer()){
+			} else if (!eui.getType().isFlyer()){ // 걷는애 5점
 				score += 5;
-			} else {
+			} else { // 나머지 -100점
 				score -= 100;
 			}
 		}
-		return score;
+		if (score < 100) { // 채소백점
+			return 0;
+		} else {
+			return score;
+		}
 	}
 	
 	private static final Map<UnitType, Integer> VULTURE_TARGET = new HashMap<>();
@@ -185,7 +183,7 @@ public class CombatExpectation {
 		VULTURE_TARGET.put(UnitType.Zerg_Larva, 0);
 		VULTURE_TARGET.put(UnitType.Zerg_Egg, 0);
 		VULTURE_TARGET.put(UnitType.Zerg_Lurker_Egg, 0);
-		VULTURE_TARGET.put(UnitType.Zerg_Drone, 10);
+		VULTURE_TARGET.put(UnitType.Zerg_Drone, 1);
 		VULTURE_TARGET.put(UnitType.Zerg_Broodling, 10);
 		VULTURE_TARGET.put(UnitType.Zerg_Lurker, 10);
 		VULTURE_TARGET.put(UnitType.Zerg_Zergling, 15);
@@ -198,9 +196,9 @@ public class CombatExpectation {
 		VULTURE_TARGET.put(UnitType.Zerg_Sunken_Colony, 800);
 		
 		
-		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, -20); // 하템 암살해야됨
+		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, 0); // 하템 암살해야됨
 		VULTURE_TARGET.put(UnitType.Protoss_Dark_Archon, 0);
-		VULTURE_TARGET.put(UnitType.Protoss_Probe, 10);
+		VULTURE_TARGET.put(UnitType.Protoss_Probe, 1);
 		VULTURE_TARGET.put(UnitType.Protoss_Zealot, 20);
 		VULTURE_TARGET.put(UnitType.Protoss_Archon, 50);
 		VULTURE_TARGET.put(UnitType.Protoss_Dark_Templar, 100);

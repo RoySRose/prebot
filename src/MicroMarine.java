@@ -53,7 +53,6 @@ public class MicroMarine extends MicroManager {
 		kitingOption.setUnitedKiting(true); //TODO 같이 가 좋으까?
 		kitingOption.setGoalPosition(order.getPosition());
 		kitingOption.setFleeAngle(MicroSet.FleeAngle.NARROW_ANGLE);
-		kitingOption.setHaveToFlee(false);
 
 		boolean kiteWithmarines = true;
 		
@@ -81,7 +80,7 @@ public class MicroMarine extends MicroManager {
 					}else{
 						if (target != null) {
 							if (kiteWithmarines) {
-								MicroUtils.preciseKiting(marine, target, kitingOption, false);
+								MicroUtils.preciseKiting(marine, target, kitingOption);
 							} 
 						}
 					}
@@ -98,10 +97,9 @@ public class MicroMarine extends MicroManager {
 				Unit target = getTarget(marine, targets);
 				if(target != null){
 					
+					boolean haveToflee = false;
 					if(marine.getType().maxHitPoints() < 11){
-						kitingOption.setHaveToFlee(true);
-					}else{
-						kitingOption.setHaveToFlee(false);
+						haveToflee = true;
 					}
 				
 	//				if(marine.getDistance(target) < marine.getType().groundWeapon().maxRange()/2){
@@ -151,7 +149,11 @@ public class MicroMarine extends MicroManager {
 							}else{
 								if (target != null) {
 									if (kiteWithmarines) {
-										MicroUtils.preciseKiting(marine, target, kitingOption, true);
+										if (haveToflee) {
+											MicroUtils.preciseKiting(marine, target, kitingOption);
+										} else {
+											MicroUtils.preciseFlee(marine, target.getPosition(), kitingOption);
+										}
 									} 
 								}
 							}
@@ -231,9 +233,9 @@ public class MicroMarine extends MicroManager {
 		return bestTarget;
 	}
 	
-	public static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle, Boolean bunker) {
-		int reverseX = rangedUnit.getPosition().getX() - target.getPosition().getX(); // 타겟과 반대로 가는 x양
-		int reverseY = rangedUnit.getPosition().getY() - target.getPosition().getY(); // 타겟과 반대로 가는 y양
+	public static Position getFleePosition(Unit rangedUnit, Position targetPosition, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle, Boolean bunker) {
+		int reverseX = rangedUnit.getPosition().getX() - targetPosition.getX(); // 타겟과 반대로 가는 x양
+		int reverseY = rangedUnit.getPosition().getY() - targetPosition.getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 	    
 		Position safePosition = null; // 0.0 means the unit is facing east.
@@ -256,7 +258,7 @@ public class MicroMarine extends MicroManager {
 				
 				int risk = MicroUtils.riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize, unitedKiting); // 회피지점에서의 예상위험도
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
-				double distanceToTarget = movePosition.getDistance(target.getPosition());
+				double distanceToTarget = movePosition.getDistance(targetPosition);
 				
 				if(bunker){
 					risk += distanceToGoal;

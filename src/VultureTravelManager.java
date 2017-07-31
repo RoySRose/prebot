@@ -11,6 +11,7 @@ import bwta.BaseLocation;
 
 public class VultureTravelManager {
 
+	private Map<String, Integer> guerillaTimeMap = new HashMap<>();
 	private Map<Integer, TravelSite> vultureSiteMap = new HashMap<>();
 	
 	public Map<Integer, TravelSite> getSquadSiteMap() {
@@ -35,7 +36,7 @@ public class VultureTravelManager {
 		if (!otherBases.isEmpty()) {
 			travelSites.clear();
 			for (BaseLocation base : otherBases) {
-				travelSites.add(new TravelSite(base, 0, 0));
+				travelSites.add(new TravelSite(base, 0, 0, 0));
 			}
 			initialized = true;
 		}
@@ -64,22 +65,55 @@ public class VultureTravelManager {
 				}
 				
 				if (relatedVultureId != null) {
-					System.out.println("change travel site");
+//					System.out.println("change travel site");
 					BaseLocation currentBase = vultureSiteMap.get(relatedVultureId).baseLocation;
 					vultureSiteMap.remove(relatedVultureId);
-					getBestTravelSite(relatedVultureId, currentBase); // travelSite 변경
+					getBestTravelSite(relatedVultureId, currentBase); // travelSite 변경(currentBase에서 가까운 곳)
 				}
 			}
 		}
+
+		// 2. 방문자 만료시간
+		Integer expiredVisitor = null;
+		for (Integer vultureId : vultureSiteMap.keySet()) {
+			TravelSite site = vultureSiteMap.get(vultureId);
+			if (site.visitAssignedFrame < MyBotModule.Broodwar.getFrameCount() - MicroSet.Vulture.CHECKER_INTERVAL_FRAME) {
+				expiredVisitor = vultureId;
+				break;
+			}
+		}
+		if (expiredVisitor != null) {
+			vultureSiteMap.remove(expiredVisitor);
+		}
+
+		// 3. 게릴라 적 무시 시간 관리
+		String ignoreExpiredSquad = null;
+		for (String squadName : guerillaTimeMap.keySet()) {
+			Integer startTime = guerillaTimeMap.get(squadName);
+			if (startTime != null && startTime < MyBotModule.Broodwar.getFrameCount() - MicroSet.Vulture.CHECKER_INTERVAL_FRAME) {
+				ignoreExpiredSquad = squadName;
+				break;
+			}
+		}
+		if (ignoreExpiredSquad != null) {
+			guerillaTimeMap.remove(ignoreExpiredSquad);
+		}
 		
-		// 2. 벌처 정책 조정(각 주요 포인트 매설 마인수, checker수)
+		// 4. 벌처 정책 조정(각 주요 포인트 매설 마인수, checker수)
 		if (CommonUtils.executeRotation(0, 48)) {
 			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
+			int mineCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture_Spider_Mine);
 			
-			MicroSet.Vulture.spiderMineNumPerPosition = vultureCount / 4 + 1;
+			int mineNumPerPosition = vultureCount / 4 + 1;
+			int bonumNumPerPosition = (mineCount - 30) / 4;
+			
+			MicroSet.Vulture.spiderMineNumPerPosition = mineNumPerPosition;
+			if (bonumNumPerPosition > 0) {
+				MicroSet.Vulture.spiderMineNumPerPosition += bonumNumPerPosition;
+			}
 
 			int checkerNum = vultureCount / 4; // 3대1 비율이다.
-			MicroSet.Vulture.maxNumChecker = checkerNum >= 5 ? 5 : checkerNum; // 정찰벌처 최대 5기
+			MicroSet.Vulture.maxNumChecker = checkerNum >= 3 ? 3 : checkerNum; // 정찰벌처 최대 3기
 //			System.out.println("vultureCount / maxNumChecker : " + vultureCount + " / " + MicroSet.Vulture.maxNumChecker);
 		}
 	}
@@ -127,6 +161,7 @@ public class VultureTravelManager {
 		
 		if (bestTravelSite != null) {
 			vultureSiteMap.put(vultureId, bestTravelSite);
+			bestTravelSite.visitAssignedFrame = MyBotModule.Broodwar.getFrameCount();
 			return bestTravelSite.baseLocation;
 		} else {
 			vultureSiteMap.remove(vultureId);
@@ -145,7 +180,7 @@ public class VultureTravelManager {
 		TravelSite bestTravelSite = null;
 		
 		for (TravelSite travelSite : travelSites) {
-			if (currFrame - travelSite.guerillaFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
+			if (currFrame - travelSite.guerillaExamFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
 				continue;
 			}
 
@@ -155,8 +190,8 @@ public class VultureTravelManager {
 			}
 			
 			// 안개속의 적 구성을 가늠해 게릴라 타게팅이 가능한지 확인한다.			
-			int enemyPower = CombatExpectation.getEnemyPowerByUnitInfo(enemiesInfo);
-			int score = CombatExpectation.getGuerillaScoreByUnitInfo(enemiesInfo);
+			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo);
+			int score = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
 			
 			if (vulturePower > enemyPower && score > bestScore) {
 				bestScore = score;
@@ -165,26 +200,36 @@ public class VultureTravelManager {
 		}
 		
 		if (bestTravelSite != null) {
-			bestTravelSite.guerillaFrame = currFrame;
+			bestTravelSite.guerillaExamFrame = currFrame;
 			return bestTravelSite.baseLocation;
 		} else {
 			return null;
 		}
 	}
+	
+	public boolean guerillaIgnoreModeEnabled(String squadName) {
+		return guerillaTimeMap.containsKey(squadName);
+	}
+	public void guerillaStart(String squadName) {
+		guerillaTimeMap.put(squadName, MyBotModule.Broodwar.getFrameCount());
+	}
 }
 
 class TravelSite {
-	TravelSite(BaseLocation baseLocation, int visitFrame, int guerillaFrame) {
+	TravelSite(BaseLocation baseLocation, int visitFrame, int visitAssignedFrame, int guerillaExamFrame) {
 		this.baseLocation = baseLocation;
 		this.visitFrame = visitFrame;
-		this.guerillaFrame = guerillaFrame;
+		this.visitAssignedFrame = visitAssignedFrame;
+		this.guerillaExamFrame = guerillaExamFrame;
 	}
 	BaseLocation baseLocation;
 	int visitFrame;
-	int guerillaFrame;
+	int visitAssignedFrame;
+	int guerillaExamFrame;
 
 	@Override
 	public String toString() {
-		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", guerillaFrame=" + guerillaFrame + "]";
+		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", visitAssignedFrame="
+				+ visitAssignedFrame + ", guerillaExamFrame=" + guerillaExamFrame + "]";
 	}
 }

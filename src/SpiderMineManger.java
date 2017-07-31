@@ -226,7 +226,21 @@ public class SpiderMineManger {
 		}
 		
 		// 해당 지역에 마인이 매설되어 있다.
-		if (MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, true, UnitType.Terran_Vulture_Spider_Mine).size() > 0) {
+		if (MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine).size() > 0) {
+			return false;
+		}
+		
+		// 해당 지역에 아군 시즈탱크, 컴셋 스테이션, SCV 등이 있다면 금지 
+		List<Unit> units = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_REMOVE_TANK_DIST, true, true, UnitType.Terran_Siege_Tank_Siege_Mode);
+		for (Unit unit : units) {
+			if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+					|| unit.getType() == UnitType.Terran_SCV
+					|| unit.getType() == UnitType.Terran_Comsat_Station) {
+				return false;
+			}
+		}
+		
+		if (MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_REMOVE_TANK_DIST, true, true, UnitType.Terran_Siege_Tank_Siege_Mode).size() > 0) {
 			return false;
 		}
 		

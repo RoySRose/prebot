@@ -16,44 +16,14 @@ public class MicroSet {
 //		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
 //	}
 	
-	public static class SquadName {
-
-		public static final String IDLE = "Idle";
-		public static final String SCOUT_DEFENSE = "ScoutDefense";
-		public static final String MAIN_ATTACK = "MainAttack";
-		public static final String BASE_DEFENSE_ = "BaseDefense_";
-		public static final String CHECKER = "Checker";
-		public static final String GUERILLA_ = "Guerilla_";
-	}
-	
-	public static class Combat {
-		public static final int IDLE_PRIORITY = 0;
-		public static final int ATTACK_PRIORITY = 2;
-		public static final int WATCHER_PRIORITY = 3;
-		public static final int CHECKER_PRIORITY = 4;
-		public static final int GUERILLA_PRIORITY = 5;
-		public static final int BASE_DEFENSE_PRIORITY = 6;
-		public static final int SCOUT_DEFENSE_PRIORITY = 7;
-		public static final int WRAITH_PRIORITY = 100;
-		public static final int VESSEL_PRIORITY = 101;
-		
-		public static final int IDLE_RADIUS = 100;
-		public static final int ATTACK_RADIUS = 300;
-		public static final int WATCHER_RADIUS = 500;
-		public static final int CHECKER_RADIUS = 600;
-		public static final int GUERILLA_RADIUS = 300;
-		public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
-		public static final int SCOUT_DEFENSE_RADIUS = 600;
-		public static final int WRAITH_RADIUS = 300;
-		public static final int VESSEL_RADIUS = 600;
-	}
-	
-	
 	public static class Vulture {
 		public static final int GEURILLA_RADIUS = 400;
+		public static final int PELOTON_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_POWER = 150;
-		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 30초
-		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 40초
+		public static final int GEURILLA_INTERVAL_FRAME = 20 * 24; // 20초
+		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
+
+		public static final int IGNORE_MOVE_FRAME = 3 * 24; // 3초
 
 		// TODO 변동 값
 	    public static int maxNumWatcher = 50;
@@ -83,11 +53,13 @@ public class MicroSet {
 	}
 	
 	public static class Common {
-		public static final double DEF_TOWER_BACKOFF_DIST = 200.0;
-		public static final double DEF_TOWER_BACKOFF_DIST_TANK = 100.0;
+		public static final double BACKOFF_DIST_DEF_TOWER = 150.0;
+		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
+		public static final double BACKOFF_DIST_RANGE_ENEMY = 150.0;
+		
 		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;
-		public static final int TANK_COVERAGE = 200;
+		public static final int MAIN_SQUAD_COVERAGE = 150;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 	}
 	 
