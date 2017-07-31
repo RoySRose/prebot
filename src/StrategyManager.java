@@ -1210,13 +1210,15 @@ public class StrategyManager {
 			
 			//앞마당 photo
 //			if(StrategysException.protossException_ForgeDouble && myunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
-//			MyBotModule.Broodwar.printf("Ap Ma Dang Photo?! Attack!!!");
+//				MyBotModule.Broodwar.printf("Ap Ma Dang Photo?! Attack!!!");
+//				incase == 3
 //				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 //			}
 			
 			//캐리어
 			//본진 photo<-- 무시
 		}
+				
 		if (InformationManager.Instance().enemyRace == Race.Zerg) {
 			if( myunitPoint > 80 && killedcombatunit-deadcombatunit > myunitPoint/3 ){//죽인수 - 죽은수 가  현재 내 유닛의 일정 비율이 넘으면 가산점
 				unitPoint += 20;
@@ -1226,14 +1228,6 @@ public class StrategyManager {
 
 		//내 팩토리 유닛 인구수 만큼 추가
 		totPoint = 	myunitPoint + expansionPoint + unitPoint;
-
-		
-	
-		//TODO 일단 공격 중이라면......
-//		if(myunit > 240){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
-//			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-//			incase = 1;
-//		}
 		
 		if(totPoint > 120){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
@@ -1249,6 +1243,10 @@ public class StrategyManager {
 			}
 			if(incase == 2 && totPoint < 40){
 				MyBotModule.Broodwar.printf("Retreat2");
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+			}
+			if(incase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
+				MyBotModule.Broodwar.printf("Retreat3");
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
 		}

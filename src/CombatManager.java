@@ -833,7 +833,9 @@ public class CombatManager {
 	
 	private void updateVesselSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
 		Squad vesselSquad = squadData.getSquad("Vessel");
-		
+		if(vesselSquad == null){
+			return;
+		}
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if(unit == null){
 				continue;

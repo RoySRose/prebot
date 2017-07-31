@@ -161,66 +161,6 @@ public class MicroWraith extends MicroManager {
 			} 
 		}
 		
-//		if (!wraithTargets.isEmpty()) {
-//
-//			for (Unit wraith : wraiths) {
-//				Unit target = getTarget(wraith, wraithTargets);
-//				MicroUtils.smartKiteTarget(wraith, target, order.getPosition(), true, true);
-//			}
-//			
-//			// 그룹을 나누어 카이팅
-//			List<List<Unit>> wraithGroups = divedToGroup(wraiths, 5);
-//			MyBotModule.Broodwar.sendText("wraithGroups.size() : " + wraithGroups.size());
-//			
-//			for (List<Unit> wraithGroup : wraithGroups) {
-//				int kitingType = kitingType(wraithGroup);
-//				
-//				switch (kitingType) {
-//				case 1:
-//					List<Unit> wraithGroupTargets = new ArrayList<>();
-//					for (Unit wraith : wraithGroup) {
-//						MapGrid.Instance().getUnitsNear(wraithGroupTargets, wraith.getPosition(), 100, false, true);
-//					}
-//					
-//					if (!wraithGroupTargets.isEmpty()) {
-//						attackFrame = MicroUtils.groupKite(wraithGroup, wraithGroupTargets, attackFrame);
-//						if (attackFrame > 0) {
-//							for (Unit wraith : wraithGroup) {
-//								Unit target = getTarget(wraith, wraithTargets);
-//								CommandUtil.attackUnit(wraith, target);
-//							}
-//						}
-//					} else {
-//						for (Unit wraith : wraithGroup) {
-//							Unit target = getTarget(wraith, wraithTargets);
-//							MicroUtils.smartKiteTarget(wraith, target, order.getPosition(), true, true);
-//						}
-//					}
-//					
-//					break;
-//					
-//				case 2:
-//					for (Unit wraith : wraithGroup) {
-//						Unit target = getTarget(wraith, wraithTargets);
-//						MicroUtils.smartKiteTarget(wraith, target, order.getPosition(), true, false);
-//					}
-//					break;
-//					
-//				case 3:
-//					for (Unit wraith : wraithGroup) {
-//						Unit target = getTarget(wraith, wraithTargets);
-//						CommandUtil.attackUnit(wraith, target);
-//					}
-//					break;
-//				}
-//			}
-//		} else {
-//			for (Unit wraith : wraiths) {
-//				if (wraith.getDistance(order.getPosition()) > 100) {
-//					CommandUtil.attackMove(wraith, order.getPosition());
-//				}
-//			}
-//		}
 	}
 	
 	private Unit getTarget(Unit rangedUnit, List<Unit> targets) {
@@ -234,22 +174,15 @@ public class MicroWraith extends MicroManager {
 			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
 			
 			int distanceScore = 0; // 거리 점수
-			int hitPointScore = 0; // HP 점수
-			int dangerousScore = 0; // 위험한 새끼 점수
 			
 			if (rangedUnit.isInWeaponRange(target)) {
 				distanceScore += 100;
 			}
 			
 			distanceScore -= rangedUnit.getDistance(target) / 5;
-	        hitPointScore -= target.getHitPoints() / 10;
 			
 	        int totalScore = 0;
-//	        if (order.getType() == SquadOrderType.WATCH) {
         	totalScore =  priorityScore + distanceScore;
-//	        } else {
-//	        	totalScore = priorityScore + distanceScore + hitPointScore + dangerousScore;
-//	        }
 	        
 	        if (totalScore > bestTargetScore) {
 				bestTargetScore = totalScore;
@@ -324,15 +257,6 @@ public class MicroWraith extends MicroManager {
 		
 	    return safePosition;
 	}
-	/**
-	 * 회피지점의 위험도
-	 * 
-	 * @param unitType
-	 * @param position
-	 * @param radius
-	 * @param united
-	 * @return
-	 */
 
 	public static double riskOfFleePositionAir(Unit myunit, Position position, int radius, boolean united, boolean fromUnit) {
 		double risk = 0;
@@ -371,13 +295,6 @@ public class MicroWraith extends MicroManager {
 						risk = (additionalrange - (distance - inrange))/additionalrange * 100;
 					}
 				}
-//				else if(enemyunits.getType() == UnitType.Terran_Goliath){
-//					risk += 100;
-//				}else if(enemyunits.getType() == UnitType.Terran_Marine){
-//					risk += 10;
-//				}else if(enemyunits.getType() == UnitType.Terran_Wraith){
-//					risk += 5;
-//				}
 			} 
 		}else{
 			for (Unit enemyunits : dangerous_targets) {
@@ -401,71 +318,4 @@ public class MicroWraith extends MicroManager {
 		}
 		return risk;
 	}
-//	private List<List<Unit>> divedToGroup(List<Unit> wraiths, int groupMax) {
-//		List<List<Unit>> wraithGroups = new ArrayList<>();
-//
-//		List<Integer> assignedUnitId = new ArrayList<>();
-//		for (Unit wraith : wraiths) {
-//			if (assignedUnitId.contains(wraith.getID())) {
-//				continue;
-//			}
-//
-//			List<Unit> wraithGroup = new ArrayList<>();
-//			wraithGroup.add(wraith);
-//			assignedUnitId.add(wraith.getID());
-//			
-//			List<Unit> checkwraiths = wraithGroup;
-//			
-//			boolean isFull = false;
-//			while (!isFull && !checkwraiths.isEmpty()) {
-//				List<Unit> nearUnits = new ArrayList<>();
-//				for (Unit checkwraith : checkwraiths) {
-//					MapGrid.Instance().getUnitsNear(nearUnits, checkwraith.getPosition(), 50, true, false);
-//				}
-//
-//				List<Unit> toAdd = new ArrayList<>();
-//				for (Unit nearUnit : nearUnits) {
-//					if (assignedUnitId.contains(nearUnit.getID()) || nearUnit.getType() != UnitType.Terran_wraith) {
-//						continue;
-//					}
-//					toAdd.add(nearUnit);
-//					assignedUnitId.add(nearUnit.getID());
-//					
-//					if (wraithGroup.size() + toAdd.size() > groupMax) {
-//						isFull = true;
-//						break;
-//					}
-//				}
-//				wraithGroup.addAll(toAdd);
-//				checkwraiths = toAdd;
-//			}
-//			
-//			wraithGroups.add(wraithGroup);
-//		}
-//		return wraithGroups;
-//	}
-//	
-//	private int kitingType(List<Unit> rangedUnit) {
-//
-//		int flying = 0;
-//		int ground = 0;
-//		List<Unit> nearEnemies = new ArrayList<>();
-//		for (Unit unit : rangedUnit) {
-//			MapGrid.Instance().getUnitsNear(nearEnemies, unit.getPosition(), 200, false, true);
-//		}
-//		for (Unit enemy : nearEnemies) {
-//			if (enemy.getType().isBuilding()) {
-//				continue;
-//			}
-//
-//			if (enemy.isFlying()) {
-//				flying++;
-//			} else {
-//				ground++;
-//			}
-//		}
-//		
-//		return 1;
-//	}
-
 }
