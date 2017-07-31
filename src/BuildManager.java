@@ -761,11 +761,25 @@ public class BuildManager {
 									&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 								// 선행 건물이 건설 예정이지도 않으면 만들기
 								if (requiredUnitType.isBuilding()) {
-									if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
-										if(Config.BuildQueueDebugYN){
-											System.out.println("Inserting blocked unit: " + requiredUnitType);
+									if (BuildManager.Instance().buildQueue.getItemCount(requiredUnitType) == 0
+											&& ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
+										int needcnt=0;
+										int requirecnt=0;
+								
+										for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+											if(unit.getType() == unitType && unit.isCompleted()){
+												needcnt++;
+											}
+											if(unit.getType() == requiredUnitType){
+												requirecnt++;
+											}
 										}
-										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
+										if(needcnt > requirecnt){		
+											if(Config.BuildQueueDebugYN){
+												System.out.println("Inserting blocked unit: " + requiredUnitType);
+											}
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
+										}
 									}
 								}
 							}

@@ -907,9 +907,7 @@ public class CombatManager {
 	
 	private void updateVesselSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
 		Squad vesselSquad = squadData.getSquad("Vessel");
-		if(vesselSquad == null){
-			return;
-		}
+		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if(unit == null){
 				continue;
@@ -919,6 +917,9 @@ public class CombatManager {
 	        }
 	    }
 		
+		if(vesselSquad == null){
+			return;
+		}
 		SquadOrder vesselOrder = null;
 
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
@@ -933,7 +934,9 @@ public class CombatManager {
 				List<Unit> units = squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
 				if(units!= null){
 					Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(vesselSquad));//TODO attack position vesselsquad 기준이 맞나?
-					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+					if(leader!=null){
+						vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+					}
 				}else{
 					vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 				}
