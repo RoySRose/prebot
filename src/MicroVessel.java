@@ -1,6 +1,9 @@
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Order;
 import bwapi.Position;
@@ -10,6 +13,30 @@ import bwapi.UnitType;
 import bwapi.WeaponType;
 
 public class MicroVessel extends MicroManager {
+	
+	// 유닛별 실행시 orderMap에서 unitId를 key로 하여 각 unit별 order를 사용한다.
+	private static Map<Integer, SquadOrder> orderMap = new HashMap<>();
+	
+	// CombatManager.updateVesselSquad에서 명령을 지정한다. by insaneojw
+	public static void setUnitOrder(Integer unitId, SquadOrder unitOrder) {
+		orderMap.put(unitId, unitOrder);
+	}
+	public static void getUnitOrder(Integer unitId) {
+		orderMap.get(unitId);
+	}
+	
+	public static void removeInvalidUnitOrder() {
+		List<Integer> removeKeys = new ArrayList<>();
+		for (Integer unitId : orderMap.keySet()) {
+			if (!CommandUtil.IsValidUnit(MyBotModule.Broodwar.getUnit(unitId))) {
+				removeKeys.add(unitId);
+			}
+		}
+		for (Integer unitId : removeKeys) {
+			orderMap.remove(unitId);
+		}
+	}
+	
 	 
 	private final static double sVesselCheckSpeed = UnitType.Terran_Science_Vessel.topSpeed()*8;
 	private final static int sVesselCheckRadius = UnitType.Terran_Science_Vessel.sightRange()+400;

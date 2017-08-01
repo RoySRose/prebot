@@ -25,6 +25,8 @@ class SquadName {
 	public static final String BASE_DEFENSE_ = "BaseDefense_";
 	public static final String CHECKER = "Checker";
 	public static final String GUERILLA_ = "Guerilla_";
+	public static final String WRAITH = "Wraith";
+	public static final String VESSEL = "Vessel";
 }
 
 class Combat {
@@ -137,10 +139,10 @@ public class CombatManager {
 		squadData.putSquad(new Squad(SquadName.CHECKER, checkerOrder, Combat.CHECKER_PRIORITY));
 		
 		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), Combat.WRAITH_RADIUS, "Wraith");
-		squadData.putSquad(new Squad("Wraith", wraithOrder, Combat.WRAITH_PRIORITY));
+		squadData.putSquad(new Squad(SquadName.WRAITH, wraithOrder, Combat.WRAITH_PRIORITY));
 		
-		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, MyBotModule.Broodwar.self().getStartLocation().toPosition(), Combat.VESSEL_RADIUS, "Vessel");
-		squadData.putSquad(new Squad("Vessel", vesselOrder, Combat.VESSEL_PRIORITY));
+		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.VESSEL_RADIUS, "Vessel");
+		squadData.putSquad(new Squad(SquadName.VESSEL, vesselOrder, Combat.VESSEL_PRIORITY));
 		
 		initialized = true;
 	}
@@ -890,58 +892,40 @@ public class CombatManager {
 	}
 	
 	private void updateWraithSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
-		Squad wraithSquad = squadData.getSquad("Wraith");
+		Squad wraithSquad = squadData.getSquad(SquadName.WRAITH);
 		
 		for (Unit unit : combatUnits) {
-			if(unit == null){
-				continue;
-			}
 	        if (unit.getType() == UnitType.Terran_Wraith && squadData.canAssignUnitToSquad(unit, wraithSquad)) {
 				squadData.assignUnitToSquad(unit, wraithSquad);// 레이스만
 	        }
 	    }
 		
-		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(wraithSquad), UnitType.Terran_Wraith.sightRange(), "Wraith");
+		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(wraithSquad), UnitType.Terran_Wraith.sightRange(), SquadName.WRAITH);
 		wraithSquad.setOrder(wraithOrder);
 	}
 	
 	private void updateVesselSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
-		Squad vesselSquad = squadData.getSquad("Vessel");
-		
+		Squad vesselSquad = squadData.getSquad(SquadName.VESSEL);
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if(unit == null){
+			if (!CommandUtil.IsValidUnit(unit)) {
 				continue;
 			}
 	        if (unit.getType() == UnitType.Terran_Science_Vessel && squadData.canAssignUnitToSquad(unit, vesselSquad)) {
 				squadData.assignUnitToSquad(unit, vesselSquad);// 베슬만
+				
+				//여기서 각 유닛별 order를 지정한다. by insaneojw
+				//setUnitOrder(unitId, order)
 	        }
 	    }
-		
-		if(vesselSquad == null){
-			return;
-		}
-		SquadOrder vesselOrder = null;
 
-		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
-			vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-		} else if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
-			
-			if(squadData.getSquad(SquadName.MAIN_ATTACK) != null){
-				List<Unit> units = squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
-				if(units!= null){
-					Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(vesselSquad));//TODO attack position vesselsquad 기준이 맞나?
-					if(leader!=null){
-						vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-					}
-				}else{
-					vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
-				}
-			}else{
-				vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+		// ############ 이 아래의 코드는 필요가 없다.(또는 default order로 사용가능) microVessel실행시 각 유닛의 order로 대체한다. ###############
+		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(vesselSquad), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+
+		if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
+			List<Unit> units = squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
+			if (units != null && !units.isEmpty()) {
+				Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(vesselSquad));//TODO attack position vesselsquad 기준이 맞나?
+				vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 			}
 		}
 		vesselSquad.setOrder(vesselOrder);

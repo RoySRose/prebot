@@ -17,6 +17,7 @@ public class SpiderMineManger {
 	private Map<Integer, MineRemoveReserved> mineRemoveMap;
 	private Map<Integer, MineReserved> mineReservedMap;
 	private List<Position> goodPositions;
+	private List<BaseLocation> myExpansions;
 
 	private static SpiderMineManger instance = new SpiderMineManger();
 	
@@ -49,10 +50,13 @@ public class SpiderMineManger {
 			mineRemoveMap = new HashMap<>();
 			
 			goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
+			myExpansions = this.getMyExpansionBaseLocation();
 			
 			// 3rd 멀티지역
 			for (BaseLocation base : otherBases) {
-				goodPositions.add(base.getPosition());
+				if (!myExpansions.contains(base)) {
+					goodPositions.add(base.getPosition());
+				}
 			}
 			
 			// 공격준비지역
@@ -255,6 +259,14 @@ public class SpiderMineManger {
 			}
 		}
 		return reservedMineNum;
+	}
+	
+	public List<BaseLocation> getMyExpansionBaseLocation() {
+		List<BaseLocation> myExpansions = new ArrayList<>();
+
+		// TODO
+		
+		return myExpansions;
 	}
 
 }
