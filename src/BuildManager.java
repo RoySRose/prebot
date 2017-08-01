@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -777,9 +776,9 @@ public class BuildManager {
 //										if(needcnt > requirecnt){		
 											if(Config.BuildQueueDebugYN){
 												System.out.println("Inserting blocked unit: " + requiredUnitType);
-//											}
+											}
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
-										}
+										//}
 									}
 								}
 							}
