@@ -763,21 +763,21 @@ public class BuildManager {
 								if (requiredUnitType.isBuilding()) {
 									if (BuildManager.Instance().buildQueue.getItemCount(requiredUnitType) == 0
 											&& ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
-										int needcnt=0;
-										int requirecnt=0;
-								
-										for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
-											if(unit.getType() == unitType && unit.isCompleted()){
-												needcnt++;
-											}
-											if(unit.getType() == requiredUnitType){
-												requirecnt++;
-											}
-										}
-										if(needcnt > requirecnt){		
+//										int needcnt=0;
+//										int requirecnt=0;
+//								
+//										for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+//											if(unit.getType() == unitType && unit.isCompleted()){
+//												needcnt++;
+//											}
+//											if(unit.getType() == requiredUnitType){
+//												requirecnt++;
+//											}
+//										}
+//										if(needcnt > requirecnt){		
 											if(Config.BuildQueueDebugYN){
 												System.out.println("Inserting blocked unit: " + requiredUnitType);
-											}
+//											}
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
 										}
 									}

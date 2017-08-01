@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import bwapi.Race;
@@ -100,24 +101,25 @@ public class StrategyManager {
 
 	private Strategys CurrentStrategyBasic = null;
 	private StrategysException CurrentStrategyException = null;
-	public Strategys LastCurrentStrategyBasic = null;
-	public StrategysException LastCurrentStrategyException = null;
+	public Strategys LastStrategyBasic = null;
+	public StrategysException LastStrategyException = null;
 	
 	public int Attackpoint=0;
 	public int MyunitPoint = 0;
 	public int ExpansionPoint = 0;
 	public int UnitPoint = 0;
+	public int CombatStartCase =0;
 	
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
-		CurrentStrategyBasic = Strategys.zergBasic;
-		CurrentStrategyException = StrategysException.Init;
+		CurrentStrategyBasic = null;
+		CurrentStrategyException = null;
 	}
 	
 	public void setCurrentStrategyBasic(Strategys strategy) {
 		if(CurrentStrategyBasic != strategy){
 			MyBotModule.Broodwar.printf("Set Strategy: " + strategy);
-			LastCurrentStrategyBasic = CurrentStrategyBasic; 
+			LastStrategyBasic = CurrentStrategyBasic; 
 			CurrentStrategyBasic = strategy;
 			setCombatUnitRatio();
 			
@@ -127,7 +129,7 @@ public class StrategyManager {
 	public void setCurrentStrategyException(StrategysException strategy) {
 		if(CurrentStrategyException != strategy){
 			MyBotModule.Broodwar.printf("Set StrategyEX: " + strategy);
-			LastCurrentStrategyException = CurrentStrategyException;
+			LastStrategyException = CurrentStrategyException;
 			CurrentStrategyException = strategy;
 			setCombatUnitRatio();
 
@@ -150,11 +152,13 @@ public class StrategyManager {
 		// 과거 게임 기록을 로딩합니다
 		//loadGameRecordList();
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
-
+		
+//		StrategyManager.Instance().setCurrentStrategyBasic(Strategys.zergBasic);
+//		StrategyManager.Instance().setCurrentStrategyException(StrategysException.Init);
+		InitialBuild.Instance().setInitialBuildOrder();	
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		
-		InitialBuild.Instance().setInitialBuildOrder();	
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
 	}
 
@@ -1015,6 +1019,9 @@ public class StrategyManager {
 						if((unit.isConstructing() == true) || ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) != 0){
 							continue;
 						}
+//						if(selected == UnitType.Terran_Goliath && isarmoryexists == false){
+//							continue;
+//						}
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 						if(Config.BuildQueueDebugYN){
 							System.out.println("queueIn : Vulture");
@@ -1120,10 +1127,14 @@ public class StrategyManager {
 	}
 
 	public boolean enemyExspansioning(){
-		int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
-
-		if (cnt > 0){
-			return true;
+		//int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
+		List<UnitInfo> enemyCC = null;
+		enemyCC = InformationManager.Instance().getEnemyUnits(InformationManager.Instance().getBasicResourceDepotBuildingType(MyBotModule.Broodwar.enemy().getRace()));
+		
+		for (UnitInfo target : enemyCC) {
+			if(target.isCompleted()){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1154,7 +1165,7 @@ public class StrategyManager {
 		
 		int selfbasecnt = 0;
 		int enemybasecnt = 0;
-		int incase =0;
+		
 		//boolean allaware = InformationManager.Instance().isReceivingEveryMultiInfo();
 		
 		//TODO 아군은 돌아가기 시작하고 scv 특정 수 이상 붙은 컴맨드만 쳐야 하지 않나?
@@ -1173,7 +1184,7 @@ public class StrategyManager {
 		if(myunitPoint > 280 || MyBotModule.Broodwar.self().supplyUsed() > 392){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
 			MyBotModule.Broodwar.printf("Many Unit Attack!");
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			incase = 1;
+			CombatStartCase = 1;
 		}
 		if(MyBotModule.Broodwar.getFrameCount() > 8000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 7){//TODO5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
 			MyBotModule.Broodwar.printf("Too Less SCV ATTACK!!");
@@ -1261,7 +1272,7 @@ public class StrategyManager {
 			//앞마당 photo
 //			if(StrategysException.protossException_ForgeDouble && myunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
 //				MyBotModule.Broodwar.printf("Ap Ma Dang Photo?! Attack!!!");
-//				incase == 3
+//				CombatStartCase == 3
 //				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 //			}
 			
@@ -1282,20 +1293,20 @@ public class StrategyManager {
 		if(totPoint > 120){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			incase = 2;
+			CombatStartCase = 2;
 		}
 		
 		
 		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
-			if(incase == 1 && myunitPoint < 20){
+			if(CombatStartCase == 1 && myunitPoint < 20){
 				MyBotModule.Broodwar.printf("Retreat1");
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
-			if(incase == 2 && totPoint < 40){
+			if(CombatStartCase == 2 && totPoint < 40){
 				MyBotModule.Broodwar.printf("Retreat2");
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
-			if(incase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
+			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
 				MyBotModule.Broodwar.printf("Retreat3");
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
@@ -1379,8 +1390,6 @@ public class StrategyManager {
 	
 	public void executeResearch() {
 		
-		
-			
 		boolean VS = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false)
 				||(MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Ion_Thrusters) ? true : false);
 		boolean VM = (MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines))
@@ -1415,6 +1424,10 @@ public class StrategyManager {
 		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
 		MetaType vsProtoss[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
 		boolean vsProtossbool[] = new boolean[]{TS, VM, VS, GR};
+		MetaType vsProtossZealot[] = new MetaType[]{vultureSpeed, vultureMine, TankSiegeMode, GoliathRange};
+		boolean vsProtossZealotbool[] = new boolean[]{VS, VM, TS, GR};
+		MetaType vsProtossAggressive[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
+		boolean vsProtossAggressivebool[] = new boolean[]{VM, VS, TS, GR};
 		
 		MetaType[] Current = null;
 		boolean[] Currentbool = null;
@@ -1424,6 +1437,20 @@ public class StrategyManager {
 		if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss){
 			Current = vsProtoss;
 			Currentbool = vsProtossbool;
+			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_ZealotPush
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+					    && LastStrategyException == StrategyManager.StrategysException.protossException_ZealotPush)){
+				Current = vsProtossZealot;
+				Currentbool = vsProtossZealotbool;
+			}
+//			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
+//			(CurrentStrategyException == StrategyManager.StrategysException.NoEarlyDragoonAttack
+//					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+//					    && LastStrategyException == StrategyManager.StrategysException.NoEarlyDragoonAttack))){
+//				Current = vsProtossAggressive;
+//				Currentbool = vsProtossAggressivebool;
+//			}
+			
 			air = false;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
 				if(unit.getType() == UnitType.Protoss_Stargate
