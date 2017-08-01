@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Region;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -54,7 +55,7 @@ public class RespondToStrategy {
 		return instance;
 	}
 	
-public boolean needOfEngineeringBay() {
+	public boolean needOfEngineeringBay() {
 		
 		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_shuttle){
 			return true;
@@ -128,6 +129,53 @@ public boolean needOfEngineeringBay() {
 			}
 		}
 		
+		boolean blocked = true;
+		//2gate zealot
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
+				if(blocked){
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 1
+							&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+						//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					}
+				}else{
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) == 0){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4
+								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+							//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
+						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
+								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
+								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
+							//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
+					}
+				}
+			}
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
+				//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus){
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
+					&& MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
+				//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
+		}
 		
 		//protossException_Dark start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Dark){

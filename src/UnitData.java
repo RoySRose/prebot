@@ -74,6 +74,7 @@ public class UnitData {
 		ui.setUnitID(unit.getID());
 		ui.setType(unit.getType());
 		ui.setCompleted(unit.isCompleted());
+		ui.setRemainingBuildTime(unit.getRemainingBuildTime());
 		
 		//unitAndUnitInfoMap.put(unit, ui);
 		
