@@ -160,11 +160,11 @@ public class UXManager {
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + (StrategyManager.Instance().getCurrentStrategyException()== StrategyManager.StrategysException.Init ? StrategyManager.Instance().getCurrentStrategyBasic() : "X")
-				+" <-- "+ StrategyManager.Instance().LastCurrentStrategyBasic);
+				+" <-- "+ StrategyManager.Instance().LastStrategyBasic);
 		y += 11;
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Current EXStrategy : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().LastCurrentStrategyException );
+		MyBotModule.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().LastStrategyException );
 		y += 11;
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");

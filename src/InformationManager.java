@@ -531,6 +531,31 @@ public class InformationManager {
 		updateChokePointAndExpansionLocation();
 	}
 	
+	public List<UnitInfo> getEnemyUnits(){
+		return getEnemyUnits(null);
+	}
+	public List<UnitInfo> getEnemyUnits(UnitType type)
+	{
+		List<UnitInfo> units = new ArrayList<>();
+		
+		Iterator<Integer> it = null;
+		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		
+		
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
+			if(ui != null){
+				if(type == null){
+					units.add(ui);
+				}else if(type == ui.getType()){
+					units.add(ui);
+				}
+			}
+		}
+		
+		return units;
+	}
+	
 	public List<UnitInfo> getEnemyBuildingUnitsNear(Unit myunit, int radius, boolean canAttack, boolean ground, boolean air)
 	{
 		List<UnitInfo> units = new ArrayList<>();

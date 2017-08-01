@@ -17,6 +17,7 @@ public class UnitInfo {
 	private UnitType type;
 	private boolean completed;
 	private int updateFrame;
+	private int remainingBuildTime;
 
 	public UnitInfo()
 	{
@@ -35,7 +36,7 @@ public class UnitInfo {
 	}
 
 	public boolean isCompleted() {
-		return completed;
+		return completed || (remainingBuildTime < MyBotModule.Broodwar.getFrameCount() - updateFrame);
 	}
 
 	public Position getLastPosition() {
@@ -92,6 +93,10 @@ public class UnitInfo {
 
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
+	}
+	
+	public void setRemainingBuildTime(int remainingBuildTime) {
+		this.remainingBuildTime = remainingBuildTime;
 	}
 	
 	public int getUpdateFrame() {
