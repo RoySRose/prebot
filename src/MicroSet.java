@@ -35,7 +35,7 @@ public class MicroSet {
 		public static final int MINE_SPREAD_RADIUS = 500;
 
 		public static final int MINE_BETWEEN_DIST = 50;
-		public static final int MINE_REMOVE_TANK_DIST = 100;
+		public static final int MINE_REMOVE_TANK_DIST = 150;
 		public static final int RESV_EXPIRE_FRAME = 24 * 3;
 	}
 	
@@ -53,9 +53,9 @@ public class MicroSet {
 	}
 	
 	public static class Common {
-		public static final double BACKOFF_DIST_DEF_TOWER = 150.0;
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
-		public static final double BACKOFF_DIST_RANGE_ENEMY = 150.0;
+		public static final double BACKOFF_DIST_DEF_TOWER = 150.0;
+		public static final double BACKOFF_DIST_RANGE_ENEMY = 200.0;
 		
 		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;

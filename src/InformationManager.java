@@ -949,25 +949,58 @@ public class InformationManager {
 	}
 	
 	public void updateReadyToAttackPosition(Player player, Chokepoint chokepoint) {
-		int approachDist = 300;
-		
-		Position secondChokePosition = chokepoint.getCenter();
-		Position center = new Position(2048, 2048); // 128x128 맵의 센터
-
-		int x = center.getX() - secondChokePosition.getX();
-		int y = center.getY() - secondChokePosition.getY();
-	    double radian = Math.atan2(y, x);
-
-	    while (approachDist > 0) {
-		    Position approachVector = new Position((int)(approachDist * Math.cos(radian)), (int)(approachDist * Math.sin(radian)));
-		    Position position = new Position (secondChokePosition.getX() + approachVector.getX(), secondChokePosition.getY() + approachVector.getY());
-		    if (position.isValid() && BWTA.getRegion(position) != null
-		    		&& MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8)) {
-				readyToAttackPosition.put(player, position);
-				break;
+		try {
+			Position selfReadyToPos = getNextChokepoint(secondChokePoint.get(selfPlayer), enemyPlayer).getCenter();
+			Position enemyReadyToPos = getNextChokepoint(secondChokePoint.get(enemyPlayer), selfPlayer).getCenter();
+			
+			readyToAttackPosition.put(selfPlayer, selfReadyToPos);
+			readyToAttackPosition.put(enemyPlayer, enemyReadyToPos);
+			
+		} catch (Exception ex) {
+			int approachDist = 300;
+			
+			Position secondChokePosition = chokepoint.getCenter();
+			Position center = new Position(2048, 2048); // 128x128 맵의 센터
+	
+			int x = center.getX() - secondChokePosition.getX();
+			int y = center.getY() - secondChokePosition.getY();
+		    double radian = Math.atan2(y, x);
+	
+		    while (approachDist > 0) {
+			    Position approachVector = new Position((int)(approachDist * Math.cos(radian)), (int)(approachDist * Math.sin(radian)));
+			    Position position = new Position (secondChokePosition.getX() + approachVector.getX(), secondChokePosition.getY() + approachVector.getY());
+			    if (position.isValid() && BWTA.getRegion(position) != null
+			    		&& MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8)) {
+					readyToAttackPosition.put(player, position);
+					break;
+			    }
+			    approachDist += 10;
 		    }
-		    approachDist += 10;
+		}
+	}
+	
+	private Chokepoint getNextChokepoint(Chokepoint currChoke, Player toPlayer) {
+		Chokepoint enemyFirstChoke = firstChokePoint.get(toPlayer);
+
+	    
+    	int chokeToEnemyChoke = MapTools.Instance().getGroundDistance(currChoke.getCenter(), enemyFirstChoke.getCenter()); // 현재chokepoint ~ 목적지chokepoint
+    	
+    	Chokepoint nextChoke = null;
+		int closestChokeToNextChoke = 999999;
+    	for (Chokepoint choke : BWTA.getChokepoints()) {
+    		if (choke.equals(currChoke)) {
+    			continue;
+    		}
+    		int chokeToNextChoke = MapTools.Instance().getGroundDistance(currChoke.getCenter(), choke.getCenter()); // 현재chokepoint ~ 다음chokepoint
+    		int nextChokeToEnemyChoke = MapTools.Instance().getGroundDistance(choke.getCenter(), enemyFirstChoke.getCenter()); // 다음chokepoint ~ 목적지chokepoint
+    		if (chokeToNextChoke + nextChokeToEnemyChoke < chokeToEnemyChoke + 10 // 최단거리 오차범위 10 * 32
+    				&& chokeToNextChoke > 10 // 너무 가깝지 않아야 한다.
+    				&& chokeToNextChoke < closestChokeToNextChoke) { // 가장 가까운 초크포인트를 선정
+    			nextChoke = choke;
+    			closestChokeToNextChoke = chokeToNextChoke;
+    		}
 	    }
+   		return nextChoke;
 	}
 	
 
@@ -1142,7 +1175,7 @@ public class InformationManager {
 
 		// check for various types of combat units
 		if (type.canAttack() || type == UnitType.Terran_Medic || type == UnitType.Protoss_Observer
-				|| type == UnitType.Terran_Bunker) {
+				|| type == UnitType.Terran_Bunker || type == UnitType.Protoss_High_Templar) {
 			return true;
 		}
 

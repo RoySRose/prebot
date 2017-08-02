@@ -69,8 +69,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		case 2: // go
 			Position movePosition = order.getPosition();
 			if (tank.canUnsiege()) {
-				Chokepoint nearChoke = BWTA.getNearestChokepoint(tank.getPosition());
-				if(tank.getDistance(movePosition) > order.getRadius() || tank.getDistance(nearChoke.getCenter()) < 150) {
+				if(tank.getDistance(movePosition) > siegeModeSpreadRadius || MicroUtils.existTooNarrowChoke(tank.getPosition())) {
 					tank.unsiege();
 				}
 			}
@@ -147,7 +146,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege()) {
 				Position positionToSiege = findPositionToSiege(siegeModeSpreadRadius);
 				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) <= 50) {
+					if (tank.getDistance(positionToSiege) < 30) {
 						tank.siege();
 					} else {
 						CommandUtil.attackMove(tank, positionToSiege);
@@ -171,8 +170,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	private Position findPositionToSiege(int siegeAreaDist) {
-		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
-		
 		int seigeNumLimit = 1;
 		int distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
 		
@@ -185,22 +182,31 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				    int y = order.getPosition().getY() + fleeVector.getY();
 				    
 				    Position movePosition = new Position(x, y);
-				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
-							&& MyBotModule.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
-				    	if (choke.getCenter().getDistance(movePosition) < 150) {
+				    if (MicroUtils.isValidGroundPosition(movePosition)) {
+				    	if (MicroUtils.existTooNarrowChoke(movePosition)) {
 				    		continue;
 				    	}
+
+				    	boolean somethingInThePosition = false;
 				    	boolean addOnPosition = false;
-				    	Position pos = new Position(movePosition.getX() - 30, movePosition.getY() - 30);
-				    	List<Unit> buildings = MapGrid.Instance().getUnitsNear(pos, 100, true, false, null);
-				    	for (Unit building : buildings) {
-				    		if (building.getType().canBuildAddon()) {
+				    	List<Unit> exactPositionUnits = MapGrid.Instance().getUnitsNear(movePosition, 20, true, false, null);
+				    	for (Unit unit : exactPositionUnits) {
+				    		if (!unit.getType().canMove()) {
+				    			somethingInThePosition = true;
+				    			break;
+				    		}
+				    	}
+				    	
+				    	Position pos1 = new Position(movePosition.getX() - 30, movePosition.getY() - 30);
+				    	List<Unit> nearUnits = MapGrid.Instance().getUnitsNear(pos1, 100, true, false, null);
+				    	for (Unit nearUnit : nearUnits) {
+				    		if (nearUnit.getType().canBuildAddon()) {
 				    			addOnPosition = true;
 				    			break;
 				    		}
 				    	}
 				    	
-				    	if (!addOnPosition) {
+				    	if (!somethingInThePosition && !addOnPosition) {
 				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
 							if (siegeCount < seigeNumLimit) {
 								return movePosition;
