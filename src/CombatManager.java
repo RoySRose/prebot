@@ -406,10 +406,12 @@ public class CombatManager {
 			int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
 			
+			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+			
 			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-			if (tankCount >= 15) {
-				mainAttackLocation = getAttackPosition(squad);
-			} else if (tankCount >= 8 || InformationManager.Instance().enemyRace == Race.Terran) {
+			if (tankCount + goliathCount >= 15) {
+				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+			} else if (tankCount + goliathCount >= 8 || InformationManager.Instance().enemyRace == Race.Terran) {
 				mainAttackLocation = secondChoke.getCenter();
 			} else {
 				mainAttackLocation = getDefensePosition(squad);
@@ -887,7 +889,8 @@ public class CombatManager {
 			
 	    }
 
-		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS, "Attack enemy base");
+		int bonusRadius = (int) (Math.log(mainAttackSquad.getUnitSet().size()) * 20);
+		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS + bonusRadius, "Attack enemy base");
 	    mainAttackSquad.setOrder(mainAttackOrder);
 	}
 	

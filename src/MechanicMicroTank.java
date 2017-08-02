@@ -143,7 +143,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			
 		case 2: // go
 			
-			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege()) {
+			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege() && !MicroUtils.existTooNarrowChoke(tank.getPosition())) {
 				Position positionToSiege = findPositionToSiege(siegeModeSpreadRadius);
 				if (positionToSiege != null) {
 					if (tank.getDistance(positionToSiege) < 30) {
@@ -189,7 +189,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 
 				    	boolean somethingInThePosition = false;
 				    	boolean addOnPosition = false;
-				    	List<Unit> exactPositionUnits = MapGrid.Instance().getUnitsNear(movePosition, 20, true, false, null);
+				    	List<Unit> exactPositionUnits = MapGrid.Instance().getUnitsNear(movePosition, 15, true, false, null);
 				    	for (Unit unit : exactPositionUnits) {
 				    		if (!unit.getType().canMove()) {
 				    			somethingInThePosition = true;

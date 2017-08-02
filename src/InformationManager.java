@@ -1170,7 +1170,8 @@ public class InformationManager {
 	/// 해당 UnitType 이 전투 유닛인지 리턴합니다
 	public final boolean isCombatUnitType(UnitType type) {
 		if (type == UnitType.Zerg_Lurker /* || type == UnitType.Protoss_Dark_Templar*/) {
-			return false;
+			// return false; 왜 false로 되어 있나?
+			return true;
 		}
 
 		// check for various types of combat units
