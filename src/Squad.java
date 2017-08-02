@@ -155,14 +155,12 @@ public class Squad {
 //			mechanicVulture.executeMechanicMicro(vulture);
 //		}
 
-		boolean saveUnit = false;
+		int saveUnitLevel = 1;
 		if (saveUnitFrameCount > 0) {
 			watchOrder.setPosition(attackerOrder.getPosition());
-			if (!attackerEnemies.isEmpty()) {
-				vultureEnemies = attackerEnemies;
-			}
+			vultureEnemies = attackerEnemies;
 			saveUnitFrameCount--;
-			saveUnit = true;
+			saveUnitLevel = 2;
 		} else {
 			if (initFrame == 0 && !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies)) {
 				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);
@@ -171,7 +169,7 @@ public class Squad {
 		}
 		
 		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnit);
+		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
 		}
@@ -230,9 +228,13 @@ public class Squad {
 //			}
 //		}
 
-		boolean saveUnit = !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies);
+//		boolean saveUnit = !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies);
+		int saveUnitLevel = 1;
+		if (name.startsWith(SquadName.GUERILLA_)) {
+			saveUnitLevel = 0;
+		}
 		mechanicVulture.prepareMechanic(order, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnit);
+		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
 		}
@@ -245,7 +247,7 @@ public class Squad {
 		}
 		
 		mechanicVulture.prepareMechanic(order, nearbyEnemiesInfo);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), false);
+		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1);
 		mechanicTank.prepareMechanic(order, nearbyEnemiesInfo);
 		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 0);
 		mechanicGoliath.prepareMechanic(order, nearbyEnemiesInfo);

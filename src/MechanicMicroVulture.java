@@ -15,18 +15,18 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	private List<UnitInfo> enemiesInfo = new ArrayList<>();
 	
 	private List<Unit> notVultureUnitList = new ArrayList<>();
-	private boolean saveUnit = false;
+	private int saveUnitLevel = 0;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
 		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, boolean saveUnit) {
+	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel) {
 		this.notVultureUnitList.clear();
 		this.notVultureUnitList.addAll(tankList);
 		this.notVultureUnitList.addAll(goliathList);
-		this.saveUnit = saveUnit;
+		this.saveUnitLevel = saveUnitLevel;
 	}
 	
 	public void executeMechanicMicro(Unit vulture) {
@@ -34,7 +34,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			return;
 		}
 
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, saveUnit); // 0: flee, 1: kiting, 2: attack
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
 
 		KitingOption kOpt = KitingOption.vultureKitingOption();
 		Position retreatPosition = order.getPosition();
