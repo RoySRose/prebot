@@ -173,10 +173,10 @@ public class MechanicMicroDecision {
 	}
 	
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo) {
-		return makeDecision(mechanicUnit, enemiesInfo, false);
+		return makeDecision(mechanicUnit, enemiesInfo, 1);
 	}
 	
-	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, boolean saveUnit) {
+	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, int saveUnitLevel) {
 		
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -202,16 +202,15 @@ public class MechanicMicroDecision {
 				continue;
 			}
 			
-			if (enemyIsComplete) {
-				int enemyGroundWeaponRange = 0;
+			if (enemyIsComplete && saveUnitLevel >= 1) {
 				if (enemyUnitType == UnitType.Zerg_Sunken_Colony
 						|| enemyUnitType == UnitType.Protoss_Photon_Cannon
 						|| enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| enemyUnitType == UnitType.Terran_Bunker
 						|| (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed())
-						|| (saveUnit && allRangeUnitType(MyBotModule.Broodwar.enemy(), enemyUnitType))) {
+						|| (saveUnitLevel >= 2 && allRangeUnitType(MyBotModule.Broodwar.enemy(), enemyUnitType))) {
 					
-					enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();
+					int enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();
 					if (enemyUnitType == UnitType.Terran_Bunker) {
 						enemyGroundWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32;
 					}

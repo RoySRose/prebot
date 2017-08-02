@@ -25,6 +25,7 @@ class SquadName {
 	public static final String BASE_DEFENSE_ = "BaseDefense_";
 	public static final String CHECKER = "Checker";
 	public static final String GUERILLA_ = "Guerilla_";
+	public static final String MARINE = "Marine";
 	public static final String WRAITH = "Wraith";
 	public static final String VESSEL = "Vessel";
 }
@@ -38,16 +39,19 @@ class Combat {
 	public static final int BASE_DEFENSE_PRIORITY = 6;
 	public static final int SCOUT_DEFENSE_PRIORITY = 7;
 	public static final int EARLY_DEFENSE_PRIORITY = 10;
+
+	public static final int MARINE_PRIORITY = 99;
 	public static final int WRAITH_PRIORITY = 100;
 	public static final int VESSEL_PRIORITY = 101;
 	
 	public static final int IDLE_RADIUS = 100;
-	public static final int ATTACK_RADIUS = 400;
-	public static final int WATCHER_RADIUS = 400;
+	public static final int ATTACK_RADIUS = 300;
+	public static final int WATCHER_RADIUS = 300;
 	public static final int CHECKER_RADIUS = 150;
 	public static final int GUERILLA_RADIUS = 300;
 	public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
 	public static final int SCOUT_DEFENSE_RADIUS = 600;
+	public static final int MARINE_RADIUS = 300;
 	public static final int WRAITH_RADIUS = 300;
 	public static final int VESSEL_RADIUS = 600;
 }
@@ -63,7 +67,7 @@ enum CombatStrategyDetail {
 public class CombatManager {
 	
 	private static Chokepoint currTargetChoke = null;
-	private static int currTargetChokeExpiredFrame = 1;
+	private static int currTargetChokeExpiredFrame = 0;
 	
 	private List<Unit> combatUnits = new ArrayList<>();
 	private SquadData squadData = new SquadData();
@@ -144,6 +148,9 @@ public class CombatManager {
 		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getAttackPosition(null), Combat.CHECKER_RADIUS, "Check it out");
 		squadData.putSquad(new Squad(SquadName.CHECKER, checkerOrder, Combat.CHECKER_PRIORITY));
 		
+		SquadOrder marineOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.MARINE_RADIUS, "Marine");
+		squadData.putSquad(new Squad(SquadName.MARINE, marineOrder, Combat.MARINE_PRIORITY));
+		
 		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), Combat.WRAITH_RADIUS, "Wraith");
 		squadData.putSquad(new Squad(SquadName.WRAITH, wraithOrder, Combat.WRAITH_PRIORITY));
 		
@@ -189,6 +196,7 @@ public class CombatManager {
 			
 			updateAttackSquads();
 			
+			updateMarineSquad();
 			updateWraithSquad();
 			updateVesselSquad(); //AttackSquads 뒤에
 			updateCheckerSquad();
@@ -399,6 +407,8 @@ public class CombatManager {
 	
 	private Position getMainAttackLocation(Squad squad) {
 		
+		Position mainAttackLocation = null;
+		
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
 			// We are guaranteed to always have a main base location, even if it has been destroyed.
 			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
@@ -410,24 +420,35 @@ public class CombatManager {
 					break;
 				}
 			}
-			return base.getPosition();
+			mainAttackLocation = base.getPosition();
 			
 		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
-			Position defPosition = getDefensePosition();
-			return defPosition;
+			int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
+			
+			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+			
+			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+			if (tankCount + goliathCount >= 15) {
+				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+			} else if (tankCount + goliathCount >= 8 || InformationManager.Instance().enemyRace == Race.Terran) {
+				mainAttackLocation = secondChoke.getCenter();
+			} else {
+				mainAttackLocation = getDefensePosition(squad);
+			}
 			
 		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
-			Position readyToAttack = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-			return readyToAttack;
+			mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
 			
 		} else { //if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
-			Position enemyPosition = getAttackPosition(squad);
-		    return enemyPosition;
+			mainAttackLocation = getAttackPosition(squad);
 		}
+		
+		return mainAttackLocation;
 	}
 	
 	
-	private Position getDefensePosition() {
+	private Position getDefensePosition(Squad squad) {
 		Position defensePosition = null;
 		Chokepoint firstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 		BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
@@ -505,13 +526,15 @@ public class CombatManager {
 		if (squad.getName().equals(SquadName.MAIN_ATTACK) && enemyBaseLocation != null && enemyFirstChoke != null) {
 			if (squad.getUnitSet().isEmpty()) {
 				currTargetChoke = null;
-				currTargetChokeExpiredFrame = 1;
+				currTargetChokeExpiredFrame = 0;
 				return null;
 			}
 
 		    Position squadPosition = MicroUtils.centerOfUnits(squad.getUnitSet());
 		    Position enemyFirstChokePosition = enemyFirstChoke.getCenter();
-		    if (currTargetChokeExpiredFrame > 0 && currTargetChokeExpiredFrame < MyBotModule.Broodwar.getFrameCount()) { // 적의 first chokePoint 도착
+		    if (currTargetChokeExpiredFrame != 0
+		    		&& squadPosition.getDistance(enemyFirstChokePosition) < 600
+		    		&& currTargetChokeExpiredFrame < MyBotModule.Broodwar.getFrameCount()) { // 적의 first chokePoint 도착
 		    	return enemyBaseLocation.getPosition(); // TODO 언덕 위로 올라가는 것에 대한 판단. 상대의 주력병력을 소모시키전에 언덕위로 진입하는 것은 위험할 수 있다.
 		    }
 
@@ -532,7 +555,7 @@ public class CombatManager {
 		    // 현재의 chokepoint에 도착했다고 판단되면 next chokepoint를 찾는다.
 		    // next chokepoint는 최단거리 상에 있는 가장 가까운 chokepoint이다.
 		    boolean nextChokeFind = false;
-		    if (currTargetChokeExpiredFrame > 0 && currTargetChokeExpiredFrame < MyBotModule.Broodwar.getFrameCount()) {
+		    if (currTargetChokeExpiredFrame < MyBotModule.Broodwar.getFrameCount()) {
 		    	nextChokeFind = true;
 		    }
 		    
@@ -994,12 +1017,21 @@ private void updateEarlyDefenseSquad() {
 	    Squad mainAttackSquad = squadData.getSquad(SquadName.MAIN_ATTACK);
 
 		for (Unit unit : combatUnits) {
-	        if (!unit.getType().isWorker() && squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
-				squadData.assignUnitToSquad(unit, mainAttackSquad);// 배슬, 드랍십도 포함됨
-	        }
+			if (unit.getType() == UnitType.Terran_Vulture
+					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+					|| unit.getType() == UnitType.Terran_Goliath) {
+				
+			} {
+				if (squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
+					squadData.assignUnitToSquad(unit, mainAttackSquad);// 배슬, 드랍십도 포함됨
+		        }
+			}
+			
 	    }
 
-		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS, "Attack enemy base");
+		int bonusRadius = (int) (Math.log(mainAttackSquad.getUnitSet().size()) * 20);
+		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS + bonusRadius, "Attack enemy base");
 	    mainAttackSquad.setOrder(mainAttackOrder);
 	}
 	
@@ -1029,6 +1061,19 @@ private void updateEarlyDefenseSquad() {
 		}
 
 		return closestDefender;
+	}
+	
+	private void updateMarineSquad() {
+		Squad marineSquad = squadData.getSquad(SquadName.MARINE);
+		
+		for (Unit unit : combatUnits) {
+	        if (unit.getType() == UnitType.Terran_Marine && squadData.canAssignUnitToSquad(unit, marineSquad)) {
+				squadData.assignUnitToSquad(unit, marineSquad);// 레이스만
+	        }
+	    }
+		
+		SquadOrder marineOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(marineSquad), Combat.MARINE_RADIUS, SquadName.MARINE);
+		marineSquad.setOrder(marineOrder);
 	}
 	
 	private void updateWraithSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
