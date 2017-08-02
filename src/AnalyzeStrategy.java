@@ -71,42 +71,8 @@ public class AnalyzeStrategy {
 				//어시밀레이터나 코어전에 2게이트라면 질럿 푸시
 				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
 			}
-			
-			
-
-			
-			/*BaseLocation tempBaseLocation =InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
-        	//Position tempPosition;
-        	
-        	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-	              Region enemyMultiRegion = null; 
-	              
-			if (tempBaseLocation != null) {
-				enemyMultiRegion = tempBaseLocation.getRegion();
-		              List<Unit> MultiRegion = MicroUtils.getUnitsInRegion(enemyMultiRegion, InformationManager.Instance().enemyPlayer);
-
-		              
-     			 for(int doublenex_cnt = 0; doublenex_cnt < MultiRegion.size(); doublenex_cnt ++){
-	     			 if(MultiRegion.get(doublenex_cnt).getType().equals(UnitType.Protoss_Nexus)){
-	     				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
-	     			 }
-     			 }
-			}*/
-		}
-		
-		
-		if(MyBotModule.Broodwar.getFrameCount() < 2000 && InformationManager.Instance().isFirstScoutAlive()){
-			//게이트가 없이 포지더블이나 생더블
-			//FirstExpansionLocation
-			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge, InformationManager.Instance().enemyPlayer) >= 1
-				||MyBotModule.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >1 ){
-				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
-			}
 
 		}
-		
-		
 		
 		if(selectedSE == StrategyManager.StrategysException.protossException_ZealotPush){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) >=3){
@@ -114,10 +80,147 @@ public class AnalyzeStrategy {
 			}
 		}
 		
+		if(MyBotModule.Broodwar.getFrameCount() < 2000){
+			//게이트가 없이 포지더블이나 생더블
+			//FirstExpansionLocation
+			//완성되지 않은 넥서스나 완성된 넥서스가 2개이상이면 더블넥서스
+			if(MyBotModule.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >1 
+				||MyBotModule.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >= 2){
+				selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
+			}
+			
+			//포톤이나 포지를 보았을때
+			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge, InformationManager.Instance().enemyPlayer) >= 1){
+				BaseLocation base = null;
+				//1. 본진에 적 포톤캐논이 있는지 본다.
+				base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+				Region myRegion = base.getRegion();
+				List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+				if (enemyUnitsInRegion.size() >= 1){
+					for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+						 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+							 selectedSE = StrategyManager.StrategysException.protossException_PhotonRush;
+							 break;
+						 }
+					 }
+				}
+				//2. 앞마당 지역은 익셉션이 포톤러쉬가 아닌 상태면 찾아본다.
+				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
+					base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+					myRegion = base.getRegion();
+					enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+					if (enemyUnitsInRegion.size() >= 1){
+						for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+							 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+								 selectedSE = StrategyManager.StrategysException.protossException_PhotonRush;
+								 break;
+							 }
+						 }
+					}
+				}
+				//3. first choke point 도 익셉션이 포톤러쉬가 아니라면 찾아본다.
+				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
+					Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+					//myRegion = choke.getRegions() ;
+					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+					if (enemyUnitsInRegion.size() >= 1){
+						for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+							 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+								 selectedSE = StrategyManager.StrategysException.protossException_PhotonRush;
+								 break;
+							 }
+						 }
+					}
+				}
+				
+				//4. second choke point 도 익셉션이 포톤러쉬가 아니라면 찾아본다.
+				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
+					Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+					//myRegion = choke.getRegions() ;
+					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+					if (enemyUnitsInRegion.size() >= 1){
+						for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+							 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+								 selectedSE = StrategyManager.StrategysException.protossException_PhotonRush;
+								 break;
+							 }
+						 }
+					}
+				}
+				
+				//포톤 or 포지를 보았는데 우리지역이 아니라면 더블넥서스다.
+				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
+					selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
+				}
+				
+			}
+
+		}
+		
 		if(selectedSE == StrategyManager.StrategysException.protossException_DoubleNexus){
 			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY  && StrategyManager.Instance().MyunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_PhotonRush){
+			boolean photon_rush = false;
+			BaseLocation base = null;
+			//1. 본진에 적 포톤캐논수를 센다
+			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+			Region myRegion = base.getRegion();
+			List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+			
+			for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+				 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+					 photon_rush = true;
+					 break;
+				 }
+			 }
+			
+			//2. 앞마당 지역은 현재 포톤러쉬 상태라면
+			if(!photon_rush){
+				base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+				myRegion = base.getRegion();
+				enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+						 photon_rush = true;
+						 break;
+					 }
+				 }
+			}
+			//3. first choke point 도 현재 포톤러쉬 상태라면
+			if(!photon_rush){
+				Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+				//myRegion = choke.getRegions() ;
+				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+						 photon_rush = true;
+						 break;
+					 }
+				 }
+			}
+			
+			//3. second choke point 도 현재 포톤러쉬 상태라면
+			if(!photon_rush){
+				Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+				//myRegion = choke.getRegions() ;
+				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
+					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
+						 photon_rush = true;
+						 break;
+					 }
+				 }
+			}
+			//끝까지 돌려봤을때 캐논이 전부 없다면 아웃
+			if(!photon_rush){
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+			
 		}
 		
 		
@@ -134,6 +237,31 @@ public class AnalyzeStrategy {
 		if(selectedSE == StrategyManager.StrategysException.protossException_Scout){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)){
 				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
+		}
+		
+		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter, InformationManager.Instance().enemyPlayer) >= 1
+			&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) < InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter, InformationManager.Instance().enemyPlayer)*4)
+				//아비터를 봤는데 골리앗이 아비터*4 보다 작거나
+			||(InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter_Tribunal, InformationManager.Instance().enemyPlayer) >= 1
+				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) < 4)){
+			//아비터 트리뷰널을 봤는데 골리앗이 4마리가 안될경우(기본적으로 섞어 다닐것)
+			
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
+			selectedSE = StrategyManager.StrategysException.protossException_Arbiter;
+			RespondToStrategy.instance().enemy_dark_templar = true;
+			
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_Arbiter){
+			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter, InformationManager.Instance().enemyPlayer) >= 1){
+				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer) *4){
+					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				}
+			}else{
+				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath, InformationManager.Instance().selfPlayer) >= 4){
+					StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+				}
 			}
 		}
 		
@@ -219,8 +347,9 @@ public class AnalyzeStrategy {
 		
 		//다크템플러 exception
 		//아카데미로 체크하지 않는다.
-		if((InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
-				&& MyBotModule.Broodwar.getFrameCount() < 7000) || InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar, InformationManager.Instance().enemyPlayer) >= 1
+		if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives, InformationManager.Instance().enemyPlayer) >= 1
+			|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Citadel_of_Adun, InformationManager.Instance().enemyPlayer) >= 1
+			|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar, InformationManager.Instance().enemyPlayer) >= 1
 				){
 
 				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
@@ -417,10 +546,10 @@ public class AnalyzeStrategy {
 	
 	private void AnalyzeVsZerg() {
 		StrategyManager.StrategysException selectedSE = null;
-		StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		int cntHatchery = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hatchery, InformationManager.Instance().enemyPlayer);
 		int cntLair = InformationManager.Instance().getNumUnits(UnitType.Zerg_Lair, InformationManager.Instance().enemyPlayer);
 		int cntHive = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer);
+		
 		
 		int ling_chk = 0;
 		int hydra_chk = 0;
@@ -464,6 +593,8 @@ public class AnalyzeStrategy {
 		//익셉션은 init 기본
 		//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 		
+		/*
+		 //20170802 농봉은 잠깐 막기
 		//start zergException_NongBong
 		int nongbong_cnt = 0;
 		int haveMarine = 0;
@@ -532,6 +663,7 @@ public class AnalyzeStrategy {
 			//Exception 이 init 이 되는순간 농봉 체크 변수 초기화
 			NongbongScv.Instance().NongBong_Chk = 0;
 		}
+		*/
 		
 		/*if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_NongBong){
 			//농봉은 즉각 반응
@@ -544,9 +676,10 @@ public class AnalyzeStrategy {
 		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den, InformationManager.Instance().enemyPlayer) >= 1){
 
 			if(cntLair >= 1){
+				selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
 				//레어가 둘일리는 없지만 어쨌든 둘이라도
 				//레어가 있고
-				if( cntHatchery >= 1 ){
+				/*if( cntHatchery >= 1 ){
 					//다른 해처리도 일반 적인 럴커 준비. 컴셋과 엔지니어링 베이가 있다면 이미 준비 끝.
 					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) < 1
 							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) < 1){
@@ -578,35 +711,75 @@ public class AnalyzeStrategy {
 						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 						SE = StrategyManager.StrategysException.Init;
 					}
-				}
+				}*/
 				
 			}else{
 				//레어가 없는 상태로 히드라덴이라면 히드라 웨이브로 일단 맞춘다.
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic_HydraWave);
 				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				SE = StrategyManager.StrategysException.Init;
+				selectedSE = StrategyManager.StrategysException.Init;
 			}
 
 		}//end hydra exception
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) < 1){
-			//아카데미가 없을때만 클로킹 유닛 체크
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-				//인비저블 유닛이 있다면 일단 클로킹 로직
-				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
-					SE = StrategyManager.StrategysException.zergException_PrepareLurker;
-				}
-				//아카데미가 있다면 init으로
-				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1){
-					//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-					SE = StrategyManager.StrategysException.Init;
-				}
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			//인비저블 유닛이 있다면 일단 럴커 대비 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+				selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
 			}
+		}
+
+		
+		if(selectedSE == StrategyManager.StrategysException.zergException_PrepareLurker){
+			BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+        	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
+        	//Position tempPosition;
+        	
+        	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+	              Region myRegion = null; 
+	              
+	           boolean mainBaseTurret = false;
+	           boolean	firstChokeTurret = false;
+            	
+			if (tempBaseLocation != null) {
+				myRegion = tempBaseLocation.getRegion();
+		              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
+		              
+     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				 //System.out.println("Turret Exists at Main Base Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				mainBaseTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			
+			if (tempChokePoint != null) {
+				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+				
+				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				//System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				firstChokeTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			if(mainBaseTurret && firstChokeTurret){
+				selectedSE = StrategyManager.StrategysException.Init;
+				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			}
+			
 		}
 		
 		//start guardian exception
-		if(
+		//가디언은 그냥 골리앗으로
+		/*if(
 			(InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian, InformationManager.Instance().enemyPlayer) >= 1
 			||InformationManager.Instance().getNumUnits(UnitType.Zerg_Greater_Spire, InformationManager.Instance().enemyPlayer) >= 1)
 			&&
@@ -615,7 +788,7 @@ public class AnalyzeStrategy {
 				
 				){
 			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_Guardian);
-			SE = StrategyManager.StrategysException.zergException_Guardian;
+			selectedSE = StrategyManager.StrategysException.zergException_Guardian;
 
 			//그레이터 스파이어 or 가디언을 발견할 경우
 			//레이스가 round(가디언/3) or 5기를 만족한다면 exit
@@ -626,20 +799,25 @@ public class AnalyzeStrategy {
 				SE = StrategyManager.StrategysException.Init;
 					
 			}
-		}
+		}*/
 		
-		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer) >=1
-			&& InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) < 4){
+		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer) >=1){
 			// 하이브 발견. 하이테크 시에는 베슬 4기 이상 추가
 			// 이걸로 디파일러 까지 배제가능
 			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_HighTech);
-			SE = StrategyManager.StrategysException.zergException_HighTech;
+			selectedSE = StrategyManager.StrategysException.zergException_HighTech;
 			
 			//
-			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) > 3){
-				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				SE = StrategyManager.StrategysException.Init;
-			}
+			
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.zergException_HighTech && InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) > 3){
+			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+			selectedSE = StrategyManager.StrategysException.Init;
+		}
+
+		if(selectedSE != null){
+			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
 		}
 		
 
