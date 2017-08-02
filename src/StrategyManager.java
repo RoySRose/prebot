@@ -88,7 +88,9 @@ public class StrategyManager {
 		,protossException_Shuttle
 		,protossException_ShuttleMix
 		,protossException_ZealotPush
+		,protossException_PhotonRush
 		,protossException_DoubleNexus
+		,protossException_Arbiter
 		,terranException_CheeseRush
 		,terranException_NuClear
 		,terranException_Wraith

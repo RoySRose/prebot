@@ -21,6 +21,10 @@ public class RespondToStrategy {
 	public boolean enemy_guardian = false;
 	
 	public boolean enemy_shuttle = false;
+	public boolean enemy_arbiter = false;
+	public boolean enemy_hive = false;
+	
+	public boolean need_vessel = false;
 	
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
@@ -58,6 +62,14 @@ public class RespondToStrategy {
 	public boolean needOfEngineeringBay() {
 		
 		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_shuttle){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean needOfVessel() {
+		
+		if(enemy_arbiter || enemy_hive){
 			return true;
 		}
 		return false;
@@ -180,8 +192,18 @@ public class RespondToStrategy {
 		//protossException_Dark start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Dark){
 			enemy_dark_templar = true;
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
+				need_vessel = true;
+			}
 		}
 		//protossException_Dark end
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
+			enemy_arbiter = true;
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
+				need_vessel = true;
+			}
+		}
 		
 		//terranException_Wraith start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_Wraith){
@@ -196,12 +218,16 @@ public class RespondToStrategy {
 		}
 		//zergException_PrepareLurker ||  zergException_FastLurker end
 		
-		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_HighTech){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
+				need_vessel = true;
+			}
+		}
 		
 		
 		
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
-		if(enemy_dark_templar || enemy_wraith || enemy_lurker){
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter){
 			//System.out.println("클로킹 유닛 대비================");
 			//이니셜에서 엔지니어링 베이까지는 짓고 갈거이므로.
 			//익셉션 다크는 패스트 다크에 대한 대비이다. 고로 아직 사베에 대한 컨트롤은 없다.
@@ -333,11 +359,15 @@ public class RespondToStrategy {
 					
 				}
 			}
-			
-			/*베슬은 일단 주석처리. 특정조건 정해지면 넣기.
+		}
+		//enemy_dark_templar end
+		
+		
+		if(need_vessel){
+			//베슬은 일단 주석처리. 특정조건 정해지면 넣기.
 			//베슬을 위한 로직
-			if(chk_factory){
-				//일단 팩토리가 있어야하고
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self()) > 4){
+				//일단 팩토리가 있어야하고, 팩토리가 4개 초과
 				//if(){ 이부분은 특정조건이 들어가야 한다.
 				if(!chk_starport){
 					//스타포트가 없다면
@@ -391,9 +421,11 @@ public class RespondToStrategy {
 						}
 					}
 				}
-			}*/
+			}
 		}
-		//enemy_dark_templar end
+		
+		
+		
 		
 		/*
 		 * 일단 가디언은 보류
@@ -494,6 +526,27 @@ public class RespondToStrategy {
 		}
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Scout){
+			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
+			if(!chk_armory){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
+					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
+							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Armory,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					}
+				}
+			}else{
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
+					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
+							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					}
+				}
+			}
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
 			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
 			if(!chk_armory){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
