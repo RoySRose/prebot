@@ -34,15 +34,6 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			return;
 		}
 
-		if (saveUnit) {
-			for (Unit notVultureUnit : notVultureUnitList) {
-				if (vulture.getDistance(notVultureUnit) < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
-					saveUnit = false;
-					break;
-				}
-			}
-		}
-		
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, saveUnit); // 0: flee, 1: kiting, 2: attack
 
 		KitingOption kOpt = KitingOption.vultureKitingOption();
@@ -102,7 +93,11 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			
 			// 이동지역까지 attackMove로 간다.
 			if (vulture.getDistance(movePosition) > order.getRadius()) {
-				CommandUtil.attackMove(vulture, movePosition);
+//				if (saveUnit) {
+					CommandUtil.move(vulture, movePosition);
+//				} else {
+//					CommandUtil.attackMove(vulture, movePosition);
+//				}
 				
 			} else { // 목적지 도착
 				if (vulture.isIdle() || vulture.isBraking()) {

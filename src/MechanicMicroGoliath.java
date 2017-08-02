@@ -33,13 +33,13 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				retreatPosition = myBase.getPosition();
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+			MicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
 			Position kitingGoalPosition = order.getPosition();
 			kOpt.setGoalPosition(kitingGoalPosition);
-			MicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
+			MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
 			break;
 			
 		case 2: // attack move
