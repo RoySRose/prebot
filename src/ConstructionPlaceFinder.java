@@ -184,7 +184,6 @@ public class ConstructionPlaceFinder {
 			case NextSupplePoint:
 				tempTilePosition = InformationManager.Instance().getNextSuppleLocation();
 				if (tempTilePosition != null) {
-					System.out.println("I choose here: " + tempTilePosition.toString());
 					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
 				}else{
 					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());

@@ -488,7 +488,7 @@ public class BuildManager {
 
 			switch (seedPositionStrategy) {
 			case MainBaseLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseBackYard;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;//TODO 다음 검색 위치
 				break;
 			case MainBaseBackYard:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
@@ -497,9 +497,15 @@ public class BuildManager {
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
 				break;
 			case FirstExpansionLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
 				break;
 			case SecondChokePoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
+				break;
+			case NextExpansionPoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
+				break;
+				
 			case SeedPositionSpecified:
 			default:
 				findAnotherPlace = false;

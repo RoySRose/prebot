@@ -135,6 +135,17 @@ public class GameCommander {
 		if(unit.getType() == UnitType.Terran_Factory){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
 		}
+		
+		if(unit.getType() == UnitType.Terran_Barracks){
+			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+				{
+					unit.setRallyPoint(myUnit);
+				}
+			}
+		}
+		
 	}
 
 	/// 유닛(건물/지상유닛/공중유닛)이 Discover 될 때 발생하는 이벤트를 처리합니다<br>

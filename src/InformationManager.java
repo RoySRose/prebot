@@ -38,8 +38,8 @@ public class InformationManager {
 
 	private boolean ReceivingEveryMultiInfo;
 
-	private boolean EarlyDefenseNeeded;
-	private boolean ScoutDefenseNeeded;
+	//private boolean EarlyDefenseNeeded;
+	//private boolean ScoutDefenseNeeded;
 	
 	private boolean FirstScoutAlive;
 	private boolean ScoutStart;
@@ -99,8 +99,8 @@ public class InformationManager {
 		enemyRace = enemyPlayer.getRace();
 		
 		ReceivingEveryMultiInfo = false;
-		EarlyDefenseNeeded = true;
-		ScoutDefenseNeeded = true;
+//		EarlyDefenseNeeded = true;
+//		ScoutDefenseNeeded = true;
 		FirstScoutAlive = false;
 		ScoutStart = false;
 		myfirstGas = null;
@@ -189,25 +189,28 @@ public class InformationManager {
 	}
 
 	private void updateCurrentStatusInfo() {
-		if(EarlyDefenseNeeded){
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if(unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-					EarlyDefenseNeeded = false;
-				}
-			}
-		}
-		if(ScoutDefenseNeeded){
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if(unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture){
-					ScoutDefenseNeeded = false;
-				}
-			}
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-				if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
-					ScoutDefenseNeeded = false;
-				}
-			}
-		}
+//		if(EarlyDefenseNeeded){
+//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//				if((unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
+//					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 4){
+//						EarlyDefenseNeeded = false;
+//					}
+//				}
+//			}
+//		}
+//		private boolean ScoutDefenseNeeded;
+//		if(ScoutDefenseNeeded){
+//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//				if((unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
+//					ScoutDefenseNeeded = false;
+//				}
+//			}
+//			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+//				if(unit.getType().isBuilding() ==false && unit.getType().isWorker() == false){
+//					ScoutDefenseNeeded = false;
+//				}
+//			}
+//		}
 		if(ScoutStart == false && WorkerManager.Instance().getScoutWorker() != null){
 			ScoutStart = true;
 			FirstScoutAlive = true;
@@ -747,6 +750,21 @@ public class InformationManager {
 					}
 				}
 			}
+			
+		}
+		if(res ==null){
+			if (mainBaseLocations.get(selfPlayer) != null && firstExpansionLocation.get(selfPlayer) != null) {
+				for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+				{
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+					//if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+					if (targetBaseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition())) continue;
+					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+					
+					res = targetBaseLocation;
+				}
+			}
+			
 		}
 		return res;
 	}
@@ -765,7 +783,7 @@ public class InformationManager {
 				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
 				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
 				if(targetBaseLocation.isStartLocation() == true){
-					res = targetBaseLocation.getTilePosition();
+					res = targetBaseLocation.getRegion().getCenter().toTilePosition();
 				}
 			}
 		}
@@ -1109,12 +1127,15 @@ public class InformationManager {
 	public boolean isReceivingEveryMultiInfo() {
 		return ReceivingEveryMultiInfo;
 	}
-	public boolean isEarlyDefenseNeeded() {
-		return EarlyDefenseNeeded;
-	}
-	public boolean isScoutDefenseNeeded() {
-		return ScoutDefenseNeeded;
-	}
+//	public boolean isEarlyDefenseNeeded() {
+//		return EarlyDefenseNeeded;
+//	}
+//	public boolean isScoutDefenseNeeded() {
+//		return ScoutDefenseNeeded;
+//	}
+//	public void setScoutDefenseNeeded(boolean b) {
+//		ScoutDefenseNeeded = b;
+//	}
 	public boolean isFirstScoutAlive() {
 		return FirstScoutAlive;
 	}
@@ -1406,4 +1427,6 @@ public class InformationManager {
 	public MapSpecificInformation getMapSpecificInformation() {
 		return mapSpecificInformation;
 	}
+
+	
 }

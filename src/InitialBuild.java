@@ -92,23 +92,62 @@ public class InitialBuild {
 			
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
 			
+			//8배럭
+			
+//			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
+//				
+//				//헌터 아닌맵
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Marine);
+//				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_Marine);
+//				queueBuild(true, UnitType.Terran_Refinery);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_Marine);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				/*queueBuild(true, UnitType.Terran_Marine);*/
+//				queueBuild(true, UnitType.Terran_Factory);//15 찍어놓고 팩토리
+//				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				
+//				//queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+//				
+//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Machine_Shop);
+//				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				//queueBuild(true, UnitType.Terran_Factory);
+//				/*queueBuild(true, UnitType.Terran_Armory);*/
+//				//queueBuild(TechType.Spider_Mines);//마인업부터
+//				/*queueBuild(true, UpgradeType.Charon_Boosters);*/
+//				
+//			}
+			//10배럭
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 			
 				//헌터 아닌맵
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
+				//queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Supply_Depot);//14 scv 찍고 서플
 				queueBuild(false, UnitType.Terran_SCV);//현재 14scv - 1정찰 / 10 미네랄 / 3가스
 				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Marine);
 				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
-				queueBuild(false, UnitType.Terran_Marine);
-				queueBuild(false, UnitType.Terran_Marine);
+				//queueBuild(false, UnitType.Terran_Marine);
+				queueBuild(true, UnitType.Terran_Supply_Depot);//14 scv 찍고 서플
+				
+				//queueBuild(false, UnitType.Terran_Marine);
 				queueBuild(true, UnitType.Terran_Factory);//15 찍어놓고 팩토리
 				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				
@@ -124,7 +163,8 @@ public class InitialBuild {
 				//queueBuild(TechType.Spider_Mines);//마인업부터
 				/*queueBuild(true, UpgradeType.Charon_Boosters);*/
 				
-			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+			}
+			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터저그전
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플
