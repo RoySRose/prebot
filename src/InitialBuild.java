@@ -127,7 +127,7 @@ public class InitialBuild {
 //				/*queueBuild(true, UpgradeType.Charon_Boosters);*/
 //				
 //			}
-			//10배럭
+			//10배럭 변경완료
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 			
 				//헌터 아닌맵
@@ -152,7 +152,7 @@ public class InitialBuild {
 				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				
 				//queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+				queueBuild(false, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
 				
 				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -166,39 +166,72 @@ public class InitialBuild {
 			}
 			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				//헌터저그전
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Barracks);//11 scv 찍고 배럭
+//				queueBuild(true, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				/*queueBuild(false, UnitType.Terran_SCV);*/
+//				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
+//				queueBuild(true, UnitType.Terran_Marine);
+//				/*queueBuild(false, UnitType.Terran_SCV);*/
+//				queueBuild(true, UnitType.Terran_Factory);//16인구 찍고 서플, 팩토리
+//				queueBuild(true, UnitType.Terran_Supply_Depot);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Factory);//17, 18scv 찍고 2팩토리
+//				queueBuild(true, UnitType.Terran_Vulture);//벌쳐
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//21인구수 서플
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Machine_Shop);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Armory);
+//				queueBuild(true, UnitType.Terran_Factory);
+//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(UpgradeType.Charon_Boosters);//골리앗 사업
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Factory);
+				
+				
+				//헌터 아닌맵
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Barracks);//11 scv 찍고 배럭
-				queueBuild(true, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
+				//queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
+				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				/*queueBuild(false, UnitType.Terran_SCV);*/
-				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
+				queueBuild(false, UnitType.Terran_SCV);//현재 14scv - 1정찰 / 10 미네랄 / 3가스
+				/*queueBuild(true, UnitType.Terran_Marine);*/
 				queueBuild(true, UnitType.Terran_Marine);
-				/*queueBuild(false, UnitType.Terran_SCV);*/
-				queueBuild(true, UnitType.Terran_Factory);//16인구 찍고 서플, 팩토리
-				queueBuild(true, UnitType.Terran_Supply_Depot);
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Factory);//17, 18scv 찍고 2팩토리
-				queueBuild(true, UnitType.Terran_Vulture);//벌쳐
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Supply_Depot);//21인구수 서플
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Machine_Shop);
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Armory);
-				queueBuild(true, UnitType.Terran_Factory);
-				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(UpgradeType.Charon_Boosters);//골리앗 사업
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Supply_Depot);
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Factory);
+				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
+				//queueBuild(false, UnitType.Terran_Marine);
+				queueBuild(true, UnitType.Terran_Supply_Depot);//14 scv 찍고 서플
 				
+				//queueBuild(false, UnitType.Terran_Marine);
+				queueBuild(true, UnitType.Terran_Factory);//15 찍어놓고 팩토리
+				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				
+				//queueBuild(false, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+				
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Machine_Shop);
+				//queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				//queueBuild(true, UnitType.Terran_Factory);
+				/*queueBuild(true, UnitType.Terran_Armory);*/
+				//queueBuild(TechType.Spider_Mines);//마인업부터
+				/*queueBuild(true, UpgradeType.Charon_Boosters);*/
 				/*queueBuild(true, UpgradeType.Charon_Boosters);*/
 				
 			}
@@ -299,39 +332,59 @@ public class InitialBuild {
 //			}
 			
 			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
-				//헌터플토전
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Supply_Depot);//9scv 찍어놓고 서플
-				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
-						BWTA.getRegion(EntranceBlocking.Instance().suppleX,EntranceBlocking.Instance().suppleY).getPoint().toTilePosition(),true);*/
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);//10 scv
-				queueBuild(true, UnitType.Terran_Barracks);//11 scv 찍고 배럭
-				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-						BWTA.getRegion(EntranceBlocking.Instance().barrackX,EntranceBlocking.Instance().barrackY).getPoint().toTilePosition(),true);*/
-				queueBuild(true, UnitType.Terran_SCV);//10 scv
-				queueBuild(true, UnitType.Terran_Refinery);//배럭 찍고 가스
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);//14scv
-				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
-				queueBuild(true, UnitType.Terran_Marine);
-				queueBuild(false, UnitType.Terran_SCV);//SCV
-				queueBuild(true, UnitType.Terran_Factory);//팩
-				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
-				queueBuild(false, UnitType.Terran_SCV);//scv
-				queueBuild(true, UnitType.Terran_Factory);//팩
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
-				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
-				queueBuild(true, UnitType.Terran_Machine_Shop);//머신샵
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
-				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크
-				queueBuild(TechType.Tank_Siege_Mode);//시즈업
-				queueBuild(false, UnitType.Terran_SCV);//scv
-				queueBuild(true, UnitType.Terran_Machine_Shop);//머신샵 추가
-				queueBuild(false, UnitType.Terran_SCV);//scv
-				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크추가
-				queueBuild(TechType.Spider_Mines);//마인업
-				queueBuild(false, UnitType.Terran_SCV);//scv
-				queueBuild(UpgradeType.Ion_Thrusters);//벌쳐 속업
-				
+//				//헌터플토전
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Supply_Depot);//9scv 찍어놓고 서플
+//				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
+//						BWTA.getRegion(EntranceBlocking.Instance().suppleX,EntranceBlocking.Instance().suppleY).getPoint().toTilePosition(),true);*/
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);//10 scv
+//				queueBuild(true, UnitType.Terran_Barracks);//11 scv 찍고 배럭
+//				/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
+//						BWTA.getRegion(EntranceBlocking.Instance().barrackX,EntranceBlocking.Instance().barrackY).getPoint().toTilePosition(),true);*/
+//				queueBuild(true, UnitType.Terran_SCV);//10 scv
+//				queueBuild(true, UnitType.Terran_Refinery);//배럭 찍고 가스
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);//14scv
+//				queueBuild(true, UnitType.Terran_Bunker);//14 scv 찍고 벙커, 마린
+//				queueBuild(true, UnitType.Terran_Marine);
+//				queueBuild(false, UnitType.Terran_SCV);//SCV
+//				queueBuild(true, UnitType.Terran_Factory);//팩
+//				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
+//				queueBuild(false, UnitType.Terran_SCV);//scv
+//				queueBuild(true, UnitType.Terran_Factory);//팩
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
+//				//queueBuild(true, UnitType.Terran_Supply_Depot);//서플
+//				queueBuild(true, UnitType.Terran_Machine_Shop);//머신샵
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);//scv
+//				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크
+//				queueBuild(TechType.Tank_Siege_Mode);//시즈업
+//				queueBuild(false, UnitType.Terran_SCV);//scv
+//				queueBuild(true, UnitType.Terran_Machine_Shop);//머신샵 추가
+//				queueBuild(false, UnitType.Terran_SCV);//scv
+//				queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크추가
+//				queueBuild(TechType.Spider_Mines);//마인업
+//				queueBuild(false, UnitType.Terran_SCV);//scv
+//				queueBuild(UpgradeType.Ion_Thrusters);//벌쳐 속업
+				if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
+					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
+					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Barracks);//10 scv 찍고 배럭
+					queueBuild(true, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
+					queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+					queueBuild(false, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Marine);
+					queueBuild(true, UnitType.Terran_Factory);//16 찍어놓고 팩토리
+					queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+					//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+					queueBuild(false, UnitType.Terran_SCV);
+					//queueBuild(true, UnitType.Terran_Vulture);//19 찍어놓고 1벌쳐
+					queueBuild(false, UnitType.Terran_SCV);
+					queueBuild(true, UnitType.Terran_Machine_Shop);
+					queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크추가
+					
+				}
 			}
 
 		}else{ 

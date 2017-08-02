@@ -373,7 +373,7 @@ public class StrategyManager {
 
 		//TODO 이거 만약 highest 가 blocking 안하는 애 인데 두번째 애가 블로킹일때는.. scv가 넘겨서 못 만들거 같은데............................. 오히려 안 바꾸는게 초반에 큰 문제를 안 일으킬수도 있고....
 		if (MyBotModule.Broodwar.self().minerals() >= 50) {
-			int maxworkerCount = tot_mineral_self * 2;
+			int maxworkerCount = tot_mineral_self * 2 + 8 * MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 			int workerCount = MyBotModule.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType()); // workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if (unit.getType().isResourceDepot()) {
@@ -383,6 +383,7 @@ public class StrategyManager {
 				}
 			}
 			
+			System.out.println("maxworkerCount: " + maxworkerCount);
 			if (workerCount < 70 && workerCount < maxworkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
@@ -396,11 +397,13 @@ public class StrategyManager {
 								if(checkItem.blocking == true){
 									break;
 								}
+								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_SCV){
+									return;
+								}
 								if(tempbuildQueue.canSkipCurrentItem() == true){
 									tempbuildQueue.skipCurrentItem();
 								}else{
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-									return;
+									break;
 								}
 								checkItem = tempbuildQueue.getItem();
 							}
@@ -408,7 +411,7 @@ public class StrategyManager {
 								return;
 							}
 						}
-
+						System.out.println("checkItem: " + checkItem.metaType.getName());
 						if (checkItem == null){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 						}else if(checkItem.metaType.isUnit()){
@@ -422,8 +425,7 @@ public class StrategyManager {
 									if(checkgas < 0){
 										checkgas = 0;
 									}
-									if(checkItem.blocking == true 
-											&& (MyBotModule.Broodwar.self().minerals() > checkItem.metaType.getUnitType().mineralPrice()+50 - checkgas)) {
+									if(MyBotModule.Broodwar.self().minerals() > checkItem.metaType.getUnitType().mineralPrice()+50 - checkgas) {
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 									}
 								}
@@ -446,6 +448,9 @@ public class StrategyManager {
 			while(true){
 				if(checkItem.blocking == true){
 					break;
+				}
+				if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot){
+					return;
 				}
 				if(tempbuildQueue.canSkipCurrentItem() == true){
 					tempbuildQueue.skipCurrentItem();
