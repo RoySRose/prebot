@@ -19,20 +19,6 @@ public class MicroMarine extends MicroManager {
 			return;
 		}
 	    	
-//		List<Unit> targets = new ArrayList<>();
-//		for (Unit target : targets) {
-//			if (target.isVisible() && target.isDetected() &&
-//					target.getType() != UnitType.Zerg_Larva &&
-//					target.getType() != UnitType.Zerg_Egg &&
-//					!target.isStasised()) {
-//				targets.add(target);
-//			}
-//		}
-		
-//		if(targets.size() == 0){
-//			return;
-//		}
-	    	
 		boolean DontGoFar = true;
 		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
@@ -47,20 +33,18 @@ public class MicroMarine extends MicroManager {
 			}
 		}
 		
-		
 		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
-		kitingOption.setUnitedKiting(true); //TODO 같이 가 좋으까?
+		kitingOption.setUnitedKiting(false); //TODO 같이 가 좋으까?
 		kitingOption.setGoalPosition(order.getPosition());
 		kitingOption.setFleeAngle(MicroSet.FleeAngle.NARROW_ANGLE);
 
 		boolean kiteWithmarines = true;
 		
-	
 		//벙커가 없는 경우 행동 
 		if(bunker == null){
-			Unit mineral = getClosestMineral(CC);			
-			kitingOption.setGoalPosition(mineral.getPosition());
+			Position mineralpos = CombatManager.Instance().getBestPosition(CC);		
+			kitingOption.setGoalPosition(mineralpos);
 			//kitingOption.setSaveUnit(false);
 			kitingOption.setCooltimeAlwaysAttack(true);
 			
@@ -72,17 +56,14 @@ public class MicroMarine extends MicroManager {
 					if(marine.getDistance(target) < 50){
 						DontGoFar= false;
 					}
-					
 					if(DontGoFar){
-						if(marine.getDistance(mineral) > 80){
-							marine.move(mineral.getPosition());
+						if(marine.getDistance(mineralpos) > 80){
+							CommandUtil.move(marine,mineralpos);
 						}
 					}else{
-						if (target != null) {
-							if (kiteWithmarines) {
-								MicroUtils.preciseKiting(marine, target, kitingOption);
-							} 
-						}
+						if (kiteWithmarines) {
+							MicroUtils.preciseKiting(marine, target, kitingOption);
+						} 
 					}
 				}else{
 					// if we're not near the order position, go there
@@ -91,7 +72,8 @@ public class MicroMarine extends MicroManager {
 					}
 				}
 			}
-		}else{//벙커가 있으면
+		}
+		else{//벙커가 있으면
 			kitingOption.setGoalPosition(bunker.getPosition());
 			for (Unit marine : marines) {
 				Unit target = getTarget(marine, targets);
@@ -167,25 +149,46 @@ public class MicroMarine extends MicroManager {
 			}
 		}
 	}
+//	public Unit getClosestMineral(Unit depot)
+//	{
+//		double bestDist = 99999;
+//		Unit bestMineral = null;
+//		
+//		for (Unit mineral : MyBotModule.Broodwar.getAllUnits()){
+//			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(depot) < 320){
+//				double dist = mineral.getDistance(depot);
+//				if (dist < bestDist){
+//                    bestMineral = mineral;
+//                    bestDist = dist;
+//                }
+//			}
+//		}
+//	    return bestMineral;
+//	}
 	
-	
-	public Unit getClosestMineral(Unit depot)
-	{
-		double bestDist = 99999;
-		Unit bestMineral = null;
-		
-		for (Unit mineral : MyBotModule.Broodwar.getAllUnits()){
-			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(depot) < 320){
-				double dist = mineral.getDistance(depot);
-				if (dist < bestDist){
-                    bestMineral = mineral;
-                    bestDist = dist;
-                }
-			}
-		}
-	    return bestMineral;
-	}
-	
+//	public Position getBestPosition(Unit depot)
+//	{
+//		int x =0;
+//		int y =0;
+//		int finalx =0;
+//		int finaly =0;
+//		int minCnt = 0;
+//		for (Unit mineral : MyBotModule.Broodwar.getAllUnits()){
+//			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(depot) < 320){
+//				x += mineral.getPosition().getX();
+//				y += mineral.getPosition().getY();
+//				minCnt++;
+//			}
+//		}
+//		finalx = x/minCnt;
+//		finaly = y/minCnt;
+//		finalx = (finalx + depot.getPosition().getX())/2;
+//		finaly = (finaly + depot.getPosition().getY())/2;
+//		
+//		Position res = new Position(finalx, finaly);
+//	    return res;
+//	}
+//	
 	private Unit getTarget(Unit marine, List<Unit> targets) {
 		int bestScore = -999999;
 		Unit bestTarget = null;
