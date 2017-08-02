@@ -9,6 +9,7 @@ import bwapi.Color;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
@@ -139,6 +140,9 @@ public class ScoutManager{
 
 				if (firstBuilding != null)
 				{
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 14){
+						return;
+					}
 					// grab the closest worker to the first building to send to scout
 					//Unit unit = WorkerManager.Instance().getClosestMineralWorkerTo(firstBuilding.getPosition());
 					/*	se-min.park 추가

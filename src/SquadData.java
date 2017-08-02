@@ -65,6 +65,14 @@ public class SquadData {
 	    Squad unitSqaud = getUnitSquad(unit);
 	    return unitSqaud == null || unitSqaud.getPriority() < squad.getPriority();
 	}
+	public void assignWorkerToSquad(Unit unit, Squad squad) {
+		Squad previousSquad = getUnitSquad(unit);
+		if (previousSquad != null) {
+			previousSquad.removeUnit(unit);
+		}
+		squad.addUnit(unit);
+		
+	}
 	
 	public void assignUnitToSquad(Unit unit, Squad squad) {
 		if (!canAssignUnitToSquad(unit, squad)) {

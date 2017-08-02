@@ -683,6 +683,7 @@ public class MicroUtils {
 		Unit leader = null;
 		int minimumDistance = 999999;
 		for (Unit unit : units) {
+			if(unit == null){break;}
 			int dist = unit.getDistance(goalPosition);
 			if (dist < minimumDistance) {
 				leader = unit;

@@ -201,16 +201,16 @@ public class StrategyManager {
 		}
 
 		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500) {
 			executeSupplyManagement();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 43 == 0) {
 			executeExpansion();
+			executeResearch();
 		}
 		if(isInitialBuildOrderFinished == true){
 			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
 				executeUpgrade();
-				executeResearch();
 			}
 		}
 		if (isInitialBuildOrderFinished == true) {
@@ -227,7 +227,7 @@ public class StrategyManager {
 			executeAddFactory();
 		}
 		
-		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0){
+		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500){
 			executeWorkerTraining();
 			executeCombatUnitTrainingBlocked();
 
@@ -356,7 +356,7 @@ public class StrategyManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
-			if (unit.getType().isResourceDepot()){
+			if (unit.getType() == UnitType.Terran_Command_Center){
 				int minerals = WorkerManager.Instance().getWorkerData().getMineralsNearDepot(unit);
 				if(minerals > 0){
 					if(unit.isCompleted() == false){
@@ -385,28 +385,49 @@ public class StrategyManager {
 				}
 			}
 			
+			System.out.println("maxworkerCount: " + maxworkerCount);
 			if (workerCount < 70 && workerCount < maxworkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
-						BuildOrderItem currentItem = null;
-						if(BuildManager.Instance().buildQueue.isEmpty() == false){
-							currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
-						}
-						if (currentItem == null){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
-						}else if(currentItem.metaType.isUnit()){
-							if(currentItem.metaType.getUnitType() == UnitType.Terran_Comsat_Station){
+						
+						BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+						BuildOrderItem checkItem = null; 
+
+						if (!tempbuildQueue.isEmpty()) {
+							checkItem= tempbuildQueue.getHighestPriorityItem();
+							while(true){
+								if(checkItem.blocking == true){
+									break;
+								}
+								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_SCV){
+									return;
+								}
+								if(tempbuildQueue.canSkipCurrentItem() == true){
+									tempbuildQueue.skipCurrentItem();
+								}else{
+									break;
+								}
+								checkItem = tempbuildQueue.getItem();
+							}
+							if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_SCV){
 								return;
-							}else if(currentItem.metaType.getUnitType() != UnitType.Terran_SCV){
+							}
+						}
+						System.out.println("checkItem: " + checkItem.metaType.getName());
+						if (checkItem == null){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+						}else if(checkItem.metaType.isUnit()){
+							if(checkItem.metaType.getUnitType() == UnitType.Terran_Comsat_Station){
+								return;
+							}else if(checkItem.metaType.getUnitType() != UnitType.Terran_SCV){
 								if(workerCount < 4){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 								}else{
-									int checkgas = currentItem.metaType.getUnitType().gasPrice() - MyBotModule.Broodwar.self().gas();
+									int checkgas = checkItem.metaType.getUnitType().gasPrice() - MyBotModule.Broodwar.self().gas();
 									if(checkgas < 0){
 										checkgas = 0;
 									}
-									if(currentItem.blocking == true 
-											&& (MyBotModule.Broodwar.self().minerals() > currentItem.metaType.getUnitType().mineralPrice()+50 - checkgas)) {
+									if(MyBotModule.Broodwar.self().minerals() > checkItem.metaType.getUnitType().mineralPrice()+50 - checkgas) {
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 									}
 								}
@@ -429,6 +450,9 @@ public class StrategyManager {
 			while(true){
 				if(checkItem.blocking == true){
 					break;
+				}
+				if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot){
+					return;
 				}
 				if(tempbuildQueue.canSkipCurrentItem() == true){
 					tempbuildQueue.skipCurrentItem();
@@ -1226,6 +1250,8 @@ public class StrategyManager {
 				if(selfExspansioning() > 0){
 					if(enemyExspansioning() == false){
 						expansionPoint -= 15;
+					}else{ 
+						expansionPoint += 30;
 					}
 				}else if(selfExspansioning() == 0){
 					if(enemyExspansioning() == true){
@@ -1292,7 +1318,7 @@ public class StrategyManager {
 		//내 팩토리 유닛 인구수 만큼 추가
 		totPoint = 	myunitPoint + expansionPoint + unitPoint;
 		
-		if(totPoint > 120){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
+		if(totPoint > 120 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 			CombatStartCase = 2;
@@ -1340,7 +1366,7 @@ public class StrategyManager {
 					}
 				}
 				//Fac Unit 30 마리 이상, 일정 이상의 자원 2단계
-				else if(getFacUnits() > 120 && MyBotModule.Broodwar.self().minerals()> 500 && MyBotModule.Broodwar.self().gas()> 300 ){
+				else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 2 && getFacUnits() > 120 && MyBotModule.Broodwar.self().minerals()> 250 && MyBotModule.Broodwar.self().gas()> 225 ){
 					
 					if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){
 						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
@@ -1409,17 +1435,20 @@ public class StrategyManager {
 		if(TS){	currentResearched++;}
 		if(GR){	currentResearched++;}
 		
-		if(getFacUnits() < 32 && currentResearched!=0 && !(MyBotModule.Broodwar.self().minerals()> 200 && MyBotModule.Broodwar.self().gas()> 200)) return;
+		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) < 2 
+				&& currentResearched >= 2 
+				&& getFacUnits() < 32 
+				&& !(MyBotModule.Broodwar.self().minerals()> 200 && MyBotModule.Broodwar.self().gas()> 150)) return;
 		
 		MetaType vultureSpeed = new MetaType(UpgradeType.Ion_Thrusters);
 		MetaType vultureMine = new MetaType(TechType.Spider_Mines);
 		MetaType TankSiegeMode = new MetaType(TechType.Tank_Siege_Mode);
 		MetaType GoliathRange = new MetaType(UpgradeType.Charon_Boosters);
 		
-		MetaType vsZerg[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
-		boolean vsZergbool[] = new boolean[]{VM, VS, TS, GR};
-		MetaType vsZergMutal[] = new MetaType[]{vultureMine, vultureSpeed, GoliathRange, TankSiegeMode};
-		boolean vsZergMutalbool[] = new boolean[]{VM, VS, GR, TS};
+		MetaType vsZerg[] = new MetaType[]{vultureMine, GoliathRange, TankSiegeMode, vultureSpeed};
+		boolean vsZergbool[] = new boolean[]{VM, GR, TS, VS};
+		MetaType vsZergHydra[] = new MetaType[]{vultureMine, TankSiegeMode, GoliathRange, vultureSpeed};
+		boolean vsZergHydrabool[] = new boolean[]{VM, TS, GR, VS};
 		MetaType vsTerran[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
 		boolean vsTerranbool[] = new boolean[]{VM, VS, TS, GR};
 		MetaType vsTerranBio[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
@@ -1490,11 +1519,12 @@ public class StrategyManager {
 				}
 			}
 		}else {
-			if(CurrentStrategyBasic == Strategys.zergBasic_LingMutal
-					|| CurrentStrategyBasic == Strategys.zergBasic_Mutal
+			air= true;//저그는 하늘 그냥 준비한다.
+			if(CurrentStrategyBasic == Strategys.zergBasic_HydraWave
+					|| CurrentStrategyBasic == Strategys.zergBasic_LingHydra
 					){
-				Current = vsZergMutal;
-				Currentbool = vsZergMutalbool;
+				Current = vsZergHydra;
+				Currentbool = vsZergHydrabool;
 			}else{
 				Current = vsZerg;
 				Currentbool = vsZergbool;
@@ -1594,6 +1624,7 @@ public class StrategyManager {
 		}
 		
 		int RealCCcnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int RealcompletedCCcnt = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 		
 		//앞마당 전
 		if(CCcnt == 1 && RealCCcnt < 2){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
@@ -1622,22 +1653,22 @@ public class StrategyManager {
 		if(CCcnt >= 2){
 			
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
-			if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 80){
+			if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 120){
 				MyBotModule.Broodwar.printf("Build Next Expansion");
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
-			//공격시 돈 400 넘으면 멀티하기
-			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && MyBotModule.Broodwar.self().minerals() > 400){
+			//공격시 돈 250 넘으면 멀티하기
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && MyBotModule.Broodwar.self().minerals() > 250){
 				MyBotModule.Broodwar.printf("Build Next Expansion");
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
-			//공격시 돈 800 넘으면 멀티하기
+			//800 넘으면 멀티하기
 			if(MyBotModule.Broodwar.self().minerals() > 800){
 				MyBotModule.Broodwar.printf("Build Next Expansion");
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
@@ -1654,7 +1685,14 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
-			
+			//200 넘고 유리하면
+			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 50 && Attackpoint > 80){
+				MyBotModule.Broodwar.printf("Build Next Expansion");
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+				}
+			}
 		}
 	}
 

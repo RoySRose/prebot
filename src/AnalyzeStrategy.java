@@ -606,7 +606,7 @@ public class AnalyzeStrategy {
 		Region myRegion = base.getRegion();
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if (enemyUnitsInRegion.size() >= 4){
-			System.out.println("적 유닛 4이상 난입");
+			//System.out.println("적 유닛 4이상 난입");
 			
 			//내 본진에 적유닛이 4마리 이상이고(드론 저글링 오버로드 일수 있음)
 			//haveBunker = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Bunker);
@@ -630,7 +630,7 @@ public class AnalyzeStrategy {
 			}
 			//벙커가 없는 경우.
 			if(haveBunker == 0){
-				System.out.println("벙커없다.");
+				//System.out.println("벙커없다.");
 				 for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
 							 && enemyUnitsInRegion.get(enemy).getDistance(theCommand) < 200){ 
