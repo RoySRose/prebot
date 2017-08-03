@@ -4,35 +4,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 
+enum Result {
+	Loss, Win, BigWin
+}
+
 public class CombatExpectation {
-
-	private static final int VULTURE_POWER = 30;
-	private static final int BONUS_ION_THRUSTERS = 30;
 	
-	private static final int BONUS_ANABOLIC_SYNTHESIS = 5;
-	private static final int BONUS_MUSCULAR_AUGMENTS = 25;
-	private static final int BONUS_GROOVED_SPINES = 25;
-	private static final int BONUS_LURKER_BURROWED = 300;
-	
-	private static final int BONUS_LEG_ENHANCEMENTS = 10;
-	private static final int BONUS_SINGULARITY_CHARGE = 30;
-
-	public static boolean expect(List<Unit> vultures, List<Unit> targets) {
+	public static Result expect(List<Unit> vultures, List<Unit> targets, boolean skipBuilding) {
 		int vulturePower = getVulturePower(vultures);
-		int enemyPower = enemyPower(targets);
-		boolean winExpected = vulturePower >= enemyPower;
+		int enemyPower = enemyPower(targets, skipBuilding);
+		Result winExpected = Result.Loss; // lose
+		if (vulturePower > enemyPower) {
+			if (vulturePower > enemyPower * 2) {
+				winExpected = Result.BigWin;
+			}
+			winExpected = Result.Win;
+		}
 		return winExpected;
 	}
 	
 	
-	public static boolean expectByUnitInfo(List<Unit> vultures, List<UnitInfo> targets) {
+	public static Result expectByUnitInfo(List<Unit> vultures, List<UnitInfo> targets, boolean skipBuilding) {
 		int vulturePower = getVulturePower(vultures);
-		int enemyPower = enemyPowerByUnitInfo(targets);
-		boolean winExpected = vulturePower >= enemyPower;
+		int enemyPower = enemyPowerByUnitInfo(targets, skipBuilding);
+		Result winExpected = Result.Loss; // lose
+		if (vulturePower > enemyPower) {
+			if (vulturePower > enemyPower * 2) {
+				winExpected = Result.BigWin;
+			}
+			winExpected = Result.Win;
+		}
 		return winExpected;
 	}
 
@@ -53,10 +59,13 @@ public class CombatExpectation {
 	// 히드라 한기 최대 점수 : 150점(업그레이드시 200점)
 	// 질럿 한기 최대 점수 : 20점(업그레이드시 30점)
 	// 드라군 한기 최대 점수 : 300점(업그레이드시 330점)
-	public static int enemyPower(List<Unit> targets) {
+	public static int enemyPower(List<Unit> targets, boolean skipBuilding) {
 		int enemyPower = 0;
 		for (Unit target : targets) {
 			if (!target.isCompleted() || VULTURE_TARGET.get(target.getType()) == null) {
+				continue;
+			}
+			if (target.getType().isBuilding() && skipBuilding) {
 				continue;
 			}
 			enemyPower += VULTURE_TARGET.get(target.getType());
@@ -85,7 +94,7 @@ public class CombatExpectation {
 		return enemyPower;
 	}
 	
-	public static int enemyPowerByUnitInfo(List<UnitInfo> targets) {
+	public static int enemyPowerByUnitInfo(List<UnitInfo> targets, boolean skipBuilding) {
 		int enemyPower = 0;
 		
 		int currFrame = MyBotModule.Broodwar.getFrameCount();
@@ -98,32 +107,50 @@ public class CombatExpectation {
 			if (!targetInfo.getType().isBuilding() && (currFrame - targetInfo.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
 				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
 			}
+			if (targetInfo.getType().isBuilding() && skipBuilding) {
+				continue;
+			}
 			
 			enemyPower += VULTURE_TARGET.get(targetInfo.getType());
-			if (targetInfo.getType().isWorker()) { // 게릴라하러 가는데 솔직히 일꾼은 계산에서 빼자
-				enemyPower -= VULTURE_TARGET.get(targetInfo.getType());
+			
+			if (InformationManager.Instance().enemyRace == Race.Zerg) {
+				if (targetInfo.getType().isWorker()) { // 게릴라하러 가는데 솔직히 일꾼은 계산에서 빼자
+					enemyPower -= VULTURE_TARGET.get(targetInfo.getType());
+				}
+				
+				if (targetInfo.getType() == UnitType.Zerg_Zergling && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Anabolic_Synthesis) > 0) {
+					enemyPower += BONUS_ANABOLIC_SYNTHESIS;
+				} else if (targetInfo.getType() == UnitType.Zerg_Hydralisk) {
+					if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Muscular_Augments) > 0) {
+						enemyPower += BONUS_MUSCULAR_AUGMENTS;
+					}
+					if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
+						enemyPower += BONUS_GROOVED_SPINES;
+					}
+					enemyPower += 80; // 80
+				} else if (targetInfo.getType() == UnitType.Zerg_Lurker) {
+					enemyPower += BONUS_LURKER_BURROWED;
+				}
+			}
+
+			if (InformationManager.Instance().enemyRace == Race.Protoss) {
+				if (targetInfo.getType() == UnitType.Protoss_Zealot && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Leg_Enhancements) > 0) {
+					enemyPower += BONUS_LEG_ENHANCEMENTS;
+				} else if (targetInfo.getType() == UnitType.Protoss_Dragoon) {
+					if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Singularity_Charge) > 0) {
+						enemyPower += BONUS_SINGULARITY_CHARGE;
+					}
+					enemyPower += 180; // 80 + 100
+				}
 			}
 			
-			if (targetInfo.getType() == UnitType.Zerg_Zergling && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Anabolic_Synthesis) > 0) {
-				enemyPower += BONUS_ANABOLIC_SYNTHESIS;
-			} else if (targetInfo.getType() == UnitType.Zerg_Hydralisk) {
-				if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Muscular_Augments) > 0) {
-					enemyPower += BONUS_MUSCULAR_AUGMENTS;
-				}
-				if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
-					enemyPower += BONUS_GROOVED_SPINES;
-				}
-				enemyPower += 80; // 80
-			} else if (targetInfo.getType() == UnitType.Zerg_Lurker) {
-				enemyPower += BONUS_LURKER_BURROWED;
-			} else if (targetInfo.getType() == UnitType.Protoss_Zealot && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Leg_Enhancements) > 0) {
-				enemyPower += BONUS_LEG_ENHANCEMENTS;
-			} else if (targetInfo.getType() == UnitType.Protoss_Dragoon) {
-				if (MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Singularity_Charge) > 0) {
-					enemyPower += BONUS_SINGULARITY_CHARGE;
-				}
-				enemyPower += 180; // 80 + 100
+			if (InformationManager.Instance().enemyRace == Race.Terran) {
+				//
 			}
+			
+			
+			
+			
 		}
 		return enemyPower;
 	}
@@ -177,6 +204,17 @@ public class CombatExpectation {
 		}
 	}
 	
+	private static final int VULTURE_POWER = 30;
+	private static final int BONUS_ION_THRUSTERS = 30;
+	
+	private static final int BONUS_ANABOLIC_SYNTHESIS = 5;
+	private static final int BONUS_MUSCULAR_AUGMENTS = 25;
+	private static final int BONUS_GROOVED_SPINES = 25;
+	private static final int BONUS_LURKER_BURROWED = 300;
+	
+	private static final int BONUS_LEG_ENHANCEMENTS = 10;
+	private static final int BONUS_SINGULARITY_CHARGE = 30;
+	
 	private static final Map<UnitType, Integer> VULTURE_TARGET = new HashMap<>();
 	
 	static {
@@ -195,7 +233,6 @@ public class CombatExpectation {
 		VULTURE_TARGET.put(UnitType.Zerg_Guardian, 400);
 		VULTURE_TARGET.put(UnitType.Zerg_Sunken_Colony, 800);
 		
-		
 		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, 0); // 하템 암살해야됨
 		VULTURE_TARGET.put(UnitType.Protoss_Dark_Archon, 0);
 		VULTURE_TARGET.put(UnitType.Protoss_Probe, 1);
@@ -207,5 +244,15 @@ public class CombatExpectation {
 		VULTURE_TARGET.put(UnitType.Protoss_Carrier, 400);
 		VULTURE_TARGET.put(UnitType.Protoss_Reaver, 400);
 		VULTURE_TARGET.put(UnitType.Protoss_Photon_Cannon, 600);
+		
+		
+		VULTURE_TARGET.put(UnitType.Terran_Marine, 30); // 하템 암살해야됨
+		VULTURE_TARGET.put(UnitType.Terran_Medic, 30);
+		VULTURE_TARGET.put(UnitType.Terran_Firebat, 30);
+		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Tank_Mode, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Siege_Mode, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Vulture, 100);
+		VULTURE_TARGET.put(UnitType.Terran_Goliath, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Bunker, 300);
 	}
 }

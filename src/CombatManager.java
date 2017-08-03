@@ -69,6 +69,18 @@ public class CombatManager {
 	private static Chokepoint currTargetChoke = null;
 	private static int currTargetChokeExpiredFrame = 0;
 	
+	private double getWaitingPeriod() {
+		Race enemyRace = InformationManager.Instance().enemyRace;
+		if (enemyRace == Race.Zerg) {
+			return 3.0;
+		} else if (enemyRace == Race.Protoss) {
+			return 3.5;
+		} else if (enemyRace == Race.Terran) {
+			return 4.0;
+		}
+		return 3.0;
+	}
+	
 	private List<Unit> combatUnits = new ArrayList<>();
 	private SquadData squadData = new SquadData();
 
@@ -95,7 +107,7 @@ public class CombatManager {
 	}
 	/// 특수상황 처리 함수 ex) 벌처 본진 귀환 setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD);
 	public void setDetailStrategy(CombatStrategyDetail detailStrategy, int frameDuration) {
-		MyBotModule.Broodwar.sendText("detailStrategy enabled : " + detailStrategy.toString());
+//		MyBotModule.Broodwar.sendText("detailStrategy enabled : " + detailStrategy.toString());
 		detailStrategyExFrame[detailStrategy.ordinal()] = MyBotModule.Broodwar.getFrameCount() + frameDuration;
 	}
 	public void updateDetailStrategy() {
@@ -105,7 +117,7 @@ public class CombatManager {
 				continue;
 			
 			if((MyBotModule.Broodwar.getFrameCount() > expireFrame)) {
-				MyBotModule.Broodwar.sendText("detailStrategy disabled : " + CombatStrategyDetail.values()[i].toString());
+//				MyBotModule.Broodwar.sendText("detailStrategy disabled : " + CombatStrategyDetail.values()[i].toString());
 				detailStrategyExFrame[i] = 0;
 			}
 		}
@@ -535,7 +547,6 @@ public class CombatManager {
 		    Position squadPosition = MicroUtils.centerOfUnits(squad.getUnitSet());
 		    Position enemyFirstChokePosition = enemyFirstChoke.getCenter();
 		    if (currTargetChokeExpiredFrame != 0
-		    		&& squadPosition.getDistance(enemyFirstChokePosition) < 600
 		    		&& currTargetChokeExpiredFrame < MyBotModule.Broodwar.getFrameCount()) { // 적의 first chokePoint 도착
 		    	return enemyBaseLocation.getPosition(); // TODO 언덕 위로 올라가는 것에 대한 판단. 상대의 주력병력을 소모시키전에 언덕위로 진입하는 것은 위험할 수 있다.
 		    }
@@ -583,7 +594,7 @@ public class CombatManager {
 			    }
 		    	if (nextChoke != null) {
 		    		currTargetChoke = nextChoke;
-		    		currTargetChokeExpiredFrame = MyBotModule.Broodwar.getFrameCount() + (closestChokeToNextChoke * 24 * 3);
+		    		currTargetChokeExpiredFrame = MyBotModule.Broodwar.getFrameCount() + (int) (closestChokeToNextChoke * 24.0 * getWaitingPeriod());
 		    	}
 		    }
 		}
@@ -1181,7 +1192,7 @@ private void updateEarlyDefenseSquad() {
 		if (bestGuerillaSite != null) {
 			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
 			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(bestGuerillaSite.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
-			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo);
+			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo, false);
 			
 			if (vulturePower > enemyPower) {
 				String squadName = SquadName.GUERILLA_ + bestGuerillaSite.getPosition().toString();
@@ -1243,11 +1254,9 @@ private void updateEarlyDefenseSquad() {
 			}
 			
 			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
-			boolean result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo);
-			if (!result) {
-				if(Config.BroodwarDebugYN){
-				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossilbe");
-				}
+			Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
+			if (result == Result.Loss) {
+				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
 				squad.clear();
 				continue;
 			}

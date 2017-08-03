@@ -156,23 +156,44 @@ public class Squad {
 //		}
 
 		int saveUnitLevel = 1;
-		if (saveUnitFrameCount > 0) {
-			watchOrder.setPosition(attackerOrder.getPosition());
-			vultureEnemies = attackerEnemies;
-			saveUnitFrameCount--;
-			saveUnitLevel = 2;
+		
+		if (initFrame > 0) {
+			List<UnitInfo> allEnemies = new ArrayList<>();
+			allEnemies.addAll(vultureEnemies);
+			allEnemies.addAll(attackerEnemies);
+			
+			List<Unit> allMyUnits = new ArrayList<>();
+			allMyUnits.addAll(microVulture.getUnits());
+			allMyUnits.addAll(microTank.getUnits());
+			allMyUnits.addAll(microGoliath.getUnits());
+			
+			Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
+			if (result == Result.Loss || result == Result.Win) {
+				saveUnitLevel = 1;
+			} else if (result == Result.BigWin) {
+				saveUnitLevel = 0;
+			}
+			
 		} else {
-			if (initFrame == 0 && !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies)) {
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);
-				saveUnitFrameCount = 24 * 10;
+			if (saveUnitFrameCount > 0) {
+				watchOrder.setPosition(attackerOrder.getPosition());
+				vultureEnemies = attackerEnemies;
+				saveUnitFrameCount--;
+				saveUnitLevel = 2;
+			} else {
+				Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
+				if (result == Result.Loss) {
+					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);
+					saveUnitFrameCount = 24 * 10;
+					saveUnitLevel = 2;
+				} else if (result == Result.Win) {
+					saveUnitLevel = 1;
+				} else if (result == Result.BigWin) {
+					saveUnitLevel = 0;
+				} 
 			}
 		}
-		
-		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
-		for (Unit vulture : microVulture.getUnits()) {
-			mechanicVulture.executeMechanicMicro(vulture);
-		}
+
 		if (attackerEnemies.isEmpty()) {
 			if (initFrame > 0) {
 				initFrame = 0;
@@ -183,6 +204,12 @@ public class Squad {
 				initFrame = MyBotModule.Broodwar.getFrameCount();
 				MyBotModule.Broodwar.sendText("initiated");
 			}
+		}
+		
+		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
+		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
+		for (Unit vulture : microVulture.getUnits()) {
+			mechanicVulture.executeMechanicMicro(vulture);
 		}
 		mechanicTank.prepareMechanic(attackerOrder, attackerEnemies);
 		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), initFrame);
