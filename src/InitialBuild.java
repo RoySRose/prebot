@@ -237,7 +237,7 @@ public class InitialBuild {
 			}
 
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
-			
+			BlockingEntrance.Instance().SetBlockingPosition();
 //			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 //				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 //				queueBuild(true, UnitType.Terran_Supply_Depot);//8서플
