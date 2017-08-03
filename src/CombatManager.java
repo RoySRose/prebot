@@ -308,7 +308,9 @@ public class CombatManager {
 					if(neareasetvessel !=null){
 						List<Unit> nearallies = MapGrid.Instance().getUnitsNear(neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
 						if(nearallies !=null && nearallies.size() > 2){
-							MyBotModule.Broodwar.printf("Vessel : I'm going! wait a sec!!");
+							if(Config.BroodwarDebugYN){
+								MyBotModule.Broodwar.printf("Vessel : I'm going! wait a sec!!");
+							}
 							break;//베슬이 올것으로 예상됨
 						}
 					}
@@ -1193,7 +1195,9 @@ private void updateEarlyDefenseSquad() {
         		// 게릴라 유닛이 남아 있다면 더 할당하지 않는다.
 				if (!guerillaSquad.getUnitSet().isEmpty()) {
 					VultureTravelManager.Instance().guerillaStart(squadName);
-					MyBotModule.Broodwar.printf("guerilla units already exist");
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("guerilla units already exist");
+					}
         		} else {
         			for (Unit assignableVulture : assignableVultures) {
     					squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
@@ -1203,10 +1207,14 @@ private void updateEarlyDefenseSquad() {
     					}
     				}
         			VultureTravelManager.Instance().guerillaStart(squadName);
+        			if(Config.BroodwarDebugYN){
         			MyBotModule.Broodwar.printf("guerilla squad created!");
+        			}
         		}
+				if(Config.BroodwarDebugYN){
     			MyBotModule.Broodwar.printf(" - unit size : " + guerillaSquad.getUnitSet().size());
     			MyBotModule.Broodwar.printf(" - position  : " + bestGuerillaSite.getPosition());
+				}
 			} else {
 				//System.out.println("not the best guerilla site");
 			}
@@ -1226,7 +1234,9 @@ private void updateEarlyDefenseSquad() {
 			if (MyBotModule.Broodwar.isVisible(squad.getOrder().getPosition().toTilePosition())) {
 				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, null);
 				if (enemies.isEmpty()) {
+					if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : no enemy");
+					}
 					squad.clear();
 					continue;
 				}
@@ -1235,14 +1245,18 @@ private void updateEarlyDefenseSquad() {
 			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
 			boolean result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo);
 			if (!result) {
+				if(Config.BroodwarDebugYN){
 				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossilbe");
+				}
 				squad.clear();
 				continue;
 			}
 
 			int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
 			if (guerillaScore <= 0) {
+				if(Config.BroodwarDebugYN){
 				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
+				}
 				squad.clear();
 				continue;
 			}
