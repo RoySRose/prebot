@@ -67,13 +67,20 @@ public class MechanicMicroDecision {
 		boolean existTooCloseTarget = false;
 		boolean existTooFarTarget = false;
 		boolean existCloakTarget = false;
+		boolean targetOutOfSight = false;
 		
 		Unit closestTooFarTarget = null;
 		int closestTooFarTargetDistance = 0;
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
 			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
-			if (enemy == null || !CommandUtil.IsValidUnit(enemy)) { // 시야에 없는 경우 skip
+			if (enemy == null) {
+				if (mechanicUnit.getDistance(enemyInfo.getLastPosition()) < MicroSet.Tank.SIEGE_MODE_MAX_RANGE) {
+					if (enemyInfo.getType().isBuilding() || MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() <= MicroSet.Common.NO_UNIT_FRAME) {
+						bestTargetInfo = enemyInfo;
+						targetOutOfSight = true;
+					}
+		        }
 				continue;
 			}
 
@@ -143,6 +150,7 @@ public class MechanicMicroDecision {
 	        if (totalScore > bestTargetScore) {
 				bestTargetScore = totalScore;
 				bestTargetInfo = enemyInfo;
+				targetOutOfSight = false;
 			}
 		}
 		
@@ -166,7 +174,11 @@ public class MechanicMicroDecision {
 			}
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
-			return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
+			if (targetOutOfSight) {
+				return MechanicMicroDecision.makeDecisionToDoNothing();				
+			} else {
+				return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
+			}
 		}
 		
 		
@@ -220,16 +232,19 @@ public class MechanicMicroDecision {
 					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode) {
 						safeDistance += MicroSet.Common.BACKOFF_DIST_SIEGE_TANK;
 						
-					} else if ((enemyUnitType == UnitType.Zerg_Sunken_Colony
-							|| enemyUnitType == UnitType.Protoss_Photon_Cannon
-							|| enemyUnitType == UnitType.Terran_Bunker)
-							&& mechanicUnit.getType() != UnitType.Terran_Siege_Tank_Siege_Mode // 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
-							) {
-						safeDistance += MicroSet.Common.BACKOFF_DIST_DEF_TOWER;
-						
+					} else if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Bunker) {
+						// 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
+						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+							safeDistance += (MicroSet.Common.BACKOFF_DIST_DEF_TOWER * 2/3);
+						} else {
+							safeDistance += MicroSet.Common.BACKOFF_DIST_DEF_TOWER;
+						}
 					} else {
-						safeDistance += MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY;
-						
+						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+							safeDistance += (MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY * 2/3);
+						} else {
+							safeDistance += MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY;
+						}
 					}
 					
 					if (distanceToNearEnemy < safeDistance) {
@@ -259,7 +274,7 @@ public class MechanicMicroDecision {
 					}
 				}
 				// 클로킹 유닛 : -1000점
-				if (!enemy.isDetected()) {
+				if (!enemy.isDetected() && enemyUnitType == UnitType.Protoss_Dark_Templar) {
 					specialScore -= 1000;
 				}
 		        

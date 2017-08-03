@@ -190,7 +190,7 @@ public class VultureTravelManager {
 			}
 			
 			// 안개속의 적 구성을 가늠해 게릴라 타게팅이 가능한지 확인한다.			
-			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo);
+			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo, false);
 			int score = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
 			
 			if (vulturePower > enemyPower && score > bestScore) {
