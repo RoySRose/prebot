@@ -100,7 +100,7 @@ public class UXManager {
 		}
 
 		if (Config.DrawUnitHealthBars) {
-			drawUnitExtendedInformationOnMap();
+			//drawUnitExtendedInformationOnMap();
 			drawUnitIdOnMap();
 		}
 
@@ -171,14 +171,14 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
 		y += 11;
 
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "MyunitPoint : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().MyunitPoint);
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "MyunitPoint(Fac) : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 80, y, "" + white + StrategyManager.Instance().MyunitPoint);
 		y += 11;
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "ExpansionPoint : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 80, y, "" + white + StrategyManager.Instance().ExpansionPoint);
 		y += 11;
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "UnitPoint(FacUnits) : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 95, y, "" + white + StrategyManager.Instance().UnitPoint);
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "UnitPoint : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().UnitPoint);
 		y += 11;
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().Attackpoint);
@@ -186,6 +186,19 @@ public class UXManager {
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
+		y += 11;
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, red + "MYKillScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + red + MyBotModule.Broodwar.self().getKillScore());
+		y += 11;
+		MyBotModule.Broodwar.drawTextScreen(x, y, red + "MYRazingScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, y, "" + red + MyBotModule.Broodwar.self().getRazingScore());
+		y += 11;
+		MyBotModule.Broodwar.drawTextScreen(x, y, purple + "EnemyKillScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, y, "" + purple + MyBotModule.Broodwar.enemy().getKillScore());
+		y += 11;
+		MyBotModule.Broodwar.drawTextScreen(x, y, purple + "EnemyRazingScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + purple + MyBotModule.Broodwar.enemy().getRazingScore());
 		y += 11;
 	}
 
