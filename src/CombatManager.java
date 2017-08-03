@@ -1256,7 +1256,9 @@ private void updateEarlyDefenseSquad() {
 			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
 			Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
 			if (result == Result.Loss) {
+				if(Config.BroodwarDebugYN){
 				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
+				}
 				squad.clear();
 				continue;
 			}
