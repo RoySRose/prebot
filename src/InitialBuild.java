@@ -34,7 +34,7 @@ public class InitialBuild {
 		//테란전 플토전은 벙커 없이 가자
 		
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
-			
+			BlockingEntrance.Instance().SetBlockingPosition();
 			
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
