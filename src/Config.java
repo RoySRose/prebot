@@ -106,6 +106,7 @@ public class Config {
 	public static boolean DrawMouseCursorInfo = true;
 	
 	public static boolean BuildQueueDebugYN = false;
+	public static boolean BroodwarDebugYN = false;
 	
 
 	public static final Color ColorLineTarget = Color.White;
