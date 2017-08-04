@@ -26,6 +26,8 @@ public class RespondToStrategy {
 	
 	public boolean need_vessel = false;
 	
+	public int need_vessel_time = 0;
+	
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
@@ -76,6 +78,11 @@ public class RespondToStrategy {
 	}
 	
 	public void update() {
+		
+		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
+			need_vessel = true;
+		}
+		
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 
@@ -228,6 +235,9 @@ public class RespondToStrategy {
 		
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
 		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter){
+			if(need_vessel_time ==0){
+				need_vessel_time = MyBotModule.Broodwar.getFrameCount();
+			}
 			//System.out.println("클로킹 유닛 대비================");
 			//이니셜에서 엔지니어링 베이까지는 짓고 갈거이므로.
 			//익셉션 다크는 패스트 다크에 대한 대비이다. 고로 아직 사베에 대한 컨트롤은 없다.
