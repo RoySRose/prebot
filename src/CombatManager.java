@@ -40,7 +40,6 @@ class Combat {
 	public static final int SCOUT_DEFENSE_PRIORITY = 7;
 	public static final int EARLY_DEFENSE_PRIORITY = 10;
 
-	public static final int MARINE_PRIORITY = 99;
 	public static final int WRAITH_PRIORITY = 100;
 	public static final int VESSEL_PRIORITY = 101;
 	
@@ -160,8 +159,8 @@ public class CombatManager {
 		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getAttackPosition(null), Combat.CHECKER_RADIUS, "Check it out");
 		squadData.putSquad(new Squad(SquadName.CHECKER, checkerOrder, Combat.CHECKER_PRIORITY));
 		
-		SquadOrder marineOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.MARINE_RADIUS, "Marine");
-		squadData.putSquad(new Squad(SquadName.MARINE, marineOrder, Combat.MARINE_PRIORITY));
+//		SquadOrder marineOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.MARINE_RADIUS, "Marine");
+//		squadData.putSquad(new Squad(SquadName.MARINE, marineOrder, Combat.MARINE_PRIORITY));
 		
 		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getAttackPosition(null), Combat.WRAITH_RADIUS, "Wraith");
 		squadData.putSquad(new Squad(SquadName.WRAITH, wraithOrder, Combat.WRAITH_PRIORITY));
@@ -196,7 +195,6 @@ public class CombatManager {
 			if(ScoutDefenseNeeded){
 				updateScoutDefenseSquad();
 			}
-			//System.out.println("ScoutDefenseNeeded: " + ScoutDefenseNeeded);
 			if(ScoutDefenseNeeded == false){
 				updateBaseDefenseSquads();
 			}
@@ -208,7 +206,6 @@ public class CombatManager {
 			
 			updateAttackSquads();
 			
-			updateMarineSquad();
 			updateWraithSquad();
 			updateVesselSquad(); //AttackSquads 뒤에
 			updateCheckerSquad();
@@ -663,11 +660,26 @@ public class CombatManager {
 	        return;
 	    }
 		
+		Squad scoutDefenseSquad = squadData.getSquad(SquadName.SCOUT_DEFENSE);
+		
 		int assignScoutDefender = 0;
-		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
-		if(enemyUnitsInRegion == null)
+		
+		List<Unit> enemyUnitsInRegion = new ArrayList<>();
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+            if (unit.getType() == InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace)
+            		&& BWTA.getRegion(unit.getTilePosition()) == myRegion) {
+                enemyUnitsInRegion.add(unit);
+            }
+        }
+		
+		if(enemyUnitsInRegion.size() == 0){
+			if (!scoutDefenseSquad.isEmpty()) {
+			   	scoutDefenseSquad.clear();
+			}
 			return;
-		//7마리 이상이면 능봉으로 넘아감
+		}
+			
+		//3마리 이상이면 능봉으로 넘아감
 		if(enemyUnitsInRegion.size() > 0){
 			int enemyscvcnt = 0;
 			for(Unit enemyscvs : enemyUnitsInRegion){
@@ -681,7 +693,7 @@ public class CombatManager {
 					assignScoutDefender++;
 				} 
 			}
-			if(enemyscvcnt > 2){
+			if(enemyscvcnt >= 3){
 				ScoutDefenseNeeded = false;
 				return;
 			}
@@ -697,7 +709,7 @@ public class CombatManager {
 //		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
 		
-		Squad scoutDefenseSquad = squadData.getSquad(SquadName.SCOUT_DEFENSE);
+		
 //		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
     	int workerDefendersNeeded = 0;
     	while(workerDefendersNeeded < assignScoutDefender){
@@ -717,15 +729,20 @@ public class CombatManager {
 		   	scoutDefenseSquad.clear();
 		}
 	}
-private void updateEarlyDefenseSquad() {
+	private void updateEarlyDefenseSquad() {
 		
 		bwta.BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 		bwta.Region myRegion = base.getRegion();
 		if (myRegion == null || !myRegion.getCenter().isValid()) {
 	        return;
 	    }
+		
+		Squad earlyDefenseSquad = squadData.getSquad("EarlyDefense");
 		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if(enemyUnitsInRegion.size() == 0){
+			if (!earlyDefenseSquad.isEmpty()) {
+				earlyDefenseSquad.clear();
+			}
 			return;
 		}
 		
@@ -750,9 +767,9 @@ private void updateEarlyDefenseSquad() {
 		}
 		if(mineral==null){return;}
 		
-		System.out.println("bestTarget: " + bestTarget.getID());
-		System.out.println("bestDist: " + bestDist);
-		Squad earlyDefenseSquad = squadData.getSquad("EarlyDefense");
+//		System.out.println("bestTarget: " + bestTarget.getID());
+//		System.out.println("bestDist: " + bestDist);
+		
 		if(bestTarget!=null){
 			if(bestDist < 250){
 				int k=0;
@@ -763,14 +780,16 @@ private void updateEarlyDefenseSquad() {
 					    squadData.assignWorkerToSquad(workerDefender, earlyDefenseSquad);
 					    k++;
 		            }
-					if(k > (int)(2+enemyUnitsInRegion.size()*2)){
+					if(k > (int)(2+enemyUnitsInRegion.size()*3)){
 						break;
 					}
 				}
 			}else if (!earlyDefenseSquad.isEmpty() && bestDist >= 240){//180) {
 				earlyDefenseSquad.clear();
 		    }
-		}else if(!earlyDefenseSquad.isEmpty()){//180) {
+		}
+		
+		if(!earlyDefenseSquad.isEmpty() && bestTarget == null){//180) {
 			earlyDefenseSquad.clear();
 	    }
 	}
@@ -794,7 +813,7 @@ private void updateEarlyDefenseSquad() {
 			
 			List<Unit> enemyUnitsInRegion = new ArrayList<>();
 	        for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-	            if (unit.getType() == UnitType.Zerg_Overlord ||
+	            if (unit.getType() == UnitType.Zerg_Overlord || //TODO 오버로드 오면 방어 안하는거 맞아?ㅡㅡ;;; 드롭도 그렇고.... 오버가 왔는데.. 무시될텐데..
 					unit.getType() == UnitType.Protoss_Observer ||
 					unit.isLifted()) { // floating terran building
 	            	continue;
@@ -806,7 +825,6 @@ private void updateEarlyDefenseSquad() {
 	        }
 
 
-	        
 	    	FastZerglingsInOurBase = 0;
 			
 //	        if(InformationManager.Instance().isEarlyDefenseNeeded()){
@@ -833,7 +851,6 @@ private void updateEarlyDefenseSquad() {
 	        		squadData.putSquad(new Squad(squadName, squadOrder, Combat.BASE_DEFENSE_PRIORITY));
 	        	}
 	        }
-
 			int numDefendersPerEnemyUnit = 2;
 
 			int numEnemyFlyingInRegion = 0;
@@ -845,22 +862,12 @@ private void updateEarlyDefenseSquad() {
 				} else {
 					numEnemyGroundInRegion++;
 				}
-				if((MyBotModule.Broodwar.getFrameCount() < 10000 || MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) <= 2) && unit.getType() == UnitType.Zerg_Zergling){
+				if((MyBotModule.Broodwar.getFrameCount() < 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) <= 2) && unit.getType() == UnitType.Zerg_Zergling){
 					FastZerglingsInOurBase++;
 				}
 			}
 			
-			
 			boolean pullWorkers = false;
-			
-//			if(FastZerglingsInOurBase > 0){
-//				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-//					if(unit.getType() == UnitType.Terran_Bunker && unit.isCompleted()){
-//						numDefendersPerEnemyUnit = numDefendersPerEnemyUnit -4;
-//					}
-//				}
-//				pullWorkers = true;
-//			}
 			
 			Squad defenseSquad = squadData.getSquad(squadName);
 		    int flyingDefendersNeeded = numDefendersPerEnemyUnit * numEnemyFlyingInRegion;
@@ -874,20 +881,14 @@ private void updateEarlyDefenseSquad() {
 				}
 			}
 			
-			// Pull workers only in narrow conditions.
-			// Pulling workers (as implemented) can lead to big losses.
-			 // TODO 일꾼을 빼야할 때.. numZerglingsInOurBase() > 0 || buildingRush());
 			
-//			System.out.println("numZerglingsInOurBase: " + numZerglingsInOurBase);
+//			System.out.println("FastZerglingsInOurBase: " + FastZerglingsInOurBase);
 //			System.out.println("groundDefendersNeeded: " + groundDefendersNeeded);
 			
 //			if(InformationManager.Instance().isEarlyDefenseNeeded() == true){
 //				updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, false);
 //			}else{
 //			System.out.println("squadName: " + squadName + ", " + "groundDefendersNeeded" + groundDefendersNeeded);
-//			for (Unit marine : defenseSquad.getUnitSet()){
-//				System.out.println("marine: " + marine.getID());
-//			}
 			updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, pullWorkers);
 //			}
 //			for (Unit marine : defenseSquad.getUnitSet()){
@@ -953,7 +954,6 @@ private void updateEarlyDefenseSquad() {
 				break;
 			}
 		}
-
 		// add ground defenders if we still need them
 		int groundDefendersAdded = 0;
 		while (groundDefendersNeeded > groundDefendersInSquad + groundDefendersAdded) {
@@ -969,61 +969,6 @@ private void updateEarlyDefenseSquad() {
 				break;
 			}
 		}
-		
-//		while (groundDefendersNeeded > groundDefendersInSquad + groundDefendersAdded) {
-//			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, pullWorkers);
-//
-////			System.out.println("test");
-//			// If we find a valid ground defender, add it.
-//			if (defenderToAdd != null) {
-//				
-////				if(FastZerglingsInOurBase > 0){
-//////					System.out.println("inside zergling");
-////			        Unit CC = null;
-////					for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
-////					    if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted()){
-////							CC = unit;
-////						}
-////					}
-////					
-////					if(CC==null){return;}
-////					Position mineral = getBestMineral(CC);	
-////					
-////					double bestDist = 99999;
-////					Unit bestTarget = null;
-////					for (Unit target : MyBotModule.Broodwar.enemy().getUnits()){
-////						double dist = mineral.getDistance(target);
-////						if (dist < bestDist){
-////			                bestTarget = target;
-////			                bestDist = dist;
-////			            }
-////					}
-////					if(mineral==null){return;}
-////					
-////					if(bestTarget!=null){
-////						if(mineral.getDistance(bestTarget) < 180){
-////							if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
-////								WorkerManager.Instance().setCombatWorker(defenderToAdd);
-////							}
-////							squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
-////							groundDefendersAdded++;
-////						}else{
-////							break;
-////						}
-////					}
-////				}else{
-//					if (defenderToAdd.getType().isWorker()) {//TODO 일꾼부터 보는게 타당한가? by KSW
-//						WorkerManager.Instance().setCombatWorker(defenderToAdd);
-//					}
-//					squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
-//					groundDefendersAdded++;
-////				}
-//			}
-//			// otherwise we'll never find another one so break out of this loop
-//			else {
-//				break;
-//			}
-//		}
 	}
 	
 	private void updateAttackSquads() {
@@ -1053,6 +998,7 @@ private void updateEarlyDefenseSquad() {
 		int minDistance = 99999;
 
 		for (Unit unit : combatUnits) {
+			
 			if ((flyingDefender && !CommandUtil.CanAttackAir(unit)) ||
 				(!flyingDefender && !CommandUtil.CanAttackGround(unit))) {
 	            continue;
@@ -1074,19 +1020,6 @@ private void updateEarlyDefenseSquad() {
 		}
 
 		return closestDefender;
-	}
-	
-	private void updateMarineSquad() {
-		Squad marineSquad = squadData.getSquad(SquadName.MARINE);
-		
-		for (Unit unit : combatUnits) {
-	        if (unit.getType() == UnitType.Terran_Marine && squadData.canAssignUnitToSquad(unit, marineSquad)) {
-				squadData.assignUnitToSquad(unit, marineSquad);// 레이스만
-	        }
-	    }
-		
-		SquadOrder marineOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(marineSquad), Combat.MARINE_RADIUS, SquadName.MARINE);
-		marineSquad.setOrder(marineOrder);
 	}
 	
 	private void updateWraithSquad() {//TODO 현재는 본진 공격 용 레이스만 있음

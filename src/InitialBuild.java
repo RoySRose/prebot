@@ -364,7 +364,6 @@ public class InitialBuild {
 //				queueBuild(TechType.Spider_Mines);//마인업
 //				queueBuild(false, UnitType.Terran_SCV);//scv
 //				queueBuild(UpgradeType.Ion_Thrusters);//벌쳐 속업
-				if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 					queueBuild(true, UnitType.Terran_Supply_Depot);//8scv 찍어놓고 서플( 아마 얘가 만들어지면 서플 지을걸)
 					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -384,7 +383,6 @@ public class InitialBuild {
 					queueBuild(true, UnitType.Terran_Machine_Shop);
 					queueBuild(true, UnitType.Terran_Siege_Tank_Siege_Mode);//탱크추가
 					
-				}
 			}
 
 		}else{ 

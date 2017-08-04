@@ -132,12 +132,22 @@ public class GameCommander {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
 		
+		if(unit.getType() == UnitType.Terran_Command_Center){
+			unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+		}
+		
 		if(unit.getType() == UnitType.Terran_Factory){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
 		}
 		
 		if(unit.getType() == UnitType.Terran_Barracks){
-			unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+				{
+					unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+				}
+			}
 		}
 		
 		
