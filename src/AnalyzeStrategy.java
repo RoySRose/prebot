@@ -249,7 +249,7 @@ public class AnalyzeStrategy {
 			
 			//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
 			selectedSE = StrategyManager.StrategysException.protossException_Arbiter;
-			RespondToStrategy.instance().enemy_dark_templar = true;
+			//RespondToStrategy.instance().enemy_dark_templar = true;
 			
 		}
 		
