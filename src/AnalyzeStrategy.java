@@ -23,6 +23,11 @@ public class AnalyzeStrategy {
 	
 
 	public void AnalyzeEnemyStrategy() {
+		//config 건물 관련 여백 조정용 함수
+		//건물 여백이 0인채로 서플 2개째를 짓고있으면 원래대로 원복
+		if(Config.BuildingSpacing == 0 && InformationManager.Instance().getNumUnits(UnitType.Terran_Supply_Depot, MyBotModule.Broodwar.self())>=2){
+			BlockingEntrance.Instance().ReturnBuildSpacing();
+		}
 
 		//최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행 
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
@@ -69,13 +74,46 @@ public class AnalyzeStrategy {
 				||(InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway, InformationManager.Instance().enemyPlayer) >= 2
 				&&InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core, InformationManager.Instance().enemyPlayer) < 1	)){
 				//어시밀레이터나 코어전에 2게이트라면 질럿 푸시
-				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+				selectedSE = StrategyManager.StrategysException.protossException_ReadyToZealot;
 			}
 
+			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway, InformationManager.Instance().enemyPlayer) == 1
+				&&InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core, InformationManager.Instance().enemyPlayer) >= 1	){
+				//원게이트에서 코어 올라가면 드래군 레디
+				selectedSE = StrategyManager.StrategysException.protossException_ReadyToDragoon;
+			}
 		}
 		
-		if(selectedSE == StrategyManager.StrategysException.protossException_ZealotPush){
+		if(selectedSE == StrategyManager.StrategysException.protossException_ReadyToZealot){
+			Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+			List<Unit> chkZealotPush = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 160);
+			for(int dragoon_cnt = 0; dragoon_cnt < chkZealotPush.size(); dragoon_cnt ++){
+				if(chkZealotPush.get(dragoon_cnt).getType() == UnitType.Protoss_Zealot
+					&&InformationManager.Instance().isFirstScoutAlive()){
+					selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+				}
+			}
+			if(!InformationManager.Instance().isFirstScoutAlive()){
+				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+			}
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) >=3){
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon){
+			Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+			List<Unit> chkDragoondPush = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 160);
+			for(int dragoon_cnt = 0; dragoon_cnt < chkDragoondPush.size(); dragoon_cnt ++){
+				if(chkDragoondPush.get(dragoon_cnt).getType() == UnitType.Protoss_Dragoon
+					&&InformationManager.Instance().isFirstScoutAlive()){
+					selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+				}
+			}
+			if(!InformationManager.Instance().isFirstScoutAlive()){
+				selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+			}
+			if(MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines) || MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)){
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}

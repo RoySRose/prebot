@@ -315,26 +315,42 @@ public class RespondToStrategy {
 			           boolean mainBaseTurret = false;
 			           boolean	firstChokeTurret = false;
 			           
+			        //first choke point
 			           if (tempChokePoint != null) {
 						//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
 						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
 						
 						 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 			     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
-			     				System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			     				firstChokeTurret = true;
 			     			 }
 		     			 }
 						 if(!firstChokeTurret){
-			     				System.out.println("FirstChoke 에 터렛 없다.");
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1){
+		     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+		     							tempChokePoint.getCenter().getPoint().toTilePosition(), true);
+		     				}
+		     				
+		     			}
+					}
+			           tempChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());;
+			           if (tempChokePoint != null) {
+							//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+							
+							 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+				     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+				     				firstChokeTurret = true;
+				     			 }
+			     			 }
+							 if(!firstChokeTurret){
 			     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1){
-			     					System.out.println("FirstChoke 가 빌드큐에도 없다.");
 			     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 			     							tempChokePoint.getCenter().getPoint().toTilePosition(), true);
 			     				}
 			     				
 			     			}
-					}
+						}
 		            	
 					if (tempBaseLocation != null) {
 						myRegion = tempBaseLocation.getRegion();
@@ -343,13 +359,11 @@ public class RespondToStrategy {
 				              
 		     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 			     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
-			     				 System.out.println("Turret Exists at Main Base Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			     				mainBaseTurret = true;
 			     			 }
 		     			 }
 		     			 if(!mainBaseTurret)
 		     			 {
-		     				System.out.println("MainBase 에 터렛 없다.");
 		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 										tempBaseLocation.getPoint().toTilePosition(), true);
@@ -394,14 +408,14 @@ public class RespondToStrategy {
 			}else{
 				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0){
 					
-					System.out.println("리버 전략 대응");
+					//System.out.println("리버 전략 대응");
 					//Position tempBaseLocation = null;
 					boolean mainBaseTurret = false;
 					
 					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 						Position tempBaseLocation = null;
 						if(unit.getType() == UnitType.Terran_Command_Center){
-							System.out.println("방어해야할 커맨드가 있따.");
+							//System.out.println("방어해야할 커맨드가 있따.");
 							tempBaseLocation = unit.getPosition();
 						}
 						int mainBaseTurret_cnt = 0;
@@ -417,11 +431,11 @@ public class RespondToStrategy {
 				     			 }
 			     			 }
 			     			 if(mainBaseTurret_cnt >= 3){
-			     				 System.out.println("방어 터렛 3기 이상");
+			     				 //System.out.println("방어 터렛 3기 이상");
 			     				 mainBaseTurret = true;
 			     				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			     			 }else{
-			     				System.out.println("방어 터렛 3기 미만");
+			     				//System.out.println("방어 터렛 3기 미만");
 		     					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 											tempBaseLocation.getPoint().toTilePosition(), true);

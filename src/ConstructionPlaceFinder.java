@@ -239,7 +239,7 @@ public class ConstructionPlaceFinder {
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = Config.BuildingResourceDepotSpacing;		
+			buildingGapSpace = Config.BuildingResourceDepotSpacing;
 		}
 //		else if (buildingType == UnitType.Protoss_Pylon) {
 //			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
@@ -391,6 +391,8 @@ public class ConstructionPlaceFinder {
 		int endx;
 		int endy;
 
+		buildingGapSpace = 0;
+		
 		boolean horizontalOnly = false;
 
 		// Refinery 의 경우 GapSpace를 체크할 필요 없다
@@ -475,7 +477,7 @@ public class ConstructionPlaceFinder {
 					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
-					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false) {
+					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Bunker) {
 						if (isTilesToAvoid(x, y)) {
 							return false;
 						}
