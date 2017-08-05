@@ -12,6 +12,14 @@ public class GameCommander {
 	/// 디버깅용 플래그 : 어느 Manager 가 에러를 일으키는지 알기위한 플래그
 	private boolean isToFindError = false;
 	private LagObserver logObserver = new LagObserver();
+	public boolean scoutFlag = false;
+	
+	private static GameCommander instance = new GameCommander();
+	
+	/// static singleton 객체를 리턴합니다
+	public static GameCommander Instance() {
+		return instance;
+	}
 	
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onStart() 
@@ -220,6 +228,10 @@ public class GameCommander {
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다
 	public void onReceiveText(Player player, String text){
+	}
+
+	public boolean getScoutFlag(){ 
+		return scoutFlag;
 	}
 
 }

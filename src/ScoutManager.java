@@ -9,6 +9,7 @@ import java.util.Vector;
 import bwapi.Color;
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -67,7 +68,8 @@ public class ScoutManager{
 		if (MyBotModule.Broodwar.getFrameCount() % 4 == 0){
 		
 			// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
-			assignScoutIfNeeded();
+			if(GameCommander.Instance().getScoutFlag() == false)
+				assignScoutIfNeeded();
 			if(fleeFlag == false){
 				moveScoutUnit();
 			}else{
@@ -191,8 +193,10 @@ public class ScoutManager{
 
 				if (firstBuilding != null)
 				{
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 14){
-						return;
+					if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 14){
+							return;
+						}
 					}
 					// grab the closest worker to the first building to send to scout
 					//Unit unit = WorkerManager.Instance().getClosestMineralWorkerTo(firstBuilding.getPosition());
@@ -213,7 +217,7 @@ public class ScoutManager{
 								return;
 						}
 						WorkerManager.Instance().setScoutWorker(currentScoutUnit);
-
+						GameCommander.Instance().scoutFlag = true;	
 						// 참고로, 일꾼의 정찰 임무를 해제하려면, 다음과 같이 하면 된다
 						//WorkerManager::Instance().setIdleWorker(currentScoutUnit);
 					}
@@ -494,9 +498,9 @@ public class ScoutManager{
 				|| (ui.getType() == UnitType.Protoss_Gateway &&  ui.getUnit().isTraining())
 				|| ui.getType() == UnitType.Terran_Marine 
 				|| ui.getType() == UnitType.Protoss_Dragoon
-				|| (ui.getType() == UnitType.Protoss_Photon_Cannon && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()) 
-				|| (ui.getType() == UnitType.Terran_Bunker && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange())
-				|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
+				|| (ui.getType() == UnitType.Protoss_Photon_Cannon && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()) 
+				|| (ui.getType() == UnitType.Terran_Bunker && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange())
+				|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
 				&& (ui.getUnit().getDistance(currentScoutUnit) < 600)) 
 			{
 				return true;
@@ -515,9 +519,9 @@ public class ScoutManager{
 			if (!ui.getType().isWorker() && 
 					(		 ui.getType() == UnitType.Terran_Marine 
 							|| ui.getType() == UnitType.Protoss_Dragoon
-							|| (ui.getType() == UnitType.Protoss_Photon_Cannon && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()) 
-							|| (ui.getType() == UnitType.Terran_Bunker && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange())
-							|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
+							|| (ui.getType() == UnitType.Protoss_Photon_Cannon && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()) 
+							|| (ui.getType() == UnitType.Terran_Bunker && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange())
+							|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
 							&& (ui.getUnit().getDistance(currentScoutUnit) < 400)) 
 			{
 				return true;
@@ -566,7 +570,7 @@ public class ScoutManager{
 			double distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
 
 			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
-			while (distanceFromCurrentVertex < 125)
+			while (distanceFromCurrentVertex < 128)
 			{
 				currentScoutFreeToVertexIndex = (currentScoutFreeToVertexIndex + 1) % enemyBaseRegionVertices.size();
 				distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
