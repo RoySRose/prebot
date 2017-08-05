@@ -709,7 +709,7 @@ public class CombatManager {
 		if(enemyUnitsInRegion.size() > 0){
 			int enemyscvcnt = 0;
 			for(Unit enemyscvs : enemyUnitsInRegion){
-				if(enemyscvs.getType() == UnitType.Terran_SCV ){
+				if(enemyscvs.getType().isWorker()){
 					enemyscvcnt++;
 				}else{
 					ScoutDefenseNeeded = false;
