@@ -126,8 +126,10 @@ public class Squad {
 		
 		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		Position watchPosition = order.getPosition();
-		if (enemyBase != null && !microVulture.getUnits().isEmpty()) {
+		if (enemyBase != null) {
 			watchPosition = enemyBase.getPosition();
+		} else {
+			watchPosition = CombatManager.Instance().letsFindRat();
 		}
 		watchOrder = new SquadOrder(SquadOrderType.WATCH, watchPosition, Combat.WATCHER_RADIUS, "Watch over");
 		// WATCHER'S ENEMY
