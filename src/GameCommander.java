@@ -133,7 +133,12 @@ public class GameCommander {
 		WorkerManager.Instance().onUnitComplete(unit);
 		
 		if(unit.getType() == UnitType.Terran_Command_Center){
-			unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+			
+			if(CombatManager.Instance().getClosestMineral(unit)==null){
+
+			}else{
+				unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+			}
 		}
 		
 		if(unit.getType() == UnitType.Terran_Factory){
@@ -141,20 +146,17 @@ public class GameCommander {
 		}
 		
 		if(unit.getType() == UnitType.Terran_Barracks){
-	          /*for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
-	            {
-	                if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
-	                {
-	                    unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
-	                }
-	            }*/
-	            
-	            if(CombatManager.Instance().getClosestMineral(unit)==null){
-
-	            }else{
-	                unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
-	            }
-	        }
+			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+				{
+					if(CombatManager.Instance().getBestPosition(myUnit)==null){
+					}else{
+						unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+					}
+				}
+			}
+		}
 		
 		
 		if(unit.getType() == UnitType.Terran_Bunker){

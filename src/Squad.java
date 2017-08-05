@@ -33,6 +33,7 @@ public class Squad {
 	private MicroGoliath microGoliath = new MicroGoliath();
 	private MicroWraith microWraith = new MicroWraith();
 	private MicroVessel microVessel = new MicroVessel();
+	private MicroBuilding microBuilding = new MicroBuilding();
 	
 	// **** 아래변수들은 팩토리 유닛으로 구성된 Squad 전용이다.
 	private int initFrame = 0;
@@ -105,6 +106,7 @@ public class Squad {
 		microGoliath.setMicroInformation(order, nearbyEnemies);
 		microWraith.setMicroInformation(order, nearbyEnemies);
 		microVessel.setMicroInformation(order, nearbyEnemies);
+		microBuilding.setMicroInformation(order, nearbyEnemies);
 		
 		microScv.execute();
 		microMarine.execute();
@@ -113,6 +115,7 @@ public class Squad {
 		microGoliath.execute();
 		microWraith.execute();
 		microVessel.execute();
+		microBuilding.execute();
 	}
 	
 	private void updateMainAttackSquad() {
@@ -387,6 +390,7 @@ public class Squad {
 		List<Unit> goliathUnits = new ArrayList<>();
 		List<Unit> wraithUnits = new ArrayList<>();
 		List<Unit> vesselUnits = new ArrayList<>();
+		List<Unit> buildingUnits = new ArrayList<>();
 
 		for (Unit unit : unitSet) {
 			if (!CommandUtil.IsValidUnit(unit) || unit.isLoaded()) {
@@ -407,6 +411,8 @@ public class Squad {
 				wraithUnits.add(unit);
 			} else if (unit.getType() == UnitType.Terran_Science_Vessel) {
 				vesselUnits.add(unit);
+			} else if ((unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && unit.isLifted()){
+				buildingUnits.add(unit);
 			}
 		}
 
@@ -417,6 +423,7 @@ public class Squad {
 		microGoliath.setUnits(goliathUnits);
 		microWraith.setUnits(wraithUnits);
 		microVessel.setUnits(vesselUnits);
+		microBuilding.setUnits(buildingUnits);
 		
 	}
 	

@@ -35,8 +35,6 @@ public class RespondToStrategy {
 	
 	public int need_vessel_time = 0;
 	
-	public int need_vessel_time = 0;
-	
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
@@ -175,45 +173,122 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
 				if(blocked){
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 1
-							&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-						//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					}
+					//입구 막혔으면 이미 한마리가 있음
 				}else{
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) == 0){
+					
+					//TODO 무조건 벙커를 짓는게 아니고 재네가 출발을 했는지를 판단해야함. 
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0){
 						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-							//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
-							//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 					}
 				}
 			}
+			
+			
+//			//멀티 지우기
+//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//			BuildOrderItem checkItem = null; 
+//
+//			if (!tempbuildQueue.isEmpty()) {
+//				checkItem= tempbuildQueue.getHighestPriorityItem();
+//				while(true){
+//					if(tempbuildQueue.canGetNextItem() == true){
+//						tempbuildQueue.canGetNextItem();
+//					}else{
+//						break;
+//					}
+//					tempbuildQueue.PointToNextItem();
+//					checkItem = tempbuildQueue.getItem();
+//					
+//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+//						tempbuildQueue.removeCurrentItem();
+//					}
+//				}
+//			}
+			
+			
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
 					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
-				//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus){
+//		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush){
+//			
+//			//멀티 지우기
+//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//			BuildOrderItem checkItem = null; 
+//	
+//			if (!tempbuildQueue.isEmpty()) {
+//				checkItem= tempbuildQueue.getHighestPriorityItem();
+//				while(true){
+//					if(tempbuildQueue.canGetNextItem() == true){
+//						tempbuildQueue.canGetNextItem();
+//					}else{
+//						break;
+//					}
+//					tempbuildQueue.PointToNextItem();
+//					checkItem = tempbuildQueue.getItem();
+//					
+//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+//						tempbuildQueue.removeCurrentItem();
+//					}
+//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+//						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+//							tempbuildQueue.removeCurrentItem();
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
+//		
+//			//멀티 지우기
+//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//			BuildOrderItem checkItem = null; 
+//	
+//			if (!tempbuildQueue.isEmpty()) {
+//				checkItem= tempbuildQueue.getHighestPriorityItem();
+//				while(true){
+//					if(tempbuildQueue.canGetNextItem() == true){
+//						tempbuildQueue.canGetNextItem();
+//					}else{
+//						break;
+//					}
+//					tempbuildQueue.PointToNextItem();
+//					checkItem = tempbuildQueue.getItem();
+//					
+//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+//						tempbuildQueue.removeCurrentItem();
+//					}
+//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+//						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+//						tempbuildQueue.removeCurrentItem();
+//						}
+//					}			
+//				}
+//			}
+//		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init){
+			
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
-					&& MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
-				//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode) == 0
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) >= 1
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) < 3){
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}
 		}
@@ -284,7 +359,8 @@ public class RespondToStrategy {
 				//컴셋이 없다면
 				if(!chk_academy){
 					//아카데미가 없다면
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) < 1){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) < 1
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0){
 						//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Academy,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -292,12 +368,12 @@ public class RespondToStrategy {
 				}else{
 					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) > 0){ 
 						//아카데미가 완성되었고
-						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1){
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1
+								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
 							//빌드큐에 컴셋이 없는데, 아카데미가 완성되었다면빌드큐에 컴셋 입력
 							if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
 									&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()){
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station,
-										BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
 							}
 						}
 					}
@@ -307,7 +383,8 @@ public class RespondToStrategy {
 			if(!chk_engineering_bay){
 				//System.out.println("엔베없다");
 				//엔베가 없다면
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
 					//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -338,14 +415,14 @@ public class RespondToStrategy {
 			     			 }
 		     			 }
 						 if(!firstChokeTurret){
-		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1){
-		     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
-		     							tempChokePoint.getCenter().getPoint().toTilePosition(), true);
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1
+		     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition()) == 0){
+		     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition(), true);
 		     				}
 		     				
 		     			}
 					}
-			           tempChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());;
+			           tempChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());
 			           if (tempChokePoint != null) {
 							//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
 							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
@@ -356,7 +433,8 @@ public class RespondToStrategy {
 				     			 }
 			     			 }
 							 if(!firstChokeTurret){
-			     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1){
+			     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1
+			     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition()) == 0){
 			     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 			     							tempChokePoint.getCenter().getPoint().toTilePosition(), true);
 			     				}
@@ -376,7 +454,8 @@ public class RespondToStrategy {
 		     			 }
 		     			 if(!mainBaseTurret)
 		     			 {
-		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1){
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1
+		     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition()) == 0){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 										tempBaseLocation.getPoint().toTilePosition(), true);
 		     				}
@@ -392,7 +471,8 @@ public class RespondToStrategy {
 			if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ShuttleMix){
 				//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
 				if(!chk_armory){
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Armory,
@@ -407,7 +487,8 @@ public class RespondToStrategy {
 			//리버 대비
 			if(!chk_engineering_bay){
 				//엔지니어링 베이가 없다면
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
 					//빌드큐를 체크하고
 					/*if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Engineering_Bay.mineralPrice()){ 
 						//미네랄이 충분하다면
@@ -448,7 +529,8 @@ public class RespondToStrategy {
 			     				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			     			 }else{
 			     				//System.out.println("방어 터렛 3기 미만");
-		     					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1){
+		     					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1
+		     							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())==0){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 											tempBaseLocation.getPoint().toTilePosition(), true);
 			     				 }
@@ -462,7 +544,8 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Scout){
 			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
 			if(!chk_armory){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
 					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
 							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Armory,
@@ -471,8 +554,8 @@ public class RespondToStrategy {
 				}
 			}else{
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
-					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
-							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
+					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
+							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
@@ -483,7 +566,8 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
 			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
 			if(!chk_armory){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
 					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
 							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Armory,
@@ -492,8 +576,8 @@ public class RespondToStrategy {
 				}
 			}else{
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
-					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
-							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
+					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
+							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}

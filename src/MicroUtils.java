@@ -723,10 +723,38 @@ public class MicroUtils {
 		int minimumDistance = 999999;
 		for (Unit unit : units) {
 			if(unit == null){break;}
-			int dist = unit.getDistance(goalPosition);
-			if (dist < minimumDistance) {
-				leader = unit;
-				minimumDistance = dist;
+			if(unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
+				int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+				if (dist < minimumDistance) {
+					leader = unit;
+					minimumDistance = dist;
+				}
+			}
+		}
+		if(leader == null){
+			minimumDistance = 999999;
+			for (Unit unit : units) {
+				if(unit == null){break;}
+				if(unit.getType() == UnitType.Terran_Goliath){
+					int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+					if (dist < minimumDistance) {
+						leader = unit;
+						minimumDistance = dist;
+					}
+				}
+			}
+		}
+		if(leader == null){
+			minimumDistance = 999999;
+			for (Unit unit : units) {
+				if(unit == null){break;}
+				if(unit.getType() == UnitType.Terran_Vulture){
+					int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+					if (dist < minimumDistance) {
+						leader = unit;
+						minimumDistance = dist;
+					}
+				}
 			}
 		}
 		return leader;

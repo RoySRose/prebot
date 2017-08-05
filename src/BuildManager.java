@@ -85,7 +85,6 @@ public class BuildManager {
 			 * " producer null"); } }
 			 */
 
-			Unit secondProducer = null;
 			boolean canMake = false;
 
 			// 건물을 만들수 있는 유닛(일꾼)이나, 유닛을 만들수 있는 유닛(건물 or 유닛)이 있으면
@@ -182,7 +181,7 @@ public class BuildManager {
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
 					if(Config.BuildQueueDebugYN){
-						System.out.println("here I am!!! Killing: " + buildQueue.getCurrentItem().metaType.getName());
+						System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
 					}
 					buildQueue.removeCurrentItem();
 				}
@@ -846,7 +845,6 @@ public class BuildManager {
 					UnitType unitType = currentItem.metaType.getUnitType();
 					TechType requiredTechType = unitType.requiredTech();
 					final Map<UnitType, Integer> requiredUnits = unitType.requiredUnits();
-					int requiredSupply = unitType.supplyRequired();
 
 					/*
 					 * std::cout + "To make " + unitType.getName() +
@@ -900,7 +898,27 @@ public class BuildManager {
 							}
 						}
 					}
-
+					
+					int getAddonCnt = 0;
+					int getAddonPossibeCnt = 0;
+					
+					if (currentItem.metaType.getUnitType().isAddon()){ 
+						UnitType ProducerType = currentItem.metaType.getUnitType().whatBuilds().first;
+						
+						for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+							if(currentItem.metaType.getUnitType() == unit.getType()){
+								getAddonCnt++;
+							}
+							if(ProducerType == unit.getType()){
+								getAddonPossibeCnt++;
+							}
+						}
+						if(getAddonPossibeCnt <= getAddonCnt){
+							System.out.println("deadlock because of addon more than host");
+							isDeadlockCase = true;
+						}
+					}
+					
 					Iterator<UnitType> it = requiredUnits.keySet().iterator();
 					// 선행 건물/유닛이 있는데
 					if (!isDeadlockCase && requiredUnits.size() > 0) {
@@ -942,52 +960,52 @@ public class BuildManager {
 
 					// 건물이 아닌 지상/공중 유닛인데, 서플라이가 부족하면 dead lock 상황이 되긴 하지만, 
 					// 이 경우는 빌드를 취소하기보다는, StrategyManager 등에서 서플라이 빌드를 추가함으로써 풀도록 한다
-					if (!isDeadlockCase && !unitType.isBuilding()
-							&& MyBotModule.Broodwar.self().supplyUsed() + unitType.supplyRequired() > MyBotModule.Broodwar.self().supplyTotal()) 
-					{
-						//isDeadlockCase = true;
-					}
+//					if (!isDeadlockCase && !unitType.isBuilding()
+//							&& MyBotModule.Broodwar.self().supplyUsed() + unitType.supplyRequired() > MyBotModule.Broodwar.self().supplyTotal()) 
+//					{
+//						//isDeadlockCase = true;
+//					}
 
 					// Pylon 이 해당 지역 주위에 먼저 지어져야 하는데, Pylon 이 해당 지역 주위에 없고, 예정되어있지도 않으면 dead lock
-					if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresPsi()
-							&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
-
-						boolean hasFoundPylon = false;
-						List<Unit> ourUnits = MyBotModule.Broodwar
-								.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
-
-						for (Unit u : ourUnits) {
-							if (u.getPlayer() == MyBotModule.Broodwar.self() && u.getType() == UnitType.Protoss_Pylon) {
-								hasFoundPylon = true;
-							}
-						}
-
-						if (hasFoundPylon == false) {
-							isDeadlockCase = true;
-						}
-					}
+//					if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresPsi()
+//							&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
+//
+//						boolean hasFoundPylon = false;
+//						List<Unit> ourUnits = MyBotModule.Broodwar
+//								.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
+//
+//						for (Unit u : ourUnits) {
+//							if (u.getPlayer() == MyBotModule.Broodwar.self() && u.getType() == UnitType.Protoss_Pylon) {
+//								hasFoundPylon = true;
+//							}
+//						}
+//
+//						if (hasFoundPylon == false) {
+//							isDeadlockCase = true;
+//						}
+//					}
 
 					// Creep 이 해당 지역 주위에 Hatchery나 Creep Colony 등을 통해 먼저 지어져야 하는데, 해당 지역 주위에 지어지지 않고 있으면 dead lock
-					if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresCreep()
-							&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
-						boolean hasFoundCreepGenerator = false;
-						List<Unit> ourUnits = MyBotModule.Broodwar
-								.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
-
-						for (Unit u : ourUnits) {
-							if (u.getPlayer() == MyBotModule.Broodwar.self() && (u.getType() == UnitType.Zerg_Hatchery
-									|| u.getType() == UnitType.Zerg_Lair || u.getType() == UnitType.Zerg_Hive
-									|| u.getType() == UnitType.Zerg_Creep_Colony
-									|| u.getType() == UnitType.Zerg_Sunken_Colony
-									|| u.getType() == UnitType.Zerg_Spore_Colony)) {
-								hasFoundCreepGenerator = true;
-							}
-						}
-
-						if (hasFoundCreepGenerator == false) {
-							isDeadlockCase = true;
-						}
-					}
+//					if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresCreep()
+//							&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
+//						boolean hasFoundCreepGenerator = false;
+//						List<Unit> ourUnits = MyBotModule.Broodwar
+//								.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
+//
+//						for (Unit u : ourUnits) {
+//							if (u.getPlayer() == MyBotModule.Broodwar.self() && (u.getType() == UnitType.Zerg_Hatchery
+//									|| u.getType() == UnitType.Zerg_Lair || u.getType() == UnitType.Zerg_Hive
+//									|| u.getType() == UnitType.Zerg_Creep_Colony
+//									|| u.getType() == UnitType.Zerg_Sunken_Colony
+//									|| u.getType() == UnitType.Zerg_Spore_Colony)) {
+//								hasFoundCreepGenerator = true;
+//							}
+//						}
+//
+//						if (hasFoundCreepGenerator == false) {
+//							isDeadlockCase = true;
+//						}
+//					}
 
 				}
 				// 테크의 경우, 해당 리서치를 이미 했거나, 이미 하고있거나, 리서치를 하는 건물 및 선행건물이 존재하지않고

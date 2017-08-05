@@ -42,13 +42,18 @@ public class InformationManager {
 	//private boolean ScoutDefenseNeeded;
 	
 	private boolean FirstScoutAlive;
+	private boolean FirstVultureAlive;
 	private boolean ScoutStart;
+	private boolean VultureStart;
 	
 	private Unit myfirstGas;
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
 	private boolean checkGasRush;
 	private int MainBaseSuppleLimit;
+	private Unit FirstCommandCenter;
+	private Unit FirstVulture;
+	private Position firstenemyunit;
 	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -73,6 +78,8 @@ public class InformationManager {
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
+	private Map<Player, Chokepoint> thirdChokePointDonotUse = new HashMap<Player, Chokepoint>();
+	public Position tighteningPoint = null;
 	
 	// 나머지 멀티 location (가까운 순으로 sorting)
 	private Map<Player, List<BaseLocation>> otherExpansionLocations = new HashMap<Player, List<BaseLocation>>();
@@ -101,13 +108,24 @@ public class InformationManager {
 		ReceivingEveryMultiInfo = false;
 //		EarlyDefenseNeeded = true;
 //		ScoutDefenseNeeded = true;
-		FirstScoutAlive = false;
+		FirstScoutAlive = true;
+		FirstVultureAlive = true;
 		ScoutStart = false;
+		VultureStart = false;
 		myfirstGas = null;
 		gasRushEnemyRefi = null;
 		gasRushed = false;
 		checkGasRush = true;
 		MainBaseSuppleLimit =0;
+		FirstCommandCenter = null;
+		FirstVulture = null;
+		Position firstenemyunit = null;
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if(unit.getType() == UnitType.Terran_Command_Center){
+				FirstCommandCenter = unit;
+			}
+		}
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -144,6 +162,9 @@ public class InformationManager {
 		firstExpansionLocation.put(enemyPlayer, null);
 		secondChokePoint.put(selfPlayer, null);
 		secondChokePoint.put(enemyPlayer, null);
+		thirdChokePointDonotUse.put(selfPlayer, null);
+		thirdChokePointDonotUse.put(enemyPlayer, null);
+		tighteningPoint = null;
 
 		otherExpansionLocations.put(selfPlayer, new ArrayList<BaseLocation>());
 		otherExpansionLocations.put(enemyPlayer, new ArrayList<BaseLocation>());
@@ -182,7 +203,7 @@ public class InformationManager {
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0) {
 			updateBaseLocationInfo();
-			setEveryMultiInfo();
+//			setEveryMultiInfo();
 		}
 		
 		
@@ -211,15 +232,34 @@ public class InformationManager {
 //				}
 //			}
 //		}
+			
+			
+		if(VultureStart == false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) > 0){
+			VultureStart = true;
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+				if(unit.getType() == UnitType.Terran_Vulture){
+					FirstVulture = unit; 
+					FirstVultureAlive = true;
+				}
+			}
+		}
+		if(VultureStart == true && FirstVultureAlive == true  && FirstVulture.exists() == false){
+			FirstVultureAlive = false;
+		}
+		
+		
 		if(ScoutStart == false && WorkerManager.Instance().getScoutWorker() != null){
 			ScoutStart = true;
-			FirstScoutAlive = true;
 		}
-			
-		if(ScoutStart == true && FirstScoutAlive == true  && WorkerManager.Instance().getScoutWorker() != null 
-				&& WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0){
+		if(ScoutStart == true && ((WorkerManager.Instance().getScoutWorker() != null 
+				&& WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0)
+				|| WorkerManager.Instance().getScoutWorker() == null )){
+			if(InformationManager.Instance().getEnemyUnits().size() > 0){
+				firstenemyunit = InformationManager.Instance().getEnemyUnits().get(0).getLastPosition();
+			}
 			FirstScoutAlive = false;
 		}
+		
 		if(checkGasRush == true){
 			
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
@@ -452,6 +492,53 @@ public class InformationManager {
 				occupiedBaseLocations.get(enemyPlayer).add(unexplored);
 			}
 		}
+		
+		
+		
+		//끝까지 상대 location 못 찾았을때
+		if (mainBaseLocations.get(enemyPlayer) == null && FirstScoutAlive == false && (FirstVultureAlive ==false || MyBotModule.Broodwar.getFrameCount() >= 8500 )) {
+			
+			List<UnitInfo> enemyUnits = null;
+			enemyUnits = InformationManager.Instance().getEnemyUnits();
+			
+			if(enemyUnits.size() > 0){
+				for(UnitInfo fogUnit : enemyUnits){
+					
+					BaseLocation closestBase = null;
+					if(fogUnit.getType().isBuilding() == true){
+						int minimumDistance = 999999;
+						for (BaseLocation startLocation : BWTA.getStartLocations()) {
+							if (startLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+							if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {continue;}
+							
+							int dist = MapTools.Instance().getGroundDistance(fogUnit.getLastPosition(), startLocation.getPosition());
+							if (dist < minimumDistance) {
+								closestBase = startLocation;
+								minimumDistance = dist;
+							}
+						}
+					}
+					
+					if(closestBase ==null){
+						int minimumDistance = 999999;
+						for (BaseLocation startLocation : BWTA.getStartLocations()) {
+							if (startLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+							if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {continue;}
+							
+							int dist = MapTools.Instance().getGroundDistance(firstenemyunit, startLocation.getPosition());
+							if (dist < minimumDistance) {
+								closestBase = startLocation;
+								minimumDistance = dist;
+							}
+						}
+					}
+					
+					mainBaseLocations.put(enemyPlayer, closestBase);
+					mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
+					break;
+				}
+			}
+		}
 
 		// update occupied base location
 		// 어떤 Base Location 에는 아군 건물, 적군 건물 모두 혼재해있어서 동시에 여러 Player 가 Occupy 하고
@@ -565,6 +652,38 @@ public class InformationManager {
 		return units;
 	}
 	
+	public List<UnitInfo> getEnemyUnitsNear(Unit myunit, int radius, boolean ground, boolean air)
+	{
+		List<UnitInfo> units = new ArrayList<>();
+		
+		Iterator<Integer> it = null;
+		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		
+		
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
+			if(ui != null){
+				if(myunit.getDistance(ui.getLastPosition()) > radius){
+					continue;
+				}
+				if(ui.getType().isBuilding()){
+					if(ground){
+						if(ui.getType().groundWeapon() != WeaponType.None){
+							units.add(ui);
+						}
+					}
+					if(air){
+						if(ui.getType().airWeapon() != WeaponType.None){
+							units.add(ui);
+						}
+					}
+				}
+			}
+		}
+		
+		return units;
+	}
+	
 	public List<UnitInfo> getEnemyBuildingUnitsNear(Unit myunit, int radius, boolean canAttack, boolean ground, boolean air)
 	{
 		List<UnitInfo> units = new ArrayList<>();
@@ -639,38 +758,38 @@ public class InformationManager {
 	
 	
 
-	public void setEveryMultiInfo() {
-		
-		if (mainBaseLocations.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
-			BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
-			for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
-			{
-				if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())) continue;
-				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
-				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
-				//적군 베이스도 아닐때
-				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,10) == true) continue;
-				
-//				occupiedBaseLocations.
-				
-//				System.out.print("targetBaseLocationX : " + targetBaseLocation.getTilePosition().getX());
-//				System.out.println(", targetBaseLocationY : " + targetBaseLocation.getTilePosition().getY());
+//	public void setEveryMultiInfo() {
+//		
+//		if (mainBaseLocations.get(selfPlayer) != null && mainBaseLocations.get(enemyPlayer) != null) {
+//			BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
+//			for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+//			{
+//				if (!BWTA.isConnected(targetBaseLocation.getTilePosition(), sourceBaseLocation.getTilePosition())) continue;
+//				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+//				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+//				//적군 베이스도 아닐때
+//				if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,10) == true) continue;
 //				
-//				System.out.println("getduration: "+ MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()));
-				if (MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()) > 8000)
-				{
-					ReceivingEveryMultiInfo = false;
-//					System.out.println("ReceivingEveryMultiInfo1: " + ReceivingEveryMultiInfo);
-					return;
-				}
-			}
-			ReceivingEveryMultiInfo = true;
-//			System.out.println("ReceivingEveryMultiInfo2: " + ReceivingEveryMultiInfo);
-		}else{
-			ReceivingEveryMultiInfo = false;
-//			System.out.println("ReceivingEveryMultiInfo3: " + ReceivingEveryMultiInfo);
-		}
-	}
+////				occupiedBaseLocations.
+//				
+////				System.out.print("targetBaseLocationX : " + targetBaseLocation.getTilePosition().getX());
+////				System.out.println(", targetBaseLocationY : " + targetBaseLocation.getTilePosition().getY());
+////				
+////				System.out.println("getduration: "+ MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()));
+//				if (MapGrid.Instance().getCellLastVisitDuration(targetBaseLocation.getPosition()) > 8000)
+//				{
+//					ReceivingEveryMultiInfo = false;
+////					System.out.println("ReceivingEveryMultiInfo1: " + ReceivingEveryMultiInfo);
+//					return;
+//				}
+//			}
+//			ReceivingEveryMultiInfo = true;
+////			System.out.println("ReceivingEveryMultiInfo2: " + ReceivingEveryMultiInfo);
+//		}else{
+//			ReceivingEveryMultiInfo = false;
+////			System.out.println("ReceivingEveryMultiInfo3: " + ReceivingEveryMultiInfo);
+//		}
+//	}
 	public BaseLocation getNextExpansionLocation() {
 		
 		BaseLocation res = null;
@@ -692,13 +811,13 @@ public class InformationManager {
 					if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
 					if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
 					
-					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
-					if(findGeyser != null){
-						if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
-							continue;
-						}
-					}
-					
+//					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
+//					if(findGeyser != null){
+//						if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
+//							continue;
+//						}
+//					}
+//					
 					sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
 					tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
 					
@@ -837,6 +956,8 @@ public class InformationManager {
 	}
 
 	public void updateChokePointAndExpansionLocation() {
+		
+		Position Center = new Position(2048,2048);
 		if (mainBaseLocationChanged.get(selfPlayer).booleanValue() == true) {
 		
 			if (mainBaseLocations.get(selfPlayer) != null) {
@@ -861,12 +982,23 @@ public class InformationManager {
 				for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
 					if ( chokepoint.getCenter().equals(firstChokePoint.get(selfPlayer).getCenter())) continue;
 	
-					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), chokepoint.getPoint());
+					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), chokepoint.getPoint())*1.1;
+					tempDistance += MapTools.Instance().getGroundDistance(Center, chokepoint.getPoint());
 //					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition()); //욱스가 주석 남기라고 함
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
+						thirdChokePointDonotUse.put(selfPlayer, secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer, chokepoint);
 						this.updateReadyToAttackPosition(selfPlayer, chokepoint);
+					}
+				}
+				//헌트 특이사항
+				if(mapSpecificInformation.getMap() == MAP.TheHunters){
+					int startingX = FirstCommandCenter.getTilePosition().getX(); 
+					int startingY = FirstCommandCenter.getTilePosition().getY();
+					if(startingX == 114 && startingY == 80)	{		
+						firstChokePoint.put(selfPlayer,  secondChokePoint.get(selfPlayer));
+						secondChokePoint.put(selfPlayer,  thirdChokePointDonotUse.get(selfPlayer));
 					}
 				}
 				this.updateOtherExpansionLocation(sourceBaseLocation);
@@ -875,12 +1007,12 @@ public class InformationManager {
 		}
 		
 		if (mainBaseLocationChanged.get(enemyPlayer).booleanValue() == true) {
-
 	
-			if (mainBaseLocations.get(enemyPlayer) != null) {
-				BaseLocation sourceBaseLocation = mainBaseLocations.get(enemyPlayer);
-	
-				firstChokePoint.put(enemyPlayer, BWTA.getNearestChokepoint(sourceBaseLocation.getTilePosition()));
+			if (mainBaseLocations.get(enemyPlayer) != null && mainBaseLocations.get(selfPlayer) != null) {
+				BaseLocation enemySourceBaseLocation = mainBaseLocations.get(enemyPlayer);
+				BaseLocation mySourceBaseLocation = mainBaseLocations.get(selfPlayer);
+				
+				firstChokePoint.put(enemyPlayer, BWTA.getNearestChokepoint(enemySourceBaseLocation.getTilePosition()));
 				
 				double tempDistance;
 				double closestDistance = 1000000000;
@@ -888,7 +1020,7 @@ public class InformationManager {
 				{
 					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
 	
-					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), targetBaseLocation.getPosition());
+					tempDistance = MapTools.Instance().getGroundDistance(enemySourceBaseLocation.getPosition(), targetBaseLocation.getPosition());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						firstExpansionLocation.put(enemyPlayer, targetBaseLocation);
@@ -899,15 +1031,41 @@ public class InformationManager {
 				for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
 					if ( chokepoint.getCenter().equals(firstChokePoint.get(enemyPlayer).getCenter())) continue;
 	
-					tempDistance = MapTools.Instance().getGroundDistance(sourceBaseLocation.getPosition(), chokepoint.getPoint());
-//					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition());
+					tempDistance = MapTools.Instance().getGroundDistance(enemySourceBaseLocation.getPosition(), chokepoint.getPoint())*1.1;
+					tempDistance += MapTools.Instance().getGroundDistance(Center, chokepoint.getPoint());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
+						thirdChokePointDonotUse.put(enemyPlayer, secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer, chokepoint);
 						this.updateReadyToAttackPosition(enemyPlayer, chokepoint);
 					}
 				}
-				this.updateOtherExpansionLocation(sourceBaseLocation);
+				//헌트 특이사항
+				if(mapSpecificInformation.getMap() == MAP.TheHunters){
+					
+					int startingX = FirstCommandCenter.getTilePosition().getX(); 
+					int startingY = FirstCommandCenter.getTilePosition().getY();
+					if(startingX == 114 && startingY == 80)	{		
+						firstChokePoint.put(enemyPlayer,  secondChokePoint.get(enemyPlayer));
+						secondChokePoint.put(enemyPlayer,  thirdChokePointDonotUse.get(enemyPlayer));
+					}
+				}
+					
+				double tempDistanceFromSelf;
+				double tempDistanceFromEnemy;
+				double tempDistanceForHunter =0;
+				closestDistance = 1000000000;
+				for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
+					tempDistanceFromSelf = MapTools.Instance().getGroundDistance(mySourceBaseLocation.getPosition(), chokepoint.getPoint());
+					tempDistanceFromEnemy = MapTools.Instance().getGroundDistance(enemySourceBaseLocation.getPosition(), chokepoint.getPoint());
+//						tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition()); //욱스가 주석 남기라고 함
+					if (tempDistanceForHunter < closestDistance && tempDistanceFromEnemy-tempDistanceFromSelf > 0) {
+						closestDistance = tempDistanceForHunter;
+						tighteningPoint = chokepoint.getCenter();
+					}
+				}
+				
+				this.updateOtherExpansionLocation(enemySourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
 		}

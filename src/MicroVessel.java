@@ -54,6 +54,7 @@ public class MicroVessel extends MicroManager {
 		boolean unitedKiting = kitingOption.isUnitedKiting();
 		Position goalPosition = kitingOption.getGoalPosition();
 		Integer[] fleeAngle = kitingOption.getFleeAngle();
+		Position originalPos = order.getPosition();
 				
 		for (Unit sVessel : sVessels) {
 			
@@ -122,7 +123,6 @@ public class MicroVessel extends MicroManager {
 				if(target.getType() == UnitType.Terran_Wraith){
 					List<Unit> neargoliaths = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange()/2, true, false, UnitType.Terran_Goliath);
 					if(neargoliaths.size() > 2){
-						mostDangerousTarget = null;
 						continue;
 					}
 				}
@@ -165,6 +165,9 @@ public class MicroVessel extends MicroManager {
 			}
 			
 			if(!fleeing){
+				if(originalPos.getDistance(order.getPosition()) > 128){
+					order.setPosition(originalPos);
+				}
 				sVessel.move(order.getPosition());
 			} 
 		}

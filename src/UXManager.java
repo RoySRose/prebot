@@ -65,7 +65,7 @@ public class UXManager {
 
 		if (Config.DrawEnemyUnitInfo) {
 			drawUnitStatisticsOnScreen1(400, 15);
-			drawUnitStatisticsOnScreen2(370, 50);
+			//drawUnitStatisticsOnScreen2(370, 50);
 		}
 
 		if (Config.DrawBWTAInfo) {
@@ -83,7 +83,7 @@ public class UXManager {
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
 		if (Config.DrawProductionInfo) {
-			//drawBuildStatusOnScreen(120, 60);
+			drawBuildStatusOnScreen(370, 50);
 		}
 
 		// 건물 건설 큐. 건물 건설 상황
