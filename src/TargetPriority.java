@@ -132,8 +132,8 @@ public class TargetPriority {
 		inputPriority = PRIORITY_MAX;
 		vulturePriorityMap.put(UnitType.Zerg_Infested_Terran,				inputPriority);
 		vulturePriorityMap.put(UnitType.Zerg_Defiler,						inputPriority -= PRIORITY_GAP);
-		vulturePriorityMap.put(UnitType.Zerg_Zergling,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Lurker,						inputPriority -= PRIORITY_GAP);
+		vulturePriorityMap.put(UnitType.Zerg_Zergling,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Hydralisk,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Ultralisk,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Drone,							inputPriority -= PRIORITY_GAP);

@@ -229,7 +229,7 @@ public class MechanicMicroDecision {
 						|| enemyUnitType == UnitType.Protoss_Photon_Cannon
 						|| enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| enemyUnitType == UnitType.Terran_Bunker
-						|| (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed())
+						|| (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed() && !enemy.isDetected())
 						|| (saveUnitLevel >= 2 && allRangeUnitType(MyBotModule.Broodwar.enemy(), enemyUnitType))) {
 					
 					int enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();

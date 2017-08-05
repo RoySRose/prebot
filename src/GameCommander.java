@@ -21,7 +21,6 @@ public class GameCommander {
 			return;
 		}
 		StrategyManager.Instance().onStart();
-		logObserver.start();
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다
@@ -41,6 +40,7 @@ public class GameCommander {
 		}
 
 		try {
+			logObserver.start();
 			LagTest lag = new LagTest();
 			if ( isToFindError) System.out.print("(a");
 
