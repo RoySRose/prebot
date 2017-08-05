@@ -48,7 +48,7 @@ public class MicroUtils {
 				continue;
 			}
 			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -88,7 +88,7 @@ public class MicroUtils {
 				continue;
 			}
 			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -613,6 +613,37 @@ public class MicroUtils {
 		return newTargetInfos;
 	}
 	
+	public static List<UnitInfo> filterFlyingTargetInfos(List<UnitInfo> targetInfos) {
+		List<UnitInfo> newTargetInfos = new ArrayList<>();
+		for (UnitInfo targetInfo : targetInfos) {
+			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+
+			if (target != null) {
+				if (!CommandUtil.IsValidUnit(target)) {
+					continue;
+				}
+				if (target.isFlying()) {
+					newTargetInfos.add(targetInfo);
+				}
+			} else {
+				UnitType enemyUnitType = targetInfo.getType();
+				if (enemyUnitType.isFlyer()) {
+					newTargetInfos.add(targetInfo);
+				}
+			}
+		}
+		return newTargetInfos;
+	}
+	
+	public static boolean exposedByEnemy(Unit myUnit, List<UnitInfo> enemiesInfo) {
+		for (UnitInfo ei : enemiesInfo) {
+			if (myUnit.getDistance(ei.getLastPosition()) <= ei.getType().sightRange()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static Position centerOfUnits(List<Unit> units) {
 		if (units.isEmpty()) {
 			return null;
@@ -660,7 +691,7 @@ public class MicroUtils {
 	
 	public static boolean existTooNarrowChoke(Position position) {
 		Chokepoint nearChoke = BWTA.getNearestChokepoint(position);
-		if (nearChoke.getWidth() < 300 && position.getDistance(nearChoke.getCenter()) < 150) {
+		if (nearChoke.getWidth() < 250 && position.getDistance(nearChoke.getCenter()) < 150) {
 			return true;
 		} else {
 			return false;

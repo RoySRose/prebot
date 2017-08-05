@@ -6,30 +6,34 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
 import bwta.BaseLocation;
-import bwta.Chokepoint;
 
 public class MechanicMicroTank extends MechanicMicroAbstract {
-
+	
 	private SquadOrder order;
 	private List<UnitInfo> enemiesInfo;
+	private List<UnitInfo> flyingEnemisInfo;
 	
 	private List<Unit> tankList = new ArrayList<>();
 	private List<Unit> goliathList = new ArrayList<>();
+	
 	private int initFrame = 0;
+	private int saveUnitLevel = 1;
+	
 	private int siegeModeSpreadRadius = 200;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
 		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
+		this.flyingEnemisInfo = MicroUtils.filterFlyingTargetInfos(enemiesInfo);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int initFrame) {
+	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int initFrame, int saveUnitLevel) {
 		this.tankList = tankList;
 		this.goliathList = goliathList;
 		this.initFrame = initFrame;
 		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tankList.size()) * 10);
+		this.saveUnitLevel = saveUnitLevel;
 	}
 	
 	public void executeMechanicMicro(Unit tank) {
@@ -50,7 +54,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		}
 		
 		// Decision -> 0: stop, 1: kiting(attack unit), 2: change
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecisionForSiegeMode(tank, enemiesInfo, tankList, order);
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecisionForSiegeMode(tank, enemiesInfo, tankList, order, saveUnitLevel);
 		SpiderMineManger.Instance().addRemoveList(tank);
 		
 		switch (decision.getDecision()) {
@@ -90,7 +94,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		}
 		
 		KitingOption kOpt = KitingOption.defaultKitingOption();
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(tank, enemiesInfo); // 0: flee, 1: kiting, 2: go, 3: change
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(tank, enemiesInfo, flyingEnemisInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: go, 3: change
 		switch (decision.getDecision()) {
 		case 0: // flee
 			Position retreatPosition = order.getPosition();
@@ -111,23 +115,32 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				targetPosition = target.getPosition();
 				targetType = target.getType();
 			}
-			if (targetType.groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃
+			if (targetType.groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃 카이팅
 				Position kitingGoalPosition = order.getPosition();
 				kOpt.setGoalPosition(kitingGoalPosition);
 				MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
 			} else {
 				boolean shouldSiege = false;
 				int distanceToTarget = tank.getDistance(targetPosition);
-				if (distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE) {
-					shouldSiege = true;
-				} else {
-					for (Unit otherTank : tankList) { // target이 시즈포격에서 자유로운가
-						if (otherTank.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-								&& otherTank.getDistance(targetPosition) <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE
-								&& otherTank.getDistance(tank.getPosition()) < MicroSet.Tank.SIEGE_LINK_DISTANCE) {
-							shouldSiege = true;
-							break;
+
+				if (targetType != UnitType.Terran_Siege_Tank_Tank_Mode && targetType != UnitType.Terran_Siege_Tank_Siege_Mode) {
+					if (distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) { // 시즈범위 안에 있다면 시즈
+						shouldSiege = true;
+					} else {
+						for (Unit otherTank : tankList) { // target이 다른 가까운 시즈포격범위 내에 있다면 시즈모드로 변경
+							if (otherTank.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+									&& otherTank.getDistance(targetPosition) <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5
+									&& otherTank.getDistance(tank.getPosition()) < MicroSet.Tank.SIEGE_LINK_DISTANCE) { 
+								shouldSiege = true;
+								break;
+							}
 						}
+					}
+				} else {
+					if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
+						shouldSiege = true;
+					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK + 10) {
+						shouldSiege = true;
 					}
 				}
 				
@@ -189,7 +202,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 
 				    	boolean somethingInThePosition = false;
 				    	boolean addOnPosition = false;
-				    	List<Unit> exactPositionUnits = MapGrid.Instance().getUnitsNear(movePosition, 15, true, false, null);
+				    	List<Unit> exactPositionUnits = MyBotModule.Broodwar.getUnitsInRadius(movePosition, 15);
 				    	for (Unit unit : exactPositionUnits) {
 				    		if (!unit.getType().canMove()) {
 				    			somethingInThePosition = true;
