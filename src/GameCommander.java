@@ -57,7 +57,7 @@ public class GameCommander {
 			// economy and base managers
 			// 일꾼 유닛에 대한 명령 (자원 채취, 이동 정도) 지시 및 정리
 			WorkerManager.Instance().update();
-			lag.test("MapGrid");
+			lag.test("WorkerManager");
 			if ( isToFindError) System.out.print("d");
 			
 			// 빌드오더큐를 관리하며, 빌드오더에 따라 실제 실행(유닛 훈련, 테크 업그레이드 등)을 지시한다.
