@@ -524,10 +524,36 @@ public class CombatManager {
 			}
 		}
 
-		// Fourth choice: We can't see anything so explore the map attacking along the way
-		//Position leastExplored = MapGrid.Instance().getLeastExplored(); //TODO 렉 유발요소 확인 필요
-		//return leastExplored;
-		return null;
+		return letsFindRat();
+	}
+	
+	// 쥐새끼를 찾자
+	public Position letsFindRat() {
+		// starting location 중에서 탐험되지 않은 지역
+		List<BaseLocation> bases = InformationManager.Instance().getMapSpecificInformation().getStartingBaseLocation();
+		for (BaseLocation base : bases) {
+			if (!MyBotModule.Broodwar.isExplored(base.getTilePosition())) {
+				return base.getPosition();
+			}
+		}
+
+		// 앞마당 지역
+		BaseLocation enemyExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+		if (enemyExpansion != null && !MyBotModule.Broodwar.isExplored(enemyExpansion.getTilePosition())) {
+			return enemyExpansion.getPosition();
+		}
+		
+		// 제 3멀티 중에서 탐험되지 않은 지역
+		List<BaseLocation> otherExpansion = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
+		if (otherExpansion != null && !otherExpansion.isEmpty()) {
+			for (BaseLocation base : otherExpansion) {
+				if (!MyBotModule.Broodwar.isExplored(base.getTilePosition())) {
+					return base.getPosition();
+				}
+			}
+		}
+		
+		return new Position(2222, 2222);
 	}
 	
 	private Position getNextChokePosition(Squad squad) {
@@ -979,8 +1005,6 @@ public class CombatManager {
 					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
 					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 					|| unit.getType() == UnitType.Terran_Goliath) {
-				
-			} {
 				if (squadData.canAssignUnitToSquad(unit, mainAttackSquad)) {
 					squadData.assignUnitToSquad(unit, mainAttackSquad);// 배슬, 드랍십도 포함됨
 		        }
