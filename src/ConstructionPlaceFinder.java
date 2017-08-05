@@ -191,6 +191,8 @@ public class ConstructionPlaceFinder {
 					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
 				}
 				break;
+			default:
+				break;
 			}
 			
 		}
@@ -304,7 +306,6 @@ public class ConstructionPlaceFinder {
 
 		//returns a valid build location near the desired tile position (x,y).
 		TilePosition resultPosition = TilePosition.None;
-		TilePosition tempPosition;
 		ConstructionTask b = new ConstructionTask(buildingType, desiredPosition);
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다

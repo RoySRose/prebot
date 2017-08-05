@@ -114,6 +114,7 @@ public class StrategyManager {
 	public int ExpansionPoint = 0;
 	public int UnitPoint = 0;
 	public int CombatStartCase =0;
+	public int WraithTime =0;
 	
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
@@ -184,6 +185,8 @@ public class StrategyManager {
 	
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
+		
+		
 //		if (enemyBaseRegionVertices.isEmpty()) {
 //			ScoutManager.Instance().calculateEnemyRegionVertices();
 //			System.out.println(ScoutManager.Instance().enemyBaseRegionVertices.toString());
@@ -197,8 +200,8 @@ public class StrategyManager {
 //		System.out.println("sourceBaseLocationP : " + sourceBaseLocation.getRegion().getCenter());
 
 		//TODO 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
-		if ((MyBotModule.Broodwar.getFrameCount() < 3000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
-				||(MyBotModule.Broodwar.getFrameCount() >= 3000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
+		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
+				||(MyBotModule.Broodwar.getFrameCount() >= 13000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) {
 			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
@@ -235,7 +238,9 @@ public class StrategyManager {
 				executeAddBuildingInit();
 			}
 		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0) { //5초에 한번 팩토리 추가 여부 결정
-			executeAddFactory();
+			if (isInitialBuildOrderFinished == true) {
+				executeAddFactory();
+			}
 		}
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500){
@@ -253,9 +258,10 @@ public class StrategyManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
 			executeFly();
 		}
-		if (MyBotModule.Broodwar.getFrameCount() % 37 == 0){//약 4초에 한번
+		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
+				||(MyBotModule.Broodwar.getFrameCount() >= 13000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) { //Analyze 와 동일하게
 			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
-			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+			//AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
 	}
@@ -609,6 +615,10 @@ public class StrategyManager {
 		boolean scienceComplete = false;
 		boolean armory = false;
 		boolean vessel = false;
+		int marinecnt = 0;
+		int vulturecnt= 0;
+		int wraithcnt = 0;
+		int valkyriecnt = 0;
 		Unit starportUnit = null;
 		int CC =0;
 	
@@ -683,6 +693,12 @@ public class StrategyManager {
 			}
 			//engineering end
 			
+			//engineering start
+			if(unit.getType() == UnitType.Terran_Armory){
+				armory = true;
+			}
+			//engineering end
+			
 			//scienceVessel start
 			if(unit.getType() == UnitType.Terran_Starport){
 				star = true;
@@ -701,6 +717,28 @@ public class StrategyManager {
 				vessel = true;
 			}
 			//scienceVessel end 	
+			
+			//marine for fast zergling and zealot start
+			if(unit.getType() == UnitType.Terran_Marine && unit.isCompleted()){
+				marinecnt ++;
+			}
+			
+			if(unit.getType() == UnitType.Terran_Vulture && unit.isCompleted()){
+				vulturecnt ++;
+			}
+			//marine for fast zergling and zealot end
+			
+			//wraith for TvT start
+			if(unit.getType() == UnitType.Terran_Wraith && unit.isCompleted()){
+				wraithcnt ++;
+			}
+			//wraith for TvT end
+			
+			//valkyrie for TvT start
+			if(unit.getType() == UnitType.Terran_Valkyrie && unit.isCompleted()){
+				valkyriecnt ++;
+			}
+			//valkyrie for TvT end
 		}
 		
 		//컴샛 start
@@ -788,7 +826,7 @@ public class StrategyManager {
 						if(Config.BroodwarDebugYN){
 						MyBotModule.Broodwar.printf("make Terran_Control_Tower");
 						}
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Control_Tower, false);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
 					}
 				}
 			}
@@ -813,8 +851,7 @@ public class StrategyManager {
 		//armory start1
 		if(armory == false){
 			if(CC>=2 || MyBotModule.Broodwar.getFrameCount() > 13000){
-				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0 
-						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0) {
 					if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("make armory since we have many CC");
@@ -824,6 +861,88 @@ public class StrategyManager {
 			}
 		}
 		//armory end2
+
+		//marine for fast zergling and zealot start
+		if((CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0) && vulturecnt == 0 && marinecnt <= 4){
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null) == 0) {
+				if(Config.BroodwarDebugYN){
+				MyBotModule.Broodwar.printf("make marine");
+				}
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, false);
+			}
+		}
+		//marine for fast zergling and zealot end
+		
+		//wraith for TvT start
+		if(RespondToStrategy.instance().max_wraith > wraithcnt){
+			if(star == false){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
+					if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("make starport since we have many CC");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+				}
+			}
+			if(starComplete){
+				if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 1500 || wraithcnt < 2)){ //TODO && wraithcnt <= needwraith){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+						if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("make wraith");
+						}
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
+					}
+				}
+			}
+		}
+		//wraith for TvT end
+		
+		//valkyrie for TvT start
+		if(RespondToStrategy.instance().max_valkyrie > valkyriecnt && CC >=2){
+			if(star == false){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
+					if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("make starport since we have many CC");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+				}
+			}
+			if(armory == false){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0) {
+					if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("make armory for valkyrie");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Armory, false);
+				}
+			}
+			if(starComplete){
+				//컨트롤 타워가 없다면
+				if(starportUnit != null && starportUnit.getAddon() == null){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) == 0
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
+						if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("make Terran_Control_Tower");
+						}
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
+					}
+				}
+			}
+			if(starComplete && starportUnit.getAddon() != null && starportUnit.getAddon().isCompleted() == true){
+				if(starportUnit.isTraining() == false){// && valkyriecnt < needwraithvalkyriecnt){ //TODO 
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie, null) == 0) {
+						if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("make valkyrie");
+						}
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Valkyrie, false);
+					}
+				}
+			}
+		}
+		//valkyrie for TvT end
+		
+		
 	}
 	
 	public void executeAddFactory() {
@@ -884,7 +1003,7 @@ public class StrategyManager {
 			if(Faccnt == 0){
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}else if(Faccnt < maxFaccnt){
-				if(MyBotModule.Broodwar.self().minerals() > 250 + additonalmin && MyBotModule.Broodwar.self().gas() > 130 + additonalgas){
+				if(MyBotModule.Broodwar.self().minerals() > 200 + additonalmin && MyBotModule.Broodwar.self().gas() > 100 + additonalgas){
 					if(Faccnt <= 5){
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					}else if(Faccnt <= 6){
@@ -933,7 +1052,7 @@ public class StrategyManager {
 ////			}
 //		}
 		
-		if( MachineShopcnt < 4 && MachineShopcnt + 2 < Faccnt){
+		if( MachineShopcnt < 4 && MachineShopcnt + 3 < Faccnt){
 			if(MyBotModule.Broodwar.self().minerals() > 50 && MyBotModule.Broodwar.self().gas() > 50){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
@@ -1564,12 +1683,14 @@ public class StrategyManager {
 		boolean vsTerranbool[] = new boolean[]{VM, VS, TS, GR};
 		MetaType vsTerranBio[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
 		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
-		MetaType vsProtoss[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
-		boolean vsProtossbool[] = new boolean[]{TS, VM, VS, GR};
+		MetaType vsProtoss[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
+		boolean vsProtossbool[] = new boolean[]{VM, VS, TS, GR};
 		MetaType vsProtossZealot[] = new MetaType[]{vultureSpeed, vultureMine, TankSiegeMode, GoliathRange};
 		boolean vsProtossZealotbool[] = new boolean[]{VS, VM, TS, GR};
-		MetaType vsProtossAggressive[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
-		boolean vsProtossAggressivebool[] = new boolean[]{VM, VS, TS, GR};
+		MetaType vsProtossDragoon[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
+		boolean vsProtossDragoonbool[] = new boolean[]{TS, VM, VS, GR};
+		MetaType vsProtossPhoto[] = new MetaType[]{TankSiegeMode, vultureSpeed, vultureMine, GoliathRange};
+		boolean vsProtossPhotobool[] = new boolean[]{TS, VS, VM, GR};
 		
 		MetaType[] Current = null;
 		boolean[] Currentbool = null;
@@ -1580,18 +1701,29 @@ public class StrategyManager {
 			Current = vsProtoss;
 			Currentbool = vsProtossbool;
 			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_ZealotPush
-					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
-					    && LastStrategyException == StrategyManager.StrategysException.protossException_ZealotPush)){
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init)){
 				Current = vsProtossZealot;
 				Currentbool = vsProtossZealotbool;
 			}
-//			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
-//			(CurrentStrategyException == StrategyManager.StrategysException.NoEarlyDragoonAttack
-//					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
-//					    && LastStrategyException == StrategyManager.StrategysException.NoEarlyDragoonAttack))){
-//				Current = vsProtossAggressive;
-//				Currentbool = vsProtossAggressivebool;
-//			}
+			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_PhotonRush
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+					    && LastStrategyException == StrategyManager.StrategysException.protossException_PhotonRush)){
+				Current = vsProtossPhoto;
+				Currentbool = vsProtossPhotobool;
+			}
+			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_DragoonPush
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+					    && LastStrategyException == StrategyManager.StrategysException.protossException_DragoonPush)){
+				Current = vsProtossDragoon;
+				Currentbool = vsProtossDragoonbool;
+			}
+			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+					    && LastStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus)){
+				Current = vsProtossPhoto;
+				Currentbool = vsProtossPhotobool;
+			}
+			
 			
 			air = false;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
@@ -1608,13 +1740,12 @@ public class StrategyManager {
 				}
 			}
 		}else if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+			Current = vsTerran;
+			Currentbool = vsTerranbool;
 			if(CurrentStrategyBasic == Strategys.terranBasic_Bionic){
 				Current = vsTerranBio;
 				Currentbool = vsTerranBiobool;
 				terranBio = true;
-			}else{
-				Current = vsTerran;
-				Currentbool = vsTerranbool;
 			}
 			air = false;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
@@ -1630,6 +1761,8 @@ public class StrategyManager {
 				}
 			}
 		}else {
+			Current = vsZerg;
+			Currentbool = vsZergbool;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()){
 				if(unit.getType() == UnitType.Zerg_Mutalisk
 						|| unit.getType() == UnitType.Zerg_Lair
@@ -1644,9 +1777,6 @@ public class StrategyManager {
 					){
 				Current = vsZergHydra;
 				Currentbool = vsZergHydrabool;
-			}else{
-				Current = vsZerg;
-				Currentbool = vsZergbool;
 			}
 		}
 		
@@ -1687,8 +1817,8 @@ public class StrategyManager {
 									 return;
 								}
 							}
-							if(currentResearched==0){
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], true);
+							if(currentResearched<=2){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(Current[i], true);
 							}else{
 								BuildManager.Instance().buildQueue.queueAsLowestPriority(Current[i], false);
 							}

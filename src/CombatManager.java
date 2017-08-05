@@ -28,6 +28,7 @@ class SquadName {
 	public static final String MARINE = "Marine";
 	public static final String WRAITH = "Wraith";
 	public static final String VESSEL = "Vessel";
+	public static final String BUILDING = "Building";
 }
 
 class Combat {
@@ -81,7 +82,7 @@ public class CombatManager {
 	}
 	
 	private List<Unit> combatUnits = new ArrayList<>();
-	private SquadData squadData = new SquadData();
+	public SquadData squadData = new SquadData();
 
 	private boolean initialized = false;
 	
@@ -124,12 +125,14 @@ public class CombatManager {
 
 	private boolean ScoutDefenseNeeded;
 	int FastZerglingsInOurBase;
+	int FastZealotInOurBase;
 	
 	private static CombatManager instance = new CombatManager();
 	
 	private CombatManager() {
 		ScoutDefenseNeeded = true;
 		FastZerglingsInOurBase = 0;
+		FastZealotInOurBase = 0;
 	}
 	
 	/// static singleton 객체를 리턴합니다
@@ -167,6 +170,9 @@ public class CombatManager {
 		
 		SquadOrder vesselOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.VESSEL_RADIUS, "Vessel");
 		squadData.putSquad(new Squad(SquadName.VESSEL, vesselOrder, Combat.VESSEL_PRIORITY));
+		
+		SquadOrder buildingOrder = new SquadOrder(SquadOrderType.DEFEND, getAttackPosition(null), Combat.VESSEL_RADIUS, "Building");
+		squadData.putSquad(new Squad(SquadName.BUILDING, buildingOrder, Combat.VESSEL_PRIORITY));
 		
 		initialized = true;
 	}
@@ -208,6 +214,7 @@ public class CombatManager {
 			
 			updateWraithSquad();
 			updateVesselSquad(); //AttackSquads 뒤에
+			updateBuildingSquad();
 			updateCheckerSquad();
 			updateGuerillaSquad();
 			
@@ -416,7 +423,7 @@ public class CombatManager {
 		
 	}
 	
-	private Position getMainAttackLocation(Squad squad) {
+	public Position getMainAttackLocation(Squad squad) {
 		
 		Position mainAttackLocation = null;
 		
@@ -852,6 +859,7 @@ public class CombatManager {
 
 
 	    	FastZerglingsInOurBase = 0;
+	    	FastZealotInOurBase = 0;
 			
 //	        if(InformationManager.Instance().isEarlyDefenseNeeded()){
 //	        if(FastZerglingsInOurBase > 0){
@@ -888,8 +896,13 @@ public class CombatManager {
 				} else {
 					numEnemyGroundInRegion++;
 				}
-				if((MyBotModule.Broodwar.getFrameCount() < 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) <= 2) && unit.getType() == UnitType.Zerg_Zergling){
-					FastZerglingsInOurBase++;
+				if((MyBotModule.Broodwar.getFrameCount() < 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) <= 2)){
+					if(unit.getType() == UnitType.Zerg_Zergling){
+						FastZerglingsInOurBase++;
+					}
+					if(unit.getType() == UnitType.Protoss_Zealot){
+						FastZealotInOurBase++;
+					}
 				}
 			}
 			
@@ -1079,11 +1092,31 @@ public class CombatManager {
 		if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
 			List<Unit> units = squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
 			if (units != null && !units.isEmpty()) {
-				Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK)));//TODO attack position vesselsquad 기준이 맞나?
+				Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK)));
 				vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 			}
 		}
 		vesselSquad.setOrder(vesselOrder);
+	}
+	
+	private void updateBuildingSquad() {
+		Squad buildingSquad = squadData.getSquad(SquadName.BUILDING);
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if (!CommandUtil.IsValidUnit(unit)) {
+				continue;
+			}
+	        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
+				squadData.assignUnitToSquad(unit, buildingSquad);// 
+				
+				//여기서 각 유닛별 order를 지정한다. by insaneojw
+				//setUnitOrder(unitId, order)
+	        }
+	    }
+
+		// ############ 이 아래의 코드는 필요가 없다.(또는 default order로 사용가능) microbuilding실행시 각 유닛의 order로 대체한다. ###############
+		SquadOrder buildingOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK)), UnitType.Terran_Science_Vessel.sightRange(), "Building");
+		
+		buildingSquad.setOrder(buildingOrder);
 	}
 	
 //	private void updateWatcherSquad() {
