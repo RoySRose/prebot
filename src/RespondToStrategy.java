@@ -33,6 +33,8 @@ public class RespondToStrategy {
 	public int max_valkyrie = 0;
 	public int max_wraith = 0;
 	
+	public int need_vessel_time = 0;
+	
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
@@ -266,7 +268,10 @@ public class RespondToStrategy {
 		
 	public void RespondExecute() {		
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
-		if(enemy_dark_templar || enemy_lurker || enemy_arbiter){
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter){
+	           if(need_vessel_time ==0){
+	                need_vessel_time = MyBotModule.Broodwar.getFrameCount();
+	            }
 		
 			if(!chk_comsat_station){
 				//컴셋이 없다면

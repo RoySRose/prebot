@@ -28,6 +28,8 @@ public class AnalyzeStrategy {
 		if(Config.BuildingSpacing == 0 && InformationManager.Instance().getNumUnits(UnitType.Terran_Supply_Depot, MyBotModule.Broodwar.self())>=2){
 			BlockingEntrance.Instance().ReturnBuildSpacing();
 		}
+		
+		
 
 		//최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행 
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
@@ -57,6 +59,12 @@ public class AnalyzeStrategy {
 
 	private void AnalyzeVsProtoss() {
 		StrategyManager.StrategysException selectedSE = null;
+		
+		Chokepoint enemy_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		Chokepoint enemy_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		
+		Chokepoint my_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		Chokepoint my_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 		//StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		
 		/*if(StrategyManager.Instance().getCurrentStrategyBasic().equals(StrategyManager.Strategys.protossBasic_Templar) && !StrategyManager.Strategys.values().equals(StrategyManager.Strategys.protossBasic_Carrier)){
@@ -85,34 +93,53 @@ public class AnalyzeStrategy {
 		}
 		
 		if(selectedSE == StrategyManager.StrategysException.protossException_ReadyToZealot){
-			Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-			List<Unit> chkZealotPush = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 160);
-			for(int dragoon_cnt = 0; dragoon_cnt < chkZealotPush.size(); dragoon_cnt ++){
-				if(chkZealotPush.get(dragoon_cnt).getType() == UnitType.Protoss_Zealot
+			
+			if(!InformationManager.Instance().isFirstScoutAlive()){
+				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+			}
+		}
+
+		//세컨초크 포인트에 질럿이 보이면 질럿 푸시
+		if(enemy_second_choke != null){
+			List<Unit> chkZealotPush = MyBotModule.Broodwar.getUnitsInRadius(enemy_second_choke.getCenter(), 160);
+			for(int zealot_cnt = 0; zealot_cnt < chkZealotPush.size(); zealot_cnt ++){
+				if(chkZealotPush.get(zealot_cnt).getType() == UnitType.Protoss_Zealot
 					&&InformationManager.Instance().isFirstScoutAlive()){
 					selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
 				}
 			}
-			if(!InformationManager.Instance().isFirstScoutAlive()){
-				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
-			}
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_ZealotPush||selectedSE == StrategyManager.StrategysException.protossException_ZealotPush){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) >=3){
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}
 		
+		
+		
+		
+		//레디투드래군 상태에서 정찰 scv가 죽으면 드래군 푸시
 		if(selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon){
-			Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-			List<Unit> chkDragoondPush = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 160);
+			if(!InformationManager.Instance().isFirstScoutAlive()){
+				selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+			}
+			
+		}
+		
+		//세컨 초크포인트에 드래군 보이면 드래군 푸시
+		if(enemy_second_choke != null){
+			List<Unit> chkDragoondPush = MyBotModule.Broodwar.getUnitsInRadius(enemy_second_choke.getCenter(), 160);
 			for(int dragoon_cnt = 0; dragoon_cnt < chkDragoondPush.size(); dragoon_cnt ++){
 				if(chkDragoondPush.get(dragoon_cnt).getType() == UnitType.Protoss_Dragoon
 					&&InformationManager.Instance().isFirstScoutAlive()){
 					selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+					break;
 				}
 			}
-			if(!InformationManager.Instance().isFirstScoutAlive()){
-				selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
-			}
+		}
+		
+		if(selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon||selectedSE == StrategyManager.StrategysException.protossException_DragoonPush){
 			if(MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines) || MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)){
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
@@ -159,9 +186,8 @@ public class AnalyzeStrategy {
 				}
 				//3. first choke point 도 익셉션이 포톤러쉬가 아니라면 찾아본다.
 				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
-					Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 					//myRegion = choke.getRegions() ;
-					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
 					if (enemyUnitsInRegion.size() >= 1){
 						for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 							 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
@@ -174,9 +200,8 @@ public class AnalyzeStrategy {
 				
 				//4. second choke point 도 익셉션이 포톤러쉬가 아니라면 찾아본다.
 				if(selectedSE!=StrategyManager.StrategysException.protossException_PhotonRush){
-					Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
 					//myRegion = choke.getRegions() ;
-					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+					enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
 					if (enemyUnitsInRegion.size() >= 1){
 						for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 							 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
@@ -231,9 +256,8 @@ public class AnalyzeStrategy {
 			}
 			//3. first choke point 도 현재 포톤러쉬 상태라면
 			if(!photon_rush){
-				Chokepoint choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 				//myRegion = choke.getRegions() ;
-				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
 				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
 						 photon_rush = true;
@@ -244,9 +268,8 @@ public class AnalyzeStrategy {
 			
 			//3. second choke point 도 현재 포톤러쉬 상태라면
 			if(!photon_rush){
-				Chokepoint choke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
 				//myRegion = choke.getRegions() ;
-				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(choke.getCenter(), 300);
+				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
 				for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
 					 if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon){
 						 photon_rush = true;
@@ -410,7 +433,6 @@ public class AnalyzeStrategy {
 		
 		if(selectedSE == StrategyManager.StrategysException.protossException_Dark){
 			BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-        	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
         	//Position tempPosition;
         	
         	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
@@ -418,6 +440,7 @@ public class AnalyzeStrategy {
 	              
 	           boolean mainBaseTurret = false;
 	           boolean	firstChokeTurret = false;
+	           boolean	secondChokeTurret = false;
             	
 			if (tempBaseLocation != null) {
 				myRegion = tempBaseLocation.getRegion();
@@ -434,9 +457,9 @@ public class AnalyzeStrategy {
      			 }
 			}
 			
-			if (tempChokePoint != null) {
+			if (my_first_choke != null) {
 				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
 				
 				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
@@ -447,7 +470,20 @@ public class AnalyzeStrategy {
 
      			 }
 			}
-			if(mainBaseTurret && firstChokeTurret){
+			if (my_second_choke != null) {
+				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
+				
+				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				//System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				secondChokeTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			if(mainBaseTurret && firstChokeTurret && secondChokeTurret){
 				selectedSE = StrategyManager.StrategysException.Init;
 				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
@@ -584,6 +620,13 @@ public class AnalyzeStrategy {
 	
 	private void AnalyzeVsZerg() {
 		StrategyManager.StrategysException selectedSE = null;
+		
+		Chokepoint enemy_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		Chokepoint enemy_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		
+		Chokepoint my_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		Chokepoint my_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		
 		int cntHatchery = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hatchery, InformationManager.Instance().enemyPlayer);
 		int cntLair = InformationManager.Instance().getNumUnits(UnitType.Zerg_Lair, InformationManager.Instance().enemyPlayer);
 		int cntHive = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer);
@@ -714,47 +757,11 @@ public class AnalyzeStrategy {
 		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den, InformationManager.Instance().enemyPlayer) >= 1){
 
 			if(cntLair >= 1){
+				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic_HydraWave);
 				selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
-				//레어가 둘일리는 없지만 어쨌든 둘이라도
-				//레어가 있고
-				/*if( cntHatchery >= 1 ){
-					//다른 해처리도 일반 적인 럴커 준비. 컴셋과 엔지니어링 베이가 있다면 이미 준비 끝.
-					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) < 1
-							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) < 1){
-						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_PrepareLurker);
-						SE = StrategyManager.StrategysException.zergException_PrepareLurker;
-					}
-//					RespondToStrategy.instance().enemy_lurker = true;
-					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
-						&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0){
-						//컴셋스테이션O , 엔지니어링 베이 O 면 일단 럴커 대비는 된것으로.
-						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-						SE = StrategyManager.StrategysException.Init;
-					}
-				}else{
-					//1레어 라면 패스트 럴커로 인식. 마인업까지 포함되어야 한다.
-					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) < 1
-							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) < 1
-							&& !MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)){
-						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.zergException_FastLurker);
-						SE = StrategyManager.StrategysException.zergException_FastLurker;
-					}
-//					RespondToStrategy.instance().enemy_lurker = true;
-					if(InformationManager.Instance().getNumUnits(UnitType.Terran_Engineering_Bay, InformationManager.Instance().selfPlayer) > 0
-							&& InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) > 0
-							&& MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)){
-						//엔지니어링 베이 O
-						//컴셋 스테이션 O
-						//마인업그레이드 O
-						//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-						SE = StrategyManager.StrategysException.Init;
-					}
-				}*/
-				
 			}else{
 				//레어가 없는 상태로 히드라덴이라면 히드라 웨이브로 일단 맞춘다.
 				StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic_HydraWave);
-				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
 
@@ -771,7 +778,7 @@ public class AnalyzeStrategy {
 		
 		if(selectedSE == StrategyManager.StrategysException.zergException_PrepareLurker){
 			BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-        	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
+
         	//Position tempPosition;
         	
         	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
@@ -779,6 +786,7 @@ public class AnalyzeStrategy {
 	              
 	           boolean mainBaseTurret = false;
 	           boolean	firstChokeTurret = false;
+	           boolean	secondChokeTurret = false;
             	
 			if (tempBaseLocation != null) {
 				myRegion = tempBaseLocation.getRegion();
@@ -795,9 +803,9 @@ public class AnalyzeStrategy {
      			 }
 			}
 			
-			if (tempChokePoint != null) {
+			if (my_first_choke != null) {
 				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
 				
 				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
@@ -808,7 +816,21 @@ public class AnalyzeStrategy {
 
      			 }
 			}
-			if(mainBaseTurret && firstChokeTurret){
+			
+			if (my_second_choke != null) {
+				//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
+				
+				 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+	     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+	     				//System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	     				firstChokeTurret = true;
+	     				break;
+	     			 }
+
+     			 }
+			}
+			if(mainBaseTurret && firstChokeTurret && secondChokeTurret){
 				selectedSE = StrategyManager.StrategysException.Init;
 				//StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
