@@ -132,6 +132,10 @@ public class GameCommander {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
 		
+		if(unit.getType() == UnitType.Terran_Command_Center){
+			unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+		}
+		
 		if(unit.getType() == UnitType.Terran_Factory){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
 		}

@@ -57,7 +57,7 @@ public class MechanicMicroDecision {
 		return enemyPosition;
 	}
 	
-	public static MechanicMicroDecision makeDecisionForSiegeMode(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<Unit> tanks, SquadOrder order) {
+	public static MechanicMicroDecision makeDecisionForSiegeMode(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<Unit> tanks, SquadOrder order, int saveUnitLevel) {
 
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -67,13 +67,22 @@ public class MechanicMicroDecision {
 		boolean existTooCloseTarget = false;
 		boolean existTooFarTarget = false;
 		boolean existCloakTarget = false;
+		boolean targetOutOfSight = false;
 		
 		Unit closestTooFarTarget = null;
 		int closestTooFarTargetDistance = 0;
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
 			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
-			if (enemy == null || !CommandUtil.IsValidUnit(enemy)) { // 시야에 없는 경우 skip
+			if (enemy == null) {
+				int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
+				if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
+					bestTargetInfo = enemyInfo;
+					targetOutOfSight = true;
+				} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
+					bestTargetInfo = enemyInfo;
+					targetOutOfSight = true;
+				}
 				continue;
 			}
 
@@ -143,6 +152,7 @@ public class MechanicMicroDecision {
 	        if (totalScore > bestTargetScore) {
 				bestTargetScore = totalScore;
 				bestTargetInfo = enemyInfo;
+				targetOutOfSight = false;
 			}
 		}
 		
@@ -155,8 +165,11 @@ public class MechanicMicroDecision {
 				if (mechanicUnit.getDistance(order.getPosition()) < order.getRadius()) {
 					return MechanicMicroDecision.makeDecisionToDoNothing();
 				}
-				for (Unit tank : tanks) { // target이 시즈포격에서 자유로운가
-					if (tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < MicroSet.Tank.SIEGE_LINK_DISTANCE) {
+				for (Unit tank : tanks) { // target이 가까운 동료 시즈포격에서 자유롭지 못하다면 상태유지
+					int distanceToTarget = tank.getDistance(closestTooFarTarget);
+					if (saveUnitLevel <= 1 && tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < MicroSet.Tank.SIEGE_LINK_DISTANCE) {
+						return MechanicMicroDecision.makeDecisionToDoNothing();
+					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
 						return MechanicMicroDecision.makeDecisionToDoNothing();
 					}
 				}
@@ -166,20 +179,29 @@ public class MechanicMicroDecision {
 			}
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
-			return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
+			if (targetOutOfSight) { // 보이지는 않지만 일정거리 안에 적이 있다면 시즈모드 유지(saveUnitLevel에 따라 변동)
+				return MechanicMicroDecision.makeDecisionToDoNothing();				
+			} else {
+				return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
+			}
 		}
 		
 		
 	}
 	
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo) {
-		return makeDecision(mechanicUnit, enemiesInfo, 1);
+		return makeDecision(mechanicUnit, enemiesInfo, null, 1);
 	}
 	
-	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, int saveUnitLevel) {
+	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo) {
+		return makeDecision(mechanicUnit, enemiesInfo, flyingEnemiesInfo, 1);
+	}
+	
+	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
 		
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
+//		int dangerousSiegeTankCount = 0;
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
 			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
@@ -198,7 +220,7 @@ public class MechanicMicroDecision {
 			}
 			
 			if (enemy == null && !enemyUnitType.isBuilding()
-					&& MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME) {
+					&& MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME(enemyInfo.getType())) {
 				continue;
 			}
 			
@@ -217,24 +239,43 @@ public class MechanicMicroDecision {
 					
 					double distanceToNearEnemy = mechanicUnit.getDistance(enemyPosition);
 					double safeDistance = enemyGroundWeaponRange;
-					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode) {
-						safeDistance += MicroSet.Common.BACKOFF_DIST_SIEGE_TANK;
+					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode) {
+						if (saveUnitLevel <= 1 && (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode)) {
+							if (MicroUtils.exposedByEnemy(mechanicUnit, flyingEnemiesInfo)) { // 적에게 노출되는 포지션이면 안전거리를 잰다. 
+								safeDistance += (MicroSet.Common.BACKOFF_DIST_SIEGE_TANK * 2/3);
+							} else { // 공격 사정거리를 재어 들어간다.
+								safeDistance = MicroSet.Tank.SIEGE_MODE_SIGHT + 30; // 320 + 30
+							}
+							
+						} else {
+							safeDistance += MicroSet.Common.BACKOFF_DIST_SIEGE_TANK;
+						}
 						
-					} else if ((enemyUnitType == UnitType.Zerg_Sunken_Colony
-							|| enemyUnitType == UnitType.Protoss_Photon_Cannon
-							|| enemyUnitType == UnitType.Terran_Bunker)
-							&& mechanicUnit.getType() != UnitType.Terran_Siege_Tank_Siege_Mode // 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
-							) {
-						safeDistance += MicroSet.Common.BACKOFF_DIST_DEF_TOWER;
-						
+					} else if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Bunker) {
+						// 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
+						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+							safeDistance += (MicroSet.Common.BACKOFF_DIST_DEF_TOWER * 2/3);
+						} else {
+							safeDistance += MicroSet.Common.BACKOFF_DIST_DEF_TOWER;
+						}
 					} else {
-						safeDistance += MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY;
-						
+						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+							safeDistance += (MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY * 2/3);
+						} else {
+							safeDistance += MicroSet.Common.BACKOFF_DIST_RANGE_ENEMY;
+						}
 					}
 					
 					if (distanceToNearEnemy < safeDistance) {
 						return MechanicMicroDecision.makeDecisionToFlee(enemyPosition);
 					}
+//					else if ((enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode)
+//							&& (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode)
+//							&& distanceToNearEnemy <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 50) {
+//						if (++dangerousSiegeTankCount >= 2) { // 시즈거리재기에서 자신을 때릴 수 있는 시즈가 2기 이상이 있으면 선빵을 치더라도 손해가 있을 수 있다.
+//							return MechanicMicroDecision.makeDecisionToFlee(enemyPosition);
+//						}
+//					}
 				}
 			}
 			
@@ -259,13 +300,14 @@ public class MechanicMicroDecision {
 					}
 				}
 				// 클로킹 유닛 : -1000점
-				if (!enemy.isDetected()) {
+				if (!enemy.isDetected() && enemyUnitType == UnitType.Protoss_Dark_Templar) {
 					specialScore -= 1000;
 				}
 		        
 			} else {
-				distanceScore = -100;
-				hitPointScore = -100;
+				distanceScore -= mechanicUnit.getDistance(enemyInfo.getLastPosition()) / 5;
+				hitPointScore = 50 - enemyInfo.getLastHealth() / 10;
+				specialScore = -100;
 				if (enemyInfo.getType().isCloakable()) {
 					continue;
 				}

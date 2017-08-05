@@ -48,7 +48,7 @@ public class MicroUtils {
 				continue;
 			}
 			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -88,7 +88,7 @@ public class MicroUtils {
 				continue;
 			}
 			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME) {
+			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -240,8 +240,11 @@ public class MicroUtils {
 		WeaponType rangedUnitWeapon = target.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
-		if (target.getType().isBuilding() || 
-				(rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon))) {
+		boolean approachKiting = false;
+		if (target.getType().isBuilding()) {
+			approachKiting = true;
+			haveToAttack = true;
+		} else if (rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
 			// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
 			haveToAttack = true;
 		
@@ -271,8 +274,13 @@ public class MicroUtils {
 		
 		// 공격 또는 회피
 		if (haveToAttack) {
-			MyBotModule.Broodwar.drawCircleMap(target.getPosition(), 20, Color.Red);
-			CommandUtil.attackUnit(rangedUnit, target);
+			if (approachKiting && (rangedUnit.isStartingAttack()
+					|| (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown()) > 0)) {
+				CommandUtil.move(rangedUnit, target.getPosition());
+			} else {
+				MyBotModule.Broodwar.drawCircleMap(target.getPosition(), 20, Color.Red);
+				CommandUtil.attackUnit(rangedUnit, target);
+			}
 			
 		} else {
 			// 피가 거의 없거나, 근처에 아군이 거의 없으면(쿨타운시간동안 이동할수 있는 거리 * 0.8) 회피설정을 높힌다.
@@ -605,6 +613,37 @@ public class MicroUtils {
 		return newTargetInfos;
 	}
 	
+	public static List<UnitInfo> filterFlyingTargetInfos(List<UnitInfo> targetInfos) {
+		List<UnitInfo> newTargetInfos = new ArrayList<>();
+		for (UnitInfo targetInfo : targetInfos) {
+			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+
+			if (target != null) {
+				if (!CommandUtil.IsValidUnit(target)) {
+					continue;
+				}
+				if (target.isFlying()) {
+					newTargetInfos.add(targetInfo);
+				}
+			} else {
+				UnitType enemyUnitType = targetInfo.getType();
+				if (enemyUnitType.isFlyer()) {
+					newTargetInfos.add(targetInfo);
+				}
+			}
+		}
+		return newTargetInfos;
+	}
+	
+	public static boolean exposedByEnemy(Unit myUnit, List<UnitInfo> enemiesInfo) {
+		for (UnitInfo ei : enemiesInfo) {
+			if (myUnit.getDistance(ei.getLastPosition()) <= ei.getType().sightRange()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static Position centerOfUnits(List<Unit> units) {
 		if (units.isEmpty()) {
 			return null;
@@ -652,7 +691,7 @@ public class MicroUtils {
 	
 	public static boolean existTooNarrowChoke(Position position) {
 		Chokepoint nearChoke = BWTA.getNearestChokepoint(position);
-		if (nearChoke.getWidth() < 300 && position.getDistance(nearChoke.getCenter()) < 150) {
+		if (nearChoke.getWidth() < 250 && position.getDistance(nearChoke.getCenter()) < 150) {
 			return true;
 		} else {
 			return false;

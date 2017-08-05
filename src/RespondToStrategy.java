@@ -35,6 +35,8 @@ public class RespondToStrategy {
 	
 	public int need_vessel_time = 0;
 	
+	public int need_vessel_time = 0;
+	
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret = 0;
 	
@@ -85,6 +87,11 @@ public class RespondToStrategy {
 	}
 	
 	public void update() {
+		
+		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
+			need_vessel = true;
+		}
+		
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 

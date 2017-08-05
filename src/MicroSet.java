@@ -40,9 +40,10 @@ public class MicroSet {
 	}
 	
 	public static class Tank {
-		public static final int SIEGE_MODE_MIN_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
-		public static final int SIEGE_MODE_MAX_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
-		public static final int TANK_MODE_RANGE = UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange();
+		public static final int SIEGE_MODE_MIN_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange(); // 64
+		public static final int SIEGE_MODE_MAX_RANGE = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange(); // 384
+		public static final int SIEGE_MODE_SIGHT = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange(); // 320
+		public static final int TANK_MODE_RANGE = UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange(); // 224
 
 		public static final int SIEGE_MODE_INNER_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().innerSplashRadius();
 		public static final int SIEGE_MODE_MEDIAN_SPLASH_RAD = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().medianSplashRadius();
@@ -57,10 +58,20 @@ public class MicroSet {
 		public static final double BACKOFF_DIST_DEF_TOWER = 150.0;
 		public static final double BACKOFF_DIST_RANGE_ENEMY = 200.0;
 		
-		public static final int NO_UNIT_FRAME = 15 * 24;
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int MAIN_SQUAD_COVERAGE = 150;
 		public static final int ARRIVE_DECISION_RANGE = 100;
+		
+		public static final int NO_UNIT_FRAME = 15 * 24;
+		public static final int NO_SIEGE_FRAME = 60 * 24;
+		
+		public static int NO_UNIT_FRAME(UnitType unitType) {
+			int noUnitFrames = NO_UNIT_FRAME;
+			if (unitType == UnitType.Terran_Siege_Tank_Tank_Mode || unitType == UnitType.Terran_Siege_Tank_Siege_Mode) {
+				noUnitFrames = NO_SIEGE_FRAME;
+			}
+			return noUnitFrames;
+		}
 	}
 	 
 	public static class RiskRadius {

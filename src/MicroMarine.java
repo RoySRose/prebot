@@ -58,7 +58,9 @@ public class MicroMarine extends MicroManager {
 					}
 					if(DontGoFar){
 						if(marine.getDistance(mineralpos) > 80){
+							System.out.println("move marine to mineral");
 							CommandUtil.move(marine,mineralpos);
+							//MicroUtils.preciseKiting(marine, target, kitingOption);
 						}
 					}else{
 						if (kiteWithmarines) {
