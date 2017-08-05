@@ -525,6 +525,12 @@ public class InformationManager {
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(selfPlayer).getUnitAndUnitInfoMap().get(it.next());
 				if (ui.getType().isBuilding()) {
+					if (CommandUtil.IsValidUnit(ui.getUnit())
+							&& ui.getUnit().isLifted()
+							&& (ui.getType() == UnitType.Terran_Barracks || ui.getType() == UnitType.Terran_Engineering_Bay)) {
+						continue;
+					}
+					
 					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()),
 							MyBotModule.Broodwar.self());
 				}
@@ -1054,6 +1060,15 @@ public class InformationManager {
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
 				if (ui.getType().isBuilding()) {
+					
+					// 띄워졌있는 배럭, 엔베는 차지한 영역으로 안쓴다. 왜냐면 우리는 이것들을 시야확보용으로 쓸 것이기 때문이다.
+					if (player == MyBotModule.Broodwar.self()
+							&& CommandUtil.IsValidUnit(ui.getUnit())
+							&& ui.getUnit().isLifted()
+							&& (ui.getType() == UnitType.Terran_Barracks || ui.getType() == UnitType.Terran_Engineering_Bay)) {
+						continue;
+					}
+					
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
 
 //					System.out.print("buildingPositionX : " + buildingPosition.getX());

@@ -15,7 +15,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	private List<UnitInfo> enemiesInfo = new ArrayList<>();
 	
 	private List<Unit> notVultureUnitList = new ArrayList<>();
-	private int saveUnitLevel = 0;
+	private int saveUnitLevel = 1;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
@@ -34,7 +34,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			return;
 		}
 
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, null, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
 
 		KitingOption kOpt = KitingOption.vultureKitingOption();
 		Position retreatPosition = order.getPosition();

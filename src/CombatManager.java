@@ -48,7 +48,7 @@ class Combat {
 	public static final int WATCHER_RADIUS = 300;
 	public static final int CHECKER_RADIUS = 150;
 	public static final int GUERILLA_RADIUS = 300;
-	public static final int BASE_DEFENSE_RADIUS = 800; // 32 * 25
+	public static final int BASE_DEFENSE_RADIUS = 500; // 32 * 25
 	public static final int SCOUT_DEFENSE_RADIUS = 600;
 	public static final int MARINE_RADIUS = 300;
 	public static final int WRAITH_RADIUS = 300;
@@ -73,9 +73,9 @@ public class CombatManager {
 		if (enemyRace == Race.Zerg) {
 			return 3.0;
 		} else if (enemyRace == Race.Protoss) {
-			return 3.5;
+			return 3.0;
 		} else if (enemyRace == Race.Terran) {
-			return 4.0;
+			return 3.0;
 		}
 		return 3.0;
 	}
@@ -440,15 +440,15 @@ public class CombatManager {
 			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
 			
 			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-			if (tankCount + goliathCount >= 15) {
+			if (tankCount + goliathCount >= 15) { // 병력이 존나 모였으면 좀더 전지
 				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
 			} else if (tankCount + goliathCount >= 8 || InformationManager.Instance().enemyRace == Race.Terran) {
-				mainAttackLocation = secondChoke.getCenter();
+				mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
 			} else {
 				mainAttackLocation = getDefensePosition(squad);
 			}
 			
-		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯
+		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯(수정햇다)
 			mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
 			
 		} else { //if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
