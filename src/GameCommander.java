@@ -141,14 +141,20 @@ public class GameCommander {
 		}
 		
 		if(unit.getType() == UnitType.Terran_Barracks){
-			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
-			{
-				if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
-				{
-					unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
-				}
-			}
-		}
+	          /*for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
+	            {
+	                if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+	                {
+	                    unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+	                }
+	            }*/
+	            
+	            if(CombatManager.Instance().getClosestMineral(unit)==null){
+
+	            }else{
+	                unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+	            }
+	        }
 		
 		
 		if(unit.getType() == UnitType.Terran_Bunker){

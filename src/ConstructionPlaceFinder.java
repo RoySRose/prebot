@@ -53,6 +53,7 @@ public class ConstructionPlaceFinder {
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (seedPosition != TilePosition.None  && seedPosition.isValid() )
 		{
+			//System.out.println("시드포지션 입력 ==>> (" + seedPosition.getX() + " , " +  seedPosition.getY() + ")" );
 			//std::cout << "getBuildLocationNear " << seedPosition.x << ", " << seedPosition.y << std::endl;
 			desiredPosition = getBuildLocationNear(buildingType, seedPosition);
 		}
@@ -184,6 +185,7 @@ public class ConstructionPlaceFinder {
 			case NextSupplePoint:
 				tempTilePosition = InformationManager.Instance().getNextSuppleLocation();
 				if (tempTilePosition != null) {
+					//System.out.println("I choose here: " + tempTilePosition.toString());
 					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
 				}else{
 					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
@@ -203,6 +205,7 @@ public class ConstructionPlaceFinder {
 	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (다른 유닛들이 자리에 있어서, Pylon, Creep, 건물지을 타일 공간이 전혀 없는 경우 등)
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition)
 	{
+		//System.out.println("getBuildLocationNear 입력111 ==>> (" + desiredPosition.getX() + " , " +  desiredPosition.getY() + ")" );
 		if (buildingType.isRefinery())
 		{
 			//std::cout << "getRefineryPositionNear "<< std::endl;
@@ -236,7 +239,7 @@ public class ConstructionPlaceFinder {
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = Config.BuildingResourceDepotSpacing;		
+			buildingGapSpace = Config.BuildingResourceDepotSpacing;
 		}
 //		else if (buildingType == UnitType.Protoss_Pylon) {
 //			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
@@ -295,6 +298,7 @@ public class ConstructionPlaceFinder {
 	/// TODO 과제 : 건물을 계획없이 지을수 있는 곳에 짓는 것을 계속 하다보면, 유닛이 건물 사이에 갇히는 경우가 발생할 수 있는데, 이를 방지하는 방법은 생각해볼 과제입니다
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, int buildingGapSpace, int constructionPlaceSearchMethod)
 	{
+		//System.out.println("getBuildLocationNear 입력222 ==>> (" + desiredPosition.getX() + " , " +  desiredPosition.getY() + ")" );
 		// std::cout << std::endl << "getBuildLocationNear " << buildingType.getName().c_str() << " " << desiredPosition.x << "," << desiredPosition.y 
 		//	<< " gap " << buildingGapSpace << " method " << constructionPlaceSearchMethod << std::endl;
 
@@ -369,6 +373,7 @@ public class ConstructionPlaceFinder {
 	/// Broodwar 의 canBuildHere, isBuildableTile, isReservedTile 를 체크합니다
 	public final boolean canBuildHereWithSpace(TilePosition position, final ConstructionTask b, int buildingGapSpace)
 	{
+		//System.out.println("canBuildHereWithSpace 입력222 ==>> (" + position.getX() + " , " +  position.getY() + ") , buildingGapSpace ==>> " + buildingGapSpace );
 		//if we can't build here, we of course can't build here with space
 		if (!canBuildHere(position, b))
 		{
@@ -386,6 +391,8 @@ public class ConstructionPlaceFinder {
 		int endx;
 		int endy;
 
+		buildingGapSpace = 0;
+		
 		boolean horizontalOnly = false;
 
 		// Refinery 의 경우 GapSpace를 체크할 필요 없다
@@ -447,12 +454,12 @@ public class ConstructionPlaceFinder {
 			}
 
 			// 테란종족 건물의 경우 다른 건물의 Addon 공간을 확보해주기 위해, 왼쪽 2칸은 반드시 GapSpace가 되도록 한다
-			if (b.getType().getRace() == Race.Terran) {
+			/*if (b.getType().getRace() == Race.Terran) {
 				if (buildingGapSpace < 2) {
 					startx = position.getX() - 2;
 					endx = position.getX() + width + buildingGapSpace;
 				}
-			}
+			}*/
 
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
 			for (int x = startx; x < endx; x++)
@@ -470,7 +477,7 @@ public class ConstructionPlaceFinder {
 					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
-					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false) {
+					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Bunker) {
 						if (isTilesToAvoid(x, y)) {
 							return false;
 						}
@@ -940,20 +947,36 @@ public class ConstructionPlaceFinder {
 		int fromx = unit.getTilePosition().getX()-1;
 		int fromy = unit.getTilePosition().getY()-1;
 		
-		if(fromx<0){
+		/*if(fromx<0){
 			fromx=0;
 		}
 		if(fromy<0){
 			fromy =0;
-		}
+		}*/
 		
-		for (int x = fromx; x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
-		{
-			for (int y = fromy ; y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
-			{
+		for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
+	        {
+	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
+	            {
 				if((x==fromx + 6 || x==fromx + 7) && y == fromy){
 					continue;
 				}
+				TilePosition temp = new TilePosition(x,y);
+				tilesToAvoid.add(temp);
+			}
+		}
+	}
+	
+	public void setTilesToAvoidAddon(Unit unit) {
+		
+		int fromx = unit.getTilePosition().getX()+4;
+		int fromy = unit.getTilePosition().getY()+1;
+		
+		for (int x = fromx; x < fromx + 2 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		{
+			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+			for (int y = fromy ; y < fromy +  2&& y < MyBotModule.Broodwar.mapHeight(); y++)
+			{
 				TilePosition temp = new TilePosition(x,y);
 				tilesToAvoid.add(temp);
 			}

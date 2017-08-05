@@ -87,7 +87,10 @@ public class StrategyManager {
 		,protossException_Scout
 		,protossException_Shuttle
 		,protossException_ShuttleMix
+		,protossException_ReadyToZealot
 		,protossException_ZealotPush
+		,protossException_ReadyToDragoon
+		,protossException_DragoonPush
 		,protossException_PhotonRush
 		,protossException_DoubleNexus
 		,protossException_Arbiter
