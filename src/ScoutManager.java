@@ -570,10 +570,16 @@ public class ScoutManager{
 			double distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
 
 			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
+			int limit =0;
 			while (distanceFromCurrentVertex < 128)
 			{
+				limit++;
 				currentScoutFreeToVertexIndex = (currentScoutFreeToVertexIndex + 1) % enemyBaseRegionVertices.size();
 				distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
+				
+				if(enemyBaseRegionVertices.size() < limit){
+					break;
+				}
 			}
 
 			return enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex);
@@ -589,11 +595,15 @@ public class ScoutManager{
 			return;
 		}
 		// check each tile position
-		enemyBaseRegionVertices.add(new Position(enemyFirstExpansionLocation.getX() + 16 , enemyFirstExpansionLocation.getY() + 16));
+		enemyBaseRegionVertices.add(new Position(enemyFirstExpansionLocation.getX(), enemyFirstExpansionLocation.getY()));
 		
 		Position enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.enemy()).getPoint();
-		enemyBaseRegionVertices.add(new Position(enemySecondChokePoint.getX() + 16 , enemySecondChokePoint.getY() + 16));
-
+		enemyBaseRegionVertices.add(new Position(enemySecondChokePoint.getX(), enemySecondChokePoint.getY()));
+		
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
+			enemyBaseRegionVertices.add(new Position(enemySecondChokePoint.getX()+(enemySecondChokePoint.getX()-enemyFirstExpansionLocation.getX())
+					,  enemySecondChokePoint.getY()+(enemySecondChokePoint.getY()- enemyFirstExpansionLocation.getY())));
+		}
 
 	}
 
