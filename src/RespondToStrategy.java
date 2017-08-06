@@ -192,29 +192,26 @@ public class RespondToStrategy {
 					}
 				}
 			}
-			
-			
-//			//멀티 지우기
-//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-//			BuildOrderItem checkItem = null; 
-//
-//			if (!tempbuildQueue.isEmpty()) {
-//				checkItem= tempbuildQueue.getHighestPriorityItem();
-//				while(true){
-//					if(tempbuildQueue.canGetNextItem() == true){
-//						tempbuildQueue.canGetNextItem();
-//					}else{
-//						break;
-//					}
-//					tempbuildQueue.PointToNextItem();
-//					checkItem = tempbuildQueue.getItem();
-//					
-//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
-//						tempbuildQueue.removeCurrentItem();
-//					}
-//				}
-//			}
-			
+			//멀티 지우기
+			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+			BuildOrderItem checkItem = null; 
+
+			if (!tempbuildQueue.isEmpty()) {
+				checkItem= tempbuildQueue.getHighestPriorityItem();
+				while(true){
+					if(tempbuildQueue.canGetNextItem() == true){
+						tempbuildQueue.canGetNextItem();
+					}else{
+						break;
+					}
+					tempbuildQueue.PointToNextItem();
+					checkItem = tempbuildQueue.getItem();
+					
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+						tempbuildQueue.removeCurrentItem();
+					}
+				}
+			}
 			
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
 					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
@@ -223,63 +220,63 @@ public class RespondToStrategy {
 			}
 		}
 		
-//		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush){
-//			
-//			//멀티 지우기
-//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-//			BuildOrderItem checkItem = null; 
-//	
-//			if (!tempbuildQueue.isEmpty()) {
-//				checkItem= tempbuildQueue.getHighestPriorityItem();
-//				while(true){
-//					if(tempbuildQueue.canGetNextItem() == true){
-//						tempbuildQueue.canGetNextItem();
-//					}else{
-//						break;
-//					}
-//					tempbuildQueue.PointToNextItem();
-//					checkItem = tempbuildQueue.getItem();
-//					
-//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
-//						tempbuildQueue.removeCurrentItem();
-//					}
-//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
-//						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
-//							tempbuildQueue.removeCurrentItem();
-//						}
-//					}
-//				}
-//			}
-//		}
-//
-//		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
-//		
-//			//멀티 지우기
-//			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-//			BuildOrderItem checkItem = null; 
-//	
-//			if (!tempbuildQueue.isEmpty()) {
-//				checkItem= tempbuildQueue.getHighestPriorityItem();
-//				while(true){
-//					if(tempbuildQueue.canGetNextItem() == true){
-//						tempbuildQueue.canGetNextItem();
-//					}else{
-//						break;
-//					}
-//					tempbuildQueue.PointToNextItem();
-//					checkItem = tempbuildQueue.getItem();
-//					
-//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
-//						tempbuildQueue.removeCurrentItem();
-//					}
-//					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
-//						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
-//						tempbuildQueue.removeCurrentItem();
-//						}
-//					}			
-//				}
-//			}
-//		}
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush){
+			
+			//멀티 지우기
+			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+			BuildOrderItem checkItem = null; 
+	
+			if (!tempbuildQueue.isEmpty()) {
+				checkItem= tempbuildQueue.getHighestPriorityItem();
+				while(true){
+					if(tempbuildQueue.canGetNextItem() == true){
+						tempbuildQueue.canGetNextItem();
+					}else{
+						break;
+					}
+					tempbuildQueue.PointToNextItem();
+					checkItem = tempbuildQueue.getItem();
+					
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+						tempbuildQueue.removeCurrentItem();
+					}
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+							tempbuildQueue.removeCurrentItem();
+						}
+					}
+				}
+			}
+		}
+
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
+		
+			//멀티 지우기
+			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+			BuildOrderItem checkItem = null; 
+	
+			if (!tempbuildQueue.isEmpty()) {
+				checkItem= tempbuildQueue.getHighestPriorityItem();
+				while(true){
+					if(tempbuildQueue.canGetNextItem() == true){
+						tempbuildQueue.canGetNextItem();
+					}else{
+						break;
+					}
+					tempbuildQueue.PointToNextItem();
+					checkItem = tempbuildQueue.getItem();
+					
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+						tempbuildQueue.removeCurrentItem();
+					}
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+						tempbuildQueue.removeCurrentItem();
+						}
+					}			
+				}
+			}
+		}
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
 				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init){

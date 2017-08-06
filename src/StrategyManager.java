@@ -1020,8 +1020,10 @@ public class StrategyManager {
 							}
 						}
 						if(bestlocation == null){
+							System.out.println("adding fac");
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 						}else{
+							System.out.println("adding fac");
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,bestlocation.getTilePosition(), false);
 						}
 					}

@@ -58,7 +58,7 @@ public class BlockingEntrance {
 	private static int bunkerX_array[] = new int []{26, 54, 98, 104, 90, 52, 14, 20};
 	private static int bunkerY_array[] = new int []{21, 25, 23,   63, 97, 96, 99, 56};
 	
-	private int set_int = 0;
+	private int starting_int = 0;
 
 	private static BlockingEntrance instance = new BlockingEntrance();
 	
@@ -226,57 +226,57 @@ public class BlockingEntrance {
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 			if(startingX == 10 && startingY == 6){
 				//11시부터 시계방향
-				set_int = 0;
+				starting_int = 0;
 			}else if(startingX == 70 && startingY == 8){
-				set_int = 1;
+				starting_int = 1;
 			}else if(startingX == 113 && startingY == 8){
-				set_int = 2;
+				starting_int = 2;
 			}else if(startingX == 114 && startingY == 80){
-				set_int = 3;
+				starting_int = 3;
 			}else if(startingX == 114 && startingY == 116){
-				set_int = 4;
+				starting_int = 4;
 			}else if(startingX == 63 && startingY == 117){
-				set_int = 5;
+				starting_int = 5;
 			}else if(startingX == 10 && startingY == 115){
-				set_int = 6;
+				starting_int = 6;
 			}else if(startingX == 8 && startingY == 47){
-				set_int = 7;
+				starting_int = 7;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
 			if(startingX == 57 && startingY == 6){
 				//11시부터 시계방향
-				set_int = 0;
+				starting_int = 0;
 			}else if(startingX == 117 && startingY == 27){
-				set_int = 1;
+				starting_int = 1;
 			}else if(startingX == 27 && startingY == 118){
-				set_int = 2;
+				starting_int = 2;
 			}else if(startingX == 7&& startingY == 87){
-				set_int = 3;
+				starting_int = 3;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
 			if(startingX == 7 && startingY == 6){
 				//11시부터 시계방향
-				set_int = 0;
+				starting_int = 0;
 			}else if(startingX == 117 && startingY == 7){
-				set_int = 1;
+				starting_int = 1;
 			}else if(startingX == 117 && startingY == 117){
-				set_int = 2;
+				starting_int = 2;
 			}else if(startingX == 7 && startingY == 116){
-				set_int = 3;
+				starting_int = 3;
 			}
 		}
-		first_suppleX = first_suppleX_array[set_int];
-		first_suppleY = first_suppleY_array[set_int];
-		second_suppleX = second_suppleX_array[set_int];
-		second_suppleY = second_suppleY_array[set_int];
+		first_suppleX = first_suppleX_array[starting_int];
+		first_suppleY = first_suppleY_array[starting_int];
+		second_suppleX = second_suppleX_array[starting_int];
+		second_suppleY = second_suppleY_array[starting_int];
 		//suppleX = 102;
 		//suppleY = 61;
-		barrackX = barrackX_array[set_int];
-		barrackY = barrackY_array[set_int];
-		factoryX = factoryX_array[set_int];
-		factoryY = factoryY_array[set_int];
-		bunkerX = bunkerX_array[set_int];
-		bunkerY = bunkerY_array[set_int];
+		barrackX = barrackX_array[starting_int];
+		barrackY = barrackY_array[starting_int];
+		factoryX = factoryX_array[starting_int];
+		factoryY = factoryY_array[starting_int];
+		bunkerX = bunkerX_array[starting_int];
+		bunkerY = bunkerY_array[starting_int];
 	
 	}
 	
@@ -317,5 +317,9 @@ public class BlockingEntrance {
 		Config.BuildingSpacing = BuildingSpacingOld;
 		Config.BuildingResourceDepotSpacing = BuildingResourceDepotSpacingOld;
 
+	}
+	
+	public int getStartingInt(){
+		return starting_int;
 	}
 }

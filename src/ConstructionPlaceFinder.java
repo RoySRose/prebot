@@ -70,7 +70,25 @@ public class ConstructionPlaceFinder {
 			switch (seedPositionStrategy) {
 
 			case MainBaseLocation:
-				desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+				
+				TilePosition pos = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
+				
+				//헌터 3시 예외상황
+				if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+					
+					if(BlockingEntrance.Instance().getStartingInt() == 3){		
+						int temp=0;
+						for(Unit unit : MyBotModule.Broodwar.self().getUnits()){
+							if(unit.getType().isBuilding()){
+								temp++;
+							}
+						}
+						if(temp>=14){
+							pos = new TilePosition(116,58);
+						}
+					}
+				}
+				desiredPosition = getBuildLocationNear(buildingType, pos);
 				break;
 
 			case MainBaseBackYard:
@@ -241,7 +259,11 @@ public class ConstructionPlaceFinder {
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = Config.BuildingResourceDepotSpacing;
+			if(buildingType == UnitType.Terran_Barracks){
+				buildingGapSpace = 0;
+			}else{
+				buildingGapSpace = Config.BuildingResourceDepotSpacing;
+			}
 		}
 //		else if (buildingType == UnitType.Protoss_Pylon) {
 //			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
@@ -255,12 +277,15 @@ public class ConstructionPlaceFinder {
 //			}
 //		}
 		else if (buildingType == UnitType.Terran_Supply_Depot) {
+			
 			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
 		}
 //		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
 //			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
-		else if (buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Terran_Bunker) {
+		else if (buildingType == UnitType.Terran_Missile_Turret) {
 			buildingGapSpace = Config.BuildingDefenseTowerSpacing;
+		}else if (buildingType == UnitType.Terran_Bunker) {
+			buildingGapSpace = 0;
 		}
 
 		while (buildingGapSpace >= 0) {
@@ -392,9 +417,13 @@ public class ConstructionPlaceFinder {
 		int endx;
 		int endy;
 
-		buildingGapSpace = 0;
+		//buildingGapSpace = 0;@@@@@@
 		
 		boolean horizontalOnly = false;
+		if (b.getType() == UnitType.Terran_Supply_Depot){
+			horizontalOnly = true;
+		}
+		
 
 		// Refinery 의 경우 GapSpace를 체크할 필요 없다
 		if (b.getType().isRefinery())
@@ -977,6 +1006,22 @@ public class ConstructionPlaceFinder {
 		{
 			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
 			for (int y = fromy ; y < fromy +  2&& y < MyBotModule.Broodwar.mapHeight(); y++)
+			{
+				TilePosition temp = new TilePosition(x,y);
+				tilesToAvoid.add(temp);
+			}
+		}
+	}
+	
+	public void setTilesToAvoidCCAddon(Unit unit) {
+		
+		int fromx = unit.getTilePosition().getX()+4;
+		int fromy = unit.getTilePosition().getY();
+		
+		for (int x = fromx; x < fromx + 3 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		{
+			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+			for (int y = fromy ; y < fromy + 3 && y < MyBotModule.Broodwar.mapHeight(); y++)
 			{
 				TilePosition temp = new TilePosition(x,y);
 				tilesToAvoid.add(temp);
