@@ -67,6 +67,7 @@ public class MechanicMicroDecision {
 		boolean existTooCloseTarget = false;
 		boolean existTooFarTarget = false;
 		boolean existCloakTarget = false;
+		Unit cloakTargetUnit = null;
 		boolean targetOutOfSight = false;
 		
 		Unit closestTooFarTarget = null;
@@ -157,6 +158,7 @@ public class MechanicMicroDecision {
 			// 클로킹 유닛 : -1000점
 			if (!enemy.isDetected()) {
 				existCloakTarget = true;
+				cloakTargetUnit = enemy;
 				continue;
 			}
 			
@@ -187,7 +189,11 @@ public class MechanicMicroDecision {
 				}
 				return MechanicMicroDecision.makeDecisionToChange();
 			} else if (existCloakTarget) {
-				return MechanicMicroDecision.makeDecisionToChange();
+				if (cloakTargetUnit.getType() == UnitType.Protoss_Dark_Templar) {
+					return MechanicMicroDecision.makeDecisionToChange();
+				} else if (cloakTargetUnit.getType() == UnitType.Zerg_Lurker) {
+					return MechanicMicroDecision.makeDecisionToDoNothing();
+				}
 			}
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
@@ -206,6 +212,9 @@ public class MechanicMicroDecision {
 	}
 
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
+		
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(2000);
 		
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -270,6 +279,7 @@ public class MechanicMicroDecision {
 					}
 					
 					if (distanceToNearEnemy < safeDistance) {
+						lag.estimate();
 						return MechanicMicroDecision.makeDecisionToFlee(enemyPosition);
 					}
 //					else if ((enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode)
@@ -323,8 +333,10 @@ public class MechanicMicroDecision {
 		}
 		
 		if (bestTargetInfo == null) {
+			lag.estimate();
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
+			lag.estimate();
 			return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
 		}
 	}

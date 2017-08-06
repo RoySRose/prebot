@@ -17,14 +17,14 @@ public class TargetPriority {
 		int priority = TargetPriority.getPriority(unit.getType(), target.getType());
 
 		// 마인 상태체크 테스트 코드 
-		if (target.getType() == UnitType.Terran_Vulture_Spider_Mine) { // && target.isMoving()
-			if (!target.isBurrowed()) {
-				MyBotModule.Broodwar.sendText("Spider_Mine is unBurrowed");
-			}
-			if (target.isDetected()) {
-				MyBotModule.Broodwar.sendText("Spider_Mine is dectected");
-			}
-		}
+//		if (target.getType() == UnitType.Terran_Vulture_Spider_Mine) { // && target.isMoving()
+//			if (!target.isBurrowed()) {
+//				MyBotModule.Broodwar.sendText("Spider_Mine is unBurrowed");
+//			}
+//			if (target.isDetected()) {
+//				MyBotModule.Broodwar.sendText("Spider_Mine is dectected");
+//			}
+//		}
 		
 		// 수리중이거나 건설중인 SCV
 		if (target.getType() == UnitType.Terran_SCV && (target.isConstructing() || target.isRepairing())) {
@@ -121,11 +121,11 @@ public class TargetPriority {
 		vulturePriorityMap.put(UnitType.Protoss_High_Templar,				inputPriority);
 		vulturePriorityMap.put(UnitType.Protoss_Dark_Templar,				inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Protoss_Archon,						inputPriority -= PRIORITY_GAP);
+		vulturePriorityMap.put(UnitType.Protoss_Probe,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Protoss_Zealot,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Protoss_Reaver,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Protoss_Dragoon,					inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Protoss_Dark_Archon,				inputPriority -= PRIORITY_GAP);
-		vulturePriorityMap.put(UnitType.Protoss_Probe,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap = inputBuildingPriority(Race.Protoss, vulturePriorityMap, inputPriority - PRIORITY_GAP);
 		
 		// 벌처 vs 저그
@@ -134,9 +134,9 @@ public class TargetPriority {
 		vulturePriorityMap.put(UnitType.Zerg_Defiler,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Lurker,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Zergling,						inputPriority -= PRIORITY_GAP);
+		vulturePriorityMap.put(UnitType.Zerg_Drone,							inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Hydralisk,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Ultralisk,						inputPriority -= PRIORITY_GAP);
-		vulturePriorityMap.put(UnitType.Zerg_Drone,							inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Broodling,						inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Larva,							inputPriority -= PRIORITY_GAP);
 		vulturePriorityMap.put(UnitType.Zerg_Lurker_Egg,					inputPriority -= PRIORITY_GAP);

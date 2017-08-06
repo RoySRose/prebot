@@ -36,7 +36,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 		
 		boolean estimateResult = false;
 		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(5000);
+		lag.setDuration(3000);
 		
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(vulture, enemiesInfo, null, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
 
@@ -78,6 +78,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				}
 			}
 			kOpt.setGoalPosition(retreatPosition);
+			estimateResult = lag.estimate();
 			MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
 			estimateResult = lag.estimate();
 			break;

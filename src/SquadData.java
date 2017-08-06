@@ -13,12 +13,13 @@ public class SquadData {
 	
 	public void update() {
 //		LagTest lag = LagTest.startTest();
+//		lag.setDuration(10);
 		for (String squadName : squads.keySet()) {
 			squads.get(squadName).update();
 //			lag.estimate(squadName + ", " + squads.get(squadName).getUnitSet().size());
 		}
 		
-//		if (CommonUtils.executeRotation(0, 84)){
+//		if (CommonUtils.executeRotation(0, 168)){
 //			System.out.println("[SQUAD INFO]");
 //			for (String squadName : squads.keySet()) {
 //				Squad sq = squads.get(squadName);
