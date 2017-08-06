@@ -2,58 +2,71 @@
 
 public class LagTest {
 
-//	private static final int CONSOLE_OUT_FRAME = 24 * 10;
 	private static final long DEFAULT_WARN_DURATION = 50;
 	private static final String ROOT_PACKAGE = "pre.";
 	
 	private String name;
 	private long startTime;
+	private boolean microTime; // 15.625ms == 15625000nanoseconds
 	private long warnDuration;
 	
-	public LagTest() {
+	public static LagTest startTest() {
 		StackTraceElement ste = new Throwable().getStackTrace()[1];
 		String className = ste.getClassName();
 		String methodName = ste.getMethodName();
 		
-		this.name = className.replace(ROOT_PACKAGE, "") + "." + methodName;
-		this.startTime = System.currentTimeMillis();
-		this.warnDuration = DEFAULT_WARN_DURATION;
+		String testName = className.replace(ROOT_PACKAGE, "") + "." + methodName;
+		return new LagTest(testName, false);
 	}
 	
-	public LagTest(long warnDuration) {
+	public static LagTest startTest(boolean microTime) {
 		StackTraceElement ste = new Throwable().getStackTrace()[1];
 		String className = ste.getClassName();
 		String methodName = ste.getMethodName();
 		
-		this.name = className.replace(ROOT_PACKAGE, "") + "." + methodName;
-		this.startTime = System.currentTimeMillis();
+		String testName = className.replace(ROOT_PACKAGE, "") + "." + methodName;
+		return new LagTest(testName, microTime);
+	}
+	
+	private LagTest(String testName, boolean microTime) {
+		this.warnDuration = DEFAULT_WARN_DURATION;
+		this.name = testName;
+		this.microTime = microTime;
+		this.startTime = microTime ? System.nanoTime() / 1000 : System.currentTimeMillis();
+	}
+	
+	public void setDuration(long warnDuration) {
 		this.warnDuration = warnDuration;
 	}
 
-	public void test() {
-//		if(!CommonUtils.executeOncePerFrame(CONSOLE_OUT_FRAME, 0)) {
-//			return;
-//		}
+	public boolean estimate() {
+		long currentTime = microTime ? System.nanoTime() / 1000 : System.currentTimeMillis();
 		
-		long currentTime = System.currentTimeMillis();
 		String section = "line" + new Throwable().getStackTrace()[1].getLineNumber();
-		if (currentTime - startTime > warnDuration) {
-			System.out.println("### " + name + "." + section + " : " + (currentTime - startTime) + " millisec");
-		}
+		long estimatedTime = currentTime - startTime;
 		startTime = currentTime;
+		
+		if (estimatedTime > warnDuration) {
+			System.out.println("### " + name + "." + section + " : " + estimatedTime + (microTime? " microsec" : " millisec"));
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
-	public void test(String tag) {
-//		if(!CommonUtils.executeOncePerFrame(CONSOLE_OUT_FRAME, 0)) {
-//			return;
-//		}
+	public boolean estimate(String tag) {
+		long currentTime = microTime ? System.nanoTime() / 1000 : System.currentTimeMillis();
 		
-		long currentTime = System.currentTimeMillis();
 		String section = "line" + new Throwable().getStackTrace()[1].getLineNumber() + " *" + tag;
-		if (currentTime - startTime > warnDuration) {
-			System.out.println("### " + name + "." + section + " : " + (currentTime - startTime) + " millisec");
-		}
+		long estimatedTime = currentTime - startTime;
 		startTime = currentTime;
+		
+		if (estimatedTime > warnDuration) {
+			System.out.println("### " + name + "." + section + " : " + estimatedTime + (microTime? " microsec" : " millisec"));
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

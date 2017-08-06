@@ -97,15 +97,11 @@ public class CombatExpectation {
 	public static int enemyPowerByUnitInfo(List<UnitInfo> targets, boolean skipBuilding) {
 		int enemyPower = 0;
 		
-		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo targetInfo : targets) {
 			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
 			
 			if ((target != null && !target.isCompleted()) || VULTURE_TARGET.get(targetInfo.getType()) == null) {
 				continue;
-			}
-			if (!targetInfo.getType().isBuilding() && (currFrame - targetInfo.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(targetInfo.getType())) {
-				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
 			}
 			if (targetInfo.getType().isBuilding() && skipBuilding) {
 				continue;
@@ -177,27 +173,22 @@ public class CombatExpectation {
 	
 	public static int guerillaScoreByUnitInfo(List<UnitInfo> enemiesInfo) {
 		int score = 0;
-		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo eui : enemiesInfo) {
-			if (!eui.getType().isBuilding() && (currFrame - eui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(eui.getType())) {
-				continue; // NO_UNIT_FRAME 초 지난 유닛은 없는 셈 친다.
-			}
-			
 			if (eui.getType().isResourceDepot()) { // 자원채취한다 100점
+				score += 100;
+			} else if (eui.getType() == UnitType.Terran_Supply_Depot || eui.getType() == UnitType.Protoss_Pylon) {
 				score += 100;
 			} else if (eui.getType().isWorker()) { // 일꾼있다 100점
 				score += 100;
-			} else if (eui.getType().isBuilding() && !eui.getType().canAttack()) {
+			} else if (eui.getType().isBuilding() && !eui.getType().canAttack()) { // 공격할 수 없는 건물
 				score += 20;
 			} else if (eui.getType().groundWeapon().maxRange() < MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 유닛 10점
 				score += 10;
 			} else if (!eui.getType().isFlyer()){ // 걷는애 5점
 				score += 5;
-			} else { // 나머지 -100점
-				score -= 100;
 			}
 		}
-		if (score < 100) { // 채소백점
+		if (score < 50) { // 채소50점이상
 			return 0;
 		} else {
 			return score;

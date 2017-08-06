@@ -57,11 +57,11 @@ class Combat {
 }
 
 enum CombatStrategy {
-	DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, READY_TO_ATTACK, ATTACK_ENEMY
+	DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, ATTACK_ENEMY //, READY_TO_ATTACK
 };
 
 enum CombatStrategyDetail {
-	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE
+	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY
 };
 
 public class CombatManager {
@@ -72,7 +72,7 @@ public class CombatManager {
 	private double getWaitingPeriod() {
 		Race enemyRace = InformationManager.Instance().enemyRace;
 		if (enemyRace == Race.Zerg) {
-			return 3.0;
+			return 2.0;
 		} else if (enemyRace == Race.Protoss) {
 			return 3.0;
 		} else if (enemyRace == Race.Terran) {
@@ -87,7 +87,7 @@ public class CombatManager {
 	private boolean initialized = false;
 	
 	private CombatStrategy combatStrategy;
-	private int[] detailStrategyExFrame = new int[2];
+	private int[] detailStrategyExFrame = new int[10];
 	
 	public CombatStrategy getCombatStrategy() {
 		return combatStrategy;
@@ -425,39 +425,38 @@ public class CombatManager {
 	
 	public Position getMainAttackLocation(Squad squad) {
 		
+//		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
+//			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+//			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+//			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+//			for (BaseLocation occupied : occupiedBases) {
+//				if (occupied == firstExpansion) {
+//					base = firstExpansion;
+//					break;
+//				}
+//			}
+//			mainAttackLocation = base.getPosition();
+
 		Position mainAttackLocation = null;
-		
-		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
-			// We are guaranteed to always have a main base location, even if it has been destroyed.
-			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-			for (BaseLocation occupied : occupiedBases) {
-				if (occupied == firstExpansion) {
-					base = firstExpansion;
-					break;
-				}
-			}
-			mainAttackLocation = base.getPosition();
-			
-		} else if (combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE
+				|| combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
 			int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
 			
 			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
 			
 			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-			if (tankCount + goliathCount >= 15) { // 병력이 존나 모였으면 좀더 전지
+			if (tankCount + goliathCount >= 15) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
 				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-			} else if (tankCount + goliathCount >= 8 || InformationManager.Instance().enemyRace == Race.Terran) {
+			} else if (tankCount + goliathCount >= 10 || InformationManager.Instance().enemyRace == Race.Terran) {
 				mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
 			} else {
 				mainAttackLocation = getDefensePosition(squad);
 			}
 			
-		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯(수정햇다)
-			mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-			
+//		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯(수정햇다)
+//			mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+//			
 		} else { //if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
 			mainAttackLocation = getAttackPosition(squad);
 		}
@@ -491,7 +490,9 @@ public class CombatManager {
 			}
 		}
 		if (defensePosition == null) {
-			defensePosition = firstChoke.getCenter();
+//			defensePosition = firstChoke.getCenter();
+			BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+			defensePosition = myBase.getPosition();
 		}
 		return defensePosition;
 	}
@@ -1025,8 +1026,8 @@ public class CombatManager {
 			
 	    }
 
-		int bonusRadius = (int) (Math.log(mainAttackSquad.getUnitSet().size()) * 20);
-		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS + bonusRadius, "Attack enemy base");
+//		int bonusRadius = (int) (Math.log(mainAttackSquad.getUnitSet().size()) * 15);
+		SquadOrder mainAttackOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(mainAttackSquad), Combat.ATTACK_RADIUS, "Attack enemy base");
 	    mainAttackSquad.setOrder(mainAttackOrder);
 	}
 	
@@ -1213,8 +1214,8 @@ public class CombatManager {
         			}
         		}
 				if(Config.BroodwarDebugYN){
-    			MyBotModule.Broodwar.printf(" - unit size : " + guerillaSquad.getUnitSet().size());
-    			MyBotModule.Broodwar.printf(" - position  : " + bestGuerillaSite.getPosition());
+	    			MyBotModule.Broodwar.printf(" - unit size : " + guerillaSquad.getUnitSet().size());
+	    			MyBotModule.Broodwar.printf(" - position  : " + bestGuerillaSite.getPosition());
 				}
 			} else {
 				//System.out.println("not the best guerilla site");
@@ -1236,18 +1237,19 @@ public class CombatManager {
 				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, null);
 				if (enemies.isEmpty()) {
 					if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : no enemy");
+						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : no enemy");
 					}
 					squad.clear();
 					continue;
 				}
 			}
 			
-			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(
+					squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS, true);
 			Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
 			if (result == Result.Loss) {
 				if(Config.BroodwarDebugYN){
-				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
+					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
 				}
 				squad.clear();
 				continue;
@@ -1256,7 +1258,7 @@ public class CombatManager {
 			int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
 			if (guerillaScore <= 0) {
 				if(Config.BroodwarDebugYN){
-				MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
+					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
 				}
 				squad.clear();
 				continue;

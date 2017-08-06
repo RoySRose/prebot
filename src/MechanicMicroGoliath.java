@@ -5,6 +5,7 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BaseLocation;
 
 public class MechanicMicroGoliath extends MechanicMicroAbstract {
@@ -12,9 +13,20 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 	private SquadOrder order = null;
 	private List<UnitInfo> enemiesInfo = new ArrayList<>();
 	
+	private List<Unit> tankList = new ArrayList<>();
+	private List<Unit> goliathList = new ArrayList<>();
+	
+	private int saveUnitLevel = 1;
+	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
 		this.enemiesInfo = enemiesInfo;
+	}
+	
+	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel) {
+		this.tankList = tankList;
+		this.goliathList = goliathList;
+		this.saveUnitLevel = saveUnitLevel;
 	}
 	
 	public void executeMechanicMicro(Unit goliath) {
@@ -22,7 +34,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 			return;
 		}
 		
-		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(goliath, enemiesInfo); // 0: flee, 1: kiting, 2: attack
+		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(goliath, enemiesInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
 
 		KitingOption kOpt = KitingOption.defaultKitingOption();
 		switch (decision.getDecision()) {

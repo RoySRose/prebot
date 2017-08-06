@@ -382,20 +382,32 @@ public class InformationManager {
 		unitData.get(unit.getPlayer()).removeUnit(unit);
 	}
 
+	
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
 	public List<UnitInfo> getNearbyForce(Position p, Player player, int radius) {
 		List<UnitInfo> unitInfo = new ArrayList<>();
-		getNearbyForce(unitInfo, p, player, radius);
+		getNearbyForce(unitInfo, p, player, radius, false);
+		return unitInfo;
+	}
+		
+	public List<UnitInfo> getNearbyForce(Position p, Player player, int radius, boolean allUnits) {
+		List<UnitInfo> unitInfo = new ArrayList<>();
+		getNearbyForce(unitInfo, p, player, radius, allUnits);
 		return unitInfo;
 	}
 	
-	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다		 
 	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius) {
+		getNearbyForce(unitInfo, p, player, radius, false);
+	}
+	
+	public void getNearbyForce(List<UnitInfo> unitInfo, Position p, Player player, int radius, boolean allUnits) {
 		Iterator<Integer> it = getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
 
 		// for each unit we know about for that player
 		// for (final Unit kv :
 		// getUnitData(player).getUnits().keySet().iterator()){
+		
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		while (it.hasNext()) {
 			final UnitInfo ui = getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
 			if (unitInfo.contains(ui)) {
@@ -404,7 +416,11 @@ public class InformationManager {
 
 			// if it's a combat unit we care about
 			// and it's finished!
-			if (isCombatUnitType(ui.getType()) && ui.isCompleted()) {
+			if (allUnits || (isCombatUnitType(ui.getType()) && ui.isCompleted())) {
+				if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
+					continue;
+				}
+				
 				// determine its attack range
 				int range = 0;
 				if (ui.getType().groundWeapon() != WeaponType.None) {

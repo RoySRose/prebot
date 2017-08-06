@@ -28,7 +28,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		this.flyingEnemisInfo = MicroUtils.filterFlyingTargetInfos(enemiesInfo);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int initFrame, int saveUnitLevel) {
+	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, int initFrame) {
 		this.tankList = tankList;
 		this.goliathList = goliathList;
 		this.initFrame = initFrame;
@@ -41,11 +41,16 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			return;
 		}
 		
+		boolean estimateResult = false;
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(5000);
+		
 		if (tank.isSieged()) {
 			executeSiegeMode(tank);
 		} else {
 			executeTankMode(tank);
 		}
+		lag.estimate();
 	}
 	
 	private void executeSiegeMode(Unit tank) {
@@ -155,9 +160,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			break;
 			
 		case 2: // go
-			
 			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege() && !MicroUtils.existTooNarrowChoke(tank.getPosition())) {
-				Position positionToSiege = findPositionToSiege(siegeModeSpreadRadius);
+				Position positionToSiege = findPositionToSiege(siegeModeSpreadRadius); // orderPosition의 중심으로 펼쳐진 시즈 대형을 만든다.
 				if (positionToSiege != null) {
 					if (tank.getDistance(positionToSiege) < 30) {
 						tank.siege();
@@ -240,7 +244,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			seigeNumLimit++;
 		}
 		
-		MyBotModule.Broodwar.sendText("findPositionToSiege is null");
+		//MyBotModule.Broodwar.sendText("findPositionToSiege is null");
 		return null;
 	}
 }

@@ -127,8 +127,8 @@ public class Squad {
 		SquadOrder attackerOrder = this.order;
 		SquadOrder watchOrder = null;
 		
+		Position watchPosition = null;
 		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-		Position watchPosition = order.getPosition();
 		if (enemyBase != null) {
 			watchPosition = enemyBase.getPosition();
 		} else {
@@ -139,15 +139,17 @@ public class Squad {
 		for (Unit vulture : microVulture.getUnits()) {
 			InformationManager.Instance().getNearbyForce(vultureEnemies, vulture.getPosition(), InformationManager.Instance().enemyPlayer, watchOrder.getRadius());
 		}
-		// TANK & GOLIATH'S ENEMY
-		for (Unit tank : microTank.getUnits()) {
-			InformationManager.Instance().getNearbyForce(attackerEnemies, tank.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
+		if (CombatManager.Instance().getCombatStrategy() != CombatStrategy.DEFENCE_INSIDE && CombatManager.Instance().getCombatStrategy() != CombatStrategy.DEFENCE_CHOKEPOINT) {
+			// TANK & GOLIATH'S ENEMY
+			for (Unit tank : microTank.getUnits()) {
+				InformationManager.Instance().getNearbyForce(attackerEnemies, tank.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
+			}
+			for (Unit goliath : microGoliath.getUnits()) {
+				InformationManager.Instance().getNearbyForce(attackerEnemies, goliath.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
+			}
 		}
-		for (Unit goliath : microGoliath.getUnits()) {
-			InformationManager.Instance().getNearbyForce(attackerEnemies, goliath.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
-		}
-		InformationManager.Instance().getNearbyForce(attackerEnemies, order.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
-		
+		InformationManager.Instance().getNearbyForce(attackerEnemies, attackerOrder.getPosition(), InformationManager.Instance().enemyPlayer, attackerOrder.getRadius());
+
 		// TANK 거리재기 상대
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			List<UnitInfo> nearTankEnemies = new ArrayList<>();
@@ -158,10 +160,6 @@ public class Squad {
 				Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
 				if (enemy != null) {
 					if (!CommandUtil.IsValidUnit(enemy)) {
-						continue;
-					}
-				} else {
-					if (MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME(enemyInfo.getType())) { // skip old unit
 						continue;
 					}
 				}
@@ -218,16 +216,14 @@ public class Squad {
 			}
 			
 		} else {
-			if (saveUnitFrameCount > 0) {
+			if (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.VULTURE_JOIN_SQUAD) > 0) {
 				watchOrder.setPosition(attackerOrder.getPosition());
 				vultureEnemies = attackerEnemies;
-				saveUnitFrameCount--;
 				saveUnitLevelVulture = 2;
 			} else {
 				Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
 				if (result == Result.Loss) {
 					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);
-					saveUnitFrameCount = 24 * 10;
 					saveUnitLevelVulture = 2;
 				} else if (result == Result.Win) {
 					saveUnitLevelVulture = 1;
@@ -236,14 +232,10 @@ public class Squad {
 				} 
 			}
 		}
-		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture);
-		for (Unit vulture : microVulture.getUnits()) {
-			mechanicVulture.executeMechanicMicro(vulture);
-		}
 		
 		// 탱크 vs 탱크 전투 판단여부
 		int saveUnitLevelTank = 1;
+		int saveUnitLevelGoliath = 1;
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			if (microTank.getUnits().size() > 1 && closeTankEnemies.size() * 2 <= microTank.getUnits().size()) {
 				saveUnitLevelTank = 1; // 거리재기 전진
@@ -252,10 +244,21 @@ public class Squad {
 			}
 		}
 		
-		mechanicTank.prepareMechanic(attackerOrder, attackerEnemies);
-		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), initFrame, saveUnitLevelTank);
-		mechanicGoliath.prepareMechanic(attackerOrder, attackerEnemies);
+		if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY
+				&& CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) {
+			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
+		}
 		
+		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
+		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture);
+		mechanicTank.prepareMechanic(attackerOrder, attackerEnemies);
+		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelTank, initFrame);
+		mechanicGoliath.prepareMechanic(attackerOrder, attackerEnemies);
+		mechanicGoliath.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelGoliath);
+
+		for (Unit vulture : microVulture.getUnits()) {
+			mechanicVulture.executeMechanicMicro(vulture);
+		}
 		for (Unit tank : microTank.getUnits()) {
 			mechanicTank.executeMechanicMicro(tank);
 		}
@@ -268,6 +271,7 @@ public class Squad {
 	private void updateVultureSquad() {
 		List<UnitInfo> vultureEnemies = new ArrayList<>();
 
+		int saveUnitLevel = 1;
 		// 적 정보 수집. 명령이 하달된 3초간은 근처 적을 무시
 		if (name.equals(SquadName.CHECKER)) {
 			for (Unit vulture : microVulture.getUnits()) {
@@ -286,6 +290,8 @@ public class Squad {
 				}
 			}
 			InformationManager.Instance().getNearbyForce(vultureEnemies, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
+			saveUnitLevel = 0;
+//			System.out.println("LET'S GUEGUEGUERILLA!");
 		}
 
 //		List<Unit> peloton = new ArrayList<>();
@@ -297,10 +303,7 @@ public class Squad {
 //		}
 
 //		boolean saveUnit = !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies);
-		int saveUnitLevel = 1;
-		if (name.startsWith(SquadName.GUERILLA_)) {
-			saveUnitLevel = 0;
-		}
+		
 		mechanicVulture.prepareMechanic(order, vultureEnemies);
 		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
 		for (Unit vulture : microVulture.getUnits()) {
@@ -317,7 +320,7 @@ public class Squad {
 		mechanicVulture.prepareMechanic(order, nearbyEnemiesInfo);
 		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1);
 		mechanicTank.prepareMechanic(order, nearbyEnemiesInfo);
-		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 0, 1);
+		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1, 0);
 		mechanicGoliath.prepareMechanic(order, nearbyEnemiesInfo);
 		
 		for (Unit vulture : microVulture.getUnits()) {
