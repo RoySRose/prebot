@@ -64,7 +64,7 @@ public class RespondToStrategy {
 	 
 	private static RespondToStrategy instance = new RespondToStrategy();
 	
-	public static RespondToStrategy instance() {
+	public static RespondToStrategy Instance() {
 		return instance;
 	}
 	
@@ -330,22 +330,19 @@ public class RespondToStrategy {
 		
 	public void RespondVsZerg() {	
 		
-		
-		
-		//zergException_PrepareLurker ||  zergException_FastLurker start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_PrepareLurker
 			||StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_FastLurker){
 			enemy_lurker = true;
 			need_vessel = true;
 			max_vessel = 1;
 		}
-		//zergException_PrepareLurker ||  zergException_FastLurker end
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_HighTech){
-			//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
-				need_vessel = true;
-				max_vessel = 4;
-			//}
+			need_vessel = true;
+			max_vessel = 4;
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_OnLyLing){
 		}
 	}
 		

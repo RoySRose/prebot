@@ -208,7 +208,9 @@ public class CombatManager {
 				updateEarlyDefenseSquad();
 			}
 			
-			updateBunker();
+			if(MyBotModule.Broodwar.getFrameCount() < 11000){
+				updateBunker();
+			}
 			
 			updateAttackSquads();
 			
@@ -266,9 +268,9 @@ public class CombatManager {
 				if(bunker.getDistance(target) <= 160){
 					bunkerOut = false;
 				}
-			}
-			if(bunkerOut){
-				bunker.unloadAll();
+				if(bunkerOut){
+					bunker.unloadAll();
+				}
 			}
 		}
 	}
@@ -347,7 +349,13 @@ public class CombatManager {
 						MicroUtils.smartScan(unit.getPosition());
 						return;
 					}
-				}else if(InformationManager.Instance().enemyRace == Race.Zerg){
+				}else if(InformationManager.Instance().enemyRace == Race.Terran){
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Wraith.sightRange(), true, false, UnitType.Terran_Goliath);
+					if(myUnits.size() > 1){
+						MicroUtils.smartScan(unit.getPosition());
+						return;
+					}
+				}else{
 					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Zerg_Lurker.sightRange(), true, false, null);
 					int faccnt = 0;
 					for(Unit facunit : myUnits){
@@ -356,12 +364,6 @@ public class CombatManager {
 						}
 					}
 					if(faccnt > 4){
-						MicroUtils.smartScan(unit.getPosition());
-						return;
-					}
-				}else{
-					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Wraith.sightRange(), true, false, UnitType.Terran_Goliath);
-					if(myUnits.size() > 1){
 						MicroUtils.smartScan(unit.getPosition());
 						return;
 					}
@@ -423,7 +425,54 @@ public class CombatManager {
 				comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
 			}
 		}
+	
 		
+		//저그전 특이사항
+		if(InformationManager.Instance().enemyRace == Race.Zerg && (AnalyzeStrategy.Instance().hydraStrategy == false || AnalyzeStrategy.Instance().multalStrategy == false)){
+			
+			int energy = 50;
+			if(RespondToStrategy.Instance().enemy_lurker == true){
+				energy = 100;
+			}
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() > energy) {
+					comsat = unit;
+				}
+			}
+			if (comsat != null) {
+			
+				Player enemyPlayer = MyBotModule.Broodwar.enemy();
+				//find place
+				List<TilePosition> scanArea = new ArrayList<TilePosition>();
+				
+				if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
+				}
+				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
+				}
+				TilePosition target = null;
+				int scantime = 1000000;
+				if(scanArea!= null){
+					for (TilePosition scans : scanArea) {
+						if(MyBotModule.Broodwar.isVisible(scans)){
+							continue;
+						}
+						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
+						if(scantime > tempscantime){
+							target = scans;
+							scantime = tempscantime;
+						}
+					}
+				}		
+				if(target!= null){
+					MapGrid.Instance().scanAtPosition(target.toPosition());
+					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+				}
+				
+			}
+		}
 	}
 	
 	public Position getMainAttackLocation(Squad squad) {
