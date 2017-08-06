@@ -81,6 +81,8 @@ public class Squad {
 		} else if (name.startsWith(SquadName.BASE_DEFENSE_)) {
 			updateDefenseSquad();
 			return;
+		} else if (name.equals(SquadName.IDLE)) {
+			return;
 		}
 		
 		if (microVulture.getUnits().size() > 0
@@ -221,15 +223,20 @@ public class Squad {
 				vultureEnemies = attackerEnemies;
 				saveUnitLevelVulture = 2;
 			} else {
-				Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
+				boolean skipBuilding = true;
+				if (CommonUtils.executeRotation(0, 20 * 24)) {
+					skipBuilding = false;
+				}
+				Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, skipBuilding);
 				if (result == Result.Loss) {
 					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);
 					saveUnitLevelVulture = 2;
-				} else if (result == Result.Win) {
+				} else if (result == Result.Win || result == Result.BigWin) {
 					saveUnitLevelVulture = 1;
-				} else if (result == Result.BigWin) {
-					saveUnitLevelVulture = 0;
-				} 
+				}
+//				else if (result == Result.BigWin) {
+//					saveUnitLevelVulture = 0;
+//				} 
 			}
 		}
 		
@@ -252,7 +259,7 @@ public class Squad {
 		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
 		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture);
 		mechanicTank.prepareMechanic(attackerOrder, attackerEnemies);
-		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelTank, initFrame);
+		mechanicTank.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelTank, initFrame);
 		mechanicGoliath.prepareMechanic(attackerOrder, attackerEnemies);
 		mechanicGoliath.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelGoliath);
 
@@ -312,33 +319,43 @@ public class Squad {
 	}
 	
 	private void updateDefenseSquad() {
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(5000);
+		
 		List<UnitInfo> nearbyEnemiesInfo = new ArrayList<>();
 		if (order.getType() == SquadOrderType.DEFEND) {
 			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 		}
+		lag.estimate();
 		
 		mechanicVulture.prepareMechanic(order, nearbyEnemiesInfo);
 		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1);
 		mechanicTank.prepareMechanic(order, nearbyEnemiesInfo);
-		mechanicTank.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1, 0);
+		mechanicTank.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), 1, 0);
 		mechanicGoliath.prepareMechanic(order, nearbyEnemiesInfo);
 		
+		lag.estimate();
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
 		}
+		lag.estimate();
 		for (Unit tank : microTank.getUnits()) {
 			mechanicTank.executeMechanicMicro(tank);
 		}
+		lag.estimate();
 		for (Unit goliath : microGoliath.getUnits()) {
 			mechanicGoliath.executeMechanicMicro(goliath);
 		}
+		lag.estimate();
 
 		List<Unit> nearbyEnemies = new ArrayList<>();
 		if (order.getType() == SquadOrderType.DEFEND) {
 			MapGrid.Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 		}
+		lag.estimate();
 		microMarine.setMicroInformation(order, nearbyEnemies);
 		microMarine.execute();
+		lag.estimate();
 	}
 	
 	private void updateUnits() {

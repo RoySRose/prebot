@@ -233,10 +233,14 @@ public class MicroUtils {
 		if (target.getType().isBuilding()) {
 			approachKiting = true;
 			haveToAttack = true;
+			
+		} else if (rangedUnit.getType() == UnitType.Terran_Vulture && target.getType() == UnitType.Terran_Vulture) {
+			haveToAttack = true;
+			
 		} else if (rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
 			// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
 			haveToAttack = true;
-		
+			
 		} else {
 			double distanceToTarget = rangedUnit.getDistance(target);
 			double distanceToAttack = distanceToTarget - MyBotModule.Broodwar.enemy().weaponMaxRange(rangedUnitWeapon); // 거리(pixel)
@@ -244,7 +248,7 @@ public class MicroUtils {
 			
 			// 명령에 대한 지연시간(latency)을 더한다.
 			timeToCatch += MicroSet.Network.LATENCY * 2; // 후퇴해야 하는 경우, 지연시간을 더하면 도망을 더 늦게갈 수도 있다. if (distanceToAttack > 0) // TODO 조절가능
-			timeToCatch += target.getType().isWorker() ? 8 : 0; // 일꾼에게는 좀 덜 도망가도 된다.
+			timeToCatch += target.getType().isWorker() ? 12 : 0; // 일꾼에게는 좀 덜 도망가도 된다.
 	
 			int currentCooldown = rangedUnit.isStartingAttack() ? rangedUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
 					: (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());

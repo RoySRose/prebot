@@ -14,6 +14,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	private List<UnitInfo> enemiesInfo;
 	private List<UnitInfo> flyingEnemisInfo;
 	
+	private List<Unit> vultureList = new ArrayList<>();
 	private List<Unit> tankList = new ArrayList<>();
 	private List<Unit> goliathList = new ArrayList<>();
 	
@@ -28,7 +29,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		this.flyingEnemisInfo = MicroUtils.filterFlyingTargetInfos(enemiesInfo);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, int initFrame) {
+	public void prepareMechanicAdditional(List<Unit> vultureList, List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, int initFrame) {
+		this.vultureList = vultureList;
 		this.tankList = tankList;
 		this.goliathList = goliathList;
 		this.initFrame = initFrame;
@@ -41,27 +43,24 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			return;
 		}
 		
-		boolean estimateResult = false;
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(5000);
-		
 		if (tank.isSieged()) {
 			executeSiegeMode(tank);
 		} else {
 			executeTankMode(tank);
 		}
-		lag.estimate();
 	}
 	
 	private void executeSiegeMode(Unit tank) {
 		if (initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
 			return;
 		}
-		
+
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(3000);
 		// Decision -> 0: stop, 1: kiting(attack unit), 2: change
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecisionForSiegeMode(tank, enemiesInfo, tankList, order, saveUnitLevel);
 		SpiderMineManger.Instance().addRemoveList(tank);
-		
+		lag.estimate();
 		switch (decision.getDecision()) {
 		case -1: // do nothing
 			break;
@@ -73,6 +72,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		case 1: // attack unit
 			UnitInfo targetInfo = decision.getTargetInfo();
 			CommandUtil.attackUnit(tank, targetInfo.getUnit());
+			lag.estimate();
 			break;
 			
 		case 2: // go
@@ -82,6 +82,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					tank.unsiege();
 				}
 			}
+			lag.estimate();
 			break;
 			
 		case 3: // change
@@ -98,6 +99,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			return;
 		}
 		
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(3000);
 		KitingOption kOpt = KitingOption.defaultKitingOption();
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(tank, enemiesInfo, flyingEnemisInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: go, 3: change
 		switch (decision.getDecision()) {
@@ -109,6 +112,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			}
 			kOpt.setGoalPosition(retreatPosition);
 			MicroUtils.preciseFlee(tank, decision.getEnemyPosition(), kOpt);
+			lag.estimate();
 			break;
 			
 		case 1: // kiting
@@ -120,7 +124,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				targetPosition = target.getPosition();
 				targetType = target.getType();
 			}
-			if (targetType.groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃 카이팅
+			if (vultureList.size() + goliathList.size() <= MicroSet.Tank.OTHER_UNIT_COUNT_SIEGE_AGAINST_MELEE
+					&& targetType.groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃 카이팅(백업 유닛이 있으면 밀리유닛 상대로도 시즈모드 변경) 
 				Position kitingGoalPosition = order.getPosition();
 				kOpt.setGoalPosition(kitingGoalPosition);
 				MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
@@ -157,6 +162,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
 				}
 			}
+			lag.estimate();
 			break;
 			
 		case 2: // go
@@ -177,7 +183,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			} else {
             	CommandUtil.attackMove(tank, order.getPosition());
 			}
-			
+			lag.estimate();
 			break;
 			
 		case 3: // change

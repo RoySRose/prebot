@@ -180,7 +180,7 @@ public class VultureTravelManager {
 		TravelSite bestTravelSite = null;
 		
 		for (TravelSite travelSite : travelSites) {
-			if (currFrame - travelSite.guerillaExamFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
+			if (assignableVultures.size() < MicroSet.Vulture.GEURILLA_FREE_VULTURE_COUNT && currFrame - travelSite.guerillaExamFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
 				continue;
 			}
 			 

@@ -49,7 +49,7 @@ class Combat {
 	public static final int WATCHER_RADIUS = 300;
 	public static final int CHECKER_RADIUS = 150;
 	public static final int GUERILLA_RADIUS = 300;
-	public static final int BASE_DEFENSE_RADIUS = 500; // 32 * 25
+	public static final int BASE_DEFENSE_RADIUS = 400; // 32 * 25
 	public static final int SCOUT_DEFENSE_RADIUS = 600;
 	public static final int MARINE_RADIUS = 300;
 	public static final int WRAITH_RADIUS = 300;
@@ -290,7 +290,10 @@ public class CombatManager {
 	private List<Unit> getCombatUnits() {
 		List<Unit> combatUnits = new ArrayList<>();
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (CommandUtil.IsValidUnit(unit) && !MicroUtils.isUnitContainedInUnitSet(unit, combatUnits) && (CommandUtil.IsCombatUnit(unit) || unit.getType().isWorker())) {
+			if (CommandUtil.IsValidUnit(unit)
+					&& unit.getType() != UnitType.Terran_Vulture_Spider_Mine
+					&& !MicroUtils.isUnitContainedInUnitSet(unit, combatUnits)
+					&& (CommandUtil.IsCombatUnit(unit) || unit.getType().isWorker())) {
 				MicroUtils.addUnitToUnitSet(unit, combatUnits);
 			}
 		}
@@ -425,6 +428,7 @@ public class CombatManager {
 	
 	public Position getMainAttackLocation(Squad squad) {
 		
+//		combatStrategy = CombatStrategy.DEFENCE_INSIDE;
 //		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE) {
 //			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 //			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);

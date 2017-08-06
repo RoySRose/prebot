@@ -20,7 +20,8 @@ public class MicroSet {
 		public static final int GEURILLA_RADIUS = 400;
 		public static final int PELOTON_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_POWER = 150;
-		public static final int GEURILLA_INTERVAL_FRAME = 20 * 24; // 20초
+		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 20초
+		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // 15마리
 		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
 
 		public static final int IGNORE_MOVE_FRAME = 3 * 24; // 3초
@@ -51,11 +52,12 @@ public class MicroSet {
 		
 		public static final int SIEGE_LINK_DISTANCE = 250;
 		public static final int SIEGE_ARRANGE_DISTANCE = 150;
+		public static final int OTHER_UNIT_COUNT_SIEGE_AGAINST_MELEE = 6;
 	}
 	
 	public static class Common {
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
-		public static final double BACKOFF_DIST_DEF_TOWER = 80.0;
+		public static final double BACKOFF_DIST_DEF_TOWER = 120.0;
 		public static final double BACKOFF_DIST_RANGE_ENEMY = 180.0;
 		
 		public static final int TANK_SQUAD_SIZE = 2;
