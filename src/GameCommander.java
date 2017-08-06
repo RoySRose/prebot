@@ -49,51 +49,51 @@ public class GameCommander {
 
 		try {
 			logObserver.start();
-			LagTest lag = new LagTest();
+			LagTest lag = LagTest.startTest();
+			lag.setDuration(30);
 			if ( isToFindError) System.out.print("(a");
 
 			// 아군 베이스 위치. 적군 베이스 위치. 각 유닛들의 상태정보 등을 Map 자료구조에 저장/업데이트
 			InformationManager.Instance().update();
-			lag.test("InformationManager");
+			lag.estimate("InformationManager");
 			if ( isToFindError) System.out.print("b");
 		
 			// 각 유닛의 위치를 자체 MapGrid 자료구조에 저장
 			MapGrid.Instance().update();
-			lag.test("MapGrid");
+			lag.estimate("MapGrid");
 			if ( isToFindError) System.out.print("c");
 
 			// economy and base managers
 			// 일꾼 유닛에 대한 명령 (자원 채취, 이동 정도) 지시 및 정리
 			WorkerManager.Instance().update();
-			lag.test("WorkerManager");
+			lag.estimate("WorkerManager");
 			if ( isToFindError) System.out.print("d");
 			
 			// 빌드오더큐를 관리하며, 빌드오더에 따라 실제 실행(유닛 훈련, 테크 업그레이드 등)을 지시한다.
 			BuildManager.Instance().update();
-			lag.test("BuildManager");
+			lag.estimate("BuildManager");
 			if ( isToFindError) System.out.print("e");
 
 			// 빌드오더 중 건물 빌드에 대해서는, 일꾼유닛 선정, 위치선정, 건설 실시, 중단된 건물 빌드 재개를 지시한다
 			ConstructionManager.Instance().update();
-			lag.test("ConstructionManager");
+			lag.estimate("ConstructionManager");
 			if ( isToFindError) System.out.print("f");
 
 			// 게임 초기 정찰 유닛 지정 및 정찰 유닛 컨트롤을 실행한다
 			ScoutManager.Instance().update();
-			lag.test("ScoutManager");
+			lag.estimate("ScoutManager");
 			if ( isToFindError) System.out.print("g");
 
 			// 전략적 판단 및 유닛 컨트롤
 			StrategyManager.Instance().update();
-			lag.test("StrategyManager");
+			lag.estimate("StrategyManager");
 			if ( isToFindError) System.out.print("h");
 			
 			CombatManager.Instance().update();
-			lag.test("CombatManager");
+			lag.estimate("CombatManager");
 			if ( isToFindError) System.out.print("i)");
 			
-			long cost = logObserver.observe();
-			logObserver.adjustment(cost);
+			logObserver.observe();
 
 		} catch (Exception e) {
 			e.printStackTrace();

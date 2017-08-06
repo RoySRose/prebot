@@ -55,8 +55,8 @@ public class MicroSet {
 	
 	public static class Common {
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
-		public static final double BACKOFF_DIST_DEF_TOWER = 150.0;
-		public static final double BACKOFF_DIST_RANGE_ENEMY = 200.0;
+		public static final double BACKOFF_DIST_DEF_TOWER = 80.0;
+		public static final double BACKOFF_DIST_RANGE_ENEMY = 180.0;
 		
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int MAIN_SQUAD_COVERAGE = 150;
@@ -160,21 +160,51 @@ public class MicroSet {
 	
 	public static class FleeAngle {
 		
-		public static Integer[] getFleeAngle(UnitType fleeUnit) {
-			Integer[] angle = FLEE_ANGLE_MAP.get(fleeUnit);
-			if (angle == null) {
-				MyBotModule.Broodwar.sendText("flee angle is null");
-				return WIDE_ANGLE;
+		public static Integer[] getLagImproveAngle(Integer[] angle) {
+			if (LagObserver.groupsize() >= 3) {
+				if (WIDE_ANGLE.equals(angle)) {
+					return WIDE_ANGLE_LOWER;
+				} else if (NARROW_ANGLE.equals(angle)) {
+					return NARROW_ANGLE_LOWER;
+				} else if (EIGHT_360_ANGLE.equals(angle)) {
+					return EIGHT_360_ANGLE_LOWER;
+				}
+			} else if (LagObserver.groupsize() >= 5) {
+				if (WIDE_ANGLE.equals(angle)) {
+					return WIDE_ANGLE_LOWEST;
+				} else if (NARROW_ANGLE.equals(angle)) {
+					return NARROW_ANGLE_LOWEST;
+				} else if (EIGHT_360_ANGLE.equals(angle)) {
+					return EIGHT_360_ANGLE_LOWEST;
+				}
 			}
 			
 			return angle;
 		}
+		
+		public static Integer[] getFleeAngle(UnitType fleeUnit) {
+			Integer[] angle = FLEE_ANGLE_MAP.get(fleeUnit);
+			if (angle == null) {
+				MyBotModule.Broodwar.sendText("flee angle is null");
+				angle = WIDE_ANGLE;
+			}
+			
+			return getLagImproveAngle(angle);
+		}
 
-		public static final Map<UnitType, Integer[]> FLEE_ANGLE_MAP = new HashMap<>();
 		public static final Integer[] NARROW_ANGLE = { -5, +5, -10, +10, -15, +15 };
 		public static final Integer[] WIDE_ANGLE = { -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
-		public static final Integer[] EIGHT_360_ANGLE = {45, 90, 135, 180, 225, 270, 315, 360};
+		public static final Integer[] EIGHT_360_ANGLE = { 45, 90, 135, 180, 225, 270, 315, 360 };
 		
+		private static final Integer[] NARROW_ANGLE_LOWER = { -10, +10 };
+		private static final Integer[] WIDE_ANGLE_LOWER = { -10, +10, -30, +30, -50, +50, -70, +70 };
+		private static final Integer[] EIGHT_360_ANGLE_LOWER = { 90, 180, 270, 360 };
+		
+		private static final Integer[] NARROW_ANGLE_LOWEST = { -10, +10 };
+		private static final Integer[] WIDE_ANGLE_LOWEST = { -10, +10, -30, +30 };
+		private static final Integer[] EIGHT_360_ANGLE_LOWEST = { 120, 240, 360 };
+
+		private static final Map<UnitType, Integer[]> FLEE_ANGLE_MAP = new HashMap<>();
 		static {
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Marine, WIDE_ANGLE);
 			FLEE_ANGLE_MAP.put(UnitType.Terran_Vulture, WIDE_ANGLE);

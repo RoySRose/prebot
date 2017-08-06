@@ -12,13 +12,13 @@ public class SquadData {
 	private Map<String, Squad> squads = new HashMap<>();
 	
 	public void update() {
-//		LagTest lag = new LagTest(0);
+//		LagTest lag = LagTest.startTest();
 		for (String squadName : squads.keySet()) {
 			squads.get(squadName).update();
-//			lag.test(squadName + ", " + squads.get(squadName).getUnitSet().size());
+//			lag.estimate(squadName + ", " + squads.get(squadName).getUnitSet().size());
 		}
 		
-//		if (CommonUtils.executeRotation(0, 42)){
+//		if (CommonUtils.executeRotation(0, 84)){
 //			System.out.println("[SQUAD INFO]");
 //			for (String squadName : squads.keySet()) {
 //				Squad sq = squads.get(squadName);

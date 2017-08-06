@@ -183,8 +183,9 @@ public class VultureTravelManager {
 			if (currFrame - travelSite.guerillaExamFrame < MicroSet.Vulture.GEURILLA_INTERVAL_FRAME) {
 				continue;
 			}
-
-			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(travelSite.baseLocation.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS);
+			 
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(
+					travelSite.baseLocation.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS, true);
 			if (enemiesInfo.isEmpty()) { // 적군이 존재하지 않음
 				continue;
 			}

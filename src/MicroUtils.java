@@ -3,7 +3,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import bwapi.Color;
 import bwapi.DamageType;
 import bwapi.Pair;
 import bwapi.Player;
@@ -35,7 +34,6 @@ public class MicroUtils {
 		boolean isSafe = true;
 		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(rangedUnit.getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
 		
-		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo ui : nearEnemisUnitInfos) {
 			Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID()); // 보이는 적에 대한 조건
 			if (unit != null && unit.getType() != UnitType.Unknown) {
@@ -45,10 +43,6 @@ public class MicroUtils {
 			}
 			
 			if (ui.getType().isWorker() || MyBotModule.Broodwar.getDamageFrom(ui.getType(), rangedUnit.getType()) == 0) {
-				continue;
-			}
-			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -73,7 +67,6 @@ public class MicroUtils {
 		boolean isSafe = true;
 		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
 		
-		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		for (UnitInfo ui : nearEnemisUnitInfos) {
 			if (!safeMine) {
 				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
@@ -85,10 +78,6 @@ public class MicroUtils {
 			}
 			
 			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {
-				continue;
-			}
-			
-			if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 				continue;
 			}
 			
@@ -278,7 +267,6 @@ public class MicroUtils {
 					|| (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown()) > 0)) {
 				CommandUtil.move(rangedUnit, target.getPosition());
 			} else {
-				MyBotModule.Broodwar.drawCircleMap(target.getPosition(), 20, Color.Red);
 				CommandUtil.attackUnit(rangedUnit, target);
 			}
 			
@@ -352,6 +340,11 @@ public class MicroUtils {
 	 * @return
 	 */
 	private static Position getFleePosition(Unit rangedUnit, Position targetPosition, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
+		
+		boolean estimateResult = false;
+		LagTest lag = LagTest.startTest(true);
+		lag.setDuration(2000);
+		
 		int reverseX = rangedUnit.getPosition().getX() - targetPosition.getX(); // 타겟과 반대로 가는 x양
 		int reverseY = rangedUnit.getPosition().getY() - targetPosition.getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
@@ -361,11 +354,12 @@ public class MicroUtils {
 		int minimumDistanceToGoal = 99999;
 
 //		Integer[] FLEE_ANGLE = MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType()); // MicroData.FleeAngle에 저장된 유닛타입에 따른 회피 각 범위(골리앗 새끼들은 뚱뚱해서 각이 넓으면 지들끼리 낑김)
-		Integer[] FLEE_ANGLE = fleeAngle != null ? fleeAngle : MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType());
+		Integer[] FLEE_ANGLE = fleeAngle != null ? MicroSet.FleeAngle.getLagImproveAngle(fleeAngle) : MicroSet.FleeAngle.getFleeAngle(rangedUnit.getType());
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
 		int moveCalcSize = moveDistPerSec; // 이동 회피지점의 거리 = 유닛의 초당이동거리
 		int riskRadius = MicroSet.RiskRadius.getRiskRadius(rangedUnit.getType());
-		
+
+		lag.estimate();		
 		while (safePosition == null && moveCalcSize > 10) {
 			for(int i = 0 ; i< FLEE_ANGLE.length; i ++) {
 			    Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
@@ -387,6 +381,7 @@ public class MicroUtils {
 					minimumDistanceToGoal = distanceToGoal;
 				}
 				fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
+				lag.estimate();
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
 //		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);

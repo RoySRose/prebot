@@ -75,14 +75,26 @@ public class MechanicMicroDecision {
 		for (UnitInfo enemyInfo : enemiesInfo) {
 			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
 			if (enemy == null) {
-				int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
-				if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
-					bestTargetInfo = enemyInfo;
-					targetOutOfSight = true;
-				} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
-					bestTargetInfo = enemyInfo;
-					targetOutOfSight = true;
-				}
+
+//				int noUnitFrame = MicroSet.Common.NO_UNIT_FRAME;
+//				if (enemyInfo.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || enemyInfo.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+//					noUnitFrame = MicroSet.Common.NO_SIEGE_FRAME;
+//				}
+				
+//				if (bestTargetInfo == null
+//						&& !MyBotModule.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())
+//						&& (MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame()) < noUnitFrame) {
+					
+					int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
+					if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
+						bestTargetInfo = enemyInfo;
+						targetOutOfSight = true;
+					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
+						bestTargetInfo = enemyInfo;
+						targetOutOfSight = true;
+					}
+//				}
+				
 				continue;
 			}
 
@@ -189,14 +201,10 @@ public class MechanicMicroDecision {
 		
 	}
 	
-	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo) {
-		return makeDecision(mechanicUnit, enemiesInfo, null, 1);
+	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, int saveUnitLevel) {
+		return makeDecision(mechanicUnit, enemiesInfo, null, saveUnitLevel);
 	}
-	
-	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo) {
-		return makeDecision(mechanicUnit, enemiesInfo, flyingEnemiesInfo, 1);
-	}
-	
+
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
 		
 		UnitInfo bestTargetInfo = null;
@@ -217,11 +225,6 @@ public class MechanicMicroDecision {
 				enemyIsComplete = enemy.isCompleted();
 				enemyPosition = enemy.getPosition();
 				enemyUnitType = enemy.getType();
-			}
-			
-			if (enemy == null && !enemyUnitType.isBuilding()
-					&& MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame() > MicroSet.Common.NO_UNIT_FRAME(enemyInfo.getType())) {
-				continue;
 			}
 			
 			if (enemyIsComplete && saveUnitLevel >= 1) {
