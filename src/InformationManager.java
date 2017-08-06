@@ -51,7 +51,6 @@ public class InformationManager {
 	private boolean gasRushed;
 	private boolean checkGasRush;
 	private int MainBaseSuppleLimit;
-	private Unit FirstCommandCenter;
 	private Unit FirstVulture;
 	private Position firstenemyunit;
 	
@@ -117,15 +116,8 @@ public class InformationManager {
 		gasRushed = false;
 		checkGasRush = true;
 		MainBaseSuppleLimit =0;
-		FirstCommandCenter = null;
 		FirstVulture = null;
 		Position firstenemyunit = null;
-		
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if(unit.getType() == UnitType.Terran_Command_Center){
-				FirstCommandCenter = unit;
-			}
-		}
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -994,9 +986,7 @@ public class InformationManager {
 				}
 				//헌트 특이사항
 				if(mapSpecificInformation.getMap() == MAP.TheHunters){
-					int startingX = FirstCommandCenter.getTilePosition().getX(); 
-					int startingY = FirstCommandCenter.getTilePosition().getY();
-					if(startingX == 114 && startingY == 80)	{		
+					if(BlockingEntrance.Instance().getStartingInt() == 3){		
 						firstChokePoint.put(selfPlayer,  secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer,  thirdChokePointDonotUse.get(selfPlayer));
 					}
@@ -1043,9 +1033,7 @@ public class InformationManager {
 				//헌트 특이사항
 				if(mapSpecificInformation.getMap() == MAP.TheHunters){
 					
-					int startingX = FirstCommandCenter.getTilePosition().getX(); 
-					int startingY = FirstCommandCenter.getTilePosition().getY();
-					if(startingX == 114 && startingY == 80)	{		
+					if(BlockingEntrance.Instance().getStartingInt() == 3){		
 						firstChokePoint.put(enemyPlayer,  secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer,  thirdChokePointDonotUse.get(enemyPlayer));
 					}
@@ -1634,6 +1622,4 @@ public class InformationManager {
 	public MapSpecificInformation getMapSpecificInformation() {
 		return mapSpecificInformation;
 	}
-
-	
 }

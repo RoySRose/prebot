@@ -142,15 +142,19 @@ public class GameCommander {
 		
 		if(unit.getType() == UnitType.Terran_Command_Center){
 			
-			if(CombatManager.Instance().getClosestMineral(unit)==null){
-
-			}else{
+			ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
+			
+			if(CombatManager.Instance().getClosestMineral(unit)!=null){
 				unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
 			}
 		}
 		
 		if(unit.getType() == UnitType.Terran_Factory){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
+		}
+		
+		if(unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility){
+			ConstructionPlaceFinder.Instance().setTilesToAvoidAddon(unit);
 		}
 		
 		if(unit.getType() == UnitType.Terran_Barracks){
@@ -165,7 +169,6 @@ public class GameCommander {
 				}
 			}
 		}
-		
 		
 		if(unit.getType() == UnitType.Terran_Bunker){
 			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
