@@ -338,6 +338,8 @@ public class ScoutManager{
 										 return;
 					                 }else
 					                	 commandUtil.attackUnit(currentScoutUnit, closestWorker);
+									 scoutUnderAttack= true;
+									 
 									//Micro::SmartAttackUnit(_workerScout, closestWorker);
 								}
 								// otherwise keep moving to the enemy region

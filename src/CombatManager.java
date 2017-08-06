@@ -679,6 +679,9 @@ public class CombatManager {
 				minCnt++;
 			}
 		}
+		if(minCnt == 0){
+			return depot.getPosition();
+		}
 		finalx = x/minCnt;
 		finaly = y/minCnt;
 		finalx = (finalx + depot.getPosition().getX())/2;
@@ -1114,8 +1117,15 @@ public class CombatManager {
 	        }
 	    }
 
+		BaseLocation temp= InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		Position sight = null;
+		if(temp ==null){
+			sight = getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK));
+		}else{
+			sight = temp.getPosition();
+		}
 		// ############ 이 아래의 코드는 필요가 없다.(또는 default order로 사용가능) microbuilding실행시 각 유닛의 order로 대체한다. ###############
-		SquadOrder buildingOrder = new SquadOrder(SquadOrderType.DEFEND, getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK)), UnitType.Terran_Science_Vessel.sightRange(), "Building");
+		SquadOrder buildingOrder = new SquadOrder(SquadOrderType.DEFEND, sight, UnitType.Terran_Science_Vessel.sightRange(), "Building");
 		
 		buildingSquad.setOrder(buildingOrder);
 	}

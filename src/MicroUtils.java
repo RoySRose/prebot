@@ -752,6 +752,7 @@ public class MicroUtils {
 				}
 			}
 		}
+		UXManager.Instance().leader = leader;
 		return leader;
 		
 	}

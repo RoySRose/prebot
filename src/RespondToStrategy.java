@@ -216,14 +216,34 @@ public class RespondToStrategy {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}
+			
+			//팩토리 추가
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) == 0
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush){
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init
+				&& StrategyManager.Instance().getLastStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
+			//컴맨드 추가
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+			}
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush
+				||StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
 			
 			//멀티 지우기
 			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
 			BuildOrderItem checkItem = null; 
 	
+			//컴맨드 빼기, 벌쳐 빼기
 			if (!tempbuildQueue.isEmpty()) {
 				checkItem= tempbuildQueue.getHighestPriorityItem();
 				while(true){
@@ -239,11 +259,18 @@ public class RespondToStrategy {
 						tempbuildQueue.removeCurrentItem();
 					}
 					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
-						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1){
 							tempbuildQueue.removeCurrentItem();
 						}
 					}
 				}
+			}
+			//팩토리 추가
+			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) == 0
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}
 			
 			//시즈 넣기
@@ -255,48 +282,18 @@ public class RespondToStrategy {
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}
 		}
-
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
-		
-			//멀티 지우기
-			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-			BuildOrderItem checkItem = null; 
 	
-			if (!tempbuildQueue.isEmpty()) {
-				checkItem= tempbuildQueue.getHighestPriorityItem();
-				while(true){
-					if(tempbuildQueue.canGetNextItem() == true){
-						tempbuildQueue.canGetNextItem();
-					}else{
-						break;
-					}
-					tempbuildQueue.PointToNextItem();
-					checkItem = tempbuildQueue.getItem();
-					
-					//벌쳐 빼고 컴맨드 빼고
-					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
-						tempbuildQueue.removeCurrentItem();
-					}
-					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
-						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
-						tempbuildQueue.removeCurrentItem();
-						}
-					}			
-				}
-			}
-		}
-		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
-				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init){
-			
-			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode) == 0
-					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) >= 1
-					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) < 3){
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			}
-		}
+//		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
+//				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init){
+//			
+//			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
+//					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode) == 0
+//					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) >= 1
+//					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) < 3){
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,
+//						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+//			}
+//		}
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Shuttle){
 			enemy_shuttle = true;

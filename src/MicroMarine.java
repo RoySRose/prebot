@@ -85,23 +85,6 @@ public class MicroMarine extends MicroManager {
 					if(marine.getType().maxHitPoints() < 11){
 						haveToflee = true;
 					}
-				
-	//				if(marine.getDistance(target) < marine.getType().groundWeapon().maxRange()/2){
-						//kitingOption.setCooltimeAlwaysAttack(false);
-	//				}else{
-	//					kitingOption.setCooltimeAlwaysAttack(true);
-	//				}
-					
-							
-		//			System.out.println("====================================");
-	//				System.out.println("marine attackrange : " + marine.getType().groundWeapon().maxRange());
-	//				System.out.println("marine attackrange : " + MyBotModule.Broodwar.self().weaponMaxRange(WeaponType.Gauss_Rifle));
-	//				System.out.println("bunker attackrange : " + bunker.getType().groundWeapon().maxRange());
-	//				System.out.println("marine " + marine.getID() + " far from bunker : " + marine.getDistance(bunker) + " and far from target : " + marine.getDistance(target));
-		//			System.out.println("target " + target.getID() + " is far from bunker : " + target.getDistance(bunker));
-		//			System.out.println("enemy in range of bunker :" + bunker.isInWeaponRange(target));
-					
-					
 						if(marine.getHitPoints() < 6){
 							bunker.load(marine);
 							continue;
