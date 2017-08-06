@@ -106,8 +106,8 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Machine_Shop);
-				queueBuild(true, UnitType.Terran_Vulture);
-				queueBuild(true, UnitType.Terran_Vulture);
+				queueBuild(false, UnitType.Terran_Vulture);
+				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				
 			}
@@ -128,8 +128,8 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Machine_Shop);
-				queueBuild(true, UnitType.Terran_Vulture);
-				queueBuild(true, UnitType.Terran_Vulture);
+				queueBuild(false, UnitType.Terran_Vulture);
+				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 			}
 

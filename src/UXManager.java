@@ -44,6 +44,7 @@ public class UXManager {
 	private List<Position> red2 = new ArrayList<Position>();
 	
 	private final int dotRadius = 2;
+	public Unit leader = null;
 	
 	private String bulletTypeName = "";
 	private String tempUnitName = "";
@@ -99,6 +100,7 @@ public class UXManager {
 			drawTilesToAvoidOnMap();
 		}
 
+		drawLeaderUnitOnMap();
 		if (Config.DrawUnitHealthBars) {
 			//drawUnitExtendedInformationOnMap();
 			drawUnitIdOnMap();
@@ -944,6 +946,17 @@ public class UXManager {
 		}
 	}
 
+	public void drawLeaderUnitOnMap() {
+		
+		if(leader!=null){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if(unit.getID() == leader.getID())
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + blue + "LEADER");
+			}
+		}
+	}
+	
 	/// Worker Unit 들의 상태를 Screen 에 표시합니다
 	public void drawWorkerStateOnScreen(int x, int y) {
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();

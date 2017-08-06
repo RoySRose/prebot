@@ -12,6 +12,7 @@ import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
+import bwta.Chokepoint;
 
 public class MicroBuilding extends MicroManager {
 	
@@ -46,14 +47,30 @@ public class MicroBuilding extends MicroManager {
 
 	    Unit leader = null;
 		List<Unit> units = CombatManager.Instance().squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
+		
+		Position GoalPos = order.getPosition();
+		
+		
 		if (units != null && !units.isEmpty()) {
 			leader = MicroUtils.leaderOfUnit(units, CombatManager.Instance().getMainAttackLocation(CombatManager.Instance().squadData.getSquad(SquadName.MAIN_ATTACK)));
 		}
 		
+		Position LeaderPos = null;
+		
+		
+		if(leader != null){
+			LeaderPos = leader.getPosition();
+		}
+		
+		
+		Chokepoint SC = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		Position halfway = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
+		
 		for (Unit flyBuilding : Buildings) {
 			
 			if(leader == null){
-				flyBuilding.move(order.getPosition());
+				GoalPos = halfway;
+				CommandUtil.move(flyBuilding,GoalPos);
 				return;
 			}
 			
@@ -61,20 +78,15 @@ public class MicroBuilding extends MicroManager {
 			double mostDangercheck = -99999;
 			
 			List<Unit> unitsAroundList = new ArrayList<Unit>();
-			unitsAroundList = MyBotModule.Broodwar.getUnitsInRadius(flyBuilding.getPosition(), sVesselCheckRadius);
+			unitsAroundList = MyBotModule.Broodwar.enemy().getUnits();
 			
 			List<Unit> dangerous_targets = new ArrayList<Unit>();
 			
 			for(Unit check_targets : unitsAroundList){
 				if(check_targets == null){break;}
-				if(check_targets.getPlayer() == InformationManager.Instance().enemyPlayer){
-					if(check_targets.getType().airWeapon() != null){
-						dangerous_targets.add(check_targets);
-					}
+				if(check_targets.getType().airWeapon() != null){
+					dangerous_targets.add(check_targets);
 				}
-//				else{
-//					myUnits.add(check_targets);
-//				}
 			}
 			
 			for (Unit target : dangerous_targets) {
@@ -105,7 +117,7 @@ public class MicroBuilding extends MicroManager {
 			if(foggedEnemyUnits.size() > 0){
 				int minimumDistance = 999999;
 				for(UnitInfo fogUnit : foggedEnemyUnits){
-					int dist = MapTools.Instance().getGroundDistance(fogUnit.getLastPosition(), leader.getPosition());
+					int dist = leader.getDistance(fogUnit.getLastPosition());
 					if (dist < minimumDistance) {
 						closestTarget = fogUnit;
 						minimumDistance = dist;
@@ -114,25 +126,30 @@ public class MicroBuilding extends MicroManager {
 			}
 			
 			if(fleeing){
-				order.setPosition(leader.getPosition());
+				GoalPos = LeaderPos;
 			}else{
 				
 				if(mostDangerousTarget != null){
 					if(flyBuilding.getDistance(leader) > 128){
-						order.setPosition(flyBuilding.getPosition());
+						GoalPos = flyBuilding.getPosition();
 					}
 				}
 				if(closestTarget != null){
 					if(closestTarget.getUnit().isVisible() == false){
-						order.setPosition(closestTarget.getLastPosition());
+						GoalPos = closestTarget.getLastPosition();
 					}
 				}
 				if(flyBuilding.getDistance(leader) > 220){
-					order.setPosition(leader.getPosition());
+					GoalPos = LeaderPos;
 				}
+				if(LeaderPos.getDistance(order.getPosition()) > halfway.getDistance(order.getPosition())){
+					GoalPos = halfway;
+				}
+
+				
 			}
 			
-			CommandUtil.move(flyBuilding,order.getPosition());
+			CommandUtil.move(flyBuilding,GoalPos);
 		}
 	}
 }
