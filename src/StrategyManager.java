@@ -6,13 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.swing.text.Position;
+
+import bwapi.Color;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
+import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
 /// BuildManager 의 buildQueue에 빌드 (건물 건설 / 유닛 훈련 / 테크 리서치 / 업그레이드) 명령을 입력합니다.<br>
@@ -186,6 +191,18 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
+//		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+//		{
+//			bwapi.Position temp = targetBaseLocation.getPosition();
+//			MyBotModule.Broodwar.drawCircleMap(temp, 5, Color.Blue, true);
+//		}
+//		
+//		
+//		for(Chokepoint chokepoint : BWTA.getChokepoints() ) {
+//			bwapi.Position temp = chokepoint.getPoint();
+//			MyBotModule.Broodwar.drawCircleMap(temp, 5, Color.Green, true);
+//			
+//		}
 		
 //		if (enemyBaseRegionVertices.isEmpty()) {
 //			ScoutManager.Instance().calculateEnemyRegionVertices();
@@ -1570,7 +1587,13 @@ public class StrategyManager {
 				}
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
+			
+			if(expansionPoint>0 && (myunitPoint > 240 || unitPoint >50)){
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
+			}
 		}
+		
+		
 		
 		MyunitPoint = myunitPoint;
 		ExpansionPoint = expansionPoint;

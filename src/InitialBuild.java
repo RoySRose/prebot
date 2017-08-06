@@ -90,7 +90,6 @@ public class InitialBuild {
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				//기타맵 프로토스전
-				
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -109,53 +108,29 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Machine_Shop);
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(true, UnitType.Terran_Vulture);
-//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				
 			}
 			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
-				//헌터플토전
-				//20170731 hkk test
-				/*queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				int suppleX[] = new int []{29, 52, 96, 102, 93, 55, 12, 23};
-				int suppleY[] = new int []{19, 23, 21,   61, 95, 94, 97, 54};
-				
-				int barrackX[] = new int []{26, 54, 98, 104, 90, 52, 14, 20};
-				int barrackY[] = new int []{21, 25, 23,   63, 97, 96, 99, 56};
-				
-				for(int a= 0; a < suppleX.length ; a ++){
-					TilePosition supplyPos = new TilePosition(suppleX[a],suppleY[a]);
-					TilePosition barrackPos = new TilePosition(barrackX[a],barrackY[a]);
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot,
-							//MyBotModule.Broodwar.getRegionAt(BlockingEntrance.Instance().suppleX,BlockingEntrance.Instance().suppleY).getPoint().toTilePosition(),true);
-							supplyPos,true);
-					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-							//MyBotModule.Broodwar.getRegionAt(BlockingEntrance.Instance().barrackX,BlockingEntrance.Instance().barrackY).getPoint().toTilePosition(),true);
-							barrackPos,true);
-					queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				}*/
-				
-				
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
-	  			queueBuild(true, UnitType.Terran_SCV);
-	  			queueBuild(true, UnitType.Terran_Refinery);//12 scv 찍고 가스
-	  			queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-	  			queueBuild(false, UnitType.Terran_SCV);
-	  			queueBuild(true, UnitType.Terran_Marine);
-	  			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
-	  			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
-	  			queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Refinery);
+				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+				queueBuild(false, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Marine);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
+				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Machine_Shop);
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(true, UnitType.Terran_Vulture);
-//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-					
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 			}
 
 		}else{

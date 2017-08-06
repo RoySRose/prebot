@@ -175,8 +175,6 @@ public class RespondToStrategy {
 				if(blocked){
 					//입구 막혔으면 이미 한마리가 있음
 				}else{
-					
-					//TODO 무조건 벙커를 짓는게 아니고 재네가 출발을 했는지를 판단해야함. 
 					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0){
 						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
@@ -247,6 +245,15 @@ public class RespondToStrategy {
 					}
 				}
 			}
+			
+			//시즈 넣기
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode) == 0
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) >= 1
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) < 3){
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
 		}
 
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
@@ -266,6 +273,7 @@ public class RespondToStrategy {
 					tempbuildQueue.PointToNextItem();
 					checkItem = tempbuildQueue.getItem();
 					
+					//벌쳐 빼고 컴맨드 빼고
 					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
 						tempbuildQueue.removeCurrentItem();
 					}
