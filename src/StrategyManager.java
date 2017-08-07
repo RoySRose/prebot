@@ -1966,7 +1966,7 @@ public class StrategyManager {
 		int RealCCcnt = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 		
 		//앞마당 전
-		if(CCcnt == 1 && RealCCcnt < 2){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
+		if(RealCCcnt == 1){//TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
 			if (isInitialBuildOrderFinished == false) {
 				return;
 			}
@@ -2010,7 +2010,7 @@ public class StrategyManager {
 		}
 		
 		//앞마당 이후
-		if(CCcnt >= 2){
+		if(RealCCcnt >= 2){
 			
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if( MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 120){
