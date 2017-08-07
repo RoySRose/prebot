@@ -241,7 +241,7 @@ public class ScoutManager{
 		int scoutHP = currentScoutUnit.getHitPoints() + currentScoutUnit.getShields();
 
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		//BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 		
 		int scoutDistanceThreshold = 30;//뭔지 모르겠다.
 		
@@ -293,7 +293,7 @@ public class ScoutManager{
 				if (MyBotModule.Broodwar.isExplored(currentScoutTargetBaseLocation.getTilePosition()) == false) {
 					currentScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
 					currentScoutTargetPosition = currentScoutTargetBaseLocation.getPosition();
-					commandUtil.move(currentScoutUnit, currentScoutTargetPosition);
+					CommandUtil.move(currentScoutUnit, currentScoutTargetPosition);
 					
 				}
 				else {
@@ -339,7 +339,7 @@ public class ScoutManager{
 //										 commandUtil.move(currentScoutUnit,closestWorker.getPosition());
 										 return;
 					                 }else
-					                	 commandUtil.attackUnit(currentScoutUnit, closestWorker);
+					                	 CommandUtil.attackUnit(currentScoutUnit, closestWorker);
 									 scoutUnderAttack= true;
 									 
 									//Micro::SmartAttackUnit(_workerScout, closestWorker);

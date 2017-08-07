@@ -670,10 +670,10 @@ public class AnalyzeStrategy {
 		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,	InformationManager.Instance().enemyPlayer) >= 2
 				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 6)
 				&&!(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
-					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
-					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
-							&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
-					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
 						)){
 			// 2배럭이면 바이오닉
 			selectedS = StrategyManager.Strategys.terranBasic_Bionic;
@@ -688,10 +688,10 @@ public class AnalyzeStrategy {
 //		}
 
 		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
-				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
-				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
-						&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
-				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
 					){
 			selectedS = StrategyManager.Strategys.terranBasic;
 		}
