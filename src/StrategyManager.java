@@ -178,6 +178,7 @@ public class StrategyManager {
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
+		System.out.println("InitFaccnt: " + InitFaccnt);
 	}
 
 	///  경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다
@@ -262,9 +263,7 @@ public class StrategyManager {
 				executeAddBuildingInit();
 			}
 		}else if (MyBotModule.Broodwar.getFrameCount() % 113 == 0) { //5초에 한번 팩토리 추가 여부 결정
-			if (isInitialBuildOrderFinished == true) {
-				executeAddFactory();
-			}
+			executeAddFactory();
 		}
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500){
@@ -284,7 +283,7 @@ public class StrategyManager {
 		}
 		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
 				||(MyBotModule.Broodwar.getFrameCount() >= 13000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) { //Analyze 와 동일하게
-			RespondToStrategy.instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+			RespondToStrategy.Instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
 			//AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
@@ -508,7 +507,6 @@ public class StrategyManager {
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
 			int supplyMargin = 4;
-			int fac_cnt = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory);
 			boolean barrackflag = false;
 			boolean factoryflag = false;
 
@@ -529,13 +527,11 @@ public class StrategyManager {
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if (unit == null) continue;
-				if (unit.getType() == UnitType.Terran_Factory){
-					Faccnt ++;
-				}
 				if (unit.getType().isResourceDepot() && unit.isCompleted()){
 					CCcnt++;
 				}
 				if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
+					Faccnt ++;
 					if(unit.isTraining() == true){
 						facFullOperating++;
 					}
@@ -546,10 +542,10 @@ public class StrategyManager {
 				if(factoryflag==false && barrackflag==true){
 					supplyMargin = 5;
 				}else if(factoryflag==true){
-					supplyMargin = 5+4*fac_cnt+facFullOperating*2;
+					supplyMargin = 6+4*Faccnt+facFullOperating*2;
 				}
 			}else{ //if((MyBotModule.Broodwar.getFrameCount()>=6000 && MyBotModule.Broodwar.getFrameCount()<10000) || (Faccnt > 3 && CCcnt == 2)){
-				supplyMargin = 8+4*fac_cnt+facFullOperating*2;
+				supplyMargin = 11+4*Faccnt+facFullOperating*2;
 			}
 			
 			// currentSupplyShortage 를 계산한다
@@ -597,7 +593,7 @@ public class StrategyManager {
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) 
 				+ MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) < InitFaccnt) {
-			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		}
 		//가스
 		if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null) 
@@ -805,7 +801,7 @@ public class StrategyManager {
 		//barrack end
 		
 		//engineering start
-		if(engineering == false && RespondToStrategy.instance().needOfEngineeringBay()){
+		if(engineering == false && RespondToStrategy.Instance().needOfEngineeringBay()){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -832,7 +828,7 @@ public class StrategyManager {
 		//engineering end2
 		
 		//scienceVessel start
-		if((RespondToStrategy.instance().need_vessel == true && CC>=2) || (CC>=3)){
+		if((RespondToStrategy.Instance().need_vessel == true && CC>=2) || (CC>=3)){
 			if(star == false){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
@@ -898,7 +894,7 @@ public class StrategyManager {
 		//marine for fast zergling and zealot end
 		
 		//wraith for TvT start
-		if(RespondToStrategy.instance().max_wraith > wraithcnt){
+		if(RespondToStrategy.Instance().max_wraith > wraithcnt){
 			if(star == false){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
@@ -922,7 +918,7 @@ public class StrategyManager {
 		//wraith for TvT end
 		
 		//valkyrie for TvT start
-		if(RespondToStrategy.instance().max_valkyrie > valkyriecnt && CC >=2){
+		if(RespondToStrategy.Instance().max_valkyrie > valkyriecnt && CC >=2){
 			if(star == false){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
@@ -1162,6 +1158,7 @@ public class StrategyManager {
 		BuildOrderItem currentItem = null; 
 		Boolean goliathInTheQueue = false;
 		Boolean tankInTheQueue = false;
+		Boolean isfacexists = false;
 		
 		if(MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 4){
 			return;
@@ -1211,6 +1208,12 @@ public class StrategyManager {
 			if (unit.getType() == UnitType.Terran_Armory && unit.isCompleted()){
 				isarmoryexists = true;
 			}
+			if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
+				isfacexists = true;
+			}
+		}
+		if(isfacexists == false){
+			return;
 		}
 		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -1393,15 +1396,18 @@ public class StrategyManager {
 			int tothydra = 0;
 			int totmutal = 0;
 			int totoverload = 0;
+			int totlurker=0;
 			
 			//tot = MyBotModule.Broodwar.self().killedUnitCount(UnitType.AllUnits);
 			totzerling = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Zergling);
 			tothydra = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Hydralisk);
+			totlurker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker) 
+					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker_Egg);
 			totmutal = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Mutalisk);
 			totoverload = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
 			//totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Drone);
 
-			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3;
+			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3 + totlurker*4;
 			return res; //저그는 저글링 때문에 이미 2배 함
 			
 		}else if (InformationManager.Instance().enemyRace == Race.Protoss) {
@@ -1412,8 +1418,8 @@ public class StrategyManager {
 			totcarrier = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
 			totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Probe);
 
-			res = tot - totworker;
-			res = res*2;
+			res = tot - totworker - totcarrier;
+			res = res*2 + totcarrier * 6;
 			
 			return res*2;
 		}else{
@@ -1476,14 +1482,15 @@ public class StrategyManager {
 		int myunitPoint = getFacUnits();
 		
 		//공통 예외 상황
-		if(myunitPoint > 280 || MyBotModule.Broodwar.self().supplyUsed() > 392){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
+		if((myunitPoint > 280 || MyBotModule.Broodwar.self().supplyUsed() > 392 )&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
 			if(Config.BroodwarDebugYN){
 			MyBotModule.Broodwar.printf("Many Unit Attack!");
 			}
 			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 			CombatStartCase = 1;
 		}
-		if(MyBotModule.Broodwar.getFrameCount() > 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 5){//TODO5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
+		if(MyBotModule.Broodwar.getFrameCount() > 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 5
+				 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//TODO5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
 			if(Config.BroodwarDebugYN){
 			MyBotModule.Broodwar.printf("Too Less SCV ATTACK!!");
 			}
@@ -1570,7 +1577,15 @@ public class StrategyManager {
 				unitPoint += 20;
 			}
 			
-			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus){
+			if(LastStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
+					&& CurrentStrategyException == StrategyManager.StrategysException.Init
+					&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){
+				
+				int temptotPoint = 	myunitPoint + expansionPoint + unitPoint + 40;
+				if(temptotPoint > 120){
+					CombatStartCase = 4;
+				}
+				
 				
 			}
 				
@@ -1617,10 +1632,17 @@ public class StrategyManager {
 				}
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
-			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
+//			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
+//				if(Config.BroodwarDebugYN){
+//					MyBotModule.Broodwar.printf("Retreat3");
+//				}
+//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+//			}
+			if(CombatStartCase == 4 && myunitPoint < 60){
 				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("Retreat3");
+					MyBotModule.Broodwar.printf("Retreat4");
 				}
+				LastStrategyException = StrategyManager.StrategysException.Init;
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
 			
@@ -1733,7 +1755,7 @@ public class StrategyManager {
 		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) < 2 
 				&& currentResearched >= 2 
 				&& getFacUnits() < 32 
-				&& !(MyBotModule.Broodwar.self().minerals()> 200 && MyBotModule.Broodwar.self().gas()> 150)) return;
+				&& !(MyBotModule.Broodwar.self().minerals()> 300 && MyBotModule.Broodwar.self().gas()> 250)) return;
 		
 		MetaType vultureSpeed = new MetaType(UpgradeType.Ion_Thrusters);
 		MetaType vultureMine = new MetaType(TechType.Spider_Mines);
@@ -1860,7 +1882,7 @@ public class StrategyManager {
 						continue;
 					}else{
 						if(i==3 && Current[3].getUpgradeType() == UpgradeType.Charon_Boosters){
-							if(!air && !(MyBotModule.Broodwar.self().minerals()> 300 && MyBotModule.Broodwar.self().gas()> 200)){
+							if(!air && !(MyBotModule.Broodwar.self().minerals()> 200 && MyBotModule.Broodwar.self().gas()> 150)){
 								continue;
 							}
 						}

@@ -602,7 +602,8 @@ public class ScoutManager{
 		Position enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.enemy()).getPoint();
 		enemyBaseRegionVertices.add(new Position(enemySecondChokePoint.getX(), enemySecondChokePoint.getY()));
 		
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts
+				|| InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
 			enemyBaseRegionVertices.add(new Position(enemySecondChokePoint.getX()+(enemySecondChokePoint.getX()-enemyFirstExpansionLocation.getX())
 					,  enemySecondChokePoint.getY()+(enemySecondChokePoint.getY()- enemyFirstExpansionLocation.getY())));
 		}

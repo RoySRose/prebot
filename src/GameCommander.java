@@ -104,6 +104,17 @@ public class GameCommander {
 	/// 유닛(건물/지상유닛/공중유닛)이 Create 될 때 발생하는 이벤트를 처리합니다
 	public void onUnitCreate(Unit unit) { 
 		InformationManager.Instance().onUnitCreate(unit);
+		
+		if(unit.getType() == UnitType.Terran_Command_Center){
+			ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
+		}
+		if(unit.getType() == UnitType.Terran_Factory){
+			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
+		}
+		
+		if(unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility){
+			ConstructionPlaceFinder.Instance().setTilesToAvoidAddon(unit);
+		}
 	}
 
 	///  유닛(건물/지상유닛/공중유닛)이 Destroy 될 때 발생하는 이벤트를 처리합니다
@@ -142,19 +153,9 @@ public class GameCommander {
 		
 		if(unit.getType() == UnitType.Terran_Command_Center){
 			
-			ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
-			
 			if(CombatManager.Instance().getClosestMineral(unit)!=null){
 				unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
 			}
-		}
-		
-		if(unit.getType() == UnitType.Terran_Factory){
-			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
-		}
-		
-		if(unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility){
-			ConstructionPlaceFinder.Instance().setTilesToAvoidAddon(unit);
 		}
 		
 		if(unit.getType() == UnitType.Terran_Barracks){
