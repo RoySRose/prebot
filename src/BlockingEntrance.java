@@ -1,7 +1,11 @@
 import bwapi.Color;
+import bwapi.Position;
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
 
 //
 public class BlockingEntrance {
@@ -253,6 +257,39 @@ public class BlockingEntrance {
 			}else if(startingX == 7&& startingY == 87){
 				starting_int = 3;
 			}
+			
+			
+			
+			for(BaseLocation island : InformationManager.Instance().getIslandBaseLocations()){
+				
+					int i = starting_int;
+					TilePosition test = new TilePosition(bunkerX_array[i], bunkerY_array[i]);
+					if(BWTA.getRegion(test)== island.getRegion()){
+						System.out.println(bunkerX_array[i] +", " + bunkerY_array[i] + " @!@!@!@!@ bunker is in island!!");
+					}
+					
+					test = new TilePosition(first_suppleX_array[i], first_suppleY_array[i]);
+					if(BWTA.getRegion(test)== island.getRegion()){
+						System.out.println(first_suppleX_array[i] +", " + first_suppleY_array[i] + "@!@!@!@!@ firsupple is in island!!");
+					}
+					
+					test = new TilePosition(second_suppleX_array[i], second_suppleY_array[i]);
+					if(BWTA.getRegion(test)== island.getRegion()){
+						System.out.println(second_suppleX_array[i] +", " + second_suppleY_array[i] + "@!@!@!@!@ secsupple is in island!!");
+					}
+					
+					test = new TilePosition(barrackX_array[i], barrackY_array[i]);
+					if(BWTA.getRegion(test)== island.getRegion()){
+						System.out.println(barrackX_array[i] +", " + barrackY_array[i] + "@!@!@!@!@ barrack is in island!!");
+					}
+					
+					test = new TilePosition(factoryX_array[i], factoryY_array[i]);
+					if(BWTA.getRegion(test)== island.getRegion()){
+						System.out.println(factoryX_array[i] +", " + factoryY_array[i] + "@!@!@!@!@ factory is in island!!");
+					}
+			}
+			
+			
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
 			if(startingX == 7 && startingY == 6){
 				//11시부터 시계방향

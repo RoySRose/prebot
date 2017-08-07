@@ -907,59 +907,29 @@ public class InformationManager {
 		
 		TilePosition res = null;
 		
-		if(occupiedBaseLocations.size() > 0){
-			for (BaseLocation targetBaseLocation : occupiedBaseLocations.get(selfPlayer))
-			{
-				if(targetBaseLocation.isStartLocation() == false){
-					continue;
-				}
-				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
-				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
-				if(targetBaseLocation.isStartLocation() == true){
-					res = targetBaseLocation.getRegion().getCenter().toTilePosition();
-				}
+		BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
+		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
+		
+		double tempDistance;
+		double sourceDistance;
+		double closestDistance = 1000000000;
+		
+		for (BaseLocation targetBaseLocation : BWTA.getStartLocations())
+		{
+			if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+			if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+			if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
+			if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
+			
+			sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+			tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+			
+			if (tempDistance < closestDistance && sourceDistance > 0) {
+				closestDistance = tempDistance;
+				res = targetBaseLocation.getRegion().getCenter().toTilePosition();
 			}
 		}
 		
-//		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
-//		if(res==null && enemyBaseLocation != null){
-//			
-//			double tempDistance;
-//			double sourceDistance;
-//			double closestDistance = 1000000000;
-//			BaseLocation tempBaseLocation = null;
-//			
-//			BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
-//			
-//			for (BaseLocation targetBaseLocation :  BWTA.getBaseLocations())
-//			{
-//				if(targetBaseLocation.isStartLocation() == false){
-//					continue;
-//				}
-//
-//				boolean pass = false;
-//				for (BaseLocation myBaseLocation : occupiedBaseLocations.get(selfPlayer))
-//				{
-//					if (targetBaseLocation.getTilePosition().equals(myBaseLocation.getTilePosition())){
-//						pass = true;
-//						break;
-//					}
-//				}
-//				if(pass){
-//					continue;
-//				}
-//				
-//				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
-//				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
-//				
-//				if (tempDistance < closestDistance && sourceDistance > 0) {
-//					closestDistance = tempDistance;
-//					tempBaseLocation = targetBaseLocation;
-//				}
-//			}
-//			System.out.println("in supple get from other");
-//			res = new TilePosition(tempBaseLocation.getX() - (tempBaseLocation.getX() - tempBaseLocation.getRegion().getCenter().getX())*2,  tempBaseLocation.getY() - (tempBaseLocation.getY() - tempBaseLocation.getRegion().getCenter().getY())*2);
-//		}
 		return res;
 	}
 

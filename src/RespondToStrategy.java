@@ -320,6 +320,33 @@ public class RespondToStrategy {
 	
 	public void RespondVsTerran() {
 		
+		max_wraith = 5;
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.terranBasic_Bionic){
+			max_wraith = 0;
+			
+			//스타포트 지우기
+			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+			BuildOrderItem checkItem = null; 
+
+			if (!tempbuildQueue.isEmpty()) {
+				checkItem= tempbuildQueue.getHighestPriorityItem();
+				while(true){
+					if(tempbuildQueue.canGetNextItem() == true){
+						tempbuildQueue.canGetNextItem();
+					}else{
+						break;
+					}
+					tempbuildQueue.PointToNextItem();
+					checkItem = tempbuildQueue.getItem();
+					
+					if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Starport){
+						tempbuildQueue.removeCurrentItem();
+					}
+				}
+			}
+			
+		}
+		
 		//terranException_Wraith start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_Wraith){
 			enemy_wraith = true;
