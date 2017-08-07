@@ -244,6 +244,6 @@ public class CombatExpectation {
 		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Siege_Mode, 400);
 		VULTURE_TARGET.put(UnitType.Terran_Vulture, 100);
 		VULTURE_TARGET.put(UnitType.Terran_Goliath, 400);
-		VULTURE_TARGET.put(UnitType.Terran_Bunker, 300);
+		VULTURE_TARGET.put(UnitType.Terran_Bunker, 400);
 	}
 }

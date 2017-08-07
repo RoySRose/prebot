@@ -10,8 +10,8 @@ public class LagObserver {
 	private static final long MILLISEC_MAX_COAST = 50;
 //	private static final long MILLISEC_MIN_COAST = 30;
 	
-	private static final int GROUP_MAX_SIZE = 48; // max : 2초 딜레이
-	private static final int GROUP_MIN_SIZE = 1;
+	private static int groupMaxSize = 48; // max : 2초 딜레이
+	private static int groupMinSize = 1;
 	
 	private static final int OBSERVER_CAPACITY = 15 * 24; // 15초간 delay가 없어서 groupsize를 낮춘다.
 	private static long[] observedTime = new long[OBSERVER_CAPACITY];
@@ -38,14 +38,20 @@ public class LagObserver {
 			long cost = observedTime[MyBotModule.Broodwar.getFrameCount() % OBSERVER_CAPACITY];
 			
 			if (cost > MILLISEC_MAX_COAST) {
-				if (groupsize < GROUP_MAX_SIZE) {
+				if (groupsize < groupMaxSize) {
 					groupsize++;
 					if(Config.BroodwarDebugYN){
 						MyBotModule.Broodwar.printf(String.format(LAG_RELIEVE_ADJUSTMENT, groupsize, "UP"));
 					}
 				}
 			} else {
-				if (groupsize > GROUP_MIN_SIZE) {
+				if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
+					groupMinSize = 6;
+				} else {
+					groupMinSize = 1;
+				}
+				
+				if (groupsize > groupMinSize) {
 					boolean exceedTimeExist = false;
 					for (long t : observedTime) {
 						if (t >= MILLISEC_MAX_COAST) {
@@ -53,7 +59,6 @@ public class LagObserver {
 							break;
 						}
 					}
-					
 					if (!exceedTimeExist) {
 						groupsize--;
 						if(Config.BroodwarDebugYN){
