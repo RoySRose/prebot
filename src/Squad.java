@@ -223,10 +223,10 @@ public class Squad {
 				vultureEnemies = attackerEnemies;
 				saveUnitLevelVulture = 2;
 			} else {
-				boolean skipBuilding = true;
-				if (CommonUtils.executeRotation(0, 20 * 24)) {
-					skipBuilding = false;
-				}
+				boolean skipBuilding = false;
+//				if (CommonUtils.executeRotation(0, 20 * 24)) {
+//					skipBuilding = false;
+//				}
 				Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, skipBuilding);
 				if (result == Result.Loss) {
 					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 15 * 24);

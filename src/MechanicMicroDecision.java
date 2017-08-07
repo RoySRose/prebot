@@ -246,7 +246,7 @@ public class MechanicMicroDecision {
 					
 					int enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();
 					if (enemyUnitType == UnitType.Terran_Bunker) {
-						enemyGroundWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32;
+						enemyGroundWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64; // 32->64(엄청 뚜두려맞아서 올림)
 					}
 					
 					double distanceToNearEnemy = mechanicUnit.getDistance(enemyPosition);
