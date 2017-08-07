@@ -268,7 +268,7 @@ public class ConstructionManager {
 				// 한번도 안가본 곳에는 build 커맨드 자체를 지시할 수 없으므로, 일단 그곳으로 이동하게 합니다
 	            if (!isBuildingPositionExplored(b))
 	            {
-	            	commandUtil.move(b.getConstructionWorker(),b.getFinalPosition().toPosition());
+	            	CommandUtil.move(b.getConstructionWorker(),b.getFinalPosition().toPosition());
 	            }
 				else if (b.isBuildCommandGiven() == false)
 	            {
@@ -408,7 +408,7 @@ public class ConstructionManager {
 							//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
 
 							b.setConstructionWorker(workerToAssign);								
-							commandUtil.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
+							CommandUtil.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
 							b.setBuildCommandGiven(true);
 							b.setLastBuildCommandGivenFrame(MyBotModule.Broodwar.getFrameCount());
 							b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
@@ -607,7 +607,7 @@ public class ConstructionManager {
 	/// constructionQueue 내 ConstructionTask 갯수를 리턴합니다
 	public Vector<UnitType> buildingsQueued()
 	{
-	    Vector<UnitType> buildingsQueued = null;
+	    Vector<UnitType> buildingsQueued = new Vector<UnitType>();//TODO?? 기존에는 그냥 =null by Zeus
 
 	    for (final ConstructionTask b : constructionQueue)
 	    {

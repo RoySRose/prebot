@@ -789,7 +789,7 @@ public class AnalyzeStrategy {
 				|| InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian,InformationManager.Instance().enemyPlayer) >= 1
 				|| InformationManager.Instance().getNumUnits(UnitType.Zerg_Devourer,InformationManager.Instance().enemyPlayer) >= 1
 				|| InformationManager.Instance().getNumUnits(UnitType.Zerg_Scourge,InformationManager.Instance().enemyPlayer) >= 1
-				|| (hydraStrategy == false || cntLair >= 1)) {
+				|| (hydraStrategy == false && cntLair >= 1)) {
 
 			selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 
@@ -803,7 +803,7 @@ public class AnalyzeStrategy {
 			multalStrategy = true;
 		}
 		
-		if(hydraStrategy == false &&MyBotModule.Broodwar.getFrameCount() > 8000){
+		if(hydraStrategy == false && multalStrategy ==false && MyBotModule.Broodwar.getFrameCount() > 8500){
 			
 			BaseLocation enemy_firstbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
 			List<BaseLocation> enemy_bases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
@@ -819,7 +819,6 @@ public class AnalyzeStrategy {
 				
 		//뮤탈 추정... 히드라가 보이면 바로 히드라 전환 가능
 			if (cntLair >= 1 || enemy_expanded == false) {
-	
 				selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 			}
 		}

@@ -235,6 +235,10 @@ public class BuildManager {
 				continue;
 			}
 			
+			if (unit.isUpgrading() || unit.isResearching()) {
+				continue;
+			}
+			
 			if (producerID != -1 && unit.getID() != producerID)	{ 
 				continue; 
 			}
@@ -245,7 +249,7 @@ public class BuildManager {
 			
 			
 			if (t.isUnit()) {
-				// if the type requires an addon and the producer doesn't have
+				// if the type dd an addon and the producer doesn't have
 				// one
 				// C++ : typedef std::pair<BWAPI::UnitType, int> ReqPair;
 				Pair<UnitType, Integer> ReqPair = null;
@@ -496,13 +500,13 @@ public class BuildManager {
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
 				break;
 			case FirstExpansionLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
+				findAnotherPlace = false;
 				break;
 			case SecondChokePoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
 				break;
 			case NextExpansionPoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
 				break;
 				
 			case SeedPositionSpecified:
