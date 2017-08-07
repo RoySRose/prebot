@@ -14,6 +14,7 @@ import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 
@@ -718,12 +719,28 @@ public class MicroUtils {
 	
 	
 	public static Unit leaderOfUnit(List<Unit> units, Position goalPosition) {
+		
+		BaseLocation enemyMainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+		
+		if(enemyMainBase == null){
+			return null;
+		}
+		
+		BaseLocation AttackLocation = null;
+		
+		if(enemyFirstExpansion != null){
+			AttackLocation = enemyFirstExpansion;
+		}else{
+			AttackLocation = enemyMainBase;
+		}
+		
 		Unit leader = null;
 		int minimumDistance = 999999;
 		for (Unit unit : units) {
 			if(unit == null){break;}
 			if(unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
-				int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+				int dist = unit.getDistance(AttackLocation.getPosition());
 				if (dist < minimumDistance) {
 					leader = unit;
 					minimumDistance = dist;
@@ -735,7 +752,7 @@ public class MicroUtils {
 			for (Unit unit : units) {
 				if(unit == null){break;}
 				if(unit.getType() == UnitType.Terran_Goliath){
-					int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+					int dist = unit.getDistance(AttackLocation.getPosition());
 					if (dist < minimumDistance) {
 						leader = unit;
 						minimumDistance = dist;
@@ -748,7 +765,7 @@ public class MicroUtils {
 			for (Unit unit : units) {
 				if(unit == null){break;}
 				if(unit.getType() == UnitType.Terran_Vulture){
-					int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), goalPosition);
+					int dist = unit.getDistance(AttackLocation.getPosition());
 					if (dist < minimumDistance) {
 						leader = unit;
 						minimumDistance = dist;

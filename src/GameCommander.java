@@ -1,6 +1,7 @@
 
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -158,14 +159,16 @@ public class GameCommander {
 			}
 		}
 		
-		if(unit.getType() == UnitType.Terran_Barracks){
-			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
-			{
-				if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+		if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
+			if(unit.getType() == UnitType.Terran_Barracks){
+				for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
 				{
-					if(CombatManager.Instance().getBestPosition(myUnit)==null){
-					}else{
-						unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+					if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
+					{
+						if(CombatManager.Instance().getBestPosition(myUnit)==null){
+						}else{
+							unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+						}
 					}
 				}
 			}

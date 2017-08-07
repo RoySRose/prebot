@@ -233,14 +233,6 @@ public class ConstructionPlaceFinder {
 			return getRefineryPositionNear(desiredPosition);
 		}
 
-//		if (MyBotModule.Broodwar.self().getRace() == Race.Protoss) {
-//			// special easy case of having no pylons
-//			if (buildingType.requiresPsi() && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon) == 0)
-//			{
-//				return TilePosition.None;
-//			}
-//		}
-
 		if (desiredPosition == TilePosition.None || desiredPosition == TilePosition.Unknown || desiredPosition == TilePosition.Invalid || desiredPosition.isValid() == false)
 		{
 			desiredPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
@@ -338,7 +330,7 @@ public class ConstructionPlaceFinder {
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
-		int maxRange = 42; // maxRange = BWAPI::Broodwar->mapWidth()/4;
+		int maxRange = 32; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 		boolean isPossiblePlace = false;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal())
@@ -423,10 +415,6 @@ public class ConstructionPlaceFinder {
 		//buildingGapSpace = 0;@@@@@@
 		
 		boolean horizontalOnly = false;
-		if (b.getType() == UnitType.Terran_Supply_Depot){
-			horizontalOnly = true;
-		}
-		
 
 		// Refinery 의 경우 GapSpace를 체크할 필요 없다
 		if (b.getType().isRefinery())

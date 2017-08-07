@@ -109,9 +109,12 @@ public class MicroBuilding extends MicroManager {
 				}
 			}
 			
-			List<UnitInfo> foggedEnemyUnits = null;
-			foggedEnemyUnits = InformationManager.Instance().getEnemyBuildingUnitsNear(leader, 1000, true, true, true);
+			List<UnitInfo> foggedEnemyUnits = new ArrayList<UnitInfo>();
+			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Protoss_Photon_Cannon));
+			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Zerg_Sunken_Colony));
+			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Missile_Turret));
 			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Siege_Tank_Siege_Mode));
+			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Bunker));
 			
 			UnitInfo closestTarget = null;
 			if(foggedEnemyUnits.size() > 0){

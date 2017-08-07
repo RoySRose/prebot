@@ -330,7 +330,7 @@ public class CombatManager {
 						List<Unit> nearallies = MapGrid.Instance().getUnitsNear(neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
 						if(nearallies !=null && nearallies.size() > 2){
 							if(Config.BroodwarDebugYN){
-								MyBotModule.Broodwar.printf("Vessel : I'm going! wait a sec!!");
+								MyBotModule.Broodwar.printf("Comsat : Vessel is near and will go! wait a sec!!");
 							}
 							break;//베슬이 올것으로 예상됨
 						}
@@ -1125,8 +1125,11 @@ public class CombatManager {
 	        }
 	    }
 		
-		SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, getMainAttackLocation(wraithSquad), UnitType.Terran_Wraith.sightRange(), SquadName.WRAITH);
-		wraithSquad.setOrder(wraithOrder);
+		if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null){
+			SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getPoint()
+					, UnitType.Terran_Wraith.sightRange(), SquadName.WRAITH);
+			wraithSquad.setOrder(wraithOrder);
+		}
 	}
 	
 	private void updateVesselSquad() {//TODO 현재는 본진 공격 용 레이스만 있음

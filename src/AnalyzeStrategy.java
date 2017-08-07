@@ -587,49 +587,48 @@ public class AnalyzeStrategy {
 	}
 
 	private void AnalyzeVsTerran() {
+		StrategyManager.Strategys selectedS = null;
 		StrategyManager.StrategysException selectedSE = null;
-		StrategyManager.StrategysException SE = StrategyManager.Instance().getCurrentStrategyException();
 		// 치즈러시 대비
-		int nongbong_cnt = 0;
-		Unit enemy_bunker = null;
-		bwta.BaseLocation base = InformationManager.Instance()
-				.getMainBaseLocation(InformationManager.Instance().selfPlayer);
-		bwta.Region myRegion = base.getRegion();
-		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
-				InformationManager.Instance().enemyPlayer);
-		if (enemyUnitsInRegion.size() >= 5) {
-			for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
-				if (enemyUnitsInRegion.get(enemy).getType().equals("Terran_Marine")
-						|| enemyUnitsInRegion.get(enemy).getType().equals("Terran_SCV")) {
-					nongbong_cnt++;
-				}
-				// 치즈러쉬 와서 벙커를 지으면 벙커부터 쳐준다.
-				// .... 어쩔까...... 마린은 왠지 도망갈것 같고..........
-				// 벙커를 치는게 낫지 않을까 농봉이니까
-				if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Terran_Bunker) {
-					enemy_bunker = enemyUnitsInRegion.get(enemy);
-				}
-			}
-		}
-
-		// 벌쳐가 없는 상태에서 상대 유닛이 내본진에 5기 이상있다면 농봉이다
-		if (InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture) < 1
-				&& nongbong_cnt >= 5) {
-			SE = StrategyManager.StrategysException.terranException_CheeseRush;
-			// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_CheeseRush);
-		}
-		// 벌쳐가 있거나 마린이 있다면 농봉없이 벙커짓고 막자.
-		// 단 치즈러쉬가 와서 벙커를 짓고 있다면 농봉상태 유지
-		if ((nongbong_cnt <= 4
-				&& InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture) > 0)
-				|| nongbong_cnt <= 4
-						&& InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Marine) > 2) {
-			// 인구수대비 해제된 상태에서 적 벙커가 없다면 농봉해제. 아니라면 유지.
-			if (enemy_bunker == null) {
-				SE = StrategyManager.StrategysException.Init;
-				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-			}
-		}
+//		int nongbong_cnt = 0;
+//		Unit enemy_bunker = null;
+//		bwta.BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+//		bwta.Region myRegion = base.getRegion();
+//		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
+//				InformationManager.Instance().enemyPlayer);
+//		if (enemyUnitsInRegion.size() >= 5) {
+//			for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+//				if (enemyUnitsInRegion.get(enemy).getType().equals("Terran_Marine")
+//						|| enemyUnitsInRegion.get(enemy).getType().equals("Terran_SCV")) {
+//					nongbong_cnt++;
+//				}
+//				// 치즈러쉬 와서 벙커를 지으면 벙커부터 쳐준다.
+//				// .... 어쩔까...... 마린은 왠지 도망갈것 같고..........
+//				// 벙커를 치는게 낫지 않을까 농봉이니까
+//				if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Terran_Bunker) {
+//					enemy_bunker = enemyUnitsInRegion.get(enemy);
+//				}
+//			}
+//		}
+//
+//		// 벌쳐가 없는 상태에서 상대 유닛이 내본진에 5기 이상있다면 농봉이다
+//		if (InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture) < 1
+//				&& nongbong_cnt >= 5) {
+//			SE = StrategyManager.StrategysException.terranException_CheeseRush;
+//			// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_CheeseRush);
+//		}
+//		// 벌쳐가 있거나 마린이 있다면 농봉없이 벙커짓고 막자.
+//		// 단 치즈러쉬가 와서 벙커를 짓고 있다면 농봉상태 유지
+//		if ((nongbong_cnt <= 4
+//				&& InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture) > 0)
+//				|| nongbong_cnt <= 4
+//						&& InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Marine) > 2) {
+//			// 인구수대비 해제된 상태에서 적 벙커가 없다면 농봉해제. 아니라면 유지.
+//			if (enemy_bunker == null) {
+//				SE = StrategyManager.StrategysException.Init;
+//				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+//			}
+//		}
 
 		// 핵에 대한건 보류 조건이 까다롭다. 원하는 조건을 어찌 해야할지 모르겄네
 		/*
@@ -639,82 +638,102 @@ public class AnalyzeStrategy {
 		 * StrategyManager.StrategysException.terranException_NuClear); }
 		 */
 
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
-				InformationManager.Instance().enemyPlayer) >= 20
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
-						InformationManager.Instance().selfPlayer) < 1) {
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 20
+				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,InformationManager.Instance().selfPlayer) < 1) {
 			// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-			SE = StrategyManager.StrategysException.terranException_Wraith;
+			selectedSE = StrategyManager.StrategysException.terranException_Wraith;
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
 					InformationManager.Instance().selfPlayer) >= 1) {
 				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				SE = StrategyManager.StrategysException.Init;
+				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
-				InformationManager.Instance().selfPlayer) < 1) {
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,InformationManager.Instance().selfPlayer) < 1) {
 			// 아카데미가 일단 없을때
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 				// 인비저블 유닛이 있다면 일단 클로킹 로직
 				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
 						&& unit.getPosition().isValid()) {
 					// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-					SE = StrategyManager.StrategysException.terranException_Wraith;
+					selectedSE = StrategyManager.StrategysException.terranException_Wraith;
 				}
 				// 아카데미가 있다면 init으로
 				if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
 						InformationManager.Instance().selfPlayer) >= 1) {
 					// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-					SE = StrategyManager.StrategysException.Init;
+					selectedSE = StrategyManager.StrategysException.Init;
 				}
 			}
 		}
 
 		// if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
-				InformationManager.Instance().enemyPlayer) >= 2) {
+		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,	InformationManager.Instance().enemyPlayer) >= 2
+				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 6)
+				&&!(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
+					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+							&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+					&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+						)){
 			// 2배럭이면 바이오닉
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_Bionic);
+			selectedS = StrategyManager.Strategys.terranBasic_Bionic;
 		}
-		// 팩이 배럭보다 많거나, 팩이 3개 이상일경우 기본으로 변경
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
-				InformationManager.Instance().enemyPlayer) <= InformationManager.Instance()
-						.getNumUnits(UnitType.Terran_Factory, InformationManager.Instance().enemyPlayer)
-				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
-						InformationManager.Instance().enemyPlayer) >= 3) {
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic);
-		}
+//		// 팩이 배럭보다 많거나, 팩이 3개 이상일경우 기본으로 변경
+//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
+//				InformationManager.Instance().enemyPlayer) <= InformationManager.Instance()
+//						.getNumUnits(UnitType.Terran_Factory, InformationManager.Instance().enemyPlayer)
+//				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
+//						InformationManager.Instance().enemyPlayer) >= 3) {
+//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic);
+//		}
 
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
-				InformationManager.Instance().enemyPlayer) == 1
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,
-						InformationManager.Instance().enemyPlayer) >= 1) {
-			// 공중 유닛에 대한 대응
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-			// RespondToStrategy.instance().enemy_wraith = true;
-		} else if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
-				InformationManager.Instance().enemyPlayer) >= 2) {
-			// 스타포트 다수에 대한 대응
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-			// RespondToStrategy.instance().enemy_wraith = true;
+		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
+				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+						&&InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+				&&InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+					){
+			selectedS = StrategyManager.Strategys.terranBasic;
 		}
-
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Dropship,
-				InformationManager.Instance().enemyPlayer) >= 3) {
-			// 드랍쉽에 대한 대응
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_DropShip);
+		
+//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
+//				InformationManager.Instance().enemyPlayer) == 1
+//				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,
+//						InformationManager.Instance().enemyPlayer) >= 1) {
+//			// 공중 유닛에 대한 대응
+//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
+//			// RespondToStrategy.instance().enemy_wraith = true;
+//		} else if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
+//				InformationManager.Instance().enemyPlayer) >= 2) {
+//			// 스타포트 다수에 대한 대응
+//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
+//			// RespondToStrategy.instance().enemy_wraith = true;
+//		}
+//
+//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Dropship,
+//				InformationManager.Instance().enemyPlayer) >= 3) {
+//			// 드랍쉽에 대한 대응
+//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_DropShip);
+//		}
+//
+//		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Facility,
+//				InformationManager.Instance().enemyPlayer) >= 1
+//				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Physics_Lab,
+//						InformationManager.Instance().enemyPlayer) >= 1)
+//				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,
+//						InformationManager.Instance().enemyPlayer) >= 1) {
+//			// (사이언스퍼실리티 & 피직스 랩 발견) or 배틀크루저 발견
+//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_BattleCruiser);
+//		}
+		if (selectedS != null) {
+			StrategyManager.Instance().setCurrentStrategyBasic(selectedS);
 		}
-
-		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Facility,
-				InformationManager.Instance().enemyPlayer) >= 1
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Physics_Lab,
-						InformationManager.Instance().enemyPlayer) >= 1)
-				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,
-						InformationManager.Instance().enemyPlayer) >= 1) {
-			// (사이언스퍼실리티 & 피직스 랩 발견) or 배틀크루저 발견
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_BattleCruiser);
+		
+		if (selectedSE != null) {
+			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
 		}
-
+	
+		
 	}
 
 	// exception 상태가 아닐때는 Init 으로

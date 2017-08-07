@@ -160,6 +160,7 @@ public class BuildManager {
 									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
 								if (desiredPosition != null)
 									System.out.print(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
+								
 								isOkToRemoveQueue = false;
 							}
 						}
@@ -718,6 +719,8 @@ public class BuildManager {
 			if (tempChokePoint != null) {
 				seedPosition = tempChokePoint.getCenter();
 			}
+			break;
+		default:
 			break;
 		}
 
