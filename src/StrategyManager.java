@@ -559,28 +559,26 @@ public class StrategyManager {
 						* InformationManager.Instance().getBasicSupplyProviderUnitType().supplyProvided();
 
 				if (currentSupplyShortage > onBuildingSupplyCount) {
-					boolean isToEnqueue = true;
-					if (!BuildManager.Instance().buildQueue.isEmpty()) {
-						BuildOrderItem currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
-						if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
-						{
-							isToEnqueue = false;
-						}
-					}
-					if (isToEnqueue) {
-						if(InformationManager.Instance().getMainBaseSuppleLimit() <= MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Supply_Depot)){
+//					boolean isToEnqueue = true;
+//					if (!BuildManager.Instance().buildQueue.isEmpty()) {
+//						BuildOrderItem currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
+//						if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
+//						{
+//							isToEnqueue = false;
+//						}
+//					}
+					if(InformationManager.Instance().getMainBaseSuppleLimit() <= MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Supply_Depot)){
 //							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
 //							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
 //							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
 //							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
-						}else{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
+					}else{
 //							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
 //							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
 //							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
 //							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						}
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}
 			}

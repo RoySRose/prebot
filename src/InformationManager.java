@@ -1203,6 +1203,10 @@ public class InformationManager {
 					
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
 
+					if(BWTA.getRegion(buildingPosition) != BWTA.getRegion(baseLocation.getTilePosition())){ //basicbot 1.2
+						continue;
+					}
+					
 //					System.out.print("buildingPositionX : " + buildingPosition.getX());
 //					System.out.println(", buildingPositionY : " + buildingPosition.getY());
 //					System.out.print("baseLocationX : " + baseLocation.getTilePosition().getX());

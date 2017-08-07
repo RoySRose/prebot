@@ -274,9 +274,11 @@ public class ScoutManager{
 
 				if (closestBaseLocation != null) {
 					// assign a scout to go scout it
-					commandUtil.move(currentScoutUnit, closestBaseLocation.getPosition());
+					CommandUtil.move(currentScoutUnit, closestBaseLocation.getPosition());
 					currentScoutTargetBaseLocation = closestBaseLocation;
 				}
+			}else{//BasicBot1.2
+				CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
 			}
 		}
 		// if we know where the enemy region is
