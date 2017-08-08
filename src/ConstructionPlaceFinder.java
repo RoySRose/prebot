@@ -18,9 +18,13 @@ public class ConstructionPlaceFinder {
 
 	/// 건설위치 탐색 방법
 	public enum ConstructionPlaceSearchMethod { 
-		SpiralMethod,	///< 나선형으로 돌아가며 탐색 
+		SpiralMethod,	///< 나선형으로 돌아가며 탐색
+		SupplyDepotMethod, /// < 서플라이 디팟 메쏘드. 가로 세로를 서플라이 크기만큼 더해서 찾기
 		NewMethod 		///< 예비
 	};
+	
+	public int maxSupplyCntX = 4;
+	public int maxSupplyCntY = 4;
 	
 	/// 건물 건설 예정 타일을 저장해놓기 위한 2차원 배열<br>
 	/// TilePosition 단위이기 때문에 보통 128*128 사이즈가 된다<br>
@@ -59,6 +63,7 @@ public class ConstructionPlaceFinder {
 		}
 		// seedPosition 을 입력하지 않은 경우
 		else {
+			//System.out.println("전략포지션 입력 ==>> (" + seedPositionStrategy + ")" );
 			Chokepoint tempChokePoint;
 			BaseLocation tempBaseLocation;
 			TilePosition tempTilePosition = null;
@@ -87,6 +92,17 @@ public class ConstructionPlaceFinder {
 							pos = new TilePosition(116,58);
 						}
 					}
+				}
+				
+				if(buildingType == UnitType.Terran_Supply_Depot){
+					pos = BlockingEntrance.Instance().getSupplyPosition();
+//					if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+//						pos = new TilePosition(BlockingEntrance.Instance().)
+//					}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
+//						
+//					}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
+//						
+//					}
 				}
 				desiredPosition = getBuildLocationNear(buildingType, pos);
 				break;
@@ -249,7 +265,15 @@ public class ConstructionPlaceFinder {
 		TilePosition testPosition = TilePosition.None;
 
 		// TODO 과제 : 건설 위치 탐색 방법은 ConstructionPlaceSearchMethod::SpiralMethod 로 하는데, 더 좋은 방법은 생각해볼 과제이다
-		int constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
+		int constructionPlaceSearchMethod = 0;
+		
+		if(buildingType == UnitType.Terran_Supply_Depot){
+			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
+		}else{
+			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();	
+		}
+		
+				
 		
 		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
 		int buildingGapSpace = Config.BuildingSpacing;
@@ -259,11 +283,7 @@ public class ConstructionPlaceFinder {
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
-			if(buildingType == UnitType.Terran_Barracks){
-				buildingGapSpace = 0;
-			}else{
-				buildingGapSpace = Config.BuildingResourceDepotSpacing;
-			}
+			buildingGapSpace = Config.BuildingResourceDepotSpacing;
 		}
 //		else if (buildingType == UnitType.Protoss_Pylon) {
 //			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
@@ -278,7 +298,11 @@ public class ConstructionPlaceFinder {
 //		}
 		else if (buildingType == UnitType.Terran_Supply_Depot) {
 			
-			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
+			//buildingGapSpace = Config.BuildingSupplyDepotSpacing;
+			buildingGapSpace = 0;
+		}
+		else if(buildingType == UnitType.Terran_Barracks){
+			buildingGapSpace = 0;
 		}
 //		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
 //			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
@@ -388,6 +412,97 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}
+		}
+		else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()) {
+			//서플라이 디팟 용 로직(4X4)
+			// y축부터 시작. 최초 포지션에서 X축 + 3 넘어가면 Y축 +2
+			int currentX = desiredPosition.getX();
+			int currentY = desiredPosition.getY();
+			//System.out.println("**************input TilePosition ==>>>>  (" + currentX + " / " + currentY + ")");
+			int depostSizeX = 3;
+			int depostSizeY = 2;
+			//4X4 배열로 건설할 것이므로 4번씩만 돌린다.
+			
+		
+			/*for(int y_position = 0; y_position < maxSupplyCntY ; y_position ++){
+				for(int x_position = 0; x_position < maxSupplyCntX ; x_position ++){
+					if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
+
+						isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+
+						if (isPossiblePlace) {
+							resultPosition = new TilePosition(currentX, currentY);
+							return resultPosition;
+						}
+						//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+					}
+					currentX = currentX + depostSizeX;
+					//currentY = currentY + spiralDirectionY;
+				}
+				//X축만 변경했을때 못찾을경우 Y축을 증가시키고 X축은 최초 포지션으로 설정
+				currentX = desiredPosition.getX();
+				currentY = currentY + depostSizeY;
+			}*/
+			for(int x_position= 0; x_position < maxSupplyCntX ; x_position ++){
+				for(int y_position  = 0; y_position < maxSupplyCntY ; y_position ++){
+					if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
+
+						isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+
+						if (isPossiblePlace) {
+							resultPosition = new TilePosition(currentX, currentY);
+							return resultPosition;
+						}
+						//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+					}
+					
+					currentY = currentY + depostSizeY;
+					//currentY = currentY + spiralDirectionY;
+				}
+				currentY = desiredPosition.getY();
+				currentX = currentX + depostSizeX;
+			}
+			//System.out.println("supply position ==>>>>>>>>>>>  (" +currentX + " , " +currentY + ")");
+			
+			
+			/*while (maxSupplyCnt < 4)
+			{
+				if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
+
+					isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
+
+					if (isPossiblePlace) {
+						resultPosition = new TilePosition(currentX, currentY);
+						break;
+					}
+				}
+
+				currentX = currentX + spiralDirectionX;
+				currentY = currentY + spiralDirectionY;
+				numSteps++;
+				
+				// 다른 방향으로 전환한다
+				if (numSteps == spiralMaxLength)
+				{
+					numSteps = 0;
+
+					if (!isFirstStep)
+						spiralMaxLength++;
+
+					isFirstStep = !isFirstStep;
+
+					if (spiralDirectionX == 0)
+					{
+						spiralDirectionX = spiralDirectionY;
+						spiralDirectionY = 0;
+					}
+					else
+					{
+						spiralDirectionY = -spiralDirectionX;
+						spiralDirectionX = 0;
+					}
+				}
+			}*/
 		}
 		else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.NewMethod.ordinal()) {
 		}

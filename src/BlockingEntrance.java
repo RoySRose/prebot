@@ -1,5 +1,6 @@
 import bwapi.Color;
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 
@@ -41,22 +42,28 @@ public class BlockingEntrance {
 	public int build_barrackX = 0;
 	public int build_barrackY = 0;
 	
+	/*public int build_fix_supplyX = 0;
+	public int build_fix_supplyY = 0;*/
+	
 	public static boolean blockingEntranceNow = true;
 	
 	private static int first_suppleX_array[] = null;// new int [];//{29, 52, 96, 102, 93, 55, 12, 23};
-	private static int first_suppleY_array[] = new int []{19, 23, 21,   61, 95, 94, 97, 54};
+	private static int first_suppleY_array[] = null;//new int []{19, 23, 21,   61, 95, 94, 97, 54};
 
-	private static int second_suppleX_array[] = new int []{29, 52, 96, 102, 93, 55, 12, 23};
-	private static int second_suppleY_array[] = new int []{19, 23, 21,   61, 95, 94, 97, 54};
+	private static int second_suppleX_array[] = null; //new int []{29, 52, 96, 102, 93, 55, 12, 23};
+	private static int second_suppleY_array[] = null; //new int []{19, 23, 21,   61, 95, 94, 97, 54};
 
-	private static int barrackX_array[] = new int []{26, 54, 98, 104, 90, 52, 14, 20};
-	private static int barrackY_array[] = new int []{21, 25, 23,   63, 97, 96, 99, 56};
+	private static int barrackX_array[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int barrackY_array[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
 	
-	private static int factoryX_array[] = new int []{26, 54, 98, 104, 90, 52, 14, 20};
-	private static int factoryY_array[] = new int []{21, 25, 23,   63, 97, 96, 99, 56};
+	private static int factoryX_array[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int factoryY_array[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
 	
-	private static int bunkerX_array[] = new int []{26, 54, 98, 104, 90, 52, 14, 20};
-	private static int bunkerY_array[] = new int []{21, 25, 23,   63, 97, 96, 99, 56};
+	private static int bunkerX_array[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int bunkerY_array[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
+	
+	private static int fix_supplyX[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int fix_supplyY[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
 	
 	private int starting_int = 0;
 
@@ -76,6 +83,11 @@ public class BlockingEntrance {
 		Config.BuildingResourceDepotSpacing = 0;
 		//헌터
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+			//ConstructionPlaceFinder.Instance().maxSupplyCntX = 3;
+			int [] fix_supplyXX = {0,47,116,116,116,46,16,0};
+			fix_supplyX = fix_supplyXX;
+			int [] fix_supplyYY = {15,0,21,66,102,119,105,33};
+			fix_supplyY = fix_supplyYY;
 			//입막용 11시 부터 시계방향으로 세팅
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {29, 52, 96, 102, 93, 55, 12, 23};//private static intnew int []
@@ -121,6 +133,10 @@ public class BlockingEntrance {
 				bunkerY_array = bunkerYY_array;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
+			int [] fix_supplyXX = {70,116,70,0};
+			fix_supplyX = fix_supplyXX;
+			int [] fix_supplyYY = {0,43,119,74};
+			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {81,113,57,10};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
@@ -157,14 +173,18 @@ public class BlockingEntrance {
 				barrackY_array = barrackYY_array;
 				int [] factoryXX_array = {63,110,31,13};
 				factoryX_array = factoryXX_array;
-				int [] factoryYY_array = {6,27,113,8};
+				int [] factoryYY_array = {6,27,113,77};
 				factoryY_array = factoryYY_array;
-				int [] bunkerXX_array = {58,117,28,5};
+				int [] bunkerXX_array = {58,116,28,5};
 				bunkerX_array = bunkerXX_array;
 				int [] bunkerYY_array = {9,25,116,84};
 				bunkerY_array = bunkerYY_array;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
+			int [] fix_supplyXX = {15,114,108,0};
+			fix_supplyX = fix_supplyXX;
+			int [] fix_supplyYY = {13,20,119,100};
+			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {10,97,117,22};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
@@ -313,6 +333,11 @@ public class BlockingEntrance {
 		}
 	}
 	
+	public final TilePosition getSupplyPosition()
+	{
+		TilePosition supply_pos= new TilePosition(fix_supplyX[starting_int], fix_supplyY[starting_int]);
+		return supply_pos;
+	}
 	public void ReturnBuildSpacing() {
 		Config.BuildingSpacing = BuildingSpacingOld;
 		Config.BuildingResourceDepotSpacing = BuildingResourceDepotSpacingOld;
