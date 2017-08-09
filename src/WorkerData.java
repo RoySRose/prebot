@@ -8,6 +8,8 @@ import java.util.Map;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
 
 public class WorkerData {
 
@@ -33,7 +35,7 @@ public class WorkerData {
 	double mineralAndMineralWorkerRatio;						
 	
 	/// 일꾼 목록
-	private ArrayList<Unit> workers = new ArrayList<Unit>();
+	public ArrayList<Unit> workers = new ArrayList<Unit>();
 	/// ResourceDepot 목록
 	private ArrayList<Unit> depots = new ArrayList<Unit>();
 	
@@ -56,7 +58,7 @@ public class WorkerData {
 	//미네랄 일꾼
 	private Map<Integer, Unit> workerMineralMap = new HashMap<Integer, Unit>();
 	//Gas 일꾼 
-	private Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
+	public Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	private Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	
@@ -535,8 +537,12 @@ public class WorkerData {
 	{
 	    // if there are minerals near the depot, add them to the set
 		List<Unit> mineralsNearDepot = new ArrayList<Unit>();
+		/*
+		 * 1.3 초기 일꾼 한마리 노는거 방지 TF 가 알려준 소스 반영 getAllUnits -> getMinerals
+		 * */
+		BaseLocation baselocation = BWTA.getNearestBaseLocation(depot.getPosition());
 	    int radius = 320;
-	    for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+	    for (Unit unit : MyBotModule.Broodwar.getMinerals())
 //	    for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
