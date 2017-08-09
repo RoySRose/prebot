@@ -23,7 +23,7 @@ public class ConstructionPlaceFinder {
 		NewMethod 		///< 예비
 	};
 	
-	public int maxSupplyCntX = 4;
+	public int maxSupplyCntX = 3;
 	public int maxSupplyCntY = 4;
 	
 	/// 건물 건설 예정 타일을 저장해놓기 위한 2차원 배열<br>
@@ -384,6 +384,8 @@ public class ConstructionPlaceFinder {
 						resultPosition = new TilePosition(currentX, currentY);
 						break;
 					}
+					//System.out.println(buildingType + " 은 여긴안돼 ==>>>> ("+currentX+"/"+currentY+")");
+					
 				}
 
 				currentX = currentX + spiralDirectionX;
@@ -614,10 +616,12 @@ public class ConstructionPlaceFinder {
 					// if we can't build here, or space is reserved, we can't build here
 					if (isBuildableTile(b, x, y) == false)
 					{
+						//System.out.println("not BuildableTile=========== ");
 						return false;
 					}
 
 					if (isReservedTile(x, y)) {
+						//System.out.println("isReservedTile=========== ");
 						return false;
 					}
 
@@ -664,6 +668,7 @@ public class ConstructionPlaceFinder {
 				//if (reserveMap.get(x).get(y))
 				if (reserveMap[x][y])
 				{
+					//System.out.println("here is reserveMap =============");
 					return false;
 				}
 			}
@@ -673,6 +678,7 @@ public class ConstructionPlaceFinder {
 		// ResourceDepot 건물이 아닌 다른 건물은 BaseLocation 위치에 짓지 못하도록 한다
 		if (isOverlapsWithBaseLocation(position, b.getType()))
 		{
+			//System.out.println("here isOverlapsWithBaseLocation ============");
 			return false;
 		}
 
@@ -776,7 +782,7 @@ public class ConstructionPlaceFinder {
 	public final boolean isOverlapsWithBaseLocation(TilePosition tile, UnitType type)
 	{
 		// if it's a resource depot we don't care if it overlaps
-		if (type.isResourceDepot())
+		if (type.isResourceDepot() || type == UnitType.Terran_Barracks  || type == UnitType.Terran_Bunker)
 		{
 			return false;
 		}
