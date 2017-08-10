@@ -55,12 +55,9 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			return;
 		}
 
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(3000);
 		// Decision -> 0: stop, 1: kiting(attack unit), 2: change
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecisionForSiegeMode(tank, enemiesInfo, tankList, order, saveUnitLevel);
 		SpiderMineManger.Instance().addRemoveList(tank);
-		lag.estimate();
 		switch (decision.getDecision()) {
 		case -1: // do nothing
 			break;
@@ -72,7 +69,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		case 1: // attack unit
 			UnitInfo targetInfo = decision.getTargetInfo();
 			CommandUtil.attackUnit(tank, targetInfo.getUnit());
-			lag.estimate();
 			break;
 			
 		case 2: // go
@@ -82,7 +78,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					tank.unsiege();
 				}
 			}
-			lag.estimate();
 			break;
 			
 		case 3: // change
@@ -99,8 +94,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			return;
 		}
 		
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(3000);
 		KitingOption kOpt = KitingOption.defaultKitingOption();
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(tank, enemiesInfo, flyingEnemisInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: go, 3: change
 		switch (decision.getDecision()) {
@@ -112,7 +105,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			}
 			kOpt.setGoalPosition(retreatPosition);
 			MicroUtils.preciseFlee(tank, decision.getEnemyPosition(), kOpt);
-			lag.estimate();
 			break;
 			
 		case 1: // kiting
@@ -162,7 +154,6 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
 				}
 			}
-			lag.estimate();
 			break;
 			
 		case 2: // go
@@ -177,13 +168,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				}
 			} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
 				if (tank.isIdle() || tank.isBraking()) {
-					Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
-					CommandUtil.attackMove(tank, randomPosition);
+					if (!tank.isBeingHealed()) {
+						Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+						CommandUtil.attackMove(tank, randomPosition);
+					}
 				}
 			} else {
             	CommandUtil.attackMove(tank, order.getPosition());
 			}
-			lag.estimate();
 			break;
 			
 		case 3: // change

@@ -24,7 +24,7 @@ public class SquadData {
 //			for (String squadName : squads.keySet()) {
 //				Squad sq = squads.get(squadName);
 //				if (sq.getUnitSet().size() > 0) {
-//					System.out.println(sq);
+//					System.out.println(sq + " -> v: " + sq.microVulture.getUnits().size() + ", t: " + sq.microTank.getUnits().size() + ", g: " + sq.microGoliath.getUnits().size() + ", m: " + sq.microMarine.getUnits().size());
 //				}
 //			}
 //		}

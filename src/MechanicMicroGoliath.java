@@ -18,6 +18,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 	private boolean attackWithTank = false;
 	
 	private int saveUnitLevel = 1;
+	private int stickToTankRadius = 0;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
@@ -29,8 +30,10 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		this.goliathList = goliathList;
 		this.saveUnitLevel = saveUnitLevel;
 		
-		if (tankList.size() * 5 > goliathList.size()) {
-			attackWithTank = true;
+		this.attackWithTank = tankList.size() * 6 >= goliathList.size();
+		if (this.attackWithTank) {
+			this.stickToTankRadius = 150 + (int) (Math.log(goliathList.size()) * 15);
+//			System.out.println("stickToTankRadius: " + stickToTankRadius);
 		}
 	}
 	
@@ -38,10 +41,8 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		if (!CommonUtils.executeUnitRotation(goliath, LagObserver.groupsize())) {
 			return;
 		}
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(3000);
+
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecision(goliath, enemiesInfo, saveUnitLevel); // 0: flee, 1: kiting, 2: attack
-		lag.estimate();
 		KitingOption kOpt = KitingOption.defaultKitingOption();
 		switch (decision.getDecision()) {
 		case 0: // flee
@@ -52,34 +53,36 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 			}
 			kOpt.setGoalPosition(retreatPosition);
 			MicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
-			lag.estimate();
 			break;
 			
 		case 1: // kiting
-
-			Position kitingGoalPosition = order.getPosition();
-			if (attackWithTank) {
-				Unit closeTank = null;
-				int closeDist = 999999;
+			boolean haveToFight = true;
+			Unit closeTank = null;
+			if (saveUnitLevel >= 1 && attackWithTank) {
+				haveToFight = false;
+				int closeDist = 9999999;
 				for (Unit tank : tankList) {
 					int dist = goliath.getDistance(tank.getPosition());
 					if (dist < closeDist) {
 						closeTank = tank;
 						closeDist = dist;
-						if (closeDist < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
+						// 가까운 곳에 탱크가 있으면 싸운다.
+						if (closeDist < stickToTankRadius) {
+							haveToFight = true;
 							break;
 						}
 					}
 				}
-				if (closeTank != null && closeDist >= MicroSet.Common.MAIN_SQUAD_COVERAGE) {
-					kitingGoalPosition = closeTank.getPosition();
-					kOpt.setCooltimeAlwaysAttack(false);
-				}
 			}
-			
-			kOpt.setGoalPosition(kitingGoalPosition);
-			MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
-			lag.estimate();
+			if (haveToFight) {
+				kOpt.setGoalPosition(order.getPosition());
+				MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+			} else {
+				// 가까운 곳에 없으면 탱크로 이동
+//				kOpt.setGoalPosition(closeTank.getPosition());
+//				kOpt.setCooltimeAlwaysAttack(false);
+				CommandUtil.move(goliath, closeTank.getPosition());
+			}
 			break;
 			
 		case 2: // attack move
@@ -87,15 +90,17 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 			
 			// 이동지역까지 attackMove로 간다.
 			if (goliath.getDistance(movePosition) > order.getRadius()) {
-				CommandUtil.attackMove(goliath, movePosition);
+//				CommandUtil.attackMove(goliath, movePosition);
+				CommandUtil.move(goliath, movePosition);
 				
 			} else { // 목적지 도착
 				if (goliath.isIdle() || goliath.isBraking()) {
-					Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
-					CommandUtil.attackMove(goliath, randomPosition);
+					if (!goliath.isBeingHealed()) {
+						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
+						CommandUtil.attackMove(goliath, randomPosition);
+					}
 				}
 			}
-			lag.estimate();
 			break;
 		}
 	}

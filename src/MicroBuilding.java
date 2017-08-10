@@ -67,6 +67,9 @@ public class MicroBuilding extends MicroManager {
 		Position halfway = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
 		
 		for (Unit flyBuilding : Buildings) {
+			if (!CommonUtils.executeUnitRotation(flyBuilding, LagObserver.groupsize())) {
+				continue;
+			}
 			
 			if(leader == null){
 				GoalPos = halfway;

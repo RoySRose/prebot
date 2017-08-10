@@ -44,6 +44,9 @@ public class MicroMarine extends MicroManager {
 			kitingOption.setGoalPosition(mineralpos);
 
 			for (Unit marine : marines) {
+				if (!CommonUtils.executeUnitRotation(marine, LagObserver.groupsize())) {
+					continue;
+				}
 
 				Unit target = getTarget(marine, targets);
 				if (target != null) {
@@ -67,6 +70,10 @@ public class MicroMarine extends MicroManager {
 			Position bunkerpos = bunker.getPosition();
 			kitingOption.setGoalPosition(bunkerpos);
 			for (Unit marine : marines) {
+				if (!CommonUtils.executeUnitRotation(marine, LagObserver.groupsize())) {
+					continue;
+				}
+				
 				Unit target = getTarget(marine, targets);
 				if (target != null) {
 

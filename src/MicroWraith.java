@@ -29,6 +29,9 @@ public class MicroWraith extends MicroManager {
 		Integer[] fleeAngle = kitingOption.getFleeAngle();
 				
 		for (Unit wraith : wraiths) {
+			if (!CommonUtils.executeUnitRotation(wraith, LagObserver.groupsize())) {
+				continue;
+			}
 
 //			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(wraith)) {
 //				continue;

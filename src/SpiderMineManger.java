@@ -246,6 +246,13 @@ public class SpiderMineManger {
 			}
 		}
 		
+		
+		// 첫번째 확장지역 마인매설 금지 처리
+		BaseLocation myFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+		if (position.getDistance(myFirstExpansion.getPosition()) < MicroSet.Vulture.MINE_REMOVE_TANK_DIST) {
+			return false;
+		}
+		
 		return true;
 	}
 	
