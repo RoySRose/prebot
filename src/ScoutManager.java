@@ -49,6 +49,7 @@ public class ScoutManager{
 	private boolean fleeLongEnemyFlag  = false; //마린 , 드래곤 판별 변수 
 	private boolean idleFlag = false;  //정찰 해제 
 	private boolean cyberFlag = false;  //프로토스 드라군 건물 완성됐는지 판별 변수. 
+	private boolean scoutFlag = false;  //스카웃 한번만 보내기 위한 변수 
 	
 	
 	private List<Unit> units = new ArrayList<>();
@@ -68,7 +69,7 @@ public class ScoutManager{
 		if (MyBotModule.Broodwar.getFrameCount() % 4 == 0){
 		
 			// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
-			if(GameCommander.Instance().getScoutFlag() == false)
+			if(scoutFlag == false)
 				assignScoutIfNeeded();
 			if(fleeFlag == false){
 				moveScoutUnit();
@@ -217,7 +218,7 @@ public class ScoutManager{
 								return;
 						}
 						WorkerManager.Instance().setScoutWorker(currentScoutUnit);
-						GameCommander.Instance().scoutFlag = true;	
+						scoutFlag = true;	
 						// 참고로, 일꾼의 정찰 임무를 해제하려면, 다음과 같이 하면 된다
 						//WorkerManager::Instance().setIdleWorker(currentScoutUnit);
 					}
@@ -319,6 +320,13 @@ public class ScoutManager{
 					// if the scout is in the enemy region
 					if (scoutInRangeOfenemy)
 					{	
+						/*
+						 * se-min.park
+						 * Buf_Fix 1.3
+						 * 욱스가 테스트가 힘들어 일꾼 공격하지 않고 바로 본진 돌도록 변경 부탁함.
+						 * 추후 확인 필요.  원복하려면 scoutUnderAttack = true; 삭제 
+						 */
+						scoutUnderAttack = true;
 						// if the worker scout is not under attack
 						if (!scoutUnderAttack){
 							

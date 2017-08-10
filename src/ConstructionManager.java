@@ -128,6 +128,7 @@ public class ConstructionManager {
 	    checkForDeadTerranBuilders();               
 	    checkForCompletedBuildings();           
 		checkForDeadlockConstruction();			
+		checkConstructionBuildings();
 	}
 
 	/// 건설 진행 도중 (공격을 받아서) 건설하려던 건물이 파괴된 경우, constructionQueue 에서 삭제합니다
@@ -399,8 +400,14 @@ public class ConstructionManager {
 					if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
 				
 						//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
-	
-						// grab a worker unit from WorkerManager which is closest to this final position
+						/*
+						 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
+						 */
+						if((CombatManager.Instance().FastZealotInOurBase > 0 || CombatManager.Instance().FastZerglingsInOurBase >0) 
+								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks || b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot)){
+							continue;
+						} 
+						// grab a worker unit from WorkerManager which is closest to this final position	
 						Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
 	
 						if (workerToAssign != null)
@@ -559,6 +566,23 @@ public class ConstructionManager {
 		}
 	}
 
+	public void checkConstructionBuildings()
+	{
+		if (MyBotModule.Broodwar.self().getRace() != Race.Terran)
+		{
+			return;
+		}
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			// 건설중인 건물의 경우 공격 받고 있고 에너지가 100밑이면 건설 취소 
+			if (unit.getType().isBuilding() && unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100)
+			{
+				unit.cancelConstruction();
+				cancelConstructionTask(unit.getType(), unit.getTilePosition());
+			}
+		}
+	}
 	// COMPLETED
 	public boolean isEvolvedBuilding(UnitType type) 
 	{
