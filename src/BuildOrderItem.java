@@ -24,7 +24,9 @@ public class BuildOrderItem {
 		SecondChokePoint,			///< 아군 두번째 길목
 		SeedPositionSpecified,		///< 별도 지정 위치
 		NextExpansionPoint,    		///< 다음 멀티 위치
-		NextSupplePoint    			///< 다음 서플 위치
+		NextSupplePoint,    		///< 다음 서플 위치
+		LastBuilingPoint,			///< 최종 건물 위치
+		getLastBuilingFinalLocation ///< 완전 더이상 없다
 	};
 	
 	public SeedPositionStrategy seedLocationStrategy;	///< 건설위치 초안 결정 정책

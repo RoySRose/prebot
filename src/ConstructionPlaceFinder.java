@@ -67,16 +67,16 @@ public class ConstructionPlaceFinder {
 			Chokepoint tempChokePoint;
 			BaseLocation tempBaseLocation;
 			TilePosition tempTilePosition = null;
-			Region tempBaseRegion;
-			int vx, vy;
-			double d, t;
-			int bx, by;
+//			Region tempBaseRegion;
+//			int vx, vy;
+//			double d, t;
+//			int bx, by;
 			
 			switch (seedPositionStrategy) {
 
 			case MainBaseLocation:
 				
-				TilePosition pos = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
+				tempTilePosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
 				
 				//헌터 3시 예외상황
 				if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
@@ -88,108 +88,105 @@ public class ConstructionPlaceFinder {
 								temp++;
 							}
 						}
-						if(temp>=14){
-							pos = new TilePosition(116,58);
+						if(temp>=12){//TODO 12개가 안들어가는 케이스이면... 아래 로직을 타서... 무조건 다른데 다 짓는다
+							tempTilePosition = new TilePosition(116,58);
 						}
 					}
 				}
 				
-				if(buildingType == UnitType.Terran_Supply_Depot){
-					pos = BlockingEntrance.Instance().getSupplyPosition();
-//					if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
-//						pos = new TilePosition(BlockingEntrance.Instance().)
-//					}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
-//						
-//					}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
-//						
-//					}
+				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				
+				if(desiredPosition == null){
+					BuildManager.Instance().MainBaseLocationFull = true;
 				}
-				desiredPosition = getBuildLocationNear(buildingType, pos);
 				break;
 
 			case MainBaseBackYard:
-				tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-				tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
-				tempBaseRegion = BWTA.getRegion(tempBaseLocation.getPosition());
-
-				//std::cout << "y";
-
-				// (vx, vy) = BaseLocation 와 ChokePoint 간 차이 벡터 = 거리 d 와 각도 t 벡터. 단위는 position
-				// 스타크래프트 좌표계 : 오른쪽으로 갈수록 x 가 증가 (데카르트 좌표계와 동일). 아래로 갈수록 y가 증가 (y축만 데카르트 좌표계와 반대)
-				// 삼각함수 값은 데카르트 좌표계에서 계산하므로, vy를 부호 반대로 해서 각도 t 값을 구함 
-
-				// FirstChokePoint 가 null 이면, MainBaseLocation 주위에서 가능한 곳을 리턴한다
-				if (tempChokePoint == null) {
-					//std::cout << "r";
-					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
-					break;
-				}
-
-				// BaseLocation 에서 ChokePoint 로의 벡터를 구한다
-				vx = tempChokePoint.getCenter().getX() - tempBaseLocation.getPosition().getX();
-				//std::cout << "vx : " << vx ;
-				vy = (tempChokePoint.getCenter().getY() - tempBaseLocation.getPosition().getY()) * (-1);
-				//std::cout << "vy : " << vy;
-				d = Math.sqrt(vx * vx + vy * vy) * 0.5; // BaseLocation 와 ChokePoint 간 거리보다 조금 짧은 거리로 조정. BaseLocation가 있는 Region은 대부분 직사각형 형태이기 때문
-				//std::cout << "d : " << d;
-				t = Math.atan2(vy, vx + 0.0001); // 라디안 단위
-				//std::cout << "t : " << t;
-
-				// cos(t+90), sin(t+180) 등 삼각함수 Trigonometric functions of allied angles 을 이용. y축에 대해서는 반대부호로 적용
-
-				// BaseLocation 에서 ChokePoint 반대쪽 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+180) = -cos(t), sin(t+180) = -sin(t))
-				bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
-				by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
-				//std::cout << "i";
-				tempTilePosition = new TilePosition(bx, by);
-				// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-				
-				//std::cout << "k";
-				// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
-				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
-					//std::cout << "l";
-
-					// BaseLocation 에서 ChokePoint 방향에 대해 오른쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t-90) = sin(t),   sin(t-90) = - cos(t))
-					bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
-					by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
-					tempTilePosition = new TilePosition(bx, by);
-					// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-					//std::cout << "m";
-
-					if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
-						// BaseLocation 에서 ChokePoint 방향에 대해 왼쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+90) = -sin(t),   sin(t+90) = cos(t))
-						bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
-						by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
-						tempTilePosition = new TilePosition(bx, by);
-						// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-
-						if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
-
-							// BaseLocation 에서 ChokePoint 방향 절반 지점의 Back Yard : 데카르트 좌표계에서 (cos(t),   sin(t))
-							bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
-							by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
-							tempTilePosition = new TilePosition(bx, by);
-							// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-							//std::cout << "m";
-						}
-
-					}
-				}
-				//std::cout << "z";
-				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
-					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
-				}
-				else {
-					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
-				}
-				//std::cout << "w";
-				// std::cout << "ConstructionPlaceFinder MainBaseBackYard desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
+//				tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+//				tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
+//				tempBaseRegion = BWTA.getRegion(tempBaseLocation.getPosition());
+//
+//				//std::cout << "y";
+//
+//				// (vx, vy) = BaseLocation 와 ChokePoint 간 차이 벡터 = 거리 d 와 각도 t 벡터. 단위는 position
+//				// 스타크래프트 좌표계 : 오른쪽으로 갈수록 x 가 증가 (데카르트 좌표계와 동일). 아래로 갈수록 y가 증가 (y축만 데카르트 좌표계와 반대)
+//				// 삼각함수 값은 데카르트 좌표계에서 계산하므로, vy를 부호 반대로 해서 각도 t 값을 구함 
+//
+//				// FirstChokePoint 가 null 이면, MainBaseLocation 주위에서 가능한 곳을 리턴한다
+//				if (tempChokePoint == null) {
+//					//std::cout << "r";
+//					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+//					break;
+//				}
+//
+//				// BaseLocation 에서 ChokePoint 로의 벡터를 구한다
+//				vx = tempChokePoint.getCenter().getX() - tempBaseLocation.getPosition().getX();
+//				//std::cout << "vx : " << vx ;
+//				vy = (tempChokePoint.getCenter().getY() - tempBaseLocation.getPosition().getY()) * (-1);
+//				//std::cout << "vy : " << vy;
+//				d = Math.sqrt(vx * vx + vy * vy) * 0.5; // BaseLocation 와 ChokePoint 간 거리보다 조금 짧은 거리로 조정. BaseLocation가 있는 Region은 대부분 직사각형 형태이기 때문
+//				//std::cout << "d : " << d;
+//				t = Math.atan2(vy, vx + 0.0001); // 라디안 단위
+//				//std::cout << "t : " << t;
+//
+//				// cos(t+90), sin(t+180) 등 삼각함수 Trigonometric functions of allied angles 을 이용. y축에 대해서는 반대부호로 적용
+//
+//				// BaseLocation 에서 ChokePoint 반대쪽 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+180) = -cos(t), sin(t+180) = -sin(t))
+//				bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
+//				by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
+//				//std::cout << "i";
+//				tempTilePosition = new TilePosition(bx, by);
+//				// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
+//				
+//				//std::cout << "k";
+//				// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
+//				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
+//					//std::cout << "l";
+//
+//					// BaseLocation 에서 ChokePoint 방향에 대해 오른쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t-90) = sin(t),   sin(t-90) = - cos(t))
+//					bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
+//					by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
+//					tempTilePosition = new TilePosition(bx, by);
+//					// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
+//					//std::cout << "m";
+//
+//					if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
+//						// BaseLocation 에서 ChokePoint 방향에 대해 왼쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+90) = -sin(t),   sin(t+90) = cos(t))
+//						bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
+//						by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
+//						tempTilePosition = new TilePosition(bx, by);
+//						// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
+//
+//						if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
+//
+//							// BaseLocation 에서 ChokePoint 방향 절반 지점의 Back Yard : 데카르트 좌표계에서 (cos(t),   sin(t))
+//							bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
+//							by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
+//							tempTilePosition = new TilePosition(bx, by);
+//							// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
+//							//std::cout << "m";
+//						}
+//
+//					}
+//				}
+//				//std::cout << "z";
+//				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
+//					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
+//				}
+//				else {
+//					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+//				}
+//				//std::cout << "w";
+//				// std::cout << "ConstructionPlaceFinder MainBaseBackYard desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
 				break;
 
 			case FirstExpansionLocation:
 				tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
 				if (tempBaseLocation != null) {
 					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
+				}
+				if(desiredPosition == null){
+					BuildManager.Instance().FirstExpansionLocationFull   = true;
 				}
 				break;
 
@@ -198,6 +195,9 @@ public class ConstructionPlaceFinder {
 				if (tempChokePoint != null) {
 					desiredPosition = getBuildLocationNear(buildingType, tempChokePoint.getCenter().toTilePosition());
 				}
+				if(desiredPosition == null){
+					BuildManager.Instance().FirstChokePointFull    = true;
+				}
 				break;
 
 			case SecondChokePoint:
@@ -205,9 +205,12 @@ public class ConstructionPlaceFinder {
 				if (tempChokePoint != null) {
 					desiredPosition = getBuildLocationNear(buildingType, tempChokePoint.getCenter().toTilePosition());
 				}
+				if(desiredPosition == null){
+					BuildManager.Instance().SecondChokePointFull     = true;
+				}
 				break;
 				
-			case NextExpansionPoint:
+			case NextExpansionPoint: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
 				tempBaseLocation = InformationManager.Instance().getNextExpansionLocation();
 				if (tempBaseLocation != null) {
 					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
@@ -216,15 +219,46 @@ public class ConstructionPlaceFinder {
 				}
 				break;
 				
-			case NextSupplePoint:
-				tempTilePosition = InformationManager.Instance().getNextSuppleLocation();
+			case LastBuilingPoint: //TODO 이놈이 마지막이니까.... NULL 일수가 없다.
+				tempTilePosition = InformationManager.Instance().getLastBuilingLocation();
+
+//				if(buildingType == UnitType.Terran_Supply_Depot){
+//					tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
+//				}
+//				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				
+				
 				if (tempTilePosition != null) {
 					//System.out.println("I choose here: " + tempTilePosition.toString());
 					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				}
+//				else{
+//					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+//				}
+				break;
+				
+			case NextSupplePoint: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+				
+				if(buildingType == UnitType.Terran_Supply_Depot){
+					tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
+				
+					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				
+					if(desiredPosition == null){
+						BuildManager.Instance().NextSupplePointFull = true;
+					}
+					break;
 				}else{
-					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+					tempTilePosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
 				}
 				break;
+			
+			case getLastBuilingFinalLocation: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+			
+				tempTilePosition = InformationManager.Instance().getLastBuilingFinalLocation();
+				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+			break;
+					
 			default:
 				break;
 			}
@@ -576,7 +610,7 @@ public class ConstructionPlaceFinder {
 				b.getType() == UnitType.Terran_Starport ||
 				b.getType() == UnitType.Terran_Science_Facility)
 			{
-				width += 2;
+				width += 3;
 			}
 
 			// 상하좌우에 buildingGapSpace 만큼 간격을 띄운다

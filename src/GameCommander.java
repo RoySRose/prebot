@@ -181,6 +181,9 @@ public class GameCommander {
 				{
 					CommandUtil.attackMove(myUnit, unit.getPosition());
 				}
+				if(myUnit.getType() == UnitType.Terran_Barracks && unit.isCompleted()){
+					myUnit.setRallyPoint(unit.getPosition());
+				}
 			}
 		}
 		

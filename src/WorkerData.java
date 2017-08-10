@@ -33,7 +33,7 @@ public class WorkerData {
 	double mineralAndMineralWorkerRatio;						
 	
 	/// 일꾼 목록
-	private ArrayList<Unit> workers = new ArrayList<Unit>();
+	public ArrayList<Unit> workers = new ArrayList<Unit>();
 	/// ResourceDepot 목록
 	private ArrayList<Unit> depots = new ArrayList<Unit>();
 	
@@ -56,7 +56,7 @@ public class WorkerData {
 	//미네랄 일꾼
 	private Map<Integer, Unit> workerMineralMap = new HashMap<Integer, Unit>();
 	//Gas 일꾼 
-	private Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
+	public Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	private Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	

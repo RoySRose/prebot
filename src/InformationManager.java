@@ -903,23 +903,84 @@ public class InformationManager {
 	}
 	
 
-	public TilePosition getNextSuppleLocation() {
+	public TilePosition getLastBuilingLocation() {
 		
 		TilePosition res = null;
 		
+		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
 		BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
+		List<BaseLocation> occupiedBaseLocation = occupiedBaseLocations.get(selfPlayer);
 		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
 		
-		double tempDistance;
-		double sourceDistance;
+		double tempDistance =0;
+		double sourceDistance =0 ;
 		double closestDistance = 1000000000;
 		
 		for (BaseLocation targetBaseLocation : BWTA.getStartLocations())
 		{
-			if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
-			if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
-			if (hasBuildingAroundBaseLocation(targetBaseLocation,selfPlayer,6) == true) continue;
-			if (hasBuildingAroundBaseLocation(targetBaseLocation,enemyPlayer,6) == true) continue;
+			if (targetBaseLocation.getTilePosition().equals(mainBaseLocation.getTilePosition())) continue;
+			if (targetBaseLocation.getTilePosition().equals(enemyBaseLocation.getTilePosition())) continue;
+			
+			for(BaseLocation myex : occupiedBaseLocation){
+				if (myex.getTilePosition().equals(mainBaseLocation.getTilePosition())) continue;
+				
+				if(targetBaseLocation.getTilePosition().equals(myex.getTilePosition())){
+					res = myex.getRegion().getCenter().toTilePosition();
+					return res;
+				}
+			}
+			continue;
+		}
+		
+		
+		if(res == null){
+			tempDistance =0;
+			sourceDistance =0 ;
+			closestDistance = 1000000000;
+			
+			for (BaseLocation targetBaseLocation : BWTA.getStartLocations())
+			{
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
+				if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition())) continue;
+				
+				sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
+				tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
+				
+				if (tempDistance < closestDistance && sourceDistance > 0) {
+					closestDistance = tempDistance;
+					res = targetBaseLocation.getRegion().getCenter().toTilePosition();
+				}
+			}
+		}
+		
+		return res;
+	}
+	
+	public TilePosition getLastBuilingFinalLocation() {
+		
+		TilePosition res = null;
+		
+		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
+		BaseLocation sourceBaseLocation = firstExpansionLocation.get(selfPlayer);
+		List<BaseLocation> occupiedBaseLocation = occupiedBaseLocations.get(selfPlayer);
+		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
+		
+		double tempDistance =0;
+		double sourceDistance =0 ;
+		double closestDistance = 1000000000;
+		
+		for (BaseLocation targetBaseLocation : BWTA.getStartLocations())
+		{
+			if (targetBaseLocation.getTilePosition().equals(mainBaseLocation.getTilePosition())) continue;
+			if (targetBaseLocation.getTilePosition().equals(enemyBaseLocation.getTilePosition())) continue;
+			
+			for(BaseLocation myex : occupiedBaseLocation){
+				if (myex.getTilePosition().equals(mainBaseLocation.getTilePosition())) continue;
+				
+				if(targetBaseLocation.getTilePosition().equals(myex.getTilePosition())){
+					continue;
+				}
+			}
 			
 			sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
 			tempDistance = sourceDistance - enemyBaseLocation.getGroundDistance(targetBaseLocation);
@@ -928,10 +989,14 @@ public class InformationManager {
 				closestDistance = tempDistance;
 				res = targetBaseLocation.getRegion().getCenter().toTilePosition();
 			}
+			
+			res = targetBaseLocation.getRegion().getCenter().toTilePosition();
 		}
 		
 		return res;
 	}
+
+
 
 	public void updateChokePointAndExpansionLocation() {
 		
