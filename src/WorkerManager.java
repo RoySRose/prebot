@@ -22,8 +22,6 @@ public class WorkerManager {
 	/// 일꾼 중 한명을 Repair Worker 로 정해서, 전체 수리 대상을 하나씩 순서대로 수리합니다
 	private Unit currentRepairWorker = null;
 	
-	private int numResourceAssigned = 0;
-	
 	private static WorkerManager instance = new WorkerManager();
 	
 	/// static singleton 객체를 리턴합니다
@@ -156,6 +154,7 @@ public class WorkerManager {
 
 	public void handleGasWorkers()
 	{
+		int numResourceAssigned = 0;
 		if(MyBotModule.Broodwar.getFrameCount() < 8000){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
@@ -639,6 +638,9 @@ public class WorkerManager {
 				double distance = unit.getDistance(refinery);
 				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false))
 				{
+					if(unit.isCarryingGas() == true){
+						distance = 0;
+					}
 					closestWorker = unit;
 					closestDistance = distance;
 				}
@@ -676,6 +678,10 @@ public class WorkerManager {
 			// worker 가 2개 이상이면, avoidWorkerID 는 피한다
 			if (workerData.getWorkers().size() >= 2 && avoidWorkerID != 0 && unit.getID() == avoidWorkerID) continue;
 
+			//1.3 worker 에너지 20이이하면 다시 추출안한다.
+			if(unit.getHitPoints() < 20)
+				continue;
+			
 			// Move / Idle Worker
 			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle))
 			{
@@ -689,9 +695,7 @@ public class WorkerManager {
 					}
 				}
 			}
-			//1.3 worker 에너지 20이이하면 다시 추출안한다.
-			if(unit.getHitPoints() < 20)
-				continue;
+			
 
 			// Move / Idle Worker 가 없을때, 다른 Worker 중에서 차출한다
 			/*
