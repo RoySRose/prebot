@@ -221,7 +221,7 @@ public class WorkerManager {
 						}
 					// if it's less than we want it to be, fill 'er up
 					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-					}else{
+					}else{ 
 						int needWorker = 3 - (10 - (numResourceAssigned+numRefAssigned) );
 						if(needWorker > 3){
 							needWorker = 3;
