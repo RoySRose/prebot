@@ -229,12 +229,40 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init
 				&& StrategyManager.Instance().getLastStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
 			//컴맨드 추가
-			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
 			}
 		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init
+				&& StrategyManager.Instance().getLastStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush){
+			//컴맨드 추가
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
+			}
+		}
+		
+
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.Init
+				&& StrategyManager.Instance().getLastStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
+			//컴맨드 추가
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 1){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
+			}
+		}
+		
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush
 				||StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){

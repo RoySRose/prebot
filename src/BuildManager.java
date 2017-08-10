@@ -5,7 +5,6 @@ import java.util.Map;
 
 import bwapi.Pair;
 import bwapi.Position;
-import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
@@ -28,9 +27,24 @@ public class BuildManager {
 
 	private static BuildManager instance = new BuildManager();
 
+	public Boolean MainBaseLocationFull;
+	public Boolean FirstChokePointFull;
+	public Boolean FirstExpansionLocationFull;
+	public Boolean SecondChokePointFull;
+	public Boolean NextSupplePointFull;
+	
 	/// static singleton 객체를 리턴합니다
 	public static BuildManager Instance() {
 		return instance;
+	}
+	
+	public BuildManager() {
+		MainBaseLocationFull = false;
+		FirstChokePointFull = false;
+		FirstExpansionLocationFull = false;
+		SecondChokePointFull = false;
+		NextSupplePointFull = false;
+		
 	}
 
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
@@ -476,6 +490,51 @@ public class BuildManager {
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
 		
+		switch (seedPositionStrategy) {
+		case MainBaseLocation:
+			if(MainBaseLocationFull == true){
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			}
+			break;
+//		case MainBaseBackYard:
+//			//seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
+//			break;
+		case FirstChokePoint:
+			if(FirstChokePointFull == true){
+				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			}
+			break;
+		case FirstExpansionLocation:
+			if(FirstExpansionLocationFull == true){
+				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			}
+			break;
+		case SecondChokePoint:
+			if(SecondChokePointFull == true){
+				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			}
+			break;
+		case NextExpansionPoint:
+			break;
+			
+		case NextSupplePoint:
+			if(NextSupplePointFull == true){
+				if(MainBaseLocationFull == true){
+					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
+				}else{
+					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+				}
+			}
+			break;
+			
+		case LastBuilingPoint:
+			seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+			break;
+			
+		default:
+			break;
+		}
+		
 		TilePosition desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 		/*
 		 * std::cout +
@@ -492,25 +551,28 @@ public class BuildManager {
 
 			switch (seedPositionStrategy) {
 			case MainBaseLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;//TODO 다음 검색 위치
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
 				break;
 			case MainBaseBackYard:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
 			case FirstChokePoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
 			case FirstExpansionLocation:
-				findAnotherPlace = false;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
 			case SecondChokePoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NextSupplePoint;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
-			case NextExpansionPoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
+			case LastBuilingPoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
 				break;
 				
+			case NextExpansionPoint:
+			case NextSupplePoint:
 			case SeedPositionSpecified:
+			case getLastBuilingFinalLocation:
 			default:
 				findAnotherPlace = false;
 				break;
@@ -916,7 +978,7 @@ public class BuildManager {
 							if(currentItem.metaType.getUnitType() == unit.getType()){
 								getAddonCnt++;
 							}
-							if(ProducerType == unit.getType()){
+							if(ProducerType == unit.getType() && unit.isCompleted()){
 								getAddonPossibeCnt++;
 							}
 						}
