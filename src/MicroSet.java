@@ -3,6 +3,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
@@ -24,7 +25,7 @@ public class MicroSet {
 		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // 15마리
 		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
 
-		public static final int IGNORE_MOVE_FRAME = 3 * 24; // 3초
+		public static final int IGNORE_MOVE_FRAME = 5 * 24; // 5초
 
 		// TODO 변동 값
 	    public static int maxNumWatcher = 50;
@@ -38,6 +39,17 @@ public class MicroSet {
 		public static final int MINE_BETWEEN_DIST = 50;
 		public static final int MINE_REMOVE_TANK_DIST = 150;
 		public static final int RESV_EXPIRE_FRAME = 24 * 3;
+		
+		public static final int VULTURE_JOIN_SQUAD_FRAME = 15 * 24;
+		public static final int VULTURE_JOIN_SQUAD_FRAME_TERRAN = 20 * 24;
+		
+		public static int getVultureJoinSquadFrame(Race race) {
+			if (race == Race.Terran) {
+				return VULTURE_JOIN_SQUAD_FRAME_TERRAN;
+			} else {
+				return VULTURE_JOIN_SQUAD_FRAME;
+			}
+		}
 	}
 	
 	public static class Tank {
@@ -56,12 +68,17 @@ public class MicroSet {
 	}
 	
 	public static class Common {
+		
+		public static final int DEFENSE_SECONDCHOKE_SIZE = 10;
+		public static final int DEFENSE_READY_TO_ATTACK_SIZE = 15;
+		
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
 		public static final double BACKOFF_DIST_DEF_TOWER = 120.0;
 		public static final double BACKOFF_DIST_RANGE_ENEMY = 180.0;
 		
 		public static final int TANK_SQUAD_SIZE = 2;
 		public static final int MAIN_SQUAD_COVERAGE = 150;
+		public static final int MAIN_SQUAD_COVERAGE2 = 250;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 		
 		public static final int NO_UNIT_FRAME = 15 * 24;

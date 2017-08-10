@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Order;
+import bwapi.Pair;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -49,7 +50,7 @@ class Combat {
 	public static final int WATCHER_RADIUS = 300;
 	public static final int CHECKER_RADIUS = 150;
 	public static final int GUERILLA_RADIUS = 300;
-	public static final int BASE_DEFENSE_RADIUS = 400; // 32 * 25
+	public static final int BASE_DEFENSE_RADIUS = 500; // 32 * 25
 	public static final int SCOUT_DEFENSE_RADIUS = 600;
 	public static final int MARINE_RADIUS = 300;
 	public static final int WRAITH_RADIUS = 300;
@@ -499,9 +500,9 @@ public class CombatManager {
 			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
 			
 			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-			if (tankCount + goliathCount >= 15) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
+			if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
 				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-			} else if (tankCount + goliathCount >= 10 || InformationManager.Instance().enemyRace == Race.Terran) {
+			} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_SECONDCHOKE_SIZE || InformationManager.Instance().enemyRace == Race.Terran) {
 				mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
 			} else {
 				mainAttackLocation = getDefensePosition(squad);
@@ -543,9 +544,19 @@ public class CombatManager {
 			}
 		}
 		if (defensePosition == null) {
-//			defensePosition = firstChoke.getCenter();
 			BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-			defensePosition = myBase.getPosition();
+			
+			Pair<Position, Position> pairPosition = firstChoke.getSides();
+			Position p1 = new Position(pairPosition.first.getX(), pairPosition.second.getY());
+			Position p2 = new Position(pairPosition.second.getX(), pairPosition.first.getY());
+			
+			if (p1.isValid() && BWTA.getRegion(p1) == myBase.getRegion()) {
+				return p1;
+			} else if (p2.isValid() && BWTA.getRegion(p2) == myBase.getRegion()) {
+				return p2;
+			} else {
+				return firstChoke.getCenter();
+			}
 		}
 		return defensePosition;
 	}
@@ -883,6 +894,7 @@ public class CombatManager {
 			earlyDefenseSquad.clear();
 	    }
 	}
+	
 	private void updateBaseDefenseSquads() {
 		
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
@@ -899,6 +911,24 @@ public class CombatManager {
 			Position regionCenter = myRegion.getCenter();
 			if (!regionCenter.isValid()) {
 				continue;
+			}
+			
+			boolean doNotAssignMechanicUnit = false;
+			
+			// 초반 방어모드에서 앞마당 방어스쿼드를 위해 메카닉 유닛을 할당하지 않는다.
+			// (왜냐하면 메인공격스쿼드의 위치가 곧 방어스쿼드의 위치이며, 메인공격스쿼드의 특성을 활용하기 위해서이다.)
+			if (combatStrategy == CombatStrategy.DEFENCE_INSIDE || combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+				BaseLocation expansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+				
+				int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
+				
+				int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+				
+				if (tankCount + goliathCount < MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE && expansion != null && regionCenter.equals(expansion.getRegion().getCenter())) {
+//					System.out.println("do not assign mechanic units for first expansion defense");
+					doNotAssignMechanicUnit = true;
+				}
 			}
 			
 			List<Unit> enemyUnitsInRegion = new ArrayList<>();
@@ -985,7 +1015,7 @@ public class CombatManager {
 //				updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, false);
 //			}else{
 //			System.out.println("squadName: " + squadName + ", " + "groundDefendersNeeded" + groundDefendersNeeded);
-			updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, pullWorkers);
+			updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, pullWorkers, doNotAssignMechanicUnit);
 //			}
 //			for (Unit marine : defenseSquad.getUnitSet()){
 //				System.out.println("marine: " + marine.getID());
@@ -1016,7 +1046,7 @@ public class CombatManager {
 		return closestMineralWorker;
 	}
 	
-	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers) {
+	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers, boolean doNotAssignMechanicUnit) {
 		// if there's nothing left to defend, clear the squad
 		if (flyingDefendersNeeded <= 0 && groundDefendersNeeded <= 0) {
 			defenseSquad.clear();
@@ -1038,7 +1068,7 @@ public class CombatManager {
 		// add flying defenders if we still need them
 		int flyingDefendersAdded = 0;
 		while (flyingDefendersNeeded > flyingDefendersInSquad + flyingDefendersAdded) {
-			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), true, false);
+			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), true, false, doNotAssignMechanicUnit);
 
 			// if we find a valid flying defender, add it to the squad
 			if (defenderToAdd != null) {
@@ -1053,7 +1083,7 @@ public class CombatManager {
 		// add ground defenders if we still need them
 		int groundDefendersAdded = 0;
 		while (groundDefendersNeeded > groundDefendersInSquad + groundDefendersAdded) {
-			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, false);
+			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, false, doNotAssignMechanicUnit);
 
 			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
@@ -1087,12 +1117,14 @@ public class CombatManager {
 	    mainAttackSquad.setOrder(mainAttackOrder);
 	}
 	
-	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers) {
+	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers, boolean doNotAssignMechanicUnit) {
 		Unit closestDefender = null;
 		int minDistance = 99999;
 
 		for (Unit unit : combatUnits) {
-			
+			if (doNotAssignMechanicUnit && MicroUtils.isFactoryUnit(unit.getType())) {
+				continue;
+			}
 			if ((flyingDefender && !CommandUtil.CanAttackAir(unit)) ||
 				(!flyingDefender && !CommandUtil.CanAttackGround(unit))) {
 	            continue;

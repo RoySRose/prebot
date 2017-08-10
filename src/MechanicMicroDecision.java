@@ -213,9 +213,6 @@ public class MechanicMicroDecision {
 
 	public static MechanicMicroDecision makeDecision(Unit mechanicUnit, List<UnitInfo> enemiesInfo, List<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
 		
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(2000);
-		
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
 //		int dangerousSiegeTankCount = 0;
@@ -279,7 +276,6 @@ public class MechanicMicroDecision {
 					}
 					
 					if (distanceToNearEnemy < safeDistance) {
-						lag.estimate();
 						return MechanicMicroDecision.makeDecisionToFlee(enemyPosition);
 					}
 //					else if ((enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode)
@@ -333,10 +329,8 @@ public class MechanicMicroDecision {
 		}
 		
 		if (bestTargetInfo == null) {
-			lag.estimate();
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
-			lag.estimate();
 			return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
 		}
 	}

@@ -20,6 +20,13 @@ import bwta.Region;
 
 public class MicroUtils {
 	
+	public static boolean isFactoryUnit(UnitType unitType) {
+		return unitType == UnitType.Terran_Vulture
+				|| unitType == UnitType.Terran_Siege_Tank_Siege_Mode
+				|| unitType == UnitType.Terran_Siege_Tank_Tank_Mode
+				|| unitType == UnitType.Terran_Goliath;
+	}
+	
 	public static Unit getUnitIfVisible(UnitInfo enemyInfo) {
 		Unit enemy = MyBotModule.Broodwar.getUnit(enemyInfo.getUnitID()); // 보이는 적에 대한 조건
 		boolean canSee = enemy != null && enemy.getType() != UnitType.Unknown;
@@ -231,11 +238,12 @@ public class MicroUtils {
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
 		boolean approachKiting = false;
-		if (target.getType().isBuilding()) {
+		if ((target.getType().isBuilding() && target.getType() != UnitType.Zerg_Hatchery) // 해처리 라바때문에 마인 폭사함
+				|| target.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
 			approachKiting = true;
 			haveToAttack = true;
 			
-		} else if (rangedUnit.getType() == UnitType.Terran_Vulture && target.getType() == UnitType.Terran_Vulture) {
+		} else if (rangedUnit.getType() == UnitType.Terran_Vulture && MicroUtils.isFactoryUnit(target.getType())) {
 			haveToAttack = true;
 			
 		} else if (rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
@@ -346,10 +354,6 @@ public class MicroUtils {
 	 */
 	private static Position getFleePosition(Unit rangedUnit, Position targetPosition, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		
-		boolean estimateResult = false;
-		LagTest lag = LagTest.startTest(true);
-		lag.setDuration(2000);
-		
 		int reverseX = rangedUnit.getPosition().getX() - targetPosition.getX(); // 타겟과 반대로 가는 x양
 		int reverseY = rangedUnit.getPosition().getY() - targetPosition.getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
@@ -364,7 +368,6 @@ public class MicroUtils {
 		int moveCalcSize = moveDistPerSec; // 이동 회피지점의 거리 = 유닛의 초당이동거리
 		int riskRadius = MicroSet.RiskRadius.getRiskRadius(rangedUnit.getType());
 
-		lag.estimate();		
 		while (safePosition == null && moveCalcSize > 10) {
 			for(int i = 0 ; i< FLEE_ANGLE.length; i ++) {
 			    Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
@@ -386,7 +389,6 @@ public class MicroUtils {
 					minimumDistanceToGoal = distanceToGoal;
 				}
 				fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
-				lag.estimate();
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
 //		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);

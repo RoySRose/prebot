@@ -57,6 +57,9 @@ public class MicroVessel extends MicroManager {
 		Position originalPos = order.getPosition();
 				
 		for (Unit sVessel : sVessels) {
+			if (!CommonUtils.executeUnitRotation(sVessel, LagObserver.groupsize())) {
+				continue;
+			}
 			
 			//싸베 디펜시브 매트릭스 쓰기
 			if(sVessel.getEnergy() > 100){
