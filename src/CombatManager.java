@@ -373,67 +373,64 @@ public class CombatManager {
 		}
 		
 		Unit comsat = null;
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() == 200) {
-				comsat = unit;
-			}
-		}
-		if (comsat != null) {
-			
-			Player enemyPlayer = MyBotModule.Broodwar.enemy();
-			Player selfPlayer = MyBotModule.Broodwar.enemy();
-			//find place
-			List<TilePosition> scanArea = new ArrayList<TilePosition>();
-			
-			if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
-				scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
-			}
-			if(InformationManager.Instance().getFirstChokePoint(enemyPlayer)!=null){
-				scanArea.add(InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
-			}
-			if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
-				scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
-			}
-			if(InformationManager.Instance().getSecondChokePoint(enemyPlayer)!=null){
-				scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter().toTilePosition());
-			}
-			if(InformationManager.Instance().getSecondChokePoint(selfPlayer)!=null){
-				scanArea.add(InformationManager.Instance().getSecondChokePoint(selfPlayer).getCenter().toTilePosition());
-			}
-			if(InformationManager.Instance().getIslandBaseLocations() !=null ){
-				for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
-					scanArea.add(islands.getTilePosition());
-				}
-			}
-			
-			TilePosition target = null;
-			int scantime = 1000000;
-			if(scanArea!= null){
-				for (TilePosition scans : scanArea) {
-					if(MyBotModule.Broodwar.isVisible(scans)){
-						continue;
-					}
-					int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
-					if(scantime > tempscantime){
-						target = scans;
-						scantime = tempscantime;
-					}
-				}
-			}		
-			
-			if(target!= null){
-				MapGrid.Instance().scanAtPosition(target.toPosition());
-				comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
-			}
-		}
-	
+		
+//		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//			if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() == 200) {
+//				comsat = unit;
+//			}
+//		}
+//		if (comsat != null) {
+//			
+//			Player enemyPlayer = MyBotModule.Broodwar.enemy();
+//			Player selfPlayer = MyBotModule.Broodwar.enemy();
+//			//find place
+//			List<TilePosition> scanArea = new ArrayList<TilePosition>();
+//			
+////			if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+////				scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
+////			}
+////			if(InformationManager.Instance().getFirstChokePoint(enemyPlayer)!=null){
+////				scanArea.add(InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
+////			}
+////			if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+////				scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
+////			}
+////			if(InformationManager.Instance().getSecondChokePoint(enemyPlayer)!=null){
+////				scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter().toTilePosition());
+////			}
+////			if(InformationManager.Instance().getSecondChokePoint(selfPlayer)!=null){
+////				scanArea.add(InformationManager.Instance().getSecondChokePoint(selfPlayer).getCenter().toTilePosition());
+////			}
+//			
+//			
+//			TilePosition target = null;
+//			int scantime = 1000000;
+//			if(scanArea!= null){
+//				for (TilePosition scans : scanArea) {
+//					if(MyBotModule.Broodwar.isVisible(scans)){
+//						continue;
+//					}
+//					int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
+//					if(scantime > tempscantime){
+//						target = scans;
+//						scantime = tempscantime;
+//					}
+//				}
+//			}		
+//			
+//			if(target!= null){
+//				MapGrid.Instance().scanAtPosition(target.toPosition());
+//				comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+//			}
+//		}
+		
 		
 		//저그전 특이사항
-		if(InformationManager.Instance().enemyRace == Race.Zerg && (AnalyzeStrategy.Instance().hydraStrategy == false || AnalyzeStrategy.Instance().multalStrategy == false)){
+		if(InformationManager.Instance().enemyRace == Race.Zerg){
 			
 			int energy = 50;
 			if(RespondToStrategy.Instance().enemy_lurker == true){
-				energy = 100;
+				energy = 150;
 			}
 			
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -465,6 +462,13 @@ public class CombatManager {
 							target = scans;
 							scantime = tempscantime;
 						}
+						if(MyBotModule.Broodwar.getFrameCount() > 20000){
+							if(InformationManager.Instance().getIslandBaseLocations() !=null ){
+								for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
+									scanArea.add(islands.getTilePosition());
+								}
+							}
+						}
 					}
 				}		
 				if(target!= null){
@@ -474,6 +478,126 @@ public class CombatManager {
 				
 			}
 		}
+		
+		//폴토전 특이사항
+		if(InformationManager.Instance().enemyRace == Race.Protoss){
+			
+			int energy = 50;
+			if(RespondToStrategy.Instance().enemy_dark_templar == true){
+				energy = 150;
+			}
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() > energy) {
+					comsat = unit;
+				}
+			}
+			if (comsat != null) {
+			
+				Player enemyPlayer = MyBotModule.Broodwar.enemy();
+				//find place
+				List<TilePosition> scanArea = new ArrayList<TilePosition>();
+				
+				if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
+				}
+				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
+				}
+				if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
+				}
+				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter().toTilePosition());
+				}
+				if(MyBotModule.Broodwar.getFrameCount() > 20000){
+					if(InformationManager.Instance().getIslandBaseLocations() !=null ){
+						for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
+							scanArea.add(islands.getTilePosition());
+						}
+					}
+				}
+				TilePosition target = null;
+				int scantime = 1000000;
+				if(scanArea!= null){
+					for (TilePosition scans : scanArea) {
+						if(MyBotModule.Broodwar.isVisible(scans)){
+							continue;
+						}
+						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
+						if(scantime > tempscantime){
+							target = scans;
+							scantime = tempscantime;
+						}
+					}
+				}		
+				if(target!= null){
+					MapGrid.Instance().scanAtPosition(target.toPosition());
+					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+				}
+				
+			}
+		}
+				
+		//테란 특이사항
+		if(InformationManager.Instance().enemyRace == Race.Terran){
+			
+			int energy = 50;
+			if(RespondToStrategy.Instance().enemy_wraith == true){
+				energy = 150;
+			}
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == UnitType.Terran_Comsat_Station &&	unit.getEnergy() > energy) {
+					comsat = unit;
+				}
+			}
+			if (comsat != null) {
+			
+				Player enemyPlayer = MyBotModule.Broodwar.enemy();
+				//find place
+				List<TilePosition> scanArea = new ArrayList<TilePosition>();
+				
+				if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
+				}
+				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
+				}
+				if(InformationManager.Instance().getMainBaseLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
+				}
+				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
+					scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter().toTilePosition());
+				}
+				if(MyBotModule.Broodwar.getFrameCount() > 20000){
+					if(InformationManager.Instance().getIslandBaseLocations() !=null ){
+						for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
+							scanArea.add(islands.getTilePosition());
+						}
+					}
+				}
+				TilePosition target = null;
+				int scantime = 1000000;
+				if(scanArea!= null){
+					for (TilePosition scans : scanArea) {
+						if(MyBotModule.Broodwar.isVisible(scans)){
+							continue;
+						}
+						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
+						if(scantime > tempscantime){
+							target = scans;
+							scantime = tempscantime;
+						}
+					}
+				}		
+				if(target!= null){
+					MapGrid.Instance().scanAtPosition(target.toPosition());
+					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+				}
+			}
+		}
+				
 	}
 	
 	public Position getMainAttackLocation(Squad squad) {

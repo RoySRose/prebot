@@ -1,3 +1,5 @@
+import java.util.List;
+
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
@@ -372,11 +374,70 @@ public class BlockingEntrance {
 		}
 	}
 	
+	
+	public final TilePosition getSupplyPosition(TilePosition tilepos)
+	{
+		int startingX = tilepos.getX();
+		int startingY = tilepos.getY();
+		int starting_int =10000;
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+			if(startingX == 10 && startingY == 6){
+				//11시부터 시계방향
+				starting_int = 0;
+			}else if(startingX == 70 && startingY == 8){
+				starting_int = 1;
+			}else if(startingX == 113 && startingY == 8){
+				starting_int = 2;
+			}else if(startingX == 114 && startingY == 80){
+				starting_int = 3;
+			}else if(startingX == 114 && startingY == 116){
+				starting_int = 4;
+			}else if(startingX == 63 && startingY == 117){
+				starting_int = 5;
+			}else if(startingX == 10 && startingY == 115){
+				starting_int = 6;
+			}else if(startingX == 8 && startingY == 47){
+				starting_int = 7;
+			}
+		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
+			if(startingX == 57 && startingY == 6){
+				//11시부터 시계방향
+				starting_int = 0;
+			}else if(startingX == 117 && startingY == 27){
+				starting_int = 1;
+			}else if(startingX == 27 && startingY == 118){
+				starting_int = 2;
+			}else if(startingX == 7&& startingY == 87){
+				starting_int = 3;
+			}
+		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
+			if(startingX == 7 && startingY == 6){
+				//11시부터 시계방향
+				starting_int = 0;
+			}else if(startingX == 117 && startingY == 7){
+				starting_int = 1;
+			}else if(startingX == 117 && startingY == 117){
+				starting_int = 2;
+			}else if(startingX == 7 && startingY == 116){
+				starting_int = 3;
+			}
+		}
+		
+		if(starting_int==10000){
+			return null;
+		}else{
+		//다음 포지션으ㅢ
+			TilePosition supply_pos= new TilePosition(fix_supplyX[starting_int], fix_supplyY[starting_int]);
+			return supply_pos;
+		}
+	}
+	
 	public final TilePosition getSupplyPosition()
 	{
-		TilePosition supply_pos= new TilePosition(fix_supplyX[starting_int], fix_supplyY[starting_int]);
-		return supply_pos;
+			TilePosition supply_pos= new TilePosition(fix_supplyX[starting_int], fix_supplyY[starting_int]);
+			return supply_pos;
 	}
+	
 	public void ReturnBuildSpacing() {
 		Config.BuildingSpacing = BuildingSpacingOld;
 		Config.BuildingResourceDepotSpacing = BuildingResourceDepotSpacingOld;

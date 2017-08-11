@@ -129,11 +129,11 @@ public class Config {
 
 	//전략 0  zergBasic
 	//전략 1  protossBasic
-	//전략 2  terranBasic                              //0  1 2  3 4 5  6  7 8  9  0 1 2 3 4  5 6 7 8 9 0  1 
-	public static final int[] vultureratio = new int[] {0, 5,0 ,0,2,0 ,0 ,5,0 ,0 ,5,5,2,5,10,8,3,0,8,9,10,8}; //기본전략 벌쳐 비, 예 vultureratio[0] 은 BasicvsZerg 에서의 비율
-	public static final int[] tankratio    = new int[] {2, 5,2 ,3,2,2 ,2 ,6,2 ,1 ,6,5,3,5,2 ,2,3,3,2,2,2 ,4}; //기본전략 탱크 비
-	public static final int[] goliathratio = new int[] {10,2,10,9,8,10,10,2,10,11,1,0,7,0,0 ,2,6,9,2,1,0 ,0}; //기본전략 골리앗 비
-	public static final int[] wgt          = new int[] {1, 1,1 ,1,1,1 ,1 ,1,1 ,1 ,1,1,1,1,1 ,1,1,1,1,1,1 ,1}; //기본전략 우선순위 1벌쳐, 2탱크, 3골리앗
+	//전략 2  terranBasic                              //0  1 2  3 4 5  6  7 8  9  0 1 2 3 4  5 6 7 8 9  
+	public static final int[] vultureratio = new int[] {0, 5,0 ,0,2,0 ,0 ,5,0 ,0 ,5,5,2,5,10,5,5,5,5,1}; //기본전략 벌쳐 비, 예 vultureratio[0] 은 BasicvsZerg 에서의 비율
+	public static final int[] tankratio    = new int[] {2, 5,2 ,3,2,2 ,2 ,6,2 ,1 ,6,5,3,5,2 ,5,5,5,5,4}; //기본전략 탱크 비
+	public static final int[] goliathratio = new int[] {10,2,10,9,8,10,10,2,10,11,1,0,7,0,0 ,0,0,1,3,8}; //기본전략 골리앗 비
+	public static final int[] wgt          = new int[] {1, 1,1 ,1,1,1 ,1 ,1,1 ,1 ,1,1,1,1,1 ,1,1,1,1,3}; //기본전략 우선순위 1벌쳐, 2탱크, 3골리앗
 
 															  // 0 1  2  3 4  5 6 7 8 9 0 1 2  3 4 5 6 7 8 9 0 1 2 3 
 	public static final int[] vultureratioexception = new int[] {6,0 ,0 ,7,0 ,6,2,9,9,8,7,7,10,6,6,0,3,0,0,0,0,0,0,0}; //예외전략 벌쳐 비, 예 vultureratio[0] 은 
@@ -160,15 +160,12 @@ public class Config {
 //	,protossBasic
 //	,protossBasic_Carrier
 //	,protossBasic_Templer
-//14	,terranBasic
-//	,terranBasic_AirUnit
-//	,terranBasic_AirUnitPlus
-//	,terranBasic_BattleCruiser
-//18	,terranBasic_DropShip
-//	,terranBasic_NoSearch
-//	,terranBasic_ReverseRush
+//14,terranBasic
 //	,terranBasic_Bionic
-	
+//	,terranBasic_Mechanic
+//	,terranBasic_MechanicWithWraith
+//	,terranBasic_MechanicWithWraithMany
+//	,terranBasic_BattleCruiser	
 	
 //0	zergException_FastLurker
 //	,zergException_Guardian

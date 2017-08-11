@@ -33,6 +33,7 @@ public class ConstructionPlaceFinder {
 	
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
+	private Set<TilePosition> tilesToAvoidAbsoluteForFirstGas = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -42,6 +43,7 @@ public class ConstructionPlaceFinder {
 	public static ConstructionPlaceFinder Instance() {
 		if (isInitialized == false) {
 			instance.setTilesToAvoid();
+			instance.setTilesToAvoidAbsoluteForFirstGas();
 			isInitialized = true;
 		}
 		return instance;
@@ -222,10 +224,14 @@ public class ConstructionPlaceFinder {
 			case LastBuilingPoint: //TODO 이놈이 마지막이니까.... NULL 일수가 없다.
 				tempTilePosition = InformationManager.Instance().getLastBuilingLocation();
 
-//				if(buildingType == UnitType.Terran_Supply_Depot){
-//					tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
-//				}
-//				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				if(buildingType == UnitType.Terran_Supply_Depot){
+					if(BuildManager.Instance().NextSupplePointFull == true){
+						tempTilePosition = BlockingEntrance.Instance().getSupplyPosition(tempTilePosition);
+						desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+					
+						break;
+					}
+				}
 				
 				
 				if (tempTilePosition != null) {
@@ -240,14 +246,15 @@ public class ConstructionPlaceFinder {
 			case NextSupplePoint: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
 				
 				if(buildingType == UnitType.Terran_Supply_Depot){
-					tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
-				
-					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
-				
-					if(desiredPosition == null){
-						BuildManager.Instance().NextSupplePointFull = true;
+					if(BuildManager.Instance().NextSupplePointFull != true){
+						tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
+						desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+					
+						if(desiredPosition == null){
+							BuildManager.Instance().NextSupplePointFull = true;
+						}
+						break;
 					}
-					break;
 				}else{
 					tempTilePosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition();
 				}
@@ -295,7 +302,7 @@ public class ConstructionPlaceFinder {
 		
 		if(buildingType == UnitType.Terran_Supply_Depot){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
-		}else{
+		}else{ 
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();	
 		}
 		
@@ -660,6 +667,11 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
+					
+					if (isTilesToAvoidAbsoluteForFirstGas(x, y)) {
+						return false;
+					}
+					
 				}
 			}
 		}
@@ -964,6 +976,16 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
+	public final boolean isTilesToAvoidAbsoluteForFirstGas(int x, int y)
+	{
+		for (TilePosition t : tilesToAvoidAbsoluteForFirstGas) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 찾아 _tilesToAvoid 에 저장합니다<br>
 	/// BaseLocation 과 Geyser 사이, ResourceDepot 건물과 Mineral 사이 공간으로 건물 건설 장소를 정하면<br> 
@@ -1117,9 +1139,33 @@ public class ConstructionPlaceFinder {
 		}
 	}
 	
+	public void clearTilesToAvoidAbsoluteForFirstGas()
+	{
+		tilesToAvoidAbsoluteForFirstGas.clear();
+	}
+	public void setTilesToAvoidAbsoluteForFirstGas()
+	{
+		Unit firstgas = InformationManager.Instance().getMyfirstGas();
+	
+		int fromx = firstgas.getTilePosition().getX()-1;
+		int fromy = firstgas.getTilePosition().getY()-1;
+		
+		for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
+	        {
+	            for (int y = fromy ; y > 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
+	            {
+				TilePosition temp = new TilePosition(x,y);
+				tilesToAvoidAbsoluteForFirstGas.add(temp);
+			}
+		}
+	}
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들의 목록을 리턴합니다		
 	public Set<TilePosition> getTilesToAvoid() {
 		return tilesToAvoid;
+	}
+	
+	public Set<TilePosition> getTilesToAvoidAbsoluteForFirstGas() {
+		return tilesToAvoidAbsoluteForFirstGas;
 	}
 
 	public void setTilesToAvoidFac(Unit unit) {

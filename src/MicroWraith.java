@@ -310,6 +310,8 @@ public class MicroWraith extends MicroManager {
 						|| enemyunits.getType() == UnitType.Terran_Goliath
 						|| enemyunits.getType() == UnitType.Terran_Marine
 						|| enemyunits.getType() == UnitType.Terran_Wraith
+						|| enemyunits.getType() == UnitType.Terran_Marine
+						|| (enemyunits.getType() == UnitType.Terran_Bunker && enemyunits.isLoaded())
 						 ){
 					if(distance<inrange){
 						risk += 100;
