@@ -175,17 +175,21 @@ public class RespondToStrategy {
 				if(blocked){
 					//입구 막혔으면 이미 한마리가 있음
 				}else{
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0){
-						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4
-								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) == 0){
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							}
 						}
 						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
+					}else{
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null) == 0) {
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, true);
 						}
 					}
 				}
@@ -376,12 +380,10 @@ public class RespondToStrategy {
 		}
 		
 		//terranException_Wraith start
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_Wraith){
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_WraithCloak){
 			enemy_wraith = true;
 		}
 	}
-		//terranException_Wraith end
-		
 		
 	public void RespondVsZerg() {	
 		
@@ -641,7 +643,10 @@ public class RespondToStrategy {
 		
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			need_valkyrie = true;
-			max_valkyrie = 6;
+			max_valkyrie = 5;
+		}else{
+			need_valkyrie = false;
+			max_valkyrie = 0;
 		}
 	}
 }

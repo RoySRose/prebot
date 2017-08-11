@@ -333,6 +333,11 @@ public class InformationManager {
 			if (enemyRace == Race.Unknown && unit.getPlayer() == enemyPlayer) {
 				enemyRace = unit.getType().getRace();
 			}
+			
+			if(unit.getPlayer() == selfPlayer && unit.getType() == UnitType.Terran_Vulture_Spider_Mine){
+				return;
+			}
+			
 			unitData.get(unit.getPlayer()).updateUnitInfo(unit);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -925,11 +930,10 @@ public class InformationManager {
 				if (myex.getTilePosition().equals(mainBaseLocation.getTilePosition())) continue;
 				
 				if(targetBaseLocation.getTilePosition().equals(myex.getTilePosition())){
-					res = myex.getRegion().getCenter().toTilePosition();
+					res = myex.getTilePosition();
 					return res;
 				}
 			}
-			continue;
 		}
 		
 		

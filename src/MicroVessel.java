@@ -177,10 +177,10 @@ public class MicroVessel extends MicroManager {
 			}
 			
 			if(!fleeing){
-				if(originalPos.getDistance(order.getPosition()) > 128){
+				if(originalPos.getDistance(sVessel.getPosition()) > 128){
 					order.setPosition(originalPos);
 				}
-				sVessel.move(order.getPosition());
+				CommandUtil.move(sVessel, order.getPosition());
 			} 
 		}
 	}

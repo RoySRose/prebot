@@ -66,13 +66,12 @@ public class StrategyManager {
 		,protossBasic_Carrier
 		,protossBasic_Templer
 		,terranBasic
-		,terranBasic_AirUnit
-		,terranBasic_AirUnitPlus
-		,terranBasic_BattleCruiser
-		,terranBasic_DropShip
-		,terranBasic_NoSearch
-		,terranBasic_ReverseRush
 		,terranBasic_Bionic
+		,terranBasic_Mechanic
+		,terranBasic_MechanicWithWraith
+		,terranBasic_MechanicWithWraithMany
+		,terranBasic_BattleCruiser	
+//		,terranBasic_ReverseRush
 		} //기본 전략 나열
 	public enum StrategysException { 
 		zergException_FastLurker
@@ -97,7 +96,7 @@ public class StrategyManager {
 		,protossException_Arbiter
 		,terranException_CheeseRush
 		,terranException_NuClear
-		,terranException_Wraith
+		,terranException_WraithCloak
 		,Init} //예외 전략 나열, 예외가 아닐때는 무조건 Init 으로 
 
 	/// static singleton 객체를 리턴합니다
@@ -120,7 +119,7 @@ public class StrategyManager {
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
 		CurrentStrategyBasic = Strategys.protossBasic_Carrier;
-		CurrentStrategyException = StrategysException.terranException_Wraith;
+		CurrentStrategyException = StrategysException.terranException_WraithCloak;
 	}
 	
 	public void setCurrentStrategyBasic(Strategys strategy) {
@@ -886,36 +885,44 @@ public class StrategyManager {
 		//armory end2
 
 		//marine for fast zergling and zealot start
-		if((CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0) && vulturecnt == 0 && marinecnt <= 4){
-			if(InformationManager.Instance().selfPlayer.allUnitCount(UnitType.Terran_Marine)
-					+ InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Bunker) * 4
-					- CombatManager.Instance().FastZerglingsInOurBase < 0){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, false);
+		if(CombatManager.Instance().FastZerglingsInOurBase > 0){
+			if(vulturecnt == 0){
+				if(marinecnt + InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Bunker) * 4
+						- CombatManager.Instance().FastZerglingsInOurBase < 0){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null) == 0) {
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, false);
+					}
 				}
 			}
-			
+			else{
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null) == 0) {
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, true);
+				}
+			}
 		}
 		//marine for fast zergling and zealot end
 		
 		//wraith for TvT start
 		if(RespondToStrategy.Instance().max_wraith > wraithcnt){
-			if(star == false){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
-					if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("make starport since we have many CC");
-					}
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
-				}
-			}
-			if(starComplete){
-				if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 1500 || wraithcnt < 2)){ //TODO && wraithcnt <= needwraith){
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+			
+			if(CC>=2){
+				if(star == false){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
 						if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("make wraith");
+						MyBotModule.Broodwar.printf("make starport since we have many CC");
 						}
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+					}
+				}
+				if(starComplete){
+					if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 1500 || wraithcnt < 2)){ //TODO && wraithcnt <= needwraith){
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+							if(Config.BroodwarDebugYN){
+							MyBotModule.Broodwar.printf("make wraith");
+							}
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
+						}
 					}
 				}
 			}

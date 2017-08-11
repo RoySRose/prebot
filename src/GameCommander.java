@@ -106,14 +106,14 @@ public class GameCommander {
 	public void onUnitCreate(Unit unit) { 
 		InformationManager.Instance().onUnitCreate(unit);
 		
-		if(unit.getType() == UnitType.Terran_Command_Center){
+		if(unit.getType() == UnitType.Terran_Command_Center  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
 		}
-		if(unit.getType() == UnitType.Terran_Factory){
+		if(unit.getType() == UnitType.Terran_Factory  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
 		}
 		
-		if(unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility){
+		if((unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility)  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidAddon(unit);
 		}
 	}
@@ -152,15 +152,20 @@ public class GameCommander {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
 		
-		if(unit.getType() == UnitType.Terran_Command_Center){
+		if(unit.getType() == UnitType.Terran_Command_Center  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			
 			if(CombatManager.Instance().getClosestMineral(unit)!=null){
 				unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
 			}
 		}
 		
+		if(unit.getType() == UnitType.Terran_Refinery  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
+			
+			ConstructionPlaceFinder.Instance().clearTilesToAvoidAbsoluteForFirstGas();
+		}
+		
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
-			if(unit.getType() == UnitType.Terran_Barracks){
+			if(unit.getType() == UnitType.Terran_Barracks  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 				for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
 				{
 					if ((myUnit.getType() == UnitType.Terran_Command_Center) && myUnit.isCompleted())
@@ -174,7 +179,7 @@ public class GameCommander {
 			}
 		}
 		
-		if(unit.getType() == UnitType.Terran_Bunker){
+		if(unit.getType() == UnitType.Terran_Bunker && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if ((myUnit.getType() == UnitType.Terran_Marine) && myUnit.isCompleted())

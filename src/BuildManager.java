@@ -565,12 +565,14 @@ public class BuildManager {
 			case SecondChokePoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
+			case NextSupplePoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
+				break;
 			case LastBuilingPoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
 				break;
-				
+			
 			case NextExpansionPoint:
-			case NextSupplePoint:
 			case SeedPositionSpecified:
 			case getLastBuilingFinalLocation:
 			default:

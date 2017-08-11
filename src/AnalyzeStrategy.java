@@ -589,6 +589,82 @@ public class AnalyzeStrategy {
 	private void AnalyzeVsTerran() {
 		StrategyManager.Strategys selectedS = null;
 		StrategyManager.StrategysException selectedSE = null;
+
+//		,terranBasic
+//		,terranBasic_Bionic
+//		,terranBasic_Mechanic
+//		,terranBasic_MechanicWithWraith
+//		,terranBasic_MechanicWithWraithMany
+//		,terranBasic_BattleCruiser
+		
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) == 1 
+				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Refinery,InformationManager.Instance().enemyPlayer) == 1){
+			
+			selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
+		}
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 3
+				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) >= 2){
+			
+			selectedS = StrategyManager.Strategys.terranBasic_Bionic;
+		}
+		
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Machine_Shop,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+				){
+			selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
+		}
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 1
+				){
+			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
+		}
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 12){
+			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraithMany;
+		}
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,InformationManager.Instance().enemyPlayer) >= 1
+				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Physics_Lab,InformationManager.Instance().enemyPlayer) >= 1){
+			selectedS = StrategyManager.Strategys.terranBasic_BattleCruiser;
+		}
+		
+		
+		
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Control_Tower,InformationManager.Instance().enemyPlayer) >= 1){
+			selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+		}
+
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			// 인비저블 유닛이 있다면 일단 클로킹 로직
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
+					&& unit.getPosition().isValid()) {
+				selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+			}
+		}
+		
+		if (selectedSE == StrategyManager.StrategysException.terranException_WraithCloak
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_WraithCloak ) {
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1) {
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		if (selectedSE != null) {
+			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
+		}
+		if (selectedS != null) {
+			StrategyManager.Instance().setCurrentStrategyBasic(selectedS);
+		}
+		
+		
 		// 치즈러시 대비
 //		int nongbong_cnt = 0;
 //		Unit enemy_bunker = null;
@@ -637,109 +713,7 @@ public class AnalyzeStrategy {
 		 * 1){ StrategyManager.Instance().setCurrentStrategyException(
 		 * StrategyManager.StrategysException.terranException_NuClear); }
 		 */
-
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 20
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,InformationManager.Instance().selfPlayer) < 1) {
-			// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-			selectedSE = StrategyManager.StrategysException.terranException_Wraith;
-			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
-					InformationManager.Instance().selfPlayer) >= 1) {
-				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-				selectedSE = StrategyManager.StrategysException.Init;
-			}
-		}
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,InformationManager.Instance().selfPlayer) < 1) {
-			// 아카데미가 일단 없을때
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-				// 인비저블 유닛이 있다면 일단 클로킹 로직
-				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
-						&& unit.getPosition().isValid()) {
-					// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.terranException_Wraith);
-					selectedSE = StrategyManager.StrategysException.terranException_Wraith;
-				}
-				// 아카데미가 있다면 init으로
-				if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy,
-						InformationManager.Instance().selfPlayer) >= 1) {
-					// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-					selectedSE = StrategyManager.StrategysException.Init;
-				}
-			}
-		}
-
-		// if(StrategyManager.StrategysException.values().equals(StrategyManager.StrategysException.Init)){
-		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,	InformationManager.Instance().enemyPlayer) >= 2
-				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 6)
-				&&!(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
-						)){
-			// 2배럭이면 바이오닉
-			selectedS = StrategyManager.Strategys.terranBasic_Bionic;
-		}
-//		// 팩이 배럭보다 많거나, 팩이 3개 이상일경우 기본으로 변경
-//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
-//				InformationManager.Instance().enemyPlayer) <= InformationManager.Instance()
-//						.getNumUnits(UnitType.Terran_Factory, InformationManager.Instance().enemyPlayer)
-//				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
-//						InformationManager.Instance().enemyPlayer) >= 3) {
-//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic);
-//		}
-
-		if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
-					){
-			selectedS = StrategyManager.Strategys.terranBasic;
-		}
-		
-//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
-//				InformationManager.Instance().enemyPlayer) == 1
-//				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,
-//						InformationManager.Instance().enemyPlayer) >= 1) {
-//			// 공중 유닛에 대한 대응
-//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-//			// RespondToStrategy.instance().enemy_wraith = true;
-//		} else if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
-//				InformationManager.Instance().enemyPlayer) >= 2) {
-//			// 스타포트 다수에 대한 대응
-//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_AirUnit);
-//			// RespondToStrategy.instance().enemy_wraith = true;
-//		}
-//
-//		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Dropship,
-//				InformationManager.Instance().enemyPlayer) >= 3) {
-//			// 드랍쉽에 대한 대응
-//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_DropShip);
-//		}
-//
-//		if ((InformationManager.Instance().getNumUnits(UnitType.Terran_Science_Facility,
-//				InformationManager.Instance().enemyPlayer) >= 1
-//				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Physics_Lab,
-//						InformationManager.Instance().enemyPlayer) >= 1)
-//				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,
-//						InformationManager.Instance().enemyPlayer) >= 1) {
-//			// (사이언스퍼실리티 & 피직스 랩 발견) or 배틀크루저 발견
-//			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic_BattleCruiser);
-//		}
-		if (selectedS != null) {
-			StrategyManager.Instance().setCurrentStrategyBasic(selectedS);
-		}
-		
-		if (selectedSE != null) {
-			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
-		}
-	
-		
 	}
-
-	// exception 상태가 아닐때는 Init 으로
-	// StrategyManager.Instance().setCurrentStrategyException("Init");
-
-	// }
 
 	private void AnalyzeVsZerg() {
 		StrategyManager.Strategys selectedS = null;
@@ -822,24 +796,21 @@ public class AnalyzeStrategy {
 			multalStrategy = true;
 		}
 		
-		if(hydraStrategy == false && multalStrategy ==false && MyBotModule.Broodwar.getFrameCount() > 8500){
+		if(hydraStrategy == false && multalStrategy ==false && MyBotModule.Broodwar.getFrameCount() > 8000){
 			
-			BaseLocation enemy_firstbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-			List<BaseLocation> enemy_bases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
-			Boolean enemy_expanded = false; 
-			
-			if(enemy_bases.size() > 0 && enemy_firstbase!=null){
-				for(BaseLocation check : enemy_bases){
-					if (check.getTilePosition().equals(enemy_firstbase.getTilePosition())){
-						enemy_expanded = true;
-					}
-				}
-			}
-				
-		//뮤탈 추정... 히드라가 보이면 바로 히드라 전환 가능
-			if (cntLair >= 1 || enemy_expanded == false) {
-				selectedS = StrategyManager.Strategys.zergBasic_Mutal;
-			}
+//			BaseLocation enemy_firstbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+//			List<BaseLocation> enemy_bases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+//			Boolean enemy_expanded = false; 
+//			
+//			if(enemy_bases.size() > 0 && enemy_firstbase!=null){
+//				for(BaseLocation check : enemy_bases){
+//					if (check.getTilePosition().equals(enemy_firstbase.getTilePosition())){
+//						enemy_expanded = true;
+//					}
+//				}
+//			}
+			//뮤탈 추정... 히드라가 보이면 바로 히드라 전환 가능
+			selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 		}
 		// mutal exception
 
