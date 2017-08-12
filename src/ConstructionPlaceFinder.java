@@ -250,6 +250,12 @@ public class ConstructionPlaceFinder {
 		}
 		if (buildingType == UnitType.Terran_Supply_Depot) {
 			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
+			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
+				buildingGapSpace=0;
+			}
+			if(MethodFix == true){
+				buildingGapSpace=0;
+			}
 		}
 		
 //		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
@@ -1092,7 +1098,6 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}
-			
 		}
 	}
 	public void setTilesToAvoidSupply() {
@@ -1104,7 +1109,7 @@ public class ConstructionPlaceFinder {
 			for(int y = 0; y < 8 ; y++){
 				TilePosition t = new TilePosition(supply_x+x,supply_y+y);
 				tilesToAvoidSupply.add(t);
-				System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+				//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
 			}
 		}
 	}

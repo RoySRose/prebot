@@ -764,6 +764,22 @@ public class AnalyzeStrategy {
 			selectedSE = StrategyManager.StrategysException.Init;
 		}
 		
+//		System.out.print("hydra den: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den,
+//				InformationManager.Instance().enemyPlayer));
+//		
+//		System.out.print(", lair: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Lair,
+//				InformationManager.Instance().enemyPlayer));
+//		System.out.print(", hatchery: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Hatchery,
+//				InformationManager.Instance().enemyPlayer));
+//		System.out.print(", mutal: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,
+//				InformationManager.Instance().enemyPlayer));
+//		
+//		System.out.print(", hydra: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk,
+//				InformationManager.Instance().enemyPlayer));
+//		
+//		System.out.print(", lurker: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Lurker,
+//				InformationManager.Instance().enemyPlayer));
+//		System.out.println();
 		// hydra check with lurker
 		if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den,
 				InformationManager.Instance().enemyPlayer) >= 1
@@ -912,7 +928,7 @@ public class AnalyzeStrategy {
 			if (MutalStrategyOnTime != 0 && MutalStrategyOnTime > MyBotModule.Broodwar.getFrameCount()) {
 				selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 			} else{
-				if (mutal_cnt >= hydra_cnt * 1.4) {
+				if (mutal_cnt >= (hydra_cnt+lurker_cnt) * 1.4) {
 					selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 					if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18)||mutal_cnt>24) {
 						selectedS = StrategyManager.Strategys.zergBasic_MutalMany;

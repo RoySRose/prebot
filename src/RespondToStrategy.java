@@ -23,6 +23,7 @@ public class RespondToStrategy {
 	
 	public boolean enemy_shuttle = false;
 	public boolean enemy_arbiter = false;
+	public boolean enemy_mutal = false;
 	public boolean enemy_scout = false;
 	public boolean enemy_hive = false;
 	
@@ -344,6 +345,7 @@ public class RespondToStrategy {
 		}
 		//protossException_Dark end
 		
+		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
 			enemy_arbiter = true;
 			//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
@@ -422,12 +424,18 @@ public class RespondToStrategy {
 				}
 			}
 		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_Mutal){
+			enemy_mutal = true;
+		}
+		
+		
 	}
 		
 		
 	public void RespondExecute() {		
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
-		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter){
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter || enemy_mutal){
 	           if(need_vessel_time ==0){
 	                need_vessel_time = MyBotModule.Broodwar.getFrameCount();
 	            }

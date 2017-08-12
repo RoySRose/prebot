@@ -446,12 +446,12 @@ public class UXManager {
 				String unit = it.next();
 				allUnit.add(unit);
 			}
-			it = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumDeadUnits().keySet().iterator();
-			while(it.hasNext())
-			{
-				String unit = it.next();
-				allUnit.add(unit);
-			}
+//			it = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumDeadUnits().keySet().iterator();
+//			while(it.hasNext())
+//			{
+//				String unit = it.next();
+//				allUnit.add(unit);
+//			}
 			it = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumUnits().keySet().iterator();
 			while(it.hasNext())
 			{
@@ -466,7 +466,7 @@ public class UXManager {
 				tempUnitName = it.next();
 				
 				int numCreatedUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumCreatedUnits(tempUnitName);
-				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumDeadUnits(tempUnitName);
+//				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumDeadUnits(tempUnitName);
 				int numUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getNumUnits(tempUnitName);
 	
 				String displayname = tempUnitName.replace("Protoss", "P");
@@ -497,12 +497,12 @@ public class UXManager {
 				String unit = it.next();
 				allUnit.add(unit);
 			}
-			it = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumDeadUnits().keySet().iterator();
-			while(it.hasNext())
-			{
-				String unit = it.next();
-				allUnit.add(unit);
-			}
+//			it = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumDeadUnits().keySet().iterator();
+//			while(it.hasNext())
+//			{
+//				String unit = it.next();
+//				allUnit.add(unit);
+//			}
 			it = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumUnits().keySet().iterator();
 			while(it.hasNext())
 			{
@@ -516,7 +516,7 @@ public class UXManager {
 			{
 				tempUnitName = it.next();
 				int numCreatedUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumCreatedUnits(tempUnitName);
-				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumDeadUnits(tempUnitName);
+//				int numDeadUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumDeadUnits(tempUnitName);
 				int numUnits = InformationManager.Instance().getUnitData(InformationManager.Instance().selfPlayer).getNumUnits(tempUnitName);
 	
 				String temp2 = "Terran";
