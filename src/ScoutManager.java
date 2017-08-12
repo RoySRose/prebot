@@ -45,11 +45,12 @@ public class ScoutManager{
 	private boolean finishGasRush = false; //보류
 	private boolean distrubMineral = false; //미네랄 겐세이
 	private boolean distrubFlag = false; //미네랄 겐세이 하다 공격받음 겐세이 중지 
-	private boolean fleeFlag  = false; //미네랄 겐세이 하다 공격받음 겐세이 중지 
+	private boolean fleeFlag  = false; //공격유닛 발견시 적진 돌기위한 변수 
 	private boolean fleeLongEnemyFlag  = false; //마린 , 드래곤 판별 변수 
 	private boolean idleFlag = false;  //정찰 해제 
 	private boolean cyberFlag = false;  //프로토스 드라군 건물 완성됐는지 판별 변수. 
 	private boolean scoutFlag = false;  //스카웃 한번만 보내기 위한 변수 
+	private boolean gasExpscoutFlag = false;  //적 본진 가스 발견했는지 판별 변수 
 	
 	
 	private List<Unit> units = new ArrayList<>();
@@ -102,11 +103,7 @@ public class ScoutManager{
 			return;
 		}
 		if(currentScoutUnit != null){
-			if(enemyLongInRadius()){
-				enemyBaseRegionVertices = new Vector<Position>();;
-				currentScoutFreeToVertexIndex = -1; 
-				fleeLongEnemyFlag = true;
-			}
+			enemyLongInRadius();
 		}
 	}
 	
@@ -240,11 +237,16 @@ public class ScoutManager{
 			return;
 		}
 		int scoutHP = currentScoutUnit.getHitPoints() + currentScoutUnit.getShields();
-
+		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		//본진일때는 무조건 false
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		//BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 		
-		int scoutDistanceThreshold = 30;//뭔지 모르겠다.
+		//아군 지역에 적 건물이 잇을땐 패스(가스 러쉬시 우리 지역을 정찰 지역으로 보는경우가 있음.
+		if (enemyBaseLocation != null && enemyBaseLocation.getDistance(myBaseLocation.getPosition()) < 5 * Config.TILE_SIZE)
+			enemyBaseLocation = null;
+		
+		int scoutDistanceThreshold = 30;
 		
 		//적 위치 못찾으면
 		if (enemyBaseLocation == null)
@@ -277,6 +279,9 @@ public class ScoutManager{
 					// assign a scout to go scout it
 					CommandUtil.move(currentScoutUnit, closestBaseLocation.getPosition());
 					currentScoutTargetBaseLocation = closestBaseLocation;
+				}else{
+					//TF 에서 정찰 일꾼 안나가는 버그 해결법 추가 -> 확인 필요
+					CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
 				}
 			}else{//BasicBot1.2
 				CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
@@ -304,12 +309,12 @@ public class ScoutManager{
 						fleeFlag = true;
 //						distrubFlag = true;
 					}
-					if(enemyInRadius()){
-						fleeFlag = true;
-						return;
-					}
-					if(enemyLongInRadius()){
-						fleeFlag = true;
+//					if(enemyInRadius()){
+//						fleeFlag = true;
+//						return;
+//					}
+					enemyLongInRadius();
+					if(fleeLongEnemyFlag == true || fleeFlag == true){
 						return;
 					}
 					//정찰 유닛이 공격받지 않고 있고 범위안에 적이 없으면.
@@ -495,15 +500,31 @@ public class ScoutManager{
 		return false;
 	}
 	//범위안에 원거리 공격 유닛 있는지 없는지 판별(마린/드래군)
-	public boolean enemyLongInRadius()
+	public void enemyLongInRadius()
 	{
-		
+		//적 가스 봤는지 못봤는지 확인하기 위한 변수
+		//아래 함수에 넣고 싶었지만 아래는 건설된 unit만 보여서 가스 판별이 안됨.
+		if(gasExpscoutFlag == false){
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			{
+				if(unit.getType().isRefinery()){
+					if(MyBotModule.Broodwar.isExplored(unit.getTilePosition())){
+						gasExpscoutFlag = true;
+					}
+					break;
+				}
+			}
+		}
 		Iterator<Integer> it = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
 //		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		while (it.hasNext()) {
 			UnitInfo ui= InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
 			if(ui.getType() == UnitType.Protoss_Cybernetics_Core && ui.isCompleted()){
 				cyberFlag = true;
+			}
+			if (!ui.getType().isWorker() && ui.getType().canAttack() && (ui.getUnit().getDistance(currentScoutUnit) < 300))
+			{
+				fleeFlag = true;
 			}
 			if (!ui.getType().isWorker() && 
 				((ui.getType() == UnitType.Terran_Barracks && ui.getUnit().isTraining())
@@ -515,11 +536,18 @@ public class ScoutManager{
 				|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
 				&& (ui.getUnit().getDistance(currentScoutUnit) < 600)) 
 			{
-				return true;
+				fleeLongEnemyFlag = true;
 			}
 		}
-
-		return false;
+		//가스를 못봤으면 앞마당으로 가는 로직 취소
+		if(gasExpscoutFlag == false){
+			fleeLongEnemyFlag = false;
+		}
+		
+		if(fleeLongEnemyFlag == true){
+			enemyBaseRegionVertices = new Vector<Position>();;
+			currentScoutFreeToVertexIndex = -1;
+		}
 	}
 	//범위안에 원거리 공격 유닛 있는지 없는지 판별(마린/드래군)
 	public boolean enemySecondLongInRadius()

@@ -34,6 +34,8 @@ public class ConstructionPlaceFinder {
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
+	//서플라이 짓는 지역
+	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -589,6 +591,12 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
+					//서플라이 지역은 서플라이 외에는 지을수 없다.
+					if (b.getType() != UnitType.Terran_Supply_Depot) {
+						if (isTilesToAvoidSupply(x, y)) {
+							return false;
+						}
+					}
 					
 					if (isTilesToAvoidAbsolute(x, y)) {
 						return false;
@@ -908,6 +916,18 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
+	
+	/// (x, y) 가 서플라이 지역이라면 지을수 없다.
+	public final boolean isTilesToAvoidSupply(int x, int y)
+	{
+		for (TilePosition t : tilesToAvoidSupply) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 찾아 _tilesToAvoid 에 저장합니다<br>
 	/// BaseLocation 과 Geyser 사이, ResourceDepot 건물과 Mineral 사이 공간으로 건물 건설 장소를 정하면<br> 
@@ -1075,7 +1095,21 @@ public class ConstructionPlaceFinder {
 			
 		}
 	}
-	public void setTilesToAvoidForFirstGas()
+	public void setTilesToAvoidSupply() {
+		
+		int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
+		int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
+		
+		for(int x = 0; x < 9 ; x++){
+			for(int y = 0; y < 8 ; y++){
+				TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+				tilesToAvoidSupply.add(t);
+				System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+			}
+		}
+	}
+
+    public void setTilesToAvoidForFirstGas()
 	{
 		Unit firstgas = InformationManager.Instance().getMyfirstGas();
 	

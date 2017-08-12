@@ -69,7 +69,7 @@ public class CombatManager {
 	
 	private static Chokepoint currTargetChoke = null;
 	private static int currTargetChokeExpiredFrame = 0;
-	
+	private boolean gasRush = false; 
 	private double getWaitingPeriod() {
 		Race enemyRace = InformationManager.Instance().enemyRace;
 		if (enemyRace == Race.Zerg) {
@@ -205,7 +205,8 @@ public class CombatManager {
 			if(ScoutDefenseNeeded == false){
 				updateBaseDefenseSquads();
 			}
-			if(FastZerglingsInOurBase > 0){
+			gasRush = InformationManager.Instance().isGasRushed();
+			if(FastZerglingsInOurBase > 0 || gasRush){
 				updateEarlyDefenseSquad();
 			}
 			
@@ -1003,8 +1004,14 @@ public class CombatManager {
 					    squadData.assignWorkerToSquad(workerDefender, earlyDefenseSquad);
 					    k++;
 		            }
-					if(k > (int)(2+enemyUnitsInRegion.size()*3)){
-						break;
+					if(gasRush){
+						if(k > 3){
+							break;
+						}
+					}else{
+						if(k > (int)(2+enemyUnitsInRegion.size()*3)){
+							break;
+						}
 					}
 				}
 			}else if (!earlyDefenseSquad.isEmpty() && bestDist >= 240){//180) {
