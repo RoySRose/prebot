@@ -240,7 +240,7 @@ public class StrategyManager {
 		}
 
 		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500) {
+		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 3200) {
 			executeSupplyManagement();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 43 == 0) {
@@ -573,7 +573,7 @@ public class StrategyManager {
 
 				if (currentSupplyShortage > onBuildingSupplyCount) {
 					
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, false);
 //					
 ////					boolean isToEnqueue = true;
 ////					if (!BuildManager.Instance().buildQueue.isEmpty()) {
@@ -833,7 +833,8 @@ public class StrategyManager {
 		//barrack end
 		
 		//engineering start
-		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/2)) ){
+		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/2))
+				&& MyBotModule.Broodwar.getFrameCount() > 12000){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -1670,7 +1671,7 @@ public class StrategyManager {
 		//내 팩토리 유닛 인구수 만큼 추가
 		totPoint = 	myunitPoint + expansionPoint + unitPoint;
 		
-		if(totPoint > 120 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
+		if(totPoint > 120 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY && myunitPoint > 80){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 			if(Config.BroodwarDebugYN){
 				MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
 			}
@@ -1680,13 +1681,13 @@ public class StrategyManager {
 		
 		
 		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
-			if(CombatStartCase == 1 && myunitPoint < 40){
+			if(CombatStartCase == 1 && myunitPoint < 50){
 				if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("Retreat1");
 				}
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
-			if(CombatStartCase == 2 && totPoint < 40){
+			if(CombatStartCase == 2 && totPoint < 50){
 				if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("Retreat2");
 				}
@@ -1813,8 +1814,8 @@ public class StrategyManager {
 		boolean vsProtossZealotbool[] = new boolean[]{VS, VM, TS, GR};
 		MetaType vsProtossDragoon[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
 		boolean vsProtossDragoonbool[] = new boolean[]{TS, VM, VS, GR};
-		MetaType vsProtossDouble[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
-		boolean vsProtossDoublebool[] = new boolean[]{VS, TS, VM, GR};
+		MetaType vsProtossDouble[] = new MetaType[]{vultureMine, TankSiegeMode, vultureSpeed, GoliathRange};
+		boolean vsProtossDoublebool[] = new boolean[]{VM, TS, VS, GR};
 		
 		MetaType[] Current = null;
 		boolean[] Currentbool = null;
@@ -1825,7 +1826,8 @@ public class StrategyManager {
 			Current = vsProtoss;
 			Currentbool = vsProtossbool;
 			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_ZealotPush
-					|| (CurrentStrategyException == StrategyManager.StrategysException.Init)){
+					|| (CurrentStrategyException == StrategyManager.StrategysException.Init
+					&& LastStrategyException == StrategyManager.StrategysException.protossException_ZealotPush)){
 				Current = vsProtossZealot;
 				Currentbool = vsProtossZealotbool;
 			}
@@ -1884,6 +1886,7 @@ public class StrategyManager {
 						|| unit.getType() == UnitType.Terran_Wraith
 						|| unit.getType() == UnitType.Terran_Battlecruiser
 						|| unit.getType() == UnitType.Terran_Physics_Lab
+						|| unit.getType() == UnitType.Terran_Control_Tower
 						){
 					air = true;
 				}
@@ -1896,6 +1899,8 @@ public class StrategyManager {
 						|| unit.getType() == UnitType.Zerg_Lair
 						|| unit.getType() == UnitType.Zerg_Spire
 						|| unit.getType() == UnitType.Zerg_Scourge
+						|| unit.getType() == UnitType.Zerg_Guardian
+						|| unit.getType() == UnitType.Zerg_Devourer
 						){
 					air = true;
 				}

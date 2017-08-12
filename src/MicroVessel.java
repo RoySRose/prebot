@@ -67,16 +67,13 @@ public class MicroVessel extends MicroManager {
 				List<Unit> matrix_targets = null;
 				matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius+300, true, false, null);
 				
-				System.out.println("matrix in!!");
 				for (Unit target : matrix_targets) {
 					if(target.getType() == UnitType.Terran_SCV){
 						continue;
 					}
-					
-					if(target.isUnderAttack() && target.getHitPoints() < target.getInitialHitPoints()*0.7
-							&& !target.isDefenseMatrixed() && target.getHitPoints() > target.getInitialHitPoints()*0.15 ){
+					if(target.isUnderAttack() && target.getHitPoints() < target.getType().maxHitPoints()*0.7
+							&& !target.isDefenseMatrixed() && target.getHitPoints() > target.getType().maxHitPoints()*0.15 ){
 						CommandUtil.useTechTarget(sVessel,TechType.Defensive_Matrix, target);
-						System.out.println("matrix used!!!");
 						return;
 					}
 				}
@@ -116,15 +113,11 @@ public class MicroVessel extends MicroManager {
 			if(invisibleEnemyUnit != null){
 				List<Unit> nearallies = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
 				
-				System.out.println("Vessel : I should GO!");
 				if(nearallies.size() > 2){
-					System.out.println("Vessel : and I'm going wait!!");
 					order.setPosition(invisibleEnemyUnit.getPosition());//움직이시오.
 					if(invisibleEnemyUnit.getDistance(sVessel) < UnitType.Terran_Science_Vessel.sightRange()*2/3){
 						order.setPosition(sVessel.getPosition());
 					}
-				}else{
-					System.out.println("Vessel : But I'm not going to less friends!");
 				}
 			}
 

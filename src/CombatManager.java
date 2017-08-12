@@ -331,9 +331,6 @@ public class CombatManager {
 					if(neareasetvessel !=null){
 						List<Unit> nearallies = MapGrid.Instance().getUnitsNear(neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), true, false, null);
 						if(nearallies !=null && nearallies.size() > 2){
-							if(Config.BroodwarDebugYN){
-								MyBotModule.Broodwar.printf("Comsat : Vessel is near and will go! wait a sec!!");
-							}
 							break;//베슬이 올것으로 예상됨
 						}
 					}

@@ -68,7 +68,7 @@ public class Config {
 	/// 건물과 건물간 띄울 최소한의 간격 - Terran_Supply_Depot 건물의 경우
 	public static int BuildingSupplyDepotSpacing = 0;
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 1;
+	public static int BuildingDefenseTowerSpacing = 0;
 	
 	
 	/*public static int BuildingSpacing = 0;

@@ -31,7 +31,7 @@ public class BuildManager {
 	public Boolean FirstChokePointFull;
 	public Boolean FirstExpansionLocationFull;
 	public Boolean SecondChokePointFull;
-	public Boolean NextSupplePointFull;
+	public Boolean FisrtSupplePointFull;
 	
 	/// static singleton 객체를 리턴합니다
 	public static BuildManager Instance() {
@@ -43,20 +43,26 @@ public class BuildManager {
 		FirstChokePointFull = false;
 		FirstExpansionLocationFull = false;
 		SecondChokePointFull = false;
-		NextSupplePointFull = false;
+		FisrtSupplePointFull = false;
 		
 	}
 
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
 		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0){
+		if (MyBotModule.Broodwar.getFrameCount() % 7 != 0){
 			return;
 		}
 
 		if (buildQueue.isEmpty()) {
 			return;
 		}
+//		System.out.print("MainBase:" + MainBaseLocationFull);
+//		System.out.print(", FCPoint:" + FirstChokePointFull);
+//		System.out.print(", FirstEx:" + FirstExpansionLocationFull);
+//		System.out.print(", SCPoint:" + SecondChokePointFull);
+//		System.out.println(", FisrtSup:" + FisrtSupplePointFull);
+		
 		
 		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
 		checkBuildOrderQueueDeadlockAndInsert();
@@ -518,11 +524,12 @@ public class BuildManager {
 			break;
 			
 		case NextSupplePoint:
-			if(NextSupplePointFull == true){
+			if(FisrtSupplePointFull == true){
 				Config.BuildingSupplyDepotSpacing = 0;
 				if(MainBaseLocationFull == true){
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				}else{
+					System.out.println("supply to mainbaselocation");
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
 					Config.BuildingSupplyDepotSpacing = 1;
 				}
@@ -1300,10 +1307,10 @@ public class BuildManager {
 
 		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
 		if(MyBotModule.Broodwar.getUnitsOnTile(x, y).size() > 0){
-			List<Unit> temp= MyBotModule.Broodwar.getUnitsOnTile(x, y);
-			for(Unit u : temp){
-				System.out.println("unit: "+ u.getType() + " at " + u.getPosition().toString());
-			}
+//			List<Unit> temp= MyBotModule.Broodwar.getUnitsOnTile(x, y);
+//			for(Unit u : temp){
+//				System.out.println("unit: "+ u.getType() + " at " + u.getPosition().toString());
+//			}
 			//System.out.println("there is unit");
 			return false;
 		}

@@ -23,6 +23,7 @@ public class RespondToStrategy {
 	
 	public boolean enemy_shuttle = false;
 	public boolean enemy_arbiter = false;
+	public boolean enemy_scout = false;
 	public boolean enemy_hive = false;
 	
 	public boolean need_vessel = false;
@@ -350,6 +351,9 @@ public class RespondToStrategy {
 			max_vessel = 2;
 			//}
 		}
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Scout){
+			enemy_scout = true;
+		}
 	}
 	
 	public void RespondVsTerran() {
@@ -403,7 +407,20 @@ public class RespondToStrategy {
 			max_vessel = 4;
 		}
 		
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
+			need_valkyrie = true;
+			max_valkyrie = 5;
+		}else{
+			need_valkyrie = false;
+			max_valkyrie = 0;
+		}
+		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_OnLyLing){
+			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer) < 5	){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) < 1){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+				}
+			}
 		}
 	}
 		
@@ -526,22 +543,7 @@ public class RespondToStrategy {
 		}
 		
 		
-		if(enemy_shuttle){
-			//셔틀에 대해서는 골리앗만 추가			
-			if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ShuttleMix){
-				//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
-				if(!chk_armory){
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
-							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
-						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
-								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Armory.gasPrice()){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Armory,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						}
-					}
-				}
-			}
-		}
+
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Reaver){
 			//리버 대비
@@ -601,8 +603,7 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Scout){
-			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
+		if(enemy_scout || enemy_shuttle){
 			if(!chk_armory){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
@@ -613,11 +614,15 @@ public class RespondToStrategy {
 					}
 				}
 			}else{
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
-					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
-							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				if((InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) <
+						InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer) * 2)
+						|| InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) < 2){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
+						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
+								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
 					}
 				}
 			}
@@ -648,13 +653,7 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
-			need_valkyrie = true;
-			max_valkyrie = 5;
-		}else{
-			need_valkyrie = false;
-			max_valkyrie = 0;
-		}
+		
 		
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.AttackIsland){
 			need_battlecruiser = true;
