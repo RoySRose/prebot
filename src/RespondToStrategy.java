@@ -28,10 +28,12 @@ public class RespondToStrategy {
 	public boolean need_vessel = false;
 	public boolean need_valkyrie = false;
 	public boolean need_wraith = false;
+	public boolean need_battlecruiser = false;
 	
 	public int max_vessel = 0;
 	public int max_valkyrie = 0;
 	public int max_wraith = 0;
+	public int max_battlecruiser = 0;
 	
 	public int need_vessel_time = 0;
 	
@@ -86,9 +88,9 @@ public class RespondToStrategy {
 	
 	public void update() {
 		
-		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
-			need_vessel = true;
-		}
+//		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
+//			need_vessel = true;
+//		}
 		
 		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -344,8 +346,8 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
 			enemy_arbiter = true;
 			//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
-				need_vessel = true;
-				max_vessel = 1;
+			need_vessel = true;
+			max_vessel = 2;
 			//}
 		}
 	}
@@ -382,6 +384,8 @@ public class RespondToStrategy {
 		//terranException_Wraith start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_WraithCloak){
 			enemy_wraith = true;
+			need_vessel = true;
+			max_vessel = 2;
 		}
 	}
 		
@@ -619,8 +623,7 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter){
-			//셔틀대비 중에. 실제 셔틀을 보면. 골리앗 추가
+		if(enemy_arbiter){
 			if(!chk_armory){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
@@ -631,11 +634,15 @@ public class RespondToStrategy {
 					}
 				}
 			}else{
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
-					if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
-							&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				if((InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) <
+						InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer) * 4)
+						|| InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) < 4){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
+						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
+								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
 					}
 				}
 			}
@@ -647,6 +654,14 @@ public class RespondToStrategy {
 		}else{
 			need_valkyrie = false;
 			max_valkyrie = 0;
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.AttackIsland){
+			need_battlecruiser = true;
+			max_battlecruiser = 8;
+		}else{
+			need_battlecruiser = false;
+			max_battlecruiser = 0;
 		}
 	}
 }

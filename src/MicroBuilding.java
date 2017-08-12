@@ -64,7 +64,7 @@ public class MicroBuilding extends MicroManager {
 		
 		
 		Chokepoint SC = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-		Position halfway = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
+		Position halfway = new Position((SC.getX()*3+2048)/4, (SC.getY()*3+2048)/4);
 		
 		for (Unit flyBuilding : Buildings) {
 			if (!CommonUtils.executeUnitRotation(flyBuilding, LagObserver.groupsize())) {

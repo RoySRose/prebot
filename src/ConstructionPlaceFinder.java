@@ -34,6 +34,7 @@ public class ConstructionPlaceFinder {
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsoluteForFirstGas = new HashSet<TilePosition>();
+	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -337,13 +338,9 @@ public class ConstructionPlaceFinder {
 //			}
 //		}
 		else if (buildingType == UnitType.Terran_Supply_Depot) {
-			
-			//buildingGapSpace = Config.BuildingSupplyDepotSpacing;
-			buildingGapSpace = 0;
+			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
 		}
-		else if(buildingType == UnitType.Terran_Barracks){
-			buildingGapSpace = 0;
-		}
+		
 //		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
 //			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
 		else if (buildingType == UnitType.Terran_Missile_Turret) {
@@ -399,7 +396,7 @@ public class ConstructionPlaceFinder {
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
-		int maxRange = 32; // maxRange = BWAPI::Broodwar->mapWidth()/4;
+		int maxRange = 42; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 		boolean isPossiblePlace = false;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal())
@@ -644,6 +641,8 @@ public class ConstructionPlaceFinder {
 				}
 			}*/
 
+			
+			
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
 			for (int x = startx; x < endx; x++)
 			{
@@ -669,6 +668,9 @@ public class ConstructionPlaceFinder {
 					}
 					
 					if (isTilesToAvoidAbsoluteForFirstGas(x, y)) {
+						return false;
+					}
+					if (isTilesToAvoidAbsolute(x, y)) {
 						return false;
 					}
 					
@@ -986,6 +988,16 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
+	public final boolean isTilesToAvoidAbsolute(int x, int y)
+	{
+		for (TilePosition t : tilesToAvoidAbsolute) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 찾아 _tilesToAvoid 에 저장합니다<br>
 	/// BaseLocation 과 Geyser 사이, ResourceDepot 건물과 Mineral 사이 공간으로 건물 건설 장소를 정하면<br> 
@@ -1154,6 +1166,9 @@ public class ConstructionPlaceFinder {
 	        {
 	            for (int y = fromy ; y > 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
 	            {
+	            	if(fromx < x && x < fromx+5 && fromy < y && y < fromy+3){
+						continue;
+					}
 				TilePosition temp = new TilePosition(x,y);
 				tilesToAvoidAbsoluteForFirstGas.add(temp);
 			}
@@ -1168,6 +1183,10 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidAbsoluteForFirstGas;
 	}
 
+	public Set<TilePosition> getTilesToAvoidAbsolute() {
+		return tilesToAvoidAbsolute;
+	}
+	
 	public void setTilesToAvoidFac(Unit unit) {
 		
 		int fromx = unit.getTilePosition().getX()-1;
@@ -1188,7 +1207,7 @@ public class ConstructionPlaceFinder {
 					continue;
 				}
 				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoid.add(temp);
+				tilesToAvoidAbsolute.add(temp);
 			}
 		}
 	}
@@ -1204,7 +1223,7 @@ public class ConstructionPlaceFinder {
 			for (int y = fromy ; y < fromy +  2&& y < MyBotModule.Broodwar.mapHeight(); y++)
 			{
 				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoid.add(temp);
+				tilesToAvoidAbsolute.add(temp);
 			}
 		}
 	}
@@ -1220,7 +1239,7 @@ public class ConstructionPlaceFinder {
 			for (int y = fromy ; y < fromy + 3 && y < MyBotModule.Broodwar.mapHeight(); y++)
 			{
 				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoid.add(temp);
+				tilesToAvoidAbsolute.add(temp);
 			}
 		}
 	}

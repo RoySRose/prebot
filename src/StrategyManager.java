@@ -71,6 +71,7 @@ public class StrategyManager {
 		,terranBasic_MechanicWithWraith
 		,terranBasic_MechanicWithWraithMany
 		,terranBasic_BattleCruiser	
+		,AttackIsland
 //		,terranBasic_ReverseRush
 		} //기본 전략 나열
 	public enum StrategysException { 
@@ -115,6 +116,7 @@ public class StrategyManager {
 	public int UnitPoint = 0;
 	public int CombatStartCase =0;
 	public int WraithTime =0;
+	public Boolean BuildingGO = false;
 	
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
@@ -277,6 +279,15 @@ public class StrategyManager {
 			executeSustainUnits();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
+			if(BuildingGO == false){
+				if(CurrentStrategyException != StrategyManager.StrategysException.protossException_ZealotPush 
+						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_DragoonPush
+						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_ReadyToZealot
+						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_ReadyToDragoon
+						){ 
+					BuildingGO = true;
+				}
+			}
 			executeFly();
 		}
 		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
@@ -561,27 +572,30 @@ public class StrategyManager {
 						* InformationManager.Instance().getBasicSupplyProviderUnitType().supplyProvided();
 
 				if (currentSupplyShortage > onBuildingSupplyCount) {
-//					boolean isToEnqueue = true;
-//					if (!BuildManager.Instance().buildQueue.isEmpty()) {
-//						BuildOrderItem currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
-//						if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
-//						{
-//							isToEnqueue = false;
-//						}
+					
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
+//					
+////					boolean isToEnqueue = true;
+////					if (!BuildManager.Instance().buildQueue.isEmpty()) {
+////						BuildOrderItem currentItem = BuildManager.Instance().buildQueue.getHighestPriorityItem();
+////						if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == InformationManager.Instance().getBasicSupplyProviderUnitType()) 
+////						{
+////							isToEnqueue = false;
+////						}
+////					}
+//					if(InformationManager.Instance().getMainBaseSuppleLimit() <= MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Supply_Depot)){
+////							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
+////							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
+////							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
+////							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
+//						
+//					}else{
+////							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
+////							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
+////							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
+////							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
 //					}
-					if(InformationManager.Instance().getMainBaseSuppleLimit() <= MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Supply_Depot)){
-//							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
-//							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
-//							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
-//							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
-					}else{
-//							MyBotModule.Broodwar.printf("currentSupplyShortage: " + currentSupplyShortage);
-//							MyBotModule.Broodwar.printf("onBuildingSupplyCount: " + onBuildingSupplyCount);
-//							MyBotModule.Broodwar.printf("supplyMargin: " + supplyMargin);
-//							MyBotModule.Broodwar.printf("supplyTotal: " + MyBotModule.Broodwar.self().supplyTotal());
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Supply_Depot,BuildOrderItem.SeedPositionStrategy.NextSupplePoint, true);
-					}
 				}
 			}
 		}
@@ -627,19 +641,23 @@ public class StrategyManager {
 		
 		boolean aca = false;
 		boolean acaComplete = false;
-		boolean barrack = false;
 		boolean engineering = false;
 		boolean star = false;
 		boolean starComplete = false;
 		boolean science = false;
 		boolean scienceComplete = false;
+		boolean physiclab = false;
 		boolean armory = false;
 		boolean vessel = false;
+		int barrackcnt = 0;
 		int marinecnt = 0;
 		int vulturecnt= 0;
 		int wraithcnt = 0;
 		int valkyriecnt = 0;
+		int engineeringcnt = 0;
 		Unit starportUnit = null;
+		Unit barrackUnit = null;
+		Unit engineeringUnit = null;
 		int CC =0;
 	
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -655,11 +673,6 @@ public class StrategyManager {
 			}
 			//컴샛 end
 			
-			//barrack start
-			if(unit.getType() == UnitType.Terran_Barracks){
-				barrack = true;
-			}
-			//barrack end
 			
 			//engineering start
 			if(unit.getType() == UnitType.Terran_Engineering_Bay){
@@ -692,6 +705,12 @@ public class StrategyManager {
 			}
 			//scienceVessel end 	
 			
+			//battle start
+			if(unit.getType() == UnitType.Terran_Physics_Lab){
+				physiclab = true;
+			}
+			//battle end
+			
 			//marine for fast zergling and zealot start
 			if(unit.getType() == UnitType.Terran_Marine && unit.isCompleted()){
 				marinecnt ++;
@@ -713,6 +732,16 @@ public class StrategyManager {
 				valkyriecnt ++;
 			}
 			//valkyrie for TvT end
+			//barrack start
+			if(unit.getType() == UnitType.Terran_Barracks && unit.isCompleted()){
+				barrackcnt++;
+				barrackUnit = unit;
+			}
+			//barrack end
+			if(unit.getType() == UnitType.Terran_Engineering_Bay && unit.isCompleted()){
+				engineeringcnt++;
+				engineeringUnit = unit;
+			}
 			
 			
 			//가스 start
@@ -780,7 +809,8 @@ public class StrategyManager {
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
 				if(unit == null) continue;
-				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null){
+				if(unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.getAddon() == null
+						&& MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Comsat_Station) < 4){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null) 
 							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
@@ -791,7 +821,7 @@ public class StrategyManager {
 		//컴샛 end
 		
 		//barrack start
-		if(barrack == false  && isInitialBuildOrderFinished == true){
+		if(isInitialBuildOrderFinished == true && (barrackcnt == 0 || (barrackcnt == 1 && barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints()/2)) ){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -803,7 +833,7 @@ public class StrategyManager {
 		//barrack end
 		
 		//engineering start
-		if(engineering == false && RespondToStrategy.Instance().needOfEngineeringBay()){
+		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/2)) ){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -830,7 +860,7 @@ public class StrategyManager {
 		//engineering end2
 		
 		//scienceVessel start
-		if((RespondToStrategy.Instance().need_vessel == true && CC>=2) || (CC>=3)){
+		if((RespondToStrategy.Instance().need_vessel == true && CC>=2) || CC>=3){
 			if(star == false){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
@@ -848,7 +878,7 @@ public class StrategyManager {
 						if(Config.BroodwarDebugYN){
 						MyBotModule.Broodwar.printf("make Terran_Control_Tower");
 						}
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Control_Tower, true);
 					}
 				}
 			}
@@ -861,7 +891,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, false);
 				}
 			}
-			if(scienceComplete && vessel == false){
+			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel) < RespondToStrategy.Instance().max_vessel){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Vessel, null) 
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Vessel, null) == 0){
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Vessel, false);
@@ -872,7 +902,7 @@ public class StrategyManager {
 		
 		//armory start1
 		if(armory == false){
-			if(CC>=2 || MyBotModule.Broodwar.getFrameCount() > 13000){
+			if(CC>=2 || MyBotModule.Broodwar.getFrameCount() > 15000){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0) {
 					if(Config.BroodwarDebugYN){
@@ -902,6 +932,57 @@ public class StrategyManager {
 		}
 		//marine for fast zergling and zealot end
 		
+		
+		//battlecruiser start
+		if(RespondToStrategy.Instance().need_battlecruiser == true && CC>=3){
+			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 4){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) < 4) {
+					if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("make starport for battle");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+				}
+			}
+			if(starComplete){
+				//컨트롤 타워가 없다면
+				if(starportUnit != null && starportUnit.getAddon() == null){
+					if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Control_Tower) < 4){
+						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) == 0
+								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) < 4) {
+							if(Config.BroodwarDebugYN){
+							MyBotModule.Broodwar.printf("make starport for battle");
+							}
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Control_Tower, false);
+						}
+					}
+				}
+			}
+			if(science == false && starComplete){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Facility, null) == 0) {
+					if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("make scienceFacil since we have many CC");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, false);
+				}
+			}
+			if(scienceComplete){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Physics_Lab, null) 
+						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Physics_Lab, null) == 0){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Physics_Lab, false);
+				}
+			}
+			
+			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Battlecruiser) < RespondToStrategy.Instance().max_battlecruiser){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Battlecruiser, null) == 0) {
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Battlecruiser, false);
+				}
+			}
+		}
+		//battlecruiser end
+				
+				
 		//wraith for TvT start
 		if(RespondToStrategy.Instance().max_wraith > wraithcnt){
 			
@@ -935,7 +1016,7 @@ public class StrategyManager {
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
 					if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("make starport since we have many CC");
+					MyBotModule.Broodwar.printf("make starport  for valkyrie");
 					}
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
 				}
@@ -955,9 +1036,9 @@ public class StrategyManager {
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) == 0
 							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
 						if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("make Terran_Control_Tower");
+						MyBotModule.Broodwar.printf("make Terran_Control_Tower  for valkyrie");
 						}
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Control_Tower, true);
 					}
 				}
 			}
@@ -982,6 +1063,7 @@ public class StrategyManager {
 		int CCcnt = 0;
 		int maxFaccnt = 0;
 		int Faccnt = 0;
+		int FaccntForMachineShop = 0;
 		int MachineShopcnt = 0;
 		boolean facFullOperating = true;
 
@@ -993,6 +1075,14 @@ public class StrategyManager {
 			}
 			if (unit.getType() == UnitType.Terran_Factory){
 				Faccnt ++;
+				FaccntForMachineShop++;
+				if (BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX()+4, unit.getTilePosition().getY()+1) == false
+						||BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX()+5, unit.getTilePosition().getY()+1) == false
+						||BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX()+4, unit.getTilePosition().getY()+2) == false
+						||BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX()+5, unit.getTilePosition().getY()+2) == false)
+				{
+					FaccntForMachineShop--;
+				}
 			}
 			if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
 				if(unit.isTraining() == false){
@@ -1006,7 +1096,6 @@ public class StrategyManager {
 				MachineShopcnt ++;
 			}
  		}
-		Faccnt = Faccnt + ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null);
 		
 		if(CCcnt <= 1){
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
@@ -1047,32 +1136,9 @@ public class StrategyManager {
 			}
 		}
 		
-		
-//		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-//		BuildOrderItem checkItem = null; 
-//
-//		if (!tempbuildQueue.isEmpty()) {
-//			checkItem= tempbuildQueue.getHighestPriorityItem();
-//			while(true){
-//				if(checkItem.blocking == true){
-//					break;
-//				}
-//				if(tempbuildQueue.canSkipCurrentItem() == true){
-//					tempbuildQueue.skipCurrentItem();
-//				}else{
-//					break;
-//				}
-//				checkItem = tempbuildQueue.getItem();
-//			}
-////			if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop){
-////				if(Faccnt > MachineShopcnt+1)
-////				tempbuildQueue.removeCurrentItem();
-////			}
-//		}
-		
-		if(MachineShopcnt < Faccnt){
+		if(MachineShopcnt < FaccntForMachineShop){
 			int addition = 3;
-			if( MyBotModule.Broodwar.self().gas() > 200){
+			if( MyBotModule.Broodwar.self().gas() > 300){
 				
 				int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
 				int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
@@ -1084,7 +1150,7 @@ public class StrategyManager {
 				}
 			}
 			
-			if(MachineShopcnt + addition < Faccnt){
+			if(MachineShopcnt + addition < FaccntForMachineShop){
 				if(MyBotModule.Broodwar.self().minerals() > 50 && MyBotModule.Broodwar.self().gas() > 50){
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0
 							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
@@ -1093,11 +1159,6 @@ public class StrategyManager {
 				}
 			}
 		}
-		
-//		if(currentItem.metaType.isUnit() == true && currentItem.metaType.isRefinery()){
-//			tempbuildQueue.removeCurrentItem();
-//			break;
-//		}
 	}
 	
 	public void setCombatUnitRatio(){
@@ -1670,66 +1731,40 @@ public class StrategyManager {
 			
 			if (unit.getType() == UnitType.Terran_Armory && unit.isCompleted() && unit.canUpgrade()){
 				//Fac Unit 18 마리 이상 되면 1단계 업그레이드 시도
-				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) ==0 && getFacUnits() > 72 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons) 
+				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) ==0 && getFacUnits() > 60 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons) 
 						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
 					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
 					}
-				}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) ==0 && getFacUnits() > 72 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)
+				}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) ==0 && getFacUnits() > 60 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)
 						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
 					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
 					}
 				}
 				//Fac Unit 30 마리 이상, 일정 이상의 자원 2단계
-				else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 2 && getFacUnits() > 120 && MyBotModule.Broodwar.self().minerals()> 250 && MyBotModule.Broodwar.self().gas()> 225 ){
+				else if(MyBotModule.Broodwar.self().minerals()> 250 && MyBotModule.Broodwar.self().gas()> 225 ){
+					if((MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 2 && getFacUnits() > 140)
+							||(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 3 && getFacUnits() > 80)){
 					
-					if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){
-						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
-						}
-					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
-						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
-						}
-					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){//3단계
-						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
-						}
-					}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
-						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+						if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){
+							if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
+							}
+						}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 1 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
+							if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+							}
+						}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)){//3단계
+							if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
+							}
+						}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 2 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)){
+							if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+							}
 						}
 					}
-//					else{
-//						boolean Science_Facility = false;
-//						boolean Starport = false;
-//						boolean Starport_complete = false;
-//						
-//						for (Unit structure : MyBotModule.Broodwar.self().getUnits()){
-//							if (structure.getType() == UnitType.Terran_Science_Facility){
-//								Science_Facility = true;
-//							}
-//							if (structure.getType() == UnitType.Terran_Starport){
-//								Starport = true;
-//								if(structure.isCompleted()){
-//									Starport_complete = true;
-//								}
-//							}
-//						}
-//					
-//						if(Starport == false){//Fac 은 무조건 있다고 본다. 
-//							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
-//									&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
-//								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-//							}
-//						}else if(Science_Facility== false && Starport_complete){
-//							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0
-//									&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Facility, null) == 0) {
-//								BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-//							} 
-//						}
-//					}
 				}
 			}
  		}
@@ -2069,7 +2104,6 @@ public class StrategyManager {
 	}
 
 	private void executeFly() {
-		
 		if(MyBotModule.Broodwar.getFrameCount() > 10000){
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 1){
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -2080,11 +2114,33 @@ public class StrategyManager {
 		 		}
 			}
 		}else{
+			
+			int dragooncnt = 0;
+			int zealotcnt = 0;
+			
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
 				
 				bwapi.Position checker = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
-				List<Unit> enemy = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
-				if(enemy.size() == 0){
+				List<Unit> eniemies = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
+				
+				for(Unit enemy : eniemies){
+					
+					if(enemy.getType() == UnitType.Protoss_Dragoon){
+						dragooncnt++;
+					}
+					if(enemy.getType() == UnitType.Protoss_Zealot){
+						zealotcnt++;
+					}
+					
+				}
+				if(dragooncnt > 0 
+						&& !((InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer))
+							+ (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer)) >= 1
+						&& MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode))){
+					
+				}else if (zealotcnt > 0 && StrategyManager.instance.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
+					
+				}else{
 					for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 					{
 						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){

@@ -306,6 +306,7 @@ public class SpiderMineManger {
 		res2=null;
 		BaseLocation res3 = null;
 		BaseLocation res4 = null;
+		closestDistance = 100000000;
 		
 		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations()){
 
@@ -317,7 +318,7 @@ public class SpiderMineManger {
 			
 			TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
 			if(findGeyser != null){
-				if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 300){
+				if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 400){
 					continue;
 				}
 			}
@@ -338,8 +339,10 @@ public class SpiderMineManger {
 		if(res!= null){
 			myExpansions.add(res);
 		}
-		if(res2!= null){
-			myExpansions.add(res2);
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.LostTemple){
+			if(res2!= null){
+				myExpansions.add(res2);
+			}
 		}
 			
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){

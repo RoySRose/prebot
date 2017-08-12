@@ -519,10 +519,12 @@ public class BuildManager {
 			
 		case NextSupplePoint:
 			if(NextSupplePointFull == true){
+				Config.BuildingSupplyDepotSpacing = 0;
 				if(MainBaseLocationFull == true){
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				}else{
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+					Config.BuildingSupplyDepotSpacing = 1;
 				}
 			}
 			break;
@@ -970,22 +972,32 @@ public class BuildManager {
 						}
 					}
 					
-					int getAddonCnt = 0;
 					int getAddonPossibeCnt = 0;
 					
 					if (currentItem.metaType.getUnitType().isAddon()){ 
 						UnitType ProducerType = currentItem.metaType.getUnitType().whatBuilds().first;
 						
 						for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-							if(currentItem.metaType.getUnitType() == unit.getType()){
-								getAddonCnt++;
-							}
-							if(ProducerType == unit.getType() && unit.isCompleted()){
+							if(ProducerType == unit.getType() && unit.isCompleted() ){
+//								if(unit.getAddon() != null){
+								if(unit.canBuildAddon() == false){
+									continue;
+								}
+								if(currentItem.metaType.getUnitType()  != UnitType.Terran_Comsat_Station){
+									if (isBuildableTile(unit.getTilePosition().getX()+4, unit.getTilePosition().getY()+1) == false
+											||isBuildableTile(unit.getTilePosition().getX()+5, unit.getTilePosition().getY()+1) == false
+											||isBuildableTile(unit.getTilePosition().getX()+4, unit.getTilePosition().getY()+2) == false
+											||isBuildableTile(unit.getTilePosition().getX()+5, unit.getTilePosition().getY()+2) == false)
+									{
+										//System.out.println("something is blocking addon place, so no cnt");
+										continue;
+									}
+								}
 								getAddonPossibeCnt++;
 							}
 						}
-						if(getAddonPossibeCnt <= getAddonCnt){
-							System.out.println("deadlock because of addon more than host");
+						if(getAddonPossibeCnt == 0){
+							//System.out.println("deadlock because no place to addon");
 							isDeadlockCase = true;
 						}
 					}
@@ -1269,5 +1281,33 @@ public class BuildManager {
 		}
 	}
 	
-	
+	public final boolean isBuildableTile(int x, int y)
+	{
+		TilePosition tp = new TilePosition(x, y);
+		if (!tp.isValid())
+		{
+			//System.out.println("Invalid");
+			return false;
+		}
+
+		// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 체크
+		//if (BWAPI::Broodwar->isBuildable(x, y) == false)
+		if (MyBotModule.Broodwar.isBuildable(x, y, true) == false)
+		{
+			//System.out.println("not buildable at: " + x + ", " + y);
+			return false;
+		}
+
+		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
+		if(MyBotModule.Broodwar.getUnitsOnTile(x, y).size() > 0){
+			List<Unit> temp= MyBotModule.Broodwar.getUnitsOnTile(x, y);
+			for(Unit u : temp){
+				System.out.println("unit: "+ u.getType() + " at " + u.getPosition().toString());
+			}
+			//System.out.println("there is unit");
+			return false;
+		}
+		
+		return true;
+	}
 };
