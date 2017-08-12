@@ -1006,6 +1006,18 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
+	
+	/// (x, y) 가 서플라이 지역이라면 지을수 없다.
+	public final boolean isTilesToAvoidSupply(int x, int y)
+	{
+		for (TilePosition t : tilesToAvoidSupply) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 찾아 _tilesToAvoid 에 저장합니다<br>
 	/// BaseLocation 과 Geyser 사이, ResourceDepot 건물과 Mineral 사이 공간으로 건물 건설 장소를 정하면<br> 
