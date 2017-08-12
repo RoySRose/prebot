@@ -89,9 +89,9 @@ public class BlockingEntrance {
 		//헌터
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 			//ConstructionPlaceFinder.Instance().maxSupplyCntX = 3;
-			int [] fix_supplyXX = {0,52,119,119,119,46,0,0};
+			int [] fix_supplyXX = {0,52,118,118,118,46,0,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {10,0,18,66,105,110,102,54};
+			int [] fix_supplyYY = {10,0,17,66,105,110,102,54};
 			fix_supplyY = fix_supplyYY;
 			//입막용 11시 부터 시계방향으로 세팅
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
@@ -138,9 +138,9 @@ public class BlockingEntrance {
 				bunkerY_array = bunkerYY_array;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
-			int [] fix_supplyXX = {66,119,42,0};
+			int [] fix_supplyXX = {66,118,40,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {0,39,119,74};
+			int [] fix_supplyYY = {0,37,118,74};
 			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {81,119,57,10};//private static intnew int []
@@ -189,9 +189,9 @@ public class BlockingEntrance {
 			/*ConstructionPlaceFinder.Instance().maxSupplyCntX = 3;
 			ConstructionPlaceFinder.Instance().maxSupplyCntY = 4;*/
 			
-			int [] fix_supplyXX = {0,119,119,0};
+			int [] fix_supplyXX = {0,118,104,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {15,17,103,102};
+			int [] fix_supplyYY = {15,17,118,102};
 			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {10,97,117,22};//private static intnew int []
