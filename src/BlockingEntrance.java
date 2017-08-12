@@ -89,9 +89,9 @@ public class BlockingEntrance {
 		//헌터
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 			//ConstructionPlaceFinder.Instance().maxSupplyCntX = 3;
-			int [] fix_supplyXX = {19,52,119,119,119,46,20,0};
+			int [] fix_supplyXX = {0,52,118,118,118,46,0,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {0,0,27,66,102,119,119,33};
+			int [] fix_supplyYY = {10,0,17,66,105,110,102,54};
 			fix_supplyY = fix_supplyYY;
 			//입막용 11시 부터 시계방향으로 세팅
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
@@ -107,7 +107,7 @@ public class BlockingEntrance {
 				barrackX_array = barrackXX_array;
 				int [] barrackYY_array = {20,24,21,63,101,96,99,56};
 				barrackY_array = barrackYY_array;
-				int [] factoryXX_array = {20,53,100,119,108,54,0,0};
+				int [] factoryXX_array = {20,53,100,119,108,64,0,0};
 				factoryX_array = factoryXX_array;
 				int [] factoryYY_array = {9,11,5,59,107,109,106,55};
 				factoryY_array = factoryYY_array;
@@ -116,31 +116,31 @@ public class BlockingEntrance {
 				int [] bunkerYY_array = {18,10,21,61,102,96,99,54};
 				bunkerY_array = bunkerYY_array;
 			}else{
-				int [] first_suppleXX_array = {10,70,113,114,115,63,10,8};
+				int [] first_suppleXX_array = {10,71,113,114,115,63,10,8};
 				first_suppleX_array = first_suppleXX_array;
 				int [] first_suppleYY_array = {11,13,13,85,112,113,111,52};
 				first_suppleY_array = first_suppleYY_array;
-				int [] second_suppleXX_array= {3,76,120,120,107,56,3,14};
+				int [] second_suppleXX_array= {3,76,120,120,107,72,3,14};
 				second_suppleX_array = second_suppleXX_array;
-				int [] second_suppleYY_array = {9,9,14,87,115,116,113,48};
+				int [] second_suppleYY_array = {9,9,14,87,115,121,113,48};
 				second_suppleY_array = second_suppleYY_array;
-				int [] barrackXX_array = {13,73,109,110,111,66,13,11};
+				int [] barrackXX_array = {13,67,109,110,111,60,13,11};
 				barrackX_array = barrackXX_array;
 				int [] barrackYY_array = {9,11,10,82,113,114,112,50};
 				barrackY_array = barrackYY_array;
-				int [] factoryXX_array = {13,63,109,108,121,67,14,11};
+				int [] factoryXX_array = {14,63,109,108,109,69,14,12};
 				factoryX_array = factoryXX_array;
-				int [] factoryYY_array = {12,11,14,79,112,111,109,53};
+				int [] factoryYY_array = {12,11,14,79,110,114,109,53};
 				factoryY_array = factoryYY_array;
-				int [] bunkerXX_array = {10,70,113,114,115,63,10,8};
+				int [] bunkerXX_array = {10,71,113,114,115,63,10,8};
 				bunkerX_array = bunkerXX_array;
 				int [] bunkerYY_array = {9,11,11,83,114,115,113,50};
 				bunkerY_array = bunkerYY_array;
 			}
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
-			int [] fix_supplyXX = {66,119,42,0};
+			int [] fix_supplyXX = {66,118,40,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {0,39,119,74};
+			int [] fix_supplyYY = {0,37,118,74};
 			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {81,119,57,10};//private static intnew int []
@@ -189,9 +189,9 @@ public class BlockingEntrance {
 			/*ConstructionPlaceFinder.Instance().maxSupplyCntX = 3;
 			ConstructionPlaceFinder.Instance().maxSupplyCntY = 4;*/
 			
-			int [] fix_supplyXX = {18,119,103,0};
+			int [] fix_supplyXX = {0,118,104,0};
 			fix_supplyX = fix_supplyXX;
-			int [] fix_supplyYY = {13,23,119,98};
+			int [] fix_supplyYY = {15,17,118,102};
 			fix_supplyY = fix_supplyYY;
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
 				int [] first_suppleXX_array = {10,97,117,22};//private static intnew int []
@@ -206,9 +206,9 @@ public class BlockingEntrance {
 				barrackX_array = barrackXX_array;
 				int [] barrackYY_array = {28,9,101,120};
 				barrackY_array = barrackYY_array;
-				int [] factoryXX_array = {0,104,118,28};
+				int [] factoryXX_array = {11,104,118,28};
 				factoryX_array = factoryXX_array;
-				int [] factoryYY_array = {15,0,98,121};
+				int [] factoryYY_array = {16,0,98,121};
 				factoryY_array = factoryYY_array;
 				int [] bunkerXX_array = {13,100,111,21};
 				bunkerX_array = bunkerXX_array;
@@ -217,7 +217,7 @@ public class BlockingEntrance {
 			}else{
 				int [] first_suppleXX_array = {8,117,117,8};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
-				int [] first_suppleYY_array = {11,2,122,121};
+				int [] first_suppleYY_array = {11,12,122,121};
 				first_suppleY_array = first_suppleYY_array;
 				int [] second_suppleXX_array= {11,114,114,11};
 				second_suppleX_array = second_suppleXX_array;
@@ -338,6 +338,9 @@ public class BlockingEntrance {
 		factoryY = factoryY_array[starting_int];
 		bunkerX = bunkerX_array[starting_int];
 		bunkerY = bunkerY_array[starting_int];
+		
+		//avoid supply 설정
+		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
 	
 	}
 	
