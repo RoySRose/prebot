@@ -101,6 +101,7 @@ public class TargetPriority {
 		Map<UnitType, Integer> siegeModePriorityMap = new HashMap<>();
 		Map<UnitType, Integer> goliathPriorityMap = new HashMap<>();
 		Map<UnitType, Integer> wraithPriorityMap = new HashMap<>();
+		Map<UnitType, Integer> marinePriorityMap = new HashMap<>();
 
 		// 벌처 vs 테란
 		int inputPriority = PRIORITY_MAX;
@@ -270,7 +271,6 @@ public class TargetPriority {
 		goliathPriorityMap.put(UnitType.Zerg_Guardian,					inputPriority);
 		goliathPriorityMap.put(UnitType.Zerg_Infested_Terran,			inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Zerg_Zergling,					inputPriority -= PRIORITY_GAP);
-		goliathPriorityMap.put(UnitType.Zerg_Guardian,					inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Zerg_Mutalisk,					inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Zerg_Defiler,					inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Zerg_Lurker,					inputPriority -= PRIORITY_GAP);
@@ -304,12 +304,36 @@ public class TargetPriority {
 		wraithPriorityMap.put(UnitType.Terran_Goliath,						inputPriority -= PRIORITY_GAP);
 		wraithPriorityMap = inputBuildingPriority(Race.Terran, wraithPriorityMap, inputPriority - PRIORITY_GAP);
 				
+
+		
+		// 마린 vs 테란
+		inputPriority = PRIORITY_MAX;
+		marinePriorityMap.put(UnitType.Terran_Marine,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Terran_SCV,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Terran_Refinery,					inputPriority -= PRIORITY_GAP);
+		
+		// 마린 vs 플토
+		inputPriority = PRIORITY_MAX;
+		marinePriorityMap.put(UnitType.Protoss_Zealot,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Protoss_Dragoon,				inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Protoss_Photon_Cannon,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Protoss_Probe,			inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Protoss_Assimilator,			inputPriority -= PRIORITY_GAP);
+		
+		// 마린 vs 저그
+		inputPriority = PRIORITY_MAX;
+		marinePriorityMap.put(UnitType.Zerg_Zergling,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Zerg_Drone,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Zerg_Extractor,					inputPriority -= PRIORITY_GAP);
+		marinePriorityMap.put(UnitType.Zerg_Mutalisk,					inputPriority -= PRIORITY_GAP);
+
 		// 맵 준비 끝
 		PRIORITY_MAP.put(UnitType.Terran_Vulture, vulturePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, tankModePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Siege_Tank_Siege_Mode, siegeModePriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Goliath, goliathPriorityMap);
 		PRIORITY_MAP.put(UnitType.Terran_Wraith, wraithPriorityMap);
+		PRIORITY_MAP.put(UnitType.Terran_Marine, marinePriorityMap);
 	}
 
 }

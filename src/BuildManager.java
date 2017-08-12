@@ -525,13 +525,11 @@ public class BuildManager {
 			
 		case NextSupplePoint:
 			if(FisrtSupplePointFull == true){
-				Config.BuildingSupplyDepotSpacing = 0;
 				if(MainBaseLocationFull == true){
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				}else{
 					System.out.println("supply to mainbaselocation");
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-					Config.BuildingSupplyDepotSpacing = 1;
 				}
 			}
 			break;

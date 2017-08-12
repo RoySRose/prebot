@@ -448,9 +448,10 @@ public class CombatManager {
 				if(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer)!=null){
 					scanArea.add(InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
 				}
+				
 				TilePosition target = null;
 				int scantime = 1000000;
-				if(scanArea!= null){
+				if(scanArea.size() > 0){
 					for (TilePosition scans : scanArea) {
 						if(MyBotModule.Broodwar.isVisible(scans)){
 							continue;
@@ -459,13 +460,6 @@ public class CombatManager {
 						if(scantime > tempscantime){
 							target = scans;
 							scantime = tempscantime;
-						}
-						if(MyBotModule.Broodwar.getFrameCount() > 20000){
-							if(InformationManager.Instance().getIslandBaseLocations() !=null ){
-								for(BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()){
-									scanArea.add(islands.getTilePosition());
-								}
-							}
 						}
 					}
 				}		
@@ -517,7 +511,7 @@ public class CombatManager {
 				}
 				TilePosition target = null;
 				int scantime = 1000000;
-				if(scanArea!= null){
+				if(scanArea.size() > 0){
 					for (TilePosition scans : scanArea) {
 						if(MyBotModule.Broodwar.isVisible(scans)){
 							continue;
@@ -577,7 +571,7 @@ public class CombatManager {
 				}
 				TilePosition target = null;
 				int scantime = 1000000;
-				if(scanArea!= null){
+				if(scanArea.size() > 0){
 					for (TilePosition scans : scanArea) {
 						if(MyBotModule.Broodwar.isVisible(scans)){
 							continue;

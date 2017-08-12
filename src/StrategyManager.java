@@ -1468,7 +1468,7 @@ public class StrategyManager {
 			totoverload = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
 			//totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Drone);
 
-			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3 + totlurker*4;
+			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3 + totlurker*5;
 			return res; //저그는 저글링 때문에 이미 2배 함
 			
 		}else if (InformationManager.Instance().enemyRace == Race.Protoss) {

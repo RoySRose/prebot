@@ -164,6 +164,8 @@ public class MicroMarine extends MicroManager {
 			if (!target.isDetected())
 				continue;
 
+			int priorityScore = TargetPriority.getPriority(marine, target); // 우선순위 점수
+			
 			// int priority = 0; // 0..12
 			int range = marine.getDistance(target); // 0..map size in pixels
 			int toGoal = target.getDistance(order.getPosition()); // 0..map size
@@ -173,7 +175,7 @@ public class MicroMarine extends MicroManager {
 			// We care about unit-target range and target-order position
 			// distance.
 			// int score = 5 * 32 * priority - range - toGoal/2;
-			int score = -range - toGoal / 2;
+			int score = -range - toGoal / 2 + priorityScore;
 
 			// Adjust for special features.
 			// This could adjust for relative speed and direction, so that we
