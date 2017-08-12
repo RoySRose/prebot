@@ -192,33 +192,51 @@ public class Squad {
 		if (attackerEnemies.isEmpty()) {
 			if (initFrame > 0) {
 				initFrame = 0;
-				MyBotModule.Broodwar.sendText("finished");
+//				MyBotModule.Broodwar.sendText("finished");
 			}
 		} else {
 			if (initFrame == 0) {
-				initFrame = MyBotModule.Broodwar.getFrameCount();
-				MyBotModule.Broodwar.sendText("initiated");
+				boolean timeToInitiate = false;
+				for (UnitInfo enemy : attackerEnemies) {
+					if (enemy.getType() != UnitType.Terran_Vulture_Spider_Mine
+							&& enemy.getType() != UnitType.Zerg_Larva
+							&& !enemy.getType().isBuilding()
+							&& !enemy.getType().isWorker()
+							&& !enemy.getType().isFlyer()) {
+						timeToInitiate = true;
+						break;
+					}
+				}
+				
+				if (timeToInitiate) {
+					initFrame = MyBotModule.Broodwar.getFrameCount();
+//					MyBotModule.Broodwar.sendText("initiated");
+				}
 			}
 		}
 		
 		// 벌처 전투 여부 판단
+		boolean attackWithMechanic = false;
 		int saveUnitLevelVulture = 1;
 		if (initFrame > 0) {
-			List<UnitInfo> allEnemies = new ArrayList<>();
-			allEnemies.addAll(vultureEnemies);
-			allEnemies.addAll(attackerEnemies);
-			
-			List<Unit> allMyUnits = new ArrayList<>();
-			allMyUnits.addAll(microVulture.getUnits());
-			allMyUnits.addAll(microTank.getUnits());
-			allMyUnits.addAll(microGoliath.getUnits());
-			
-			Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
-			if (result == Result.Loss || result == Result.Win) {
-				saveUnitLevelVulture = 1;
-			} else if (result == Result.BigWin) {
-				saveUnitLevelVulture = 0;
+			if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
+				attackWithMechanic = true;
 			}
+//			List<UnitInfo> allEnemies = new ArrayList<>();
+//			allEnemies.addAll(vultureEnemies);
+//			allEnemies.addAll(attackerEnemies);
+//			
+//			List<Unit> allMyUnits = new ArrayList<>();
+//			allMyUnits.addAll(microVulture.getUnits());
+//			allMyUnits.addAll(microTank.getUnits());
+//			allMyUnits.addAll(microGoliath.getUnits());
+			
+//			Result result = CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies, false);
+//			if (result == Result.Loss || result == Result.Win) {
+//				saveUnitLevelVulture = 1;
+//			} else if (result == Result.BigWin) {
+//				saveUnitLevelVulture = 0;
+//			}
 			
 		} else {
 			if (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.VULTURE_JOIN_SQUAD) > 0) {
@@ -262,7 +280,7 @@ public class Squad {
 		}
 		
 		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture);
+		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture, attackWithMechanic);
 		mechanicTank.prepareMechanic(attackerOrder, attackerEnemies);
 		mechanicTank.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelTank, initFrame);
 		mechanicGoliath.prepareMechanic(attackerOrder, attackerEnemies);
@@ -323,7 +341,7 @@ public class Squad {
 //		boolean saveUnit = !CombatExpectation.expectByUnitInfo(microVulture.getUnits(), vultureEnemies);
 		
 		mechanicVulture.prepareMechanic(order, vultureEnemies);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel);
+		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel, false);
 		
 		LagTest lagTest = LagTest.startTest(true);
 		lagTest.setDuration(3000);
@@ -335,12 +353,22 @@ public class Squad {
 	
 	private void updateDefenseSquad() {
 		List<UnitInfo> nearbyEnemiesInfo = new ArrayList<>();
+//		for (Unit vulture : microVulture.getUnits()) {
+//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, vulture.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Vulture.sightRange());
+//		}
+//		for (Unit tank : microTank.getUnits()) {
+//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, tank.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode.sightRange());
+//		}
+//		for (Unit goliath : microGoliath.getUnits()) {
+//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, goliath.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Goliath.sightRange());
+//		}
+//		InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 		if (order.getType() == SquadOrderType.DEFEND) {
 			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 		}
 		
 		mechanicVulture.prepareMechanic(order, nearbyEnemiesInfo);
-		mechanicVulture.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), 1);
+		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), 1, true);
 		mechanicTank.prepareMechanic(order, nearbyEnemiesInfo);
 		mechanicTank.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), 1, 0);
 		mechanicGoliath.prepareMechanic(order, nearbyEnemiesInfo);

@@ -8,6 +8,7 @@ import bwapi.TechType;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Region;
 
 public class MechanicMicroVulture extends MechanicMicroAbstract {
 
@@ -17,16 +18,26 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	private List<Unit> notVultureUnitList = new ArrayList<>();
 	private int saveUnitLevel = 1;
 	
+	private boolean attackWithMechanics = false;
+	private int stickToMechanicRadius = 0;
+	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
 		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
 	}
 	
-	public void prepareMechanicAdditional(List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel) {
+	public void prepareMechanicAdditional(List<Unit> vultureList, List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, boolean attackWithMechanics) {
 		this.notVultureUnitList.clear();
 		this.notVultureUnitList.addAll(tankList);
 		this.notVultureUnitList.addAll(goliathList);
 		this.saveUnitLevel = saveUnitLevel;
+		this.attackWithMechanics = attackWithMechanics && notVultureUnitList.size() > 0;
+		if (this.attackWithMechanics) {
+			this.stickToMechanicRadius = 140 + (int) (Math.log(vultureList.size()) * 15);
+			if (saveUnitLevel == 0) {
+				this.stickToMechanicRadius += 100;
+			}
+		}
 	}
 	
 	public void executeMechanicMicro(Unit vulture) {
@@ -65,15 +76,40 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 					retreatPosition = travelBase.getPosition();
 				}
 			}
-			for (Unit notVultureUnit : notVultureUnitList) {
-				if (vulture.getDistance(notVultureUnit) < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
-					kOpt = KitingOption.defaultKitingOption();
-					retreatPosition = notVultureUnit.getPosition();
-					break;
+
+			boolean haveToFight = true;
+			Unit closeMechanic = null;
+			if (attackWithMechanics) {
+				haveToFight = false;
+				int closeDist = 9999999;
+				for (Unit mechanicUnit : notVultureUnitList) {
+					int dist = vulture.getDistance(mechanicUnit.getPosition());
+					if (dist < closeDist) {
+						closeMechanic = mechanicUnit;
+						closeDist = dist;
+						// 가까운 곳에 메카닉유닛이 있으면 싸운다.
+						if (closeDist < stickToMechanicRadius) {
+							haveToFight = true;
+							break;
+						}
+					}
+				}
+			} else {
+				for (Unit notVultureUnit : notVultureUnitList) {
+					if (vulture.getDistance(notVultureUnit) < MicroSet.Common.MAIN_SQUAD_COVERAGE) {
+						kOpt = KitingOption.defaultKitingOption();
+						retreatPosition = notVultureUnit.getPosition();
+						break;
+					}
 				}
 			}
-			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
+
+			if (haveToFight) {
+				kOpt.setGoalPosition(retreatPosition);
+				MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
+			} else {
+				CommandUtil.move(vulture, closeMechanic.getPosition());
+			}
 			break;
 			
 		case 2: // attack move
@@ -120,11 +156,24 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	}
 	
 	private boolean reserveSpiderMine(Unit vulture) {
-		Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, MicroSet.Vulture.spiderMineNumPerPosition);
+		Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, MicroSet.Vulture.spiderMineNumPerGoodPosition);
 		if (minePosition == null && order.getType() == SquadOrderType.WATCH) {
+			Region vultureRegion = BWTA.getRegion(vulture.getPosition());
 			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-			if (BWTA.getRegion(base.getPosition()) != BWTA.getRegion(vulture.getPosition())) {
-				minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition);
+			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+			if (vultureRegion != BWTA.getRegion(base.getPosition())) { // 본진 region에는 마인 설치안함
+				boolean lessMineNum = false;
+				for (BaseLocation occupiedBase : occupiedBases) {
+					if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
+						lessMineNum = true;
+						break;
+					}
+				}
+				if (lessMineNum) {
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerGoodPosition);
+				} else {
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition); // 그외에는 좀 많이
+				}
 			}
 		}
 		if (minePosition != null) { // 매설할 마인이 있다면 종료

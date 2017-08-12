@@ -17,7 +17,7 @@ public class VultureTravelManager {
 	public Map<Integer, TravelSite> getSquadSiteMap() {
 		return vultureSiteMap;
 	}
-
+	
 	private final List<TravelSite> travelSites = new ArrayList<>();
 	
 	private boolean initialized = false;
@@ -28,6 +28,16 @@ public class VultureTravelManager {
 	
 	public static VultureTravelManager Instance() {
 		return instance;
+	}
+	
+	private static boolean timeToShiftDuty = false;
+	
+	public static boolean timeToShiftDuty() {
+		if (VultureTravelManager.timeToShiftDuty) {
+			VultureTravelManager.timeToShiftDuty = false;
+			return true;
+		}
+		return false;
 	}
 	
 	public void init() {
@@ -104,13 +114,15 @@ public class VultureTravelManager {
 			int vultureCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture);
 			int mineCount = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Vulture_Spider_Mine);
 			
-			int mineNumPerPosition = vultureCount / 4 + 1;
-			int bonumNumPerPosition = (mineCount - 30) / 4;
-			
+			int mineNumPerPosition = vultureCount / 3 + 1;
 			MicroSet.Vulture.spiderMineNumPerPosition = mineNumPerPosition;
+			
+			int bonumNumPerPosition = (mineCount - 10) / 4;
 			if (bonumNumPerPosition > 0) {
 				MicroSet.Vulture.spiderMineNumPerPosition += bonumNumPerPosition;
 			}
+
+			MicroSet.Vulture.spiderMineNumPerGoodPosition = vultureCount / 10 + 1;
 
 			int checkerNum = vultureCount / 4; // 3대1 비율이다.
 			MicroSet.Vulture.maxNumChecker = checkerNum >= 3 ? 3 : checkerNum; // 정찰벌처 최대 3기
@@ -165,6 +177,7 @@ public class VultureTravelManager {
 			return bestTravelSite.baseLocation;
 		} else {
 			vultureSiteMap.remove(vultureId);
+			timeToShiftDuty = true;
 			return null;
 		}
 	}

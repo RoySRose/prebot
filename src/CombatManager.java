@@ -73,9 +73,9 @@ public class CombatManager {
 	private double getWaitingPeriod() {
 		Race enemyRace = InformationManager.Instance().enemyRace;
 		if (enemyRace == Race.Zerg) {
-			return 2.0;
-		} else if (enemyRace == Race.Protoss) {
 			return 3.0;
+		} else if (enemyRace == Race.Protoss) {
+			return 3.3;
 		} else if (enemyRace == Race.Terran) {
 			return 3.0;
 		}
@@ -95,7 +95,7 @@ public class CombatManager {
 	}
 	public void setCombatStrategy(CombatStrategy combatStrategy) {
 		if (this.combatStrategy != combatStrategy) {
-			MyBotModule.Broodwar.sendText("combatStrategy changed : " + combatStrategy);
+//			MyBotModule.Broodwar.sendText("combatStrategy changed : " + combatStrategy);
 			this.combatStrategy = combatStrategy;
 		}
 		
@@ -179,6 +179,16 @@ public class CombatManager {
 	}
 	
 	public void update() {
+		
+//		LagTest test = LagTest.startTest(true);
+//		test.setDuration(0);
+//		
+//		int scvcount1 = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_SCV);
+//		test.estimate();
+//		int scvcount2 = InformationManager.Instance().getNumUnits(UnitType.Terran_SCV, InformationManager.Instance().selfPlayer);
+//		test.estimate();
+//		System.out.println(scvcount1 + ", " + scvcount2);
+		
 		
 		if(ScoutDefenseNeeded){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -562,40 +572,45 @@ public class CombatManager {
 	}
 	
 	private Position getAttackPosition(Squad squad) {
-		// What stuff the squad can attack.
-		boolean canAttackAir = true;
-		boolean canAttackGround = true;
+		// 공격포지션
 		if (squad != null) {
-			Position nextChokePosition = getNextChokePosition(squad);
-			if (nextChokePosition != null) {
-				return nextChokePosition;
+			boolean enemyBaseDestoryed = false;
+			BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+			if (MyBotModule.Broodwar.isVisible(enemyBaseLocation.getTilePosition())) {
+				List<Unit> commands = MapGrid.Instance().getUnitsNear(
+						enemyBaseLocation.getPosition(), 300, false, true, InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
+				if (commands.size() == 0) {
+					enemyBaseDestoryed = true;
+				}
 			}
-		}
-		
-		// Second choice: Attack known enemy buildings.
-		// We assume that a terran can lift the buildings; otherwise, the squad must be able to attack ground.
-		if (canAttackGround || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
-			Map<Integer, UnitInfo> unitAndUnitInfoMap = InformationManager.Instance().getUnitAndUnitInfoMap(MyBotModule.Broodwar.enemy());
-			for (Integer unitId : unitAndUnitInfoMap.keySet()) {
-				UnitInfo ui = unitAndUnitInfoMap.get(unitId);
-
-				if (ui.getType().isBuilding() && ui.getLastPosition() != Position.None) {
-					return ui.getLastPosition();
+			
+			if (!enemyBaseDestoryed) {
+				Position nextChokePosition = getNextChokePosition(squad);
+				if (nextChokePosition != null) {
+					return nextChokePosition;
 				}
 			}
 		}
+		
+		// 적 건물
+		Map<Integer, UnitInfo> unitAndUnitInfoMap = InformationManager.Instance().getUnitAndUnitInfoMap(MyBotModule.Broodwar.enemy());
+		for (Integer unitId : unitAndUnitInfoMap.keySet()) {
+			UnitInfo ui = unitAndUnitInfoMap.get(unitId);
 
-		// Third choice: Attack visible enemy units.
+			if (ui.getType().isBuilding() && ui.getLastPosition() != Position.None) {
+				return ui.getLastPosition();
+			}
+		}
+
+		// 적 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 			if (unit.getType() == UnitType.Zerg_Larva || !CommandUtil.IsValidUnit(unit, false, true) || !unit.isVisible()) {
 				continue;
 			}
-
-			if (unit.isFlying() && canAttackAir || !unit.isFlying() && canAttackGround) {
-				return unit.getPosition();
-			}
+			return unit.getPosition();
 		}
 
+		// 쥐
 		return letsFindRat();
 	}
 	
@@ -911,6 +926,11 @@ public class CombatManager {
 			Position regionCenter = myRegion.getCenter();
 			if (!regionCenter.isValid()) {
 				continue;
+			}
+			
+			BaseLocation base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+			if (regionCenter.getDistance(base.getPosition()) >= 700) {
+				continue; // 일단 안지키도록 함.
 			}
 			
 			boolean doNotAssignMechanicUnit = false;
@@ -1235,9 +1255,32 @@ public class CombatManager {
 //	}
 	
 	private void updateCheckerSquad() {
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters
+				&& InformationManager.Instance().enemyRace == Race.Terran
+				&& centerIsOccupied()) {
+			return;
+		}
+		
 		Squad checkerSquad = squadData.getSquad(SquadName.CHECKER);
 
-		// checker 유닛 할당 // TODO 기왕이면 마인 있는 놈으로.. 그리고 교체
+		// 모든 정찰벌처가 하나의 스파이더 마인도 가지고 있지 않다면 정찰 스쿼드를 교체한다.
+		// 단, 이미 경로에서 벗어나 안정적으로 정찰을 하고 있는 벌처가 돌아오거나 전투중인 벌처를 갑자기 정찰로 빼는건 좋지 않은 영향이 있을 수 있다.
+		// 그러므로 VultureTravelManager에서 교체가 가능한 타이밍을 관리한다.(정찰이 마쳐진 상황)
+		if (!checkerSquad.getUnitSet().isEmpty() && VultureTravelManager.timeToShiftDuty()) {
+			boolean clearSquad = true;
+			for (Unit vulture : checkerSquad.getUnitSet()) {
+				if (vulture.getSpiderMineCount() > 0) {
+					clearSquad = false;
+					break;
+				}
+			}
+			if (clearSquad) {
+				checkerSquad.clear();
+				return;
+			}
+		}
+
+		// checker 유닛 할당
 		List<Unit> spareList = new ArrayList<>();
 		for (Unit unit : combatUnits) {
 			if (checkerSquad.getUnitSet().size() >= MicroSet.Vulture.maxNumChecker) {
@@ -1258,12 +1301,17 @@ public class CombatManager {
 			}
 			squadData.assignUnitToSquad(unit, checkerSquad);
 		}
-	    
+		
 		SquadOrder checkerOrder = new SquadOrder(SquadOrderType.CHECK, getMainAttackLocation(checkerSquad), Combat.CHECKER_RADIUS, "Check it out");
 		checkerSquad.setOrder(checkerOrder);
 	}
 	
 	private void updateGuerillaSquad() {
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters
+				&& InformationManager.Instance().enemyRace == Race.Terran
+				&& centerIsOccupied()) {
+			return;
+		}
 		
 		List<Unit> assignableVultures = new ArrayList<>();
 		for (Unit unit : combatUnits) {
@@ -1271,6 +1319,14 @@ public class CombatManager {
 				Squad unitSquad = squadData.getUnitSquad(unit);
 				if (unitSquad == null || Combat.GUERILLA_PRIORITY > unitSquad.getPriority()) {
 					assignableVultures.add(unit);
+
+					// 전투중일때는 최대 20%의 벌처만을 게릴라로 보낼 수 있다.
+					int vultureCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
+					if (combatStrategy == CombatStrategy.ATTACK_ENEMY && assignableVultures.size() > (int) (vultureCount * 0.2)) {
+						break;
+					} else if (assignableVultures.size() > (int) (vultureCount * 0.8)) {
+						
+					}
 				}
 			}
 		}
@@ -1342,26 +1398,34 @@ public class CombatManager {
 				}
 			}
 			
-			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(
-					squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS, true);
-			Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
-			if (result == Result.Loss) {
-				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
+			List<Unit> workers = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace));
+			if (workers.isEmpty()) {
+				List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS, true);
+				Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
+				if (result == Result.Loss) {
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
+					}
+					squad.clear();
+					continue;
 				}
-				squad.clear();
-				continue;
-			}
 
-			int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
-			if (guerillaScore <= 0) {
-				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
+				int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
+				if (guerillaScore <= 0) {
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
+					}
+					squad.clear();
+					continue;
 				}
-				squad.clear();
-				continue;
 			}
 		}
 		
 	}
+	
+	private boolean centerIsOccupied() {
+		List<UnitInfo> enemyUnitInfos = InformationManager.Instance().getNearbyForce(new Position(2048, 2048), InformationManager.Instance().enemyPlayer, 300);
+		return enemyUnitInfos.size() >= 5;
+	}
 }
+

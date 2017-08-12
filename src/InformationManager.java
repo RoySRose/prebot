@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.print.StreamPrintService;
-
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -1591,14 +1589,14 @@ public class InformationManager {
 		MAP mapDecision = MAP.LostTemple;
 		if (candiMapByPosition == candiMapByName) {
 			mapDecision = candiMapByPosition;
-			System.out.println("map : " + candiMapByPosition + "(100%)");
+//			System.out.println("map : " + candiMapByPosition + "(100%)");
 		} else {
 			if (candiMapByPosition != MAP.Unknown) {
 				mapDecision = candiMapByPosition;
-				System.out.println("map : " + mapDecision + "(mapByName is -> " + candiMapByName + ")");
+//				System.out.println("map : " + mapDecision + "(mapByName is -> " + candiMapByName + ")");
 			} else if (candiMapByName != MAP.Unknown) {
 				mapDecision = candiMapByName;
-				System.out.println("map : " + mapDecision + "(mapByPosition is -> " + candiMapByPosition + ")");
+//				System.out.println("map : " + mapDecision + "(mapByPosition is -> " + candiMapByPosition + ")");
 			}
 		}
 

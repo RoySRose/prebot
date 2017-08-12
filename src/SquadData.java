@@ -77,7 +77,7 @@ public class SquadData {
 	
 	public void assignUnitToSquad(Unit unit, Squad squad) {
 		if (!canAssignUnitToSquad(unit, squad)) {
-			MyBotModule.Broodwar.sendText("We shouldn't be re-assigning this unit!");
+//			MyBotModule.Broodwar.sendText("We shouldn't be re-assigning this unit!");
 			return;
 		}
 		
