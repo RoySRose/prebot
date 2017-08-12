@@ -17,6 +17,7 @@ import bwta.Region;
 public class AnalyzeStrategy {
 
 	int MutalStrategyOnTime;
+	int CarrierStrategyToBasicOnTime;
 	public Boolean hydraStrategy;
 	public Boolean multalStrategy;
 	
@@ -33,7 +34,7 @@ public class AnalyzeStrategy {
 				MyBotModule.Broodwar.self()) >= 2) {
 			BlockingEntrance.Instance().ReturnBuildSpacing();
 		}
-
+		CarrierStrategyToBasicOnTime =0;
 		MutalStrategyOnTime = 0;
 		hydraStrategy = false;
 		multalStrategy = false;
@@ -50,13 +51,28 @@ public class AnalyzeStrategy {
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
 			if(MyBotModule.Broodwar.getFrameCount() > 25000){
-				for (BaseLocation base : InformationManager.Instance().getIslandBaseLocations()) {
-					List<Unit> enemy = MapGrid.Instance().getUnitsNear(base.getPosition(), 600, false, true, null);
-					
-					if(enemy.size()>0){
-						BaseLocation enemymainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-						if(enemymainbase.isIsland()){
-							StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.AttackIsland);
+				
+				
+				Boolean checkisland = true;
+				List<BaseLocation> occupiedBaseLocation = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+				
+				//섬 지역 아닌곳에 상대 유닛이 있으면 패스
+				for (BaseLocation base : occupiedBaseLocation)
+				{
+					if(base.isIsland() == false){
+						checkisland = false;
+					}
+				}
+				
+				if(checkisland == true){
+					for (BaseLocation base : occupiedBaseLocation){
+						List<Unit> enemy = MapGrid.Instance().getUnitsNear(base.getPosition(), 600, false, true, null);
+						
+						if(enemy.size()>0){
+							BaseLocation enemymainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+							if(enemymainbase.isIsland()){
+								StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.AttackIsland);
+							}
 						}
 					}
 				}
@@ -85,127 +101,14 @@ public class AnalyzeStrategy {
 
 	private void AnalyzeVsProtoss() {
 		StrategyManager.StrategysException selectedSE = null;
+		StrategyManager.Strategys selectedS = null;
 
-		Chokepoint enemy_first_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-		Chokepoint enemy_second_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		Chokepoint enemy_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 
-		Chokepoint my_first_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().selfPlayer);
-		Chokepoint my_second_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().selfPlayer);
-		// StrategyManager.StrategysException SE =
-		// StrategyManager.Instance().getCurrentStrategyException();
+		Chokepoint my_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		Chokepoint my_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 
-		/*
-		 * if(StrategyManager.Instance().getCurrentStrategyBasic().equals(
-		 * StrategyManager.Strategys.protossBasic_Templar) &&
-		 * !StrategyManager.Strategys.values().equals(StrategyManager.Strategys.
-		 * protossBasic_Carrier)){
-		 * 
-		 * //String test = StrategyManager.Strategys.protossBasic_Templar;
-		 * //캐리어와 템플러 대비 기본이 아니라면 일반 기본으로
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.protossBasic); // 이런식으로 기본 전략 세팅가능 }
-		 */
-
-		if (MyBotModule.Broodwar.getFrameCount() < 5000 && InformationManager.Instance().isFirstScoutAlive()) {
-			// 4300 프레임이전에
-			if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
-					InformationManager.Instance().enemyPlayer) >= 2
-					&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator,
-							InformationManager.Instance().enemyPlayer) < 1)
-					|| (InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
-							InformationManager.Instance().enemyPlayer) >= 2
-							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,
-									InformationManager.Instance().enemyPlayer) < 1)) {
-				// 어시밀레이터나 코어전에 2게이트라면 질럿 푸시
-				selectedSE = StrategyManager.StrategysException.protossException_ReadyToZealot;
-			}
-
-			if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
-					InformationManager.Instance().enemyPlayer) == 1
-					&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,
-							InformationManager.Instance().enemyPlayer) >= 1) {
-				// 원게이트에서 코어 올라가면 드래군 레디
-				selectedSE = StrategyManager.StrategysException.protossException_ReadyToDragoon;
-			}
-		}
-
-		// 레디투드래군 상태에서 정찰 scv가 죽으면 드래군 푸시
-		if (StrategyManager.Instance()
-				.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot) {
-
-			if (!InformationManager.Instance().isFirstScoutAlive()) {
-				selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
-			}
-		}
-		if (StrategyManager.Instance()
-				.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon) {
-			if (!InformationManager.Instance().isFirstScoutAlive()) {
-				selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
-			}
-
-		}
-
-		// 푸시 판단
-		if (enemy_second_choke != null && MyBotModule.Broodwar.getFrameCount() < 8500) {
-			List<Unit> chkPush = MyBotModule.Broodwar.getUnitsInRadius(enemy_second_choke.getCenter(), 180);
-			int temp = 0;
-			for (Unit enemy : chkPush) {
-				if (enemy.getType() == UnitType.Protoss_Dragoon) {
-					selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
-					break;
-				}
-				if (enemy.getType() == UnitType.Protoss_Zealot) {
-					temp++;
-				}
-				if (temp > 3) {
-					selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
-				}
-			}
-		}
-		// //세컨 초크포인트에 드래군 보이면 드래군 푸시
-		// if(enemy_second_choke != null){
-		// List<Unit> chkDragoondPush =
-		// MyBotModule.Broodwar.getUnitsInRadius(enemy_second_choke.getCenter(),
-		// 160);
-		// for(int dragoon_cnt = 0; dragoon_cnt < chkDragoondPush.size();
-		// dragoon_cnt ++){
-		// if(chkDragoondPush.get(dragoon_cnt).getType() ==
-		// UnitType.Protoss_Dragoon){
-		// selectedSE =
-		// StrategyManager.StrategysException.protossException_DragoonPush;
-		// break;
-		// }
-		// }
-		// }
-
-		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToZealot
-				|| selectedSE == StrategyManager.StrategysException.protossException_ZealotPush
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush) {
-			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 4) {
-				selectedSE = StrategyManager.StrategysException.Init;
-			}
-		}
-
-		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon
-				|| selectedSE == StrategyManager.StrategysException.protossException_DragoonPush
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush) {
-			if (MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode) && MyBotModule.Broodwar.self()
-					.completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
-					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 2) {
-				selectedSE = StrategyManager.StrategysException.Init;
-			}
-		}
-
+		
 		if (MyBotModule.Broodwar.getFrameCount() < 10000) {
 			// 게이트가 없이 포지더블이나 생더블
 			// FirstExpansionLocation
@@ -216,8 +119,7 @@ public class AnalyzeStrategy {
 			}
 
 			// 포톤이나 포지를 보았을때
-			if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,
-					InformationManager.Instance().enemyPlayer) >= 1
+			if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,InformationManager.Instance().enemyPlayer) >= 1
 					|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Forge,
 							InformationManager.Instance().enemyPlayer) >= 1) {
 				BaseLocation base = null;
@@ -285,9 +187,93 @@ public class AnalyzeStrategy {
 				}
 			}
 		}
+		
+		if(MyBotModule.Broodwar.getFrameCount() < 8500){
+			if (MyBotModule.Broodwar.getFrameCount() < 5000 && InformationManager.Instance().isFirstScoutAlive()) {
+				// 4300 프레임이전에
+				if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
+						InformationManager.Instance().enemyPlayer) >= 2
+						&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator,
+								InformationManager.Instance().enemyPlayer) < 1)
+						|| (InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
+								InformationManager.Instance().enemyPlayer) >= 2
+								&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,
+										InformationManager.Instance().enemyPlayer) < 1)) {
+					// 어시밀레이터나 코어전에 2게이트라면 질럿 푸시
+					selectedSE = StrategyManager.StrategysException.protossException_ReadyToZealot;
+				}
+	
+				if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
+						InformationManager.Instance().enemyPlayer) == 1
+						&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,
+								InformationManager.Instance().enemyPlayer) >= 1) {
+					// 원게이트에서 코어 올라가면 드래군 레디
+					selectedSE = StrategyManager.StrategysException.protossException_ReadyToDragoon;
+				}
+			}
+	
+			// 레디투드래군 상태에서 정찰 scv가 죽으면 드래군 푸시
+			if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot
+					&& MyBotModule.Broodwar.getFrameCount() < 8500
+					) {
+	
+				if (!InformationManager.Instance().isFirstScoutAlive()) {
+					selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+				}
+			}
+			if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon) {
+				if (!InformationManager.Instance().isFirstScoutAlive()) {
+					selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+				}
+	
+			}
+	
+			// 푸시 판단
+			if (enemy_second_choke != null && MyBotModule.Broodwar.getFrameCount() < 8500) {
+				List<Unit> chkPush = MyBotModule.Broodwar.getUnitsInRadius(enemy_second_choke.getCenter(), 100);
+				int temp = 0;
+				for (Unit enemy : chkPush) {
+					if (enemy.getType() == UnitType.Protoss_Dragoon) {
+						selectedSE = StrategyManager.StrategysException.protossException_DragoonPush;
+						break;
+					}
+					if (enemy.getType() == UnitType.Protoss_Zealot) {
+						temp++;
+					}
+					if (temp > 3) {
+						selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+						break;
+					}
+				}
+			}
+		}
 
-		if (StrategyManager.Instance()
-				.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
+		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToZealot
+				|| selectedSE == StrategyManager.StrategysException.protossException_ZealotPush
+				|| StrategyManager.Instance()
+						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot
+				|| StrategyManager.Instance()
+						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush) {
+			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 4) {
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+
+		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon
+				|| selectedSE == StrategyManager.StrategysException.protossException_DragoonPush
+				|| StrategyManager.Instance()
+						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon
+				|| StrategyManager.Instance()
+						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush) {
+			if (MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode) 
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+
+
+		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
 				|| selectedSE == StrategyManager.StrategysException.protossException_DoubleNexus) {
 			if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY
 					&& StrategyManager.Instance().MyunitPoint >= 60
@@ -296,98 +282,93 @@ public class AnalyzeStrategy {
 			}
 		}
 
-		if (StrategyManager.Instance()
-				.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush) {
+		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush
+				|| selectedSE == StrategyManager.StrategysException.protossException_PhotonRush) {
 			boolean photon_rush = false;
 			BaseLocation base = null;
-			// 1. 본진에 적 포톤캐논수를 센다
-			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-			Region myRegion = base.getRegion();
-			List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
-					InformationManager.Instance().enemyPlayer);
-
-			for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
-				if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
-					photon_rush = true;
-					break;
-				}
-			}
-
-			// 2. 앞마당 지역은 현재 포톤러쉬 상태라면
-			if (!photon_rush) {
-				base = InformationManager.Instance()
-						.getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-				myRegion = base.getRegion();
-				enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
-				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
-					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
-						photon_rush = true;
-						break;
-					}
-				}
-			}
-			// 3. first choke point 도 현재 포톤러쉬 상태라면
-			if (!photon_rush) {
-				// myRegion = choke.getRegions() ;
-				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
-				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
-					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
-						photon_rush = true;
-						break;
-					}
-				}
-			}
-
-			// 3. second choke point 도 현재 포톤러쉬 상태라면
-			if (!photon_rush) {
-				// myRegion = choke.getRegions() ;
-				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
-				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
-					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
-						photon_rush = true;
-						break;
-					}
-				}
-			}
-			// 끝까지 돌려봤을때 캐논이 전부 없다면 아웃
-			if (!photon_rush) {
+//			// 1. 본진에 적 포톤캐논수를 센다
+//			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+//			Region myRegion = base.getRegion();
+//			List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
+//					InformationManager.Instance().enemyPlayer);
+//
+//			for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+//				if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
+//					photon_rush = true;
+//					break;
+//				}
+//			}
+//
+//			// 2. 앞마당 지역은 현재 포톤러쉬 상태라면
+//			if (!photon_rush) {
+//				base = InformationManager.Instance()
+//						.getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+//				myRegion = base.getRegion();
+//				enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+//				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+//					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
+//						photon_rush = true;
+//						break;
+//					}
+//				}
+//			}
+//			// 3. first choke point 도 현재 포톤러쉬 상태라면
+//			if (!photon_rush) {
+//				// myRegion = choke.getRegions() ;
+//				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
+//				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+//					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
+//						photon_rush = true;
+//						break;
+//					}
+//				}
+//			}
+//
+//			// 3. second choke point 도 현재 포톤러쉬 상태라면
+//			if (!photon_rush) {
+//				// myRegion = choke.getRegions() ;
+//				enemyUnitsInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
+//				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+//					if (enemyUnitsInRegion.get(enemy).getType() == UnitType.Protoss_Photon_Cannon) {
+//						photon_rush = true;
+//						break;
+//					}
+//				}
+//			}
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
-
 		}
-
-		if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout,
-				InformationManager.Instance().enemyPlayer) >= 1
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,
-						InformationManager.Instance().selfPlayer) < InformationManager.Instance()
-								.getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)) {
-			// 스카웃은 큰 위협이 안되므로, 골리앗만 맞춰줄것
-
-			// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Scout);
+		
+		if (RespondToStrategy.Instance().enemy_scout == false && (InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout,InformationManager.Instance().enemyPlayer) >= 1)){
 			selectedSE = StrategyManager.StrategysException.protossException_Scout;
-
 		}
-
-		if (selectedSE == StrategyManager.StrategysException.protossException_Scout) {
-			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,
-					InformationManager.Instance().selfPlayer) >= InformationManager.Instance()
-							.getNumUnits(UnitType.Protoss_Scout, InformationManager.Instance().enemyPlayer)) {
-				StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
+		
+		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Scout
+				||selectedSE == StrategyManager.StrategysException.protossException_Scout) {
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) >= 2) {
+				selectedSE = StrategyManager.StrategysException.Init;
+			}
+		}
+		
+		if (RespondToStrategy.Instance().enemy_shuttle == false && (InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle,InformationManager.Instance().enemyPlayer) >= 1)){
+			selectedSE = StrategyManager.StrategysException.protossException_Shuttle;
+		}
+		
+		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Shuttle
+				||selectedSE == StrategyManager.StrategysException.protossException_Shuttle) {
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) >= 2) {
+				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}
 
-//		System.out.println("howmany enemy arbiter: " + InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer));
 		if (RespondToStrategy.Instance().enemy_arbiter == false && (InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer) >= 1
 				|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter_Tribunal,InformationManager.Instance().enemyPlayer) >= 1)){
-			// 아비터 트리뷰널을 봤는데 골리앗이 4마리가 안될경우(기본적으로 섞어 다닐것)
-			
 			selectedSE = StrategyManager.StrategysException.protossException_Arbiter;
 		}
-
 		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_Arbiter
 				||selectedSE == StrategyManager.StrategysException.protossException_Arbiter) {
-			
-//			System.out.println("howmany goliath: " + InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer));
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) >= 4) {
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
@@ -582,14 +563,28 @@ public class AnalyzeStrategy {
 			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
 		}
 
-		if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Stargate,
-				InformationManager.Instance().enemyPlayer) >= 1
-				// 캐리어 대비 전략
-				&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Fleet_Beacon,
-						InformationManager.Instance().enemyPlayer) >= 1) {
-			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic_Carrier);
+		if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Fleet_Beacon, InformationManager.Instance().enemyPlayer) >= 1
+				&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) >= 1) {
+			
+			CarrierStrategyToBasicOnTime = 0;
+			selectedS = StrategyManager.Strategys.protossBasic_Carrier;
 		}
 
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.protossBasic_Carrier){
+			if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier, InformationManager.Instance().enemyPlayer) == 0) {
+				if(CarrierStrategyToBasicOnTime == 0){
+					CarrierStrategyToBasicOnTime = MyBotModule.Broodwar.getFrameCount() + 7000;
+				}
+				else if(CarrierStrategyToBasicOnTime < MyBotModule.Broodwar.getFrameCount()){
+					selectedS = StrategyManager.Strategys.protossBasic;
+				}
+			}
+		}
+		
+		if (selectedS != null) {
+			StrategyManager.Instance().setCurrentStrategyBasic(selectedS);
+		}
+		
 	}
 
 	private void AnalyzeVsTerran() {
@@ -671,6 +666,8 @@ public class AnalyzeStrategy {
 		}
 		
 		
+
+        
 		// 치즈러시 대비
 //		int nongbong_cnt = 0;
 //		Unit enemy_bunker = null;
@@ -792,7 +789,7 @@ public class AnalyzeStrategy {
 
 			selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 
-			if (mutal_cnt > 15 && ling_cnt + hydra_cnt + lurker_cnt < 18) {
+			if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18)||mutal_cnt>24) {
 				selectedS = StrategyManager.Strategys.zergBasic_MutalMany;
 			}
 
@@ -900,7 +897,7 @@ public class AnalyzeStrategy {
 			System.out.println("저글링 업글 상태: " + MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost));
 			selectedSE = StrategyManager.StrategysException.zergException_OnLyLing;
 		}
-		if(selectedSE == StrategyManager.StrategysException.zergException_OnLyLing && (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) > 11
+		if(selectedSE == StrategyManager.StrategysException.zergException_OnLyLing && (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) > 5
 				|| multalStrategy ==true || hydraStrategy == true)){
 			selectedSE = StrategyManager.StrategysException.Init;
 		}
@@ -917,11 +914,11 @@ public class AnalyzeStrategy {
 			} else{
 				if (mutal_cnt >= hydra_cnt * 1.4) {
 					selectedS = StrategyManager.Strategys.zergBasic_Mutal;
+					if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18)||mutal_cnt>24) {
+						selectedS = StrategyManager.Strategys.zergBasic_MutalMany;
+					}
 				} else {
-					selectedS = StrategyManager.Strategys.zergBasic_HydraWave;
-				}
-				if ((mutal_cnt > 15 && ling_cnt + hydra_cnt + lurker_cnt < 18)||mutal_cnt>24) {
-					selectedS = StrategyManager.Strategys.zergBasic_MutalMany;
+					selectedS = StrategyManager.Strategys.zergBasic_HydraMutal;
 				}
 			}
 		}

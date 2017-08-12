@@ -33,7 +33,6 @@ public class ConstructionPlaceFinder {
 	
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
-	private Set<TilePosition> tilesToAvoidAbsoluteForFirstGas = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
@@ -44,7 +43,7 @@ public class ConstructionPlaceFinder {
 	public static ConstructionPlaceFinder Instance() {
 		if (isInitialized == false) {
 			instance.setTilesToAvoid();
-			instance.setTilesToAvoidAbsoluteForFirstGas();
+			instance.setTilesToAvoidForFirstGas();
 			isInitialized = true;
 		}
 		return instance;
@@ -60,9 +59,10 @@ public class ConstructionPlaceFinder {
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (seedPosition != TilePosition.None  && seedPosition.isValid() )
 		{
-			//System.out.println("시드포지션 입력 ==>> (" + seedPosition.getX() + " , " +  seedPosition.getY() + ")" );
-			//std::cout << "getBuildLocationNear " << seedPosition.x << ", " << seedPosition.y << std::endl;
-			desiredPosition = getBuildLocationNear(buildingType, seedPosition);
+			
+			//System.out.println("checking here");
+			desiredPosition = getBuildLocationNear(buildingType, seedPosition, true);
+			
 		}
 		// seedPosition 을 입력하지 않은 경우
 		else {
@@ -97,90 +97,11 @@ public class ConstructionPlaceFinder {
 					}
 				}
 				
-				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition, true);
 				
 				if(desiredPosition == null){
 					BuildManager.Instance().MainBaseLocationFull = true;
 				}
-				break;
-
-			case MainBaseBackYard:
-//				tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-//				tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
-//				tempBaseRegion = BWTA.getRegion(tempBaseLocation.getPosition());
-//
-//				//std::cout << "y";
-//
-//				// (vx, vy) = BaseLocation 와 ChokePoint 간 차이 벡터 = 거리 d 와 각도 t 벡터. 단위는 position
-//				// 스타크래프트 좌표계 : 오른쪽으로 갈수록 x 가 증가 (데카르트 좌표계와 동일). 아래로 갈수록 y가 증가 (y축만 데카르트 좌표계와 반대)
-//				// 삼각함수 값은 데카르트 좌표계에서 계산하므로, vy를 부호 반대로 해서 각도 t 값을 구함 
-//
-//				// FirstChokePoint 가 null 이면, MainBaseLocation 주위에서 가능한 곳을 리턴한다
-//				if (tempChokePoint == null) {
-//					//std::cout << "r";
-//					desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
-//					break;
-//				}
-//
-//				// BaseLocation 에서 ChokePoint 로의 벡터를 구한다
-//				vx = tempChokePoint.getCenter().getX() - tempBaseLocation.getPosition().getX();
-//				//std::cout << "vx : " << vx ;
-//				vy = (tempChokePoint.getCenter().getY() - tempBaseLocation.getPosition().getY()) * (-1);
-//				//std::cout << "vy : " << vy;
-//				d = Math.sqrt(vx * vx + vy * vy) * 0.5; // BaseLocation 와 ChokePoint 간 거리보다 조금 짧은 거리로 조정. BaseLocation가 있는 Region은 대부분 직사각형 형태이기 때문
-//				//std::cout << "d : " << d;
-//				t = Math.atan2(vy, vx + 0.0001); // 라디안 단위
-//				//std::cout << "t : " << t;
-//
-//				// cos(t+90), sin(t+180) 등 삼각함수 Trigonometric functions of allied angles 을 이용. y축에 대해서는 반대부호로 적용
-//
-//				// BaseLocation 에서 ChokePoint 반대쪽 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+180) = -cos(t), sin(t+180) = -sin(t))
-//				bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
-//				by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
-//				//std::cout << "i";
-//				tempTilePosition = new TilePosition(bx, by);
-//				// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-//				
-//				//std::cout << "k";
-//				// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
-//				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
-//					//std::cout << "l";
-//
-//					// BaseLocation 에서 ChokePoint 방향에 대해 오른쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t-90) = sin(t),   sin(t-90) = - cos(t))
-//					bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.sin(t) / Config.TILE_SIZE);
-//					by = tempBaseLocation.getTilePosition().getY() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
-//					tempTilePosition = new TilePosition(bx, by);
-//					// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-//					//std::cout << "m";
-//
-//					if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
-//						// BaseLocation 에서 ChokePoint 방향에 대해 왼쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+90) = -sin(t),   sin(t+90) = cos(t))
-//						bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
-//						by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.cos(t) / Config.TILE_SIZE);
-//						tempTilePosition = new TilePosition(bx, by);
-//						// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-//
-//						if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*Config.TILE_SIZE, by*Config.TILE_SIZE))) {
-//
-//							// BaseLocation 에서 ChokePoint 방향 절반 지점의 Back Yard : 데카르트 좌표계에서 (cos(t),   sin(t))
-//							bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.cos(t) / Config.TILE_SIZE);
-//							by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.sin(t) / Config.TILE_SIZE);
-//							tempTilePosition = new TilePosition(bx, by);
-//							// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
-//							//std::cout << "m";
-//						}
-//
-//					}
-//				}
-//				//std::cout << "z";
-//				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
-//					desiredPosition = getBuildLocationNear(buildingType, tempBaseLocation.getTilePosition());
-//				}
-//				else {
-//					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
-//				}
-//				//std::cout << "w";
-//				// std::cout << "ConstructionPlaceFinder MainBaseBackYard desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
 				break;
 
 			case FirstExpansionLocation:
@@ -222,21 +143,19 @@ public class ConstructionPlaceFinder {
 				}
 				break;
 				
-			case LastBuilingPoint: //TODO 이놈이 마지막이니까.... NULL 일수가 없다.
+			case LastBuilingPoint: 
 				tempTilePosition = InformationManager.Instance().getLastBuilingLocation();
 
-				if(buildingType == UnitType.Terran_Supply_Depot){
-					if(BuildManager.Instance().NextSupplePointFull == true){
-						tempTilePosition = BlockingEntrance.Instance().getSupplyPosition(tempTilePosition);
-						desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
-					
-						break;
-					}
-				}
-				
-				
 				if (tempTilePosition != null) {
-					//System.out.println("I choose here: " + tempTilePosition.toString());
+					if(buildingType == UnitType.Terran_Supply_Depot){
+						if(BuildManager.Instance().FisrtSupplePointFull == true){
+							tempTilePosition = BlockingEntrance.Instance().getSupplyPosition(tempTilePosition);
+							desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
+						
+							break;
+						}
+					}
+				
 					desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
 				}
 //				else{
@@ -244,15 +163,15 @@ public class ConstructionPlaceFinder {
 //				}
 				break;
 				
-			case NextSupplePoint: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+			case NextSupplePoint: 
 				
 				if(buildingType == UnitType.Terran_Supply_Depot){
-					if(BuildManager.Instance().NextSupplePointFull != true){
+					if(BuildManager.Instance().FisrtSupplePointFull != true){
 						tempTilePosition = BlockingEntrance.Instance().getSupplyPosition();
 						desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
 					
 						if(desiredPosition == null){
-							BuildManager.Instance().NextSupplePointFull = true;
+							BuildManager.Instance().FisrtSupplePointFull = true;
 						}
 						break;
 					}
@@ -261,7 +180,7 @@ public class ConstructionPlaceFinder {
 				}
 				break;
 			
-			case getLastBuilingFinalLocation: //TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+			case getLastBuilingFinalLocation: //이놈이 마지막이니까.... NULL 일수가 없다.
 			
 				tempTilePosition = InformationManager.Instance().getLastBuilingFinalLocation();
 				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
@@ -281,7 +200,11 @@ public class ConstructionPlaceFinder {
 	/// desiredPosition 이 valid 한 곳이 아니라면, desiredPosition 를 MainBaseLocation 로 해서 주위를 찾는다<br>
 	/// Returns a suitable TilePosition to build a given building type near specified TilePosition aroundTile.<br>
 	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (다른 유닛들이 자리에 있어서, Pylon, Creep, 건물지을 타일 공간이 전혀 없는 경우 등)
-	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition)
+	
+	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition){
+		return getBuildLocationNear(buildingType, desiredPosition, false);
+	}
+	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, Boolean MethodFix)
 	{
 		//System.out.println("getBuildLocationNear 입력111 ==>> (" + desiredPosition.getX() + " , " +  desiredPosition.getY() + ")" );
 		if (buildingType.isRefinery())
@@ -301,13 +224,11 @@ public class ConstructionPlaceFinder {
 		// TODO 과제 : 건설 위치 탐색 방법은 ConstructionPlaceSearchMethod::SpiralMethod 로 하는데, 더 좋은 방법은 생각해볼 과제이다
 		int constructionPlaceSearchMethod = 0;
 		
-		if(buildingType == UnitType.Terran_Supply_Depot){
+		if(buildingType == UnitType.Terran_Supply_Depot && MethodFix == false){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		}else{ 
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();	
 		}
-		
-				
 		
 		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
 		int buildingGapSpace = Config.BuildingSpacing;
@@ -325,19 +246,7 @@ public class ConstructionPlaceFinder {
 		if(buildingType == UnitType.Terran_Factory){
 			buildingGapSpace = 0;
 		}
-		
-//		else if (buildingType == UnitType.Protoss_Pylon) {
-//			int numPylons = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
-//			
-//			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
-//			if (numPylons < 3) {
-//				buildingGapSpace = Config.BuildingPylonEarlyStageSpacing;
-//			}
-//			else {
-//				buildingGapSpace = Config.BuildingPylonSpacing;
-//			}
-//		}
-		else if (buildingType == UnitType.Terran_Supply_Depot) {
+		if (buildingType == UnitType.Terran_Supply_Depot) {
 			buildingGapSpace = Config.BuildingSupplyDepotSpacing;
 		}
 		
@@ -396,7 +305,7 @@ public class ConstructionPlaceFinder {
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
-		int maxRange = 42; // maxRange = BWAPI::Broodwar->mapWidth()/4;
+		int maxRange = 38; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 		boolean isPossiblePlace = false;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal())
@@ -451,6 +360,11 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}
+//			if(resultPosition ==null){
+//				System.out.println("chekcking resultPosition: " + currentX + ", "+ currentY);
+//			}else{
+//				System.out.println("chekcking resultPosition: " + resultPosition.toString());
+//			}
 		}
 		else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()) {
 			//서플라이 디팟 용 로직(4X4)
@@ -490,7 +404,7 @@ public class ConstructionPlaceFinder {
 
 						if (isPossiblePlace) {
 							resultPosition = new TilePosition(currentX, currentY);
-							return resultPosition;
+							break;
 						}
 						//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
 					}
@@ -498,6 +412,10 @@ public class ConstructionPlaceFinder {
 					currentY = currentY + depostSizeY;
 					//currentY = currentY + spiralDirectionY;
 				}
+				if (isPossiblePlace) {
+					break;
+				}
+				
 				currentY = desiredPosition.getY();
 				currentX = currentX + depostSizeX;
 			}
@@ -542,6 +460,11 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}*/
+//			if(resultPosition ==null){
+//				System.out.println("chekcking resultPosition2: " + currentX + ", "+ currentY);
+//			}else{
+//				System.out.println("chekcking resultPosition2: " + resultPosition.toString());
+//			}
 		}
 		else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.NewMethod.ordinal()) {
 		}
@@ -661,15 +584,12 @@ public class ConstructionPlaceFinder {
 					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
-					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Bunker) {
+					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret) {
 						if (isTilesToAvoid(x, y)) {
 							return false;
 						}
 					}
 					
-					if (isTilesToAvoidAbsoluteForFirstGas(x, y)) {
-						return false;
-					}
 					if (isTilesToAvoidAbsolute(x, y)) {
 						return false;
 					}
@@ -978,16 +898,6 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
-	public final boolean isTilesToAvoidAbsoluteForFirstGas(int x, int y)
-	{
-		for (TilePosition t : tilesToAvoidAbsoluteForFirstGas) {
-			if (t.getX() == x && t.getY() == y) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 	public final boolean isTilesToAvoidAbsolute(int x, int y)
 	{
 		for (TilePosition t : tilesToAvoidAbsolute) {
@@ -1147,40 +1057,46 @@ public class ConstructionPlaceFinder {
 						}
 					}
 				}
+				if(InformationManager.Instance().enemyRace != Race.Protoss) {
+					
+					int fromx = mineral.getTilePosition().getX()-2;
+					int fromy = mineral.getTilePosition().getY()-2;
+					
+					for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
+				        {
+				            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
+				            {
+							TilePosition temp = new TilePosition(x,y);
+							tilesToAvoid.add(temp);
+						}
+					}
+				}
 			}
+			
 		}
 	}
-	
-	public void clearTilesToAvoidAbsoluteForFirstGas()
-	{
-		tilesToAvoidAbsoluteForFirstGas.clear();
-	}
-	public void setTilesToAvoidAbsoluteForFirstGas()
+	public void setTilesToAvoidForFirstGas()
 	{
 		Unit firstgas = InformationManager.Instance().getMyfirstGas();
 	
-		int fromx = firstgas.getTilePosition().getX()-1;
-		int fromy = firstgas.getTilePosition().getY()-1;
+		int fromx = firstgas.getTilePosition().getX()-2;
+		int fromy = firstgas.getTilePosition().getY()-2;
 		
-		for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
 	        {
-	            for (int y = fromy ; y > 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
+	            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
 	            {
 	            	if(fromx < x && x < fromx+5 && fromy < y && y < fromy+3){
 						continue;
 					}
 				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoidAbsoluteForFirstGas.add(temp);
+				tilesToAvoid.add(temp);
 			}
 		}
 	}
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들의 목록을 리턴합니다		
 	public Set<TilePosition> getTilesToAvoid() {
 		return tilesToAvoid;
-	}
-	
-	public Set<TilePosition> getTilesToAvoidAbsoluteForFirstGas() {
-		return tilesToAvoidAbsoluteForFirstGas;
 	}
 
 	public Set<TilePosition> getTilesToAvoidAbsolute() {

@@ -65,6 +65,7 @@ public class MicroBuilding extends MicroManager {
 		
 		Chokepoint SC = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
 		Position halfway = new Position((SC.getX()*3+2048)/4, (SC.getY()*3+2048)/4);
+		Position halfwaychecker = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
 		
 		for (Unit flyBuilding : Buildings) {
 			if (!CommonUtils.executeUnitRotation(flyBuilding, LagObserver.groupsize())) {
@@ -145,11 +146,15 @@ public class MicroBuilding extends MicroManager {
 						GoalPos = closestTarget.getLastPosition();
 					}
 				}
-				if(flyBuilding.getDistance(leader) > 220){
+				if(flyBuilding.getDistance(leader) > 350){
 					GoalPos = LeaderPos;
 				}
-				if(LeaderPos.getDistance(order.getPosition()) > halfway.getDistance(order.getPosition())){
+				if(LeaderPos.getDistance(order.getPosition()) > halfwaychecker.getDistance(order.getPosition())){
 					GoalPos = halfway;
+				}
+				
+				if(LeaderPos.getDistance(order.getPosition()) < flyBuilding.getDistance(order.getPosition())){
+					GoalPos = order.getPosition();
 				}
 
 				

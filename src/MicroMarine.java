@@ -31,7 +31,10 @@ public class MicroMarine extends MicroManager {
 				CC = unit;
 			}
 		}
-
+		if(InformationManager.Instance().isGasRushed() == true){
+			DontGoFar = false;
+		}
+		
 		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(true);
 		kitingOption.setUnitedKiting(false); // TODO 같이 가 좋으까?
