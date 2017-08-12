@@ -1057,11 +1057,11 @@ public class CombatManager {
 				continue;
 			}
 			
-			BaseLocation base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-			if (regionCenter.getDistance(base.getPosition()) >= 700) {
+			BaseLocation mainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+			if (!regionCenter.equals(BWTA.getRegion(mainBase.getPosition()).getCenter()) && regionCenter.getDistance(firstExpansion.getPosition()) >= 800) {
 				continue; // 일단 안지키도록 함.
 			}
-			
 			boolean doNotAssignMechanicUnit = false;
 			
 			// 초반 방어모드에서 앞마당 방어스쿼드를 위해 메카닉 유닛을 할당하지 않는다.
