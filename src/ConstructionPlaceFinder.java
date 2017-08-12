@@ -668,6 +668,12 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
+					//서플라이 지역은 서플라이 외에는 지을수 없다.
+					if (b.getType() != UnitType.Terran_Supply_Depot) {
+						if (isTilesToAvoidSupply(x, y)) {
+							return false;
+						}
+					}
 					
 					if (isTilesToAvoidAbsoluteForFirstGas(x, y)) {
 						return false;
