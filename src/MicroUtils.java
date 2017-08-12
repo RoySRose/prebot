@@ -110,7 +110,7 @@ public class MicroUtils {
 //			return false;
 //		}
 		if (MapGrid.Instance().scanIsActiveAt(targetPosition)) {
-			MyBotModule.Broodwar.sendText("SmartScan : last scan still on");
+//			MyBotModule.Broodwar.sendText("SmartScan : last scan still on");
 			return false;
 		}
 
@@ -140,7 +140,7 @@ public class MicroUtils {
 		int readyToCount = 0;
 		
 		if (totalCount == 0) {
-			MyBotModule.Broodwar.sendText("groupKite : totalCount is zero");
+//			MyBotModule.Broodwar.sendText("groupKite : totalCount is zero");
 			return 0;
 		}
 		
@@ -148,7 +148,7 @@ public class MicroUtils {
 			if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 					!CommandUtil.IsValidUnit(rangedUnit) ||
 					rangedUnit.getType() != rangedUnitType) {
-				MyBotModule.Broodwar.sendText("groupKite : bad arg");
+//				MyBotModule.Broodwar.sendText("groupKite : bad arg");
 				return 0;
 			}
 			
@@ -221,7 +221,7 @@ public class MicroUtils {
 		if (rangedUnit.getPlayer() != MyBotModule.Broodwar.self() ||
 				!CommandUtil.IsValidUnit(rangedUnit) ||
 				!CommandUtil.IsValidUnit(target, false, false)) {
-			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
+//			MyBotModule.Broodwar.sendText("smartKiteTarget : bad arg");
 			return;
 		}
 
@@ -243,7 +243,8 @@ public class MicroUtils {
 			approachKiting = true;
 			haveToAttack = true;
 			
-		} else if (rangedUnit.getType() == UnitType.Terran_Vulture && MicroUtils.isFactoryUnit(target.getType())) {
+		} else if ((!rangedUnit.isUnderAttack() && target.getType().isWorker())
+				|| (rangedUnit.getType() == UnitType.Terran_Vulture && MicroUtils.isFactoryUnit(target.getType()))) {
 			haveToAttack = true;
 			
 		} else if (rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
@@ -257,7 +258,7 @@ public class MicroUtils {
 			
 			// 명령에 대한 지연시간(latency)을 더한다.
 			timeToCatch += MicroSet.Network.LATENCY * 2; // 후퇴해야 하는 경우, 지연시간을 더하면 도망을 더 늦게갈 수도 있다. if (distanceToAttack > 0) // TODO 조절가능
-			timeToCatch += target.getType().isWorker() ? 12 : 0; // 일꾼에게는 좀 덜 도망가도 된다.
+//			timeToCatch += target.getType().isWorker() ? 12 : 0; // 일꾼에게는 좀 덜 도망가도 된다.
 	
 			int currentCooldown = rangedUnit.isStartingAttack() ? rangedUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
 					: (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
@@ -391,12 +392,10 @@ public class MicroUtils {
 				fleeRadianAdjust = rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
-//		    	MyBotModule.Broodwar.sendText("safe is null : " + moveCalcSize);
 		    	moveCalcSize = moveCalcSize * 2 / 3;
 //		    	riskRadius = riskRadius * 2 / 3;
 		    	
 		    	if (moveCalcSize <= 10 && FLEE_ANGLE.equals(MicroSet.FleeAngle.NARROW_ANGLE)) { // 회피지역이 없을 경우 2) 각 범위를 넓힘
-			    	MyBotModule.Broodwar.sendText("wider angle");
 					FLEE_ANGLE = MicroSet.FleeAngle.WIDE_ANGLE;
 					unitedKiting = false;
 					moveCalcSize = moveDistPerSec;

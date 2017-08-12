@@ -15,9 +15,9 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 	private List<Unit> tankList = new ArrayList<>();
 	private List<Unit> goliathList = new ArrayList<>();
 	
-	private boolean attackWithTank = false;
-	
 	private int saveUnitLevel = 1;
+	
+	private boolean attackWithTank = false;
 	private int stickToTankRadius = 0;
 	
 	public void prepareMechanic(SquadOrder order, List<UnitInfo> enemiesInfo) {
@@ -32,8 +32,10 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		
 		this.attackWithTank = tankList.size() * 6 >= goliathList.size();
 		if (this.attackWithTank) {
-			this.stickToTankRadius = 150 + (int) (Math.log(goliathList.size()) * 15);
-//			System.out.println("stickToTankRadius: " + stickToTankRadius);
+			this.stickToTankRadius = 140 + (int) (Math.log(goliathList.size()) * 15);
+			if (saveUnitLevel == 0) {
+				this.stickToTankRadius += 100;
+			}
 		}
 	}
 	
@@ -58,7 +60,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 		case 1: // kiting
 			boolean haveToFight = true;
 			Unit closeTank = null;
-			if (saveUnitLevel >= 1 && attackWithTank) {
+			if (attackWithTank) {
 				haveToFight = false;
 				int closeDist = 9999999;
 				for (Unit tank : tankList) {

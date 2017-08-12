@@ -21,7 +21,7 @@ public class MicroSet {
 		public static final int GEURILLA_RADIUS = 400;
 		public static final int PELOTON_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_POWER = 150;
-		public static final int GEURILLA_INTERVAL_FRAME = 30 * 24; // 20초
+		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 35초
 		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // 15마리
 		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
 
@@ -31,6 +31,7 @@ public class MicroSet {
 	    public static int maxNumWatcher = 50;
 		public static int maxNumChecker = 0;
 		public static int spiderMineNumPerPosition = 1;
+		public static int spiderMineNumPerGoodPosition = 1;
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;
@@ -40,8 +41,8 @@ public class MicroSet {
 		public static final int MINE_REMOVE_TANK_DIST = 150;
 		public static final int RESV_EXPIRE_FRAME = 24 * 3;
 		
-		public static final int VULTURE_JOIN_SQUAD_FRAME = 15 * 24;
-		public static final int VULTURE_JOIN_SQUAD_FRAME_TERRAN = 20 * 24;
+		public static final int VULTURE_JOIN_SQUAD_FRAME = 13 * 24;
+		public static final int VULTURE_JOIN_SQUAD_FRAME_TERRAN = 18 * 24;
 		
 		public static int getVultureJoinSquadFrame(Race race) {
 			if (race == Race.Terran) {
@@ -97,7 +98,7 @@ public class MicroSet {
 		public static int getRiskRadius(UnitType unitType) {
 			Integer radius = RISK_RADIUS_MAP.get(unitType);
 			if (radius == null) {
-				MyBotModule.Broodwar.sendText("radius is null");
+//				MyBotModule.Broodwar.sendText("radius is null");
 				return RISK_RADIUS_DEFAULT;
 			}
 			return radius;
@@ -140,7 +141,7 @@ public class MicroSet {
 					return 3.0 * 24.0; // 벌처 업그레이드 된 스피드 안나온다. 걍 frame당 3pixel 더 간다고 치자.
 				} else if (!vultureSpeedUpgrade && MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) > 0) {
 					vultureSpeedUpgrade = true;
-					MyBotModule.Broodwar.sendText("Ion Thrusters Upgraded!");
+//					MyBotModule.Broodwar.sendText("Ion Thrusters Upgraded!");
 					return 3.0 * 24.0;
 				}
 			} else if (upgrade == UpgradeType.Charon_Boosters) {
@@ -148,7 +149,7 @@ public class MicroSet {
 					return 3.0 * 24.0; // 골리앗 대공 사정거리 업그레이드 : 5(→8)
 				} else if (!goliathAttkRangeUpgrade && MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) > 0) {
 					goliathAttkRangeUpgrade = true;
-					MyBotModule.Broodwar.sendText("Charon Boosters Upgraded!");
+//					MyBotModule.Broodwar.sendText("Charon Boosters Upgraded!");
 					return 3.0 * 24.0;
 				}
 			}
@@ -161,7 +162,7 @@ public class MicroSet {
 					return true;
 				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Tank_Siege_Mode)) {
 					siegeModeUpgrade = true;
-					MyBotModule.Broodwar.sendText("Siege Mode Upgraded!");
+//					MyBotModule.Broodwar.sendText("Siege Mode Upgraded!");
 					return true;
 				}
 			} else if (tech == TechType.Spider_Mines) {
@@ -169,7 +170,7 @@ public class MicroSet {
 					return true;
 				} else if (InformationManager.Instance().selfPlayer.hasResearched(TechType.Spider_Mines)) {
 					spiderMineUpgrade = true;
-					MyBotModule.Broodwar.sendText("Spider Mines Upgraded!");
+//					MyBotModule.Broodwar.sendText("Spider Mines Upgraded!");
 					return true;
 				} 
 			}
@@ -204,7 +205,7 @@ public class MicroSet {
 		public static Integer[] getFleeAngle(UnitType fleeUnit) {
 			Integer[] angle = FLEE_ANGLE_MAP.get(fleeUnit);
 			if (angle == null) {
-				MyBotModule.Broodwar.sendText("flee angle is null");
+//				MyBotModule.Broodwar.sendText("flee angle is null");
 				angle = WIDE_ANGLE;
 			}
 			

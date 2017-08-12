@@ -19,6 +19,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	private List<Unit> goliathList = new ArrayList<>();
 	
 	private int initFrame = 0;
+	private boolean useInitFrame = false;
 	private int saveUnitLevel = 1;
 	
 	private int siegeModeSpreadRadius = 200;
@@ -34,8 +35,9 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		this.tankList = tankList;
 		this.goliathList = goliathList;
 		this.initFrame = initFrame;
-		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tankList.size()) * 10);
+		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tankList.size()) * 11);
 		this.saveUnitLevel = saveUnitLevel;
+		this.useInitFrame = false;
 	}
 	
 	public void executeMechanicMicro(Unit tank) {
@@ -89,7 +91,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	private void executeTankMode(Unit tank) {
-		if (initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
+		if (!useInitFrame && initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
+			useInitFrame = true;
 			tank.siege();
 			return;
 		}
@@ -158,7 +161,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			
 		case 2: // go
 			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege() && !MicroUtils.existTooNarrowChoke(tank.getPosition())) {
-				Position positionToSiege = findPositionToSiege(siegeModeSpreadRadius); // orderPosition의 중심으로 펼쳐진 시즈 대형을 만든다.
+				Position positionToSiege = findPositionToSiege(tank, siegeModeSpreadRadius); // orderPosition의 중심으로 펼쳐진 시즈 대형을 만든다.
 				if (positionToSiege != null) {
 					if (tank.getDistance(positionToSiege) < 30) {
 						tank.siege();
@@ -184,11 +187,11 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		}
 	}
 	
-	private Position findPositionToSiege(int siegeAreaDist) {
+	private Position findPositionToSiege(Unit tank, int siegeAreaDist) {
 		int seigeNumLimit = 1;
 		int distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
 		
-		while (seigeNumLimit < 10) {
+		while (seigeNumLimit < 8) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
 				for (Integer angle : MicroSet.FleeAngle.EIGHT_360_ANGLE) {
 					double radianAdjust = MicroUtils.rotate(0.0, angle);
@@ -197,36 +200,32 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				    int y = order.getPosition().getY() + fleeVector.getY();
 				    
 				    Position movePosition = new Position(x, y);
-				    if (MicroUtils.isValidGroundPosition(movePosition)) {
+				    if (MicroUtils.isValidGroundPosition(movePosition)
+				    		&& MyBotModule.Broodwar.hasPath(tank.getPosition(), movePosition)
+							&& MicroUtils.isConnectedPosition(tank.getPosition(), movePosition)) {
 				    	if (MicroUtils.existTooNarrowChoke(movePosition)) {
 				    		continue;
 				    	}
 
-				    	boolean somethingInThePosition = false;
-				    	boolean addOnPosition = false;
-				    	List<Unit> exactPositionUnits = MyBotModule.Broodwar.getUnitsInRadius(movePosition, 15);
+				    	List<Unit> exactPositionUnits = MyBotModule.Broodwar.getUnitsInRadius(movePosition, 20);
 				    	for (Unit unit : exactPositionUnits) {
 				    		if (!unit.getType().canMove()) {
-				    			somethingInThePosition = true;
-				    			break;
+				    			continue;// somethingInThePosition
 				    		}
 				    	}
 				    	
-				    	Position pos1 = new Position(movePosition.getX() - 30, movePosition.getY() - 30);
-				    	List<Unit> nearUnits = MapGrid.Instance().getUnitsNear(pos1, 100, true, false, null);
+				    	Position shiftLeftUpPos = new Position(movePosition.getX() - 30, movePosition.getY() - 30);
+				    	List<Unit> nearUnits = MapGrid.Instance().getUnitsNear(shiftLeftUpPos, 100, true, false, null);
 				    	for (Unit nearUnit : nearUnits) {
 				    		if (nearUnit.getType().canBuildAddon()) {
-				    			addOnPosition = true;
-				    			break;
+				    			continue; // addOnPosition
 				    		}
 				    	}
 				    	
-				    	if (!somethingInThePosition && !addOnPosition) {
-				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
-							if (siegeCount < seigeNumLimit) {
-								return movePosition;
-							}
-				    	}
+			    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
+						if (siegeCount < seigeNumLimit) {
+							return movePosition;
+						}
 				    }
 				}
 				

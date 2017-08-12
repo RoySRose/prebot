@@ -37,7 +37,7 @@ public class TargetPriority {
 	public static int getPriority(UnitType attacker, UnitType target) {
 		Map<UnitType, Integer> map = PRIORITY_MAP.get(attacker);
 		if (map == null) {
-			MyBotModule.Broodwar.sendText("priority map is null");
+//			MyBotModule.Broodwar.sendText("priority map is null");
 			return 0;
 		}
 		

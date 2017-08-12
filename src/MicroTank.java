@@ -37,7 +37,7 @@ public class MicroTank extends MicroManager {
 		
 		// 이니시에이팅한다.
 		if (initFrame == 0) {
-			MyBotModule.Broodwar.sendText("initiate!");
+//			MyBotModule.Broodwar.sendText("initiate!");
 			initFrame = MyBotModule.Broodwar.getFrameCount();
 			initTarget = tankTargets.get(0);
 		}
@@ -258,7 +258,7 @@ public class MicroTank extends MicroManager {
 			seigeNumLimit++;
 		}
 		
-		MyBotModule.Broodwar.sendText("findPositionToSiege is null");
+//		MyBotModule.Broodwar.sendText("findPositionToSiege is null");
 		return null;
 	}
 	
@@ -309,7 +309,7 @@ public class MicroTank extends MicroManager {
 			        } else if (splashUnitDistance <= MicroSet.Tank.SIEGE_MODE_OUTER_SPLASH_RAD) {
 			        	priorityInSpash = (int) (priorityInSpash * 0.2);
 			        } else {
-			        	MyBotModule.Broodwar.sendText("tank splash enemy error");
+//			        	MyBotModule.Broodwar.sendText("tank splash enemy error");
 			        }
 			        
 			        // 아군일 경우 우선순위를 뺀다. priority값이 마이너스(-)가 나올 수도 있다. 이때는 타겟으로 지정하지 않는다.
