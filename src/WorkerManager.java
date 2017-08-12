@@ -386,7 +386,9 @@ public class WorkerManager {
 		{
 			
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
-			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
+			// 나르는 건물 수리 안함.
+			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()
+					&& !unit.isFlying())
 			{
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 0);
 				setRepairWorker(repairWorker, unit);
@@ -433,7 +435,9 @@ public class WorkerManager {
 			{
 				double dist = worker.getDistance(p);
 
-				if (closestWorker == null || (dist < closestDist && worker.isCarryingMinerals() == false && worker.isCarryingGas() == false ))
+				if(worker.isCarryingMinerals() || worker.isCarryingGas())
+					continue;
+				if (closestWorker == null || (dist < closestDist ))
 	            {
 					closestWorker = worker;
 	                dist = closestDist;
