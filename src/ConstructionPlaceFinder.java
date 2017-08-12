@@ -35,6 +35,8 @@ public class ConstructionPlaceFinder {
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsoluteForFirstGas = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
+	//서플라이 짓는 지역
+	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
