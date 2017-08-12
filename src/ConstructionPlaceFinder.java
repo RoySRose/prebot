@@ -1151,6 +1151,20 @@ public class ConstructionPlaceFinder {
 		}
 	}
 	
+	public void setTilesToAvoidSupply() {
+		
+		int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
+		int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
+		
+		for(int x = 0; x < 9 ; x++){
+			for(int y = 0; y < 8 ; y++){
+				TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+				tilesToAvoidSupply.add(t);
+				System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+			}
+		}
+	}
+	
 	public void clearTilesToAvoidAbsoluteForFirstGas()
 	{
 		tilesToAvoidAbsoluteForFirstGas.clear();
