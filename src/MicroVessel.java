@@ -7,6 +7,7 @@ import java.util.Map;
 
 import bwapi.Order;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -39,7 +40,7 @@ public class MicroVessel extends MicroManager {
 	
 	 
 	private final static double sVesselCheckSpeed = UnitType.Terran_Science_Vessel.topSpeed()*8;
-	private final static int sVesselCheckRadius = UnitType.Terran_Science_Vessel.sightRange()+400;
+	private final static int sVesselCheckRadius = UnitType.Terran_Science_Vessel.sightRange();
 
 	@Override
 	protected void executeMicro(List<Unit> targets) {
@@ -64,15 +65,18 @@ public class MicroVessel extends MicroManager {
 			//싸베 디펜시브 매트릭스 쓰기
 			if(sVessel.getEnergy() > 100){
 				List<Unit> matrix_targets = null;
-				matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius, true, false, null);
+				matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius+300, true, false, null);
 				
+				System.out.println("matrix in!!");
 				for (Unit target : matrix_targets) {
 					if(target.getType() == UnitType.Terran_SCV){
 						continue;
 					}
+					
 					if(target.isUnderAttack() && target.getHitPoints() < target.getInitialHitPoints()*0.7
 							&& !target.isDefenseMatrixed() && target.getHitPoints() > target.getInitialHitPoints()*0.15 ){
 						CommandUtil.useTechTarget(sVessel,TechType.Defensive_Matrix, target);
+						System.out.println("matrix used!!!");
 						return;
 					}
 				}
@@ -86,6 +90,7 @@ public class MicroVessel extends MicroManager {
 					if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker
 							|| unit.getType() == UnitType.Terran_Wraith || unit.getType() == UnitType.Terran_Ghost || unit.getType() == UnitType.Protoss_Arbiter){
 						int tempdist = unit.getDistance(sVessel);
+												
 						if(tempdist < closestDistToVessel){
 							invisibleEnemyUnit = unit;
 							closestDistToVessel = tempdist;
@@ -93,9 +98,7 @@ public class MicroVessel extends MicroManager {
 					}
 				}
 			}
-			if(closestDistToVessel < UnitType.Terran_Science_Vessel.sightRange()*2/3){
-				invisibleEnemyUnit = sVessel;
-			}
+			
 			if(invisibleEnemyUnit == null){
 				closestDistToVessel = 100000;
 				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
@@ -117,6 +120,9 @@ public class MicroVessel extends MicroManager {
 				if(nearallies.size() > 2){
 					System.out.println("Vessel : and I'm going wait!!");
 					order.setPosition(invisibleEnemyUnit.getPosition());//움직이시오.
+					if(invisibleEnemyUnit.getDistance(sVessel) < UnitType.Terran_Science_Vessel.sightRange()*2/3){
+						order.setPosition(sVessel.getPosition());
+					}
 				}else{
 					System.out.println("Vessel : But I'm not going to less friends!");
 				}
@@ -126,18 +132,18 @@ public class MicroVessel extends MicroManager {
 			double mostDangercheck = -99999;
 			
 			List<Unit> dangerous_targets = null;
-			dangerous_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius, false, true, UnitType.Terran_Missile_Turret);
-			dangerous_targets.addAll(MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius, false, true, UnitType.Terran_Goliath));
+			dangerous_targets =  MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
+			
 			
 			for (Unit target : dangerous_targets) {
 				
 				//wraith 일때 아군 골리앗이 주위에 있으면 무시
-				if(target.getType() == UnitType.Terran_Wraith){
-					List<Unit> neargoliaths = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange()/2, true, false, UnitType.Terran_Goliath);
-					if(neargoliaths.size() > 2){
-						continue;
-					}
-				}
+//				if(target.getType() == UnitType.Terran_Wraith){
+//					List<Unit> neargoliaths = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange()/2, true, false, UnitType.Terran_Goliath);
+//					if(neargoliaths.size() > 2){
+//						continue;
+//					}
+//				}
 				
 				//프로토스, 저그에 대한 소스도... 
 //				if(target.getType() == UnitType.Terran_Wraith){
@@ -185,6 +191,7 @@ public class MicroVessel extends MicroManager {
 		}
 	}
 	
+	
 	public static boolean isValidPosition(Unit unit, Position position) {
 		if(unit.isFlying()){
 			return position.isValid();
@@ -218,7 +225,7 @@ public class MicroVessel extends MicroManager {
 				
 			    Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
 				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
-				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
+				//Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
 				if(rangedUnit.getID() == 102){
 				//System.out.print("fleeVector: " + fleeVector.toString());

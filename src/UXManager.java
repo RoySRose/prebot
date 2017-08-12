@@ -891,6 +891,29 @@ public class UXManager {
 
 			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
 		}
+		
+		Set<TilePosition> tilesToAvoid2 = ConstructionPlaceFinder.Instance().getTilesToAvoidAbsoluteForFirstGas();
+		for (TilePosition t : tilesToAvoid2)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
+		}
+		
+		Set<TilePosition> tilesToAvoid3 = ConstructionPlaceFinder.Instance().getTilesToAvoidAbsolute();
+		for (TilePosition t : tilesToAvoid3)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
+		}
+		
 	}
 
 	/// ConstructionQueue 를 Screen 에 표시합니다

@@ -724,17 +724,17 @@ public class MicroUtils {
 		
 		BaseLocation enemyMainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-		
 		if(enemyMainBase == null){
 			return null;
 		}
 		
-		BaseLocation AttackLocation = null;
-		
-		if(enemyFirstExpansion != null){
-			AttackLocation = enemyFirstExpansion;
-		}else{
-			AttackLocation = enemyMainBase;
+		BaseLocation AttackLocation = enemyMainBase;
+		List<BaseLocation> enemyBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+		for(BaseLocation enemyBase : enemyBases){
+			if (enemyFirstExpansion.getTilePosition().equals(enemyBase.getTilePosition())){
+				AttackLocation = enemyFirstExpansion;
+				break;
+			}
 		}
 		
 		Unit leader = null;
@@ -762,19 +762,20 @@ public class MicroUtils {
 				}
 			}
 		}
-		if(leader == null){
-			minimumDistance = 999999;
-			for (Unit unit : units) {
-				if(unit == null){break;}
-				if(unit.getType() == UnitType.Terran_Vulture){
-					int dist = unit.getDistance(AttackLocation.getPosition());
-					if (dist < minimumDistance) {
-						leader = unit;
-						minimumDistance = dist;
-					}
-				}
-			}
-		}
+		//벌쳐는 리더가 될수 없다
+//		if(leader == null){
+//			minimumDistance = 999999;
+//			for (Unit unit : units) {
+//				if(unit == null){break;}
+//				if(unit.getType() == UnitType.Terran_Vulture){
+//					int dist = unit.getDistance(AttackLocation.getPosition());
+//					if (dist < minimumDistance) {
+//						leader = unit;
+//						minimumDistance = dist;
+//					}
+//				}
+//			}
+//		}
 		UXManager.Instance().leader = leader;
 		return leader;
 		

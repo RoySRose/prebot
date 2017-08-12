@@ -70,7 +70,18 @@ public class ConstructionManager {
 				WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 			}
 			if (b.getFinalPosition() != null) {
-				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), b.getType().tileWidth(), b.getType().tileHeight());
+				
+				int width = b.getType().tileWidth();
+				int height = b.getType().tileHeight();
+				
+				if (b.getType() == UnitType.Terran_Command_Center ||
+						b.getType() == UnitType.Terran_Factory ||
+						b.getType() == UnitType.Terran_Starport ||
+						b.getType() == UnitType.Terran_Science_Facility)
+					{
+						width += 2;
+				}
+				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 			}
 	        constructionQueue.remove(b);
 	    }
@@ -196,8 +207,19 @@ public class ConstructionManager {
 				b.setFinalPosition(testLocation);
 				b.setStatus(ConstructionTask.ConstructionStatus.Assigned.ordinal());
 
+				int width = b.getType().tileWidth();
+				int height = b.getType().tileHeight();
+				
+				if (b.getType() == UnitType.Terran_Command_Center ||
+						b.getType() == UnitType.Terran_Factory ||
+						b.getType() == UnitType.Terran_Starport ||
+						b.getType() == UnitType.Terran_Science_Facility)
+					{
+						width += 2;
+				}
+				
 				// reserve this building's space
-				ConstructionPlaceFinder.Instance().reserveTiles(testLocation, b.getType().tileWidth(), b.getType().tileHeight());
+				ConstructionPlaceFinder.Instance().reserveTiles(testLocation, width, height);
 				b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 	        }
 	    }
@@ -253,8 +275,18 @@ public class ConstructionManager {
 				// Unassigned 된 상태로 되돌린다
 				WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 
+				int width = b.getType().tileWidth();
+				int height = b.getType().tileHeight();
+				
+				if (b.getType() == UnitType.Terran_Command_Center ||
+						b.getType() == UnitType.Terran_Factory ||
+						b.getType() == UnitType.Terran_Starport ||
+						b.getType() == UnitType.Terran_Science_Facility)
+					{
+						width += 2;
+				}
+				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 				// free the previous location in reserved
-				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), b.getType().tileWidth(), b.getType().tileHeight());
 				b.setConstructionWorker(null);
 				b.setBuildCommandGiven(false);
 				b.setFinalPosition(TilePosition.None);
@@ -299,7 +331,17 @@ public class ConstructionManager {
 						WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 
 						// free the previous location in reserved
-						ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), b.getType().tileWidth(), b.getType().tileHeight());
+						int width = b.getType().tileWidth();
+						int height = b.getType().tileHeight();
+						
+						if (b.getType() == UnitType.Terran_Command_Center ||
+								b.getType() == UnitType.Terran_Factory ||
+								b.getType() == UnitType.Terran_Starport ||
+								b.getType() == UnitType.Terran_Science_Facility)
+							{
+								width += 2;
+						}
+						ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 
 						// nullify its current builder unit
 						b.setConstructionWorker(null);
@@ -367,7 +409,17 @@ public class ConstructionManager {
 	                }
 
 	                // free this space
-	                ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(),b.getType().tileWidth(),b.getType().tileHeight());
+	                int width = b.getType().tileWidth();
+					int height = b.getType().tileHeight();
+					
+					if (b.getType() == UnitType.Terran_Command_Center ||
+							b.getType() == UnitType.Terran_Factory ||
+							b.getType() == UnitType.Terran_Starport ||
+							b.getType() == UnitType.Terran_Science_Facility)
+						{
+							width += 2;
+					}
+					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 
 					// put it in the under construction vector
 	                b.setStatus(ConstructionTask.ConstructionStatus.UnderConstruction.ordinal());

@@ -50,7 +50,7 @@ public class InformationManager {
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
 	private boolean checkGasRush;
-	private int MainBaseSuppleLimit;
+//	private int MainBaseSuppleLimit;
 	private Unit FirstVulture;
 	private Position firstenemyunit;
 	
@@ -115,7 +115,7 @@ public class InformationManager {
 		gasRushEnemyRefi = null;
 		gasRushed = false;
 		checkGasRush = true;
-		MainBaseSuppleLimit =0;
+//		MainBaseSuppleLimit =0;
 		FirstVulture = null;
 		Position firstenemyunit = null;
 		
@@ -167,23 +167,23 @@ public class InformationManager {
 		updateFirstGasInformation();
 		updateMapSpecificInformation();
 		updateChokePointAndExpansionLocation();
-		checkTileForSupply();
+//		checkTileForSupply();
 	}
 
-	private void checkTileForSupply() {
-
-		int MainBaseSpaceForSup =0;
-		Polygon temp= getMainBaseLocation(selfPlayer).getRegion().getPolygon();
-		for(int y=0; y<128 ; y++){
-			for(int x=0; x<128 ; x++){
-				Position test2 = new Position(x*32+16,y*32+16);
-				if(temp.isInside(test2)){
-					MainBaseSpaceForSup++;
-				}
-			}
-		}
-		MainBaseSuppleLimit =  (int)((MainBaseSpaceForSup - 106)/30);
-	}
+//	private void checkTileForSupply() {
+//
+//		int MainBaseSpaceForSup =0;
+//		Polygon temp= getMainBaseLocation(selfPlayer).getRegion().getPolygon();
+//		for(int y=0; y<128 ; y++){
+//			for(int x=0; x<128 ; x++){
+//				Position test2 = new Position(x*32+16,y*32+16);
+//				if(temp.isInside(test2)){
+//					MainBaseSpaceForSup++;
+//				}
+//			}
+//		}
+//		MainBaseSuppleLimit =  (int)((MainBaseSpaceForSup - 106)/30)+5;
+//	}
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
@@ -1398,9 +1398,9 @@ public class InformationManager {
 	public Unit getMyfirstGas() {
 		return myfirstGas;
 	}
-	public int getMainBaseSuppleLimit() {
-		return MainBaseSuppleLimit;
-	}
+//	public int getMainBaseSuppleLimit() {
+//		return MainBaseSuppleLimit;
+//	}
 	
 	//점령한 베이스 개수 확인
 	public int getOccupiedBaseLocationsCnt(Player player) {

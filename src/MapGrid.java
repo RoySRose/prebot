@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -282,6 +283,50 @@ public class MapGrid {
 //				}
 //			}
 //		}
+	}
+	
+	public List<Unit> getUnitsNearForAir(Position position, int radius, boolean ourUnits, boolean oppUnits)
+	{
+		List<Unit> units = new ArrayList<>();
+		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
+		for (Unit u : unitsInRadius) {
+			if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
+				
+				if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+					if(u.getType() == UnitType.Protoss_Dragoon
+							|| u.getType() == UnitType.Protoss_Archon
+							|| u.getType() == UnitType.Protoss_Carrier
+							|| u.getType() == UnitType.Protoss_Corsair
+							|| u.getType() == UnitType.Protoss_Scout
+							){
+						if (!units.contains(u)) {
+							units.add(u);
+						}
+					}
+				}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+					if(u.getType() == UnitType.Terran_Missile_Turret
+							|| u.getType() == UnitType.Terran_Goliath
+							|| u.getType() == UnitType.Terran_Marine
+							|| u.getType() == UnitType.Terran_Wraith
+							){
+						if (!units.contains(u)) {
+							units.add(u);
+						}
+					}
+				}else {
+					if(u.getType() == UnitType.Zerg_Hydralisk
+							|| u.getType() == UnitType.Zerg_Mutalisk
+							|| u.getType() == UnitType.Zerg_Scourge
+							|| u.getType() == UnitType.Zerg_Devourer
+							){
+						if (!units.contains(u)) {
+							units.add(u);
+						}
+					}
+				}
+			}
+		}
+		return units;
 	}
 	
 	public List<Unit> getUnitsNear(Position position, int radius, boolean ourUnits, boolean oppUnits, UnitType unitType)

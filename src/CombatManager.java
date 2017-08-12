@@ -182,7 +182,7 @@ public class CombatManager {
 		
 		if(ScoutDefenseNeeded){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if((unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Bunker || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
+				if((unit.getType() == UnitType.Terran_Marine || (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 1 &&  unit.getType() == UnitType.Terran_Bunker) || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
 					ScoutDefenseNeeded = false;
 				}
 			}
@@ -483,7 +483,7 @@ public class CombatManager {
 		if(InformationManager.Instance().enemyRace == Race.Protoss){
 			
 			int energy = 50;
-			if(RespondToStrategy.Instance().enemy_dark_templar == true){
+			if(RespondToStrategy.Instance().enemy_dark_templar == true || RespondToStrategy.Instance().enemy_arbiter == true ){
 				energy = 150;
 			}
 			
@@ -597,6 +597,7 @@ public class CombatManager {
 				}
 			}
 		}
+		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 				
 	}
 	
@@ -1307,9 +1308,11 @@ public class CombatManager {
 
 		if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
 			List<Unit> units = squadData.getSquad(SquadName.MAIN_ATTACK).getUnitSet();
-			if (units != null && !units.isEmpty()) {
+			if (units.size()>0) {
 				Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(squadData.getSquad(SquadName.MAIN_ATTACK)));
-				vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				if(leader !=null){
+					vesselOrder = new SquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
+				}
 			}
 		}
 		vesselSquad.setOrder(vesselOrder);
@@ -1321,12 +1324,14 @@ public class CombatManager {
 			if (!CommandUtil.IsValidUnit(unit)) {
 				continue;
 			}
-	        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
-				squadData.assignUnitToSquad(unit, buildingSquad);// 
-				
-				//여기서 각 유닛별 order를 지정한다. by insaneojw
-				//setUnitOrder(unitId, order)
-	        }
+			if(StrategyManager.Instance().BuildingGO == true){
+		        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
+					squadData.assignUnitToSquad(unit, buildingSquad);// 
+					
+					//여기서 각 유닛별 order를 지정한다. by insaneojw
+					//setUnitOrder(unitId, order)
+		        }
+			}
 	    }
 
 		BaseLocation temp= InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
