@@ -240,7 +240,7 @@ public class StrategyManager {
 		}
 
 		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 3200) {
+		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 4500) {
 			executeSupplyManagement();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 43 == 0) {
@@ -1543,7 +1543,7 @@ public class StrategyManager {
 		int myunitPoint = getFacUnits();
 		
 		//공통 예외 상황
-		if((myunitPoint > 190 || MyBotModule.Broodwar.self().supplyUsed() > 392 )&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
+		if((myunitPoint > 170 || MyBotModule.Broodwar.self().supplyUsed() > 392 )&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
 			if(Config.BroodwarDebugYN){
 			MyBotModule.Broodwar.printf("Many Unit Attack!");
 			}
@@ -1638,17 +1638,20 @@ public class StrategyManager {
 				unitPoint += 20;
 			}
 			
-			if(LastStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
-					&& CurrentStrategyException == StrategyManager.StrategysException.Init
-					&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){
-				
-				int temptotPoint = 	myunitPoint + expansionPoint + unitPoint + 40;
-				if(temptotPoint > 120){
-					CombatStartCase = 4;
-				}
-				
-				
-			}
+			unitPoint += InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,InformationManager.Instance().enemyPlayer)*4;
+			
+//			
+//			if(LastStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
+//					&& CurrentStrategyException == StrategyManager.StrategysException.Init
+//					&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){
+//				
+//				int temptotPoint = 	myunitPoint + expansionPoint + unitPoint + 40;
+//				if(temptotPoint > 120){
+//					CombatStartCase = 4;
+//				}
+//				
+//				
+//			}
 				
 			//앞마당 photo
 //			if(StrategysException.protossException_ForgeDouble && myunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
@@ -1665,6 +1668,7 @@ public class StrategyManager {
 			if( myunitPoint > 80 && killedcombatunit-deadcombatunit > myunitPoint/3 ){//죽인수 - 죽은수 가  현재 내 유닛의 일정 비율이 넘으면 가산점
 				unitPoint += 20;
 			}
+			unitPoint += InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony,InformationManager.Instance().enemyPlayer)*4;
 			//triple hatchery
 		}
 
@@ -1675,23 +1679,48 @@ public class StrategyManager {
 			if(Config.BroodwarDebugYN){
 				MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
 			}
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+			
+			if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
+				if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) <
+				MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)*2){
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				}
+				//triple hatchery
+			}else{
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+			}
 			CombatStartCase = 2;
 		}
 		
 		
 		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
-			if(CombatStartCase == 1 && myunitPoint < 50){
+			if(CombatStartCase == 1 && myunitPoint < 30){
 				if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("Retreat1");
 				}
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
-			if(CombatStartCase == 2 && totPoint < 50){
-				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("Retreat2");
+			if(CombatStartCase == 2){
+				
+				if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
+					if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) >
+					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)){
+						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					}
+					//triple hatchery
+					if(totPoint < 50){
+						if(Config.BroodwarDebugYN){
+							MyBotModule.Broodwar.printf("Retreat2");
+						}
+						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					}
+				}else
+				if(totPoint < 50){
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("Retreat2");
+					}
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 				}
-				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 			}
 //			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
 //				if(Config.BroodwarDebugYN){
@@ -1699,13 +1728,13 @@ public class StrategyManager {
 //				}
 //				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 //			}
-			if(CombatStartCase == 4 && myunitPoint < 60){
-				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("Retreat4");
-				}
-				LastStrategyException = StrategyManager.StrategysException.Init;
-				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-			}
+//			if(CombatStartCase == 4 && myunitPoint < 60){
+//				if(Config.BroodwarDebugYN){
+//					MyBotModule.Broodwar.printf("Retreat4");
+//				}
+//				LastStrategyException = StrategyManager.StrategysException.Init;
+//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+//			}
 			
 			if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && (myunitPoint > 150 || unitPoint > 40)){
 				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
@@ -1715,8 +1744,6 @@ public class StrategyManager {
 				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 0);
 			}
 		}
-		
-		
 		
 		MyunitPoint = myunitPoint;
 		ExpansionPoint = expansionPoint;
@@ -1911,6 +1938,8 @@ public class StrategyManager {
 				Current = vsZergHydra;
 				Currentbool = vsZergHydrabool;
 			}
+			Current = vsZergHydra;
+			Currentbool = vsZergHydrabool;
 		}
 		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())

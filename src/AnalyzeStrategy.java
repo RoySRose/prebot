@@ -17,9 +17,10 @@ import bwta.Region;
 public class AnalyzeStrategy {
 
 	int MutalStrategyOnTime;
+	public Boolean MutalStrategyOnTimeChecker;
 	int CarrierStrategyToBasicOnTime;
 	public Boolean hydraStrategy;
-	public Boolean multalStrategy;
+	public Boolean mutalStrategy;
 	
 	private static AnalyzeStrategy instance = new AnalyzeStrategy();
 
@@ -27,17 +28,23 @@ public class AnalyzeStrategy {
 		return instance;
 	}
 
-	public void AnalyzeEnemyStrategy() {
-		// config 건물 관련 여백 조정용 함수
-		// 건물 여백이 0인채로 서플 2개째를 짓고있으면 원래대로 원복
-		if (Config.BuildingSpacing == 0 && InformationManager.Instance().getNumUnits(UnitType.Terran_Supply_Depot,
-				MyBotModule.Broodwar.self()) >= 2) {
-			BlockingEntrance.Instance().ReturnBuildSpacing();
-		}
+	public AnalyzeStrategy(){
+		
 		CarrierStrategyToBasicOnTime =0;
 		MutalStrategyOnTime = 0;
 		hydraStrategy = false;
-		multalStrategy = false;
+		mutalStrategy = false;
+		MutalStrategyOnTimeChecker = false;
+	}
+	
+	public void AnalyzeEnemyStrategy() {
+		// config 건물 관련 여백 조정용 함수
+		// 건물 여백이 0인채로 서플 2개째를 짓고있으면 원래대로 원복
+//		if (Config.BuildingSpacing == 0 && InformationManager.Instance().getNumUnits(UnitType.Terran_Supply_Depot,
+//				MyBotModule.Broodwar.self()) >= 2) {
+//			BlockingEntrance.Instance().ReturnBuildSpacing();
+//		}
+		
 		
 		// 최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행
 		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
@@ -246,14 +253,21 @@ public class AnalyzeStrategy {
 					}
 				}
 			}
+			
+			
 		}
 
 		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToZealot
 				|| selectedSE == StrategyManager.StrategysException.protossException_ZealotPush
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush) {
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToZealot
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush) {
+			if(7000 >  MyBotModule.Broodwar.getFrameCount()){
+				if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,InformationManager.Instance().enemyPlayer)
+					+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot) < 5){
+						RespondToStrategy.Instance().prepareDark = true;
+					}
+			}
+					 
 			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 4) {
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
@@ -261,10 +275,14 @@ public class AnalyzeStrategy {
 
 		if (selectedSE == StrategyManager.StrategysException.protossException_ReadyToDragoon
 				|| selectedSE == StrategyManager.StrategysException.protossException_DragoonPush
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon
-				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush) {
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ReadyToDragoon
+				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush) {
+			if(7000 >  MyBotModule.Broodwar.getFrameCount()){
+				if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,InformationManager.Instance().enemyPlayer)
+					+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) < 4){
+						RespondToStrategy.Instance().prepareDark = true;
+					}
+			}
 			if (MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode) 
 					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
@@ -764,6 +782,9 @@ public class AnalyzeStrategy {
 			selectedSE = StrategyManager.StrategysException.Init;
 		}
 		
+//		System.out.print("frame: " + MyBotModule.Broodwar.getFrameCount());
+//		
+//		System.out.print("mutaframe: " + MutalStrategyOnTime);
 //		System.out.print("hydra den: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den,
 //				InformationManager.Instance().enemyPlayer));
 //		
@@ -778,8 +799,10 @@ public class AnalyzeStrategy {
 //				InformationManager.Instance().enemyPlayer));
 //		
 //		System.out.print(", lurker: " + InformationManager.Instance().getNumUnits(UnitType.Zerg_Lurker,
-//				InformationManager.Instance().enemyPlayer));
-//		System.out.println();
+//				InformationManager.Instance().enemyPlayer)+ "("+lurker_cnt+")");
+//		System.out.print(", hydraStrategy: " + hydraStrategy);
+//		System.out.print(", mutalStrategy: " + mutalStrategy);
+		
 		// hydra check with lurker
 		if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den,
 				InformationManager.Instance().enemyPlayer) >= 1
@@ -809,26 +832,13 @@ public class AnalyzeStrategy {
 				selectedS = StrategyManager.Strategys.zergBasic_MutalMany;
 			}
 
-			if (multalStrategy == false) {
-				MutalStrategyOnTime = MyBotModule.Broodwar.getFrameCount() + 5000; // 5000 frame동안 일단 뮤탈
+			if (mutalStrategy == false && MutalStrategyOnTimeChecker == false) {
+				MutalStrategyOnTime = MyBotModule.Broodwar.getFrameCount() + 3000; // 5000 frame동안 일단 뮤탈
 			}
-			multalStrategy = true;
+			mutalStrategy = true;
 		}
 		
-		if(hydraStrategy == false && multalStrategy ==false && MyBotModule.Broodwar.getFrameCount() > 8000){
-			
-//			BaseLocation enemy_firstbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-//			List<BaseLocation> enemy_bases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
-//			Boolean enemy_expanded = false; 
-//			
-//			if(enemy_bases.size() > 0 && enemy_firstbase!=null){
-//				for(BaseLocation check : enemy_bases){
-//					if (check.getTilePosition().equals(enemy_firstbase.getTilePosition())){
-//						enemy_expanded = true;
-//					}
-//				}
-//			}
-			//뮤탈 추정... 히드라가 보이면 바로 히드라 전환 가능
+		if(hydra_cnt == 0 && lurker_cnt == 0 && mutalStrategy ==false && MyBotModule.Broodwar.getFrameCount() > 8000){
 			selectedS = StrategyManager.Strategys.zergBasic_Mutal;
 		}
 		// mutal exception
@@ -909,12 +919,12 @@ public class AnalyzeStrategy {
 		}
 
 		//TODO 상대 업글 감지 가능?
-		if(multalStrategy == false && hydraStrategy == false && cntHatchery >= 3 && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost)==1){
+		if(mutalStrategy == false && hydraStrategy == false && cntHatchery >= 3 && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost)==1){
 			System.out.println("저글링 업글 상태: " + MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost));
 			selectedSE = StrategyManager.StrategysException.zergException_OnLyLing;
 		}
 		if(selectedSE == StrategyManager.StrategysException.zergException_OnLyLing && (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) > 5
-				|| multalStrategy ==true || hydraStrategy == true)){
+				|| mutalStrategy ==true || hydraStrategy == true)){
 			selectedSE = StrategyManager.StrategysException.Init;
 		}
 		
@@ -922,19 +932,26 @@ public class AnalyzeStrategy {
 			StrategyManager.Instance().setCurrentStrategyException(selectedSE);
 		}
 
-		if (multalStrategy && hydraStrategy) { // Mutal과 히드라 중에 고른다
+		if (mutalStrategy && hydraStrategy) { // Mutal과 히드라 중에 고른다
 
+//			System.out.print(", choose betwee H,M: " );
 
 			if (MutalStrategyOnTime != 0 && MutalStrategyOnTime > MyBotModule.Broodwar.getFrameCount()) {
 				selectedS = StrategyManager.Strategys.zergBasic_Mutal;
+//				System.out.print(", chose M1" );
 			} else{
-				if (mutal_cnt >= (hydra_cnt+lurker_cnt) * 1.4) {
+				if (mutal_cnt >= (hydra_cnt * 1.4 +lurker_cnt * 0.9)) {
 					selectedS = StrategyManager.Strategys.zergBasic_Mutal;
+//					System.out.print(", chose M2" );
 					if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18)||mutal_cnt>24) {
 						selectedS = StrategyManager.Strategys.zergBasic_MutalMany;
 					}
-				} else {
+				} else if(mutal_cnt >= (hydra_cnt * 0.7 +lurker_cnt * 0.45)){
 					selectedS = StrategyManager.Strategys.zergBasic_HydraMutal;
+//					System.out.print(", chose H1" );
+				}else{
+					selectedS = StrategyManager.Strategys.zergBasic_HydraWave;
+//					System.out.print(", chose H2" );
 				}
 			}
 		}
@@ -955,210 +972,17 @@ public class AnalyzeStrategy {
 			selectedS = StrategyManager.Strategys.zergBasic_LingUltra;
 		}
 		
+		if(selectedS == StrategyManager.Strategys.zergBasic_HydraWave && (hydra_cnt + lurker_cnt > 0)){
+			MutalStrategyOnTimeChecker = true;
+		}
+				 
+		System.out.println();
 		//TODO 필요할지 확인  zergBasic_GiftSet
 		//TODO 필요할지 확인  zergBasic_Guardian
 		
 		if (selectedS != null) {
 			StrategyManager.Instance().setCurrentStrategyBasic(selectedS);
 		}
-		
-		
-	
-		/*
-		 * 기존로직은일단 주석처리 if(mutal_cnt >= 1){ //||
-		 * InformationManager.Instance().getNumUnits(UnitType.Zerg_Spire,
-		 * InformationManager.Instance().enemyPlayer) >= 1){ //뮤탈을 봤을경우 //건물을
-		 * 보는것은 일단 보류.
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_Mutal); if(mutal_cnt >= 15){ //뮤탈 올인 or 뮤탈쪽에 무게를
-		 * 싣는 전략 대비
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_MutalMany); } }
-		 * 
-		 * if(InformationManager.Instance().getNumUnits(UnitType.
-		 * Zerg_Ultralisk_Cavern, InformationManager.Instance().enemyPlayer) >=1
-		 * && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,
-		 * InformationManager.Instance().enemyPlayer) < 10 &&
-		 * (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,
-		 * InformationManager.Instance().enemyPlayer) <=
-		 * InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,
-		 * InformationManager.Instance().selfPlayer))){ //울트라리스크 커번을 봤을때, 울트라가
-		 * 나오고 나서 비율조정을 하게 되면 늦으므로, 미리 조정을 한다. //단, 히드라는 탱크가 많아도 괜찮지만, 뮤탈은 골리앗
-		 * 비중이 적어지면 어려우므로, //1. 일정 뮤탈 숫자 이하일때, 비중을 변경하던지 //2. 발키리를 몇기정도 생산하는걸로.
-		 * 이건 고민해볼걸
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_Ultra);
-		 * 
-		 * if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Zergling,
-		 * InformationManager.Instance().enemyPlayer) >=8){ //링+ 울트라. 울트라가 나온다면
-		 * 이 전략일 확률이 크겠지.
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_LingUltra); }
-		 * 
-		 * }
-		 * 
-		 * if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Zergling,
-		 * InformationManager.Instance().enemyPlayer) >=8
-		 * &&InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk,
-		 * InformationManager.Instance().enemyPlayer) >=5){ // 링+히드라 조합. 링 >=8 &
-		 * 히드라 >=5
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_LingHydra); }
-		 * 
-		 * if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Zergling,
-		 * InformationManager.Instance().enemyPlayer) >=8 &&
-		 * (InformationManager.Instance().getNumUnits(UnitType.Zerg_Lurker,
-		 * InformationManager.Instance().enemyPlayer) >=1
-		 * ||InformationManager.Instance().getNumUnits(UnitType.Zerg_Lurker_Egg,
-		 * InformationManager.Instance().enemyPlayer) >=1)){ // 링+럴커 조합. 럴커를 보거나
-		 * 럴커에그를 보았을때
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_LingLurker); }
-		 * 
-		 * if((ling_cnt >=8 &&
-		 * InformationManager.Instance().getNumUnits(UnitType.Zerg_Spire,
-		 * InformationManager.Instance().enemyPlayer) >=1 &&
-		 * InformationManager.Instance().getNumUnits(UnitType.
-		 * Zerg_Hydralisk_Den, InformationManager.Instance().enemyPlayer) ==0)
-		 * || ling_cnt >= 8 && mutal_cnt >= 5){ // 링+뮤탈. 링 >=8 & 스파이어 & 히드라덴 없음
-		 * // 또는 링 >=8 & 뮤탈 발견
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_LingMutal); }
-		 * 
-		 * //아마 우리가 상대하게될 가장 많은 조합 //저그전은 이것때문에 특히 컴셋이 중요한데 //시즈 탱크와 시즈업은 히드라가
-		 * 나오는 순간 찍어줘도 되기 때문이다. if(hydra_cnt >=8 && mutal_cnt >=8){ // 히드라+뮤탈.
-		 * 히드라 >=8 & 뮤탈 >= 8
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_HydraMutal); }
-		 * 
-		 * if(ling_chk + hydra_chk + mutal_chk + ultra_chk >= 3){
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_GiftSet); }
-		 * 
-		 * 
-		 * //};
-		 * 
-		 * //exception 상태가 아닐때는 Init 으로
-		 * //StrategyManager.Instance().setCurrentStrategyException("Init");
-		 * if(MyBotModule.Broodwar.getFrameCount() % 48 == 0){
-		 * System.out.println("Current Basic strategy ===>>>>  " +
-		 * StrategyManager.Instance().getCurrentStrategyBasic());
-		 * 
-		 * System.out.println("Current Exception strategy ===>>>>  " +
-		 * StrategyManager.Instance().getCurrentStrategyException()); } 기존로직
-		 * 주석처리 끝
-		 */
-
-		// 기본 저그 전술 세팅
-		/*
-		 * if(StrategyManager.Instance().getCurrentStrategyBasic() ==
-		 * StrategyManager.Strategys.zergBasic_HighTech){
-		 * 
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic_HighTech); }else{
-		 * System.out.println("zergBasic 으로 세팅");
-		 * StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.
-		 * Strategys.zergBasic); } System.out.println("zergBasic 으로 세팅");
-		 */
-		// 익셉션은 init 기본
-		// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-
-		/*
-		 * //20170802 농봉은 잠깐 막기 //start zergException_NongBong int nongbong_cnt
-		 * = 0; int haveMarine = 0; int haveBunker = 0;
-		 * 
-		 * Unit theBunker = null; Unit theCommand = null; BaseLocation base =
-		 * InformationManager.Instance().getMainBaseLocation(InformationManager.
-		 * Instance().selfPlayer); Region myRegion = base.getRegion();
-		 * List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
-		 * InformationManager.Instance().enemyPlayer); if
-		 * (enemyUnitsInRegion.size() >= 4){
-		 * //System.out.println("적 유닛 4이상 난입");
-		 * 
-		 * //내 본진에 적유닛이 4마리 이상이고(드론 저글링 오버로드 일수 있음) //haveBunker =
-		 * InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.
-		 * Terran_Bunker); for (Unit unit : MyBotModule.Broodwar.getAllUnits()){
-		 * if(unit.getType() == UnitType.Terran_Bunker && unit.isCompleted()){
-		 * haveBunker ++; theBunker = unit; }
-		 * 
-		 * if(unit.getType() == UnitType.Terran_Marine){ haveMarine ++;
-		 * if(haveBunker > 0 && haveMarine >0){ theBunker.load(unit); } }
-		 * 
-		 * if(unit.getType() == UnitType.Terran_Command_Center){ theCommand =
-		 * unit; }
-		 * 
-		 * } //벙커가 없는 경우. if(haveBunker == 0){ //System.out.println("벙커없다.");
-		 * for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
-		 * if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
-		 * && enemyUnitsInRegion.get(enemy).getDistance(theCommand) < 200){
-		 * nongbong_cnt ++; } }
-		 * //StrategyManager.Instance().setCurrentStrategyException(
-		 * StrategyManager.StrategysException.zergException_NongBong); SE =
-		 * StrategyManager.StrategysException.zergException_NongBong; //농봉 되는순간
-		 * 호출 } // 벙커가 1개인데 마린이 2 미만인 경우 if(haveBunker == 1 && haveMarine < 2){
-		 * for(int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy ++){
-		 * if(enemyUnitsInRegion.get(enemy).getType() == UnitType.Zerg_Zergling
-		 * && enemyUnitsInRegion.get(enemy).getDistance(theBunker) < 100){
-		 * NongbongScv.Instance().NongBong_At_Unit =
-		 * enemyUnitsInRegion.get(enemy); nongbong_cnt ++; } }
-		 * //StrategyManager.Instance().setCurrentStrategyException(
-		 * StrategyManager.StrategysException.zergException_NongBong); SE =
-		 * StrategyManager.StrategysException.zergException_NongBong;
-		 * 
-		 * }
-		 * 
-		 * } if(StrategyManager.Instance().getCurrentStrategyException() ==
-		 * StrategyManager.StrategysException.zergException_NongBong &&
-		 * nongbong_cnt < 4){ //본진 저글링이 3미만 이라면 농봉을 안타고 init으로 exit
-		 * //StrategyManager.Instance().setCurrentStrategyException(
-		 * StrategyManager.StrategysException.Init); SE =
-		 * StrategyManager.StrategysException.Init; //Exception 이 init 이 되는순간 농봉
-		 * 체크 변수 초기화 NongbongScv.Instance().NongBong_Chk = 0; }
-		 */
-
-		/*
-		 * if(StrategyManager.Instance().getCurrentStrategyException() ==
-		 * StrategyManager.StrategysException.zergException_NongBong){ //농봉은 즉각
-		 * 반응 NongbongScv.Instance().executeNongBong(); }
-		 */
-
-		// end zergException_NongBong
-
-		// start guardian exception
-		// 가디언은 그냥 골리앗으로
-		/*
-		 * if(
-		 * (InformationManager.Instance().getNumUnits(UnitType.Zerg_Guardian,
-		 * InformationManager.Instance().enemyPlayer) >= 1
-		 * ||InformationManager.Instance().getNumUnits(UnitType.
-		 * Zerg_Greater_Spire, InformationManager.Instance().enemyPlayer) >= 1)
-		 * && (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
-		 * InformationManager.Instance().selfPlayer) < 5
-		 * &&Math.ceil(InformationManager.Instance().getNumUnits(UnitType.
-		 * Zerg_Guardian, InformationManager.Instance().enemyPlayer) /3) <
-		 * InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
-		 * InformationManager.Instance().selfPlayer))
-		 * 
-		 * ){ //StrategyManager.Instance().setCurrentStrategyException(
-		 * StrategyManager.StrategysException.zergException_Guardian);
-		 * selectedSE =
-		 * StrategyManager.StrategysException.zergException_Guardian;
-		 * 
-		 * //그레이터 스파이어 or 가디언을 발견할 경우 //레이스가 round(가디언/3) or 5기를 만족한다면 exit
-		 * 
-		 * if(InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
-		 * InformationManager.Instance().selfPlayer) == 5
-		 * ||Math.ceil(InformationManager.Instance().getNumUnits(UnitType.
-		 * Zerg_Guardian, InformationManager.Instance().enemyPlayer) /3) >=
-		 * InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
-		 * InformationManager.Instance().selfPlayer) ){
-		 * //StrategyManager.Instance().setCurrentStrategyException(
-		 * StrategyManager.StrategysException.Init); SE =
-		 * StrategyManager.StrategysException.Init;
-		 * 
-		 * } }
-		 */
-
 	}
 
 }

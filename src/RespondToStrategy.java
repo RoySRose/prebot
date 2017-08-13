@@ -32,6 +32,8 @@ public class RespondToStrategy {
 	public boolean need_wraith = false;
 	public boolean need_battlecruiser = false;
 	
+	public boolean prepareDark = false;
+	
 	public int max_vessel = 0;
 	public int max_valkyrie = 0;
 	public int max_wraith = 0;
@@ -433,7 +435,19 @@ public class RespondToStrategy {
 	}
 		
 		
-	public void RespondExecute() {		
+	public void RespondExecute() {	
+		
+		if(prepareDark == true){
+			if(!chk_engineering_bay){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay)
+						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					//}
+				}
+			}
+		}
+			
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
 		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter || enemy_mutal){
 	           if(need_vessel_time ==0){
