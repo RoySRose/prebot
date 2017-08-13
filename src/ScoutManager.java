@@ -505,7 +505,7 @@ public class ScoutManager{
 		//적 가스 봤는지 못봤는지 확인하기 위한 변수
 		//아래 함수에 넣고 싶었지만 아래는 건설된 unit만 보여서 가스 판별이 안됨.
 		if(gasExpscoutFlag == false){
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 			{
 				if(unit.getType().isRefinery()){
 					if(MyBotModule.Broodwar.isExplored(unit.getTilePosition())){
