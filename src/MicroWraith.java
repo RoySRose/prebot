@@ -61,27 +61,28 @@ public class MicroWraith extends MicroManager {
 			dangerous_targets.addAll(MapGrid.Instance().getUnitsNear(wraith.getPosition(), wraithCheckRadius, false, true, UnitType.Terran_Goliath));
 			List<UnitInfo> dangerousBuildingTargets = null;
 			dangerousBuildingTargets = InformationManager.Instance().getEnemyBuildingUnitsNear(wraith, wraithCheckRadius, true, false, true);
-			
-			for (UnitInfo target : dangerousBuildingTargets) {
-				double temp = target.getType().airWeapon().maxRange() - target.getLastPosition().getDistance(wraith.getPosition()); 
-				if(temp > mostDangerBuildingcheck){
-					mostDangerousBuildingTarget = target;
-					mostDangerBuildingcheck = temp;
-				}
-			}
-			
-			for (Unit target : dangerous_targets) {
-				boolean pass = false;
-				if(dangerousBuildingTargets != null){
-					for (UnitInfo foggedtarget : dangerousBuildingTargets) {
-						if(foggedtarget.getUnitID() == target.getID()){
-							pass = true;
-						}
+//			MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
+			if(dangerousBuildingTargets.size() > 0){
+				for (UnitInfo target : dangerousBuildingTargets) {
+					double temp = target.getType().airWeapon().maxRange() - target.getLastPosition().getDistance(wraith.getPosition()); 
+					if(temp > mostDangerBuildingcheck){
+						mostDangerousBuildingTarget = target;
+						mostDangerBuildingcheck = temp;
 					}
 				}
-				if(pass){
-					continue;
-				}
+			}
+			for (Unit target : dangerous_targets) {
+//					boolean pass = false;
+//					if(dangerousBuildingTargets != null){
+//						for (UnitInfo foggedtarget : dangerousBuildingTargets) {
+//							if(foggedtarget.getUnitID() == target.getID()){
+//								pass = true;
+//							}
+//						}
+//					}
+//					if(pass){
+//						continue;
+//					}
 				double temp = target.getType().airWeapon().maxRange() - target.getPosition().getDistance(wraith.getPosition()); 
 				if(temp > mostDangercheck){
 					mostDangerousTarget = target;
@@ -89,33 +90,41 @@ public class MicroWraith extends MicroManager {
 				}
 			}
 			
-			double adjustment = 0;
+//			double adjustment = 0;
 			
-			if(mostDangercheck < mostDangerBuildingcheck){
-				double DimT = mostDangerousBuildingTarget.getType().dimensionUp();
-				double DimB = mostDangerousBuildingTarget.getType().dimensionDown();
-				double DimL = mostDangerousBuildingTarget.getType().dimensionLeft();
-				double DimR = mostDangerousBuildingTarget.getType().dimensionRight();
-			
-				if(DimT < DimB){
-					DimT = DimB;
-				}
-				if(DimL < DimR){
-					DimL = DimR;
-				}
-				adjustment = Math.sqrt(DimT * DimT + DimL * DimL);
-				
-			}else{
-				//mostDangerBuildingcheck = mostDangerousTarget;
-			}
+//			if(mostDangerousBuildingTarget != null && mostDangerousTarget !=null){			
+//				if(mostDangercheck < mostDangerBuildingcheck){
+//					double DimT = mostDangerousBuildingTarget.getType().dimensionUp();
+//					double DimB = mostDangerousBuildingTarget.getType().dimensionDown();
+//					double DimL = mostDangerousBuildingTarget.getType().dimensionLeft();
+//					double DimR = mostDangerousBuildingTarget.getType().dimensionRight();
+//				
+//					if(DimT < DimB){
+//						DimT = DimB;
+//					}
+//					if(DimL < DimR){
+//						DimL = DimR;
+//					}
+//					adjustment = Math.sqrt(DimT * DimT + DimL * DimL);
+//					mostDangerousTarget = null;
+//				}else{
+//					mostDangerousBuildingTarget = null;
+//					//mostDangerBuildingcheck = mostDangerousTarget;
+//				}
+//			}
 			
 			boolean fleeing = false;
-			if(mostDangerousBuildingTarget != null){			
+			if(mostDangerousBuildingTarget != null){
+				
+				//MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
+//				double eee =  ((double)MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
+//						+ (double)wraithCheckSpeed +  (double)adjustment);
+//				System.out.println("dis : " + eee);
 //				System.out.println("Wraith ID: " + wraith.getID() + "In dangerous fogged "+ mostDangerousBuildingTarget.getType());
-				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) 
-						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
-						+ wraithCheckSpeed +  adjustment)	{
-					
+//				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) 
+//						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
+//						+ wraithCheckSpeed +  adjustment)	{
+				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) > 470){
 					Position fleePosition = getFleePosition(wraith, mostDangerousBuildingTarget.getLastPosition(), (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					wraith.move(fleePosition);
 					fleeing = true;
@@ -125,23 +134,26 @@ public class MicroWraith extends MicroManager {
 			}
 			
 				
-			if(mostDangerousTarget != null){
-				double temp = 0;
-				if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret){
-					temp = wraithCheckSpeed * 3;
-				}
-//				System.out.println("Wraith ID: " + wraith.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
-				if(mostDangerousTarget.isInWeaponRange(wraith) || (wraith.getDistance(mostDangerousTarget) 
-						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
-						+ wraithCheckSpeed + temp)
-						){
-//					System.out.println("flee shown");
-					//System.out.println("It's "+ mostDangerousTarget.getType() + " Danger and changing");
-					Position fleePosition = getFleePosition(wraith, mostDangerousTarget, (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
-					wraith.move(fleePosition);
-					fleeing = true;
-//					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
-//					System.out.println("flee shown unit,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
+			if(fleeing == false){
+				if(mostDangerousTarget != null){
+//					double temp = 0;
+//					if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret){
+//						temp = wraithCheckSpeed * 3;
+//					}
+//					
+//					double eee =  (double) MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
+//							+ (double)wraithCheckSpeed + (double)temp;
+//					System.out.println("dis2 : " + eee);
+	//				System.out.println("Wraith ID: " + wraith.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
+//					if(mostDangerousTarget.isInWeaponRange(wraith) || (wraith.getDistance(mostDangerousTarget) 
+//							<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
+//							+ wraithCheckSpeed + temp)
+//							){
+//					if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret || mostDangerousTarget.getType() != UnitType.Terran_Goliath){
+						Position fleePosition = getFleePosition(wraith, mostDangerousTarget, (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
+						wraith.move(fleePosition);
+						fleeing = true;
+//					}
 				}
 			}
 			

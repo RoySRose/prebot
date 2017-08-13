@@ -13,7 +13,8 @@ import bwapi.UpgradeType;
 /// 빌드 오더 목록 자료구조 class
 public class BuildOrderQueue {
 	
-	private enum SeedPositionStrategy { MainBaseLocation, MainBaseBackYard, FirstChokePoint, FirstExpansionLocation, SecondChokePoint, SeedPositionSpecified };
+	private enum SeedPositionStrategy { MainBaseLocation, MainBaseBackYard, FirstChokePoint, FirstExpansionLocation, SecondChokePoint, SeedPositionSpecified 
+		,NextExpansionPoint ,NextSupplePoint ,LastBuilingPoint ,getLastBuilingFinalLocation};
 	private SeedPositionStrategy seedLocationStrategy;
 
 	private int highestPriority;
