@@ -2,6 +2,7 @@
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -62,9 +63,13 @@ public class MicroMarine extends MicroManager {
 						MicroUtils.preciseKiting(marine, target, kitingOption);
 					}
 				} else {
+					if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
 					// if we're not near the order position, go there
-					if (marine.getDistance(mineralpos) > 30) {
-						CommandUtil.move(marine, mineralpos);
+						if (marine.getDistance(mineralpos) > 30) {
+							CommandUtil.move(marine, mineralpos);
+						}
+					}else{
+						CommandUtil.move(marine, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
 					}
 				}
 			}
