@@ -143,7 +143,11 @@ public class WorkerManager {
 				//1.3 일꾼 에너지가 20이하일떄 idle 변경
 				if(worker.getHitPoints() <= 16)
 				{
+					Squad temp = CombatManager.Instance().squadData.getUnitSquad(worker);
 //					worker.cancelConstruction();
+					if(temp!=null){
+						temp.removeUnit(worker);
+					}
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
 				}
 			}

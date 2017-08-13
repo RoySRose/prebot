@@ -51,7 +51,7 @@ class Combat {
 	public static final int CHECKER_RADIUS = 150;
 	public static final int GUERILLA_RADIUS = 300;
 	public static final int BASE_DEFENSE_RADIUS = 500; // 32 * 25
-	public static final int SCOUT_DEFENSE_RADIUS = 600;
+	public static final int SCOUT_DEFENSE_RADIUS = 1500;
 	public static final int MARINE_RADIUS = 300;
 	public static final int WRAITH_RADIUS = 300;
 	public static final int VESSEL_RADIUS = 600;
@@ -129,6 +129,7 @@ public class CombatManager {
 	private boolean ScoutDefenseNeeded;
 	int FastZerglingsInOurBase;
 	int FastZealotInOurBase;
+	int ScoutDefenseNeededMin;
 	
 	private static CombatManager instance = new CombatManager();
 	
@@ -136,6 +137,7 @@ public class CombatManager {
 		ScoutDefenseNeeded = true;
 		FastZerglingsInOurBase = 0;
 		FastZealotInOurBase = 0;
+		ScoutDefenseNeededMin =0;
 	}
 	
 	/// static singleton 객체를 리턴합니다
@@ -918,14 +920,16 @@ public class CombatManager {
 		List<Unit> enemyUnitsInRegion = new ArrayList<>();
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
             if (unit.getType() == InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace)
-            		&& BWTA.getRegion(unit.getTilePosition()) == myRegion) {
+            		&& BWTA.getRegion(unit.getPosition()) == myRegion) {
                 enemyUnitsInRegion.add(unit);
             }
         }
+		System.out.println("enemyUnitsInRegion.size(): " + enemyUnitsInRegion.size());
 		
 		if(enemyUnitsInRegion.size() == 0){
 			if (!scoutDefenseSquad.isEmpty()) {
 			   	scoutDefenseSquad.clear();
+			   	ScoutDefenseNeededMin =0;
 			}
 			return;
 		}
@@ -944,11 +948,17 @@ public class CombatManager {
 					assignScoutDefender++;
 				} 
 			}
-			if(enemyscvcnt >= 3){
-				ScoutDefenseNeeded = false;
-				return;
-			}
+//			if(enemyscvcnt >= 3){
+//				ScoutDefenseNeeded = false;
+//				return;
+//			}
 			// 일꾼이
+		}
+		if(ScoutDefenseNeededMin <= assignScoutDefender){
+			ScoutDefenseNeededMin = assignScoutDefender;
+		}
+		if(assignScoutDefender < ScoutDefenseNeededMin){
+			assignScoutDefender = ScoutDefenseNeededMin;
 		}
 		
 //		int assignScoutDefender = 0;
@@ -959,13 +969,13 @@ public class CombatManager {
 //		}
 //		boolean assignScoutDefender = enemyUnitsInRegion.size() == 1 && enemyUnitsInRegion.get(0).getType().isWorker() && enemyUnitsInRegion.get(0).isAttacking(); // 일꾼 한마리가 내 지역에서 돌아다닌다.
 
-		
-		
+//		System.out.println("assignScoutDefender: " + assignScoutDefender);
+//		System.out.println("assigned: " + scoutDefenseSquad.getUnitSet().size());
 //		Unit defenderToAdd = findClosestDefender(scoutDefenseSquad, scoutDefenseSquad.getOrder().getPosition(), true, false);
-    	int workerDefendersNeeded = 0;
-    	while(workerDefendersNeeded < assignScoutDefender){
-	    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
-	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker, false);
+    	
+    	
+    	for(Unit enemy : enemyUnitsInRegion){
+    		Unit workerDefender = findClosestWorkerToTarget(enemy, false);
 	        if(workerDefender == null)
 	        	return;
 	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && workerDefender != null) {
@@ -974,8 +984,22 @@ public class CombatManager {
 	        		squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
 	        	}
 	        }
-            workerDefendersNeeded++;
     	}
+//    	while(workerDefendersNeeded < assignScoutDefender){
+//	    	Unit enemyWorker = enemyUnitsInRegion.get(workerDefendersNeeded);
+//	        Unit workerDefender = findClosestWorkerToTarget(enemyWorker, false);
+//	        if(workerDefender == null)
+//	        	return;
+//	        if (scoutDefenseSquad.getUnitSet().size() < assignScoutDefender  && workerDefender != null) {
+//	        	if (squadData.canAssignUnitToSquad(workerDefender, scoutDefenseSquad)) {
+//	        		WorkerManager.Instance().setCombatWorker(workerDefender);
+//	        		squadData.assignUnitToSquad(workerDefender, scoutDefenseSquad);
+//	        	}
+//	        }
+//            workerDefendersNeeded++;
+//    	}
+    	
+    	
     	if (!scoutDefenseSquad.isEmpty() && assignScoutDefender == 0) {
 		   	scoutDefenseSquad.clear();
 		}
