@@ -448,7 +448,11 @@ public class ConstructionManager {
 				if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal()) {
 
 					if (b.getBuildingUnit().isCompleted()) continue;
-					
+					//건설중인 일꾼 에너지 20이하로 idle 되었으나 여기선 되지 않아 건물 재건설 안하는 현상 발생
+					//여기 할당된 워커 null로 변경
+					if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
+						b.setConstructionWorker(null);
+					}
 					if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
 				
 						//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
@@ -459,6 +463,9 @@ public class ConstructionManager {
 								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks || b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot)){
 							continue;
 						} 
+						if(WorkerManager.Instance().isCheckEnemy(b.getBuildingUnit())){
+							continue;
+						}
 						// grab a worker unit from WorkerManager which is closest to this final position	
 						Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
 	
