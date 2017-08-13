@@ -51,6 +51,7 @@ public class InformationManager {
 	private boolean photonRushed;
 //	private int MainBaseSuppleLimit;
 	private Unit FirstVulture;
+	private Unit FirstCC;
 	private Position firstenemyunit;
 	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
@@ -117,7 +118,13 @@ public class InformationManager {
 		photonRushed = false;
 //		MainBaseSuppleLimit =0;
 		FirstVulture = null;
-		Position firstenemyunit = null;
+		
+		
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+			if(unit.getType() == UnitType.Terran_Command_Center && FirstCC==null){
+				FirstCC = unit;
+			}
+		}
 		
 		unitData.put(selfPlayer, new UnitData());
 		unitData.put(enemyPlayer, new UnitData());
@@ -1333,6 +1340,9 @@ public class InformationManager {
 	/// 해당 Player (아군 or 적군) 가 건물을 건설해서 점령한 Region 목록을 리턴합니다
 	public Set<Region> getOccupiedRegions(Player player) {
 		return occupiedRegions.get(player);
+	}
+	public Unit getFirstCC() {
+		return FirstCC;
 	}
 
 	/// 해당 Player (아군 or 적군) 의 건물을 건설해서 점령한 BaseLocation 목록을 리턴합니다		 
