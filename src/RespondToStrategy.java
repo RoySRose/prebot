@@ -424,11 +424,15 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			need_valkyrie = true;
 			max_valkyrie = 5;
+			max_turret_to_mutal = 6;
 		}else{
 			need_valkyrie = false;
 			max_valkyrie = 0;
+			if(AnalyzeStrategy.Instance().mutalStrategy){
+				max_turret_to_mutal = 4;
+			}
 		}
-		
+	
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_OnLyLing){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer) < 5	){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) < 1){
@@ -726,12 +730,7 @@ public class RespondToStrategy {
 			need_battlecruiser = false;
 			max_battlecruiser = 0;
 		}
-		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
-			need_valkyrie = true;
-			max_valkyrie = 6;
-		}
-		
+
 		if(max_turret_to_mutal != 0){
 			
 			if(!chk_engineering_bay){
