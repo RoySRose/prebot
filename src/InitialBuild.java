@@ -117,7 +117,7 @@ public class InitialBuild {
 			}
 			
 		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
-			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
+			//if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -137,32 +137,31 @@ public class InitialBuild {
 				//queueBuild(false, UnitType.Terran_Siege_Tank_Tank_Mode);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_Engineering_Bay);
 				
 				//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				
-			}
-			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
-				queueBuild(true, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Refinery);
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_Marine);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
-				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Vulture);
-				queueBuild(true, UnitType.Terran_Vulture);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Machine_Shop);
-				queueBuild(false, UnitType.Terran_Siege_Tank_Tank_Mode);
-				//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-			}
+//			}
+//			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
+//				queueBuild(true, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Refinery);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_Marine);
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
+//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Vulture);
+//				queueBuild(true, UnitType.Terran_Vulture);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(true, UnitType.Terran_Machine_Shop);
+//				queueBuild(false, UnitType.Terran_Siege_Tank_Tank_Mode);
+//				//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+//			}
 
 		}else{//저그전
 			//if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){

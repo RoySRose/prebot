@@ -821,7 +821,7 @@ public class StrategyManager {
 		//컴샛 end
 		
 		//barrack start
-		if(isInitialBuildOrderFinished == true && (barrackcnt == 0 || (barrackcnt == 1 && barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints()/2)) ){
+		if(isInitialBuildOrderFinished == true && (barrackcnt == 0 || (barrackcnt == 1 && barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints()/3)) ){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -833,7 +833,7 @@ public class StrategyManager {
 		//barrack end
 		
 		//engineering start
-		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/2))
+		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/3))
 				&& MyBotModule.Broodwar.getFrameCount() > 12000){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
@@ -2010,7 +2010,7 @@ public class StrategyManager {
 
 		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 		{
-			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320 && unit.getResources() > 200)
+			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 450 && unit.getResources() > 200)
 			{
 				mineralsNearDepot++;
 			}
@@ -2172,6 +2172,11 @@ public class StrategyManager {
 					if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
 						unit.lift();
 					}
+					if (MyBotModule.Broodwar.enemy().getRace() != Race.Zerg) {
+						if(unit.getType() == UnitType.Terran_Marine){
+							CommandUtil.move(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+						}
+					} 
 		 		}
 			}
 		}else{
@@ -2207,6 +2212,11 @@ public class StrategyManager {
 						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
 							unit.lift();
 						}
+						if (MyBotModule.Broodwar.enemy().getRace() != Race.Zerg) {
+							if(unit.getType() == UnitType.Terran_Marine){
+								CommandUtil.move(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+							}
+						} 
 			 		}
 				}
 			}

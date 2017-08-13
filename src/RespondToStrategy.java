@@ -522,7 +522,7 @@ public class RespondToStrategy {
 						}
 						if (!firstChokeTurret) {
 							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 250) 
-							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 250) == 0){
+							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 250) < 1){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										UnitType.Terran_Missile_Turret,
 										tempChokePoint.getCenter().toTilePosition(), true);
@@ -540,7 +540,7 @@ public class RespondToStrategy {
 						}
 						if (!mainBaseTurret) {
 							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, tempBaseLocation.getRegion().getCenter().toTilePosition(), 300) 
-							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempBaseLocation.getRegion().getCenter().toTilePosition(), 300) == 0){
+							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempBaseLocation.getRegion().getCenter().toTilePosition(), 300) < 1){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										UnitType.Terran_Missile_Turret,
 										tempBaseLocation.getRegion().getCenter().toTilePosition(), true);
@@ -592,7 +592,7 @@ public class RespondToStrategy {
 							}
 							if (!secondChokeTurret) {
 								if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 300) 
-								+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 300) == 0){
+								+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 300) < 1){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(
 											UnitType.Terran_Missile_Turret,
 											temp2ChokePoint.getCenter().toTilePosition(), true);
