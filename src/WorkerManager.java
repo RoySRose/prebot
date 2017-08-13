@@ -390,21 +390,38 @@ public class WorkerManager {
 			
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
-			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()
-					&& !unit.isFlying() && !isCheckEnemy(unit))
+			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
+				if(isCheckEnemy(unit)){
+					continue;
+				}
+				if(unit.isFlying() && MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+					continue;
+				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				setRepairWorker(repairWorker, unit);
 				break;
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
-			else if (unit.getType() != UnitType.Terran_Vulture && unit.getType() != UnitType.Terran_Wraith && unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
+			else if (unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
-				if (unit.getType() != UnitType.Terran_SCV) {
-					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 1000 * Config.TILE_SIZE);
+				if (unit.getType() != UnitType.Terran_SCV && unit.getType() != UnitType.Terran_Vulture && unit.getType() != UnitType.Terran_Wraith){
+//					if(unit.getType() == UnitType.Terran_Goliath){
+//						BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+//						Position myFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self()).getPosition();
+//						//본진일때는 무조건 false
+//						if (myBaseLocation != null && unit.getDistance(myBaseLocation.getPosition()) < (int)(myBaseLocation.getPosition().getDistance(myFirstExpansionLocation))){
+//							Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+//							setRepairWorker(repairWorker, unit);
+//							repairWorkCnt = workerData.workerRepairMap.size();
+//						}
+//					}else{
+					
+					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 					setRepairWorker(repairWorker, unit);
 					repairWorkCnt = workerData.workerRepairMap.size();
+//					}
 				}
 			}
 			if(repairWorkCnt > 3){
