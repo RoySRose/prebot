@@ -37,6 +37,8 @@ public class RespondToStrategy {
 	
 	public boolean prepareDark = false;
 	
+	public int max_turret_to_mutal = 0;
+	
 	public int max_vessel = 0;
 	public int max_valkyrie = 0;
 	public int max_wraith = 0;
@@ -94,7 +96,7 @@ public class RespondToStrategy {
 	}
 	
 	public void update() {
-		
+		max_turret_to_mutal = 0;
 //		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
 //			need_vessel = true;
 //		}
