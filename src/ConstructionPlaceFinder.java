@@ -63,7 +63,7 @@ public class ConstructionPlaceFinder {
 		{
 			
 			//System.out.println("checking here");
-			desiredPosition = getBuildLocationNear(buildingType, seedPosition, true);
+			desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
 			
 		}
 		// seedPosition 을 입력하지 않은 경우
@@ -203,10 +203,14 @@ public class ConstructionPlaceFinder {
 	/// Returns a suitable TilePosition to build a given building type near specified TilePosition aroundTile.<br>
 	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (다른 유닛들이 자리에 있어서, Pylon, Creep, 건물지을 타일 공간이 전혀 없는 경우 등)
 	
+	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, Boolean MethodFix)
+	{
+		return getBuildLocationNear(buildingType, desiredPosition, MethodFix, false);
+	}
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition){
 		return getBuildLocationNear(buildingType, desiredPosition, false);
 	}
-	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, Boolean MethodFix)
+	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, Boolean MethodFix, Boolean spaceZero)
 	{
 		//System.out.println("getBuildLocationNear 입력111 ==>> (" + desiredPosition.getX() + " , " +  desiredPosition.getY() + ")" );
 		if (buildingType.isRefinery())
@@ -254,6 +258,9 @@ public class ConstructionPlaceFinder {
 				buildingGapSpace=0;
 			}
 			if(MethodFix == true){
+				buildingGapSpace=1;
+			}
+			if(spaceZero == true){
 				buildingGapSpace=0;
 			}
 		}

@@ -732,6 +732,33 @@ public class ConstructionManager {
 
 		return count;
 	}
+	
+	public int getConstructionQueueItemCountNear(UnitType queryType, TilePosition queryTilePosition, int range)
+	{
+		// queryTilePosition 을 입력한 경우, 거리의 maxRange. 타일단위
+		int maxRange = range;
+
+		Position queryTilePositionPoint = null;
+		queryTilePositionPoint = queryTilePosition.toPosition();
+		
+
+		int count = 0;
+		for (ConstructionTask b : constructionQueue)
+		{
+			if (b.getType() == queryType)
+			{
+				if (queryType.isBuilding())
+				{
+					if (queryTilePositionPoint.getDistance(b.getDesiredPosition().toPosition()) <= maxRange) {
+						count++;
+					}
+				}
+			}
+		}
+
+		return count;
+	}
+	
 
 	public Vector<ConstructionTask> getConstructionQueue()
 	{

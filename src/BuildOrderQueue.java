@@ -152,6 +152,64 @@ public class BuildOrderQueue {
 		return itemCount;
 	}
 
+	
+	public int getItemCountNear(UnitType unitType, TilePosition queryTilePosition, int range)
+	{
+		return getItemCountNear(new MetaType(unitType), queryTilePosition, range);
+	}
+	
+	
+	public int getItemCountNear(MetaType queryType, TilePosition queryTilePosition, int range)
+	{
+		// queryTilePosition 을 입력한 경우, 거리의 maxRange. 타일단위
+		int maxRange = range;
+		
+		int itemCount = 0;
+
+		int reps = queue.size();
+		
+		Object[] tempArr = queue.toArray();
+		
+		// for each unit in the queue
+		for (int i = 0; i<reps; i++) {
+					
+			final MetaType item = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType;
+			TilePosition itemPosition = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation;
+			Point seedPositionPoint = null;
+			if(queryTilePosition != null)
+			{
+				seedPositionPoint = new Point(queryTilePosition.getX(), queryTilePosition.getY());
+			}
+
+			if (queryType.isUnit() && item.isUnit()) {
+				//if (item.getUnitType().getID() == queryType.getUnitType().getID()) {
+				if (item.getUnitType() == queryType.getUnitType()) 
+				{
+					if (queryType.getUnitType().isBuilding())
+					{
+						//System.out.println("distance : " + itemPosition.getDistance(new TilePosition((int)seedPositionPoint.getX(), (int)seedPositionPoint.getY())));
+						if (itemPosition.getDistance(new TilePosition((int)seedPositionPoint.getX(), (int)seedPositionPoint.getY())) <= maxRange){
+							itemCount++;
+						}
+					}
+				}
+			}
+			else if (queryType.isTech() && item.isTech()) {
+				//if (item.getTechType().getID() == queryType.getTechType().getID()) {
+				if (item.getTechType() == queryType.getTechType()) {
+					itemCount++;
+				}
+			}
+			else if (queryType.isUpgrade() && item.isUpgrade()) {
+				//if (type.getUpgradeType().getID() == queryType.getUpgradeType().getID()) {
+				if (item.getUpgradeType() == queryType.getUpgradeType()) {
+					itemCount++;
+				}
+			}
+		}
+		return itemCount;
+	}
+	
 	/// BuildOrderQueue에 해당 type 의 Item 이 몇 개 존재하는지 리턴한다. queryTilePosition 을 입력한 경우, 건물에 대해서 추가 탐색한다
 	public int getItemCount(MetaType queryType)
 	{
