@@ -396,8 +396,10 @@ public class WorkerManager {
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
-				if(isCheckEnemy(unit)){
-					continue;
+				if(MyBotModule.Broodwar.getFrameCount() > 6000){
+					if(isCheckEnemy(unit)){
+						continue;
+					}
 				}
 				if(unit.isFlying() && MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
 					continue;
@@ -563,8 +565,10 @@ public class WorkerManager {
 					&& unit.isLifted() == false)
 			{
 				if (workerData.depotHasEnoughMineralWorkers(unit) == false) {
-					if(isCheckEnemy(unit) == true){
-						continue;
+					if(MyBotModule.Broodwar.getFrameCount() > 6000){
+						if(isCheckEnemy(unit) == true){
+							continue;
+						}
 					}
 					double distance = unit.getDistance(worker);
 					if (closestDistance > distance) {
@@ -584,8 +588,10 @@ public class WorkerManager {
 				if (unit.getType().isResourceDepot())
 				{
 					if (workerData.getMineralsNearDepot(unit) > 0) {
-						if(isCheckEnemy(unit) == true){
-							continue;
+						if(MyBotModule.Broodwar.getFrameCount() > 6000){
+							if(isCheckEnemy(unit) == true){
+								continue;
+							}
 						}
 						double distance = unit.getDistance(worker);
 						if (closestDistance > distance) {
@@ -603,8 +609,10 @@ public class WorkerManager {
 				if (unit == null) continue;
 				if (unit.getType().isResourceDepot())
 				{
-					if(isCheckEnemy(unit) == true){
-						continue;
+					if(MyBotModule.Broodwar.getFrameCount() > 6000){
+						if(isCheckEnemy(unit) == true){
+							continue;
+						}
 					}
 					double distance = unit.getDistance(worker);
 					if (closestDistance > distance) {
@@ -632,7 +640,7 @@ public class WorkerManager {
 			return false;
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		{
-			if(unit.isVisible() && unit.getDistance(depot) < 200 && unit.getType().canAttack()){
+			if(unit.isVisible() && unit.getDistance(depot) < 300 && unit.getType().canAttack()){
 				unitCnt++;
 //				commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
 //				if(unitCnt > 8){
@@ -880,7 +888,7 @@ public class WorkerManager {
 			double dist = unit.getDistance(worker);
 
 			//if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
-			if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
+			if ((dist < 1000) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
 				closestDist = dist;
