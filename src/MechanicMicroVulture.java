@@ -158,21 +158,25 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	private boolean reserveSpiderMine(Unit vulture) {
 		Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, MicroSet.Vulture.spiderMineNumPerGoodPosition);
 		if (minePosition == null && order.getType() == SquadOrderType.WATCH) {
+			
 			Region vultureRegion = BWTA.getRegion(vulture.getPosition());
 			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-			if (vultureRegion != BWTA.getRegion(base.getPosition())) { // 본진 region에는 마인 설치안함
-				boolean lessMineNum = false;
-				for (BaseLocation occupiedBase : occupiedBases) {
+
+			int minePrepareLevel = SpiderMineManger.Instance().getMineInMyBaseLevel(); // 0: 본진매설X, 점령지역조금, 1: 본진매설X, 점령지역많이, 2: 본진조금, 점령지역많이
+			boolean vultureInMyBaseRegion = vultureRegion == BWTA.getRegion(base.getPosition());
+			if (!vultureInMyBaseRegion || minePrepareLevel >= 2) { // 본진 region에는 마인 설치안함(단 패스트 다크, 패스트 럴커 등인 경우 매설)
+				boolean occupiedRegion = false;
+				for (BaseLocation occupiedBase : occupiedBases) { // 앞마당 포함한 점령지역에 마인을 적게 매설함(단, 
 					if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
-						lessMineNum = true;
+						occupiedRegion = true;
 						break;
 					}
 				}
-				if (lessMineNum) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerGoodPosition);
-				} else {
+				if (!occupiedRegion || (!vultureInMyBaseRegion && minePrepareLevel >= 1)) {
 					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition); // 그외에는 좀 많이
+				} else {
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerGoodPosition);
 				}
 			}
 		}

@@ -15,6 +15,16 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 
 public class SpiderMineManger {
+	
+	private int mineInMyBaseLevel = 0;
+
+	public int getMineInMyBaseLevel() {
+		return mineInMyBaseLevel;
+	}
+
+	public void setMineInMyBaseLevel(int mineInMyBaseLevel) {
+		this.mineInMyBaseLevel = mineInMyBaseLevel;
+	}
 
 	private Map<Integer, MineRemoveReserved> mineRemoveMap;
 	private Map<Integer, MineReserved> mineReservedMap;
@@ -38,16 +48,17 @@ public class SpiderMineManger {
 		}
 
 		List<BaseLocation> otherBases = InformationManager.Instance().getOtherExpansionLocations(InformationManager.Instance().enemyPlayer);
-//		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+		Chokepoint mySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
 		
 		Position enemyReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
 		BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-//		Chokepoint enemyFirstChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 //		Position center = new Position(2048, 2048); // 128x128 맵의 센터
 //		BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer); // region이 좋음
 		
-		if (!otherBases.isEmpty() && enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
+		if (!otherBases.isEmpty() && myReadyToAttackPos != null && mySecondChoke != null
+				&& enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
 			mineReservedMap = new HashMap<>();
 			mineRemoveMap = new HashMap<>();
 			
@@ -62,11 +73,12 @@ public class SpiderMineManger {
 			}
 			
 			// 공격준비지역
-//			goodPositions.add(myReadyToAttackPos);
+			goodPositions.add(myReadyToAttackPos);
+			goodPositions.add(mySecondChoke.getCenter());
+			
 			goodPositions.add(enemyReadyToAttackPos);
-			goodPositions.add(enemyFirstExpansion.getPosition());
-//			goodPositions.add(enemyFirstChoke.getCenter());
 			goodPositions.add(enemySecondChoke.getCenter());
+			goodPositions.add(enemyFirstExpansion.getPosition());
 			
 			// 제거해야되는 마인리스트
 			initialized = true;
@@ -74,6 +86,31 @@ public class SpiderMineManger {
 	}
 	
 	public void update() {
+		
+		// 패스트다크인 경우 본진 마인매설(11000프레임 이하)
+//		System.out.println(MyBotModule.Broodwar.getFrameCount());
+		if (MyBotModule.Broodwar.getFrameCount() > 11000) {
+			if (mineInMyBaseLevel != 0) {
+				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 0");
+				mineInMyBaseLevel = 0;
+			}
+			
+		} else if (MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Dark_Templar) > 0
+				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Lurker) > 0
+				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Shuttle) > 0) {
+			if (mineInMyBaseLevel != 2) {
+				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 2");
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 50 * 24);
+				mineInMyBaseLevel = 2; // 본진 앞마당 전부
+			}
+			
+		} else if (MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Hydralisk) > 3) {
+			if (mineInMyBaseLevel != 1) {
+				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 1");
+				mineInMyBaseLevel = 1; // 앞마당에 많이
+			}
+		}
+		
 		if (!initialized) {
 			init();
 			return;
