@@ -398,7 +398,7 @@ public class WorkerManager {
 				break;
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
-			else if (unit.getType() != UnitType.Terran_Vulture && unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
+			else if (unit.getType() != UnitType.Terran_Vulture && unit.getType() != UnitType.Terran_Wraith && unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if (unit.getType() != UnitType.Terran_SCV) {
