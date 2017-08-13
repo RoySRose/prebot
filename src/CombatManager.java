@@ -347,7 +347,10 @@ public class CombatManager {
 				}
 				
 				if(InformationManager.Instance().enemyRace == Race.Protoss){
-					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Protoss_Dark_Templar.sightRange(), true, false, null);
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Vulture.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Vulture);
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Goliath.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Goliath));
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Siege_Tank_Siege_Mode));
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Siege_Tank_Tank_Mode));
 					int faccnt = 0;
 					for(Unit facunit : myUnits){
 						if(facunit.getType() == UnitType.Terran_Vulture||facunit.getType() == UnitType.Terran_Goliath||facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
@@ -365,11 +368,18 @@ public class CombatManager {
 						return;
 					}
 				}else{
-					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Zerg_Lurker.sightRange(), true, false, null);
+					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Vulture.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Vulture);
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Goliath.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Goliath));
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Siege_Tank_Siege_Mode));
+					myUnits.addAll(MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange()+2, true, false, UnitType.Terran_Siege_Tank_Tank_Mode));
+					
 					int faccnt = 0;
 					for(Unit facunit : myUnits){
-						if(facunit.getType() == UnitType.Terran_Vulture||facunit.getType() == UnitType.Terran_Goliath||facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+						if(facunit.getType() == UnitType.Terran_Vulture||facunit.getType() == UnitType.Terran_Goliath){
 							faccnt++;
+						}
+						if(facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+							faccnt = 10;
 						}
 					}
 					if(faccnt > 4){

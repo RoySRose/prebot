@@ -441,11 +441,11 @@ public class BlockingEntrance {
 			return supply_pos;
 	}
 	
-	public void ReturnBuildSpacing() {
-		Config.BuildingSpacing = BuildingSpacingOld;
-		Config.BuildingResourceDepotSpacing = BuildingResourceDepotSpacingOld;
-
-	}
+//	public void ReturnBuildSpacing() {
+//		Config.BuildingSpacing = BuildingSpacingOld;
+//		Config.BuildingResourceDepotSpacing = BuildingResourceDepotSpacingOld;
+//
+//	}
 	
 	public int getStartingInt(){
 		return starting_int;
