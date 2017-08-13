@@ -599,33 +599,32 @@ public class RespondToStrategy {
 								}
 							}
 						}
-					}
-					
-					//타지역 멀티
-					List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-					//List tempBaseLocationList = InformationManager.Instance().ge(InformationManager.Instance().selfPlayer);
-					bwta.Region myRegion = null; 
-					for(BaseLocation baseLocation : tempBaseLocationList){
-						boolean location_turret = false;
-						//tempBaseLocation = (BaseLocation)tempBaseLocationList.get(a);
-						//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
-						if (baseLocation != null) {
-							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getRegion().getCenter(),100);
-					              //List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
-				          	for(Unit turret : turretInRegion){
-								if (turret.getType() == UnitType.Terran_Missile_Turret) {
-									location_turret = true;
+						
+						//타지역 멀티
+						List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+						//List tempBaseLocationList = InformationManager.Instance().ge(InformationManager.Instance().selfPlayer);
+						for(BaseLocation baseLocation : tempBaseLocationList){
+							boolean location_turret = false;
+							//tempBaseLocation = (BaseLocation)tempBaseLocationList.get(a);
+							//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
+							if (baseLocation != null) {
+								List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getRegion().getCenter(),100);
+						              //List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+					          	for(Unit turret : turretInRegion){
+									if (turret.getType() == UnitType.Terran_Missile_Turret) {
+										location_turret = true;
+									}
 								}
+					          	
+					          	if(!location_turret){
+						              if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) 
+									+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) == 0){
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(
+												UnitType.Terran_Missile_Turret,
+												baseLocation.getRegion().getCenter().toTilePosition(), true);
+									}
+					          	}
 							}
-				          	
-				          	if(!location_turret){
-					              if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) 
-								+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) == 0){
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(
-											UnitType.Terran_Missile_Turret,
-											baseLocation.getRegion().getCenter().toTilePosition(), true);
-								}
-				          	}
 						}
 					}
 				}
