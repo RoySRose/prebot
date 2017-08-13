@@ -1,6 +1,9 @@
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Unit;
@@ -8,9 +11,31 @@ import bwapi.UnitType;
 
 public class MicroWraith extends MicroManager {
 
-	private final static double wraithSpeed = UnitType.Terran_Wraith.topSpeed();
+	// 유닛별 실행시 orderMap에서 unitId를 key로 하여 각 unit별 order를 사용한다.
+//	private static Map<Integer, SquadOrder> orderMap = new HashMap<>();
+//	
+//	// CombatManager.updateVesselSquad에서 명령을 지정한다. by insaneojw
+//	public static void setUnitOrder(Integer unitId, SquadOrder unitOrder) {
+//		orderMap.put(unitId, unitOrder);
+//	}
+//	public static void getUnitOrder(Integer unitId) {
+//		orderMap.get(unitId);
+//	}
+//	
+//	public static void removeInvalidUnitOrder() {
+//		List<Integer> removeKeys = new ArrayList<>();
+//		for (Integer unitId : orderMap.keySet()) {
+//			if (!CommandUtil.IsValidUnit(MyBotModule.Broodwar.getUnit(unitId))) {
+//				removeKeys.add(unitId);
+//			}
+//		}
+//		for (Integer unitId : removeKeys) {
+//			orderMap.remove(unitId);
+//		}
+//	}
+	
 	private final static double wraithCheckSpeed = UnitType.Terran_Wraith.topSpeed()*8;
-	private final static int wraithCheckRadius = UnitType.Terran_Wraith.sightRange()+400;
+	private final static int wraithCheckRadius = UnitType.Terran_Wraith.sightRange()+50;
 //	private int attackFrame = 0;
 
 	@Override
@@ -59,11 +84,17 @@ public class MicroWraith extends MicroManager {
 			List<Unit> dangerous_targets = null;
 			dangerous_targets = MapGrid.Instance().getUnitsNear(wraith.getPosition(), wraithCheckRadius, false, true, UnitType.Terran_Missile_Turret);
 			dangerous_targets.addAll(MapGrid.Instance().getUnitsNear(wraith.getPosition(), wraithCheckRadius, false, true, UnitType.Terran_Goliath));
+			
 			List<UnitInfo> dangerousBuildingTargets = null;
 			dangerousBuildingTargets = InformationManager.Instance().getEnemyBuildingUnitsNear(wraith, wraithCheckRadius, true, false, true);
 //			MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
 			if(dangerousBuildingTargets.size() > 0){
 				for (UnitInfo target : dangerousBuildingTargets) {
+					
+					if(target.getType() != UnitType.Terran_Missile_Turret){
+						continue;
+					}
+					
 					double temp = target.getType().airWeapon().maxRange() - target.getLastPosition().getDistance(wraith.getPosition()); 
 					if(temp > mostDangerBuildingcheck){
 						mostDangerousBuildingTarget = target;
@@ -124,7 +155,7 @@ public class MicroWraith extends MicroManager {
 //				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) 
 //						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
 //						+ wraithCheckSpeed +  adjustment)	{
-				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) > 470){
+				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) > 350){
 					Position fleePosition = getFleePosition(wraith, mostDangerousBuildingTarget.getLastPosition(), (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					wraith.move(fleePosition);
 					fleeing = true;
@@ -209,14 +240,6 @@ public class MicroWraith extends MicroManager {
 	}
 	
 	
-	public static boolean isValidPosition(Unit unit, Position position) {
-		if(unit.isFlying()){
-			return position.isValid();
-		}else{
-			return false;
-		}
-	}
-	
 	public static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		return getFleePosition(rangedUnit, target.getPosition(), moveDistPerSec, unitedKiting, goalPosition, fleeAngle, true);
 	}
@@ -251,8 +274,7 @@ public class MicroWraith extends MicroManager {
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
 				// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
 				// 변경사항. 기존과 같이 전체를 확인하다가 만족스러운 곳이 있으면 회피 지점이 아닌 전체를 모두 확인하고 가장 좋은 자리를 가지고 간다.
-				if (risk < 100 && isValidPosition(rangedUnit, movePosition)
-						&& (risk < minimumRisk || ((risk == minimumRisk) && distanceToGoal < minimumDistanceToGoal))) {
+				if (risk < 100 	&& (risk < minimumRisk || ((risk == minimumRisk) && distanceToGoal < minimumDistanceToGoal))) {
 				
 					//System.out.print("selected: " + i + "  ");
 					safePosition =  movePosition;

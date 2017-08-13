@@ -84,8 +84,8 @@ public class UnitData {
 		ui.setUpdateFrame(MyBotModule.Broodwar.getFrameCount());
 		ui.setPlayer(unit.getPlayer());
 		ui.setLastPosition(unit.getPosition());
-		ui.setLastHealth(unit.getHitPoints());
-		ui.setLastShields(unit.getShields());
+//		ui.setLastHealth(unit.getHitPoints());
+//		ui.setLastShields(unit.getShields());
 		ui.setUnitID(unit.getID());
 		ui.setType(unit.getType());
 		ui.setCompleted(unit.isCompleted());

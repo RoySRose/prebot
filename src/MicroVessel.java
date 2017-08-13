@@ -79,7 +79,6 @@ public class MicroVessel extends MicroManager {
 				}
 			}
 			
-			//고민해 볼것... 컴샛 없으면 사베가 가야되고 컴셋있고 마나 있으면 사베가 굳이 안가도 되는데 컴셋이랑 어떻게 처리할껀지 
 			Unit invisibleEnemyUnit = null;
 			int closestDistToVessel = 100000;
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
@@ -100,7 +99,6 @@ public class MicroVessel extends MicroManager {
 				closestDistToVessel = 100000;
 				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 					if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-						// At most one scan per call. We don't check whether it succeeds.
 						int tempdist = unit.getDistance(sVessel);
 						if(tempdist < closestDistToVessel){
 							invisibleEnemyUnit = unit;
@@ -129,23 +127,6 @@ public class MicroVessel extends MicroManager {
 			
 			
 			for (Unit target : dangerous_targets) {
-				
-				//wraith 일때 아군 골리앗이 주위에 있으면 무시
-//				if(target.getType() == UnitType.Terran_Wraith){
-//					List<Unit> neargoliaths = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange()/2, true, false, UnitType.Terran_Goliath);
-//					if(neargoliaths.size() > 2){
-//						continue;
-//					}
-//				}
-				
-				//프로토스, 저그에 대한 소스도... 
-//				if(target.getType() == UnitType.Terran_Wraith){
-//					List<Unit> neargoliaths = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange()/2, true, false, UnitType.Terran_Goliath);
-//					if(neargoliaths.size() > 2){
-//						mostDangerousTarget = null;
-//						continue;
-//					}
-//				}
 				
 				double temp = target.getType().airWeapon().maxRange() - target.getPosition().getDistance(sVessel.getPosition()); 
 				if(temp > mostDangercheck){
@@ -181,15 +162,6 @@ public class MicroVessel extends MicroManager {
 				}
 				CommandUtil.move(sVessel, order.getPosition());
 			} 
-		}
-	}
-	
-	
-	public static boolean isValidPosition(Unit unit, Position position) {
-		if(unit.isFlying()){
-			return position.isValid();
-		}else{
-			return false;
 		}
 	}
 	
@@ -231,8 +203,7 @@ public class MicroVessel extends MicroManager {
 				
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가 같을 경우 2번째 고려사항: 목표지점까지의 거리
 
-				if (risk < 100 && isValidPosition(rangedUnit, movePosition)
-						&& (risk < minimumRisk || ((risk == minimumRisk) && distanceToGoal < minimumDistanceToGoal))) {
+				if (risk < 100 	&& (risk < minimumRisk || ((risk == minimumRisk) && distanceToGoal < minimumDistanceToGoal))) {
 				
 					//System.out.print("selected: " + i + "  ");
 					safePosition =  movePosition;

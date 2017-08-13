@@ -101,7 +101,7 @@ public class MicroMarine extends MicroManager {
 						}
 					} else {
 						if (marine.getDistance(target) <= marine.getType().groundWeapon().maxRange() * 3 / 4){
-							if (marine.getDistance(bunker) < 20) {
+							if (marine.getDistance(bunker) < 40) {
 								bunker.load(marine);
 							} else {
 								marine.move(bunker.getPosition());

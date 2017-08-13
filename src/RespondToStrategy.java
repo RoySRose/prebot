@@ -15,62 +15,121 @@ import bwta.Chokepoint;
 public class RespondToStrategy {
 	
 	//클로킹 유닛에 대한 대처
-	public boolean enemy_dark_templar = false;
-	public boolean enemy_lurker = false;
-	public boolean enemy_wraith = false;
+	public boolean enemy_dark_templar;
+	public boolean enemy_lurker;
+	public boolean enemy_wraith;
 	
-	public boolean enemy_guardian = false;
+	public boolean enemy_guardian;
 	
-	public boolean enemy_shuttle = false;
-	public boolean enemy_arbiter = false;
-	public boolean enemy_mutal = false;
-	public boolean enemy_scout = false;
-	public boolean enemy_hive = false;
+	public boolean enemy_shuttle;
+	public boolean enemy_arbiter;
+	public boolean enemy_mutal;
+	public boolean enemy_scout;
+	public boolean enemy_hive;
 	
-	public boolean need_vessel = false;
-	public boolean need_valkyrie = false;
-	public boolean need_wraith = false;
-	public boolean need_battlecruiser = false;
+	public boolean need_vessel;
+	public boolean need_valkyrie;
+	public boolean need_wraith;
+	public boolean need_battlecruiser;
 	
-	public boolean mainBaseTurret = false;
-	public boolean firstChokeTurret = false;
+	public boolean mainBaseTurret;
+	public boolean firstChokeTurret;
 	
-	public boolean prepareDark = false;
+	public boolean prepareDark;
 	
-	public int max_vessel = 0;
-	public int max_valkyrie = 0;
-	public int max_wraith = 0;
-	public int max_battlecruiser = 0;
+	public int max_vessel;
+	public int max_valkyrie;
+	public int max_wraith;
+	public int max_battlecruiser;
 	
-	public int need_vessel_time = 0;
+	public int need_vessel_time;
 	
 	//초반 터렛 건설에 대한 체크
-	private int chk_turret = 0;
+	private int chk_turret;
 	
 	//유닛체크values()
-	public boolean chk_scv = false;
-	public boolean chk_marine = false;
-	public boolean chk_goliath = false;
-	public boolean chk_vulture = false;
-	public boolean chk_siege_tank = false;
-	public boolean chk_vessel = false;
-	public boolean chk_wraith = false;
-	public boolean chk_valkyrie = false;
+	public boolean chk_scv;
+	public boolean chk_marine;
+	public boolean chk_goliath;
+	public boolean chk_vulture;
+	public boolean chk_siege_tank;
+	public boolean chk_vessel;
+	public boolean chk_wraith;
+	public boolean chk_valkyrie;
 	
 	//건물체크
-	public boolean chk_refinery = false;
-	public boolean chk_barrack = false;
-	public boolean chk_engineering_bay = false;
-	public boolean chk_missile_turret = false;
-	public boolean chk_academy = false;
-	public boolean chk_factory = false;
-	public boolean chk_machine_shop = false;
-	public boolean chk_armory = false;
-	public boolean chk_starport = false;
-	public boolean chk_control_tower = false;
-	public boolean chk_comsat_station = false;
-	public boolean chk_science_facility = false;
-	 
+	public boolean chk_refinery;
+	public boolean chk_barrack;
+	public boolean chk_engineering_bay;
+	public boolean chk_missile_turret;
+	public boolean chk_academy;
+	public boolean chk_factory;
+	public boolean chk_machine_shop;
+	public boolean chk_armory;
+	public boolean chk_starport;
+	public boolean chk_control_tower;
+	public boolean chk_comsat_station;
+	public boolean chk_science_facility;
+	
+	public RespondToStrategy() {
+		//클로킹 유닛에 대한 대처
+		enemy_dark_templar = false;
+		enemy_lurker = false;
+		enemy_wraith = false;
+		
+		enemy_guardian = false;
+		
+		enemy_shuttle = false;
+		enemy_arbiter = false;
+		enemy_mutal = false;
+		enemy_scout = false;
+		enemy_hive = false;
+		
+		need_vessel = false;
+		need_valkyrie = false;
+		need_wraith = false;
+		need_battlecruiser = false;
+		
+		mainBaseTurret = false;
+		firstChokeTurret = false;
+		
+		prepareDark = false;
+		
+		max_vessel = 0;
+		max_valkyrie = 0;
+		max_wraith = 0;
+		max_battlecruiser = 0;
+		
+		need_vessel_time = 0;
+		
+		//초반 터렛 건설에 대한 체크
+		chk_turret = 0;
+		
+		//유닛체크values()
+		chk_scv = false;
+		chk_marine = false;
+		chk_goliath = false;
+		chk_vulture = false;
+		chk_siege_tank = false;
+		chk_vessel = false;
+		chk_wraith = false;
+		chk_valkyrie = false;
+		
+		//건물체크
+		chk_refinery = false;
+		chk_barrack = false;
+		chk_engineering_bay = false;
+		chk_missile_turret = false;
+		chk_academy = false;
+		chk_factory = false;
+		chk_machine_shop = false;
+		chk_armory = false;
+		chk_starport = false;
+		chk_control_tower = false;
+		chk_comsat_station = false;
+		chk_science_facility = false;
+	}
+	
 	private static RespondToStrategy instance = new RespondToStrategy();
 	
 	public static RespondToStrategy Instance() {
@@ -487,12 +546,13 @@ public class RespondToStrategy {
 				}
 			}
 			
-			if(!chk_engineering_bay  && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) >= 2){
+			if(!chk_engineering_bay  && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 2){
 				//System.out.println("엔베없다");
 				//엔베가 없다면
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
 					//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+					System.out.println("engineering because of cloaked");
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				}
@@ -682,7 +742,7 @@ public class RespondToStrategy {
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Goliath,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 					}
@@ -707,7 +767,7 @@ public class RespondToStrategy {
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Goliath,
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Goliath,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						}
 					}
@@ -716,8 +776,10 @@ public class RespondToStrategy {
 		}
 		
 		
-		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.AttackIsland){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.terranBasic_BattleCruiser){
+			need_battlecruiser = true;
+			max_battlecruiser = 8;
+		}else if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.AttackIsland){
 			need_battlecruiser = true;
 			max_battlecruiser = 8;
 		}else{

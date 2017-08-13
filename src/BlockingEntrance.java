@@ -23,8 +23,8 @@ public class BlockingEntrance {
 	/// 건물과 건물간 띄울 최소한의 간격 - ResourceDepot 건물의 경우 (Nexus, Hatchery, Command Center)
 	private static int BuildingResourceDepotSpacingOld = Config.BuildingResourceDepotSpacing;
 	
-	private int startingX = 0;
-	private int startingY = 0;
+	public int startingX = 0;
+	public int startingY = 0;
 	
 	public int first_suppleX = 0;
 	public int first_suppleY = 0;
