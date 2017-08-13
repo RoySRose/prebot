@@ -1114,6 +1114,9 @@ public class StrategyManager {
 			maxFaccnt = 9;
 		}
 		
+		Faccnt += ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null);
+				
+		
 		int additonalmin = 0;
 		int additonalgas = 0;
 		if(facFullOperating == false){
@@ -1121,7 +1124,7 @@ public class StrategyManager {
 			additonalgas = (Faccnt-1)*20;
 		}
 		
-		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0) {
+		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) == 0 ) {
 			if(Faccnt == 0){
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}else if(Faccnt < maxFaccnt){
@@ -1416,15 +1419,17 @@ public class StrategyManager {
 	public int getTotDeadCombatUnits(){
 		
 		int res =0;
-		int tot =0;
-		int totscv = 0;
-		int totmarine = 0;
 		
-		tot = MyBotModule.Broodwar.self().deadUnitCount();
-		totmarine = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
-		totscv = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_SCV);
+		int totmarine = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
+		int tottank = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+				+MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) ;
+		int totgoliath = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
+		int totvulture = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
+		int totwraith = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
+		int totvessel = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
 		
-		res = tot - totmarine - totscv;
+		
+		res = tottank + totgoliath + totvulture + totwraith + totvessel;
 		res = res*2 + totmarine;
 		
 		return res*2;//스타에서는 두배
@@ -1436,16 +1441,19 @@ public class StrategyManager {
 		int tot = 0;
 		
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			int totworker = 0;
 			int totbio = 0;
 			
-			tot = MyBotModule.Broodwar.self().killedUnitCount();
+			int tottank = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+					+MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) ;
+			int totgoliath = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
+			int totvulture = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
+			int totwraith = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
+			int totvessel = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
 			totbio = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Marine)
 					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Firebat)
 					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Medic);
-			totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_SCV);
 
-			res = tot - totbio - totworker;
+			res = tottank + totgoliath + totvulture + totwraith + totvessel;
 			res = res*2 + totbio;
 			
 			return res*2;
@@ -1835,8 +1843,10 @@ public class StrategyManager {
 		boolean vsTerranbool[] = new boolean[]{VM, VS, TS, GR};
 		MetaType vsTerranBio[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
 		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
-		MetaType vsProtoss[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
-		boolean vsProtossbool[] = new boolean[]{VM, VS, TS, GR};
+//		MetaType vsProtoss[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
+//		boolean vsProtossbool[] = new boolean[]{VM, VS, TS, GR};
+		MetaType vsProtoss[] = new MetaType[]{vultureMine, TankSiegeMode, vultureSpeed, GoliathRange};
+		boolean vsProtossbool[] = new boolean[]{VM, TS, VS, GR};
 		MetaType vsProtossZealot[] = new MetaType[]{vultureSpeed, vultureMine, TankSiegeMode, GoliathRange};
 		boolean vsProtossZealotbool[] = new boolean[]{VS, VM, TS, GR};
 		MetaType vsProtossDragoon[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
@@ -2128,6 +2138,23 @@ public class StrategyManager {
 			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 50 && Attackpoint > 30 && ExpansionPoint > 0){
 				if(Config.BroodwarDebugYN){
 					MyBotModule.Broodwar.printf("Build Next Expansion by unit and advance in fight");
+				}
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+				}
+			}
+			//공격시 돈 250 넘으면 멀티하기
+			
+			int temp =0;
+			for(Unit units : MyBotModule.Broodwar.self().getUnits()){
+				if(units.getType() == UnitType.Terran_Command_Center && units.isCompleted()){
+					temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
+				}
+			}
+			if(temp < 8000 && CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+				if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("Build Next Expansion by attacking point");
 				}
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {

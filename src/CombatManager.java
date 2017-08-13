@@ -326,7 +326,11 @@ public class CombatManager {
 		// 상대 클록 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
-				
+				if(InformationManager.Instance().enemyRace == Race.Protoss){
+					if(unit.isFlying() && RespondToStrategy.Instance().enemy_arbiter == false){
+						continue;
+					}
+				}
 				//주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로 넘어간다
 				List<Unit> nearvessel = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Science_Vessel.sightRange()*2, true, false, UnitType.Terran_Science_Vessel);
 				if(nearvessel!= null){

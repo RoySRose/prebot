@@ -68,7 +68,7 @@ public class MicroVessel extends MicroManager {
 				matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius+300, true, false, null);
 				
 				for (Unit target : matrix_targets) {
-					if(target.getType() == UnitType.Terran_SCV){
+					if(target.getType() == UnitType.Terran_SCV || target.getType() == UnitType.Terran_Vulture_Spider_Mine ){
 						continue;
 					}
 					if(target.isUnderAttack() && target.getHitPoints() < target.getType().maxHitPoints()*0.7

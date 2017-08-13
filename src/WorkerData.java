@@ -601,6 +601,24 @@ public class WorkerData {
 
 		return mineralsNearDepot;
 	}
+	
+	/// ResourceDepot 반경 200 point 이내의 미네랄 덩이 수를 반환합니다
+	public int getMineralsSumNearDepot(Unit depot)
+	{
+		if (depot == null) { return 0; }
+
+		int mineralsNearDepot = 0;
+
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+		{
+			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320)
+			{
+				mineralsNearDepot += unit.getResources();
+			}
+		}
+
+		return mineralsNearDepot;
+	}
 
 	public Unit getWorkerResource(Unit unit)
 	{
