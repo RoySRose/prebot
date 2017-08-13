@@ -35,7 +35,7 @@ public class MicroSet {
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;
-		public static final int MINE_SPREAD_RADIUS = 500;
+		public static final int MINE_SPREAD_RADIUS = 250;
 
 		public static final int MINE_BETWEEN_DIST = 50;
 		public static final int MINE_REMOVE_TANK_DIST = 150;
@@ -70,8 +70,8 @@ public class MicroSet {
 	
 	public static class Common {
 		
-		public static final int DEFENSE_SECONDCHOKE_SIZE = 10;
-		public static final int DEFENSE_READY_TO_ATTACK_SIZE = 15;
+		public static final int DEFENSE_SECONDCHOKE_SIZE = 9;
+		public static final int DEFENSE_READY_TO_ATTACK_SIZE = 14;
 		
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
 		public static final double BACKOFF_DIST_DEF_TOWER = 120.0;
