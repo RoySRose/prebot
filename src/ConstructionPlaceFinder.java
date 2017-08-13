@@ -273,35 +273,42 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = 0;
 		}
 
-		while (buildingGapSpace >= 0) {
+		testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+//		
+//		while (buildingGapSpace >= 0) {
+//
+//			testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+//
+//			// std::cout << "ConstructionPlaceFinder testPosition " << testPosition.x << "," << testPosition.y << std::endl;
+//
+//			if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid)
+//				return testPosition;
+//					
+//			// 찾을 수 없다면, buildingGapSpace 값을 줄여서 다시 탐색한다
+//			// buildingGapSpace 값이 1이면 지상유닛이 못지나가는 경우가 많아  제외하도록 한다 
+//			// 4 -> 3 -> 2 -> 0 -> 탐색 종료
+//			//      3 -> 2 -> 0 -> 탐색 종료 
+//			//           1 -> 0 -> 탐색 종료
+//			if (buildingGapSpace > 2) {
+//				buildingGapSpace -= 1;
+//			}
+//			else if (buildingGapSpace == 2){
+//				buildingGapSpace = 0;
+//			}
+//			else if (buildingGapSpace == 1){
+//				buildingGapSpace = 0;
+//			}
+//			else {
+//				break;
+//			}
+//		}
 
-			testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
-
-			// std::cout << "ConstructionPlaceFinder testPosition " << testPosition.x << "," << testPosition.y << std::endl;
-
-			if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid)
-				return testPosition;
-					
-			// 찾을 수 없다면, buildingGapSpace 값을 줄여서 다시 탐색한다
-			// buildingGapSpace 값이 1이면 지상유닛이 못지나가는 경우가 많아  제외하도록 한다 
-			// 4 -> 3 -> 2 -> 0 -> 탐색 종료
-			//      3 -> 2 -> 0 -> 탐색 종료 
-			//           1 -> 0 -> 탐색 종료
-			if (buildingGapSpace > 2) {
-				buildingGapSpace -= 1;
-			}
-			else if (buildingGapSpace == 2){
-				buildingGapSpace = 0;
-			}
-			else if (buildingGapSpace == 1){
-				buildingGapSpace = 0;
-			}
-			else {
-				break;
-			}
+		if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid){
+			return testPosition;
 		}
-
-		return TilePosition.None;
+		else{
+			return TilePosition.None;
+		}
 	}
 
 	/// 해당 buildingType 이 건설될 수 있는 위치를 desiredPosition 근처에서 탐색해서 탐색결과를 리턴합니다<br>
@@ -320,7 +327,7 @@ public class ConstructionPlaceFinder {
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
-		int maxRange = 38; // maxRange = BWAPI::Broodwar->mapWidth()/4;
+		int maxRange = 40; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 		boolean isPossiblePlace = false;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal())

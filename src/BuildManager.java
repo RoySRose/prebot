@@ -985,7 +985,10 @@ public class BuildManager {
 						for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								if(unit.getAddon() != null){
-								if(unit.canBuildAddon() == false){
+//								if(unit.canBuildAddon() == false){
+//									continue;
+//								}
+								if(unit.getAddon() != null){
 									continue;
 								}
 								if(currentItem.metaType.getUnitType()  != UnitType.Terran_Comsat_Station){

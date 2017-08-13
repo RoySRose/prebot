@@ -745,8 +745,8 @@ public class ConstructionManager {
 		// queryTilePosition 을 입력한 경우, 거리의 maxRange. 타일단위
 		int maxRange = range;
 
-		Position queryTilePositionPoint = null;
-		queryTilePositionPoint = queryTilePosition.toPosition();
+		TilePosition queryTilePositionPoint = null;
+		queryTilePositionPoint = queryTilePosition.toPosition().toTilePosition();
 		
 
 		int count = 0;
@@ -756,7 +756,7 @@ public class ConstructionManager {
 			{
 				if (queryType.isBuilding())
 				{
-					if (queryTilePositionPoint.getDistance(b.getDesiredPosition().toPosition()) <= maxRange) {
+					if (queryTilePositionPoint.getDistance(b.getDesiredPosition().toPosition().toTilePosition()) <= maxRange) {
 						count++;
 					}
 				}

@@ -84,8 +84,8 @@ public class UnitData {
 		ui.setUpdateFrame(MyBotModule.Broodwar.getFrameCount());
 		ui.setPlayer(unit.getPlayer());
 		ui.setLastPosition(unit.getPosition());
-		ui.setLastHealth(unit.getHitPoints());
-		ui.setLastShields(unit.getShields());
+//		ui.setLastHealth(unit.getHitPoints());
+//		ui.setLastShields(unit.getShields());
 		ui.setUnitID(unit.getID());
 		ui.setType(unit.getType());
 		ui.setCompleted(unit.isCompleted());
@@ -135,7 +135,8 @@ public class UnitData {
 	public void removeUnitbyMorph(Unit unit, UnitType type)
 	{
 		if (unit == null) { return; }
-
+		if (type == null) { return; }
+		
 		if(numUnits.get(type.toString()) == 1){
 			numUnits.remove(type.toString());
 		}else{
