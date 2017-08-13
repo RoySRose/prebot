@@ -87,9 +87,9 @@ public class SpiderMineManger {
 	
 	public void update() {
 		
-		// 패스트다크인 경우 본진 마인매설(11000프레임 이하)
+		// 패스트다크인 경우 본진 마인매설(12000프레임 이하)
 //		System.out.println(MyBotModule.Broodwar.getFrameCount());
-		if (MyBotModule.Broodwar.getFrameCount() > 11000) {
+		if (MyBotModule.Broodwar.getFrameCount() > 12000) {
 			if (mineInMyBaseLevel != 0) {
 				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 0");
 				mineInMyBaseLevel = 0;
@@ -104,7 +104,8 @@ public class SpiderMineManger {
 				mineInMyBaseLevel = 2; // 본진 앞마당 전부
 			}
 			
-		} else if (MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Hydralisk) > 3) {
+		} else if (MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Hydralisk) >= 3
+				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Dragoon) >= 3) {
 			if (mineInMyBaseLevel != 1) {
 				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 1");
 				mineInMyBaseLevel = 1; // 앞마당에 많이

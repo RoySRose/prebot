@@ -33,7 +33,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 		this.saveUnitLevel = saveUnitLevel;
 		this.attackWithMechanics = attackWithMechanics && notVultureUnitList.size() > 0;
 		if (this.attackWithMechanics) {
-			this.stickToMechanicRadius = 140 + (int) (Math.log(vultureList.size()) * 15);
+			this.stickToMechanicRadius = 120 + (int) (Math.log(vultureList.size()) * 15);
 			if (saveUnitLevel == 0) {
 				this.stickToMechanicRadius += 100;
 			}
@@ -167,7 +167,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			boolean vultureInMyBaseRegion = vultureRegion == BWTA.getRegion(base.getPosition());
 			if (!vultureInMyBaseRegion || minePrepareLevel >= 2) { // 본진 region에는 마인 설치안함(단 패스트 다크, 패스트 럴커 등인 경우 매설)
 				boolean occupiedRegion = false;
-				for (BaseLocation occupiedBase : occupiedBases) { // 앞마당 포함한 점령지역에 마인을 적게 매설함(단, 
+				for (BaseLocation occupiedBase : occupiedBases) { // 앞마당 포함한 점령지역에 마인을 적게 매설함(단, 히드라웨이브, 드라군 푸시인 경우 많이 매설)
 					if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
 						occupiedRegion = true;
 						break;
