@@ -37,10 +37,13 @@ public class RespondToStrategy {
 	
 	public boolean prepareDark;
 	
+
+	public int max_turret_to_mutal;
 	public int max_vessel;
 	public int max_valkyrie;
 	public int max_wraith;
 	public int max_battlecruiser;
+
 	
 	public int need_vessel_time;
 	
@@ -99,6 +102,7 @@ public class RespondToStrategy {
 		max_valkyrie = 0;
 		max_wraith = 0;
 		max_battlecruiser = 0;
+		max_turret_to_mutal = 0;
 		
 		need_vessel_time = 0;
 		
@@ -153,7 +157,7 @@ public class RespondToStrategy {
 	}
 	
 	public void update() {
-		
+		max_turret_to_mutal = 0;
 //		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
 //			need_vessel = true;
 //		}
@@ -481,11 +485,15 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			need_valkyrie = true;
 			max_valkyrie = 5;
+			max_turret_to_mutal = 4;
 		}else{
 			need_valkyrie = false;
 			max_valkyrie = 0;
+			if(AnalyzeStrategy.Instance().mutalStrategy){
+				max_turret_to_mutal = 4;
+			}
 		}
-		
+	
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_OnLyLing){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer) < 5	){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) < 1){
@@ -573,7 +581,7 @@ public class RespondToStrategy {
 					// first choke point
 					if (tempChokePoint != null) {
 						// myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),400);
+						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),100);
 
 						for(Unit turret : turretInRegion){
 							if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -581,8 +589,8 @@ public class RespondToStrategy {
 							}
 						}
 						if (!firstChokeTurret) {
-							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 250) 
-							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 250) < 1){
+							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 100) 
+							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().toTilePosition(), 100) == 0){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										UnitType.Terran_Missile_Turret,
 										tempChokePoint.getCenter().toTilePosition(), true);
@@ -591,7 +599,7 @@ public class RespondToStrategy {
 					}		
 					
 					if (tempBaseLocation != null) {
-						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation.getRegion().getCenter(),500);
+						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation.getRegion().getCenter(),250);
 
 						for(Unit turret : turretInRegion){
 							if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -609,41 +617,34 @@ public class RespondToStrategy {
 					}
 					
 					
-//					if (tempBaseLocation != null) { 
-//						
-//						Position firstChokeHalf = new Position((tempBaseLocation.getRegion().getCenter().getX() + tempChokePoint.getX()*2)/3 , (tempBaseLocation.getRegion().getCenter().getY() + tempChokePoint.getY()*2)/3);
-//						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeHalf,400);
-//
-//						for(Unit turret : turretInRegion){
-//							if (turret.getType() == UnitType.Terran_Missile_Turret) {
-//								firstChokeHalfTurret = true;
-//							}
-//						}
-//						if (!firstChokeHalfTurret) {
-//							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret,firstChokeHalf.toTilePosition(), 250) 
-//							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, firstChokeHalf.toTilePosition(), 250) == 0){
-//								BuildManager.Instance().buildQueue.queueAsHighestPriority(
-//										UnitType.Terran_Missile_Turret,
-//										firstChokeHalf.toTilePosition(), true);
-//							}
-//						}
-//					}
+					if (tempBaseLocation != null) { 
+						
+						Position firstChokeHalf = new Position((tempBaseLocation.getRegion().getCenter().getX() + tempChokePoint.getX()*2)/3 , (tempBaseLocation.getRegion().getCenter().getY() + tempChokePoint.getY()*2)/3);
+						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeHalf,100);
+
+						for(Unit turret : turretInRegion){
+							if (turret.getType() == UnitType.Terran_Missile_Turret) {
+								firstChokeHalfTurret = true;
+							}
+						}
+						if (!firstChokeHalfTurret) {
+							if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret,firstChokeHalf.toTilePosition(), 100) 
+							+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, firstChokeHalf.toTilePosition(), 100) == 0){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(
+										UnitType.Terran_Missile_Turret,
+										firstChokeHalf.toTilePosition(), true);
+							}
+						}
+					}
 					
 					
-//					BaseLocation FirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-//					
-//					Boolean firstexpanded = enemyMainBase;
-//					List<BaseLocation> myBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-//					for(BaseLocation enemyBase : myBases){
-//						if (FirstExpansion.getTilePosition().equals(myBases.getTilePosition())){
-//							AttackLocation = enemyFirstExpansion;
-//						}
-//					}
+					//BaseLocation FirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+					
 					if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1){
 						
 						if (temp2ChokePoint != null) {
 							// myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(temp2ChokePoint.getCenter(),500);
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(temp2ChokePoint.getCenter(),100);
 
 							for(Unit turret : turretInRegion){
 								if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -651,12 +652,42 @@ public class RespondToStrategy {
 								}
 							}
 							if (!secondChokeTurret) {
-								if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 300) 
-								+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 300) < 1){
+
+								if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 100) 
+								+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, temp2ChokePoint.getCenter().toTilePosition(), 100) == 0){
+
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(
 											UnitType.Terran_Missile_Turret,
 											temp2ChokePoint.getCenter().toTilePosition(), true);
+									System.out.println("build turret to second choke ===>>>>  (" +temp2ChokePoint.getCenter().toTilePosition().getX()+"," +temp2ChokePoint.getCenter().toTilePosition().getY()+")");
 								}
+							}
+						}
+						
+						//타지역 멀티
+						List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+						//List tempBaseLocationList = InformationManager.Instance().ge(InformationManager.Instance().selfPlayer);
+						for(BaseLocation baseLocation : tempBaseLocationList){
+							boolean location_turret = false;
+							//tempBaseLocation = (BaseLocation)tempBaseLocationList.get(a);
+							//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
+							if (baseLocation != null) {
+								List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getRegion().getCenter(),100);
+						              //List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+					          	for(Unit turret : turretInRegion){
+									if (turret.getType() == UnitType.Terran_Missile_Turret) {
+										location_turret = true;
+									}
+								}
+					          	
+					          	if(!location_turret){
+						              if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) 
+									+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) == 0){
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(
+												UnitType.Terran_Missile_Turret,
+												baseLocation.getRegion().getCenter().toTilePosition(), true);
+									}
+					          	}
 							}
 						}
 					}
@@ -785,6 +816,155 @@ public class RespondToStrategy {
 		}else{
 			need_battlecruiser = false;
 			max_battlecruiser = 0;
+		}
+
+		if(max_turret_to_mutal != 0){
+			
+			if(!chk_engineering_bay){
+				//System.out.println("엔베없다");
+				//엔베가 없다면
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
+					//지어졌거나 건설중인게 없는데 빌드큐에도 없다면 아카데미를 빌드큐에 입력
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				}
+			}else{
+				//엔베가 있다면
+				//System.out.println("엔베있다!!!!!!!!!!!!!!!!!!");
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0){
+					//엔베가 완성이 되었다면
+					BaseLocation tempBaseLocation =InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+	            	Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());;
+	            	//Position tempPosition;
+	            	
+	            	//BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+			              bwta.Region myRegion = null; 
+			              
+			           boolean mainBaseTurret = false;
+			           boolean	firstChokeTurret = false;
+			           int build_turret_cnt = 0;
+			        //first choke point
+			           /*if (tempChokePoint != null) {
+						//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+						
+						 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+			     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+			     				build_turret_cnt++;
+			     			 }
+		     			 }
+						 //first choke 는 1~3개
+						 if(build_turret_cnt < max_turret_to_mutal -3){
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1
+		     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition()) == 0){
+		     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition(), true);
+		     				}
+		     				
+		     			}
+					}*/
+			          /*tempChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());
+			           if (tempChokePoint != null) {
+							//myRegion = BWTA.getRegion(tempChokePoint.getPoint());
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(), 300);
+							
+							 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+				     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+				     				firstChokeTurret = true;
+				     			 }
+			     			 }
+							 if(!firstChokeTurret){
+			     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition())< 1
+			     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempChokePoint.getCenter().getPoint().toTilePosition()) == 0){
+			     					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+			     							tempChokePoint.getCenter().getPoint().toTilePosition(), true);
+			     				}
+			     				
+			     			}
+						}*/
+
+			           //20170812_본진 앞마당 빼고 전체 통합
+			           /*
+			           //본진
+					if (tempBaseLocation != null) {
+						myRegion = tempBaseLocation.getRegion();
+				              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
+				             build_turret_cnt = 0; 
+		     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+			     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+			     				build_turret_cnt++;
+			     			 }
+		     			 }
+		     			 if(build_turret_cnt < max_turret_to_mutal)
+		     			 {
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1
+		     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition()) == 0){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+										tempBaseLocation.getPoint().toTilePosition(), true);
+		     				}
+		     			 }
+					}
+					
+					//앞마당
+					tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+					if (tempBaseLocation != null) {
+						myRegion = tempBaseLocation.getRegion();
+				              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
+				             build_turret_cnt = 0; 
+		     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+			     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+			     				build_turret_cnt++;
+			     			 }
+		     			 }
+		     			 //앞마당은 2~4개
+		     			 if(build_turret_cnt < max_turret_to_mutal-3)
+		     			 {
+		     				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition())< 1
+		     						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, tempBaseLocation.getPoint().toTilePosition()) == 0){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+										tempBaseLocation.getPoint().toTilePosition(), true);
+		     				}
+		     			 }
+					}
+					*/
+					
+					//타지역 멀티
+					List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+					//List tempBaseLocationList = InformationManager.Instance().ge(InformationManager.Instance().selfPlayer);
+					for(BaseLocation baseLocation : tempBaseLocationList){
+						//tempBaseLocation = (BaseLocation)tempBaseLocationList.get(a);
+						//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
+						if (baseLocation != null) {
+							myRegion = baseLocation.getRegion();
+					              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
+					             build_turret_cnt = 0; 
+			     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
+				     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
+				     				build_turret_cnt++;
+				     			 }
+			     			 }
+			     			 //System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
+			     			//System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);
+			     			 //터렛은 3~5개
+			     			 if(build_turret_cnt < max_turret_to_mutal-1)
+			     			 {
+			     				 /*System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
+			     				System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);*/
+			     				//if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition())< 1
+			     				if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250)< 1
+			     						&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250) == 0){
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
+											baseLocation.getPoint().toTilePosition(), true);
+									//System.out.println("지으라고 한곳 ==>>>> " + );
+			     				}
+			     			 }
+						}
+					}
+				}
+			}
 		}
 	}
 }
