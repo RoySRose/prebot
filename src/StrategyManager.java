@@ -997,14 +997,15 @@ public class StrategyManager {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
 					}
 				}
-				if(starComplete){
-					if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 1500 || wraithcnt < 2)){ //TODO && wraithcnt <= needwraith){
-						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
-							if(Config.BroodwarDebugYN){
-							MyBotModule.Broodwar.printf("make wraith");
-							}
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
+			}
+			if(starComplete){
+				if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 2200 || wraithcnt < 1)){ //TODO && wraithcnt <= needwraith){
+					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+						if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("make wraith");
 						}
+						WraithTime = MyBotModule.Broodwar.getFrameCount();
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
 					}
 				}
 			}
@@ -1839,8 +1840,8 @@ public class StrategyManager {
 		boolean vsZergbool[] = new boolean[]{VM, GR, TS, VS};
 		MetaType vsZergHydra[] = new MetaType[]{vultureMine, TankSiegeMode, GoliathRange, vultureSpeed};
 		boolean vsZergHydrabool[] = new boolean[]{VM, TS, GR, VS};
-		MetaType vsTerran[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
-		boolean vsTerranbool[] = new boolean[]{VM, VS, TS, GR};
+		MetaType vsTerran[] = new MetaType[]{vultureMine, TankSiegeMode, vultureSpeed, GoliathRange};
+		boolean vsTerranbool[] = new boolean[]{VM, TS, VS, GR};
 		MetaType vsTerranBio[] = new MetaType[]{vultureSpeed, TankSiegeMode, vultureMine, GoliathRange};
 		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
 //		MetaType vsProtoss[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
@@ -2061,7 +2062,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				}
 			}
-			if( MyBotModule.Broodwar.getFrameCount() > 10000 && MyBotModule.Broodwar.self().minerals() > 400){
+			if( MyBotModule.Broodwar.getFrameCount() > 9000 && MyBotModule.Broodwar.self().minerals() > 400){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if(Config.BroodwarDebugYN){
@@ -2069,7 +2070,7 @@ public class StrategyManager {
 					}
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				}
-			}if( MyBotModule.Broodwar.getFrameCount() > 13000 && MyBotModule.Broodwar.self().minerals() > 200){
+			}if( MyBotModule.Broodwar.getFrameCount() > 12000 && getFacUnits() > 40){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if(Config.BroodwarDebugYN){
@@ -2078,7 +2079,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				}
 			}
-			if( MyBotModule.Broodwar.getFrameCount() > 10000 && getFacUnits() > 80){
+			if( MyBotModule.Broodwar.getFrameCount() > 80000 && getFacUnits() > 80){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if(Config.BroodwarDebugYN){

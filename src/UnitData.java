@@ -135,7 +135,8 @@ public class UnitData {
 	public void removeUnitbyMorph(Unit unit, UnitType type)
 	{
 		if (unit == null) { return; }
-
+		if (type == null) { return; }
+		
 		if(numUnits.get(type.toString()) == 1){
 			numUnits.remove(type.toString());
 		}else{

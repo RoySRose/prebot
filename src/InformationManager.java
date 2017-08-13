@@ -725,6 +725,10 @@ public class InformationManager {
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
 			if(ui != null){
+				
+				if(ui.getLastPosition() == Position.None){
+					continue;
+				}
 				if(myunit.getDistance(ui.getLastPosition()) > radius){
 					continue;
 				}
@@ -761,6 +765,10 @@ public class InformationManager {
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
 			if(ui != null){
+				
+				if(ui.getLastPosition() == Position.None){
+					continue;
+				}
 				if(myunit.getDistance(ui.getLastPosition()) > radius){
 					continue;
 				}
