@@ -874,8 +874,7 @@ public class AnalyzeStrategy {
 
 		// 러커 out 조건
 		if (selectedSE == StrategyManager.StrategysException.zergException_PrepareLurker) {
-			BaseLocation tempBaseLocation = InformationManager.Instance()
-					.getMainBaseLocation(MyBotModule.Broodwar.self());
+			BaseLocation tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 
 			Region myRegion = null;
 			boolean mainBaseTurret = false;
@@ -884,13 +883,11 @@ public class AnalyzeStrategy {
 
 			if (tempBaseLocation != null) {
 				myRegion = tempBaseLocation.getRegion();
-				List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion,
-						InformationManager.Instance().selfPlayer);
+				List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion,InformationManager.Instance().selfPlayer);
 
 				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
 					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at Main Base
-						// Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						//System.out.println("Turret Exists at Main Base Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						mainBaseTurret = true;
 						break;
 					}
@@ -904,8 +901,7 @@ public class AnalyzeStrategy {
 
 				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
 					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at First Choke
-						// Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						//System.out.println("Turret Exists at First Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						firstChokeTurret = true;
 						break;
 					}
@@ -919,15 +915,15 @@ public class AnalyzeStrategy {
 
 				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
 					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at First Choke
-						// Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-						firstChokeTurret = true;
+						//System.out.println("Turret Exists at Second Choke Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						secondChokeTurret = true;
 						break;
 					}
 
 				}
 			}
 			if (mainBaseTurret && firstChokeTurret && secondChokeTurret) {
+				//System.out.println("Turret Exists at all Point!!!!!!!!!!");
 				selectedSE = StrategyManager.StrategysException.Init;
 				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
