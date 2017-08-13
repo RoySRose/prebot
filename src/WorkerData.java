@@ -60,7 +60,7 @@ public class WorkerData {
 	//Gas 일꾼 
 	public Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
-	private Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
+	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	
 	private CommandUtil commandUtil = new CommandUtil();
 	
@@ -509,6 +509,20 @@ public class WorkerData {
 //			}
 //		}
 		return WorkerJob.Default;
+	}
+	
+	//워커는 Build 명령 취소되었지만 ConstructionManager 에서 build 명령취소 되지 않은것 비교하기 위한 함수
+	public boolean getWorkerId(Unit unit)
+	{
+		if (unit == null)
+		{
+			return false;
+		}
+		if(workerJobMap.get(unit.getID()) !=  WorkerData.WorkerJob.Build)
+		{
+			return true;
+		}
+		return false;
 	}
 	//1.1 추가 함수
 	

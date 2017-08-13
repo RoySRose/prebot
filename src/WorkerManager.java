@@ -124,12 +124,12 @@ public class WorkerManager {
 			// if its job is Build
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build)
 			{
-				if(worker.getHitPoints() < 20)
-							
 				// 대상이 파괴되었거나, 수리가 다 끝난 경우
 				//1.3 일꾼 에너지가 20이하일떄 idle 변경
+				if(worker.getHitPoints() < 20)
 				{
 //					worker.cancelConstruction();
+					
 					worker.haltConstruction();
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
 				}
@@ -381,6 +381,9 @@ public class WorkerManager {
 		if(MyBotModule.Broodwar.self().minerals() <5 ){
 			return;
 		}
+		
+		int repairWorkCnt = workerData.workerRepairMap.size();
+		
 
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
@@ -388,9 +391,9 @@ public class WorkerManager {
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()
-					&& !unit.isFlying())
+					&& !unit.isFlying() && !isCheckEnemy(unit))
 			{
-				Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 0);
+				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				setRepairWorker(repairWorker, unit);
 				break;
 			}
@@ -399,25 +402,29 @@ public class WorkerManager {
 			{
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if (unit.getType() != UnitType.Terran_SCV) {
-					Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 10 * Config.TILE_SIZE);
+					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 1000 * Config.TILE_SIZE);
 					setRepairWorker(repairWorker, unit);
-					break;
+					repairWorkCnt = workerData.workerRepairMap.size();
 				}
 			}
-
+			if(repairWorkCnt > 3){
+				break;
+			}
 		}
 	}
 	
 
 	/// position 에서 가장 가까운 Mineral 혹은 Idle 혹은 Move 일꾼 유닛들 중에서 Repair 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
-	public Unit chooseRepairWorkerClosestTo(Position p, int maxRange)
+	public Unit chooseRepairWorkerClosestTo(Unit unit, int maxRange)
 	{
+		Position p = unit.getPosition();
 		if (!p.isValid()) return null;
 
 	    Unit closestWorker = null;
 	    double closestDist = 100000000;
 
-		if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0)
+	    
+		if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding())
 	    {
 			return currentRepairWorker;
 	    }
@@ -607,7 +614,8 @@ public class WorkerManager {
 			if(unit.isVisible() && unit.getDistance(depot) < 200 && unit.getType().canAttack()){
 				unitCnt++;
 //				commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-				if(unitCnt > 8){
+//				if(unitCnt > 8){
+				if(unitCnt > 3){
 					return true;
 				}
 			}
@@ -682,8 +690,8 @@ public class WorkerManager {
 			if (workerData.getWorkers().size() >= 2 && avoidWorkerID != 0 && unit.getID() == avoidWorkerID) continue;
 
 			//1.3 worker 에너지 20이이하면 다시 추출안한다.
-			if(unit.getHitPoints() < 20)
-				continue;
+//			if(unit.getHitPoints() < 20)
+//				continue;
 			
 			// Move / Idle Worker
 			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle))

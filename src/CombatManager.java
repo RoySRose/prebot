@@ -70,6 +70,8 @@ public class CombatManager {
 	private static Chokepoint currTargetChoke = null;
 	private static int currTargetChokeExpiredFrame = 0;
 	private boolean gasRush = false; 
+	private boolean photonRush = false; 
+	private static int photonDefenseWornCnt = 0; 
 	private double getWaitingPeriod() {
 		Race enemyRace = InformationManager.Instance().enemyRace;
 		if (enemyRace == Race.Zerg) {
@@ -206,7 +208,9 @@ public class CombatManager {
 				updateBaseDefenseSquads();
 			}
 			gasRush = InformationManager.Instance().isGasRushed();
-			if(FastZerglingsInOurBase > 0 || gasRush){
+			//포톤러쉬 체크
+			photonRush = InformationManager.Instance().isPhotonRushed();
+			if(FastZerglingsInOurBase > 0 || gasRush || photonRush){
 				updateEarlyDefenseSquad();
 			}
 			
@@ -954,6 +958,7 @@ public class CombatManager {
 		}
 	}
 	private void updateEarlyDefenseSquad() {
+		int photonCnt = 0;
 		
 		bwta.BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 		bwta.Region myRegion = base.getRegion();
@@ -982,20 +987,32 @@ public class CombatManager {
 		Position mineral = getBestPosition(CC);	
 		double bestDist = 99999;
 		Unit bestTarget = null;
+
+		//포톤수 체크
+		//완성된 포톤이 있으면 공격안하는걸로 
 		for (Unit target : enemyUnitsInRegion){
 			dist = mineral.getDistance(target);
 			if (dist < bestDist){
                 bestTarget = target;
                 bestDist = dist;
             }
+			if(photonRush){
+				if (target.getType() == InformationManager.Instance().getAdvancedRushBuildingType(MyBotModule.Broodwar.enemy().getRace())) {
+					if(target.isCompleted()){
+						photonCnt = 0;
+						break;
+					}else{
+						photonCnt++;
+					}
+				}
+			}
 		}
 		if(mineral==null){return;}
 		
 //		System.out.println("bestTarget: " + bestTarget.getID());
 //		System.out.println("bestDist: " + bestDist);
-		
 		if(bestTarget!=null){
-			if(bestDist < 250){
+			if(photonRush){
 				int k=0;
 				//while(k< (int)(4+enemyUnitsInRegion.size()*2) ){
 				for (Unit workerDefender : MyBotModule.Broodwar.self().getUnits()){
@@ -1004,19 +1021,37 @@ public class CombatManager {
 					    squadData.assignWorkerToSquad(workerDefender, earlyDefenseSquad);
 					    k++;
 		            }
-					if(gasRush){
-						if(k > 3){
-							break;
-						}
-					}else{
-						if(k > (int)(2+enemyUnitsInRegion.size()*3)){
-							break;
+					if(k > photonCnt*4){
+						break;
+					}
+					
+				}
+				
+			
+			}else{ 
+				if(bestDist < 250){
+					int k=0;
+					//while(k< (int)(4+enemyUnitsInRegion.size()*2) ){
+					for (Unit workerDefender : MyBotModule.Broodwar.self().getUnits()){
+						if (workerDefender.getType() == UnitType.Terran_SCV) {
+						    WorkerManager.Instance().setCombatWorker(workerDefender);
+						    squadData.assignWorkerToSquad(workerDefender, earlyDefenseSquad);
+						    k++;
+			            }
+						if(gasRush){
+							if(k > 3){
+								break;
+							}
+						}else{
+							if(k > (int)(2+enemyUnitsInRegion.size()*3)){
+								break;
+							}
 						}
 					}
-				}
-			}else if (!earlyDefenseSquad.isEmpty() && bestDist >= 240){//180) {
-				earlyDefenseSquad.clear();
-		    }
+				}else if (!earlyDefenseSquad.isEmpty() && bestDist >= 240){//180) {
+					earlyDefenseSquad.clear();
+			    }
+			}
 		}
 		
 		if(!earlyDefenseSquad.isEmpty() && bestTarget == null){//180) {

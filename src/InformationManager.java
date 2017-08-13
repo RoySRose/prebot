@@ -50,6 +50,7 @@ public class InformationManager {
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
 	private boolean checkGasRush;
+	private boolean photonRushed;
 //	private int MainBaseSuppleLimit;
 	private Unit FirstVulture;
 	private Position firstenemyunit;
@@ -115,6 +116,7 @@ public class InformationManager {
 		gasRushEnemyRefi = null;
 		gasRushed = false;
 		checkGasRush = true;
+		photonRushed = false;
 //		MainBaseSuppleLimit =0;
 		FirstVulture = null;
 		Position firstenemyunit = null;
@@ -297,6 +299,22 @@ public class InformationManager {
 //					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){
 //						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 //					}
+				}
+			}
+		}
+		//10000프레임 이전까지만 포톤러쉬 확인.
+		if (MyBotModule.Broodwar.getFrameCount() < 10000) {
+			BaseLocation base = null;
+			// 1. 본진에 적 포톤캐논이 있는지 본다.
+			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+			Region myRegion = base.getRegion();
+			List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
+			InformationManager.Instance().enemyPlayer);
+			if (enemyUnitsInRegion.size() >= 1) {
+				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
+					if (enemyUnitsInRegion.get(enemy).getType() == getAdvancedRushBuildingType(enemyRace)) {
+						photonRushed = true;
+					}
 				}
 			}
 		}
@@ -1365,6 +1383,9 @@ public class InformationManager {
 	public boolean isGasRushed() {
 		return gasRushed;
 	}
+	public boolean isPhotonRushed() {
+		return photonRushed;
+	}
 	public Unit getMyfirstGas() {
 		return myfirstGas;
 	}
@@ -1572,6 +1593,24 @@ public class InformationManager {
 //		} else {
 //			return UnitType.None;
 //		}
+	}
+	
+	// 해당 종족의 UnitType 중 방어유닛 러쉬 기능을 하는 UnitType을 리턴합니다
+	public UnitType getAdvancedRushBuildingType() {
+		return getAdvancedRushBuildingType(MyBotModule.Broodwar.self().getRace());
+	}
+
+	// 해당 종족의 UnitType 중 Advanced Depense 기능을 하는 UnitType을 리턴합니다
+	public UnitType getAdvancedRushBuildingType(Race race) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Photon_Cannon;
+		} else if (race == Race.Terran) {
+			return UnitType.Terran_Bunker;
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Sunken_Colony;
+		} else {
+			return UnitType.None;
+		}
 	}
 	
 	public void updateFirstGasInformation() {

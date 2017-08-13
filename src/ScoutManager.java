@@ -528,7 +528,7 @@ public class ScoutManager{
 			}
 			if (!ui.getType().isWorker() && 
 				((ui.getType() == UnitType.Terran_Barracks && ui.getUnit().isTraining())
-				|| (ui.getType() == UnitType.Protoss_Gateway &&  ui.getUnit().isTraining())
+				|| (cyberFlag = true && ui.getType() == UnitType.Protoss_Gateway &&  ui.getUnit().isTraining())
 				|| ui.getType() == UnitType.Terran_Marine 
 				|| ui.getType() == UnitType.Protoss_Dragoon
 				|| (ui.getType() == UnitType.Protoss_Photon_Cannon && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()) 
@@ -536,6 +536,7 @@ public class ScoutManager{
 				|| (ui.getType() == UnitType.Zerg_Sunken_Colony && ui.isCompleted() && ui.getUnit().getDistance(currentScoutUnit) < ui.getType().groundWeapon().maxRange()))
 				&& (ui.getUnit().getDistance(currentScoutUnit) < 600)) 
 			{
+				fleeFlag = true;
 				fleeLongEnemyFlag = true;
 			}
 		}
