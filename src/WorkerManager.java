@@ -1,5 +1,6 @@
 
 import java.util.Iterator;
+import java.util.List;
 
 import bwapi.Color;
 import bwapi.Position;
@@ -638,23 +639,42 @@ public class WorkerManager {
 
 	} 
 
-	/// 해당 지역에 공격유닛이 잇는지 판단
+//	/// 해당 지역에 공격유닛이 잇는지 판단
+//	public boolean isCheckEnemy(Unit depot)
+//	{
+//		int unitCnt = 0;
+//		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+//		//본진일때는 무조건 false
+//		if (myBaseLocation == null || depot.getDistance(myBaseLocation.getPosition()) < 5 * Config.TILE_SIZE)
+//			return false;
+//		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+//		{
+//			if(unit.isVisible() && unit.getDistance(depot) < 300 && unit.getType().canAttack()){
+//				unitCnt++;
+////				commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
+////				if(unitCnt > 8){
+//				if(unitCnt > 3){
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
+	
+	
 	public boolean isCheckEnemy(Unit depot)
 	{
-		int unitCnt = 0;
 		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 		//본진일때는 무조건 false
-		if (myBaseLocation == null || depot.getDistance(myBaseLocation.getPosition()) < 5 * Config.TILE_SIZE)
-			return false;
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+		if (myBaseLocation == null || (depot.getTilePosition().getX() == BlockingEntrance.Instance().startingX 
+				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().startingY )){
+				return false;
+			}
+			
+		for (Unit enemy : MapGrid.Instance().getUnitsNear(depot.getPosition(), 300, false, true, null))
 		{
-			if(unit.isVisible() && unit.getDistance(depot) < 300 && unit.getType().canAttack()){
-				unitCnt++;
-//				commandUtil.move(currentScoutUnit, firstBuilding.getPosition());
-//				if(unitCnt > 8){
-				if(unitCnt > 3){
-					return true;
-				}
+			if(enemy.getType().canAttack()){
+				return true;
 			}
 		}
 		return false;
