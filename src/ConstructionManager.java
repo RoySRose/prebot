@@ -460,11 +460,14 @@ public class ConstructionManager {
 						 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
 						 */
 						if((CombatManager.Instance().FastZealotInOurBase > 0 || CombatManager.Instance().FastZerglingsInOurBase >0) 
-								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks || b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot)){
+								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks 
+								|| b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot || b.getBuildingUnit().getType() == UnitType.Terran_Factory)){
 							continue;
 						} 
-						if(WorkerManager.Instance().isCheckEnemy(b.getBuildingUnit())){
-							continue;
+						if(MyBotModule.Broodwar.getFrameCount() > 6000){
+							if(WorkerManager.Instance().isCheckEnemy(b.getBuildingUnit())){
+								continue;
+							}
 						}
 						// grab a worker unit from WorkerManager which is closest to this final position	
 						Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
