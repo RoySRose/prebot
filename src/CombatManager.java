@@ -66,11 +66,15 @@ enum CombatStrategyDetail {
 };
 
 public class CombatManager {
-	
+
 	private static Chokepoint currTargetChoke = null;
 	private static int currTargetChokeExpiredFrame = 0;
+	
 	private boolean gasRush = false; 
-	private boolean photonRush = false; 
+	private boolean photonRush = false;
+	
+	public boolean pushSiegeLine = false;
+	
 	private static int photonDefenseWornCnt = 0; 
 	private double getWaitingPeriod() {
 		Race enemyRace = InformationManager.Instance().enemyRace;
