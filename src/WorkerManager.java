@@ -232,10 +232,18 @@ public class WorkerManager {
 							needWorker = 0;
 						}
 						if(needWorker > numRefAssigned){
-							Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
+							/*Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
 							if (gasWorker != null)
 							{
 								workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+							}*/
+							//2마리 할당되는 이슈있어서 한번에 할당되도록 변경.
+							for (int i = numRefAssigned; i<=needWorker; i++){				
+								Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
+								if (gasWorker != null && !gasWorker.isCarryingGas())
+								{
+									workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+								}
 							}
 						}else if(needWorker < numRefAssigned){
 							for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {

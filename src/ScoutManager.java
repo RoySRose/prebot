@@ -51,6 +51,7 @@ public class ScoutManager{
 	private boolean cyberFlag = false;  //프로토스 드라군 건물 완성됐는지 판별 변수. 
 	private boolean scoutFlag = false;  //스카웃 한번만 보내기 위한 변수 
 	private boolean gasExpscoutFlag = false;  //적 본진 가스 발견했는지 판별 변수 
+	private boolean twoBarrack = false;  //적 본진 가스 발견했는지 판별 변수 
 	
 	
 	private List<Unit> units = new ArrayList<>();
@@ -504,6 +505,9 @@ public class ScoutManager{
 	{
 		//적 가스 봤는지 못봤는지 확인하기 위한 변수
 		//아래 함수에 넣고 싶었지만 아래는 건설된 unit만 보여서 가스 판별이 안됨.
+		//배럭 2개면 빠지기 위한 변수
+		int barrackCnt = 0;
+		
 		if(gasExpscoutFlag == false){
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 			{
@@ -539,10 +543,22 @@ public class ScoutManager{
 				fleeFlag = true;
 				fleeLongEnemyFlag = true;
 			}
+			if(ui.getType() == UnitType.Terran_Barracks){
+				barrackCnt++;
+			}
+			if(barrackCnt >= 2){
+				twoBarrack = true;
+			}
+			
 		}
 		//가스를 못봤으면 앞마당으로 가는 로직 취소
 		if(gasExpscoutFlag == false){
 			fleeLongEnemyFlag = false;
+		}
+		
+		//가스 못봐도 투배럭이면 빠져 나오는걸로 변경
+		if(twoBarrack == true){
+			fleeLongEnemyFlag = true;
 		}
 		
 		if(fleeLongEnemyFlag == true){
