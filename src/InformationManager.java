@@ -20,7 +20,6 @@ import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import bwta.Polygon;
 import bwta.Region;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
@@ -1038,7 +1037,6 @@ public class InformationManager {
 						closestDistance = tempDistance;
 						thirdChokePointDonotUse.put(selfPlayer, secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer, chokepoint);
-						this.updateReadyToAttackPosition(selfPlayer, chokepoint);
 					}
 				}
 				//헌트 특이사항
@@ -1084,7 +1082,6 @@ public class InformationManager {
 						closestDistance = tempDistance;
 						thirdChokePointDonotUse.put(enemyPlayer, secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer, chokepoint);
-						this.updateReadyToAttackPosition(enemyPlayer, chokepoint);
 					}
 				}
 				//헌트 특이사항
@@ -1109,7 +1106,7 @@ public class InformationManager {
 						tighteningPoint = chokepoint.getCenter();
 					}
 				}
-				
+				this.updateReadyToAttackPosition();
 				this.updateOtherExpansionLocation(enemySourceBaseLocation);
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
@@ -1175,34 +1172,21 @@ public class InformationManager {
 		});
 	}
 	
-	public void updateReadyToAttackPosition(Player player, Chokepoint chokepoint) {
+	public void updateReadyToAttackPosition() {
 		try {
-			Position selfReadyToPos = getNextChokepoint(secondChokePoint.get(selfPlayer), enemyPlayer).getCenter();
-			Position enemyReadyToPos = getNextChokepoint(secondChokePoint.get(enemyPlayer), selfPlayer).getCenter();
+			Chokepoint secChokeSelf = secondChokePoint.get(selfPlayer);
+			Chokepoint secChokeEnemy = secondChokePoint.get(enemyPlayer);
+			Position selfReadyToPos = getNextChokepoint(secChokeSelf, enemyPlayer).getCenter();
+			Position enemyReadyToPos = getNextChokepoint(secChokeEnemy, selfPlayer).getCenter();
+			
+//			System.out.println("###selfReadyToPos: " + selfReadyToPos);
+//			System.out.println("###enemyReadyToPos: " + enemyReadyToPos);
 			
 			readyToAttackPosition.put(selfPlayer, selfReadyToPos);
 			readyToAttackPosition.put(enemyPlayer, enemyReadyToPos);
 			
 		} catch (Exception ex) {
-			int approachDist = 300;
-			
-			Position secondChokePosition = chokepoint.getCenter();
-			Position center = new Position(2048, 2048); // 128x128 맵의 센터
-	
-			int x = center.getX() - secondChokePosition.getX();
-			int y = center.getY() - secondChokePosition.getY();
-		    double radian = Math.atan2(y, x);
-	
-		    while (approachDist > 0) {
-			    Position approachVector = new Position((int)(approachDist * Math.cos(radian)), (int)(approachDist * Math.sin(radian)));
-			    Position position = new Position (secondChokePosition.getX() + approachVector.getX(), secondChokePosition.getY() + approachVector.getY());
-			    if (position.isValid() && BWTA.getRegion(position) != null
-			    		&& MyBotModule.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8)) {
-					readyToAttackPosition.put(player, position);
-					break;
-			    }
-			    approachDist += 10;
-		    }
+			System.out.println(ex);
 		}
 	}
 	

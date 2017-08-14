@@ -88,12 +88,14 @@ public class MechanicMicroDecision {
 //						&& (MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame()) < noUnitFrame) {
 					
 					int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
-					if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
+					if (saveUnitLevel == 0 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 						bestTargetInfo = enemyInfo;
 						targetOutOfSight = true;
-					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
+					} else if (saveUnitLevel >= 2 && distanceToTarget <= (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK)) {
 						bestTargetInfo = enemyInfo;
 						targetOutOfSight = true;
+					} else {
+//						System.out.println(distanceToTarget + ", " + (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK));
 					}
 //				}
 				

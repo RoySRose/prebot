@@ -62,7 +62,7 @@ enum CombatStrategy {
 };
 
 enum CombatStrategyDetail {
-	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY, TIGHTENING, MINE_STRATEGY_FOR_TERRAN
+	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY, MINE_STRATEGY_FOR_TERRAN
 };
 
 public class CombatManager {
@@ -641,28 +641,27 @@ public class CombatManager {
 		Position mainAttackLocation = null;
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE
 				|| combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
+//			Position pos1 = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+//			Position pos2 = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
+//			System.out.println("pos1 : " + pos1);
+//			System.out.println("pos2 : " + pos2);
 			// 조이기 전략 -> tighteningPoint 위치가 잘 안잡히는 현상으로 readyToAttackPostion으로 임시 사용한다.
-			if (getDetailStrategyFrame(CombatStrategyDetail.TIGHTENING) > 0) {
-				Chokepoint selfSecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-//				Chokepoint nextChoke = InformationManager.Instance().getNextChokepoint(selfSecondChoke, InformationManager.Instance().enemyPlayer);
-				mainAttackLocation = selfSecondChoke.getCenter();
+			int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
+			
+			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+			if (MicroSet.Common.versusMechanicSet() && tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE_TERRAN) {
+				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+				
+			} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
+				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+				
+			} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_SECONDCHOKE_SIZE || InformationManager.Instance().enemyRace == Race.Terran) {
+				Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+				mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
 				
 			} else {
-				int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
-						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
-				
-				int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
-				
-				Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-				if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
-//					mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-					mainAttackLocation = secondChoke.getCenter();
-				} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_SECONDCHOKE_SIZE || InformationManager.Instance().enemyRace == Race.Terran) {
-					mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
-				} else {
-					mainAttackLocation = getDefensePosition(squad);
-				}
-				
+				mainAttackLocation = getDefensePosition(squad);
 			}
 			
 //		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯(수정햇다)
