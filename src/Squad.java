@@ -16,15 +16,12 @@ public class Squad {
 		this.name = name;
 		this.order = order;
 		this.priority = priority;
-		this.attackAtMax = this.lastRetreatSwitchVal = false;
 	}
 	
 	private String name;
 	private SquadOrder order;
 	private int priority;
-	private boolean attackAtMax;
-    private int lastRetreatSwitch;
-	private boolean lastRetreatSwitchVal;
+	private boolean pushLine;
 	
 	public MicroScv microScv = new MicroScv();
 	public MicroMarine microMarine = new MicroMarine();
@@ -37,7 +34,6 @@ public class Squad {
 
 	// **** 아래변수들은 팩토리 유닛으로 구성된 Squad 전용이다.
 	private int initFrame = 0;
-	private int saveUnitFrameCount = 0;
 	private MechanicMicroVulture mechanicVulture = new MechanicMicroVulture();
 	private MechanicMicroTank mechanicTank = new MechanicMicroTank();
 	private MechanicMicroGoliath mechanicGoliath = new MechanicMicroGoliath();
@@ -276,8 +272,10 @@ public class Squad {
 		int saveUnitLevelGoliath = 1;
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			if (closeTankEnemies.size() * 3 <= microTank.getUnits().size()) {
+//				System.out.println("go ahead");
 				saveUnitLevelTank = 1; // 거리재기 전진
 			} else {
+//				System.out.println("keep in line");
 				saveUnitLevelTank = 2; // 안전거리 유지
 			}
 		}
@@ -285,10 +283,23 @@ public class Squad {
 		if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY
 				&& CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) { // strategy manager 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
-		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360) {
-//				|| MyBotModule.Broodwar.self().supplyUsed() >= 380) { // combat manager 자체 판단
+		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360) { // combat manager 자체 판단
+			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
+		} else if (InformationManager.Instance().enemyRace == Race.Terran && pushLine) {
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
 		}
+		
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
+			if (!pushLine && MyBotModule.Broodwar.self().supplyUsed() >= 380
+					&& MyBotModule.Broodwar.self().minerals() >= 2000) {
+				MyBotModule.Broodwar.printf("LET'S GO!!");
+				pushLine = true;
+			} else if (pushLine && MyBotModule.Broodwar.self().supplyUsed() < 310) {
+				MyBotModule.Broodwar.printf("RETREAT");
+				pushLine = false;
+			}
+		}
+		
 		
 		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
 		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture, attackWithMechanic);
@@ -523,172 +534,6 @@ public class Squad {
 		}
 		unitSet.clear();
 	}
-	
-	
-	private boolean needsToRegroupChecker() {
-		if (unitSet.isEmpty()) {
-			return false;
-		}
-		Unit leader = MicroUtils.leaderOfUnit(unitSet, order.getPosition());
-		for (Unit unit : unitSet) {
-			if (unit.getID() == leader.getID()) {
-				continue;
-			}
-			if (leader.getDistance(unit) > 500) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	private boolean needsToRegroup() {
-		if (unitSet.isEmpty()) {
-			return false;
-		}
-
-		if (order.getType() != SquadOrderType.ATTACK) {
-			return false;
-		}
-
-		// If we're nearly maxed and have good income or cash, don't retreat.
-		if (MyBotModule.Broodwar.self().supplyUsed() >= 390 &&
-			(MyBotModule.Broodwar.self().minerals() > 1000 || WorkerManager.Instance().getNumMineralWorkers() > 12)) {
-			attackAtMax = true;
-		}
-
-		if (attackAtMax) {
-			if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
-				attackAtMax = false;
-			} else {
-				return false;
-			}
-		}
-
-		UnitData unitData = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer);
-		Map<Integer, UnitInfo> enemyUnitInfo = unitData.getUnitAndUnitInfoMap();
-		
-		// if none of our units are in range of any enemy units, don't retreat
-		boolean anyInRange = false;
-		
-		for (Integer unitId : enemyUnitInfo.keySet()) {
-			UnitInfo eui = enemyUnitInfo.get(unitId);
-			
-			for (Unit u : unitSet) {
-				if (!u.exists() || u.isLoaded()) {
-					continue;
-				}
-				
-				int range = 0;
-				if (CommandUtil.CanAttack(eui.getUnit(), u)) {
-					if (eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-						range = UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + 64;
-					} else {
-						range = eui.getType().sightRange();
-					}
-					range += 128;
-					
-					if (range >= eui.getLastPosition().getDistance(u.getPosition())) {
-						anyInRange = true;
-						break;
-					}
-				}
-			}
-
-			if (anyInRange) {
-	            break;       // break out of outer loop
-	        }
-		}
-		
-		if (!anyInRange) {
-			return false;
-	    }
-
-		int score = 0;
-
-		//TODO do the SparCraft Simulation!
-//		CombatSimulation sim;
-//	    
-//		sim.setCombatUnits(unitClosest->getPosition(), Config::Micro::CombatRegroupRadius);
-//		score = sim.simulateCombat();
-
-	    boolean retreat = score < 0;
-	    int switchTime = 100;
-
-	    // we should not attack unless 5 seconds have passed since a retreat
-	    if (retreat != lastRetreatSwitchVal) {
-	        if (!retreat && (MyBotModule.Broodwar.getFrameCount() - lastRetreatSwitch < switchTime)) {
-	            retreat = lastRetreatSwitchVal;
-	        } else {
-	            lastRetreatSwitch = MyBotModule.Broodwar.getFrameCount();
-	            lastRetreatSwitchVal = retreat;
-	        }
-	    }
-		
-		if (retreat) {
-			MyBotModule.Broodwar.sendText("retreat");
-		} else {
-//			MyBotModule.Broodwar.sendText("attack");
-		}
-
-		return retreat;
-	}
-	
-//	private Unit unitClosestToEnemy() {
-//		Unit closest = null;
-//		int closestDist = 100000;
-//
-//		for (Unit unit : unitSet) {
-//			if (unit.getType().isDetector() || unit.isLoaded()) {
-//				continue;
-//			}
-//
-//			// the distance to the order position
-//			int dist = MapTools.Instance().getGroundDistance(unit.getPosition(), order.getPosition());
-//			if (dist != -1 && dist < closestDist) {
-//				closest = unit;
-//				closestDist = dist;
-//			}
-//		}
-//
-//		return closest;
-//	}
-	
-//	private Position calcRegroupPosition() {
-//		Position regroup = null;
-//
-//		int minDist = 100000;
-//		for (Unit unit : unitSet) {
-//			if (!nearEnemy.get(unit.getID()) && !unit.getType().isDetector() && !unit.isLoaded()) {
-//				int dist = unit.getDistance(order.getPosition());
-//				if (dist < minDist) {
-//					minDist = dist;
-//					regroup = unit.getPosition();
-//				}
-//			}
-//		}
-//
-//		// Failing that, retreat to a base we own.
-//		if (regroup == null) {
-//			// Retreat to the main base (guaranteed not null, even if the buildings were destroyed).
-//			BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-//
-//			// If the natural has been taken, retreat there instead.
-//			BaseLocation natural = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-//			if (natural != null) {
-//				List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-//				for (BaseLocation b : occupiedBases) {
-//					if (b == natural) {
-//						base = natural;
-//						break;
-//					}
-//				}
-//			}
-//			return BWTA.getRegion(base.getTilePosition()).getCenter();
-//		}
-//		
-//		return regroup;
-//	}
 	
 	@Override
 	public String toString() {

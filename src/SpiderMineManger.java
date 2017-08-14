@@ -98,7 +98,7 @@ public class SpiderMineManger {
 //		System.out.println(MyBotModule.Broodwar.getFrameCount());
 		if (MyBotModule.Broodwar.getFrameCount() > 12000) {
 			if (mineInMyBaseLevel != 0) {
-				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 0");
+//				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 0");
 				mineInMyBaseLevel = 0;
 			}
 			
@@ -106,7 +106,7 @@ public class SpiderMineManger {
 				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Lurker) > 0
 				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Shuttle) > 0) {
 			if (mineInMyBaseLevel != 2) {
-				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 2");
+//				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 2");
 				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 50 * 24);
 				mineInMyBaseLevel = 2; // 본진 앞마당 전부
 			}
@@ -114,7 +114,7 @@ public class SpiderMineManger {
 		} else if (MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Zerg_Hydralisk) >= 3
 				|| MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Dragoon) >= 3) {
 			if (mineInMyBaseLevel != 1) {
-				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 1");
+//				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 1");
 				mineInMyBaseLevel = 1; // 앞마당에 많이
 			}
 		}

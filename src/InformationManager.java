@@ -436,7 +436,9 @@ public class InformationManager {
 
 			// if it's a combat unit we care about
 			// and it's finished!
-			if (allUnits || (isCombatUnitType(ui.getType()) && ui.isCompleted())) {
+			if (allUnits || ui.getType() == UnitType.Terran_Barracks
+					|| ui.getType() == UnitType.Terran_Engineering_Bay
+					|| (isCombatUnitType(ui.getType()) && ui.isCompleted())) {
 				if (!ui.getType().isBuilding() && (currFrame - ui.getUpdateFrame()) > MicroSet.Common.NO_UNIT_FRAME(ui.getType())) {
 					continue;
 				}

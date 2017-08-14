@@ -95,6 +95,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 			
 		case 2: // attack move
 			if (MicroSet.Common.versusMechanicSet()) {
+				// 테란전용 go
 				int distToOrder = goliath.getDistance(order.getPosition());
 				if (distToOrder <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
 					if (goliath.isIdle() || goliath.isBraking()) {
