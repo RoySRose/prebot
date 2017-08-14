@@ -71,7 +71,7 @@ public class StrategyManager {
 		,terranBasic_Bionic
 		,terranBasic_Mechanic
 		,terranBasic_MechanicWithWraith
-		,terranBasic_MechanicWithWraithMany
+		,terranBasic_MechanicAfter
 		,terranBasic_BattleCruiser	
 		,AttackIsland
 //		,terranBasic_ReverseRush
@@ -945,7 +945,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, false);
 				}
 			}
-			if(starComplete && science && controltower){
+			if(starComplete && scienceComplete && controltower){
 				if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel) < RespondToStrategy.Instance().max_vessel){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Vessel, null) 
 							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Vessel, null) == 0){
@@ -973,11 +973,6 @@ public class StrategyManager {
 		//marine for fast zergling and zealot start
 		if(CombatManager.Instance().FastZerglingsInOurBase > 0){
 			if(vulturecnt == 0){
-//				int bunkercnt = InformationManager.Instance().selfPlayer.completedUnitCount(UnitType.Terran_Bunker) * 4;
-//				if(marinecnt ==0){
-//					bunkercnt =0;
-//				}
-//				if(marinecnt + bunkercnt - CombatManager.Instance().FastZerglingsInOurBase < 0){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null) == 0) {
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, false);
 					}
@@ -1075,7 +1070,7 @@ public class StrategyManager {
 				}
 			}
 			if(starComplete){
-				if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 2200 || wraithcnt < 1)){ //TODO && wraithcnt <= needwraith){
+				if(starportUnit.isTraining() == false && (MyBotModule.Broodwar.getFrameCount() - WraithTime > 2400 || wraithcnt < 1)){ //TODO && wraithcnt <= needwraith){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
 						if(Config.BroodwarDebugYN){
 						MyBotModule.Broodwar.printf("make wraith");
@@ -1534,7 +1529,6 @@ public class StrategyManager {
 	public int getTotKilledCombatUnits(){
 		
 		int res = 0;
-		int tot = 0;
 		
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int totbio = 0;
@@ -1556,7 +1550,6 @@ public class StrategyManager {
 			
 		}else if (InformationManager.Instance().enemyRace == Race.Zerg) {
 			
-			int totworker = 0;
 			int totzerling = 0;
 			int tothydra = 0;
 			int totmutal = 0;
@@ -1570,21 +1563,26 @@ public class StrategyManager {
 					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker_Egg);
 			totmutal = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Mutalisk);
 			totoverload = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
-			//totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Drone);
+			int totguardian = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Guardian);
+			int totultra = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Ultralisk);
+			int totsunken = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Sunken_Colony);
 
-			res = totzerling + tothydra*2 + totmutal*4 + totoverload*3 + totlurker*5;
+			res = totzerling + + totsunken * 2+ tothydra*2 + totmutal*4 + totoverload*3 + totlurker*5 + totguardian*8 + totultra*10;
 			return res; //저그는 저글링 때문에 이미 2배 함
 			
 		}else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-			int totworker = 0;
-			int totcarrier = 0;
 			
-			tot = MyBotModule.Broodwar.self().killedUnitCount();
-			totcarrier = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
-			totworker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Probe);
+//			tot = MyBotModule.Broodwar.self().killedUnitCount();
+			
+			int totzealot = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Zealot);
+			int totdragoon = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Dragoon);
+			int totarchon = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Archon);
+			int totphoto = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Photon_Cannon);
+			int tothigh = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_High_Templar);
+			int totdark = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Dark_Templar);
+			int totcarrier = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
 
-			res = tot - totworker - totcarrier;
-			res = res*2 + totcarrier * 6;
+			res = (totzealot+totdragoon+totphoto+tothigh+totdark)*2 + totarchon*4 + totcarrier * 8;
 			
 			return res*2;
 		}else{
@@ -1743,29 +1741,6 @@ public class StrategyManager {
 			}
 			
 			unitPoint += InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,InformationManager.Instance().enemyPlayer)*4;
-			
-//			
-//			if(LastStrategyException == StrategyManager.StrategysException.protossException_DoubleNexus
-//					&& CurrentStrategyException == StrategyManager.StrategysException.Init
-//					&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){
-//				
-//				int temptotPoint = 	myunitPoint + expansionPoint + unitPoint + 40;
-//				if(temptotPoint > 120){
-//					CombatStartCase = 4;
-//				}
-//				
-//				
-//			}
-				
-			//앞마당 photo
-//			if(StrategysException.protossException_ForgeDouble && myunitPoint >= 60 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3){
-//				MyBotModule.Broodwar.printf("Ap Ma Dang Photo?! Attack!!!");
-//				CombatStartCase == 3
-//				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-//			}
-			
-			//캐리어
-			//본진 photo<-- 무시
 		}
 				
 		if (InformationManager.Instance().enemyRace == Race.Zerg) {
@@ -1842,11 +1817,26 @@ public class StrategyManager {
 			if(CombatStartCase == 5){
 				
 				if(CombatTime < MyBotModule.Broodwar.getFrameCount() && myunitPoint < 20 && unitPoint <20){
-					
-					System.out.println("why here?");
+				
 					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 					if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
 						setCurrentStrategyBasic(CurrentStrategyBasic.protossBasic);
+					}
+				}
+				
+				if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,InformationManager.Instance().enemyPlayer)
+						+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot)
+						+ InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,InformationManager.Instance().enemyPlayer)
+						+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20
+						){
+					if(totPoint < 50){
+						if(Config.BroodwarDebugYN){
+							MyBotModule.Broodwar.printf("Retreat5");
+						}
+						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+						if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
+							setCurrentStrategyBasic(CurrentStrategyBasic.protossBasic);
+						}
 					}
 				}
 			}

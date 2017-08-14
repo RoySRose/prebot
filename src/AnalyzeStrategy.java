@@ -535,41 +535,41 @@ public class AnalyzeStrategy {
 		
 	}
 
+	boolean after = false;
 	private void AnalyzeVsTerran() {
 		StrategyManager.Strategys selectedS = null;
 		StrategyManager.StrategysException selectedSE = null;
 
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) == 1 
-				&& InformationManager.Instance().getNumUnits(UnitType.Terran_Refinery,InformationManager.Instance().enemyPlayer) == 1){
+		
+		if(after== false){
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) == 1 
+					&& InformationManager.Instance().getNumUnits(UnitType.Terran_Refinery,InformationManager.Instance().enemyPlayer) == 1){
+				
+				selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
+			}
 			
-			selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
-		}
-		
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 3
-				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) >= 2){
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,InformationManager.Instance().enemyPlayer) >= 3
+					|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,InformationManager.Instance().enemyPlayer) >= 2){
+				
+				selectedS = StrategyManager.Strategys.terranBasic_Bionic;
+			}
 			
-			selectedS = StrategyManager.Strategys.terranBasic_Bionic;
-		}
-		
-		
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Machine_Shop,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
-				){
-			selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
-		}
-		
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,InformationManager.Instance().enemyPlayer) >= 1
-				||InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 1
-				){
-			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
-		}
-		
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 12){
-			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraithMany;
+			
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Machine_Shop,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().enemyPlayer) >= 1
+					){
+				selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
+			}
+			
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,InformationManager.Instance().enemyPlayer) >= 1
+					||InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 1
+					){
+				selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
+			}
 		}
 		
 //		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,InformationManager.Instance().enemyPlayer) >= 1
@@ -577,6 +577,12 @@ public class AnalyzeStrategy {
 //			selectedS = StrategyManager.Strategys.terranBasic_BattleCruiser;
 //		}
 		
+		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3){
+			if(StrategyManager.Instance().getCurrentStrategyBasic() != StrategyManager.Strategys.terranBasic_Bionic){
+				selectedS = StrategyManager.Strategys.terranBasic_MechanicAfter;
+				after = true;
+			}
+		}
 		
 		
 		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Control_Tower,InformationManager.Instance().enemyPlayer) >= 1){
