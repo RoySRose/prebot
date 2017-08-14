@@ -432,6 +432,9 @@ public class RespondToStrategy {
 			need_vessel = true;
 			max_vessel = 2;
 		}
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.terranBasic_MechanicWithWraith){
+			enemy_wraith = true;
+		}
 	}
 		
 	public void RespondVsZerg() {	
@@ -728,7 +731,7 @@ public class RespondToStrategy {
 //			}
 //		}
 		
-		if(enemy_scout || enemy_shuttle){
+		if(enemy_scout || enemy_shuttle || enemy_wraith){
 			if(!chk_armory){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
@@ -739,9 +742,7 @@ public class RespondToStrategy {
 					}
 				}
 			}else{
-				if((InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) <
-						InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer) * 2)
-						|| InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) < 2){
+				if(InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) < 2){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) < 1){
 						if(MyBotModule.Broodwar.self().minerals() >= UnitType.Terran_Goliath.mineralPrice() 
 								&& MyBotModule.Broodwar.self().gas() >= UnitType.Terran_Goliath.gasPrice()){

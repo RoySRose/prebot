@@ -331,7 +331,7 @@ public class CombatManager {
 		
 		// 상대 클록 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid()) {
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() ==false) {
 				if(InformationManager.Instance().enemyRace == Race.Protoss){
 					if(unit.isFlying() && RespondToStrategy.Instance().enemy_arbiter == false){
 						continue;
