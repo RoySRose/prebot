@@ -117,7 +117,7 @@ public class VultureTravelManager {
 			int mineNumPerPosition = vultureCount / 3 + 1;
 			MicroSet.Vulture.spiderMineNumPerPosition = mineNumPerPosition;
 			
-			int bonumNumPerPosition = (mineCount - 10) / 4;
+			int bonumNumPerPosition = (mineCount - 10) / 8;
 			if (bonumNumPerPosition > 0) {
 				MicroSet.Vulture.spiderMineNumPerPosition += bonumNumPerPosition;
 			}

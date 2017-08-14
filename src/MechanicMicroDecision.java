@@ -188,10 +188,10 @@ public class MechanicMicroDecision {
 						return MechanicMicroDecision.makeDecisionToDoNothing();
 					}
 				}
-				if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
-					return MechanicMicroDecision.makeDecisionToDoNothing();	
+				if (saveUnitLevel == 0 || MyBotModule.Broodwar.enemy().getRace() != Race.Terran) {
+					return MechanicMicroDecision.makeDecisionToChange();
 				}
-				return MechanicMicroDecision.makeDecisionToChange();
+				return MechanicMicroDecision.makeDecisionToDoNothing();
 			} else if (existCloakTarget) {
 				if (cloakTargetUnit.getType() == UnitType.Protoss_Dark_Templar) {
 					return MechanicMicroDecision.makeDecisionToChange();
