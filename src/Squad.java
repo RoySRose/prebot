@@ -2,7 +2,6 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Race;
@@ -285,21 +284,20 @@ public class Squad {
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
 		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360) { // combat manager 자체 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
-		} else if (InformationManager.Instance().enemyRace == Race.Terran && pushLine) {
+		} else if (InformationManager.Instance().enemyRace == Race.Terran && CombatManager.Instance().pushSiegeLine) {
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
 		}
 		
-		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			if (!pushLine && MyBotModule.Broodwar.self().supplyUsed() >= 380
-					&& MyBotModule.Broodwar.self().minerals() >= 2000) {
-				MyBotModule.Broodwar.printf("LET'S GO!!");
-				pushLine = true;
-			} else if (pushLine && MyBotModule.Broodwar.self().supplyUsed() < 310) {
-				MyBotModule.Broodwar.printf("RETREAT");
-				pushLine = false;
-			}
-		}
-		
+//		if (InformationManager.Instance().enemyRace == Race.Terran) {
+//			if (!pushLine && MyBotModule.Broodwar.self().supplyUsed() >= 380
+//					&& MyBotModule.Broodwar.self().minerals() >= 2000) {
+//				MyBotModule.Broodwar.printf("LET'S GO!!");
+//				pushLine = true;
+//			} else if (pushLine && MyBotModule.Broodwar.self().supplyUsed() < 310) {
+//				MyBotModule.Broodwar.printf("RETREAT");
+//				pushLine = false;
+//			}
+//		}
 		
 		mechanicVulture.prepareMechanic(watchOrder, vultureEnemies);
 		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelVulture, attackWithMechanic);
