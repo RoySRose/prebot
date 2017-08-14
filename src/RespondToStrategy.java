@@ -1,5 +1,4 @@
 
-
 import java.util.List;
 
 import bwapi.Position;
@@ -524,7 +523,8 @@ public class RespondToStrategy {
 //		}
 			
 		//enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
-		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter || enemy_mutal || prepareDark){
+		//if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter || enemy_mutal || prepareDark){
+		if(enemy_dark_templar || enemy_wraith || enemy_lurker || enemy_arbiter || prepareDark){
 	           if(need_vessel_time ==0){
 	                need_vessel_time = MyBotModule.Broodwar.getFrameCount();
 	            }
@@ -672,7 +672,7 @@ public class RespondToStrategy {
 							//tempBaseLocation = (BaseLocation)tempBaseLocationList.get(a);
 							//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
 							if (baseLocation != null) {
-								List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getRegion().getCenter(),100);
+								List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getRegion().getCenter(),250);
 						              //List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
 					          	for(Unit turret : turretInRegion){
 									if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -681,8 +681,8 @@ public class RespondToStrategy {
 								}
 					          	
 					          	if(!location_turret){
-						              if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) 
-									+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 100) == 0){
+						              if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250) 
+									+ ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250) == 0){
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(
 												UnitType.Terran_Missile_Turret,
 												baseLocation.getRegion().getCenter().toTilePosition(), true);
@@ -938,8 +938,7 @@ public class RespondToStrategy {
 						//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
 						if (baseLocation != null) {
 							myRegion = baseLocation.getRegion();
-					              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
-
+					              List<Unit> turretInRegion = MicroUtils.getUnitsInRadius(baseLocation.getRegion().getCenter(),250);
 					             build_turret_cnt = 0; 
 			     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 				     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
@@ -954,8 +953,8 @@ public class RespondToStrategy {
 			     				 /*System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
 			     				System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);*/
 			     				//if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition())< 1
-			     				if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250)< 1
-			     						&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250) == 0){
+			     				if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250)< 1
+			     						&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250) == 0){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 											baseLocation.getPoint().toTilePosition(), true);
 									//System.out.println("지으라고 한곳 ==>>>> " + );
