@@ -237,14 +237,7 @@ public class MicroUtils {
 		WeaponType rangedUnitWeapon = target.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
-		boolean approachKiting = false;
-		if ((target.getType().isBuilding() && target.getType() != UnitType.Zerg_Hatchery) // 해처리 라바때문에 마인 폭사함
-				|| target.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-				|| (target.getType() == UnitType.Protoss_Carrier && rangedUnit.getType() == UnitType.Terran_Goliath)) {
-			approachKiting = true;
-			haveToAttack = true;
-			
-		} else if ((!rangedUnit.isUnderAttack() && target.getType().isWorker())
+		if ((!rangedUnit.isUnderAttack() && target.getType().isWorker())
 				|| (rangedUnit.getType() == UnitType.Terran_Vulture && MicroUtils.isFactoryUnit(target.getType()))) {
 			haveToAttack = true;
 			
@@ -254,7 +247,7 @@ public class MicroUtils {
 			
 		} else {
 			double distanceToTarget = rangedUnit.getDistance(target);
-			double distanceToAttack = distanceToTarget - MyBotModule.Broodwar.enemy().weaponMaxRange(rangedUnitWeapon); // 거리(pixel)
+			double distanceToAttack = distanceToTarget - MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon); // 거리(pixel)
 			int timeToCatch = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
 			
 			// 명령에 대한 지연시간(latency)을 더한다.
@@ -278,25 +271,45 @@ public class MicroUtils {
 		
 		// 공격 또는 회피
 		if (haveToAttack) {
-			if (approachKiting && (rangedUnit.isStartingAttack()
-					|| (target.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown()) > 0)) {
-				CommandUtil.move(rangedUnit, target.getPosition());
-			} else {
-				CommandUtil.attackUnit(rangedUnit, target);
-			}
+			CommandUtil.attackUnit(rangedUnit, target);
 			
 		} else {
-			// 피가 거의 없거나, 근처에 아군이 거의 없으면(쿨타운시간동안 이동할수 있는 거리 * 0.8) 회피설정을 높힌다.
-			if (survivalInstinct || groundUnitFreeKiting(rangedUnit, (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8))) {
-				unitedKiting = false;
-				fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
-			}
+			boolean approachKiting = false;
+			int approachDistance = 100;
+			if (target.getType().isBuilding() && target.getType() != UnitType.Zerg_Hatchery) { // 해처리 라바때문에 마인 폭사함
+				approachKiting = true;
+				approachDistance = 80;
 			
-			KitingOption fleeOption = KitingOption.defaultKitingOption();
-			fleeOption.setUnitedKiting(unitedKiting);
-			fleeOption.setGoalPosition(goalPosition);
-			fleeOption.setFleeAngle(fleeAngle);
-			preciseFlee(rangedUnit, target.getPosition(), fleeOption);
+			} else if (target.getType() == UnitType.Terran_Siege_Tank_Siege_Mode && rangedUnit.getType() == UnitType.Terran_Vulture) {
+				approachKiting = true;
+				approachDistance = 15;
+				
+			} else if ((target.getType() == UnitType.Protoss_Carrier || target.getType() == UnitType.Zerg_Overlord)
+					&& rangedUnit.getType() == UnitType.Terran_Goliath) {
+				approachKiting = true;
+				approachDistance = 100;
+			} 
+			
+			if (approachKiting) {
+				if (rangedUnit.getDistance(target) >= approachDistance) {
+					rangedUnit.rightClick(target.getPosition());
+				} else {
+					CommandUtil.attackUnit(rangedUnit, target);
+				}
+				
+			} else {
+				// 피가 거의 없거나, 근처에 아군이 거의 없으면(쿨타운시간동안 이동할수 있는 거리 * 0.8) 회피설정을 높힌다.
+				if (survivalInstinct || groundUnitFreeKiting(rangedUnit, (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8))) {
+					unitedKiting = false;
+					fleeAngle = MicroSet.FleeAngle.WIDE_ANGLE;
+				}
+				
+				KitingOption fleeOption = KitingOption.defaultKitingOption();
+				fleeOption.setUnitedKiting(unitedKiting);
+				fleeOption.setGoalPosition(goalPosition);
+				fleeOption.setFleeAngle(fleeAngle);
+				preciseFlee(rangedUnit, target.getPosition(), fleeOption);
+			}
 		}
 	}
 	
