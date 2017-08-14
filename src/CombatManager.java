@@ -62,7 +62,7 @@ enum CombatStrategy {
 };
 
 enum CombatStrategyDetail {
-	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY, MINE_STRATEGY_FOR_TERRAN
+	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, NO_CHECK_NO_GUERILLA, ATTACK_NO_MERCY, MINE_STRATEGY_FOR_TERRAN
 };
 
 public class CombatManager {
@@ -731,6 +731,10 @@ public class CombatManager {
 			}
 			
 			if (!enemyBaseDestoryed) {
+				if (getDetailStrategyFrame(CombatStrategyDetail.NO_WAITING_CHOKE) > 0) {
+					return enemyBaseLocation.getPosition();
+				}
+				
 				Position nextChokePosition = getNextChokePosition(squad);
 				if (nextChokePosition != null) {
 					return nextChokePosition;
@@ -1485,6 +1489,8 @@ public class CombatManager {
 				&& InformationManager.Instance().enemyRace == Race.Terran
 				&& centerIsOccupied(InformationManager.Instance().enemyPlayer)) {
 			return;
+		} else if (getDetailStrategyFrame(CombatStrategyDetail.NO_CHECK_NO_GUERILLA) > 0) {
+			return;
 		}
 		
 		Squad checkerSquad = squadData.getSquad(SquadName.CHECKER);
@@ -1536,6 +1542,8 @@ public class CombatManager {
 		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters
 				&& InformationManager.Instance().enemyRace == Race.Terran
 				&& centerIsOccupied(InformationManager.Instance().enemyPlayer)) {
+			return;
+		} else if (getDetailStrategyFrame(CombatStrategyDetail.NO_CHECK_NO_GUERILLA) > 0) {
 			return;
 		}
 		

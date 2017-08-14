@@ -239,7 +239,8 @@ public class MicroUtils {
 		
 		boolean approachKiting = false;
 		if ((target.getType().isBuilding() && target.getType() != UnitType.Zerg_Hatchery) // 해처리 라바때문에 마인 폭사함
-				|| target.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+				|| target.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+				|| (target.getType() == UnitType.Protoss_Carrier && rangedUnit.getType() == UnitType.Terran_Goliath)) {
 			approachKiting = true;
 			haveToAttack = true;
 			
