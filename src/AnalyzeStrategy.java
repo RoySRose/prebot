@@ -105,13 +105,10 @@ public class AnalyzeStrategy {
 	}
 
 	private void AnalyzeVsProtoss() {
-		StrategyManager.StrategysException selectedSE = null;
-		StrategyManager.Strategys selectedS = null;
+		StrategyManager.StrategysException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		StrategyManager.Strategys selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		Chokepoint enemy_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-
-		Chokepoint my_first_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
-		Chokepoint my_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() != StrategyManager.StrategysException.protossException_Dark){
@@ -179,6 +176,16 @@ public class AnalyzeStrategy {
 						selectedSE = StrategyManager.StrategysException.protossException_DoubleNexus;
 					}
 				}
+				
+				BaseLocation enemyMainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+				if(enemyMainbase != null){
+					if(MyBotModule.Broodwar.getFrameCount() > 3200 && InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
+							InformationManager.Instance().enemyPlayer) == 0) {
+						selectedS = StrategyManager.Strategys.protossBasic_DoublePhoto;
+					}
+				}
+				
+				
 			}
 			
 			if(selectedS != StrategyManager.Strategys.protossBasic_DoublePhoto){
@@ -537,8 +544,8 @@ public class AnalyzeStrategy {
 
 	boolean after = false;
 	private void AnalyzeVsTerran() {
-		StrategyManager.Strategys selectedS = null;
-		StrategyManager.StrategysException selectedSE = null;
+		StrategyManager.StrategysException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		StrategyManager.Strategys selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		
 		if(after== false){
@@ -564,12 +571,6 @@ public class AnalyzeStrategy {
 					){
 				selectedS = StrategyManager.Strategys.terranBasic_Mechanic;
 			}
-			
-			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,InformationManager.Instance().enemyPlayer) >= 1
-					||InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 1
-					){
-				selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
-			}
 		}
 		
 //		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Battlecruiser,InformationManager.Instance().enemyPlayer) >= 1
@@ -577,16 +578,29 @@ public class AnalyzeStrategy {
 //			selectedS = StrategyManager.Strategys.terranBasic_BattleCruiser;
 //		}
 		
-		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3){
+		if(after ==false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3){
 			if(StrategyManager.Instance().getCurrentStrategyBasic() != StrategyManager.Strategys.terranBasic_Bionic){
 				selectedS = StrategyManager.Strategys.terranBasic_MechanicAfter;
 				after = true;
 			}
 		}
-		
+		if(after){
+			selectedS = StrategyManager.Strategys.terranBasic_MechanicAfter;
+		}
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,InformationManager.Instance().enemyPlayer) >= 1
+				||InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,InformationManager.Instance().enemyPlayer) >= 1
+				){
+			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
+		}
 		
 		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Control_Tower,InformationManager.Instance().enemyPlayer) >= 1){
 			selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+		}
+		
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)) {
+				selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+			}
 		}
 
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
@@ -669,13 +683,8 @@ public class AnalyzeStrategy {
 	}
 
 	private void AnalyzeVsZerg() {
-		StrategyManager.Strategys selectedS = null;
-		StrategyManager.StrategysException selectedSE = null;
-
-		Chokepoint enemy_first_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-		Chokepoint enemy_second_choke = InformationManager.Instance()
-				.getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		StrategyManager.StrategysException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		StrategyManager.Strategys selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		Chokepoint my_first_choke = InformationManager.Instance()
 				.getFirstChokePoint(InformationManager.Instance().selfPlayer);
@@ -686,8 +695,6 @@ public class AnalyzeStrategy {
 		int cntHatchery = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hatchery,
 				InformationManager.Instance().enemyPlayer);
 		int cntLair = InformationManager.Instance().getNumUnits(UnitType.Zerg_Lair,
-				InformationManager.Instance().enemyPlayer);
-		int cntHive = InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive,
 				InformationManager.Instance().enemyPlayer);
 
 		int ling_cnt = InformationManager.Instance().getNumUnits(UnitType.Zerg_Zergling,

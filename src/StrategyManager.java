@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import bwapi.Order;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
@@ -447,8 +448,12 @@ public class StrategyManager {
 				}
 			}
 			
+			int nomorescv = 65;
+			if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+				nomorescv = 60;
+			}
 			//System.out.println("maxworkerCount: " + maxworkerCount);
-			if (workerCount < 70 && workerCount < maxworkerCount) {
+			if (workerCount < nomorescv && workerCount < maxworkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 					if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
 						
@@ -1643,24 +1648,7 @@ public class StrategyManager {
 		}
 		
 		int myunitPoint = getFacUnits();
-		
-		//공통 예외 상황
-		if((myunitPoint > 170 || MyBotModule.Broodwar.self().supplyUsed() > 392 )&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
-			if(Config.BroodwarDebugYN){
-			MyBotModule.Broodwar.printf("Many Unit Attack!");
-			}
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			CombatStartCase = 1;
-		}
-		if(MyBotModule.Broodwar.getFrameCount() > 10000 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 5
-				 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//TODO5드론에서 피해를 봣을때의 기준에 따라서 수치 조정 필요.. 감이 없음
-			if(Config.BroodwarDebugYN){
-			MyBotModule.Broodwar.printf("Too Less SCV ATTACK!!");
-			}
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY); //TODO 올인에 대한거 하나 만들어야 겠다... 올인이면 공격 취소도 하면 안되므로..
-		}
-		
-		
+	
 		
 		//공통 기본 로직, 팩토리 유닛 50마리 기준 유닛 Kill Death 상황에 따라 변경.
 		
@@ -1754,118 +1742,206 @@ public class StrategyManager {
 		//내 팩토리 유닛 인구수 만큼 추가
 		totPoint = 	myunitPoint + expansionPoint + unitPoint;
 		
-		if(totPoint > 120 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY && myunitPoint > 80){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
-			if(Config.BroodwarDebugYN){
-				MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
-			}
+		
+	
+		if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
 			
-			if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
-				if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) <
-				MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)*2){
-					CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-				}
-				//triple hatchery
-			}else{
+			if(unitPoint > 10 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3){
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+			}else if(unitPoint > 0 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4){
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+			}else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 			}
-			CombatStartCase = 2;
-		}
-		
-		if((LastStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto || CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto) 
-				&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY
-				&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-				+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
-			CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			CombatStartCase=5;
-			CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_CHECK_NO_GUERILLA, 500*24);
-			CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_WAITING_CHOKE, 500*24);
 			
-			if(CombatTime ==0 ){
-				CombatTime = MyBotModule.Broodwar.getFrameCount() + 6000;
-			}
-		}
-		
-		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
-			if(CombatStartCase == 1 && myunitPoint < 30){
-				if(Config.BroodwarDebugYN){
-					MyBotModule.Broodwar.printf("Retreat1");
+			int CC = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && unitPoint <0){
+				if( CC == 1 && myunitPoint + unitPoint < 0){
+					System.out.println("terran retreat1");
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 				}
-				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+				if( CC == 2 && myunitPoint + unitPoint/2 < 0){
+					System.out.println("terran retreat1");
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+				}
+				if( CC > 3 && myunitPoint < 20){
+					System.out.println("terran retreat1");
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+				}
 			}
-			if(CombatStartCase == 2){
+			if(CC > 4){
+				CC= 4;
+			}
+			if((myunitPoint > 250 - CC*10 || MyBotModule.Broodwar.self().supplyUsed() > 392 )){
+				CombatManager.Instance().pushSiegeLine = true;
+				CombatStartCase = 1;
+			}
+			
+			if(CombatStartCase == 1 && myunitPoint < 90){
+				CombatManager.Instance().pushSiegeLine = false;
+			}
+			
+			if(myunitPoint > 100 && unitPoint > 40){
+				CombatManager.Instance().pushSiegeLine = true;
+				CombatStartCase = 2;
+			}
+			if(CombatStartCase == 2 && unitPoint < 10){
+				CombatManager.Instance().pushSiegeLine = false;
+			}
+			
+			
+		}else{
+			//공통 예외 상황
+			if((myunitPoint > 170 || MyBotModule.Broodwar.self().supplyUsed() > 392 )&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY){//팩토리 유닛  130 이상 또는 서플 196 이상 사용시(스타 내부에서는 2배)
+	
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				CombatStartCase = 1;
+			}
+			
+			
+			if(totPoint > 120 && CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY && myunitPoint > 80){// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
+				if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("Total Combat Point Over 120 Attack!!");
+				}
 				
 				if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
-					if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) >
-					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)){
-						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) <
+					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)*2){
+						CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 					}
 					//triple hatchery
+				}else{
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				}
+				CombatStartCase = 2;
+			}
+			
+			if((LastStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto || CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto) 
+					&& CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+					+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
+				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				CombatStartCase=5;
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_CHECK_NO_GUERILLA, 500*24);
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_WAITING_CHOKE, 500*24);
+				
+				if(CombatTime ==0 ){
+					CombatTime = MyBotModule.Broodwar.getFrameCount() + 6000;
+				}
+			}
+			
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+				if(CombatStartCase == 1 && myunitPoint < 30){
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("Retreat1");
+					}
+					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+				}
+				if(CombatStartCase == 2){
+					
+					if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
+						if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) >
+						MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)){
+							CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+						}
+						//triple hatchery
+						if(totPoint < 50){
+							if(Config.BroodwarDebugYN){
+								MyBotModule.Broodwar.printf("Retreat2");
+							}
+							CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+						}
+					}else
 					if(totPoint < 50){
 						if(Config.BroodwarDebugYN){
 							MyBotModule.Broodwar.printf("Retreat2");
 						}
 						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 					}
-				}else
-				if(totPoint < 50){
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("Retreat2");
-					}
-					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 				}
-			}
-			if(CombatStartCase == 5){
-				
-				if(CombatTime < MyBotModule.Broodwar.getFrameCount() && myunitPoint < 20 && unitPoint <20){
-				
-					CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-					if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
-						setCurrentStrategyBasic(CurrentStrategyBasic.protossBasic);
-					}
-				}
-				
-				if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,InformationManager.Instance().enemyPlayer)
-						+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot)
-						+ InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,InformationManager.Instance().enemyPlayer)
-						+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20
-						){
-					if(totPoint < 50){
-						if(Config.BroodwarDebugYN){
-							MyBotModule.Broodwar.printf("Retreat5");
-						}
+				if(CombatStartCase == 5){
+					
+					if(CombatTime < MyBotModule.Broodwar.getFrameCount() && myunitPoint < 20 && unitPoint <20){
+					
 						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 						if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
 							setCurrentStrategyBasic(CurrentStrategyBasic.protossBasic);
 						}
 					}
+					
+					if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,InformationManager.Instance().enemyPlayer)
+							+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot)
+							+ InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,InformationManager.Instance().enemyPlayer)
+							+ MyBotModule.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20
+							){
+						if(totPoint < 50){
+							if(Config.BroodwarDebugYN){
+								MyBotModule.Broodwar.printf("Retreat5");
+							}
+							CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
+								setCurrentStrategyBasic(CurrentStrategyBasic.protossBasic);
+							}
+						}
+					}
 				}
-			}
-//			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
-//				if(Config.BroodwarDebugYN){
-//					MyBotModule.Broodwar.printf("Retreat3");
-//				}
-//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-//			}
-//			if(CombatStartCase == 4 && myunitPoint < 60){
-//				if(Config.BroodwarDebugYN){
-//					MyBotModule.Broodwar.printf("Retreat4");
-//				}
-//				LastStrategyException = StrategyManager.StrategysException.Init;
-//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-//			}
-			
-			if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120 && unitPoint > 65){
-				if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <=3) {
-					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
-				}
-				if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <=3) {
-					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
+	//			if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
+	//				if(Config.BroodwarDebugYN){
+	//					MyBotModule.Broodwar.printf("Retreat3");
+	//				}
+	//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+	//			}
+	//			if(CombatStartCase == 4 && myunitPoint < 60){
+	//				if(Config.BroodwarDebugYN){
+	//					MyBotModule.Broodwar.printf("Retreat4");
+	//				}
+	//				LastStrategyException = StrategyManager.StrategysException.Init;
+	//				CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+	//			}
+				
+				if (InformationManager.Instance().enemyRace == Race.Protoss) {
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) ==0	&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Comsat_Station) ==0){
+						for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+							if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() ==false) {
+								MyBotModule.Broodwar.printf("dark and no comsat or vessel");
+								CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							}
+						}
+					}else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Comsat_Station) > 0){
+						boolean energy = false;
+						boolean dark = false;
+						for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+							if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() ==false) {
+								dark = true;
+							}
+						}
+						if(dark){
+							for(Unit myunit : MyBotModule.Broodwar.self().getUnits()){
+								if(myunit.getType() == UnitType.Terran_Comsat_Station && myunit.isCompleted() && myunit.getEnergy() > 50){
+									energy = true;
+								}
+							}
+							if(energy == false){
+								MyBotModule.Broodwar.printf("dark and no comsat energy");
+								CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							}
+						}
+					}
 				}
 				
-			}
-			
-			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.DEFENCE_CHOKEPOINT || (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0 && (expansionPoint < 0 || (myunitPoint < 40 || unitPoint < 10)))){
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 0);
+				if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120 && unitPoint > 65){
+					if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <=3) {
+						CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
+					}
+					if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <=3) {
+						CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
+					}
+					
+				}
+				
+				if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.DEFENCE_CHOKEPOINT || (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0 && (expansionPoint < 0 || (myunitPoint < 40 || unitPoint < 10)))){
+					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 0);
+				}
 			}
 		}
 		
@@ -2177,7 +2253,7 @@ public class StrategyManager {
 				return;
 			}
 			
-			if((MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40) || (getFacUnits() > 60 && Attackpoint > 60 && ExpansionPoint > 0)){
+			if((MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 40 && UnitPoint > 15) || (getFacUnits() > 60 && Attackpoint > 60 && ExpansionPoint > 0)){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					if(Config.BroodwarDebugYN){
@@ -2212,6 +2288,16 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 				}
 			}
+			if((MyBotModule.Broodwar.self().minerals() > 600 && getFacUnits() > 40)){
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					if(Config.BroodwarDebugYN){
+						MyBotModule.Broodwar.printf("Build First Expansion by money and advance in fight");
+					}
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				}
+			}
+			
 			
 		}
 		
