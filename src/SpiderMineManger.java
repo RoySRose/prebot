@@ -87,10 +87,7 @@ public class SpiderMineManger {
 			// 테란 스파이더마인 정책 적용
 
 			if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 10 * 60 * 24);
-			}
-			if (MicroSet.Common.versusMechanicSet()) {
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.TIGHTENING, 20 * 60 * 24);
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 1 * 60 * 24);
 			}
 		}
 	}

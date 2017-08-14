@@ -285,8 +285,8 @@ public class Squad {
 		if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY
 				&& CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) { // strategy manager 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
-		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360
-				|| MyBotModule.Broodwar.self().supplyUsed() >= 380) { // combat manager 자체 판단
+		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360) {
+//				|| MyBotModule.Broodwar.self().supplyUsed() >= 380) { // combat manager 자체 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
 		}
 		

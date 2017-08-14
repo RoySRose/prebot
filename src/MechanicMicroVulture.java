@@ -192,14 +192,11 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			}
 			
 			if (minePosition == null) {
-				Chokepoint enemySecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-				Chokepoint nextChoke = InformationManager.Instance().getNextChokepoint(enemySecondChoke, InformationManager.Instance().selfPlayer);
+				Position enemyReadyPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
 				
-//				Position tightening = InformationManager.Instance().tighteningPoint;
-				Position tightening = nextChoke.getCenter();
-				int distance = vulture.getDistance(tightening);
+				int distance = vulture.getDistance(enemyReadyPos);
 				if (distance <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition * 2);
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroSet.Vulture.spiderMineNumPerPosition);
 				}
 			}
 			

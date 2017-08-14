@@ -100,6 +100,7 @@ public class MicroSet {
 		
 		public static final int DEFENSE_SECONDCHOKE_SIZE = 9;
 		public static final int DEFENSE_READY_TO_ATTACK_SIZE = 14;
+		public static final int DEFENSE_READY_TO_ATTACK_SIZE_TERRAN = 2;
 		
 		public static final double BACKOFF_DIST_SIEGE_TANK = 100.0;
 		public static final double BACKOFF_DIST_DEF_TOWER = 120.0;
