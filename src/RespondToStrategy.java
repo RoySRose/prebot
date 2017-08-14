@@ -237,9 +237,92 @@ public class RespondToStrategy {
 		RespondExecute();
 	}
 		
+	boolean once = true;
 	public void RespondVsProtoss() {
 		boolean blocked = true;
 		//2gate zealot
+		
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.protossBasic_DoublePhoto){
+			
+			if(MyBotModule.Broodwar.getFrameCount() < 10000){
+				BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+				BuildOrderItem checkItem = null; 
+	
+				if (!tempbuildQueue.isEmpty()) {
+					checkItem= tempbuildQueue.getHighestPriorityItem();
+					while(true){
+						if(tempbuildQueue.canGetNextItem() == true){
+							tempbuildQueue.canGetNextItem();
+						}else{
+							break;
+						}
+						tempbuildQueue.PointToNextItem();
+						checkItem = tempbuildQueue.getItem();
+						
+						if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Command_Center){
+							tempbuildQueue.removeCurrentItem();
+						}
+					}
+				}
+			}
+			if(once){
+							
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,true);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Siege_Tank_Tank_Mode,false);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,true);
+			once = false;
+			}
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Machine_Shop,true);
+			
+			
+			
+//			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) >= 1){
+//				
+//				
+//				if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1){
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+//						
+//						BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//						BuildOrderItem checkItem = null; 
+//			
+//						if (!tempbuildQueue.isEmpty()) {
+//							checkItem= tempbuildQueue.getHighestPriorityItem();
+//							while(true){
+//								if(tempbuildQueue.canGetNextItem() == true){
+//									tempbuildQueue.canGetNextItem();
+//								}else{
+//									break;
+//								}
+//								tempbuildQueue.PointToNextItem();
+//								checkItem = tempbuildQueue.getItem();
+//								
+//								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Factory){
+//									tempbuildQueue.removeCurrentItem();
+//								}
+//								
+//								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop){
+//									tempbuildQueue.removeCurrentItem();
+//								}
+//								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Vulture){
+//									tempbuildQueue.removeCurrentItem();
+//								}
+//								
+//							}
+//						}
+//						
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop,true);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_SCV,false);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_SCV,false);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_SCV,false);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_SCV,false);
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_SCV,false);
+//					}
+//				}
+//				
+		}
+		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
 				if(blocked){
@@ -385,7 +468,8 @@ public class RespondToStrategy {
 //			}
 		}
 	
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus){
+		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DoubleNexus
+				&& StrategyManager.Instance().getCurrentStrategyBasic() != StrategyManager.Strategys.protossBasic_DoublePhoto){
 			
 			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
