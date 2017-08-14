@@ -1407,8 +1407,12 @@ public class InformationManager {
 		}
 
 		// check for various types of combat units
-		if (type.canAttack() || type == UnitType.Terran_Medic || type == UnitType.Protoss_Observer
-				|| type == UnitType.Terran_Bunker || type == UnitType.Protoss_High_Templar) {
+		if (type.canAttack()
+				|| type == UnitType.Terran_Medic
+				|| type == UnitType.Protoss_Observer
+				|| type == UnitType.Protoss_Carrier
+				|| type == UnitType.Terran_Bunker
+				|| type == UnitType.Protoss_High_Templar) {
 			return true;
 		}
 

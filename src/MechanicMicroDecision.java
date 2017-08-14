@@ -317,6 +317,9 @@ public class MechanicMicroDecision {
 				if (!enemy.isDetected() && enemyUnitType == UnitType.Protoss_Dark_Templar) {
 					specialScore -= 1000;
 				}
+				if (enemyUnitType == UnitType.Protoss_Interceptor) {
+					specialScore -= 1000;
+				}
 		        
 			} else {
 				distanceScore -= mechanicUnit.getDistance(enemyInfo.getLastPosition()) / 5;

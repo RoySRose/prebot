@@ -261,9 +261,9 @@ public class TargetPriority {
 		goliathPriorityMap.put(UnitType.Protoss_Zealot,					inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Protoss_Dragoon,				inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Protoss_Probe,					inputPriority -= PRIORITY_GAP);
-		goliathPriorityMap.put(UnitType.Protoss_Interceptor,			inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Protoss_Dark_Archon,			inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap.put(UnitType.Protoss_Corsair,				inputPriority -= PRIORITY_GAP);
+		goliathPriorityMap.put(UnitType.Protoss_Interceptor,			inputPriority -= PRIORITY_GAP);
 		goliathPriorityMap = inputBuildingPriority(Race.Protoss, goliathPriorityMap, inputPriority - PRIORITY_GAP);
 		
 		// 골리앗 vs 저그
