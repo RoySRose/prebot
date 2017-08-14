@@ -924,7 +924,7 @@ public class CombatManager {
                 enemyUnitsInRegion.add(unit);
             }
         }
-		System.out.println("enemyUnitsInRegion.size(): " + enemyUnitsInRegion.size());
+		//System.out.println("enemyUnitsInRegion.size(): " + enemyUnitsInRegion.size());
 		
 		if(enemyUnitsInRegion.size() == 0){
 			if (!scoutDefenseSquad.isEmpty()) {
