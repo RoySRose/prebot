@@ -83,21 +83,19 @@ public class MechanicMicroDecision {
 //					noUnitFrame = MicroSet.Common.NO_SIEGE_FRAME;
 //				}
 				
-//				if (bestTargetInfo == null
-//						&& !MyBotModule.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())
-//						&& (MyBotModule.Broodwar.getFrameCount() - enemyInfo.getUpdateFrame()) < noUnitFrame) {
+				if (bestTargetInfo == null && !MyBotModule.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
 					
 					int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
 					if (saveUnitLevel == 0 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 						bestTargetInfo = enemyInfo;
 						targetOutOfSight = true;
-					} else if (saveUnitLevel >= 2 && distanceToTarget <= (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK)) {
+					} else if (saveUnitLevel >= 1 && distanceToTarget <= (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK)) {
 						bestTargetInfo = enemyInfo;
 						targetOutOfSight = true;
 					} else {
 //						System.out.println(distanceToTarget + ", " + (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK));
 					}
-//				}
+				}
 				
 				continue;
 			}
@@ -204,6 +202,7 @@ public class MechanicMicroDecision {
 			return MechanicMicroDecision.makeDecisionToGo();
 		} else {
 			if (targetOutOfSight) { // 보이지는 않지만 일정거리 안에 적이 있다면 시즈모드 유지(saveUnitLevel에 따라 변동)
+//				CommonUtils.consoleOut(1, mechanicUnit.getID(), "11111");
 				return MechanicMicroDecision.makeDecisionToDoNothing();				
 			} else {
 				return MechanicMicroDecision.makeDecisionToKiting(bestTargetInfo);
