@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 
@@ -186,6 +187,9 @@ public class MechanicMicroDecision {
 					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK) {
 						return MechanicMicroDecision.makeDecisionToDoNothing();
 					}
+				}
+				if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+					return MechanicMicroDecision.makeDecisionToDoNothing();	
 				}
 				return MechanicMicroDecision.makeDecisionToChange();
 			} else if (existCloakTarget) {

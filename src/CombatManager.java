@@ -62,7 +62,7 @@ enum CombatStrategy {
 };
 
 enum CombatStrategyDetail {
-	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY
+	VULTURE_JOIN_SQUAD, NO_WAITING_CHOKE, ATTACK_NO_MERCY, TIGHTENING, MINE_STRATEGY_FOR_TERRAN
 };
 
 public class CombatManager {
@@ -641,18 +641,28 @@ public class CombatManager {
 		Position mainAttackLocation = null;
 		if (combatStrategy == CombatStrategy.DEFENCE_INSIDE
 				|| combatStrategy == CombatStrategy.DEFENCE_CHOKEPOINT) {
-			int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
-					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
-			
-			int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
-			
-			Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-			if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
-				mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
-			} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_SECONDCHOKE_SIZE || InformationManager.Instance().enemyRace == Race.Terran) {
-				mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
+			// 조이기 전략 -> tighteningPoint 위치가 잘 안잡히는 현상으로 readyToAttackPostion으로 임시 사용한다.
+			if (getDetailStrategyFrame(CombatStrategyDetail.TIGHTENING) > 0) {
+				Chokepoint selfSecondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+//				Chokepoint nextChoke = InformationManager.Instance().getNextChokepoint(selfSecondChoke, InformationManager.Instance().enemyPlayer);
+				mainAttackLocation = selfSecondChoke.getCenter();
+				
 			} else {
-				mainAttackLocation = getDefensePosition(squad);
+				int tankCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
+						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
+				
+				int goliathCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath);
+				
+				Chokepoint secondChoke = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+				if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_READY_TO_ATTACK_SIZE) { // 병력이 모였으면 좀더 전진된 위치(정찰, 확장, 공격 용이)
+//					mainAttackLocation = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
+					mainAttackLocation = secondChoke.getCenter();
+				} else if (tankCount + goliathCount >= MicroSet.Common.DEFENSE_SECONDCHOKE_SIZE || InformationManager.Instance().enemyRace == Race.Terran) {
+					mainAttackLocation = secondChoke.getCenter(); // 병력이 좀 모였거나, 상대가 테란이면 secondChoke
+				} else {
+					mainAttackLocation = getDefensePosition(squad);
+				}
+				
 			}
 			
 //		} else if (combatStrategy == CombatStrategy.READY_TO_ATTACK) { // 헌터에서 사용하면 위치에 따라 꼬일 수 있을듯(수정햇다)
@@ -1123,13 +1133,21 @@ public class CombatManager {
 			if (!regionCenter.isValid()) {
 				continue;
 			}
+
+			boolean tooFarToDefense = false;
+			boolean doNotAssignMechanicUnit = false;
+			boolean doNotAssignTankNGoliath = false;
 			
 			BaseLocation mainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 			if (!regionCenter.equals(BWTA.getRegion(mainBase.getPosition()).getCenter()) && regionCenter.getDistance(firstExpansion.getPosition()) >= 800) {
-				continue; // 일단 안지키도록 함.
+				if (centerIsOccupied(InformationManager.Instance().enemyPlayer)) {
+					continue;
+				} else {
+					tooFarToDefense = true;
+//					doNotAssignTankNGoliath = true;
+				}
 			}
-			boolean doNotAssignMechanicUnit = false;
 			
 			// 초반 방어모드에서 앞마당 방어스쿼드를 위해 메카닉 유닛을 할당하지 않는다.
 			// (왜냐하면 메인공격스쿼드의 위치가 곧 방어스쿼드의 위치이며, 메인공격스쿼드의 특성을 활용하기 위해서이다.)
@@ -1158,6 +1176,9 @@ public class CombatManager {
 	            if (BWTA.getRegion(unit.getTilePosition()) == myRegion) {
 	                enemyUnitsInRegion.add(unit);
 	            }
+	        }
+	        if (tooFarToDefense && enemyUnitsInRegion.size() >= 5) {
+	        	continue;
 	        }
 
 
@@ -1231,7 +1252,7 @@ public class CombatManager {
 //				updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, false);
 //			}else{
 //			System.out.println("squadName: " + squadName + ", " + "groundDefendersNeeded" + groundDefendersNeeded);
-			updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, pullWorkers, doNotAssignMechanicUnit);
+			updateDefenseSquadUnits(defenseSquad, flyingDefendersNeeded, groundDefendersNeeded, pullWorkers, doNotAssignMechanicUnit, doNotAssignTankNGoliath);
 //			}
 //			for (Unit marine : defenseSquad.getUnitSet()){
 //				System.out.println("marine: " + marine.getID());
@@ -1262,7 +1283,7 @@ public class CombatManager {
 		return closestMineralWorker;
 	}
 	
-	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers, boolean doNotAssignMechanicUnit) {
+	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers, boolean doNotAssignMechanicUnit, boolean doNotAssignTankNGoliath) {
 		// if there's nothing left to defend, clear the squad
 		if (flyingDefendersNeeded <= 0 && groundDefendersNeeded <= 0) {
 			defenseSquad.clear();
@@ -1284,7 +1305,7 @@ public class CombatManager {
 		// add flying defenders if we still need them
 		int flyingDefendersAdded = 0;
 		while (flyingDefendersNeeded > flyingDefendersInSquad + flyingDefendersAdded) {
-			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), true, false, doNotAssignMechanicUnit);
+			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), true, false, doNotAssignMechanicUnit, doNotAssignTankNGoliath);
 
 			// if we find a valid flying defender, add it to the squad
 			if (defenderToAdd != null) {
@@ -1299,7 +1320,7 @@ public class CombatManager {
 		// add ground defenders if we still need them
 		int groundDefendersAdded = 0;
 		while (groundDefendersNeeded > groundDefendersInSquad + groundDefendersAdded) {
-			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, false, doNotAssignMechanicUnit);
+			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, false, doNotAssignMechanicUnit, doNotAssignTankNGoliath);
 
 			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
@@ -1333,12 +1354,18 @@ public class CombatManager {
 	    mainAttackSquad.setOrder(mainAttackOrder);
 	}
 	
-	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers, boolean doNotAssignMechanicUnit) {
+	private Unit findClosestDefender(Squad defenseSquad, Position pos, boolean flyingDefender, boolean pullWorkers, boolean doNotAssignMechanicUnit, boolean doNotAssignTankNGoliath) {
 		Unit closestDefender = null;
 		int minDistance = 99999;
 
 		for (Unit unit : combatUnits) {
 			if (doNotAssignMechanicUnit && MicroUtils.isFactoryUnit(unit.getType())) {
+				continue;
+			}
+			if (doNotAssignTankNGoliath && (
+					unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+					|| unit.getType() == UnitType.Terran_Goliath)) {
 				continue;
 			}
 			if ((flyingDefender && !CommandUtil.CanAttackAir(unit)) ||
@@ -1457,7 +1484,7 @@ public class CombatManager {
 	private void updateCheckerSquad() {
 		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters
 				&& InformationManager.Instance().enemyRace == Race.Terran
-				&& centerIsOccupied()) {
+				&& centerIsOccupied(InformationManager.Instance().enemyPlayer)) {
 			return;
 		}
 		
@@ -1509,7 +1536,7 @@ public class CombatManager {
 	private void updateGuerillaSquad() {
 		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters
 				&& InformationManager.Instance().enemyRace == Race.Terran
-				&& centerIsOccupied()) {
+				&& centerIsOccupied(InformationManager.Instance().enemyPlayer)) {
 			return;
 		}
 		
@@ -1623,8 +1650,8 @@ public class CombatManager {
 		
 	}
 	
-	private boolean centerIsOccupied() {
-		List<UnitInfo> enemyUnitInfos = InformationManager.Instance().getNearbyForce(new Position(2048, 2048), InformationManager.Instance().enemyPlayer, 300);
+	private boolean centerIsOccupied(Player player) {
+		List<UnitInfo> enemyUnitInfos = InformationManager.Instance().getNearbyForce(new Position(2048, 2048), player, 300);
 		return enemyUnitInfos.size() >= 5;
 	}
 }

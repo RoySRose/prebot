@@ -223,7 +223,7 @@ public class MicroTank extends MicroManager {
 		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
 		
 		int seigeNumLimit = 1;
-		int distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
+		int distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance();
 		
 		while (seigeNumLimit < 10) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
@@ -247,14 +247,14 @@ public class MicroTank extends MicroManager {
 				}
 				
 				if (distanceFromOrderPosition <= 0) {
-					distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE + 50;
-				} else if (distanceFromOrderPosition <= MicroSet.Tank.SIEGE_ARRANGE_DISTANCE) {
+					distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance() + 50;
+				} else if (distanceFromOrderPosition <= MicroSet.Tank.getSiegeArrangeDistance()) {
 					distanceFromOrderPosition -= 50;
 				} else {
 					distanceFromOrderPosition += 50;
 				}
 			}
-			distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
+			distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance();
 			seigeNumLimit++;
 		}
 		

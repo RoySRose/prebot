@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -74,10 +75,25 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			break;
 			
 		case 2: // go
-			Position movePosition = order.getPosition();
-			if (tank.canUnsiege()) {
-				if(tank.getDistance(movePosition) > siegeModeSpreadRadius || MicroUtils.existTooNarrowChoke(tank.getPosition())) {
-					tank.unsiege();
+			if (MicroSet.Common.versusMechanicSet()) {
+				// 테란전용 go
+				int distToOrder = tank.getDistance(order.getPosition());
+				if (tank.canUnsiege()) {
+					if(distToOrder > MicroSet.Tank.SIEGE_MODE_MAX_RANGE
+							|| MicroUtils.existTooNarrowChoke(tank.getPosition())
+							|| MicroUtils.isExpansionPosition(tank.getPosition())) {
+						tank.unsiege();
+					}
+				}
+				
+			} else {
+				Position movePosition = order.getPosition();
+				if (tank.canUnsiege()) {
+					if(tank.getDistance(movePosition) > siegeModeSpreadRadius
+							|| MicroUtils.existTooNarrowChoke(tank.getPosition())
+							|| MicroUtils.isExpansionPosition(tank.getPosition())) {
+						tank.unsiege();
+					}
 				}
 			}
 			break;
@@ -91,10 +107,12 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	}
 	
 	private void executeTankMode(Unit tank) {
-		if (!useInitFrame && initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
-			useInitFrame = true;
-			tank.siege();
-			return;
+		if (MyBotModule.Broodwar.self().getRace() != Race.Terran) {
+			if (!useInitFrame && initFrame + 24 >= MyBotModule.Broodwar.getFrameCount()) {
+				useInitFrame = true;
+				tank.siege();
+				return;
+			}
 		}
 		
 		KitingOption kOpt = KitingOption.defaultKitingOption();
@@ -119,7 +137,10 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				targetPosition = target.getPosition();
 				targetType = target.getType();
 			}
-			if (vultureList.size() + goliathList.size() <= MicroSet.Tank.OTHER_UNIT_COUNT_SIEGE_AGAINST_MELEE
+			if (target != null && targetType == UnitType.Terran_Vulture_Spider_Mine && tank.isInWeaponRange(target)) {
+				tank.holdPosition();
+				
+			} if (vultureList.size() + goliathList.size() <= MicroSet.Tank.OTHER_UNIT_COUNT_SIEGE_AGAINST_MELEE
 					&& targetType.groundWeapon().maxRange() <= MicroSet.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃 카이팅(백업 유닛이 있으면 밀리유닛 상대로도 시즈모드 변경) 
 				Position kitingGoalPosition = order.getPosition();
 				kOpt.setGoalPosition(kitingGoalPosition);
@@ -142,9 +163,9 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 						}
 					}
 				} else {
-					if (saveUnitLevel <= 1 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
+					if (saveUnitLevel == 0 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 						shouldSiege = true;
-					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK + 10) {
+					} else if (saveUnitLevel > 0 && distanceToTarget <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + MicroSet.Common.BACKOFF_DIST_SIEGE_TANK + 10) {
 						shouldSiege = true;
 					}
 				}
@@ -160,24 +181,53 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 			break;
 			
 		case 2: // go
-			if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege() && !MicroUtils.existTooNarrowChoke(tank.getPosition())) {
-				Position positionToSiege = findPositionToSiege(tank, siegeModeSpreadRadius); // orderPosition의 중심으로 펼쳐진 시즈 대형을 만든다.
-				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) < 30) {
+			if (MicroSet.Common.versusMechanicSet()) {
+				// 테란전용 go
+				int distToOrder = tank.getDistance(order.getPosition());
+				if (distToOrder <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE
+						&& !MicroUtils.existTooNarrowChoke(tank.getPosition())
+						&& !MicroUtils.isExpansionPosition(tank.getPosition())) { // orderPosition의 둘러싼 대형을 만든다.
+					if (tank.canSiege()) {
 						tank.siege();
 					} else {
-						CommandUtil.attackMove(tank, positionToSiege);
+						if (tank.isIdle() || tank.isBraking()) {
+							if (!tank.isBeingHealed()) {
+								Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+								CommandUtil.attackMove(tank, randomPosition);
+							}
+						}
 					}
+				} else {
+					CommandUtil.attackMove(tank, order.getPosition());
 				}
-			} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
-				if (tank.isIdle() || tank.isBraking()) {
-					if (!tank.isBeingHealed()) {
-						Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
-						CommandUtil.attackMove(tank, randomPosition);
-					}
-				}
+				
 			} else {
-            	CommandUtil.attackMove(tank, order.getPosition());
+				// 일반적인 go
+				if (tank.getDistance(order.getPosition()) <= siegeModeSpreadRadius && tank.canSiege()) {
+					Position positionToSiege = findPositionToSiege(tank, siegeModeSpreadRadius); // orderPosition의 중심으로 펼쳐진 시즈 대형을 만든다.
+					if (positionToSiege != null) {
+						if (tank.getDistance(positionToSiege) < 30) {
+							tank.siege();
+						} else {
+							CommandUtil.attackMove(tank, positionToSiege);
+						}
+					}
+					if (tank.isIdle() || tank.isBraking()) {
+						if (!tank.isBeingHealed()) {
+							Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+							CommandUtil.attackMove(tank, randomPosition);
+						}
+					}
+				} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
+					if (tank.isIdle() || tank.isBraking()) {
+						if (!tank.isBeingHealed()) {
+							Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+							CommandUtil.attackMove(tank, randomPosition);
+						}
+					}
+				} else {
+	            	CommandUtil.attackMove(tank, order.getPosition());
+				}
 			}
 			break;
 			
@@ -189,7 +239,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	
 	private Position findPositionToSiege(Unit tank, int siegeAreaDist) {
 		int seigeNumLimit = 1;
-		int distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
+		int distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance();
 		
 		while (seigeNumLimit < 8) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
@@ -203,7 +253,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				    if (MicroUtils.isValidGroundPosition(movePosition)
 				    		&& MyBotModule.Broodwar.hasPath(tank.getPosition(), movePosition)
 							&& MicroUtils.isConnectedPosition(tank.getPosition(), movePosition)) {
-				    	if (MicroUtils.existTooNarrowChoke(movePosition)) {
+				    	if (MicroUtils.existTooNarrowChoke(movePosition) || MicroUtils.isExpansionPosition(movePosition)) {
 				    		continue;
 				    	}
 
@@ -230,14 +280,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				}
 				
 				if (distanceFromOrderPosition <= 0) {
-					distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE + 50;
-				} else if (distanceFromOrderPosition <= MicroSet.Tank.SIEGE_ARRANGE_DISTANCE) {
-					distanceFromOrderPosition -= 50;
+					distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance() + MicroSet.Tank.getSiegeArrangeDistanceAdjust();
+				} else if (distanceFromOrderPosition <= MicroSet.Tank.getSiegeArrangeDistance()) {
+					distanceFromOrderPosition -= MicroSet.Tank.getSiegeArrangeDistanceAdjust();
 				} else {
-					distanceFromOrderPosition += 50;
+					distanceFromOrderPosition += MicroSet.Tank.getSiegeArrangeDistanceAdjust();
 				}
 			}
-			distanceFromOrderPosition = MicroSet.Tank.SIEGE_ARRANGE_DISTANCE;
+			distanceFromOrderPosition = MicroSet.Tank.getSiegeArrangeDistance();
 			seigeNumLimit++;
 		}
 		

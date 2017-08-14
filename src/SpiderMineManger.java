@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
@@ -82,6 +83,15 @@ public class SpiderMineManger {
 			
 			// 제거해야되는 마인리스트
 			initialized = true;
+			
+			// 테란 스파이더마인 정책 적용
+
+			if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 10 * 60 * 24);
+			}
+			if (MicroSet.Common.versusMechanicSet()) {
+				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.TIGHTENING, 20 * 60 * 24);
+			}
 		}
 	}
 	
@@ -123,6 +133,8 @@ public class SpiderMineManger {
 			MineReserved mineReserved = mineReservedMap.get(unitId);
 			if (mineReserved.reservedFrame + MicroSet.Vulture.RESV_EXPIRE_FRAME < MyBotModule.Broodwar.getFrameCount()) {
 				//System.out.println("expired mine position : " + mineReserved.positionToMine);
+				expiredList.add(unitId);
+			} else if (!CommandUtil.IsValidUnit(MyBotModule.Broodwar.getUnit(unitId))) {
 				expiredList.add(unitId);
 			}
 //			MyBotModule.Broodwar.drawCircleScreen(mineReserved.positionToMine, 100, Color.White);
@@ -192,6 +204,32 @@ public class SpiderMineManger {
 		return false;
 	}
 	
+	public Position enemyPositionToMine(Unit vulture, List<UnitInfo> enemiesInfo) {
+		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
+			return null;
+		}
+		
+		for (UnitInfo enemyInfo : enemiesInfo) {
+			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
+			if (enemy != null) {
+				if (vulture.getDistance(enemy) <= MicroSet.Vulture.MINE_ENEMY_TARGET_DISTANCE) {
+					List<Unit> spiderMinesNearEnemy = MapGrid.Instance().getUnitsNear(enemy.getPosition(), MicroSet.Vulture.MINE_ENEMY_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine);
+					if (spiderMinesNearEnemy.size() + numOfMineReserved(enemy.getPosition(), MicroSet.Vulture.MINE_ENEMY_RADIUS) < 1) {
+						for (int i = 0; i < 3; i++) {
+							Position minePosition = MicroUtils.randomPosition(enemy.getPosition(), MicroSet.Vulture.MINE_ENEMY_RADIUS);
+							if (noProblemToMine(minePosition)) { // 문제없다면 없다면 매설
+								mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
+								return minePosition;
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	
 	public Position goodPositionToMine(Unit vulture, int mineNumberPerPosition) {
 		if (!initialized || vulture == null || vulture.getSpiderMineCount() <= 0) {
 			return null;
@@ -202,7 +240,7 @@ public class SpiderMineManger {
 		Position nearestGoodPosition = null;
 		for (Position position : goodPositions) {
 			int distance = vulture.getDistance(position);
-			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position, true)) {
+			if (distance < nearestDistance && distance < MicroSet.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position)) {
 				nearestDistance = distance;
 				nearestGoodPosition = position;
 			}
@@ -234,7 +272,7 @@ public class SpiderMineManger {
 			if (spiderMinesInExactRadius.size() == 0) {
 				for (int i = 0; i < 3; i++) {
 					Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_EXACT_RADIUS);
-					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
+					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
 						mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 						return minePosition;
 					}
@@ -247,7 +285,7 @@ public class SpiderMineManger {
 		if (spiderMinesInSpreadRadius.size() + numOfMineReserved(position, MicroSet.Vulture.MINE_SPREAD_RADIUS) < mineNumberPerPosition) {
 			for (int i = 0; i < 3; i++) {
 				Position minePosition = MicroUtils.randomPosition(position, MicroSet.Vulture.MINE_SPREAD_RADIUS);
-				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition, true)) { // 문제없다면 없다면 매설
+				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
 					mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, MyBotModule.Broodwar.getFrameCount()));
 					return minePosition;
 				}
@@ -270,12 +308,14 @@ public class SpiderMineManger {
 		}
 		
 		// 해당 지역에 마인이 매설되어 있다.
-		if (MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine).size() > 0) {
+		int exactPosMineNum = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine).size();
+		int overlapMine = MyBotModule.Broodwar.enemy().getRace() == Race.Terran ? 2 : 1;
+		if (exactPosMineNum >= overlapMine) {
 			return false;
 		}
 		
 		// 해당 지역에 아군 시즈탱크, 컴셋 스테이션, SCV 등이 있다면 금지 
-		List<Unit> units = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_REMOVE_TANK_DIST, true, true, null);
+		List<Unit> units = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_REMOVE_TANK_DIST, true, false, null);
 		for (Unit unit : units) {
 			if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 					|| unit.getType() == UnitType.Terran_SCV

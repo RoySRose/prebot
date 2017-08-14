@@ -1206,10 +1206,9 @@ public class InformationManager {
 		}
 	}
 	
-	private Chokepoint getNextChokepoint(Chokepoint currChoke, Player toPlayer) {
+	public Chokepoint getNextChokepoint(Chokepoint currChoke, Player toPlayer) {
 		Chokepoint enemyFirstChoke = firstChokePoint.get(toPlayer);
 
-	    
     	int chokeToEnemyChoke = MapTools.Instance().getGroundDistance(currChoke.getCenter(), enemyFirstChoke.getCenter()); // 현재chokepoint ~ 목적지chokepoint
     	
     	Chokepoint nextChoke = null;

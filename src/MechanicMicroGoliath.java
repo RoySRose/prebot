@@ -5,6 +5,7 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BaseLocation;
 
 public class MechanicMicroGoliath extends MechanicMicroAbstract {
@@ -77,8 +78,13 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				}
 			}
 			if (haveToFight) {
-				kOpt.setGoalPosition(order.getPosition());
-				MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+				Unit enemy = MicroUtils.getUnitIfVisible(decision.getTargetInfo());
+				if (enemy != null && enemy.getType() == UnitType.Terran_Vulture_Spider_Mine && goliath.isInWeaponRange(enemy)) {
+					goliath.holdPosition();
+				} else {
+					kOpt.setGoalPosition(order.getPosition());
+					MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+				}
 			} else {
 				// 가까운 곳에 없으면 탱크로 이동
 //				kOpt.setGoalPosition(closeTank.getPosition());
@@ -88,18 +94,33 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 			break;
 			
 		case 2: // attack move
-			Position movePosition = order.getPosition();
-			
-			// 이동지역까지 attackMove로 간다.
-			if (goliath.getDistance(movePosition) > order.getRadius()) {
-//				CommandUtil.attackMove(goliath, movePosition);
-				CommandUtil.move(goliath, movePosition);
+			if (MicroSet.Common.versusMechanicSet()) {
+				int distToOrder = goliath.getDistance(order.getPosition());
+				if (distToOrder <= MicroSet.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
+					if (goliath.isIdle() || goliath.isBraking()) {
+						if (!goliath.isBeingHealed()) {
+							Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
+							CommandUtil.attackMove(goliath, randomPosition);
+						}
+					}
+				} else {
+					CommandUtil.attackMove(goliath, order.getPosition());
+				}
 				
-			} else { // 목적지 도착
-				if (goliath.isIdle() || goliath.isBraking()) {
-					if (!goliath.isBeingHealed()) {
-						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
-						CommandUtil.attackMove(goliath, randomPosition);
+			} else {
+				Position movePosition = order.getPosition();
+				
+				// 이동지역까지 attackMove로 간다.
+				if (goliath.getDistance(movePosition) > order.getRadius()) {
+//					CommandUtil.attackMove(goliath, movePosition);
+					CommandUtil.move(goliath, movePosition);
+					
+				} else { // 목적지 도착
+					if (goliath.isIdle() || goliath.isBraking()) {
+						if (!goliath.isBeingHealed()) {
+							Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
+							CommandUtil.attackMove(goliath, randomPosition);
+						}
 					}
 				}
 			}

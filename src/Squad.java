@@ -189,10 +189,11 @@ public class Squad {
 //			mechanicVulture.executeMechanicMicro(vulture);
 //		}
 		
+		// 시즈, 골리앗 병력의 적이 있을 때를 전투시작(initiate)으로 정한다.
 		if (attackerEnemies.isEmpty()) {
 			if (initFrame > 0) {
-				initFrame = 0;
 //				MyBotModule.Broodwar.sendText("finished");
+				initFrame = 0;
 			}
 		} else {
 			if (initFrame == 0) {
@@ -218,10 +219,10 @@ public class Squad {
 		// 벌처 전투 여부 판단
 		boolean attackWithMechanic = false;
 		int saveUnitLevelVulture = 1;
-		if (initFrame > 0) {
-			if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
+		if (initFrame > 0) { // initiate 됐다면 탱크, 골리앗과 함께 싸운다.
+//			if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
 				attackWithMechanic = true;
-			}
+//			}
 //			List<UnitInfo> allEnemies = new ArrayList<>();
 //			allEnemies.addAll(vultureEnemies);
 //			allEnemies.addAll(attackerEnemies);
@@ -239,9 +240,12 @@ public class Squad {
 //			}
 			
 		} else {
-			if (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.VULTURE_JOIN_SQUAD) > 0) {
+			// initiate가 아닌 벌처 단독 활동시 임무
+			if (CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.VULTURE_JOIN_SQUAD) > 0) { // 후퇴명령
 				watchOrder.setPosition(attackerOrder.getPosition());
-				vultureEnemies = attackerEnemies;
+				if (CombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY) {
+					vultureEnemies = attackerEnemies;
+				}
 				saveUnitLevelVulture = 2;
 			} else {
 				boolean skipBuilding = false;
@@ -252,8 +256,14 @@ public class Squad {
 				if (result == Result.Loss) {
 					CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, MicroSet.Vulture.getVultureJoinSquadFrame(InformationManager.Instance().enemyRace));
 					saveUnitLevelVulture = 2;
-				} else if (result == Result.Win || result == Result.BigWin) {
+				} else if (result == Result.Win) {
 					saveUnitLevelVulture = 1;
+				} else if (result == Result.BigWin) {
+					if (MicroSet.Common.versusMechanicSet()) {
+						saveUnitLevelVulture = 0;
+					} else {
+						saveUnitLevelVulture = 1;
+					}
 				}
 //				else if (result == Result.BigWin) {
 //					saveUnitLevelVulture = 0;
@@ -265,7 +275,7 @@ public class Squad {
 		int saveUnitLevelTank = 1;
 		int saveUnitLevelGoliath = 1;
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			if (microTank.getUnits().size() > 1 && closeTankEnemies.size() * 2 <= microTank.getUnits().size()) {
+			if (closeTankEnemies.size() * 3 <= microTank.getUnits().size()) {
 				saveUnitLevelTank = 1; // 거리재기 전진
 			} else {
 				saveUnitLevelTank = 2; // 안전거리 유지
@@ -275,7 +285,8 @@ public class Squad {
 		if (CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY
 				&& CombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) { // strategy manager 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
-		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360) { // combat manager 자체 판단
+		} else if (InformationManager.Instance().enemyRace != Race.Terran && MyBotModule.Broodwar.self().supplyUsed() >= 360
+				|| MyBotModule.Broodwar.self().supplyUsed() >= 380) { // combat manager 자체 판단
 			saveUnitLevelVulture = saveUnitLevelTank = saveUnitLevelGoliath = 0;
 		}
 		

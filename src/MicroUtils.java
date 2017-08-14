@@ -71,19 +71,19 @@ public class MicroUtils {
 	}
 	
 	 // (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
-	public static boolean isSafePlace(Position position, boolean safeMine) {
+	public static boolean isSafePlace(Position position) {
 		boolean isSafe = true;
 		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroSet.Tank.SIEGE_MODE_MAX_RANGE);
 		
 		for (UnitInfo ui : nearEnemisUnitInfos) {
-			if (!safeMine) {
-				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
-				if (unit != null && unit.getType() != UnitType.Unknown) {
-					if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
-						continue;
-					}
-				}
-			}
+//			if (!safeMine) {
+//				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
+//				if (unit != null && unit.getType() != UnitType.Unknown) {
+//					if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
+//						continue;
+//					}
+//				}
+//			}
 			
 			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {
 				continue;
@@ -697,6 +697,15 @@ public class MicroUtils {
 		} else {
 			return false;
 		}
+	}
+	
+	public static boolean isExpansionPosition(Position position) {
+		BaseLocation expansionBase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+    	if (position.getDistance(expansionBase.getPosition()) < 100) {
+    		return true;
+    	} else {
+    		return false;
+    	}
 	}
 	
 	public static boolean isConnectedPosition(Position pos1, Position pos2) {
