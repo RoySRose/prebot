@@ -1,4 +1,3 @@
-
 import java.util.List;
 
 import bwapi.Position;
@@ -938,7 +937,8 @@ public class RespondToStrategy {
 						//System.out.println("baseLocation ==>>> (" + baseLocation.getPoint().toTilePosition().getX() +","+baseLocation.getPoint().toTilePosition().getY()+")" );
 						if (baseLocation != null) {
 							myRegion = baseLocation.getRegion();
-					              List<Unit> turretInRegion = MicroUtils.getUnitsInRadius(baseLocation.getRegion().getCenter(),250);
+					              List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().selfPlayer);
+
 					             build_turret_cnt = 0; 
 			     			 for(int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt ++){
 				     			 if(turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)){
@@ -953,8 +953,8 @@ public class RespondToStrategy {
 			     				 /*System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
 			     				System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);*/
 			     				//if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition())< 1
-			     				if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250)< 1
-			     						&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getRegion().getCenter().toTilePosition(), 250) == 0){
+			     				if(BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250)< 1
+			     						&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition(),250) == 0){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret,
 											baseLocation.getPoint().toTilePosition(), true);
 									//System.out.println("지으라고 한곳 ==>>>> " + );
