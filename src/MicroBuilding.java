@@ -69,7 +69,8 @@ public class MicroBuilding extends MicroManager {
 		}else{
 			halfway = new Position((SC.getX()*5+2048)/6, (SC.getY()*5+2048)/6);
 		}
-		Position halfwaychecker = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
+		
+		//Position halfwaychecker = new Position((SC.getX()+2048)/2, (SC.getY()+2048)/2);
 		
 		for (Unit flyBuilding : Buildings) {
 			if (!CommonUtils.executeUnitRotation(flyBuilding, LagObserver.groupsize())) {
@@ -145,17 +146,18 @@ public class MicroBuilding extends MicroManager {
 						GoalPos = flyBuilding.getPosition();
 					}
 				}
-				if(flyBuilding.getDistance(leader) > 350){
-					GoalPos = LeaderPos;
-				}
-				if(LeaderPos.getDistance(order.getPosition()) > halfwaychecker.getDistance(order.getPosition())){
-					GoalPos = halfway;
-				}
 				
 				if(closestTarget != null){
 					if(closestTarget.getUnit().isVisible() == false){
 						GoalPos = closestTarget.getLastPosition();
 					}
+				}
+				
+				if(flyBuilding.getDistance(leader) > 350){
+					GoalPos = LeaderPos;
+				}
+				if(LeaderPos.getDistance(order.getPosition()) > SC.getDistance(order.getPosition())){
+					GoalPos = halfway;
 				}
 				
 				if(LeaderPos.getDistance(order.getPosition()) < flyBuilding.getDistance(order.getPosition())){
