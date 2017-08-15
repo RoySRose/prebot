@@ -204,7 +204,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, MicroSet.Vulture.spiderMineNumPerGoodPosition);
 			if (minePosition == null && order.getType() == SquadOrderType.WATCH) {
 //				// 적 유닛에게 마인 선물하기
-//				if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran && saveUnitLevel == 0) {
+//				if (InformationManager.Instance().enemyRace == Race.Terran && saveUnitLevel == 0) {
 //					minePosition = SpiderMineManger.Instance().enemyPositionToMine(vulture, enemiesInfo);
 //				}
 				// 맵 구석구석 마인 심기

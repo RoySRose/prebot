@@ -188,7 +188,7 @@ public class MechanicMicroDecision {
 						return MechanicMicroDecision.makeDecisionToDoNothing();
 					}
 				}
-				if (saveUnitLevel == 0 || MyBotModule.Broodwar.enemy().getRace() != Race.Terran) {
+				if (saveUnitLevel == 0 || InformationManager.Instance().enemyRace != Race.Terran) {
 					return MechanicMicroDecision.makeDecisionToChange();
 				}
 				return MechanicMicroDecision.makeDecisionToDoNothing();

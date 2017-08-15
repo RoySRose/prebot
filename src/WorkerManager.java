@@ -1,6 +1,4 @@
-
 import java.util.Iterator;
-import java.util.List;
 
 import bwapi.Color;
 import bwapi.Position;
@@ -9,7 +7,6 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import bwta.BaseLocation;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
@@ -123,18 +120,19 @@ public class WorkerManager {
 			
 			//1.3 추가 건물짓고 있을떄 일꾼 에너지 20이하이면 idle
 			// if its job is Build
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build)
-			{
-				// 대상이 파괴되었거나, 수리가 다 끝난 경우
-				//1.3 일꾼 에너지가 20이하일떄 idle 변경
-				if(worker.getHitPoints() < 20)
-				{
-//					worker.cancelConstruction();
-					
-					worker.haltConstruction();
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
-				}
-			}
+//			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build)
+//			{
+//				// 대상이 파괴되었거나, 수리가 다 끝난 경우
+//				//1.3 일꾼 에너지가 20이하일떄 idle 변경
+//				if(worker.getHitPoints() < 20)
+//				{
+////					worker.cancelConstruction();
+//					
+//					
+//					worker.haltConstruction();
+//					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
+//				}
+//			}
 			
 			//1.3 추가  공격하고 있을떄 일꾼 에너지 20이하이면 idle
 			// if its job is Build
@@ -185,74 +183,32 @@ public class WorkerManager {
 				}
 				if(!existNearRefinery)
 					return;
-				// get the number of workers currently assigned to it
+				
 				int numRefAssigned = workerData.getNumAssignedWorkers(unit);
 				
-			
 				//미네랄 일꾼과 가스 일꾼과의 밸런스
 				if(MyBotModule.Broodwar.getFrameCount() < 8000){
-					//미네랄 일꾼과 가스 일꾼과의 밸런스
-					int totalMinerals = MyBotModule.Broodwar.self().minerals();
-					int totalGas = MyBotModule.Broodwar.self().gas();
-					
-					//미네랄 200 이하 가스 100이상 
-					if((totalMinerals < 200 && totalGas > 100)
-							&& (numResourceAssigned+numRefAssigned) <= 10){
-						for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
-							Unit worker = it.next();
-							if (workerData.workerRefineryMap.containsKey(worker.getID())) {
-								workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
-							}
-						}
-						return;
-					}
-					if(totalMinerals > 500 && totalGas < 200){
-						if(Config.WorkersPerRefinery - numRefAssigned < 0){
+//					System.out.println("numResourceAssigned: " + numResourceAssigned + ", numRefAssigned: " + numRefAssigned);
+					if(numResourceAssigned <= 7){
+						for (int i = 0; i<(7 - numResourceAssigned); ++i){				
 							for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
 								Unit worker = it.next();
 								if (workerData.workerRefineryMap.containsKey(worker.getID())) {
+									if(worker.isCarryingGas()){
+										continue;
+									}
 									workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
+									break;
 								}
-								return;
 							}
 						}
-						for (int i = 0; i<(Config.WorkersPerRefinery - numRefAssigned); ++i){				
+					}else{
+						int correction = numResourceAssigned - 7;
+						for (int i = 0; i<(Config.WorkersPerRefinery - numRefAssigned) && i < correction; ++i){				
 							Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
 							if (gasWorker != null && !gasWorker.isCarryingGas())
 							{
 								workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
-							}
-						}
-					// if it's less than we want it to be, fill 'er up
-					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-					}else{ 
-						int needWorker = 3 - (10 - (numResourceAssigned+numRefAssigned) );
-						if(needWorker > 3){
-							needWorker = 3;
-						}else if(needWorker < 0){
-							needWorker = 0;
-						}
-						if(needWorker > numRefAssigned){
-							/*Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
-							if (gasWorker != null)
-							{
-								workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
-							}*/
-							//2마리 할당되는 이슈있어서 한번에 할당되도록 변경.
-							for (int i = numRefAssigned; i<=needWorker; i++){				
-								Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
-								if (gasWorker != null && !gasWorker.isCarryingGas())
-								{
-									workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
-								}
-							}
-						}else if(needWorker < numRefAssigned){
-							for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
-								Unit worker = it.next();
-								if (workerData.workerRefineryMap.containsKey(worker.getID())) {
-									workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
-									return;
-								}
 							}
 						}
 					}
@@ -405,12 +361,7 @@ public class WorkerManager {
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
-				if(MyBotModule.Broodwar.getFrameCount() > 6000){
-					if(isCheckEnemy(unit)){
-						continue;
-					}
-				}
-				if(unit.isFlying() && MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+				if(unit.isFlying() && InformationManager.Instance().enemyRace == Race.Terran){
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
@@ -569,15 +520,11 @@ public class WorkerManager {
 		{
 			if (unit == null) continue;
 
-			if (unit.getType().isResourceDepot()
-					&& (unit.isCompleted() || unit.getType() == UnitType.Zerg_Lair || unit.getType() == UnitType.Zerg_Hive) 
-					&& unit.isLifted() == false)
+			if (unit.getType().isResourceDepot() && unit.isCompleted()&& unit.isLifted() == false)
 			{
 				if (workerData.depotHasEnoughMineralWorkers(unit) == false) {
-					if(MyBotModule.Broodwar.getFrameCount() > 6000){
-						if(isCheckEnemy(unit) == true){
-							continue;
-						}
+					if(isCheckEnemy(unit) == true){
+						continue;
 					}
 					double distance = unit.getDistance(worker);
 					if (closestDistance > distance) {
@@ -597,11 +544,6 @@ public class WorkerManager {
 				if (unit.getType().isResourceDepot())
 				{
 					if (workerData.getMineralsNearDepot(unit) > 0) {
-						if(MyBotModule.Broodwar.getFrameCount() > 6000){
-							if(isCheckEnemy(unit) == true){
-								continue;
-							}
-						}
 						double distance = unit.getDistance(worker);
 						if (closestDistance > distance) {
 							closestDepot = unit;
@@ -618,11 +560,6 @@ public class WorkerManager {
 				if (unit == null) continue;
 				if (unit.getType().isResourceDepot())
 				{
-					if(MyBotModule.Broodwar.getFrameCount() > 6000){
-						if(isCheckEnemy(unit) == true){
-							continue;
-						}
-					}
 					double distance = unit.getDistance(worker);
 					if (closestDistance > distance) {
 						closestDepot = unit;
@@ -664,10 +601,8 @@ public class WorkerManager {
 	
 	public boolean isCheckEnemy(Unit depot)
 	{
-		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-		//본진일때는 무조건 false
-		if (myBaseLocation == null || (depot.getTilePosition().getX() == BlockingEntrance.Instance().startingX 
-				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().startingY )){
+		if (depot.getTilePosition().getX() == BlockingEntrance.Instance().startingX 
+				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().startingY ){
 				return false;
 			}
 			
@@ -746,15 +681,20 @@ public class WorkerManager {
 			// worker 가 2개 이상이면, avoidWorkerID 는 피한다
 			if (workerData.getWorkers().size() >= 2 && avoidWorkerID != 0 && unit.getID() == avoidWorkerID) continue;
 
-			//1.3 worker 에너지 20이이하면 다시 추출안한다.
-//			if(unit.getHitPoints() < 20)
-//				continue;
+			
 			
 			// Move / Idle Worker
 			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle))
 			{
+				
+				
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
+				//1.3 worker 에너지 20이이하면 다시 추출안한다.
+				if(unit.getHitPoints() < 20){
+					distance += 200;
+				}
+				
 				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {

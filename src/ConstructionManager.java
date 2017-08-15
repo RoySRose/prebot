@@ -132,7 +132,8 @@ public class ConstructionManager {
 	    }
 	    */
 	    
-	    validateWorkersAndBuildings();          
+	    validateWorkersAndBuildings();  
+	    haltConstructionBuildings();
 	    assignWorkersToUnassignedBuildings();       
 	    checkForStartedConstruction();              
 	    constructAssignedBuildings();               
@@ -140,6 +141,32 @@ public class ConstructionManager {
 	    checkForCompletedBuildings();           
 		checkForDeadlockConstruction();			
 		checkConstructionBuildings();
+	}
+
+	public void haltConstructionBuildings()
+	{
+		for (ConstructionTask b : constructionQueue)
+		{
+			// if a terran building whose worker died mid construction, 
+			// send the right click command to the buildingUnit to resume construction			
+			if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal()) {
+
+				if (b.getBuildingUnit().isCompleted()) continue;
+//				//건설중인 일꾼 에너지 20이하로 idle 되었으나 여기선 되지 않아 건물 재건설 안하는 현상 발생
+//				//여기 할당된 워커 null로 변경
+//				if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
+//					b.setConstructionWorker(null);
+//				}
+				Unit worker = b.getConstructionWorker() ;
+				if(worker!= null){
+					if(worker.isUnderAttack() && worker.getHitPoints() < 20){
+						worker.haltConstruction();
+						WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
+						b.setConstructionWorker(null);
+					}
+				}
+			}
+		}
 	}
 
 	/// 건설 진행 도중 (공격을 받아서) 건설하려던 건물이 파괴된 경우, constructionQueue 에서 삭제합니다
@@ -448,27 +475,22 @@ public class ConstructionManager {
 				if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal()) {
 
 					if (b.getBuildingUnit().isCompleted()) continue;
-					//건설중인 일꾼 에너지 20이하로 idle 되었으나 여기선 되지 않아 건물 재건설 안하는 현상 발생
-					//여기 할당된 워커 null로 변경
-					if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
-						b.setConstructionWorker(null);
-					}
+//					//건설중인 일꾼 에너지 20이하로 idle 되었으나 여기선 되지 않아 건물 재건설 안하는 현상 발생
+//					//여기 할당된 워커 null로 변경
+//					if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
+//						b.setConstructionWorker(null);
+//					}
 					if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
 				
 						//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
 						/*
 						 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
 						 */
-						if((CombatManager.Instance().FastZealotInOurBase > 0 || CombatManager.Instance().FastZerglingsInOurBase >0) 
-								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks 
-								|| b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot || b.getBuildingUnit().getType() == UnitType.Terran_Factory)){
-							continue;
-						} 
-						if(MyBotModule.Broodwar.getFrameCount() > 6000){
-							if(WorkerManager.Instance().isCheckEnemy(b.getBuildingUnit())){
-								continue;
-							}
-						}
+//						if(( CombatManager.Instance().FastZerglingsInOurBase >0) 
+//								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks 
+//								|| b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot || b.getBuildingUnit().getType() == UnitType.Terran_Factory)){
+//							continue;
+//						} 
 						// grab a worker unit from WorkerManager which is closest to this final position	
 						Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
 	
@@ -638,7 +660,7 @@ public class ConstructionManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			// 건설중인 건물의 경우 공격 받고 있고 에너지가 100밑이면 건설 취소 
-			if (unit.getType().isBuilding() && unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100)
+			if (unit.getType().isBuilding() && unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100 && unit.getHitPoints() < unit.getType().maxHitPoints()*0.1)
 			{
 				unit.cancelConstruction();
 				cancelConstructionTask(unit.getType(), unit.getTilePosition());

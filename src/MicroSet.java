@@ -75,14 +75,14 @@ public class MicroSet {
 		public static final int SIEGE_ARRANGE_DISTANCE_ADJUST_TERRAN = 20;
 		
 		public static final int getSiegeArrangeDistance() {
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Terran) {
 				return SIEGE_ARRANGE_DISTANCE_TERRAN;
 			}
 			return SIEGE_ARRANGE_DISTANCE;
 		}
 		
 		public static final int getSiegeArrangeDistanceAdjust() {
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Terran) {
 				return SIEGE_ARRANGE_DISTANCE_ADJUST_TERRAN;
 			}
 			return SIEGE_ARRANGE_DISTANCE_ADJUST;
@@ -91,7 +91,7 @@ public class MicroSet {
 	
 	public static class Common {
 		public static final boolean versusMechanicSet() {
-			if (MyBotModule.Broodwar.enemy().getRace() != Race.Terran) {
+			if (InformationManager.Instance().enemyRace != Race.Terran) {
 				return false;
 			} else {
 				return true;

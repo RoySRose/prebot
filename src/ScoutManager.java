@@ -192,7 +192,7 @@ public class ScoutManager{
 
 				if (firstBuilding != null)
 				{
-					if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg){
+					if(InformationManager.Instance().enemyRace == Race.Zerg){
 						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 14){
 							return;
 						}

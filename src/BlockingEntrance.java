@@ -94,7 +94,7 @@ public class BlockingEntrance {
 			int [] fix_supplyYY = {10,0,17,66,105,110,102,54};
 			fix_supplyY = fix_supplyYY;
 			//입막용 11시 부터 시계방향으로 세팅
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
 				int [] first_suppleXX_array = {29,55,100,102,99,55,12,24};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
 				int [] first_suppleYY_array = {19,26,23,61,100,94,97,55};
@@ -142,7 +142,7 @@ public class BlockingEntrance {
 			fix_supplyX = fix_supplyXX;
 			int [] fix_supplyYY = {0,37,118,74};
 			fix_supplyY = fix_supplyYY;
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
 				int [] first_suppleXX_array = {81,119,57,10};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
 				int [] first_suppleYY_array = {6,53,106,61};
@@ -193,7 +193,7 @@ public class BlockingEntrance {
 			fix_supplyX = fix_supplyXX;
 			int [] fix_supplyYY = {15,17,118,102};
 			fix_supplyY = fix_supplyYY;
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
 				int [] first_suppleXX_array = {10,97,117,22};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
 				int [] first_suppleYY_array = {26,5,120,118};
@@ -345,7 +345,7 @@ public class BlockingEntrance {
 	}
 	
 	public void CheckBlockingPosition() {
-		if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss || MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+		if(InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if(unit.getType() == UnitType.Terran_Supply_Depot){
 					//System.out.println("unit.getTilePosition().getX() ==>> " + unit.getTilePosition().getX() + "  //  unit.getTilePosition().getY() ==>> " +unit.getTilePosition().getY());

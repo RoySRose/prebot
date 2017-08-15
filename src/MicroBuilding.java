@@ -64,7 +64,7 @@ public class MicroBuilding extends MicroManager {
 		
 		Position halfway = null;
 		Chokepoint SC = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
-		if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+		if(InformationManager.Instance().enemyRace == Race.Terran) {
 			halfway = new Position((SC.getX()*3+2048)/4, (SC.getY()*3+2048)/4);
 		}else{
 			halfway = new Position((SC.getX()*5+2048)/6, (SC.getY()*5+2048)/6);
