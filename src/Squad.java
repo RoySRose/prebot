@@ -373,19 +373,19 @@ public class Squad {
 	
 	private void updateDefenseSquad() {
 		List<UnitInfo> nearbyEnemiesInfo = new ArrayList<>();
-//		for (Unit vulture : microVulture.getUnits()) {
-//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, vulture.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Vulture.sightRange());
-//		}
-//		for (Unit tank : microTank.getUnits()) {
-//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, tank.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode.sightRange());
-//		}
-//		for (Unit goliath : microGoliath.getUnits()) {
-//			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, goliath.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Goliath.sightRange());
-//		}
-//		InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
-		if (order.getType() == SquadOrderType.DEFEND) {
-			InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
+		if (MicroSet.Common.versusMechanicSet()) {
+			for (Unit vulture : microVulture.getUnits()) {
+				InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, vulture.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Vulture.sightRange());
+			}
+			for (Unit tank : microTank.getUnits()) {
+				InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, tank.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode.sightRange());
+			}
+			for (Unit goliath : microGoliath.getUnits()) {
+				InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, goliath.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Goliath.sightRange());
+			}
+			
 		}
+		InformationManager.Instance().getNearbyForce(nearbyEnemiesInfo, order.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 		
 		mechanicVulture.prepareMechanic(order, nearbyEnemiesInfo);
 		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), 1, true);
