@@ -83,7 +83,7 @@ public class BlockingEntrance {
 	}*/
 	
 
-	public void SetBlockingPosition() {
+	public void SetBlockingPosition() { 
 		Config.BuildingSpacing = 0;
 		Config.BuildingResourceDepotSpacing = 0;
 		//헌터
@@ -143,13 +143,13 @@ public class BlockingEntrance {
 			int [] fix_supplyYY = {0,37,118,74};
 			fix_supplyY = fix_supplyYY;
 			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
-				int [] first_suppleXX_array = {81,119,57,10};//private static intnew int []
+				int [] first_suppleXX_array = {78,117,54,13};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
-				int [] first_suppleYY_array = {6,53,106,61};
+				int [] first_suppleYY_array = {6,51,106,61};
 				first_suppleY_array = first_suppleYY_array;
-				int [] second_suppleXX_array= {78,117,54,13};
+				int [] second_suppleXX_array= {81,119,57,10};
 				second_suppleX_array = second_suppleXX_array;
-				int [] second_suppleYY_array = {6,51,106,61};
+				int [] second_suppleYY_array = {6,53,106,61};
 				second_suppleY_array = second_suppleYY_array;
 				int [] barrackXX_array = {76,113,52,14};
 				barrackX_array = barrackXX_array;
@@ -194,13 +194,13 @@ public class BlockingEntrance {
 			int [] fix_supplyYY = {15,17,118,102};
 			fix_supplyY = fix_supplyYY;
 			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
-				int [] first_suppleXX_array = {10,97,117,22};//private static intnew int []
+				int [] first_suppleXX_array = {7,100,118,28};//private static intnew int []
 				first_suppleX_array = first_suppleXX_array;
-				int [] first_suppleYY_array = {26,5,120,118};
+				int [] first_suppleYY_array = {26,7,100,121};
 				first_suppleY_array = first_suppleYY_array;
-				int [] second_suppleXX_array= {7,100,124,8};
+				int [] second_suppleXX_array= {10,97,120,22};
 				second_suppleX_array = second_suppleXX_array;
-				int [] second_suppleYY_array = {26,7,113,119};
+				int [] second_suppleYY_array = {26,5,98,118};
 				second_suppleY_array = second_suppleYY_array;
 				int [] barrackXX_array = {4,102,114,24};
 				barrackX_array = barrackXX_array;
