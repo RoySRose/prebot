@@ -1459,14 +1459,12 @@ public class CombatManager {
 			if (!CommandUtil.IsValidUnit(unit)) {
 				continue;
 			}
-			if(StrategyManager.Instance().BuildingGO == true){
-		        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
-					squadData.assignUnitToSquad(unit, buildingSquad);// 
-					
-					//여기서 각 유닛별 order를 지정한다. by insaneojw
-					//setUnitOrder(unitId, order)
-		        }
-			}
+	        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
+				squadData.assignUnitToSquad(unit, buildingSquad);// 
+				
+				//여기서 각 유닛별 order를 지정한다. by insaneojw
+				//setUnitOrder(unitId, order)
+	        }
 	    }
 
 		BaseLocation temp= InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);

@@ -491,9 +491,7 @@ public class Squad {
 			} else if (unit.getType() == UnitType.Terran_Science_Vessel) {
 				vesselUnits.add(unit);
 			} else if ((unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && unit.isLifted()){
-				if(StrategyManager.Instance().BuildingGO == true){
-					buildingUnits.add(unit);
-				}
+				buildingUnits.add(unit);
 			}
 		}
 

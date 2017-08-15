@@ -460,7 +460,7 @@ public class RespondToStrategy {
 		
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			need_valkyrie = true;
-			max_valkyrie = 5;
+			max_valkyrie = 4;
 		}else{
 			need_valkyrie = false;
 			max_valkyrie = 0;
