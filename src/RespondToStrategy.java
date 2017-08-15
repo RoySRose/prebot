@@ -2,10 +2,9 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Race;
-import bwapi.Region;
-import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 
@@ -335,7 +334,7 @@ public class RespondToStrategy {
 					//입구 막혔으면 이미 한마리가 있음
 				}else{
 					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) == 0){
-						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+						if(StrategyManager.Instance().LiftChecker == false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							}
@@ -465,6 +464,14 @@ public class RespondToStrategy {
 			need_valkyrie = false;
 			max_valkyrie = 0;
 		}
+		
+//		if(MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost) == 1){
+//			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+//				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+//					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+//				}
+//			}
+//		}
 		
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_Mutal ||
                 StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany ||

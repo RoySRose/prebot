@@ -387,18 +387,18 @@ public class WorkerManager {
 				
 				if((InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran)){
 					if(unit.isFlying() == true){
-						break;
+						continue;
 					}
 					if(unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot){
 						if(unit.getHitPoints() > unit.getType().maxHitPoints()* 0.9){
-							break;
+							continue;
 						}
 					}
 				}
 				else if(unit.getType() == UnitType.Terran_Bunker){
 				
 				}else{
-					break;
+					continue;
 				}
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
