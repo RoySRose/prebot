@@ -180,13 +180,14 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_Marine);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,false);
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Machine_Shop);
-				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+				//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Vulture);
-				queueBuild(true, UnitType.Terran_Factory);
+				//queueBuild(true, UnitType.Terran_Factory);
 				queueBuild(true, UnitType.Terran_Armory);
 //			}
 //			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){

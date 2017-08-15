@@ -1112,7 +1112,12 @@ public class CombatManager {
 								break;
 							}
 						}else{
-							if(k > (int)(2+enemyUnitsInRegion.size()*3)){
+							int marine = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
+							int bunker = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Bunker);
+							if(marine>1 && bunker>0){
+								marine+=1;
+							}
+							if(k > (int)((enemyUnitsInRegion.size()-marine)*2)){
 								break;
 							}
 						}

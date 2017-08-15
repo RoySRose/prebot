@@ -443,6 +443,7 @@ public class RespondToStrategy {
 		}
 	}
 		
+	boolean expanchcker = false;
 	public void RespondVsZerg() {	
 		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_PrepareLurker
@@ -482,6 +483,29 @@ public class RespondToStrategy {
 		}
 		
 		
+		if(expanchcker==false){
+			BaseLocation enemyMainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+			
+			if(enemyMainbase != null && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1 && StrategyManager.Instance().getFacUnits() >= 25){
+				
+				
+				BaseLocation enemyFEbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+				List<BaseLocation> enemybases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+				
+				for(BaseLocation check : enemybases){
+					if(enemyFEbase.equals(check)){
+						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+							expanchcker = true;
+							
+						}
+					}
+				}
+			}
+			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==2)
+				expanchcker = true;
+		}
 	}
 		
 		
