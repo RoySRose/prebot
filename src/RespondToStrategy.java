@@ -460,13 +460,17 @@ public class RespondToStrategy {
 		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
 			need_valkyrie = true;
 			max_valkyrie = 5;
-			max_turret_to_mutal = 4;
 		}else{
 			need_valkyrie = false;
 			max_valkyrie = 0;
-			if(AnalyzeStrategy.Instance().mutalStrategy){
-				max_turret_to_mutal = 4;
-			}
+		}
+		
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_Mutal ||
+                StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany ||
+                        StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_HydraMutal ||
+                                StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_LingMutal)
+		{
+			max_turret_to_mutal = 3;
 		}
 	
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_OnLyLing){
@@ -914,7 +918,7 @@ public class RespondToStrategy {
 			     			 //System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
 			     			//System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);
 			     			 //터렛은 3~5개
-			     			 if(build_turret_cnt < max_turret_to_mutal-1)
+			     			 if(build_turret_cnt < max_turret_to_mutal)
 			     			 {
 			     				 /*System.out.println("max_turret_to_mutal ==>>>>  " + (max_turret_to_mutal-1));
 			     				System.out.println("build_turret_cnt ==>>>>  " + build_turret_cnt);*/
