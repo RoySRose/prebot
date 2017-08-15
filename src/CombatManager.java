@@ -1061,7 +1061,7 @@ public class CombatManager {
                 bestDist = dist;
             }
 			if(photonRush){
-				if (target.getType() == InformationManager.Instance().getAdvancedRushBuildingType(MyBotModule.Broodwar.enemy().getRace())) {
+				if (target.getType() == InformationManager.Instance().getAdvancedRushBuildingType(InformationManager.Instance().enemyRace)) {
 					if(target.isCompleted()){
 						photonCnt = 0;
 						break;

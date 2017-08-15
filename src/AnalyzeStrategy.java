@@ -19,6 +19,8 @@ public class AnalyzeStrategy {
 	int CarrierStrategyToBasicOnTime;
 	public Boolean hydraStrategy;
 	public Boolean mutalStrategy;
+	public Boolean randomchecker;
+	
 	
 	private static AnalyzeStrategy instance = new AnalyzeStrategy();
 
@@ -33,6 +35,7 @@ public class AnalyzeStrategy {
 		hydraStrategy = false;
 		mutalStrategy = false;
 		MutalStrategyOnTimeChecker = false;
+		randomchecker =true;
 	}
 	
 	public void AnalyzeEnemyStrategy() {
@@ -43,15 +46,20 @@ public class AnalyzeStrategy {
 //			BlockingEntrance.Instance().ReturnBuildSpacing();
 //		}
 		
+		if(randomchecker == true && MyBotModule.Broodwar.enemy().getRace() ==Race.Unknown && InformationManager.Instance().enemyRace != Race.Unknown){
+			AnalyzeEnemyStrategyInit();
+			randomchecker = false;
+		}
 		
 		// 최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행
-		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+		if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			AnalyzeVsProtoss();
-		} else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+		} else if (InformationManager.Instance().enemyRace == Race.Terran) {
 			AnalyzeVsTerran();
 		} else {
 			AnalyzeVsZerg();
 		}
+		
 		
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.LostTemple){
@@ -94,9 +102,9 @@ public class AnalyzeStrategy {
 		// 최초 각 종족별 Basic 세팅
 		// Exception 은기본 init 처리
 		StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
-		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+		if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.protossBasic);
-		} else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+		} else if (InformationManager.Instance().enemyRace == Race.Terran) {
 			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.terranBasic);
 		} else {
 			StrategyManager.Instance().setCurrentStrategyBasic(StrategyManager.Strategys.zergBasic);

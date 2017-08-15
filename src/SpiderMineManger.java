@@ -86,7 +86,7 @@ public class SpiderMineManger {
 			
 			// 테란 스파이더마인 정책 적용
 
-			if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+			if (InformationManager.Instance().enemyRace == Race.Terran) {
 				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 1 * 60 * 24);
 			}
 		}
@@ -306,7 +306,7 @@ public class SpiderMineManger {
 		
 		// 해당 지역에 마인이 매설되어 있다.
 		int exactPosMineNum = MapGrid.Instance().getUnitsNear(position, MicroSet.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine).size();
-		int overlapMine = MyBotModule.Broodwar.enemy().getRace() == Race.Terran ? 2 : 1;
+		int overlapMine = InformationManager.Instance().enemyRace == Race.Terran ? 2 : 1;
 		if (exactPosMineNum >= overlapMine) {
 			return false;
 		}

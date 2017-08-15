@@ -484,7 +484,6 @@ public class BuildOrderQueue {
 
 		Object[] tempArr = queue.toArray();
 		BuildOrderItem currentItem = (BuildOrderItem)tempArr[numSkippedItems];
-		//System.out.println("BuildOrderQueue currentItem to remove is " + currentItem.metaType.getName());
 		queue.remove(currentItem);
 		
 		//assert((int)(queue.size()) < size);

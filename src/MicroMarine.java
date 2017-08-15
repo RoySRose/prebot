@@ -63,7 +63,7 @@ public class MicroMarine extends MicroManager {
 						MicroUtils.preciseKiting(marine, target, kitingOption);
 					}
 				} else {
-					if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
+					if (InformationManager.Instance().enemyRace == Race.Zerg) {
 					// if we're not near the order position, go there
 						if (marine.getDistance(mineralpos) > 30) {
 							CommandUtil.move(marine, mineralpos);

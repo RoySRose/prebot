@@ -292,7 +292,7 @@ public class MapGrid {
 		for (Unit u : unitsInRadius) {
 			if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
 				
-				if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+				if (InformationManager.Instance().enemyRace == Race.Protoss) {
 					if(u.getType() == UnitType.Protoss_Dragoon
 							|| u.getType() == UnitType.Protoss_Archon
 							|| u.getType() == UnitType.Protoss_Carrier
@@ -303,7 +303,7 @@ public class MapGrid {
 							units.add(u);
 						}
 					}
-				}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+				}else if (InformationManager.Instance().enemyRace == Race.Terran) {
 					if(u.getType() == UnitType.Terran_Missile_Turret
 							|| u.getType() == UnitType.Terran_Goliath
 							|| u.getType() == UnitType.Terran_Marine

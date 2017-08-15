@@ -28,7 +28,11 @@ public class StrategyManager {
 	
 	private boolean isInitialBuildOrderFinished;
 	
-	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
+	public boolean isInitialBuildOrderFinished() {
+		return isInitialBuildOrderFinished;
+	}
+
+		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 		// 경기 결과 파일 Save / Load 및 로그파일 Save 예제 추가를 위한 변수 및 메소드 선언
 		/// 한 게임에 대한 기록을 저장하는 자료구조
 		private class GameRecord {
@@ -403,15 +407,15 @@ public class StrategyManager {
 	}
 	
 	private int GetCurrentTotBlocked(UnitType checkunit) {
-		return  MyBotModule.Broodwar.self().allUnitCount(checkunit);
-		
-//		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-//			if (unit.getType() == UnitType.Terran_Factory && unit.isTraining()) {
-//				if(unit.getTrainingQueue() != null && unit.getTrainingQueue().size() > 0 && unit.getTrainingQueue().){
-//					cnt ++;
-//				}
-//			}
-//		}
+		int cnt = MyBotModule.Broodwar.self().allUnitCount(checkunit);
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+			if (unit.getType() == UnitType.Terran_Factory && unit.isTraining()) {
+				if(unit.getTrainingQueue().size() > 0 && unit.getTrainingQueue().get(0) == checkunit){
+					cnt ++;
+				}
+			}
+		}
+		return cnt;
 	}
 	
 	// 일꾼 계속 추가 생산
@@ -449,7 +453,7 @@ public class StrategyManager {
 			}
 			
 			int nomorescv = 65;
-			if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+			if(InformationManager.Instance().enemyRace == Race.Terran){
 				nomorescv = 60;
 			}
 			//System.out.println("maxworkerCount: " + maxworkerCount);
@@ -1598,7 +1602,7 @@ public class StrategyManager {
 	public boolean enemyExspansioning(){
 		//int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
 		List<UnitInfo> enemyCC = null;
-		enemyCC = InformationManager.Instance().getEnemyUnits(InformationManager.Instance().getBasicResourceDepotBuildingType(MyBotModule.Broodwar.enemy().getRace()));
+		enemyCC = InformationManager.Instance().getEnemyUnits(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
 		
 		for (UnitInfo target : enemyCC) {
 			if(target.isCompleted()){
@@ -1744,7 +1748,7 @@ public class StrategyManager {
 		
 		
 	
-		if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+		if(InformationManager.Instance().enemyRace == Race.Terran){
 			
 			if(unitPoint > 10 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
@@ -1930,10 +1934,10 @@ public class StrategyManager {
 				}
 				
 				if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120 && unitPoint > 65){
-					if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <=3) {
+					if(InformationManager.Instance().enemyRace == Race.Protoss && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <=3) {
 						CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
 					}
-					if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <=3) {
+					if(InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <=3) {
 						CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
 					}
 					
@@ -1957,14 +1961,24 @@ public class StrategyManager {
 		{
 			if (unit == null) continue;
 			
+			boolean standard = false;
+			
+			
+			if(getFacUnits() > 42 || (UnitPoint > 10 && getFacUnits() > 30)){
+				standard = true;
+			}
+			if(UnitPoint < -10 && getFacUnits() < 60){
+				standard = false;
+			}
+				
 			if (unit.getType() == UnitType.Terran_Armory && unit.isCompleted() && unit.canUpgrade()){
 				//Fac Unit 18 마리 이상 되면 1단계 업그레이드 시도
-				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) ==0 && getFacUnits() > 60 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons) 
+				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) ==0 && standard  && unit.canUpgrade(UpgradeType.Terran_Vehicle_Weapons) 
 						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
 					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
 					}
-				}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) ==0 && getFacUnits() > 60 && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)
+				}else if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) ==0 && standard && unit.canUpgrade(UpgradeType.Terran_Vehicle_Plating)
 						&& MyBotModule.Broodwar.self().minerals()> 100 && MyBotModule.Broodwar.self().gas()> 100){
 					if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
@@ -2054,7 +2068,7 @@ public class StrategyManager {
 		boolean air = true;
 		boolean terranBio = false;
 		
-		if(MyBotModule.Broodwar.enemy().getRace() == Race.Protoss){
+		if(InformationManager.Instance().enemyRace == Race.Protoss){
 			Current = vsProtoss;
 			Currentbool = vsProtossbool;
 			if(CurrentStrategyException == StrategyManager.StrategysException.protossException_ZealotPush
@@ -2107,7 +2121,7 @@ public class StrategyManager {
 					air = true;
 				}
 			}
-		}else if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+		}else if(InformationManager.Instance().enemyRace == Race.Terran){
 			Current = vsTerran;
 			Currentbool = vsTerranbool;
 			if(CurrentStrategyBasic == Strategys.terranBasic_Bionic){
@@ -2417,7 +2431,7 @@ public class StrategyManager {
 					if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
 						unit.lift();
 					}
-					if (MyBotModule.Broodwar.enemy().getRace() != Race.Zerg) {
+					if (InformationManager.Instance().enemyRace != Race.Zerg) {
 						if(unit.getType() == UnitType.Terran_Marine){
 							CommandUtil.move(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
 						}
@@ -2451,7 +2465,7 @@ public class StrategyManager {
 						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
 							unit.lift();
 						}
-						if (MyBotModule.Broodwar.enemy().getRace() != Race.Zerg) {
+						if (InformationManager.Instance().enemyRace != Race.Zerg) {
 							if(unit.getType() == UnitType.Terran_Marine){
 								CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
 							}
@@ -2481,7 +2495,7 @@ public class StrategyManager {
 						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
 							unit.lift();
 						}
-						if (MyBotModule.Broodwar.enemy().getRace() != Race.Zerg) {
+						if (InformationManager.Instance().enemyRace != Race.Zerg) {
 							if(unit.getType() == UnitType.Terran_Marine){
 								CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
 							}
@@ -2567,7 +2581,7 @@ public class StrategyManager {
 		thisGameRecord.myName = myName;
 		thisGameRecord.myRace = MyBotModule.Broodwar.self().getRace().toString();
 		thisGameRecord.enemyName = enemyName;
-		thisGameRecord.enemyRace = MyBotModule.Broodwar.enemy().getRace().toString();
+		thisGameRecord.enemyRace = InformationManager.Instance().enemyRace.toString();
 		thisGameRecord.enemyRealRace = InformationManager.Instance().enemyRace.toString();
 		thisGameRecord.gameFrameCount = MyBotModule.Broodwar.getFrameCount();
 		if (isWinner) {

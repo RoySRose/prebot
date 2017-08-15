@@ -29,7 +29,7 @@ public class InitialBuild {
 		
 		
 		
-		if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			
 			
 //			if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
@@ -50,7 +50,7 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_Machine_Shop);
+				queueBuild(true, UnitType.Terran_Machine_Shop);
 				queueBuildSeed(true, UnitType.Terran_Factory, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Vulture);
@@ -116,7 +116,7 @@ public class InitialBuild {
 //				queueBuild(true, UnitType.Terran_Armory, UnitType.Terran_Academy);
 //			}
 			
-		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+		}else if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			//if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);

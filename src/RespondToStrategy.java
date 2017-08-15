@@ -226,9 +226,9 @@ public class RespondToStrategy {
 		}
 		
 		//최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행 
-		if (MyBotModule.Broodwar.enemy().getRace() == Race.Protoss) {
+		if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			RespondVsProtoss();
-		}else if (MyBotModule.Broodwar.enemy().getRace() == Race.Terran) {
+		}else if (InformationManager.Instance().enemyRace == Race.Terran) {
 			RespondVsTerran();
 		}else{
 			RespondVsZerg();
