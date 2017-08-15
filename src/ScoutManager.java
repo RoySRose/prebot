@@ -324,14 +324,14 @@ public class ScoutManager{
 				        scoutUnderAttack = false;
 			        }
 					// if the scout is in the enemy region
-					if (scoutInRangeOfenemy)
+					/*if (scoutInRangeOfenemy)
 					{	
-						/*
+						
 						 * se-min.park
 						 * Buf_Fix 1.3
 						 * 욱스가 테스트가 힘들어 일꾼 공격하지 않고 바로 본진 돌도록 변경 부탁함.
 						 * 추후 확인 필요.  원복하려면 scoutUnderAttack = true; 삭제 
-						 */
+						 
 						scoutUnderAttack = true;
 						// if the worker scout is not under attack
 						if (!scoutUnderAttack){
@@ -386,8 +386,8 @@ public class ScoutManager{
 
 						// move to the enemy region
 							followPerimeter();
-			        }
-					
+			        }*/
+					followPerimeter();
 					
 				}
 			}	
