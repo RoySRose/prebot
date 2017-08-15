@@ -1,4 +1,5 @@
 import java.util.Iterator;
+import java.util.Map;
 
 import bwapi.Color;
 import bwapi.Position;
@@ -186,6 +187,7 @@ public class WorkerManager {
 				
 				int numRefAssigned = workerData.getNumAssignedWorkers(unit);
 				
+				
 				//미네랄 일꾼과 가스 일꾼과의 밸런스
 				if(MyBotModule.Broodwar.getFrameCount() < 8000){
 //					System.out.println("numResourceAssigned: " + numResourceAssigned + ", numRefAssigned: " + numRefAssigned);
@@ -193,15 +195,17 @@ public class WorkerManager {
 						for (int i = 0; i<(7 - numResourceAssigned); ++i){				
 							for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
 								Unit worker = it.next();
+								if(worker.isCarryingGas()){
+									continue;
+								}
 								if (workerData.workerRefineryMap.containsKey(worker.getID())) {
-									if(worker.isCarryingGas()){
-										continue;
+									if (workerData.workerRefineryMap.get(worker.getID()).getID() == unit.getID()){
+										workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
 									}
-									workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
-									break;
 								}
 							}
 						}
+						
 					}else{
 						int correction = numResourceAssigned - 7;
 						for (int i = 0; i<(Config.WorkersPerRefinery - numRefAssigned) && i < correction; ++i){				
@@ -213,16 +217,29 @@ public class WorkerManager {
 						}
 					}
 				}else{
-					if(Config.WorkersPerRefinery - numRefAssigned < 0){
-						for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
-							Unit worker = it.next();
-							if (workerData.workerRefineryMap.containsKey(worker.getID())) {
-								workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
-								return;
-							}
+					
+					int workerforgas = Config.WorkersPerRefinery;
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Refinery) >= 3){
+						if(unit.getResources() < 8){
+							workerforgas = 0;
 						}
 					}
-					for (int i = 0; i<(Config.WorkersPerRefinery - numRefAssigned); ++i){				
+					
+					if(workerforgas - numRefAssigned < 0){
+						for (Iterator<Unit> it = workerData.workers.iterator(); it.hasNext(); ) {
+							Unit worker = it.next();
+							if(worker.isCarryingGas()){
+								continue;
+							}
+							if (workerData.workerRefineryMap.containsKey(worker.getID())) {
+								if (workerData.workerRefineryMap.get(worker.getID()).getID() == unit.getID()){
+									workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, unit);
+									return;
+								}
+							}	
+						}
+					}
+					for (int i = 0; i<(workerforgas - numRefAssigned); ++i){				
 						Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
 						if (gasWorker != null && !gasWorker.isCarryingGas())
 						{
@@ -353,44 +370,55 @@ public class WorkerManager {
 		
 		int repairWorkCnt = workerData.workerRepairMap.size();
 		
-
+		int repairmax = 3;
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
-			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
+			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()*0.9)
 			{
-				if(unit.isFlying() && InformationManager.Instance().enemyRace == Race.Terran){
+				if(InformationManager.Instance().enemyRace == Race.Terran && unit.isFlying()){
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				setRepairWorker(repairWorker, unit);
-				break;
+				repairWorkCnt = workerData.workerRepairMap.size();
+				
+				if((InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran)){
+					if(unit.isFlying() == true){
+						break;
+					}
+					if(unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot){
+						if(unit.getHitPoints() > unit.getType().maxHitPoints()* 0.9){
+							break;
+						}
+					}
+				}
+				else if(unit.getType() == UnitType.Terran_Bunker){
+				
+				}else{
+					break;
+				}
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
 			else if (unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
-				if (unit.getType() != UnitType.Terran_SCV && unit.getType() != UnitType.Terran_Vulture && unit.getType() != UnitType.Terran_Wraith){
-//					if(unit.getType() == UnitType.Terran_Goliath){
-//						BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-//						Position myFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self()).getPosition();
-//						//본진일때는 무조건 false
-//						if (myBaseLocation != null && unit.getDistance(myBaseLocation.getPosition()) < (int)(myBaseLocation.getPosition().getDistance(myFirstExpansionLocation))){
-//							Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-//							setRepairWorker(repairWorker, unit);
-//							repairWorkCnt = workerData.workerRepairMap.size();
-//						}
-//					}else{
-					
+				if (unit.getType() == UnitType.Terran_Goliath 
+						|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode 
+						|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+						|| unit.getType() == UnitType.Terran_Science_Vessel){
 					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 					setRepairWorker(repairWorker, unit);
 					repairWorkCnt = workerData.workerRepairMap.size();
-//					}
 				}
 			}
-			if(repairWorkCnt > 3){
+			
+			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+				repairmax = 6;
+			}
+			if(repairWorkCnt > repairmax){
 				break;
 			}
 		}
@@ -421,7 +449,7 @@ public class WorkerManager {
 			}
 
 			if (worker.isCompleted() 
-				&& (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move))
+				&& (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat))
 			{
 				double dist = worker.getDistance(p);
 
