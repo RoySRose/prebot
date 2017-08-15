@@ -238,7 +238,7 @@ public class MicroUtils {
 		WeaponType targetWeapon = rangedUnit.isFlying() ? target.getType().airWeapon() : target.getType().groundWeapon();
 		
 		if ((!rangedUnit.isUnderAttack() && target.getType().isWorker())
-				|| (rangedUnit.getType() == UnitType.Terran_Vulture && MicroUtils.isFactoryUnit(target.getType()))) {
+				|| (rangedUnit.getType() == UnitType.Terran_Vulture && target.getType() == UnitType.Terran_Vulture)) {
 			haveToAttack = true;
 			
 		} else if (rangedUnit.getType() != UnitType.Terran_Vulture && MyBotModule.Broodwar.self().weaponMaxRange(rangedUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
