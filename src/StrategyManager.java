@@ -123,7 +123,6 @@ public class StrategyManager {
 	public int UnitPoint = 0;
 	public int CombatStartCase =0;
 	public int WraithTime =0;
-	public Boolean BuildingGO = false;
 	public int nomorewraithcnt=0;
 	public int CombatTime=0;
 	
@@ -288,15 +287,6 @@ public class StrategyManager {
 			executeSustainUnits();
 		}
 		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
-			if(BuildingGO == false){
-				if(CurrentStrategyException != StrategyManager.StrategysException.protossException_ZealotPush 
-						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_DragoonPush
-						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_ReadyToZealot
-						&& CurrentStrategyException != StrategyManager.StrategysException.protossException_ReadyToDragoon
-						){ 
-					BuildingGO = true;
-				}
-			}
 			executeFly();
 		}
 		
@@ -1051,7 +1041,7 @@ public class StrategyManager {
 
 		
 		if (InformationManager.Instance().enemyRace == Race.Zerg) {
-			if(LiftChecker == false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 1){
+			if(LiftChecker == false && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){
 				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
@@ -1062,8 +1052,10 @@ public class StrategyManager {
 		
 		//marine for fast zergling and zealot start
 		if(LiftChecker == false && CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0){
-			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null) == 0) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 7){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
+				}
 			}
 		}
 		//marine for fast zergling and zealot end
@@ -1167,7 +1159,7 @@ public class StrategyManager {
 		//wraith for TvT end
 		
 		//valkyrie for TvT start
-		if(RespondToStrategy.Instance().max_valkyrie > valkyriecnt && CC >=2){
+		if(RespondToStrategy.Instance().max_valkyrie > valkyriecnt && CC >2){
 			if(star == false){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
@@ -1444,12 +1436,6 @@ public class StrategyManager {
 			return;
 		}
 		
-		int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
-		int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
-		int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
-		
-		UnitType selected = null; 
-		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
@@ -1482,6 +1468,12 @@ public class StrategyManager {
 				
 				boolean eventually_vulture = true;
 				
+				int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
+				int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
+				int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
+				
+				UnitType selected = null; 
+				
 				if(Config.BuildQueueDebugYN){
 					System.out.print("currentItem : " + currentItem.metaType.getUnitType());
 				}
@@ -1499,11 +1491,10 @@ public class StrategyManager {
 							if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() &&
 									currentItem.metaType.gasPrice()+selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								return;
-//								if(Config.BuildQueueDebugYN){
-//									System.out.println("queueIn : Tank");
-//								}
-//								eventually_vulture = false;
+								if(Config.BuildQueueDebugYN){
+									System.out.println("queueIn : Tank");
+								}
+								eventually_vulture = false;
 							}
 						}
 					}else if(selected == UnitType.Terran_Goliath && goliathInTheQueue == false){
@@ -1514,11 +1505,10 @@ public class StrategyManager {
 							if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() &&
 									currentItem.metaType.gasPrice()+selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								return;
-//								if(Config.BuildQueueDebugYN){
-//									System.out.println("queueIn : Goliath");
-//								}
-//								eventually_vulture = false;
+								if(Config.BuildQueueDebugYN){
+									System.out.println("queueIn : Goliath");
+								}
+								eventually_vulture = false;
 							}
 						}
 					}
@@ -1548,11 +1538,10 @@ public class StrategyManager {
 //						}
 						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-							return;
 						}
-//						if(Config.BuildQueueDebugYN){
-//							System.out.println("queueIn : Vulture");
-//						}
+						if(Config.BuildQueueDebugYN){
+							System.out.println("queueIn : Vulture");
+						}
 					}
 				}
 			}
@@ -1883,7 +1872,7 @@ public class StrategyManager {
 				
 				if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
 					if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) <
-					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)){
+					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath) || MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) > 2){
 						CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 					}
 					//triple hatchery
@@ -1938,7 +1927,7 @@ public class StrategyManager {
 				}
 				if(CombatStartCase == 5){
 					
-					if(CombatTime < MyBotModule.Broodwar.getFrameCount() && myunitPoint < 20 && unitPoint <20){
+					if(CombatTime < MyBotModule.Broodwar.getFrameCount() && ((myunitPoint < 20 && unitPoint <20) || unitPoint < -10)){
 					
 						CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 						if(CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
@@ -1999,7 +1988,6 @@ public class StrategyManager {
 								}
 							}
 							if(energy == false){
-								MyBotModule.Broodwar.printf("dark and no comsat energy");
 								CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
 							}
 						}
