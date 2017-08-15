@@ -206,9 +206,9 @@ public class BlockingEntrance {
 				barrackX_array = barrackXX_array;
 				int [] barrackYY_array = {28,9,101,120};
 				barrackY_array = barrackYY_array;
-				int [] factoryXX_array = {11,104,118,28};
+				int [] factoryXX_array = {11,104,110,15};
 				factoryX_array = factoryXX_array;
-				int [] factoryYY_array = {16,0,98,121};
+				int [] factoryYY_array = {16,0,107,111};
 				factoryY_array = factoryYY_array;
 				int [] bunkerXX_array = {13,100,111,21};
 				bunkerX_array = bunkerXX_array;
