@@ -1883,7 +1883,7 @@ public class StrategyManager {
 				
 				if (InformationManager.Instance().enemyRace == Race.Zerg && InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) > 6) {
 					if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk,InformationManager.Instance().enemyPlayer) <
-					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)*2){
+					MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Goliath)){
 						CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 					}
 					//triple hatchery
