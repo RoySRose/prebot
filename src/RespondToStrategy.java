@@ -353,7 +353,6 @@ public class RespondToStrategy {
 			}
 		}
 		
-		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_DragoonPush
 				||StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_PhotonRush){
 			

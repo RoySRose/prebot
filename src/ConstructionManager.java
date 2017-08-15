@@ -133,7 +133,7 @@ public class ConstructionManager {
 	    */
 	    
 	    validateWorkersAndBuildings();  
-	    haltConstructionBuildings();
+	    //haltConstructionBuildings();
 	    assignWorkersToUnassignedBuildings();       
 	    checkForStartedConstruction();              
 	    constructAssignedBuildings();               

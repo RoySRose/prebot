@@ -376,7 +376,7 @@ public class WorkerManager {
 			
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
-			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
+			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()*0.9)
 			{
 				if(InformationManager.Instance().enemyRace == Race.Terran && unit.isFlying()){
 					continue;
