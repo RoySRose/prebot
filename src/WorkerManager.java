@@ -449,7 +449,7 @@ public class WorkerManager {
 			}
 
 			if (worker.isCompleted() 
-				&& (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat))
+				&& (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move))
 			{
 				double dist = worker.getDistance(p);
 
