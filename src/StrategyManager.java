@@ -737,12 +737,6 @@ public class StrategyManager {
 			
 			
 			//engineering start
-			if(unit.getType() == UnitType.Terran_Engineering_Bay){
-				engineering = true;
-			}
-			//engineering end
-			
-			//engineering start
 			if(unit.getType() == UnitType.Terran_Armory){
 				armory = true;
 			}
@@ -806,9 +800,13 @@ public class StrategyManager {
 				barrackUnit = unit;
 			}
 			//barrack end
-			if(unit.getType() == UnitType.Terran_Engineering_Bay && unit.isCompleted()){
-				engineeringcnt++;
-				engineeringUnit = unit;
+			if(unit.getType() == UnitType.Terran_Engineering_Bay){
+				
+				engineering = true;
+				if(unit.isCompleted()){
+					engineeringUnit = unit;
+					engineeringcnt++;
+				}
 			}
 			
 			
@@ -954,7 +952,7 @@ public class StrategyManager {
 		
 		//engineering start
 		if(isInitialBuildOrderFinished == true && (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints()/3))
-				&& MyBotModule.Broodwar.getFrameCount() > 12000){
+				&& MyBotModule.Broodwar.getFrameCount() > 11000){
 			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 				if(Config.BroodwarDebugYN){
@@ -1040,25 +1038,7 @@ public class StrategyManager {
 		//armory end2
 
 		
-		if (InformationManager.Instance().enemyRace == Race.Zerg) {
-			if(LiftChecker == false && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){
-				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
-					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
-					}
-				}
-			}
-		}
 		
-		//marine for fast zergling and zealot start
-		if(LiftChecker == false && CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0){
-			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 7){
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
-				}
-			}
-		}
-		//marine for fast zergling and zealot end
 		
 		
 		//battlecruiser start
@@ -1811,12 +1791,16 @@ public class StrategyManager {
 		
 	
 		if(InformationManager.Instance().enemyRace == Race.Terran){
+			int plus=0;
+			if( CurrentStrategyBasic == StrategyManager.Strategys.terranBasic_Bionic){
+				plus = 2;
+			}
 			
-			if(unitPoint > 10 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3){
+			if(unitPoint > 10 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4+plus){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			}else if(unitPoint > 0 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4){
+			}else if(unitPoint > 0 &&  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5+plus){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
-			}else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5){
+			}else if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6+plus){
 				CombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 			}
 			
