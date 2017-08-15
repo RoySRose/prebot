@@ -83,7 +83,7 @@ public class BlockingEntrance {
 	}*/
 	
 
-	public void SetBlockingPosition() {
+	public void SetBlockingPosition() { 
 		Config.BuildingSpacing = 0;
 		Config.BuildingResourceDepotSpacing = 0;
 		//헌터
