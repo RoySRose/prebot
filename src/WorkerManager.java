@@ -435,7 +435,8 @@ public class WorkerManager {
 	    double closestDist = 100000000;
 
 	    
-		if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding())
+		//if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding())
+	    if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding() && unit.getType() != UnitType.Terran_Bunker)
 	    {
 			return currentRepairWorker;
 	    }
