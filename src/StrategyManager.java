@@ -1316,7 +1316,6 @@ public class StrategyManager {
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0
 									&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop, true);
-								System.out.println("in from here");
 								break;
 							}
 						}
@@ -1444,6 +1443,12 @@ public class StrategyManager {
 			return;
 		}
 		
+		int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
+		int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
+		
+		UnitType selected = null; 
+		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit == null) continue;
@@ -1476,12 +1481,6 @@ public class StrategyManager {
 				
 				boolean eventually_vulture = true;
 				
-				int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
-				int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
-				int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
-				
-				UnitType selected = null; 
-				
 				if(Config.BuildQueueDebugYN){
 					System.out.print("currentItem : " + currentItem.metaType.getUnitType());
 				}
@@ -1499,10 +1498,11 @@ public class StrategyManager {
 							if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() &&
 									currentItem.metaType.gasPrice()+selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								if(Config.BuildQueueDebugYN){
-									System.out.println("queueIn : Tank");
-								}
-								eventually_vulture = false;
+								return;
+//								if(Config.BuildQueueDebugYN){
+//									System.out.println("queueIn : Tank");
+//								}
+//								eventually_vulture = false;
 							}
 						}
 					}else if(selected == UnitType.Terran_Goliath && goliathInTheQueue == false){
@@ -1513,10 +1513,11 @@ public class StrategyManager {
 							if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() &&
 									currentItem.metaType.gasPrice()+selected.gasPrice() < MyBotModule.Broodwar.self().gas() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								if(Config.BuildQueueDebugYN){
-									System.out.println("queueIn : Goliath");
-								}
-								eventually_vulture = false;
+								return;
+//								if(Config.BuildQueueDebugYN){
+//									System.out.println("queueIn : Goliath");
+//								}
+//								eventually_vulture = false;
 							}
 						}
 					}
@@ -1546,10 +1547,11 @@ public class StrategyManager {
 //						}
 						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+							return;
 						}
-						if(Config.BuildQueueDebugYN){
-							System.out.println("queueIn : Vulture");
-						}
+//						if(Config.BuildQueueDebugYN){
+//							System.out.println("queueIn : Vulture");
+//						}
 					}
 				}
 			}
@@ -2003,7 +2005,7 @@ public class StrategyManager {
 					}
 				}
 				
-				if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120 && unitPoint > 65){
+				if( CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120	&& unitPoint + totPoint*0.1 > 55){
 					if(InformationManager.Instance().enemyRace == Race.Protoss && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <=3) {
 						CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500*24);
 					}
