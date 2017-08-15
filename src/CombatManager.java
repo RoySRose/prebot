@@ -1408,6 +1408,12 @@ public class CombatManager {
 		return closestDefender;
 	}
 	
+	public int wraithOrderState = 0;
+	public int wraithOrderStateChangedFrame = 0;
+	public void changeWraithOrderState() {
+		this.wraithOrderState = (wraithOrderState + 1) % 4;
+		this.wraithOrderStateChangedFrame = MyBotModule.Broodwar.getFrameCount();
+	}
 	private void updateWraithSquad() {//TODO 현재는 본진 공격 용 레이스만 있음
 		Squad wraithSquad = squadData.getSquad(SquadName.WRAITH);
 		
@@ -1417,9 +1423,32 @@ public class CombatManager {
 	        }
 	    }
 		
+		Position orderPosition = null;
+		
+//		if (wraithOrderState % 2 == 1) {
+//			orderPosition = getMainAttackLocation(wraithSquad);
+//		} else
+		if (wraithOrderState == 0) {
+			BaseLocation enemyBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+			if (enemyBase != null) {
+				orderPosition = enemyBase.getPosition();
+			}
+		} else if (wraithOrderState == 2) {
+			BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
+			if (enemyFirstExpansion != null) {
+				orderPosition = enemyFirstExpansion.getPosition();
+			}
+		}
+		if (orderPosition == null) {
+			if (MyBotModule.Broodwar.getFrameCount() - wraithOrderStateChangedFrame > 15 * 24) {
+				changeWraithOrderState();
+			}
+			orderPosition = getMainAttackLocation(wraithSquad);
+		}
+		
+		
 		if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null){
-			SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getPoint()
-					, UnitType.Terran_Wraith.sightRange(), SquadName.WRAITH);
+			SquadOrder wraithOrder = new SquadOrder(SquadOrderType.ATTACK, orderPosition, UnitType.Terran_Wraith.sightRange(), SquadName.WRAITH);
 			wraithSquad.setOrder(wraithOrder);
 		}
 	}
