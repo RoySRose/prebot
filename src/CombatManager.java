@@ -200,8 +200,12 @@ public class CombatManager {
 		
 		if(ScoutDefenseNeeded){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if((unit.getType() == UnitType.Terran_Marine || (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) >= 1 &&  unit.getType() == UnitType.Terran_Bunker) || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
+				if((unit.getType() == UnitType.Terran_Marine || unit.getType() == UnitType.Terran_Vulture) && unit.isCompleted()){
 					ScoutDefenseNeeded = false;
+					Squad scoutDefenseSquad = squadData.getSquad(SquadName.SCOUT_DEFENSE);
+					if (!scoutDefenseSquad.isEmpty()) {
+					   	scoutDefenseSquad.clear();
+					}
 				}
 			}
 		}
@@ -221,6 +225,7 @@ public class CombatManager {
 				updateScoutDefenseSquad();
 			}
 			if(ScoutDefenseNeeded == false){
+				
 				updateBaseDefenseSquads();
 			}
 			gasRush = InformationManager.Instance().isGasRushed();

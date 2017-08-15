@@ -16,6 +16,7 @@ public class RespondToStrategy {
 	public boolean enemy_dark_templar;
 	public boolean enemy_lurker;
 	public boolean enemy_wraith;
+	public boolean enemy_wraithcloak;
 	
 	public boolean enemy_guardian;
 	
@@ -77,6 +78,7 @@ public class RespondToStrategy {
 		enemy_dark_templar = false;
 		enemy_lurker = false;
 		enemy_wraith = false;
+		enemy_wraithcloak = false;
 		
 		enemy_guardian = false;
 		
@@ -425,9 +427,14 @@ public class RespondToStrategy {
 			
 		}
 		
+		
+		//terranException_Wraith start
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.terranBasic_MechanicWithWraith){
+			enemy_wraith = true;
+		}
 		//terranException_Wraith start
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_WraithCloak){
-			enemy_wraith = true;
+			enemy_wraithcloak = true;
 			need_vessel = true;
 			max_vessel = 2;
 		}

@@ -49,6 +49,8 @@ public class BuildManager {
 
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
+		
+		
 		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
 		if (MyBotModule.Broodwar.getFrameCount() % 7 != 0){
 			return;
@@ -57,17 +59,15 @@ public class BuildManager {
 		if (buildQueue.isEmpty()) {
 			return;
 		}
-//		System.out.print("MainBase:" + MainBaseLocationFull);
-//		System.out.print(", FCPoint:" + FirstChokePointFull);
-//		System.out.print(", FirstEx:" + FirstExpansionLocationFull);
-//		System.out.print(", SCPoint:" + SecondChokePointFull);
-//		System.out.println(", FisrtSup:" + FisrtSupplePointFull);
+
 		
 		
 		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
 		checkBuildOrderQueueDeadlockAndInsert();
 		// Dead Lock 을 체크해서 제거한다
+		
 		checkBuildOrderQueueDeadlockAndAndFixIt();
+		
 		// Dead Lock 제거후 Empty 될 수 있다
 		if (buildQueue.isEmpty()) {
 			return;
@@ -159,7 +159,6 @@ public class BuildManager {
 							// ConstructionPlaceFinder 를 통해 건설 가능 위치를
 							// desiredPosition 주위에서 찾을 것이다
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
-
 							// std::cout << "BuildManager " +
 							// currentItem.metaType.getUnitType().getName().c_str()
 							// + " desiredPosition " + desiredPosition.x + "," +
@@ -206,6 +205,7 @@ public class BuildManager {
 					}
 					buildQueue.removeCurrentItem();
 				}
+				
 				// don't actually loop around in here
 				break;
 			}
@@ -528,7 +528,6 @@ public class BuildManager {
 				if(MainBaseLocationFull == true){
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				}else{
-					System.out.println("supply to mainbaselocation");
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
 				}
 			}

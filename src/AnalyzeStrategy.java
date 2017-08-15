@@ -601,27 +601,22 @@ public class AnalyzeStrategy {
 			selectedS = StrategyManager.Strategys.terranBasic_MechanicWithWraith;
 		}
 		
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Control_Tower,InformationManager.Instance().enemyPlayer) >= 1){
+		
+		if (RespondToStrategy.Instance().enemy_wraithcloak == false && InformationManager.Instance().getNumUnits(UnitType.Terran_Control_Tower,InformationManager.Instance().enemyPlayer) >= 1){
 			selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
 		}
 		
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)) {
-				selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
-			}
-		}
-
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			// 인비저블 유닛이 있다면 일단 클로킹 로직
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
-					&& unit.getPosition().isValid()) {
-				selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+		if (RespondToStrategy.Instance().enemy_wraithcloak == false){
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)) {
+					selectedSE = StrategyManager.StrategysException.terranException_WraithCloak;
+				}
 			}
 		}
 		
 		if (selectedSE == StrategyManager.StrategysException.terranException_WraithCloak
 				|| StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.terranException_WraithCloak ) {
-			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Academy, InformationManager.Instance().selfPlayer) >= 1) {
+			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station, InformationManager.Instance().selfPlayer) >= 1) {
 				selectedSE = StrategyManager.StrategysException.Init;
 			}
 		}
@@ -757,7 +752,7 @@ public class AnalyzeStrategy {
 			
 			selectedS = StrategyManager.Strategys.zergBasic_HydraWave;
 
-			if (cntLair >= 1) {
+			if (RespondToStrategy.Instance().enemy_lurker == false && cntLair >= 1) {
 				selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
 			}
 			hydraStrategy = true;
@@ -791,78 +786,32 @@ public class AnalyzeStrategy {
 		// mutal exception
 
 		// lurker in 조건
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			// 인비저블 유닛이 있다면 일단 럴커 대비 로직
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
-					&& unit.getPosition().isValid()) {
-				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+		if (RespondToStrategy.Instance().enemy_lurker == false){
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				// 인비저블 유닛이 있다면 일단 럴커 대비 로직
+				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
+						&& unit.getPosition().isValid()) {
+					// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.protossException_Dark);
+					selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
+				}
+			}
+			if (lurker_cnt > 0) {
 				selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
 			}
 		}
-		if (lurker_cnt > 0) {
-			selectedSE = StrategyManager.StrategysException.zergException_PrepareLurker;
-		}
+		
 
 		// 러커 out 조건
-		if (selectedSE == StrategyManager.StrategysException.zergException_PrepareLurker) {
-			BaseLocation tempBaseLocation = InformationManager.Instance()
-					.getMainBaseLocation(MyBotModule.Broodwar.self());
+		if (RespondToStrategy.Instance().enemy_lurker == false 
+				&& selectedSE == StrategyManager.StrategysException.zergException_PrepareLurker
+				||StrategyManager.Instance().getCurrentStrategyException()== StrategyManager.StrategysException.zergException_PrepareLurker) {
 
-			Region myRegion = null;
-			boolean mainBaseTurret = false;
-			boolean firstChokeTurret = false;
-			boolean secondChokeTurret = false;
-
-			if (tempBaseLocation != null) {
-				myRegion = tempBaseLocation.getRegion();
-				List<Unit> turretInRegion = MicroUtils.getUnitsInRegion(myRegion,
-						InformationManager.Instance().selfPlayer);
-
-				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
-					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at Main Base
-						// Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-						mainBaseTurret = true;
-						break;
-					}
-
-				}
-			}
-
-			if (my_first_choke != null) {
-				// myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_first_choke.getCenter(), 300);
-
-				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
-					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at First Choke
-						// Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-						firstChokeTurret = true;
-						break;
-					}
-
-				}
-			}
-
-			if (my_second_choke != null) {
-				// myRegion = BWTA.getRegion(tempChokePoint.getPoint());
-				List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(my_second_choke.getCenter(), 300);
-
-				for (int turret_cnt = 0; turret_cnt < turretInRegion.size(); turret_cnt++) {
-					if (turretInRegion.get(turret_cnt).getType().equals(UnitType.Terran_Missile_Turret)) {
-						// System.out.println("Turret Exists at First Choke
-						// Point !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-						firstChokeTurret = true;
-						break;
-					}
-
-				}
-			}
-			if (mainBaseTurret && firstChokeTurret && secondChokeTurret) {
+			boolean mainBaseTurret = RespondToStrategy.Instance().mainBaseTurret;
+			boolean firstChokeTurret =  RespondToStrategy.Instance().firstChokeTurret;
+			
+			if (mainBaseTurret && firstChokeTurret) {
 				selectedSE = StrategyManager.StrategysException.Init;
-				// StrategyManager.Instance().setCurrentStrategyException(StrategyManager.StrategysException.Init);
 			}
-
 		}
 
 		//TODO 상대 업글 감지 가능?

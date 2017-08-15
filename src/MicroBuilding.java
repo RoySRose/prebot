@@ -145,16 +145,17 @@ public class MicroBuilding extends MicroManager {
 						GoalPos = flyBuilding.getPosition();
 					}
 				}
-				if(closestTarget != null){
-					if(closestTarget.getUnit().isVisible() == false){
-						GoalPos = closestTarget.getLastPosition();
-					}
-				}
 				if(flyBuilding.getDistance(leader) > 350){
 					GoalPos = LeaderPos;
 				}
 				if(LeaderPos.getDistance(order.getPosition()) > halfwaychecker.getDistance(order.getPosition())){
 					GoalPos = halfway;
+				}
+				
+				if(closestTarget != null){
+					if(closestTarget.getUnit().isVisible() == false){
+						GoalPos = closestTarget.getLastPosition();
+					}
 				}
 				
 				if(LeaderPos.getDistance(order.getPosition()) < flyBuilding.getDistance(order.getPosition())){
