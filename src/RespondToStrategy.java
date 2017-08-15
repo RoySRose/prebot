@@ -446,6 +446,14 @@ public class RespondToStrategy {
 	boolean expanchcker = false;
 	public void RespondVsZerg() {	
 		
+		if(StrategyManager.Instance().LiftChecker == false && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
+				}
+			}
+		}
+		
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_PrepareLurker
 			||StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.zergException_FastLurker){
 			enemy_lurker = true;
@@ -535,7 +543,16 @@ public class RespondToStrategy {
 		// }
 		// }
 		// }
-
+		
+		//marine for fast zergling and zealot start
+		if(StrategyManager.Instance().LiftChecker == false && CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0){
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 7){
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
+				}
+			}
+		}
+		//marine for fast zergling and zealot end
 		// enemy_dark_templar & enemy_lurker & enemy_wraith 클로킹 유닛에 대한 대비
 		// if(enemy_dark_templar || enemy_wraith || enemy_lurker ||
 		// enemy_arbiter || enemy_mutal || prepareDark){

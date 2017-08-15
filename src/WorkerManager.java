@@ -371,6 +371,13 @@ public class WorkerManager {
 		int repairWorkCnt = workerData.workerRepairMap.size();
 		
 		int repairmax = 3;
+		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+			repairmax = 6;
+		}
+		if(repairWorkCnt > repairmax){
+			return;
+		}
+		
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			
@@ -404,6 +411,8 @@ public class WorkerManager {
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
 			else if (unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints())
 			{
+				repairWorkCnt = workerData.workerRepairMap.size();
+				
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if (unit.getType() == UnitType.Terran_Goliath 
 						|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode 
@@ -415,9 +424,7 @@ public class WorkerManager {
 				}
 			}
 			
-			if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
-				repairmax = 6;
-			}
+			
 			if(repairWorkCnt > repairmax){
 				break;
 			}
