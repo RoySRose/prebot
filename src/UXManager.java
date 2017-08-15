@@ -966,13 +966,14 @@ public class UXManager {
 
 	public void drawLeaderUnitOnMap() {
 		
-		if(leader!=null){
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-			{
-				if(unit.getID() == leader.getID())
-				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + blue + "LEADER");
-			}
-		}
+//		
+//		if(leader!=null){
+//			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//			{
+//				if(unit.getID() == leader.getID())
+//				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + blue + "LEADER");
+//			}
+//		}
 	}
 	
 	/// Worker Unit 들의 상태를 Screen 에 표시합니다
