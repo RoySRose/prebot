@@ -784,21 +784,6 @@ public class MicroUtils {
 				}
 			}
 		}
-		//벌쳐는 리더가 될수 없다
-//		if(leader == null){
-//			minimumDistance = 999999;
-//			for (Unit unit : units) {
-//				if(unit == null){break;}
-//				if(unit.getType() == UnitType.Terran_Vulture){
-//					int dist = unit.getDistance(AttackLocation.getPosition());
-//					if (dist < minimumDistance) {
-//						leader = unit;
-//						minimumDistance = dist;
-//					}
-//				}
-//			}
-//		}
-		UXManager.Instance().leader = leader;
 		return leader;
 		
 	}

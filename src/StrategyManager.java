@@ -250,12 +250,8 @@ public class StrategyManager {
 		}
 		lag.estimate("5");
 		
-		if (isInitialBuildOrderFinished == true) {
-			if (MyBotModule.Broodwar.getFrameCount() % 31 == 0){// info 의 멀티 체크가 31 에 돈다 
-				executeCombat();
-			}
-		}else if(LastStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto || CurrentStrategyBasic == StrategyManager.Strategys.protossBasic_DoublePhoto){
-				executeCombat();
+		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0){// info 의 멀티 체크가 31 에 돈다 
+			executeCombat();
 		}
 		lag.estimate("6");
 		
