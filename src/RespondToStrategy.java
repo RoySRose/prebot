@@ -956,7 +956,7 @@ public class RespondToStrategy {
 				     			 
 				     			  
 				     			 
-				     			 if(build_turret_cnt < max_turret_to_mutal-1)
+				     			 if(build_turret_cnt < max_turret_to_mutal)
 				     			 {
 
 				     				//if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret, baseLocation.getPoint().toTilePosition())< 1
