@@ -109,12 +109,8 @@ public class GameCommander {
 		if(unit.getType() == UnitType.Terran_Command_Center  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
 		}
-		if(unit.getType() == UnitType.Terran_Factory  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
+		if((unit.getType() == UnitType.Terran_Factory||unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility)  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
-		}
-		
-		if((unit.getType() == UnitType.Terran_Starport ||unit.getType() == UnitType.Terran_Science_Facility)  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
-			ConstructionPlaceFinder.Instance().setTilesToAvoidAddon(unit);
 		}
 	}
 

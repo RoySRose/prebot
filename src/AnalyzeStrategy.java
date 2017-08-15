@@ -816,7 +816,7 @@ public class AnalyzeStrategy {
 
 		//TODO 상대 업글 감지 가능?
 		if(mutalStrategy == false && hydraStrategy == false && cntHatchery >= 3 && MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost)==1){
-			System.out.println("저글링 업글 상태: " + MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost));
+			//System.out.println("저글링 업글 상태: " + MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost));
 			selectedSE = StrategyManager.StrategysException.zergException_OnLyLing;
 		}
 		if(selectedSE == StrategyManager.StrategysException.zergException_OnLyLing && (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) > 5
