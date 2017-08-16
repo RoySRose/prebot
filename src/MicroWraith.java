@@ -36,170 +36,108 @@ public class MicroWraith extends MicroManager {
 	
 	private final static double wraithCheckSpeed = UnitType.Terran_Wraith.topSpeed()*8;
 	private final static int wraithCheckRadius = UnitType.Terran_Wraith.sightRange()+50;
+	private static final Integer[] WRAITH_ANGLE_LEFT = { -80, -70, -60, -50, -40, -30, -20, -10, +10, +20, +30, +40, +50, +60, +70, +80 };
+	private static final Integer[] WRAITH_ANGLE_RIGHT = { +80, +70, +60, +50, +40, +30, +20, +10, -10, -20, -30, -40, -50, -60, -70, -80 };
+	
+	private List<UnitInfo> wraithTargets = new ArrayList<>();
 //	private int attackFrame = 0;
 
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> wraiths = getUnits();
-		List<Unit> wraithTargets = MicroUtils.filterTargets(targets, true);
+//		List<Unit> wraithTargets = MicroUtils.filterTargets(targets, true);
 		
 		KitingOption kitingOption = KitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
-		kitingOption.setUnitedKiting(false);
-		kitingOption.setGoalPosition(order.getPosition());
-		kitingOption.setFleeAngle(MicroSet.FleeAngle.WIDE_ANGLE);
+		kitingOption.setUnitedKiting(true);
 		
-		boolean unitedKiting = kitingOption.isUnitedKiting();
-		Position goalPosition = kitingOption.getGoalPosition();
-		Integer[] fleeAngle = kitingOption.getFleeAngle();
+		if (order.getPosition().equals(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer))) {
+			kitingOption.setFleeAngle(WRAITH_ANGLE_LEFT);
+		} else if (order.getPosition().equals(InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer))) {
+			kitingOption.setFleeAngle(WRAITH_ANGLE_RIGHT);
+		} else {
+			kitingOption.setFleeAngle(MicroSet.FleeAngle.WIDE_ANGLE);
+		}
+		kitingOption.setGoalPosition(order.getPosition());
+		
+		wraithTargets.clear();
+		for (Unit wraith : wraiths) {
+			InformationManager.Instance().getNearbyForce(wraithTargets, wraith.getPosition(), InformationManager.Instance().enemyPlayer, UnitType.Terran_Wraith.sightRange() + 500);
+		}
+		
+		int goliathCount = 0;
+		for (UnitInfo target : wraithTargets) {
+			if (target.getType() == UnitType.Terran_Goliath) {
+				goliathCount++;
+				if (goliathCount >= 2) {
+					CombatManager.Instance().changeWraithOrderState();
+					return;
+				}
+			}
+		}
+		
 				
 		for (Unit wraith : wraiths) {
 			if (!CommonUtils.executeUnitRotation(wraith, LagObserver.groupsize())) {
 				continue;
 			}
 
-//			if (order.getType() == SquadOrderType.ATTACK && inUnityThereIsStrength(wraith)) {
-//				continue;
-//			}
-			//wraith.
-			
-			/**
-			 * 
-			 * rangedUnit은 target으로부터 회피한다.
-			 * 
-			 * @param rangedUnit
-			 * @param target
-			 * @param moveDistPerSec : 초당 이동거리(pixel per 24frame). 해당 pixel만큼의 거리를 회피지점으로 선정한다. 찾지 못했을 경우 거리를 좁힌다.
-			 * @param unitedKiting
-			 * @param goalPosition
-			 * @return
-			 */
-			//private static Position getFleePosition(Unit rangedUnit, Unit dangerous_target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
-				
-			Unit mostDangerousTarget = null;
-			double mostDangercheck = -99999;
 			UnitInfo mostDangerousBuildingTarget = null;
-			double mostDangerBuildingcheck = -99999;
+			double mostDangerBuildingCheck = -99999;
 			
-			List<Unit> dangerous_targets = null;
-			dangerous_targets = MapGrid.Instance().getUnitsNear(wraith.getPosition(), wraithCheckRadius, false, true, UnitType.Terran_Missile_Turret);
-			dangerous_targets.addAll(MapGrid.Instance().getUnitsNear(wraith.getPosition(), wraithCheckRadius, false, true, UnitType.Terran_Goliath));
+			UnitInfo mostDangerousUnitTarget = null;
+			double mostDangerUnitCheck = -99999;
 			
-			List<UnitInfo> dangerousBuildingTargets = null;
-			dangerousBuildingTargets = InformationManager.Instance().getEnemyBuildingUnitsNear(wraith, wraithCheckRadius, true, false, true);
-//			MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
-			if(dangerousBuildingTargets.size() > 0){
-				for (UnitInfo target : dangerousBuildingTargets) {
-					
-					if(target.getType() != UnitType.Terran_Missile_Turret){
-						continue;
-					}
-					
-					double temp = target.getType().airWeapon().maxRange() - target.getLastPosition().getDistance(wraith.getPosition()); 
-					if(temp > mostDangerBuildingcheck){
+			for (UnitInfo target : wraithTargets) {
+				if (target.getType() == UnitType.Terran_Missile_Turret) {
+					double temp = MyBotModule.Broodwar.enemy().weaponMaxRange(target.getType().airWeapon()) - target.getLastPosition().getDistance(wraith.getPosition()); 
+					if (temp > mostDangerBuildingCheck) {
 						mostDangerousBuildingTarget = target;
-						mostDangerBuildingcheck = temp;
+						mostDangerBuildingCheck = temp;
+					}
+				} else if (target.getType() == UnitType.Terran_Goliath) {
+					double temp = MyBotModule.Broodwar.enemy().weaponMaxRange(target.getType().airWeapon()) - target.getLastPosition().getDistance(wraith.getPosition()); 
+					if (temp > mostDangerUnitCheck) {
+						mostDangerousUnitTarget = target;
+						mostDangerUnitCheck = temp;
 					}
 				}
 			}
-			for (Unit target : dangerous_targets) {
-//					boolean pass = false;
-//					if(dangerousBuildingTargets != null){
-//						for (UnitInfo foggedtarget : dangerousBuildingTargets) {
-//							if(foggedtarget.getUnitID() == target.getID()){
-//								pass = true;
-//							}
-//						}
-//					}
-//					if(pass){
-//						continue;
-//					}
-				double temp = target.getType().airWeapon().maxRange() - target.getPosition().getDistance(wraith.getPosition()); 
-				if(temp > mostDangercheck){
-					mostDangerousTarget = target;
-					mostDangercheck = temp;
-				}
-			}
 			
-//			double adjustment = 0;
-			
-//			if(mostDangerousBuildingTarget != null && mostDangerousTarget !=null){			
-//				if(mostDangercheck < mostDangerBuildingcheck){
-//					double DimT = mostDangerousBuildingTarget.getType().dimensionUp();
-//					double DimB = mostDangerousBuildingTarget.getType().dimensionDown();
-//					double DimL = mostDangerousBuildingTarget.getType().dimensionLeft();
-//					double DimR = mostDangerousBuildingTarget.getType().dimensionRight();
-//				
-//					if(DimT < DimB){
-//						DimT = DimB;
-//					}
-//					if(DimL < DimR){
-//						DimL = DimR;
-//					}
-//					adjustment = Math.sqrt(DimT * DimT + DimL * DimL);
-//					mostDangerousTarget = null;
-//				}else{
-//					mostDangerousBuildingTarget = null;
-//					//mostDangerBuildingcheck = mostDangerousTarget;
-//				}
-//			}
+			boolean unitedKiting = kitingOption.isUnitedKiting();
+			Position goalPosition = kitingOption.getGoalPosition();
+			Integer[] fleeAngle = kitingOption.getFleeAngle();
 			
 			boolean fleeing = false;
-			if(mostDangerousBuildingTarget != null){
-				
-				//MapGrid.Instance().getUnitsNearForAir(sVessel.getPosition(), sVesselCheckRadius, false, true);
-//				double eee =  ((double)MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
-//						+ (double)wraithCheckSpeed +  (double)adjustment);
-//				System.out.println("dis : " + eee);
-//				System.out.println("Wraith ID: " + wraith.getID() + "In dangerous fogged "+ mostDangerousBuildingTarget.getType());
-//				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) 
-//						<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousBuildingTarget.getType().airWeapon())
-//						+ wraithCheckSpeed +  adjustment)	{
-				if(wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) > 350){
+			if (mostDangerousBuildingTarget != null){
+				if (wraith.getDistance(mostDangerousBuildingTarget.getLastPosition()) < 350) {
 					Position fleePosition = getFleePosition(wraith, mostDangerousBuildingTarget.getLastPosition(), (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
 					wraith.move(fleePosition);
 					fleeing = true;
-//					System.out.println("wraith current,  X:" + wraith.getX() + ", Y:" + wraith.getY());
-//					System.out.println("flee fogged building,  X:" + fleePosition.getX() + ", Y:" + fleePosition.getY());
 				}
 			}
 			
-				
-			if(fleeing == false){
-				if(mostDangerousTarget != null){
-//					double temp = 0;
-//					if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret){
-//						temp = wraithCheckSpeed * 3;
-//					}
-//					
-//					double eee =  (double) MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
-//							+ (double)wraithCheckSpeed + (double)temp;
-//					System.out.println("dis2 : " + eee);
-	//				System.out.println("Wraith ID: " + wraith.getID() + "mostDangerousTarget: "+ mostDangerousTarget.getType());
-//					if(mostDangerousTarget.isInWeaponRange(wraith) || (wraith.getDistance(mostDangerousTarget) 
-//							<= MyBotModule.Broodwar.enemy().weaponMaxRange(mostDangerousTarget.getType().airWeapon())
-//							+ wraithCheckSpeed + temp)
-//							){
-//					if(mostDangerousTarget.getType() != UnitType.Terran_Missile_Turret || mostDangerousTarget.getType() != UnitType.Terran_Goliath){
-						Position fleePosition = getFleePosition(wraith, mostDangerousTarget, (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
-						wraith.move(fleePosition);
-						fleeing = true;
-//					}
+			if (!fleeing) {
+				if(mostDangerousUnitTarget != null){
+					Position fleePosition = getFleePosition(wraith, mostDangerousUnitTarget.getLastPosition(), (int) wraithCheckSpeed, unitedKiting, goalPosition, fleeAngle);
+					wraith.move(fleePosition);
+					fleeing = true;
 				}
 			}
 			
-			if(!fleeing){
-				Unit target = getTarget(wraith, wraithTargets);
+			if (!fleeing) {
+				Unit target = getTarget(wraith);
 				if (target != null && !fleeing) {
-//					System.out.println("attacking target: " + target.getType());
-					MicroUtils.preciseKiting(wraith, target, kitingOption);
+					if (target.getType().airWeapon().damageAmount() == 0) {
+						CommandUtil.attackUnit(wraith, target);
+					} else {
+						MicroUtils.preciseKiting(wraith, target, kitingOption);
+					}
 				}else {
-					// if we're not near the order position, go there
 					if (wraith.getDistance(order.getPosition()) > order.getRadius()) {
 						CommandUtil.attackMove(wraith, order.getPosition());
 					} else {
 						if (wraith.isIdle()) {
-							//Position randomPosition = MicroUtils.randomPosition(wraith.getPosition(), squadRange);
 							CommandUtil.attackMove(wraith, order.getPosition());
 						}
 					}
@@ -209,17 +147,30 @@ public class MicroWraith extends MicroManager {
 		
 	}
 	
-	private Unit getTarget(Unit rangedUnit, List<Unit> targets) {
+	private Unit getTarget(Unit rangedUnit) {
 		Unit bestTarget = null;
 		int bestTargetScore = -999999;
 
-		for (Unit target : targets) {
-			if(target.getType() == UnitType.Terran_Missile_Turret || target.getType() == UnitType.Terran_Goliath || target.getType() == UnitType.Terran_Bunker){
+		for (UnitInfo targetInfo : wraithTargets) {
+			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+			if (target == null) {
 				continue;
 			}
-			int priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
+			if (target.getType().isBuilding() && !target.isFlying()) {
+				continue;
+			}
 			
-			int distanceScore = 0; // 거리 점수
+			if (target.getType() == UnitType.Terran_Missile_Turret
+					|| target.getType() == UnitType.Terran_Goliath
+					|| target.getType() == UnitType.Terran_Bunker) {
+				continue;
+			}
+			
+			int priorityScore = 0;
+			int distanceScore = 0;
+			
+			priorityScore = TargetPriority.getPriority(rangedUnit, target); // 우선순위 점수
+			distanceScore = 0; // 거리 점수
 			
 			if (rangedUnit.isInWeaponRange(target)) {
 				distanceScore += 100;
@@ -227,8 +178,7 @@ public class MicroWraith extends MicroManager {
 			
 			distanceScore -= rangedUnit.getDistance(target) / 5;
 			
-	        int totalScore = 0;
-        	totalScore =  priorityScore + distanceScore;
+	        int totalScore =  priorityScore + distanceScore;
 	        
 	        if (totalScore > bestTargetScore) {
 				bestTargetScore = totalScore;
@@ -240,14 +190,14 @@ public class MicroWraith extends MicroManager {
 	}
 	
 	
-	public static Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
+	public Position getFleePosition(Unit rangedUnit, Unit target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		return getFleePosition(rangedUnit, target.getPosition(), moveDistPerSec, unitedKiting, goalPosition, fleeAngle, true);
 	}
 	
-	public static Position getFleePosition(Unit rangedUnit, Position target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
+	public Position getFleePosition(Unit rangedUnit, Position target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle) {
 		return getFleePosition(rangedUnit, target, moveDistPerSec, unitedKiting, goalPosition, fleeAngle, false);
 	}
-	public static Position getFleePosition(Unit rangedUnit, Position target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle, boolean fromUnit) {
+	public Position getFleePosition(Unit rangedUnit, Position target, int moveDistPerSec, boolean unitedKiting, Position goalPosition, Integer[] fleeAngle, boolean fromUnit) {
 		int reverseX = rangedUnit.getPosition().getX() - target.getX(); // 타겟과 반대로 가는 x양
 		int reverseY = rangedUnit.getPosition().getY() - target.getY(); // 타겟과 반대로 가는 y양
 	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
@@ -295,66 +245,35 @@ public class MicroWraith extends MicroManager {
 	    return safePosition;
 	}
 
-	public static double riskOfFleePositionAir(Unit myunit, Position position, int radius, boolean united, boolean fromUnit) {
+	public double riskOfFleePositionAir(Unit myunit, Position position, int radius, boolean united, boolean fromUnit) {
 		double risk = 0;
-		
-		List<UnitInfo> dangerousBuildingTargets = null;
-		dangerousBuildingTargets = InformationManager.Instance().getEnemyBuildingUnitsNear(position, wraithCheckRadius, true, false, true);
-		
-		List<Unit> dangerous_targets = null;
-		dangerous_targets = MapGrid.Instance().getUnitsNear(position, wraithCheckRadius, false, true, UnitType.Terran_Missile_Turret);
-		dangerous_targets.addAll(MapGrid.Instance().getUnitsNear(position, wraithCheckRadius, false, true, UnitType.Terran_Goliath));
+
+		for (UnitInfo targetInfo : wraithTargets) {
+			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+			if (target == null) {
+				continue;
+			}
 			
-		if(!fromUnit){
-			for (UnitInfo enemyunits : dangerousBuildingTargets) {
-				double adjustment =0;
-				double DimT = enemyunits.getType().dimensionUp();
-				double DimB = enemyunits.getType().dimensionDown();
-				double DimL = enemyunits.getType().dimensionLeft();
-				double DimR = enemyunits.getType().dimensionRight();
-			
-				if(DimT < DimB){
-					DimT = DimB;
-				}
-				if(DimL < DimR){
-					DimL = DimR;
-				}
-				adjustment = Math.sqrt(DimT * DimT + DimL * DimL);
-				double inrange =  MyBotModule.Broodwar.enemy().weaponMaxRange(enemyunits.getType().airWeapon()) + adjustment;
-				double additionalrange = wraithCheckSpeed;						
-				double distance = position.getDistance(enemyunits.getLastPosition());
-				
-						
-				if(enemyunits.getType() == UnitType.Terran_Missile_Turret){
-					if(distance<inrange){
-						risk += 100;
-					}else{
-						risk = (additionalrange - (distance - inrange))/additionalrange * 100;
-					}
-				}
-			} 
-		}else{
-			for (Unit enemyunits : dangerous_targets) {
-				
-				double inrange =  MyBotModule.Broodwar.enemy().weaponMaxRange(enemyunits.getType().airWeapon());
-				double additionalrange = wraithCheckSpeed;		
-				double distance = enemyunits.getDistance(position);
-				//if(enemyunits.getDistance(unit) <= inrange + additionalrange){
-				if(enemyunits.getType() == UnitType.Terran_Missile_Turret
-						|| enemyunits.getType() == UnitType.Terran_Goliath
-						|| enemyunits.getType() == UnitType.Terran_Marine
-						|| enemyunits.getType() == UnitType.Terran_Wraith
-						|| enemyunits.getType() == UnitType.Terran_Marine
-						|| (enemyunits.getType() == UnitType.Terran_Bunker && enemyunits.isLoaded())
-						 ){
-					if(distance<inrange){
-						risk += 100;
-					}else{
-						risk = (additionalrange - (distance - inrange))/additionalrange * 100;
-					}
+			double inrange =  MyBotModule.Broodwar.enemy().weaponMaxRange(target.getType().airWeapon());
+			double additionalrange = wraithCheckSpeed;		
+			double distance = target.getDistance(position);
+			//if(enemyunits.getDistance(unit) <= inrange + additionalrange){
+			if(target.getType() == UnitType.Terran_Missile_Turret
+					|| target.getType() == UnitType.Terran_Goliath
+					|| target.getType() == UnitType.Terran_Marine
+					|| target.getType() == UnitType.Terran_Wraith
+					|| target.getType() == UnitType.Terran_Marine
+					|| (target.getType() == UnitType.Terran_Bunker && target.isLoaded())
+					 ){
+				if (distance < inrange) {
+					risk += 100;
+				} else {
+//					risk = (additionalrange - (distance - inrange))/additionalrange * 100;
 				}
 			}
+			
 		}
+		
 		return risk;
 	}
 }
