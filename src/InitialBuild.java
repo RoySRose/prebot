@@ -50,7 +50,7 @@ public class InitialBuild {
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Machine_Shop);
+				queueBuild(false, UnitType.Terran_Machine_Shop);
 				queueBuildSeed(true, UnitType.Terran_Factory, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Vulture);
@@ -132,7 +132,7 @@ public class InitialBuild {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,false);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);
-				queueBuild(true, UnitType.Terran_Machine_Shop);
+				queueBuild(false, UnitType.Terran_Machine_Shop);
 				queueBuild(false, UnitType.Terran_Vulture);
 				//queueBuild(false, UnitType.Terran_Siege_Tank_Tank_Mode);
 				queueBuild(false, UnitType.Terran_SCV);

@@ -554,7 +554,7 @@ public class WorkerData {
 		/*
 		 * 1.3 초기 일꾼 한마리 노는거 방지 TF 가 알려준 소스 반영 getAllUnits -> getMinerals
 		 * */
-		BaseLocation baselocation = BWTA.getNearestBaseLocation(depot.getPosition());
+		//BaseLocation baselocation = BWTA.getNearestBaseLocation(depot.getPosition());
 	    int radius = 320;
 	    for (Unit unit : MyBotModule.Broodwar.getMinerals())
 //	    for (Unit unit : MyBotModule.Broodwar.self().getUnits())

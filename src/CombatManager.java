@@ -905,6 +905,9 @@ public class CombatManager {
 	
 	public Position getBestPosition(Unit depot)
 	{
+		if(depot == null){
+			return new Position(128,128);
+		}
 		int x =0;
 		int y =0;
 		int finalx =0;
@@ -1116,6 +1119,9 @@ public class CombatManager {
 							int bunker = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Bunker);
 							if(marine>1 && bunker>0){
 								marine+=1;
+							}
+							if(marine==0){
+								marine = -5;
 							}
 							if(k > (int)((enemyUnitsInRegion.size()-marine)*2)){
 								break;
