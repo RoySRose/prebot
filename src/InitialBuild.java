@@ -56,7 +56,7 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Vulture);
-				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				queueBuildSeed(true, UnitType.Terran_Starport, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				
 //			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
@@ -129,13 +129,13 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_Marine);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,false);
+				queueBuildSeed(false, UnitType.Terran_Factory, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Vulture);
 				queueBuild(false, UnitType.Terran_Machine_Shop);
-				queueBuild(false, UnitType.Terran_Vulture);
+				//queueBuild(false, UnitType.Terran_Vulture);
 				//queueBuild(false, UnitType.Terran_Siege_Tank_Tank_Mode);
-				queueBuild(false, UnitType.Terran_SCV);
+				
 				queueBuild(false, UnitType.Terran_SCV);
 				
 				//queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
@@ -164,13 +164,17 @@ public class InitialBuild {
 //			}
 
 		}else{//저그전
-			//if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
-				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+			
+				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
+                queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
+//				queueBuild(false, UnitType.Terran_SCV);
+//				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
+//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(true, UnitType.Terran_Refinery);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
 				queueBuild(false, UnitType.Terran_SCV);
@@ -189,36 +193,6 @@ public class InitialBuild {
 				queueBuild(false, UnitType.Terran_Vulture);
 				//queueBuild(true, UnitType.Terran_Factory);
 				queueBuild(true, UnitType.Terran_Armory);
-//			}
-//			else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
-//				//헌터저그전
-//				/*
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker, bunkerPos,true);
-//				*/
-//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, firstSupplyPos,true);
-//				queueBuild(false, UnitType.Terran_SCV);
-//				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
-//				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//				queueBuild(true, UnitType.Terran_Refinery);
-//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//				queueBuild(false, UnitType.Terran_SCV);
-//				queueBuild(true, UnitType.Terran_Marine);
-//				//ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker, bunkerPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
-//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
-//				queueBuild(false, UnitType.Terran_Vulture);
-//				queueBuildSeed(true, UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-//				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//				queueBuild(true, UnitType.Terran_Machine_Shop);
-				
-//			}
 		}
 	}
 	

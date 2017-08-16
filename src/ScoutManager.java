@@ -183,7 +183,7 @@ public class ScoutManager{
 
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 				{
-					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false)
+					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false && unit.isCompleted())
 					{
 						firstBuilding = unit;
 						break;

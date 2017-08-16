@@ -546,7 +546,7 @@ public class RespondToStrategy {
 		
 		//marine for fast zergling and zealot start
 		if(StrategyManager.Instance().LiftChecker == false && CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0){
-			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 7){
+			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
 				}
