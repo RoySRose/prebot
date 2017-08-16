@@ -64,7 +64,7 @@ public class ConstructionManager {
 		ConstructionTask b = new ConstructionTask(type, desiredPosition);
 	    if (constructionQueue.contains(b))
 	    {
-	    	System.out.println("Cancel Construction " + b.getType() + " at " + b.getDesiredPosition().getX() + "," + b.getDesiredPosition().getY());
+	    	//System.out.println("Cancel Construction " + b.getType() + " at " + b.getDesiredPosition().getX() + "," + b.getDesiredPosition().getY());
 
 			if (b.getConstructionWorker() != null) {
 				WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
@@ -182,7 +182,7 @@ public class ConstructionManager {
 				// 그렇지 않으면 (아마도 전투가 벌어지고있는) 기존 위치에 다시 건물을 지으려 할 것이기 때문.
 				if (b.getBuildingUnit() == null || !b.getBuildingUnit().getType().isBuilding() || b.getBuildingUnit().getHitPoints() <= 0 || !b.getBuildingUnit().exists())
 				{
-					System.out.println("Construction Failed case . remove ConstructionTask " + b.getType());
+					//System.out.println("Construction Failed case . remove ConstructionTask " + b.getType());
 					toRemove.add(b);
 
 					if (b.getConstructionWorker() != null) {
@@ -582,7 +582,7 @@ public class ConstructionManager {
 
 					// Refinery 를 지으려는 장소를 찾을 수 없으면 dead lock
 					if (testLocation == TilePosition.None || testLocation == TilePosition.Invalid || testLocation.isValid() == false) {
-						System.out.println("Construction Dead lock case . Cann't find place to construct " + b.getType());
+						//System.out.println("Construction Dead lock case . Cann't find place to construct " + b.getType());
 						hasAvailableGeyser = false;
 					}
 					else {
@@ -594,7 +594,7 @@ public class ConstructionManager {
 							}
 						}
 						if (hasAvailableGeyser == false) {
-							System.out.println("Construction Dead lock case . Refinery Building was built already at " + testLocation.getX() + ", " + testLocation.getY());
+							//System.out.println("Construction Dead lock case . Refinery Building was built already at " + testLocation.getX() + ", " + testLocation.getY());
 						}
 					}
 

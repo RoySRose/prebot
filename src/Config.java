@@ -118,8 +118,6 @@ public class Config {
 	/// 화면 표시 여부 - 마우스 커서	
 	public static boolean DrawMouseCursorInfo = true;
 	
-	public static boolean BuildQueueDebugYN = false;
-	public static boolean BroodwarDebugYN = true;
 	
 
 	public static final Color ColorLineTarget = Color.White;

@@ -247,7 +247,6 @@ public class BlockingEntrance {
 				//System.out.println("unit.getTilePosition().getX() ==>> " + unit.getTilePosition().getX() + "  //  unit.getTilePosition().getY() ==>> " +unit.getTilePosition().getY());
 				startingX = unit.getTilePosition().getX(); //unit.getPosition().getX();// getTilePosition().getX();
 				startingY = unit.getTilePosition().getY();
-				//System.out.println("unit.getPosition().getX() ==>> " + startingX + "  //  unit.getPosition().getY() ==>> " + startingY);
 			}
 		}
 
@@ -281,39 +280,6 @@ public class BlockingEntrance {
 			}else if(startingX == 7&& startingY == 87){
 				starting_int = 3;
 			}
-			
-			
-			
-			for(BaseLocation island : InformationManager.Instance().getIslandBaseLocations()){
-				
-					int i = starting_int;
-					TilePosition test = new TilePosition(bunkerX_array[i], bunkerY_array[i]);
-					if(BWTA.getRegion(test)== island.getRegion()){
-						System.out.println(bunkerX_array[i] +", " + bunkerY_array[i] + " @!@!@!@!@ bunker is in island!!");
-					}
-					
-					test = new TilePosition(first_suppleX_array[i], first_suppleY_array[i]);
-					if(BWTA.getRegion(test)== island.getRegion()){
-						System.out.println(first_suppleX_array[i] +", " + first_suppleY_array[i] + "@!@!@!@!@ firsupple is in island!!");
-					}
-					
-					test = new TilePosition(second_suppleX_array[i], second_suppleY_array[i]);
-					if(BWTA.getRegion(test)== island.getRegion()){
-						System.out.println(second_suppleX_array[i] +", " + second_suppleY_array[i] + "@!@!@!@!@ secsupple is in island!!");
-					}
-					
-					test = new TilePosition(barrackX_array[i], barrackY_array[i]);
-					if(BWTA.getRegion(test)== island.getRegion()){
-						System.out.println(barrackX_array[i] +", " + barrackY_array[i] + "@!@!@!@!@ barrack is in island!!");
-					}
-					
-					test = new TilePosition(factoryX_array[i], factoryY_array[i]);
-					if(BWTA.getRegion(test)== island.getRegion()){
-						System.out.println(factoryX_array[i] +", " + factoryY_array[i] + "@!@!@!@!@ factory is in island!!");
-					}
-			}
-			
-			
 		}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.FightingSpririts){
 			if(startingX == 7 && startingY == 6){
 				//11시부터 시계방향
@@ -348,31 +314,19 @@ public class BlockingEntrance {
 		if(InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran){
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if(unit.getType() == UnitType.Terran_Supply_Depot){
-					//System.out.println("unit.getTilePosition().getX() ==>> " + unit.getTilePosition().getX() + "  //  unit.getTilePosition().getY() ==>> " +unit.getTilePosition().getY());
 					build_first_suppleX = unit.getTilePosition().getX(); //unit.getPosition().getX();// getTilePosition().getX();
 					build_first_suppleY = unit.getTilePosition().getY();
 					if(first_suppleX != build_first_suppleX || first_suppleY != build_first_suppleY){
-						/*System.out.println("서플 위치 다름");
-						System.out.println("supple : (" + suppleX + " , " + suppleY + ") <> (" + build_suppleX + " , " + build_suppleY + ")" );*/
 						blockingEntranceNow = false;
 					}
-					//System.out.println("unit.getPosition().getX() ==>> " + startingX + "  //  unit.getPosition().getY() ==>> " + startingY);
 				}
 				if(unit.getType() == UnitType.Terran_Barracks){
 					build_barrackX = unit.getTilePosition().getX(); //unit.getPosition().getX();// getTilePosition().getX();
 					build_barrackY = unit.getTilePosition().getY();
 					if(barrackX != build_barrackX || barrackY != build_barrackY){
-						/*System.out.println("배럭 위치 다름");
-						System.out.println("barrack : (" + barrackX + " , " + barrackY + ") <> (" + build_barrackX + " , " + build_barrackY + ")" );*/
 						blockingEntranceNow = false;
 					}
 				}
-				/*if(suppleX != build_suppleX || suppleY != build_suppleY || barrackX != build_barrackX || barrackX != build_barrackY){
-					System.out.println("입구안막힘");
-					System.out.println("supple : (" + suppleX + " , " + suppleY + ") <> (" + build_suppleX + " , " + build_suppleY + ")" );
-					System.out.println("barrack : (" + barrackX + " , " + barrackY + ") <> (" + build_barrackX + " , " + build_barrackY + ")" );
-					blockingEntrance = false;
-				}*/
 			}
 		}
 	}

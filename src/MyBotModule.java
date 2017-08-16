@@ -404,9 +404,6 @@ public class MyBotModule extends DefaultBWListener {
 		if (timeStartedAtFrame[Broodwar.getFrameCount()] == 0) {
 			timeStartedAtFrame[Broodwar.getFrameCount()] = System.currentTimeMillis();
 		}
-		if(Config.BroodwarDebugYN){
-		Broodwar.printf(player.getName() + " said \"" + text + "\"");
-		}
 		gameCommander.onReceiveText(player, text);
 	}
 	
