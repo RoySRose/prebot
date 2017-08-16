@@ -173,6 +173,7 @@ public class AnalyzeStrategy {
 								for (Unit enemy : enemyUnitsInRegion) {
 									if (enemy.getType() == UnitType.Protoss_Photon_Cannon || enemy.getType() == UnitType.Protoss_Forge) {
 										selectedS = StrategyManager.Strategys.protossBasic_DoublePhoto;
+										System.out.println("select DP 3");
 										break;
 									}
 								}
@@ -187,9 +188,14 @@ public class AnalyzeStrategy {
 				
 				BaseLocation enemyMainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 				if(enemyMainbase != null){
-					if(MyBotModule.Broodwar.getFrameCount() > 3200 && InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
-							InformationManager.Instance().enemyPlayer) == 0) {
+					if(MyBotModule.Broodwar.getFrameCount() > 3600 
+							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) == 0
+//							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) == 0
+							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Pylon,InformationManager.Instance().enemyPlayer) >= 1
+							&& MyBotModule.Broodwar.isExplored(enemyMainbase.getTilePosition())
+							) {
 						selectedS = StrategyManager.Strategys.protossBasic_DoublePhoto;
+						System.out.println("select DP 2");
 					}
 				}
 				
@@ -530,6 +536,8 @@ public class AnalyzeStrategy {
 				|| selectedSE == StrategyManager.StrategysException.protossException_DoubleNexus) {
 			if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) >= 4){
 				selectedS = StrategyManager.Strategys.protossBasic_DoublePhoto;
+
+					System.out.println("select DP 1");
 			}
 		}
 		
@@ -712,7 +720,7 @@ public class AnalyzeStrategy {
 				InformationManager.Instance().enemyPlayer);
 		int ultra_cnt = InformationManager.Instance().getNumUnits(UnitType.Zerg_Ultralisk,
 				InformationManager.Instance().enemyPlayer);
-		;
+		
 
 		
 		if(InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive, InformationManager.Instance().enemyPlayer) >=1

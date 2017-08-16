@@ -2436,6 +2436,15 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
+			if(getFacUnits() > 160){
+				if(Config.BroodwarDebugYN){
+					MyBotModule.Broodwar.printf("Build Next Expansion by unit and money");
+				}
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+				}
+			}
 		}
 	}
 
