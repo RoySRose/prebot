@@ -100,7 +100,7 @@ public class WorkerManager {
 				Unit refinery = workerData.getWorkerResource(worker);
 
 				// if the refinery doesn't exist anymore (파괴되었을 경우)
-				if (refinery == null || !refinery.exists() ||	refinery.getHitPoints() <= 0)
+				if (refinery == null || !refinery.exists() ||	refinery.getHitPoints() <= 0 || worker.isGatheringMinerals())
 				{
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
 				}
