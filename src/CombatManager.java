@@ -1632,9 +1632,6 @@ public class CombatManager {
         		// 게릴라 유닛이 남아 있다면 더 할당하지 않는다.
 				if (!guerillaSquad.getUnitSet().isEmpty()) {
 					VultureTravelManager.Instance().guerillaStart(squadName);
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("guerilla units already exist");
-					}
         		} else {
         			for (Unit assignableVulture : assignableVultures) {
     					squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
@@ -1644,16 +1641,7 @@ public class CombatManager {
     					}
     				}
         			VultureTravelManager.Instance().guerillaStart(squadName);
-        			if(Config.BroodwarDebugYN){
-        			MyBotModule.Broodwar.printf("guerilla squad created!");
-        			}
         		}
-				if(Config.BroodwarDebugYN){
-	    			MyBotModule.Broodwar.printf(" - unit size : " + guerillaSquad.getUnitSet().size());
-	    			MyBotModule.Broodwar.printf(" - position  : " + bestGuerillaSite.getPosition());
-				}
-			} else {
-				//System.out.println("not the best guerilla site");
 			}
 		}
 		
@@ -1671,9 +1659,7 @@ public class CombatManager {
 			if (MyBotModule.Broodwar.isVisible(squad.getOrder().getPosition().toTilePosition())) {
 				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroSet.Vulture.GEURILLA_RADIUS, false, true, null);
 				if (enemies.isEmpty()) {
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : no enemy");
-					}
+					
 					squad.clear();
 					continue;
 				}
@@ -1684,18 +1670,14 @@ public class CombatManager {
 				List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroSet.Vulture.GEURILLA_RADIUS, true);
 				Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
 				if (result == Result.Loss) {
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : mission impossible");
-					}
+					
 					squad.clear();
 					continue;
 				}
 
 				int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(enemiesInfo);
 				if (guerillaScore <= 0) {
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf("guerillaSquads " + squad.getName() + " clear : worthless");
-					}
+					
 					squad.clear();
 					continue;
 				}

@@ -40,9 +40,6 @@ public class LagObserver {
 			if (cost > MILLISEC_MAX_COAST) {
 				if (groupsize < groupMaxSize) {
 					groupsize++;
-					if(Config.BroodwarDebugYN){
-						MyBotModule.Broodwar.printf(String.format(LAG_RELIEVE_ADJUSTMENT, groupsize, "UP"));
-					}
 				}
 			} else {
 				if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
@@ -61,9 +58,6 @@ public class LagObserver {
 					}
 					if (!exceedTimeExist) {
 						groupsize--;
-						if(Config.BroodwarDebugYN){
-							MyBotModule.Broodwar.printf(String.format(LAG_RELIEVE_ADJUSTMENT, groupsize, "DOWN"));
-						}
 					}
 				}
 			}

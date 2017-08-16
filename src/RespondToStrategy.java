@@ -466,13 +466,13 @@ public class RespondToStrategy {
 			max_vessel = 4;
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
-			need_valkyrie = true;
-			max_valkyrie = 4;
-		}else{
-			need_valkyrie = false;
-			max_valkyrie = 0;
-		}
+//		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
+//			need_valkyrie = true;
+//			max_valkyrie = 4;
+//		}else{
+//			need_valkyrie = false;
+//			max_valkyrie = 0;
+//		}
 		
 //		if(MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost) == 1){
 //			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){

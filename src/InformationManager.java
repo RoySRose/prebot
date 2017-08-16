@@ -300,7 +300,7 @@ public class InformationManager {
 			if(gasRushed == true && gasRushEnemyRefi != null){
 				if(gasRushEnemyRefi == null || gasRushEnemyRefi.getHitPoints() <= 0 || gasRushEnemyRefi.isTargetable() == false){
 					gasRushed = false;//가스 러쉬 위험 끝
-					System.out.println("gas rush finished");
+//					System.out.println("gas rush finished");
 //					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){
 //						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 //					}

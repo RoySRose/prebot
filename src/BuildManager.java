@@ -76,8 +76,6 @@ public class BuildManager {
 		// the current item to be used
 		BuildOrderItem currentItem = buildQueue.getHighestPriorityItem();
 
-		//System.out.println("current HighestPriorityItem is " + currentItem.metaType.getName());
-
 		// while there is still something left in the buildQueue
 		while (!buildQueue.isEmpty()) {
 			boolean isOkToRemoveQueue = true;
@@ -174,11 +172,11 @@ public class BuildManager {
 								// 없는 경우인데,
 								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음
 								// frame 에 건물 지을 공간을 다시 탐색하도록 한다.
-								System.out.print("There is no place to construct " + currentItem.metaType.getUnitType()+ " strategy " + currentItem.seedLocationStrategy);
-								if (currentItem.seedLocation != null)
-									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
-								if (desiredPosition != null)
-									System.out.print(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
+//								System.out.print("There is no place to construct " + currentItem.metaType.getUnitType()+ " strategy " + currentItem.seedLocationStrategy);
+//								if (currentItem.seedLocation != null)
+//									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
+//								if (desiredPosition != null)
+//									System.out.print(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								
 								isOkToRemoveQueue = false;
 							}
@@ -200,9 +198,6 @@ public class BuildManager {
 				}
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
-					if(Config.BuildQueueDebugYN){
-						System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
-					}
 					buildQueue.removeCurrentItem();
 				}
 				
@@ -856,9 +851,6 @@ public class BuildManager {
 //											}
 //										}
 //										if(needcnt > requirecnt){		
-											if(Config.BuildQueueDebugYN){
-												System.out.println("Inserting blocked unit: " + requiredUnitType);
-											}
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
 										//}
 									}
@@ -1277,8 +1269,7 @@ public class BuildManager {
 				}
 
 				if (isDeadlockCase) {
-					System.out.println(
-							"Build Order Dead lock case . remove BuildOrderItem " + currentItem.metaType.getName());
+//					System.out.println(	"Build Order Dead lock case . remove BuildOrderItem " + currentItem.metaType.getName());
 
 					buildQueue.removeCurrentItem();
 				}
@@ -1292,7 +1283,6 @@ public class BuildManager {
 		TilePosition tp = new TilePosition(x, y);
 		if (!tp.isValid())
 		{
-			//System.out.println("Invalid");
 			return false;
 		}
 
@@ -1300,7 +1290,6 @@ public class BuildManager {
 		//if (BWAPI::Broodwar->isBuildable(x, y) == false)
 		if (MyBotModule.Broodwar.isBuildable(x, y, true) == false)
 		{
-			//System.out.println("not buildable at: " + x + ", " + y);
 			return false;
 		}
 
