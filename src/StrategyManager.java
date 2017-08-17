@@ -1210,7 +1210,11 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			}else if(Faccnt < maxFaccnt){
 				if(MyBotModule.Broodwar.self().minerals() > 200 + additonalmin && MyBotModule.Broodwar.self().gas() > 100 + additonalgas){
-					if(Faccnt <= 6){
+					if(Faccnt == 2){
+						if(getFacUnits()>24 && facFullOperating){
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+						}
+					}else if(Faccnt <= 6){
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					}else{
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory,BuildOrderItem.SeedPositionStrategy.LastBuilingPoint, false);
@@ -1426,9 +1430,6 @@ public class StrategyManager {
 					if(MyBotModule.Broodwar.self().gas() < 250){
 						minNeed = 75;
 					}
-					
-					System.out.println("selected: " + selected);
-					System.out.println("currentItem: " + currentItem.metaType.getUnitType());
 					
 					if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 						if((unit.isConstructing() == true) || ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) != 0){
@@ -1995,8 +1996,8 @@ public class StrategyManager {
 		boolean vsTerranBiobool[] = new boolean[]{VS, TS, VM, GR};
 //		MetaType vsProtoss[] = new MetaType[]{vultureMine, vultureSpeed, TankSiegeMode, GoliathRange};
 //		boolean vsProtossbool[] = new boolean[]{VM, VS, TS, GR};
-		MetaType vsProtoss[] = new MetaType[]{vultureMine, TankSiegeMode, vultureSpeed, GoliathRange};
-		boolean vsProtossbool[] = new boolean[]{VM, TS, VS, GR};
+		MetaType vsProtoss[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
+		boolean vsProtossbool[] = new boolean[]{TS, VM, VS, GR};
 		MetaType vsProtossZealot[] = new MetaType[]{vultureSpeed, vultureMine, TankSiegeMode, GoliathRange};
 		boolean vsProtossZealotbool[] = new boolean[]{VS, VM, TS, GR};
 		MetaType vsProtossDragoon[] = new MetaType[]{TankSiegeMode, vultureMine, vultureSpeed, GoliathRange};
