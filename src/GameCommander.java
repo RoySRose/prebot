@@ -158,13 +158,15 @@ public class GameCommander {
 		if(unit.getType() == UnitType.Terran_Barracks  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			
 			if (InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran) {
-				for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
-				{
-					if (myUnit.getType() == UnitType.Terran_Command_Center && myUnit.isCompleted())
-					{
-						unit.setRallyPoint(new Position( (unit.getX()*7 + myUnit.getX())/8, (unit.getY()*7 + myUnit.getY())/8));
-					}
-				}
+				unit.lift();
+//				for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())
+//				{
+					
+//					if (myUnit.getType() == UnitType.Terran_Command_Center && myUnit.isCompleted())
+//					{
+//						unit.setRallyPoint(new Position( (unit.getX()*7 + myUnit.getX())/8, (unit.getY()*7 + myUnit.getY())/8));
+//					}
+//				}
 			}
 			else{
 				for (Unit myUnit : MyBotModule.Broodwar.self().getUnits())

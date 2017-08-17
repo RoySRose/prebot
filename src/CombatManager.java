@@ -906,7 +906,7 @@ public class CombatManager {
 	public Position getBestPosition(Unit depot)
 	{
 		if(depot == null){
-			return new Position(128,128);
+			return new Position(64,64);
 		}
 		int x =0;
 		int y =0;
@@ -1465,7 +1465,7 @@ public class CombatManager {
 			if (!CommandUtil.IsValidUnit(unit)) {
 				continue;
 			}
-	        if (unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
+	        if (MyBotModule.Broodwar.getFrameCount() > 12000 && unit.isLifted() && (unit.getType() == UnitType.Terran_Engineering_Bay || unit.getType() == UnitType.Terran_Barracks) && squadData.canAssignUnitToSquad(unit, buildingSquad)) {
 				squadData.assignUnitToSquad(unit, buildingSquad);// 
 				
 				//여기서 각 유닛별 order를 지정한다. by insaneojw
