@@ -190,15 +190,15 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
-		LagTest lag = LagTest.startTest();
-		lag.setDuration(10);
+//		LagTest lag = LagTest.startTest();
+//		lag.setDuration(10);
 		
 		
 		if(EXOK == false && MyBotModule.Broodwar.getFrameCount()%2 == 0){
 			executeFirstex();
 		}
 		
-		lag.estimate("1");
+//		lag.estimate("1");
 		
 		//TODO 전략은 자주 확인할 필요 없다, 1초에 한번 하지만@@!@!@ 초반에는 자주 확인해야된다 아래
 		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
@@ -206,7 +206,7 @@ public class StrategyManager {
 			AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
 		
-		lag.estimate("2");
+//		lag.estimate("2");
 		
 		if (!isInitialBuildOrderFinished && BuildManager.Instance().buildQueue.isEmpty()) {
 			if(isInitialBuildOrderFinished == false){
@@ -214,7 +214,7 @@ public class StrategyManager {
 			isInitialBuildOrderFinished = true;
 		}
 		
-		lag.estimate("3");
+//		lag.estimate("3");
 
 		// 1초에 한번만 실행
 		if (MyBotModule.Broodwar.getFrameCount() % 29 == 0 && MyBotModule.Broodwar.getFrameCount() > 4500) {
@@ -225,19 +225,19 @@ public class StrategyManager {
 			executeResearch();
 		}
 		
-		lag.estimate("4");
+//		lag.estimate("4");
 		
 		if(isInitialBuildOrderFinished == true){
 			if(MyBotModule.Broodwar.getFrameCount() % 53 == 0) {
 				executeUpgrade();
 			}
 		}
-		lag.estimate("5");
+//		lag.estimate("5");
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 31 == 0){// info 의 멀티 체크가 31 에 돈다 
 			executeCombat();
 		}
-		lag.estimate("6");
+//		lag.estimate("6");
 		
 		if (isInitialBuildOrderFinished == false) {
 			if (MyBotModule.Broodwar.getFrameCount() % 23 == 0){
@@ -247,7 +247,7 @@ public class StrategyManager {
 			executeAddFactory();
 		}
 		
-		lag.estimate("7");
+//		lag.estimate("7");
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 5 == 0 && MyBotModule.Broodwar.getFrameCount() > 2500){
 			executeWorkerTraining();
@@ -259,22 +259,28 @@ public class StrategyManager {
 			}
 
 		}
-		lag.estimate("8");
+//		lag.estimate("8");
 		if(MyBotModule.Broodwar.getFrameCount() % 239 == 0) {
 			executeSustainUnits();
 		}
-		if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
-			executeFly();
+		if(MyBotModule.Broodwar.getFrameCount() < 10000 ){
+			if (MyBotModule.Broodwar.getFrameCount() % 29 == 0) {
+				executeFly();
+			}
+		}else{
+			if (MyBotModule.Broodwar.getFrameCount() % 281 == 0) {
+				executeFly();
+			}
 		}
 		
-		lag.estimate("9");
+//		lag.estimate("9");
 		
 		if ((MyBotModule.Broodwar.getFrameCount() < 13000 && MyBotModule.Broodwar.getFrameCount() % 5 == 0)
 				||(MyBotModule.Broodwar.getFrameCount() >= 13000 && MyBotModule.Broodwar.getFrameCount() % 23 == 0)) { //Analyze 와 동일하게
 			RespondToStrategy.Instance().update();//다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
 			//AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
-		lag.estimate("10");
+//		lag.estimate("10");
 	}
 	
 	public static int least(double a, double b, double c, int checker){
@@ -2324,181 +2330,384 @@ public class StrategyManager {
 			}
 		}
 	}
+	 
 	private void executeFly() {
+		  
+		if (MyBotModule.Broodwar.getFrameCount() > 12000) {
+			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 1) {
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks	|| unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
 
-		
-		if(MyBotModule.Broodwar.getFrameCount() > 10000){
-			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 1){
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-				{
-					if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
-						
-						
 						unit.lift();
 						LiftChecker = true;
 						BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-						BuildOrderItem checkItem = null; 
-			
+						BuildOrderItem checkItem = null;
+
 						if (!tempbuildQueue.isEmpty()) {
-							checkItem= tempbuildQueue.getHighestPriorityItem();
-							while(true){
-								if(tempbuildQueue.canGetNextItem() == true){
+							checkItem = tempbuildQueue.getHighestPriorityItem();
+							while (true) {
+								if (tempbuildQueue.canGetNextItem() == true) {
 									tempbuildQueue.canGetNextItem();
-								}else{
+								} else {
 									break;
 								}
 								tempbuildQueue.PointToNextItem();
 								checkItem = tempbuildQueue.getItem();
-								
-								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+
+								if (checkItem.metaType.isUnit()
+										&& checkItem.metaType.getUnitType() == UnitType.Terran_Marine) {
 									tempbuildQueue.removeCurrentItem();
 								}
 							}
 						}
 					}
 					if (InformationManager.Instance().enemyRace != Race.Zerg) {
-						if(unit.getType() == UnitType.Terran_Marine){
-							CommandUtil.move(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+						if (unit.getType() == UnitType.Terran_Marine) {
+							CommandUtil.move(unit, InformationManager.Instance()
+									.getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
 						}
-					} 
-		 		}
-			}
-		}else{
-			
-			if (InformationManager.Instance().enemyRace != Race.Zerg) {
-				int dragooncnt = 0;
-				int zealotcnt = 0;
-				
-				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
-					
-					bwapi.Position checker = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
-					List<Unit> eniemies = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
-					
-					for(Unit enemy : eniemies){
-						
-						if(enemy.getType() == UnitType.Protoss_Dragoon){
-							dragooncnt++;
-						}
-						if(enemy.getType() == UnitType.Protoss_Zealot){
-							zealotcnt++;
-						}
-						
-					}
-					
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3&& dragooncnt+zealotcnt == 0){
-						for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-						{
-							if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
-								unit.lift();
-								LiftChecker = true;
-								BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-								BuildOrderItem checkItem = null; 
-					
-								if (!tempbuildQueue.isEmpty()) {
-									checkItem= tempbuildQueue.getHighestPriorityItem();
-									while(true){
-										if(tempbuildQueue.canGetNextItem() == true){
-											tempbuildQueue.canGetNextItem();
-										}else{
-											break;
-										}
-										tempbuildQueue.PointToNextItem();
-										checkItem = tempbuildQueue.getItem();
-										
-										if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
-											tempbuildQueue.removeCurrentItem();
-										}
-									}
-								}
-							}
-							if (InformationManager.Instance().enemyRace != Race.Zerg) {
-								if(unit.getType() == UnitType.Terran_Marine){
-									CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
-								}
-							} 
-				 		}
-					}else if(CurrentStrategyException == StrategysException.protossException_DragoonPush){
-						
-					}else if(CurrentStrategyException == StrategysException.protossException_ZealotPush){
-						
-					}else if(CurrentStrategyException == StrategysException.protossException_ReadyToZealot && InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) > 3){
-							
-					}else if(CurrentStrategyException == StrategysException.protossException_ReadyToDragoon && InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer) > 2){
-						
-					}
-					else if((CurrentStrategyException == StrategysException.protossException_DragoonPush || CurrentStrategyException == StrategysException.protossException_ReadyToDragoon)&& dragooncnt+zealotcnt > 0 
-							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer)
-								+ InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer)) <= dragooncnt
-							){
-						
-					}else if((CurrentStrategyException == StrategysException.protossException_ZealotPush || CurrentStrategyException == StrategysException.protossException_ReadyToZealot)&& dragooncnt+zealotcnt > 0 
-							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer)
-								< zealotcnt)){
-							
-					}else{
-						for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-						{
-							if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
-								unit.lift();
-								LiftChecker = true;
-								BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-								BuildOrderItem checkItem = null; 
-					
-								if (!tempbuildQueue.isEmpty()) {
-									checkItem= tempbuildQueue.getHighestPriorityItem();
-									while(true){
-										if(tempbuildQueue.canGetNextItem() == true){
-											tempbuildQueue.canGetNextItem();
-										}else{
-											break;
-										}
-										tempbuildQueue.PointToNextItem();
-										checkItem = tempbuildQueue.getItem();
-										
-										if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
-											tempbuildQueue.removeCurrentItem();
-										}
-									}
-								}
-							}
-							if (InformationManager.Instance().enemyRace != Race.Zerg) {
-								if(unit.getType() == UnitType.Terran_Marine){
-									CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
-								}
-							} 
-				 		}
 					}
 				}
-			}else{
-				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) ==2){
-					for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-					{
-						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+			}
+		}
+
+		else {
+			if (InformationManager.Instance().enemyRace == Race.Terran) {
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)> 2) {
+					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks	|| unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
+
 							unit.lift();
 							LiftChecker = true;
 							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-							BuildOrderItem checkItem = null; 
-				
+							BuildOrderItem checkItem = null;
+
 							if (!tempbuildQueue.isEmpty()) {
-								checkItem= tempbuildQueue.getHighestPriorityItem();
-								while(true){
-									if(tempbuildQueue.canGetNextItem() == true){
+								checkItem = tempbuildQueue.getHighestPriorityItem();
+								while (true) {
+									if (tempbuildQueue.canGetNextItem() == true) {
 										tempbuildQueue.canGetNextItem();
-									}else{
+									} else {
 										break;
 									}
 									tempbuildQueue.PointToNextItem();
 									checkItem = tempbuildQueue.getItem();
-									
-									if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+
+									if (checkItem.metaType.isUnit()
+											&& checkItem.metaType.getUnitType() == UnitType.Terran_Marine) {
 										tempbuildQueue.removeCurrentItem();
 									}
 								}
 							}
 						}
-			 		}
+					}
+				}
+			}
+			if (InformationManager.Instance().enemyRace == Race.Protoss) {
+
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if (unit.isLifted() == true && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
+						if (unit.isLifted()) {
+							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrackX,	BlockingEntrance.Instance().barrackY))) {
+								unit.land(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY));
+								LiftChecker = false;
+							}else{
+								unit.land(unit.getTilePosition());
+								LiftChecker = true;
+							}
+						}
+					}
+				}
+
+				int dragooncnt = 0;
+				int zealotcnt = 0;
+
+//				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
+//						&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1) {
+
+				bwapi.Position checker = InformationManager.Instance()
+						.getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
+				List<Unit> eniemies = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
+
+				Boolean lift = false;
+				for (Unit enemy : eniemies) {
+
+					if (enemy.getType() == UnitType.Protoss_Dragoon) {
+						dragooncnt++;
+					}
+					if (enemy.getType() == UnitType.Protoss_Zealot) {
+						zealotcnt++;
+					}
+
+				}
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3
+						&& dragooncnt + zealotcnt == 0) {
+					lift = true;
+				}
+
+				if (CurrentStrategyException != StrategysException.protossException_DragoonPush
+						&& CurrentStrategyException != StrategysException.protossException_ZealotPush
+						&& CurrentStrategyException != StrategysException.protossException_ReadyToZealot
+						&& CurrentStrategyException != StrategysException.protossException_ReadyToDragoon) {
+					lift = true;
+				}
+
+				if (MyBotModule.Broodwar.getFrameCount() > 8000) {
+					if (CurrentStrategyException == StrategysException.protossException_ReadyToZealot
+							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,
+									InformationManager.Instance().enemyPlayer) < 4) {
+						lift = true;
+					}
+					if (CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
+							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,
+									InformationManager.Instance().enemyPlayer) < 3) {
+						lift = true;
+					}
+				}
+				if (zealotcnt + dragooncnt > 0) {
+					lift = false;
+				}
+
+				if ((CurrentStrategyException == StrategysException.protossException_DragoonPush
+						|| CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
+						|| CurrentStrategyException == StrategysException.protossException_ZealotPush
+						|| CurrentStrategyException == StrategysException.protossException_ReadyToZealot)
+						&& dragooncnt + zealotcnt > 0
+						&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
+								InformationManager.Instance().selfPlayer)
+								+ InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
+										InformationManager.Instance().selfPlayer)) >= dragooncnt
+						&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,
+								InformationManager.Instance().selfPlayer)) >= zealotcnt) {
+					lift = true;
+				}
+				if (dragooncnt + zealotcnt == 0) {
+					lift = true;
+				}
+				if (CurrentStrategyException == StrategysException.protossException_DragoonPush
+						|| CurrentStrategyException == StrategysException.protossException_ZealotPush){
+					lift = false;
+				}
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
+					lift = true;
+				}
+				if (lift) {
+					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+						if (unit.isLifted() == false
+								&& (unit.getType() == UnitType.Terran_Barracks
+										|| unit.getType() == UnitType.Terran_Engineering_Bay)
+								&& unit.isCompleted()) {
+							unit.lift();
+							LiftChecker = true;
+							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+							BuildOrderItem checkItem = null;
+
+							if (!tempbuildQueue.isEmpty()) {
+								checkItem = tempbuildQueue.getHighestPriorityItem();
+								while (true) {
+									if (tempbuildQueue.canGetNextItem() == true) {
+										tempbuildQueue.canGetNextItem();
+									} else {
+										break;
+									}
+									tempbuildQueue.PointToNextItem();
+									checkItem = tempbuildQueue.getItem();
+
+									if (checkItem.metaType.isUnit()
+											&& checkItem.metaType.getUnitType() == UnitType.Terran_Marine) {
+										tempbuildQueue.removeCurrentItem();
+									}
+								}
+							}
+						}
+						// if (InformationManager.Instance().enemyRace !=
+						// Race.Zerg) {
+						// if(unit.getType() == UnitType.Terran_Marine){
+						// CommandUtil.attackMove(unit,
+						// InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+						// }
+						// }
+					}
 				}
 			}
 		}
 	}
+//	private void executeFly() {
+//
+//		
+//		if(MyBotModule.Broodwar.getFrameCount() > 10000){
+//			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 1){
+//				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//				{
+//					if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+//						
+//						
+//						unit.lift();
+//						LiftChecker = true;
+//						BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//						BuildOrderItem checkItem = null; 
+//			
+//						if (!tempbuildQueue.isEmpty()) {
+//							checkItem= tempbuildQueue.getHighestPriorityItem();
+//							while(true){
+//								if(tempbuildQueue.canGetNextItem() == true){
+//									tempbuildQueue.canGetNextItem();
+//								}else{
+//									break;
+//								}
+//								tempbuildQueue.PointToNextItem();
+//								checkItem = tempbuildQueue.getItem();
+//								
+//								if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+//									tempbuildQueue.removeCurrentItem();
+//								}
+//							}
+//						}
+//					}
+//					if (InformationManager.Instance().enemyRace != Race.Zerg) {
+//						if(unit.getType() == UnitType.Terran_Marine){
+//							CommandUtil.move(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+//						}
+//					} 
+//		 		}
+//			}
+//		}else{
+//			
+//			if (InformationManager.Instance().enemyRace != Race.Zerg) {
+//				int dragooncnt = 0;
+//				int zealotcnt = 0;
+//				
+//				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1){
+//					
+//					bwapi.Position checker = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
+//					List<Unit> eniemies = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
+//					
+//					for(Unit enemy : eniemies){
+//						
+//						if(enemy.getType() == UnitType.Protoss_Dragoon){
+//							dragooncnt++;
+//						}
+//						if(enemy.getType() == UnitType.Protoss_Zealot){
+//							zealotcnt++;
+//						}
+//						
+//					}
+//					
+//					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3&& dragooncnt+zealotcnt == 0){
+//						for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//						{
+//							if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+//								unit.lift();
+//								LiftChecker = true;
+//								BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//								BuildOrderItem checkItem = null; 
+//					
+//								if (!tempbuildQueue.isEmpty()) {
+//									checkItem= tempbuildQueue.getHighestPriorityItem();
+//									while(true){
+//										if(tempbuildQueue.canGetNextItem() == true){
+//											tempbuildQueue.canGetNextItem();
+//										}else{
+//											break;
+//										}
+//										tempbuildQueue.PointToNextItem();
+//										checkItem = tempbuildQueue.getItem();
+//										
+//										if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+//											tempbuildQueue.removeCurrentItem();
+//										}
+//									}
+//								}
+//							}
+//							if (InformationManager.Instance().enemyRace != Race.Zerg) {
+//								if(unit.getType() == UnitType.Terran_Marine){
+//									CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+//								}
+//							} 
+//				 		}
+//					}else if(CurrentStrategyException == StrategysException.protossException_DragoonPush){
+//						
+//					}else if(CurrentStrategyException == StrategysException.protossException_ZealotPush){
+//						
+//					}else if(CurrentStrategyException == StrategysException.protossException_ReadyToZealot && InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer) > 3){
+//							
+//					}else if(CurrentStrategyException == StrategysException.protossException_ReadyToDragoon && InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer) > 2){
+//						
+//					}
+//					else if((CurrentStrategyException == StrategysException.protossException_DragoonPush || CurrentStrategyException == StrategysException.protossException_ReadyToDragoon)&& dragooncnt+zealotcnt > 0 
+//							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer)
+//								+ InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,InformationManager.Instance().selfPlayer)) <= dragooncnt
+//							){
+//						
+//					}else if((CurrentStrategyException == StrategysException.protossException_ZealotPush || CurrentStrategyException == StrategysException.protossException_ReadyToZealot)&& dragooncnt+zealotcnt > 0 
+//							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer)
+//								< zealotcnt)){
+//							
+//					}else{
+//						for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//						{
+//							if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+//								unit.lift();
+//								LiftChecker = true;
+//								BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//								BuildOrderItem checkItem = null; 
+//					
+//								if (!tempbuildQueue.isEmpty()) {
+//									checkItem= tempbuildQueue.getHighestPriorityItem();
+//									while(true){
+//										if(tempbuildQueue.canGetNextItem() == true){
+//											tempbuildQueue.canGetNextItem();
+//										}else{
+//											break;
+//										}
+//										tempbuildQueue.PointToNextItem();
+//										checkItem = tempbuildQueue.getItem();
+//										
+//										if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+//											tempbuildQueue.removeCurrentItem();
+//										}
+//									}
+//								}
+//							}
+//							if (InformationManager.Instance().enemyRace != Race.Zerg) {
+//								if(unit.getType() == UnitType.Terran_Marine){
+//									CommandUtil.attackMove(unit, InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer).getPoint());
+//								}
+//							} 
+//				 		}
+//					}
+//				}
+//			}else{
+//				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) ==2){
+//					for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+//					{
+//						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay)&& unit.isCompleted()){
+//							unit.lift();
+//							LiftChecker = true;
+//							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//							BuildOrderItem checkItem = null; 
+//				
+//							if (!tempbuildQueue.isEmpty()) {
+//								checkItem= tempbuildQueue.getHighestPriorityItem();
+//								while(true){
+//									if(tempbuildQueue.canGetNextItem() == true){
+//										tempbuildQueue.canGetNextItem();
+//									}else{
+//										break;
+//									}
+//									tempbuildQueue.PointToNextItem();
+//									checkItem = tempbuildQueue.getItem();
+//									
+//									if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Marine){
+//										tempbuildQueue.removeCurrentItem();
+//									}
+//								}
+//							}
+//						}
+//			 		}
+//				}
+//			}
+//		}
+//	}
 }
