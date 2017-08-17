@@ -1278,12 +1278,12 @@ public class CombatManager {
 		    int groundDefendersNeeded = numDefendersPerEnemyUnit * numEnemyGroundInRegion;
 		    
 		    // Count static defense as air defenders.
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-				if (unit.getType() == UnitType.Terran_Missile_Turret &&
-					unit.isCompleted() && unit.isPowered() && BWTA.getRegion(unit.getTilePosition()) == myRegion) {
-					flyingDefendersNeeded -= 2;
-				}
-			}
+//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//				if (unit.getType() == UnitType.Terran_Missile_Turret &&
+//					unit.isCompleted() && unit.isPowered() && BWTA.getRegion(unit.getTilePosition()) == myRegion) {
+//					flyingDefendersNeeded -= 2;
+//				}
+//			}
 			
 			
 //			System.out.println("FastZerglingsInOurBase: " + FastZerglingsInOurBase);
@@ -1330,18 +1330,18 @@ public class CombatManager {
 			return;
 		}
 		
-//		List<Unit> squadUnits = defenseSquad.getUnitSet();
+		List<Unit> squadUnits = defenseSquad.getUnitSet();
 		
 		int flyingDefendersInSquad = 0;
 		int groundDefendersInSquad = 0;
-//		for (Unit unit : squadUnits) {
-//			if (CommandUtil.CanAttackAir(unit)) {
-//				flyingDefendersInSquad++;
-//			}
-//			if (CommandUtil.CanAttackGround(unit)) {
-//				groundDefendersInSquad++;
-//			}
-//		}
+		for (Unit unit : squadUnits) {
+			if (CommandUtil.CanAttackAir(unit)) {
+				flyingDefendersInSquad++;
+			}
+			if (CommandUtil.CanAttackGround(unit)) {
+				groundDefendersInSquad++;
+			}
+		}
 		// add flying defenders if we still need them
 		int flyingDefendersAdded = 0;
 		while (flyingDefendersNeeded > flyingDefendersInSquad + flyingDefendersAdded) {
