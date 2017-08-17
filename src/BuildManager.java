@@ -693,7 +693,7 @@ public class BuildManager {
 			break;
 		case MainBaseBackYard:
 			tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-			tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
+			tempChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 			tempBaseRegion = BWTA.getRegion(tempBaseLocation.getPosition());
 
 			//std::cout << "y";
@@ -776,7 +776,7 @@ public class BuildManager {
 			break;
 
 		case FirstChokePoint:
-			tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
+			tempChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 			if (tempChokePoint != null) {
 				seedPosition = tempChokePoint.getCenter();
 			}

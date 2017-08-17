@@ -191,13 +191,6 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
-		BaseLocation mainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-		BaseLocation expBase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-		MyBotModule.Broodwar.drawCircleMap(expBase.getPosition(),500, Color.Red);
-		MyBotModule.Broodwar.drawCircleMap(mainBase.getPosition(),500, Color.Red);
-//		LagTest lag = LagTest.startTest();
-//		lag.setDuration(10);
-		
 		
 		if(EXOK == false && MyBotModule.Broodwar.getFrameCount()%2 == 0){
 			executeFirstex();
@@ -2475,8 +2468,7 @@ public class StrategyManager {
 //				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1
 //						&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 1) {
 
-				bwapi.Position checker = InformationManager.Instance()
-						.getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
+				bwapi.Position checker = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
 				List<Unit> eniemies = MapGrid.Instance().getUnitsNear(checker, 500, false, true, null);
 
 				Boolean lift = false;
@@ -2488,8 +2480,8 @@ public class StrategyManager {
 					if (enemy.getType() == UnitType.Protoss_Zealot) {
 						zealotcnt++;
 					}
-
 				}
+				
 				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 3
 						&& dragooncnt + zealotcnt == 0) {
