@@ -210,8 +210,7 @@ public class AnalyzeStrategy {
 							selectedSE = StrategyManager.StrategysException.protossException_ReadyToZealot;
 						}
 			
-						if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,
-								InformationManager.Instance().enemyPlayer) >= 1
+						if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) >= 1
 								&& (InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,
 										InformationManager.Instance().enemyPlayer) >= 1)
 								|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator,
@@ -371,8 +370,7 @@ public class AnalyzeStrategy {
 
 	if(StrategyManager.Instance().getCurrentStrategyException()==StrategyManager.StrategysException.protossException_Scout||selectedSE==StrategyManager.StrategysException.protossException_Scout)
 	{
-		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,
-				InformationManager.Instance().selfPlayer) >= 2) {
+		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) >= 2) {
 			selectedSE = StrategyManager.StrategysException.Init;
 		}
 	}
@@ -419,6 +417,27 @@ public class AnalyzeStrategy {
 
 	}
 
+	if (MyBotModule.Broodwar.getFrameCount() < 6000) {
+		if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) >= 2
+				&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator,InformationManager.Instance().enemyPlayer) == 0)
+				|| (InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,	InformationManager.Instance().enemyPlayer) >= 2
+						&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Cybernetics_Core,	InformationManager.Instance().enemyPlayer) == 0)) {
+			TilePosition center = new TilePosition(64,64);
+			for(Unit gateway : MyBotModule.Broodwar.enemy().getUnits()){
+				
+				if(gateway.getType() == UnitType.Protoss_Gateway|| gateway.getType() == UnitType.Protoss_Pylon){
+					if(center.getDistance(gateway.getTilePosition()) < 600){
+						RespondToStrategy.Instance().center_gateway= true;
+						System.out.println("center_gateway true!!");
+					}
+				}
+			}
+			
+			selectedSE = StrategyManager.StrategysException.protossException_ZealotPush;
+		}
+	}
+
+		
 	if(selectedSE!=null)
 	{
 		StrategyManager.Instance().setCurrentStrategyException(selectedSE);

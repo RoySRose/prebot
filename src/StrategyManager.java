@@ -190,6 +190,7 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
+		System.out.println("@!@!");
 //		LagTest lag = LagTest.startTest();
 //		lag.setDuration(10);
 		
@@ -2373,10 +2374,36 @@ public class StrategyManager {
 
 		else {
 			if (InformationManager.Instance().enemyRace == Race.Terran) {
-				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)> 2) {
+				
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+					if (unit.isLifted() == true && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
+						if (unit.isLifted()) {
+							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrackX,	BlockingEntrance.Instance().barrackY))) {
+								unit.land(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY));
+								LiftChecker = false;
+							}else{
+								unit.land(unit.getTilePosition());
+								LiftChecker = false;
+							}
+						}
+					}
+				}
+				Boolean lift = false;
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture)
+						> InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().enemyPlayer)){
+					lift = true;
+				}	
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+						+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)> 2) {
+					
+					lift = true;
+				}
+				if (lift) {
 					for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-						if (unit.isLifted() == false && (unit.getType() == UnitType.Terran_Barracks	|| unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
-
+						if (unit.isLifted() == false
+								&& (unit.getType() == UnitType.Terran_Barracks
+										|| unit.getType() == UnitType.Terran_Engineering_Bay)
+								&& unit.isCompleted()) {
 							unit.lift();
 							LiftChecker = true;
 							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -2413,7 +2440,7 @@ public class StrategyManager {
 								LiftChecker = false;
 							}else{
 								unit.land(unit.getTilePosition());
-								LiftChecker = true;
+								LiftChecker = false;
 							}
 						}
 					}
@@ -2453,42 +2480,45 @@ public class StrategyManager {
 					lift = true;
 				}
 
-				if (MyBotModule.Broodwar.getFrameCount() > 8000) {
-					if (CurrentStrategyException == StrategysException.protossException_ReadyToZealot
-							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,
-									InformationManager.Instance().enemyPlayer) < 4) {
-						lift = true;
-					}
-					if (CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
-							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,
-									InformationManager.Instance().enemyPlayer) < 3) {
-						lift = true;
-					}
+//				if (MyBotModule.Broodwar.getFrameCount() > 8000) {
+//					if (CurrentStrategyException == StrategysException.protossException_ReadyToZealot
+//							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,
+//									InformationManager.Instance().enemyPlayer) < 4) {
+//						lift = true;
+//					}
+//					if (CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
+//							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,
+//									InformationManager.Instance().enemyPlayer) < 3) {
+//						lift = true;
+//					}
+//				}
+				if (CurrentStrategyException == StrategysException.protossException_DragoonPush
+						|| CurrentStrategyException == StrategysException.protossException_ZealotPush){
+					lift = false;
 				}
 				if (zealotcnt + dragooncnt > 0) {
 					lift = false;
 				}
 
-				if ((CurrentStrategyException == StrategysException.protossException_DragoonPush
-						|| CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
-						|| CurrentStrategyException == StrategysException.protossException_ZealotPush
-						|| CurrentStrategyException == StrategysException.protossException_ReadyToZealot)
-						&& dragooncnt + zealotcnt > 0
-						&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
-								InformationManager.Instance().selfPlayer)
-								+ InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
-										InformationManager.Instance().selfPlayer)) >= dragooncnt
-						&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,
-								InformationManager.Instance().selfPlayer)) >= zealotcnt) {
-					lift = true;
+				if (zealotcnt + dragooncnt > 8) {
+					if ((CurrentStrategyException == StrategysException.protossException_DragoonPush
+							|| CurrentStrategyException == StrategysException.protossException_ReadyToDragoon
+							|| CurrentStrategyException == StrategysException.protossException_ZealotPush
+							|| CurrentStrategyException == StrategysException.protossException_ReadyToZealot)
+							&& dragooncnt + zealotcnt > 0
+							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
+									InformationManager.Instance().selfPlayer)
+									+ InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,
+											InformationManager.Instance().selfPlayer)) >= dragooncnt
+							&& (InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,
+									InformationManager.Instance().selfPlayer)) > zealotcnt) {
+						lift = true;
+					}
 				}
 				if (dragooncnt + zealotcnt == 0) {
 					lift = true;
 				}
-				if (CurrentStrategyException == StrategysException.protossException_DragoonPush
-						|| CurrentStrategyException == StrategysException.protossException_ZealotPush){
-					lift = false;
-				}
+				
 				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 					lift = true;
 				}
