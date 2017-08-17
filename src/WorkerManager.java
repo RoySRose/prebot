@@ -253,19 +253,37 @@ public class WorkerManager {
 	}
 	/// Idle 일꾼을 Mineral 일꾼으로 만듭니다
 	public void handleIdleWorkers() 
-	{
-		// for each of our workers
-		for (Unit worker : workerData.getWorkers())
-		{
-			if (worker == null) continue;
-			// if worker's job is idle 
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default )
-			{
-				// send it to the nearest mineral patch
-				setMineralWorker(worker);
-			}
-		}
-	}
+    {
+        if(MyBotModule.Broodwar.getFrameCount() > 10000){
+            int k=0;
+            // for each of our workers
+            for (Unit worker : workerData.getWorkers())
+            {
+                if (worker == null) continue;
+                // if worker's job is idle 
+                if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default )
+                {
+                    // send it to the nearest mineral patch
+                    setMineralWorker(worker);
+                    k++;
+                }
+                if(k>0){
+                    break;
+                }
+            }
+        }else{
+            for (Unit worker : workerData.getWorkers())
+            {
+                if (worker == null) continue;
+                // if worker's job is idle 
+                if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default )
+                {
+                    // send it to the nearest mineral patch
+                    setMineralWorker(worker);
+                }
+            }
+        }
+    }
 
 	private void updatework() {
 		
