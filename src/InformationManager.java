@@ -1043,7 +1043,9 @@ public class InformationManager {
 				}
 				//헌트 특이사항
 				if(mapSpecificInformation.getMap() == MAP.TheHunters){
-					if(BlockingEntrance.Instance().getStartingInt() == 3){		
+					if(FirstCC.getTilePosition().getX() == 114 && FirstCC.getTilePosition().getY() == 80){	
+//							startingX == 114 && startingY == 80
+//							BlockingEntrance.Instance().getStartingInt() == 3){		
 						firstChokePoint.put(selfPlayer,  secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer,  thirdChokePointDonotUse.get(selfPlayer));
 					}
@@ -1089,7 +1091,7 @@ public class InformationManager {
 				//헌트 특이사항
 				if(mapSpecificInformation.getMap() == MAP.TheHunters){
 					
-					if(BlockingEntrance.Instance().getStartingInt() == 3){		
+					if(FirstCC.getTilePosition().getX() == 114 && FirstCC.getTilePosition().getY() == 80){	
 						firstChokePoint.put(enemyPlayer,  secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer,  thirdChokePointDonotUse.get(enemyPlayer));
 					}
