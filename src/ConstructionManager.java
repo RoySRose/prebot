@@ -639,6 +639,7 @@ public class ConstructionManager {
 				}
 
 				if (isDeadlockCase) {
+					System.out.println("deadlock cancel at conQ:" + requiredUnits.toString());
 					toCancel.add(b);
 				}
 			}

@@ -273,35 +273,37 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = 0;
 		}
 
-		testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
-//		
-//		while (buildingGapSpace >= 0) {
-//
-//			testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
-//
-//			// std::cout << "ConstructionPlaceFinder testPosition " << testPosition.x << "," << testPosition.y << std::endl;
-//
-//			if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid)
-//				return testPosition;
-//					
-//			// 찾을 수 없다면, buildingGapSpace 값을 줄여서 다시 탐색한다
-//			// buildingGapSpace 값이 1이면 지상유닛이 못지나가는 경우가 많아  제외하도록 한다 
-//			// 4 -> 3 -> 2 -> 0 -> 탐색 종료
-//			//      3 -> 2 -> 0 -> 탐색 종료 
-//			//           1 -> 0 -> 탐색 종료
-//			if (buildingGapSpace > 2) {
-//				buildingGapSpace -= 1;
-//			}
-//			else if (buildingGapSpace == 2){
-//				buildingGapSpace = 0;
-//			}
-//			else if (buildingGapSpace == 1){
-//				buildingGapSpace = 0;
-//			}
-//			else {
-//				break;
-//			}
-//		}
+		if (buildingType == UnitType.Terran_Missile_Turret) {
+			while (buildingGapSpace >= 0) {
+
+				testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+
+				// std::cout << "ConstructionPlaceFinder testPosition " << testPosition.x << "," << testPosition.y << std::endl;
+
+				if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid)
+					return testPosition;
+						
+				// 찾을 수 없다면, buildingGapSpace 값을 줄여서 다시 탐색한다
+				// buildingGapSpace 값이 1이면 지상유닛이 못지나가는 경우가 많아  제외하도록 한다 
+				// 4 -> 3 -> 2 -> 0 -> 탐색 종료
+				//      3 -> 2 -> 0 -> 탐색 종료 
+				//           1 -> 0 -> 탐색 종료
+				if (buildingGapSpace > 2) {
+					buildingGapSpace -= 1;
+				}
+				else if (buildingGapSpace == 2){
+					buildingGapSpace = 0;
+				}
+				else if (buildingGapSpace == 1){
+					buildingGapSpace = 0;
+				}
+				else {
+					break;
+				}
+			}
+		}else{
+			testPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+		}
 
 		if (testPosition != TilePosition.None && testPosition != TilePosition.Invalid){
 			return testPosition;
