@@ -426,9 +426,8 @@ public class AnalyzeStrategy {
 			for(Unit gateway : MyBotModule.Broodwar.enemy().getUnits()){
 				
 				if(gateway.getType() == UnitType.Protoss_Gateway|| gateway.getType() == UnitType.Protoss_Pylon){
-					if(center.getDistance(gateway.getTilePosition()) < 600){
+					if(center.getDistance(gateway.getTilePosition()) < 17){
 						RespondToStrategy.Instance().center_gateway= true;
-						System.out.println("center_gateway true!!");
 					}
 				}
 			}

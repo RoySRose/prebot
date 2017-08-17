@@ -2281,7 +2281,7 @@ public class StrategyManager {
 				}
 			}
 			//200 넘고 유리하면
-			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 50 && Attackpoint > 30 && ExpansionPoint > 0){
+			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 50 && Attackpoint > 30 && ExpansionPoint >= 0){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
@@ -2289,6 +2289,19 @@ public class StrategyManager {
 			}
 			//공격시 돈 250 넘으면 멀티하기
 			
+			
+			if(MyBotModule.Broodwar.getFrameCount() > 14000){
+				
+				
+				if( getFacUnits() > 80 
+						&& MyBotModule.Broodwar.self().deadUnitCount() - MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture)< 12){
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+							+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+					}
+				}
+			}
+						
 			int temp =0;
 			for(Unit units : MyBotModule.Broodwar.self().getUnits()){
 				if(units.getType() == UnitType.Terran_Command_Center && units.isCompleted()){

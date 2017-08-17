@@ -3,6 +3,7 @@ import java.util.List;
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -512,9 +513,16 @@ public class RespondToStrategy {
 		}
 		
 //		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
-//			need_valkyrie = true;
-//			max_valkyrie = 4;
-//		}else{
+//			
+//			if(MyBotModule.Broodwar.self().hasResearched(TechType.Irradiate) ==false &&MyBotModule.Broodwar.self().isResearching(TechType.Irradiate) ==false){
+//				if(BuildManager.Instance().buildQueue.getItemCount(TechType.Irradiate) < 1){
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Irradiate);
+//				}
+//			}
+//			need_vessel = true;
+//			max_vessel = 4;
+//		}
+//		else{
 //			need_valkyrie = false;
 //			max_valkyrie = 0;
 //		}
@@ -634,7 +642,8 @@ public class RespondToStrategy {
 				}
 			}
 
-			if(!chk_engineering_bay){
+			if(chk_engineering_bay == false && (InformationManager.Instance().enemyRace != Race.Protoss || MyBotModule.Broodwar.getFrameCount() > 5000)){
+				
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
