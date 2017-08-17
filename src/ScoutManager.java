@@ -183,7 +183,7 @@ public class ScoutManager{
 
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 				{
-					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false && unit.isCompleted())
+					if (unit.getType().isBuilding() == true && unit.getType() == UnitType.Terran_Barracks)
 					{
 						firstBuilding = unit;
 						break;
@@ -252,6 +252,9 @@ public class ScoutManager{
 		//적 위치 못찾으면
 		if (enemyBaseLocation == null)
 		{
+			
+			
+			
 			// currentScoutTargetBaseLocation 가 null 이거나 정찰 유닛이 currentScoutTargetBaseLocation 에 도착했으면 
 			// 아군 MainBaseLocation 으로부터 가장 가까운 미정찰 BaseLocation 을 새로운 정찰 대상 currentScoutTargetBaseLocation 으로 잡아서 이동
 			if (currentScoutTargetBaseLocation == null || currentScoutUnit.getDistance(currentScoutTargetBaseLocation.getPosition()) < 5 * Config.TILE_SIZE) 
@@ -276,6 +279,12 @@ public class ScoutManager{
 					}
 				}
 
+				
+				if (MyBotModule.Broodwar.isExplored(new TilePosition(64,64)) == false){
+				    CommandUtil.move(currentScoutUnit, new TilePosition(64,64).toPosition());
+				    currentScoutTargetBaseLocation = closestBaseLocation;
+				}else
+					
 				if (closestBaseLocation != null) {
 					// assign a scout to go scout it
 					CommandUtil.move(currentScoutUnit, closestBaseLocation.getPosition());
@@ -285,7 +294,11 @@ public class ScoutManager{
 					CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
 				}
 			}else{//BasicBot1.2
-				CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
+				if (MyBotModule.Broodwar.isExplored(new TilePosition(64,64)) == false){
+				    CommandUtil.move(currentScoutUnit, new TilePosition(64,64).toPosition());
+				}else{
+					CommandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
+				}
 			}
 		}
 		// if we know where the enemy region is

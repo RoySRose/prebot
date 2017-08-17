@@ -3,6 +3,7 @@ import java.util.List;
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
@@ -72,6 +73,9 @@ public class RespondToStrategy {
 	public boolean chk_control_tower;
 	public boolean chk_comsat_station;
 	public boolean chk_science_facility;
+	
+	
+	public boolean center_gateway = false;
 	
 	public RespondToStrategy() {
 		//클로킹 유닛에 대한 대처
@@ -328,27 +332,59 @@ public class RespondToStrategy {
 //				}
 //				
 		}
-		
+		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush) {
+			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1) {
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3) {
+					if (StrategyManager.Instance().LiftChecker == false
+							&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4) {
+						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1) {
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						}
+					}
+					if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
+							&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker,
+									null) == 0) {
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					}
+				}
+			}
+		}
 		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyManager.StrategysException.protossException_ZealotPush){
 			if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
-				if(blocked){
-					//입구 막혔으면 이미 한마리가 있음
-				}else{
-					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) == 0){
+				if(center_gateway){
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3){
 						if(StrategyManager.Instance().LiftChecker == false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 							}
 						}
 						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+							TilePosition bunkerPos = new TilePosition(BlockingEntrance.Instance().bunkerX,BlockingEntrance.Instance().bunkerY);
+							ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker, bunkerPos,true);
+
 						}
-					}else{
-						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null) == 0) {
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, true);
+					}
+				}else{
+					if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) >= 1) {
+						if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3){
+							if(StrategyManager.Instance().LiftChecker == false && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+								if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+								}
+							}
+							if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
+									&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
+									&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							}
 						}
 					}
 				}
@@ -366,7 +402,16 @@ public class RespondToStrategy {
 			if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				}
+			}
+		}else{
+			if(MyBotModule.Broodwar.enemy().allUnitCount(UnitType.Protoss_Nexus) ==2){
+				if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1){
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+					}
 				}
 			}
 		}
@@ -595,7 +640,8 @@ public class RespondToStrategy {
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				}
 			}else{
-				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0) {
+				int turretcnt = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret) < 10) {
 					BaseLocation tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 					BaseLocation tempExpLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
 					Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
@@ -609,8 +655,8 @@ public class RespondToStrategy {
 					
 					MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),180, Color.White);
  					if (tempBaseLocation != null) {
- 						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation.getPosition(),300);
- 						MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),300, Color.Red);
+ 						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation.getPosition(),300+turretcnt*10);
+ 						MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),300+turretcnt*10, Color.Red);
  						for(Unit turret : turretInRegion){
  							if (turret.getType() == UnitType.Terran_Missile_Turret) {
  								mainBaseTurret = true;
@@ -629,8 +675,8 @@ public class RespondToStrategy {
  					if (tempBaseLocation != null) { 
    						//Position firstChokeMainHalf = new Position((tempBaseLocation.getRegion().getCenter().getX() + tempChokePoint.getX()*2)/3 - 60, (tempBaseLocation.getRegion().getCenter().getY() + tempChokePoint.getY()*2)/3 - 60);
  						Position firstChokeMainHalf = new Position((tempBaseLocation.getPosition().getX() + tempChokePoint.getX()*2)/3 - 60, (tempBaseLocation.getPosition().getY() + tempChokePoint.getY()*2)/3 - 60);
-   						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeMainHalf,180);
-   						MyBotModule.Broodwar.drawCircleMap(firstChokeMainHalf,180, Color.Orange);	
+   						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeMainHalf,180+turretcnt*10);
+   						MyBotModule.Broodwar.drawCircleMap(firstChokeMainHalf,180+turretcnt*10, Color.Orange);	
 
    						for(Unit turret : turretInRegion){
    							if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -647,8 +693,8 @@ public class RespondToStrategy {
  					
  					if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 						if (tempChokePoint != null) {
-							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),150);
-							MyBotModule.Broodwar.drawCircleMap(tempChokePoint.getCenter(),150, Color.Blue);
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),150+turretcnt*10);
+							MyBotModule.Broodwar.drawCircleMap(tempChokePoint.getCenter(),150+turretcnt*10, Color.Blue);
 							for(Unit turret : turretInRegion){
 								if (turret.getType() == UnitType.Terran_Missile_Turret) {
 									firstChokeTurret = true;
@@ -664,8 +710,8 @@ public class RespondToStrategy {
 					}else{
 						if (tempBaseLocation != null) { 
 	   						Position firstChokeExpHalf = new Position((tempExpLocation.getPosition().getX()*2 + tempChokePoint.getX())/3, (tempExpLocation.getPosition().getY()*2 + tempChokePoint.getY())/3);
-	   						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeExpHalf.getPoint(),150);
-	   						MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf,150, Color.Blue);
+	   						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeExpHalf.getPoint(),150+turretcnt*10);
+	   						MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf,150+turretcnt*10, Color.Blue);
 	   						for(Unit turret : turretInRegion){
 	   							if (turret.getType() == UnitType.Terran_Missile_Turret) {
 	   								firstChokeExpHalfTurret = true;
@@ -683,7 +729,7 @@ public class RespondToStrategy {
  					
  					if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1){
  						if (temp2ChokePoint != null) {
- 							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(temp2ChokePoint.getCenter(),100);
+ 							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(temp2ChokePoint.getCenter(),100+turretcnt*10);
 
  							for(Unit turret : turretInRegion){
  								if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -765,21 +811,20 @@ public class RespondToStrategy {
 		if (max_turret_to_mutal != 0) {
 
 			if (!chk_engineering_bay) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay,
-								null) == 0) {
+				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) 
+						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay,	null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				}
 			} else {
-				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0) {
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret) < 10) {
 					int build_turret_cnt = 0;
-
+					int turretcnt =  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
 					//지역 멀티
 					List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
 					for (BaseLocation baseLocation : tempBaseLocationList) {
 						if (baseLocation != null) {
-							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 320);
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 320+turretcnt*10);
 							build_turret_cnt = 0;
 							for(Unit unit: turretInRegion){
 								if (unit.getType() == UnitType.Terran_Missile_Turret) {
