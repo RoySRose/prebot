@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import bwapi.Color;
 import bwapi.Order;
 import bwapi.Race;
 import bwapi.TechType;
@@ -190,7 +191,10 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 		
-		System.out.println("@!@!");
+		BaseLocation mainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+		BaseLocation expBase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+		MyBotModule.Broodwar.drawCircleMap(expBase.getPosition(),500, Color.Red);
+		MyBotModule.Broodwar.drawCircleMap(mainBase.getPosition(),500, Color.Red);
 //		LagTest lag = LagTest.startTest();
 //		lag.setDuration(10);
 		
@@ -1394,6 +1398,8 @@ public class StrategyManager {
 				UnitType selected = null; 
 				
 				selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
+				
+				
 				int minNeed = selected.mineralPrice();
 				
 				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType()!=selected){
@@ -1420,6 +1426,9 @@ public class StrategyManager {
 					if(MyBotModule.Broodwar.self().gas() < 250){
 						minNeed = 75;
 					}
+					
+					System.out.println("selected: " + selected);
+					System.out.println("currentItem: " + currentItem.metaType.getUnitType());
 					
 					if(currentItem.metaType.mineralPrice()+minNeed < MyBotModule.Broodwar.self().minerals() && MyBotModule.Broodwar.self().supplyUsed() <= 392){
 						if((unit.isConstructing() == true) || ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) != 0){

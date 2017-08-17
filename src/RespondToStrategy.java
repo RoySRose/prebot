@@ -821,21 +821,41 @@ public class RespondToStrategy {
 					int build_turret_cnt = 0;
 					int turretcnt =  MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
 					//지역 멀티
-					List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-					for (BaseLocation baseLocation : tempBaseLocationList) {
-						if (baseLocation != null) {
-							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 320+turretcnt*10);
+					
+					BaseLocation mainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+					BaseLocation expBase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+					if (mainBase != null) {
+						
+						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(mainBase.getPosition(), 600+turretcnt*10);
+						build_turret_cnt = 0;
+						for(Unit unit: turretInRegion){
+							if (unit.getType() == UnitType.Terran_Missile_Turret) {
+								build_turret_cnt++;
+							}
+						}
+
+						if (build_turret_cnt < max_turret_to_mutal) {
+							if (BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, mainBase.getPosition().toTilePosition(), 300) < 1
+									&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret,	mainBase.getPosition().toTilePosition(), 300) == 0) {
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, mainBase.getPosition().toTilePosition(),true);
+							}
+						}
+					}
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 1){
+						if (expBase != null) {
+							
+							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(expBase.getPosition(), 600+turretcnt*10);
 							build_turret_cnt = 0;
 							for(Unit unit: turretInRegion){
 								if (unit.getType() == UnitType.Terran_Missile_Turret) {
 									build_turret_cnt++;
 								}
 							}
-
+	
 							if (build_turret_cnt < max_turret_to_mutal) {
-								if (BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, baseLocation.getPosition().toTilePosition(), 300) < 1
-										&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret,	baseLocation.getPosition().toTilePosition(), 300) == 0) {
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, baseLocation.getPosition().toTilePosition(),true);
+								if (BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, expBase.getPosition().toTilePosition(), 300) < 1
+										&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret,	expBase.getPosition().toTilePosition(), 300) == 0) {
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, expBase.getPosition().toTilePosition(),true);
 								}
 							}
 						}

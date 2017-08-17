@@ -854,7 +854,7 @@ public class BuildManager {
 //											}
 //										}
 //										if(needcnt > requirecnt){		
-											//System.out.println("Inserting blocked unit: " + requiredUnitType);
+											System.out.println("Inserting blocked unit: " + requiredUnitType);
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
 										//}
 									}
@@ -999,7 +999,7 @@ public class BuildManager {
 							}
 						}
 						if(getAddonPossibeCnt == 0){
-							//System.out.println("deadlock because no place to addon");
+							System.out.println("deadlock because no place to addon");
 							isDeadlockCase = true;
 						}
 					}
