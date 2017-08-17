@@ -175,12 +175,12 @@ public class InitialBuild {
 //				queueBuild(false, UnitType.Terran_SCV); //TODO 짧은 맵은 이거 한마리 날리면 산다. 
 //				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, barrackPos,true);
 //				queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Refinery);
 				queueBuild(false, UnitType.Terran_SCV, UnitType.Terran_SCV);
-				queueBuild(false, UnitType.Terran_SCV);
-				queueBuild(true, UnitType.Terran_Marine);
 				ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker, bunkerPos,true);
+				queueBuild(false, UnitType.Terran_SCV);
+				queueBuild(true, UnitType.Terran_Marine);
+				queueBuild(true, UnitType.Terran_Refinery);
 				queueBuild(false, UnitType.Terran_Marine);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot, secondSupplyPos,true);
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory, factoryPos,true);
