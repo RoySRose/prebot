@@ -105,8 +105,6 @@ public class Squad {
 		microVessel.setMicroInformation(order, nearbyEnemies);
 		microBuilding.setMicroInformation(order, nearbyEnemies);
 		
-		LagTest lagTest = LagTest.startTest(true);
-		lagTest.setDuration(3000);
 		microScv.execute();
 		microMarine.execute();
 		microVulture.execute();
@@ -115,7 +113,6 @@ public class Squad {
 		microWraith.execute();
 		microVessel.execute();
 		microBuilding.execute();
-		lagTest.estimate();
 	}
 	
 	private void updateMainAttackSquad() {
@@ -306,19 +303,14 @@ public class Squad {
 		mechanicGoliath.prepareMechanic(attackerOrder, attackerEnemies);
 		mechanicGoliath.prepareMechanicAdditional(microTank.getUnits(), microGoliath.getUnits(), saveUnitLevelGoliath);
 
-		LagTest lagTest = LagTest.startTest(true);
-		lagTest.setDuration(3000);
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
-			lagTest.estimate();
 		}
 		for (Unit tank : microTank.getUnits()) {
 			mechanicTank.executeMechanicMicro(tank);
-			lagTest.estimate();
 		}
 		for (Unit goliath : microGoliath.getUnits()) {
 			mechanicGoliath.executeMechanicMicro(goliath);
-			lagTest.estimate();
 		}
 	}
 	
@@ -363,11 +355,8 @@ public class Squad {
 		mechanicVulture.prepareMechanic(order, vultureEnemies);
 		mechanicVulture.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), saveUnitLevel, false);
 		
-		LagTest lagTest = LagTest.startTest(true);
-		lagTest.setDuration(3000);
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
-			lagTest.estimate();
 		}
 	}
 	
