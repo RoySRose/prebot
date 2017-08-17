@@ -512,16 +512,16 @@ public class RespondToStrategy {
 			max_vessel = 4;
 		}
 		
-//		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
-//			
-//			if(MyBotModule.Broodwar.self().hasResearched(TechType.Irradiate) ==false &&MyBotModule.Broodwar.self().isResearching(TechType.Irradiate) ==false){
-//				if(BuildManager.Instance().buildQueue.getItemCount(TechType.Irradiate) < 1){
-//					BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Irradiate);
-//				}
-//			}
-//			need_vessel = true;
-//			max_vessel = 4;
-//		}
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
+			
+			if(MyBotModule.Broodwar.self().hasResearched(TechType.Irradiate) ==false &&MyBotModule.Broodwar.self().isResearching(TechType.Irradiate) ==false){
+				if(BuildManager.Instance().buildQueue.getItemCount(TechType.Irradiate) < 1){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Irradiate);
+				}
+			}
+			need_vessel = true;
+			max_vessel = 4;
+		}
 //		else{
 //			need_valkyrie = false;
 //			max_valkyrie = 0;

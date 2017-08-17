@@ -2281,7 +2281,7 @@ public class StrategyManager {
 				}
 			}
 			//200 넘고 유리하면
-			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 50 && Attackpoint > 30 && ExpansionPoint >= 0){
+			if( MyBotModule.Broodwar.self().minerals() > 200 && getFacUnits() > 80 && Attackpoint > 40 && ExpansionPoint >= 0){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null)== 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);

@@ -62,8 +62,27 @@ public class MicroVessel extends MicroManager {
 				continue;
 			}
 			
+			if(StrategyManager.Instance().getCurrentStrategyBasic() == StrategyManager.Strategys.zergBasic_MutalMany){
+				//싸베 이리디 쓰기
+				if(sVessel.getEnergy() >= 75){
+					List<Unit> matrix_targets = null;
+					matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius+300, false, true, null);
+					
+					for (Unit target : matrix_targets) {
+						if(target.getType() == UnitType.Zerg_Mutalisk || target.getHitPoints() > target.getType().maxHitPoints()*0.9){
+							CommandUtil.useTechTarget(sVessel,TechType.Irradiate, target);
+							return;
+						}
+	//					if(target.isUnderAttack() && target.getHitPoints() < target.getType().maxHitPoints()*0.7
+	//							&& !target.isDefenseMatrixed() && target.getHitPoints() > target.getType().maxHitPoints()*0.15 ){
+	//						CommandUtil.useTechTarget(sVessel,TechType.Defensive_Matrix, target);
+	//						return;
+	//					}
+					}
+				}
+			}
 			//싸베 디펜시브 매트릭스 쓰기
-			if(sVessel.getEnergy() > 100){
+			else if(sVessel.getEnergy() >= 100){
 				List<Unit> matrix_targets = null;
 				matrix_targets = MapGrid.Instance().getUnitsNear(sVessel.getPosition(), sVesselCheckRadius+300, true, false, null);
 				

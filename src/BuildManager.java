@@ -200,7 +200,7 @@ public class BuildManager {
 				}
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
-					System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
+//					System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
 					buildQueue.removeCurrentItem();
 				}
 				
@@ -999,7 +999,7 @@ public class BuildManager {
 							}
 						}
 						if(getAddonPossibeCnt == 0){
-							System.out.println("deadlock because no place to addon");
+//							System.out.println("deadlock because no place to addon");
 							isDeadlockCase = true;
 						}
 					}
@@ -1273,8 +1273,7 @@ public class BuildManager {
 				}
 
 				if (isDeadlockCase) {
-					System.out.println(
-							"Build Order Dead lock case . remove BuildOrderItem " + currentItem.metaType.getName());
+//					System.out.println(	"Build Order Dead lock case . remove BuildOrderItem " + currentItem.metaType.getName());
 
 					buildQueue.removeCurrentItem();
 				}
