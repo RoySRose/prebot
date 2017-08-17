@@ -393,19 +393,19 @@ public class Squad {
 		mechanicTank.prepareMechanicAdditional(microVulture.getUnits(), microTank.getUnits(), microGoliath.getUnits(), 1, 0);
 		mechanicGoliath.prepareMechanic(order, nearbyEnemiesInfo);
 		
-		LagTest lagTest = LagTest.startTest(true);
-		lagTest.setDuration(3000);
+//		LagTest lagTest = LagTest.startTest(true);
+//		lagTest.setDuration(3000);
 		for (Unit vulture : microVulture.getUnits()) {
 			mechanicVulture.executeMechanicMicro(vulture);
-			lagTest.estimate();
+//			lagTest.estimate();
 		}
 		for (Unit tank : microTank.getUnits()) {
 			mechanicTank.executeMechanicMicro(tank);
-			lagTest.estimate();
+//			lagTest.estimate();
 		}
 		for (Unit goliath : microGoliath.getUnits()) {
 			mechanicGoliath.executeMechanicMicro(goliath);
-			lagTest.estimate();
+//			lagTest.estimate();
 		}
 
 		List<Unit> nearbyEnemies = new ArrayList<>();
@@ -414,7 +414,7 @@ public class Squad {
 		}
 		microMarine.setMicroInformation(order, nearbyEnemies);
 		microMarine.execute();
-		lagTest.estimate();
+//		lagTest.estimate();
 	}
 	
 	private void updateUnits() {
