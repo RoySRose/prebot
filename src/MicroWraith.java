@@ -191,8 +191,13 @@ public class MicroWraith extends MicroManager {
 			if(!fleeing){
 				Unit target = getTarget(wraith, wraithTargets);
 				if (target != null && !fleeing) {
-//					System.out.println("attacking target: " + target.getType());
-					MicroUtils.preciseKiting(wraith, target, kitingOption);
+					if (target.canAttack(wraith)) {
+						System.out.println("attacking target: " + target.getType());
+						MicroUtils.preciseKiting(wraith, wraith, kitingOption);
+					} else {
+						CommandUtil.attackUnit(wraith, target);
+					}
+//					
 				}else {
 					// if we're not near the order position, go there
 					if (wraith.getDistance(order.getPosition()) > order.getRadius()) {
