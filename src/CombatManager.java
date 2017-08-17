@@ -732,10 +732,28 @@ public class CombatManager {
 			boolean enemyBaseDestoryed = false;
 			BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 			if (MyBotModule.Broodwar.isVisible(enemyBaseLocation.getTilePosition())) {
-				List<Unit> commands = MapGrid.Instance().getUnitsNear(
-						enemyBaseLocation.getPosition(), 300, false, true, InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
-				if (commands.size() == 0) {
-					enemyBaseDestoryed = true;
+				List<Unit> commands = null;
+				if (InformationManager.Instance().enemyRace != Race.Zerg) {
+					int commandCount = 0;
+					commands = MapGrid.Instance().getUnitsNear(enemyBaseLocation.getPosition(), 300, false, true, null);
+					for (Unit command : commands) {
+						if (command.getType() == UnitType.Zerg_Hatchery
+								|| command.getType() == UnitType.Zerg_Lair
+								|| command.getType() == UnitType.Zerg_Hive) {
+							commandCount++;
+							break;
+						}
+					}
+					if (commandCount == 0) {
+						enemyBaseDestoryed = true;
+					}
+					
+				} else {
+					commands = MapGrid.Instance().getUnitsNear(enemyBaseLocation.getPosition(), 300, false, true
+							, InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
+					if (commands.size() == 0) {
+						enemyBaseDestoryed = true;
+					}
 				}
 			}
 			
