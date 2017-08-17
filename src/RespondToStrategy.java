@@ -365,9 +365,11 @@ public class RespondToStrategy {
 						if(MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Bunker) < 1
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
+
 							TilePosition bunkerPos = new TilePosition(BlockingEntrance.Instance().bunkerX,BlockingEntrance.Instance().bunkerY);
 							ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker, bunkerPos,true);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker, bunkerPos,true);
+
 						}
 					}
 				}else{
