@@ -389,22 +389,29 @@ public class WorkerManager {
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-				setRepairWorker(repairWorker, unit);
-				repairWorkCnt = workerData.workerRepairMap.size();
 				
-				if((InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran)){
-					if(unit.isFlying() == true){
-						continue;
+//				if((InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran)){
+//					if(unit.isFlying() == true){
+//						continue;
+//					}
+////					if(unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot){
+////						if(unit.getHitPoints() > unit.getType().maxHitPoints()* 0.9){
+////							continue;
+////						}
+////					}
+//				}
+				if(MyBotModule.Broodwar.getFrameCount() <= 12000){
+					if((unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot) && unit.getHitPoints() > unit.getType().maxHitPoints()* 0.9){
+						setRepairWorker(repairWorker, unit);
+						repairWorkCnt = workerData.workerRepairMap.size();
 					}
-					if(unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot){
-						if(unit.getHitPoints() > unit.getType().maxHitPoints()* 0.9){
-							continue;
-						}
-					}
-				}
-				else if(unit.getType() == UnitType.Terran_Bunker){
-				
+				} 
+				if(unit.getType() == UnitType.Terran_Bunker){
+						setRepairWorker(repairWorker, unit);
+						repairWorkCnt = workerData.workerRepairMap.size();
 				}else{
+					setRepairWorker(repairWorker, unit);
+					repairWorkCnt = workerData.workerRepairMap.size();
 					continue;
 				}
 			}
@@ -425,7 +432,7 @@ public class WorkerManager {
 			}
 			
 			
-			if(repairWorkCnt > repairmax){
+			if(repairWorkCnt >= repairmax){
 				break;
 			}
 		}
@@ -442,10 +449,15 @@ public class WorkerManager {
 	    double closestDist = 100000000;
 
 	    
-		//if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding())
-	    if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding() && unit.getType() != UnitType.Terran_Bunker)
-	    {
-			return currentRepairWorker;
+	  //if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding())
+	    if(MyBotModule.Broodwar.getFrameCount() <= 12000){
+	    	if(currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding() 
+	    			&& (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot || unit.getType() == UnitType.Terran_Bunker) == false){
+	    		return currentRepairWorker;
+	    	}
+	    }else if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0 && unit.getType().isBuilding() 
+	    		&& unit.getType() != UnitType.Terran_Bunker){
+	    	return currentRepairWorker;
 	    }
 
 	    // for each of our workers
