@@ -344,7 +344,7 @@ public class WorkerManager {
 
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat)
 			{
-				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4, Color.Yellow, true);
+//				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4, Color.Yellow, true);
 				Unit target = getClosestEnemyUnitFromWorker(worker);
 
 				if (target != null)

@@ -200,7 +200,7 @@ public class BuildManager {
 				}
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {
-					//System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
+					System.out.println("here I am!!! Killing: " + buildQueue.getItem().metaType.getName());
 					buildQueue.removeCurrentItem();
 				}
 				

@@ -136,6 +136,8 @@ public class UnitData {
 	{
 		if (unit == null) { return; }
 		if (type == null) { return; }
+		if (numUnits.get(type.toString()) == null){return;}
+		
 		
 		if(numUnits.get(type.toString()) == 1){
 			numUnits.remove(type.toString());

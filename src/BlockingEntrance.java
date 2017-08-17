@@ -116,10 +116,10 @@ public class BlockingEntrance {
 				factoryX_array = factoryXX_array;
 				int[] factoryYY_array = { 9, 11, 5, 59, 107, 109, 106, 55 };
 				factoryY_array = factoryYY_array;
-				int[] bunkerXX_array = { 26, 52, 99, 105, 99, 56, 11, 21 };
-				bunkerX_array = bunkerXX_array;
-				int[] bunkerYY_array = { 18, 10, 21, 61, 102, 96, 99, 54 };
-				bunkerY_array = bunkerYY_array;
+				int[] bunkerXX_array = { 26, 55, 99, 105, 99, 56, 11, 21 };
+			    bunkerX_array = bunkerXX_array;
+			    int[] bunkerYY_array = { 18, 24, 21, 61, 102, 96, 99, 54 };
+			    bunkerY_array = bunkerYY_array;
 			} else {
 				int[] first_suppleXX_array = { 10, 71, 113, 114, 115, 63, 10, 8 };
 				first_suppleX_array = first_suppleXX_array;
@@ -168,10 +168,10 @@ public class BlockingEntrance {
 				factoryX_array = factoryXX_array;
 				int[] factoryYY_array = { 12, 38, 109, 82 };
 				factoryY_array = factoryYY_array;
-				int[] bunkerXX_array = { 78, 110, 54, 16 };
-				bunkerX_array = bunkerXX_array;
-				int[] bunkerYY_array = { 4, 51, 104, 61 };
-				bunkerY_array = bunkerYY_array;
+				int[] bunkerXX_array = { 77, 110, 53, 16 };
+			    bunkerX_array = bunkerXX_array;
+			    int[] bunkerYY_array = { 4, 51, 104, 61 };
+			    bunkerY_array = bunkerYY_array;
 			} else {
 				int[] first_suppleXX_array = { 57, 117, 27, 7 };// private
 																// static intnew
@@ -227,10 +227,10 @@ public class BlockingEntrance {
 				factoryX_array = factoryXX_array;
 				int[] factoryYY_array = { 16, 0, 107, 111 };
 				factoryY_array = factoryYY_array;
-				int[] bunkerXX_array = { 13, 100, 111, 21 };
-				bunkerX_array = bunkerXX_array;
-				int[] bunkerYY_array = { 26, 5, 101, 113 };
-				bunkerY_array = bunkerYY_array;
+				int[] bunkerXX_array = { 13, 100, 111, 25 };
+			    bunkerX_array = bunkerXX_array;
+			    int[] bunkerYY_array = { 26, 5, 101, 122 };
+			    bunkerY_array = bunkerYY_array; 
 			} else {
 				int[] first_suppleXX_array = { 8, 117, 117, 8 };// private
 																// static intnew

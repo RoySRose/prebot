@@ -183,10 +183,18 @@ public class ScoutManager{
 
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 				{
-					if (unit.getType().isBuilding() == true && unit.getType() == UnitType.Terran_Barracks)
-					{
-						firstBuilding = unit;
-						break;
+					if (InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters) {
+						if (unit.getType().isBuilding() == true && unit.getType() == UnitType.Terran_Supply_Depot)
+						{
+							firstBuilding = unit;
+							break;
+						}
+					}else{
+						if (unit.getType().isBuilding() == true && unit.getType() == UnitType.Terran_Barracks)
+						{
+							firstBuilding = unit;
+							break;
+						}
 					}
 				}
 
@@ -412,7 +420,7 @@ public class ScoutManager{
 	{
 	    Position fleeTo = getScoutFleePositionFromEnemyRegionVertices();
 
-        MyBotModule.Broodwar.drawCircleMap(fleeTo, 5, Color.Red, true);
+//        MyBotModule.Broodwar.drawCircleMap(fleeTo, 5, Color.Red, true);
 	    
 		commandUtil.move(currentScoutUnit, fleeTo);
 	}
@@ -730,8 +738,8 @@ public class ScoutManager{
 					int y1 = tp.getY() * 32 + 2;
 					int x2 = (tp.getX() + 1) * 32 - 2;
 					int y2 = (tp.getY() + 1) * 32 - 2;
-					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + MapTools.Instance().getGroundDistance(tp.toPosition(), basePosition));
-					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+//					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + MapTools.Instance().getGroundDistance(tp.toPosition(), basePosition));
+//					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
 				}
 
 				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));

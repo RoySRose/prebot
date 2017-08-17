@@ -653,10 +653,10 @@ public class RespondToStrategy {
 					Boolean firstChokeMainHalfTurret = false;
 					Boolean firstChokeExpHalfTurret = false;
 					
-					MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),180, Color.White);
+//					MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),180, Color.White);
  					if (tempBaseLocation != null) {
  						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempBaseLocation.getPosition(),300+turretcnt*10);
- 						MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),300+turretcnt*10, Color.Red);
+// 						MyBotModule.Broodwar.drawCircleMap(tempBaseLocation.getRegion().getCenter(),300+turretcnt*10, Color.Red);
  						for(Unit turret : turretInRegion){
  							if (turret.getType() == UnitType.Terran_Missile_Turret) {
  								mainBaseTurret = true;
@@ -676,7 +676,7 @@ public class RespondToStrategy {
    						//Position firstChokeMainHalf = new Position((tempBaseLocation.getRegion().getCenter().getX() + tempChokePoint.getX()*2)/3 - 60, (tempBaseLocation.getRegion().getCenter().getY() + tempChokePoint.getY()*2)/3 - 60);
  						Position firstChokeMainHalf = new Position((tempBaseLocation.getPosition().getX() + tempChokePoint.getX()*2)/3 - 60, (tempBaseLocation.getPosition().getY() + tempChokePoint.getY()*2)/3 - 60);
    						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeMainHalf,180+turretcnt*10);
-   						MyBotModule.Broodwar.drawCircleMap(firstChokeMainHalf,180+turretcnt*10, Color.Orange);	
+//   						MyBotModule.Broodwar.drawCircleMap(firstChokeMainHalf,180+turretcnt*10, Color.Orange);	
 
    						for(Unit turret : turretInRegion){
    							if (turret.getType() == UnitType.Terran_Missile_Turret) {
@@ -694,7 +694,7 @@ public class RespondToStrategy {
  					if(InformationManager.Instance().getMapSpecificInformation().getMap() != MAP.TheHunters){
 						if (tempChokePoint != null) {
 							List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),150+turretcnt*10);
-							MyBotModule.Broodwar.drawCircleMap(tempChokePoint.getCenter(),150+turretcnt*10, Color.Blue);
+//							MyBotModule.Broodwar.drawCircleMap(tempChokePoint.getCenter(),150+turretcnt*10, Color.Blue);
 							for(Unit turret : turretInRegion){
 								if (turret.getType() == UnitType.Terran_Missile_Turret) {
 									firstChokeTurret = true;
@@ -711,7 +711,7 @@ public class RespondToStrategy {
 						if (tempBaseLocation != null) { 
 	   						Position firstChokeExpHalf = new Position((tempExpLocation.getPosition().getX()*2 + tempChokePoint.getX())/3, (tempExpLocation.getPosition().getY()*2 + tempChokePoint.getY())/3);
 	   						List<Unit> turretInRegion = MyBotModule.Broodwar.getUnitsInRadius(firstChokeExpHalf.getPoint(),150+turretcnt*10);
-	   						MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf,150+turretcnt*10, Color.Blue);
+//	   						MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf,150+turretcnt*10, Color.Blue);
 	   						for(Unit turret : turretInRegion){
 	   							if (turret.getType() == UnitType.Terran_Missile_Turret) {
 	   								firstChokeExpHalfTurret = true;
