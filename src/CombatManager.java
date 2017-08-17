@@ -1307,50 +1307,44 @@ public class CombatManager {
 	}
 	
 	private void updateDefenseSquadUnits(Squad defenseSquad, int flyingDefendersNeeded, int groundDefendersNeeded, boolean pullWorkers, boolean doNotAssignMechanicUnit, boolean doNotAssignTankNGoliath) {
-		// if there's nothing left to defend, clear the squad
 		if (flyingDefendersNeeded <= 0 && groundDefendersNeeded <= 0) {
 			defenseSquad.clear();
 			return;
 		}
 		
-		List<Unit> squadUnits = defenseSquad.getUnitSet();
+//		List<Unit> squadUnits = defenseSquad.getUnitSet();
 		
 		int flyingDefendersInSquad = 0;
 		int groundDefendersInSquad = 0;
-		for (Unit unit : squadUnits) {
-			if (CommandUtil.CanAttackAir(unit)) {
-				flyingDefendersInSquad++;
-			}
-			if (CommandUtil.CanAttackGround(unit)) {
-				groundDefendersInSquad++;
-			}
-		}
+//		for (Unit unit : squadUnits) {
+//			if (CommandUtil.CanAttackAir(unit)) {
+//				flyingDefendersInSquad++;
+//			}
+//			if (CommandUtil.CanAttackGround(unit)) {
+//				groundDefendersInSquad++;
+//			}
+//		}
 		// add flying defenders if we still need them
 		int flyingDefendersAdded = 0;
 		while (flyingDefendersNeeded > flyingDefendersInSquad + flyingDefendersAdded) {
 			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), true, false, doNotAssignMechanicUnit, doNotAssignTankNGoliath);
 
-			// if we find a valid flying defender, add it to the squad
 			if (defenderToAdd != null) {
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
 				flyingDefendersAdded++;
 			}
-			// otherwise we'll never find another one so break out of this loop
 			else {
 				break;
 			}
 		}
-		// add ground defenders if we still need them
 		int groundDefendersAdded = 0;
 		while (groundDefendersNeeded > groundDefendersInSquad + groundDefendersAdded) {
 			Unit defenderToAdd = findClosestDefender(defenseSquad, defenseSquad.getOrder().getPosition(), false, false, doNotAssignMechanicUnit, doNotAssignTankNGoliath);
 
-			// If we find a valid ground defender, add it.
 			if (defenderToAdd != null) {
 				squadData.assignUnitToSquad(defenderToAdd, defenseSquad);
 				groundDefendersAdded++;
 			}
-			// otherwise we'll never find another one so break out of this loop
 			else {
 				break;
 			}

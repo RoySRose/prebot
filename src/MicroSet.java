@@ -38,6 +38,7 @@ public class MicroSet {
 		public static final int MINE_SPREAD_RADIUS = 250;
 		public static final int MINE_ENEMY_RADIUS = 50;
 		public static final int MINE_ENEMY_TARGET_DISTANCE = 500;
+		public static final int MINE_MAX_NUM = 150;
 
 		public static final int MINE_BETWEEN_DIST = 50;
 		public static final int MINE_REMOVE_TANK_DIST = 150;
