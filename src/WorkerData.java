@@ -653,7 +653,6 @@ public class WorkerData {
 		Unit bestMineral = null;
 		double bestDist = 100000000;
 	    double bestNumAssigned = 10000000;
-	    int lowSCV = 10;
 	    int workerCnt = depotWorkerCount.get(depot.getID());
 	    int minCnt = 0;
 	    
@@ -664,10 +663,6 @@ public class WorkerData {
 	        minCnt = mineralPatches.size();
 	        if( workerCnt > minCnt){
 	        	bestDist = 0;
-	        }
-	        for (Unit mineral : mineralPatches){
-	        	lowSCV = workersOnMineralPatch.get(mineral.getID());
-	        	//System.out.println("mineralPatches : " + mineralPatches.size());
 	        }
 			for (Unit mineral : mineralPatches)
 			{
