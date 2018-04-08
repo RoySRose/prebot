@@ -278,7 +278,7 @@ public class BuildManager extends GameManager {
 					// this deals with the frame-delay of telling a unit to
 					// build an addon and it actually starting to build
 					if (unit.getLastCommand().getUnitCommandType() == UnitCommandType.Build_Addon // C++ : unit.getLastCommand().getType()
-							&& (TimeUtils.frames(unit.getLastCommandFrame()) < 10)) {
+							&& (TimeUtils.elapsedFrames(unit.getLastCommandFrame()) < 10)) {
 						continue;
 					}
 

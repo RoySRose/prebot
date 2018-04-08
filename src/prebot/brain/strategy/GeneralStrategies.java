@@ -6,9 +6,8 @@ public class GeneralStrategies {
 	
 	public static final class GeneralStrategyForProtoss extends GeneralStrategy {
 		public GeneralStrategyForProtoss() {
-			buildActionList = getDefaultBuildActionList();
-			squadList = getDefaultSquadList();
-			actionList = getDefaultActionList();
+			setUpDefaultGeneralStrategy();
+			setUpFactoryUnitTrainActionByRatio(1, 1, 1);
 			
 			// TODO add protoss specific options
 		}
@@ -16,17 +15,15 @@ public class GeneralStrategies {
 	
 	public static final class GeneralStrategyForZerg extends GeneralStrategy {
 		public GeneralStrategyForZerg() {
-			buildActionList = getDefaultBuildActionList();
-			squadList = getDefaultSquadList();
-			actionList = getDefaultActionList();
+			setUpDefaultGeneralStrategy();
+			setUpFactoryUnitTrainActionByRatio(1, 1, 1);
 		}
 	}
 	
 	public static final class GeneralStrategyForTerran extends GeneralStrategy {
 		public GeneralStrategyForTerran() {
-			buildActionList = getDefaultBuildActionList();
-			squadList = getDefaultSquadList();
-			actionList = getDefaultActionList();
+			setUpDefaultGeneralStrategy();
+			setUpFactoryUnitTrainActionByRatio(1, 1, 1);
 		}
 	}
 	

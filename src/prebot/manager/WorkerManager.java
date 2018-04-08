@@ -8,13 +8,14 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import prebot.brain.action.ActionVariables;
+import prebot.common.code.Code.UnitFindRange;
 import prebot.common.code.GameConstant;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
 import prebot.main.PreBot;
 import prebot.manager.information.WorkerData;
-import prebot.manager.information.WorkerMoveData;
 import prebot.manager.information.WorkerData.WorkerJob;
+import prebot.manager.information.WorkerMoveData;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -129,37 +130,25 @@ public class WorkerManager extends GameManager {
 		}
 	}
 
-	/// 가스일꾼 조절
-	/// [가스통 x1 기준]
-	/// 일꾼 00-09기, 가스일꾼 0기
-	/// 일꾼 10-11기, 가스일꾼 1기
-	/// 일꾼 12-13기, 가스일꾼 2기
-	/// 일꾼 14-15기, 가스일꾼 3기
-	/// 일꾼 16-??기, 가스일꾼 max
-	///
-	/// [가스통 x2 기준]
-	/// 일꾼 00-11기, 가스일꾼 0기
-	/// 일꾼 12-15기, 가스일꾼 1기
-	/// 일꾼 16-19기, 가스일꾼 2기
-	/// 일꾼 20-23기, 가스일꾼 3기
-	/// 일꾼 24-??기, 가스일꾼 max
 	private int getAdjustedWorkersPerRefinery() {
 		if (ActionVariables.gasAdjustment) {
 			// specific count adjusted by action
 			return ActionVariables.gasAdjustmentWorkerCount;
 			
 		} else {
-			// default gas adjustment
-			int workerCountExcludeEightMineralWorkers = PreBot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) - 8;
-			if (workerCountExcludeEightMineralWorkers <= 0) {
+			int workerCount = UnitUtils.getUnitCount(UnitType.Terran_SCV, UnitFindRange.COMPLETE);
+			if (workerCount <= 7) {
 				return 0;
-			}
-			int refineryCount = PreBot.Broodwar.self().completedUnitCount(UnitType.Terran_Refinery);
-			int workersPerRefinery = (int) (workerCountExcludeEightMineralWorkers / (refineryCount * 2));
-			if (workersPerRefinery > GameConstant.WORKERS_PER_REFINERY) {
-				return GameConstant.WORKERS_PER_REFINERY;
+				
 			} else {
-				return workersPerRefinery;
+				int refineryCount = UnitUtils.getUnitCount(UnitType.Terran_Refinery, UnitFindRange.COMPLETE);
+				int workersPerRefinery = (int) (workerCount - 7 + 1) / (refineryCount * 2);
+				
+				if (workersPerRefinery > GameConstant.WORKERS_PER_REFINERY) {
+					return GameConstant.WORKERS_PER_REFINERY;
+				} else {
+					return workersPerRefinery;
+				}
 			}
 		}
 	}

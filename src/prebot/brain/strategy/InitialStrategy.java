@@ -5,22 +5,19 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.brain.buildaction.BuildAction;
+import prebot.brain.squad.Squads;
 import prebot.manager.build.BuildOrderItem;
-import prebot.manager.build.MetaType;
 import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.manager.build.MetaType;
 
 public class InitialStrategy extends Strategy {
-	
+
 	public class InitialBuildBuilder {
 		
 		private List<BuildAction> initialBuildActionList = new ArrayList<>();
 		
-		public InitialBuildBuilder add(UnitType unitType) {
-			return add(unitType, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
-		}
-
-		public InitialBuildBuilder add(UnitType unitType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
-			return add(unitType, seedPositionStrategy, true);
+		public InitialBuildBuilder add(UnitType unitType, boolean blocking) {
+			return add(unitType, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, blocking);
 		}
 
 		public InitialBuildBuilder add(UnitType unitType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy, boolean blocking) {
@@ -50,6 +47,10 @@ public class InitialStrategy extends Strategy {
 			};
 		}
 	}
-
+	
+	public void setUpDefaultInitialStrategy() {
+		squadList.add(new Squads.IdleSquad());
+		squadList.add(new Squads.MainSquad());
+	}
 	
 }

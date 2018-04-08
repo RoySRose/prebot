@@ -15,33 +15,43 @@ public class TimeUtils {
 	}
 
 	/// 경과시간을 frame으로 리턴
-	public static int frames() {
+	public static int elapsedFrames() {
 		return PreBot.Broodwar.getFrameCount();
 	}
 	
 	/// 경과시간을 second로 리턴
-	public static int seconds() {
+	public static int elapsedSeconds() {
 		return PreBot.Broodwar.getFrameCount() / SECOND;
 	}
 	
 	/// 경과시간을 minute으로 리턴
-	public static int miniutes() {
+	public static int elapsedMiniutes() {
 		return PreBot.Broodwar.getFrameCount() / MINUTE;
 	}
 	
 	/// 경과시간을 frame으로 리턴
-	public static int frames(int startFrame) {
+	public static int elapsedFrames(int startFrame) {
 		return PreBot.Broodwar.getFrameCount() - startFrame;
 	}
 
 	/// 경과시간을 second으로 리턴
-	public static int seconds(int startFrame) {
+	public static int elapsedSeconds(int startFrame) {
 		return (PreBot.Broodwar.getFrameCount() - startFrame) / SECOND;
 	}
 
 	/// 경과시간을 minute으로 리턴
-	public static int miniutes(int startFrame) {
+	public static int elapsedMiniutes(int startFrame) {
 		return (PreBot.Broodwar.getFrameCount() - startFrame) / MINUTE;
+	}
+
+	/// frame을 second로 단위변경하여 리턴
+	public static int framesToSeconds(int frame) {
+		return frame / SECOND;
+	}
+
+	/// frame을 second로 단위변경하여 리턴
+	public static int framesToMinutes(int frame) {
+		return frame / MINUTE;
 	}
 	
 	/// 실행할 frame되어야 하는 frame이면 true

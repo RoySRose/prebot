@@ -35,7 +35,7 @@ public class Brain {
 	}
 
 	private void stackHistory() {
-		int seconds = TimeUtils.seconds();
+		int seconds = TimeUtils.elapsedSeconds();
 		UnitCache unitCache = UnitCache.getCurrentCache();
 
 		// TODO unit 정보를 담는다. 판단에 어떤 정보가 더 필요할지에 따라 정보가 추가되어야 한다. 
@@ -50,10 +50,10 @@ public class Brain {
 		
 		// TOOD 결과로 나온 STRATEGY를 새로운(new) 객체로 리턴
 		// 분석결과(analysed data)
-		Strategy analysedStrategy = analysedStrategy();
+		Strategy analysedStrategy = analysedStrategy(previousStrategy);
 		boolean strategyChanged = !analysedStrategy.getClass().equals(previousStrategy.getClass());
 		
-		// 1. 빌드액션 :
+		// 1. 빌드액션
 		// - 초반빌드큐는 항상 모든 빌드아이템을 리턴하고, 처리된 항목은 제외한다.
 		if (analysedStrategy instanceof InitialStrategy) {
 			analysedStrategy.buildActionList = this.finishedBuildActionRemoved(analysedStrategy.buildActionList);
@@ -78,8 +78,12 @@ public class Brain {
 		return analysedStrategy;
 	}
 
-	private Strategy analysedStrategy() {
-		return InitialStrategies.initialStrategy(PreBot.Broodwar.enemy().getRace());
+	private Strategy analysedStrategy(Strategy previousStrategy) {
+		if (previousStrategy instanceof GeneralStrategy) {
+			return GeneralStrategies.generalStrategy(PreBot.Broodwar.enemy().getRace());
+		} else {
+			return InitialStrategies.initialStrategy(PreBot.Broodwar.enemy().getRace());
+		}
 	}
 
 	private List<BuildAction> finishedBuildActionRemoved(List<BuildAction> buildActionList) {
@@ -112,7 +116,7 @@ public class Brain {
 			}
 		}
 		
-		List<Action> resultActionList = new ArrayList<>();
+		List<Action> resultActionList = new ArrayList<>(actionList);
 		resultActionList.removeAll(removeActionList); // 종료된 action 제거
 		resultActionList.addAll(addActionList); // 연결된 다음 action 추가
 		

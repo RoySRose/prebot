@@ -14,7 +14,6 @@ import prebot.brain.Brain;
 import prebot.brain.RespondToStrategy;
 import prebot.brain.action.Action;
 import prebot.brain.buildaction.BuildAction;
-import prebot.brain.buildaction.FactoryUnitSelector;
 import prebot.brain.squad.Squad;
 import prebot.brain.strategy.Strategy;
 import prebot.common.code.Code.UnitFindRange;
@@ -24,8 +23,8 @@ import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.main.PreBot;
 import prebot.manager.build.BuildOrderItem;
-import prebot.manager.build.ConstructionPlaceFinder;
 import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.manager.build.ConstructionPlaceFinder;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
@@ -121,12 +120,6 @@ public class StrategyManager extends GameManager {
 	}
 
 	private void executeUpgrade() {
-	}
-
-	private void executeTrainFactoryUnit() {
-		// requiredUnitMap.put
-		UnitType selectedFactoryUnitType = FactoryUnitSelector.factoryUnitSelect();
-		BuildManager.Instance().buildQueue.qHigh(selectedFactoryUnitType, false);
 	}
 
 	private void executeTrainStarportUnit() {

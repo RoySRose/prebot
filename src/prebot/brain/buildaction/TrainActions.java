@@ -31,14 +31,14 @@ public class TrainActions {
 				return false;
 			}
 			
-			//현재 일꾼 수가 일꾼 max를 초과하면 안됨
+			// 2. 현재 일꾼 수가 일꾼 max를 초과하면 안됨
 			int currentCount = UnitUtils.getUnitCount(UnitType.Terran_SCV, UnitFindRange.ALL);
 			int maxCount = getMaxScvCount();
-			if (currentCount > maxCount) {
+			if (currentCount >= maxCount) {
 				return false;
 			}
 			
-			//가동중이지 않은 커맨드센터가 있어야 한다.
+			// 3. 가동중이지 않은 커맨드센터가 있어야 한다.
 			boolean existIdleCommandCenter = false;
 			for (Unit commandCenter : UnitUtils.getUnitList(UnitType.Terran_Command_Center, UnitFindRange.COMPLETE)) {
 				if (!commandCenter.isTraining() && commandCenter.getHitPoints() > GameConstant.UNIT_PRODUCE_HITPOINT) {
@@ -72,6 +72,63 @@ public class TrainActions {
 			//TODO 아래 계산식은 오류로 보임. selfMineralCount * 2로 변경함. 테스트 필요. 
 			//selfMineralCount * 2 + 8 * PreBot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 			return Math.min(GameConstant.MAX_WORKER_COUNT, selfMineralCount * 2);
+		}
+	}
+	
+	/**
+	 * BuildOrderItem : Vulture
+	 * 
+	 * 전략별 비율에 따른 FactoryUnitSelector에 의해 선택된 유닛을 생산한다.
+	 */
+	public static final class TrainVulture extends BuildAction {
+		private FactoryUnitSelector selector;
+		
+		public TrainVulture(FactoryUnitSelector selector) {
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Vulture), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			this.selector = selector;
+		}
+
+		@Override
+		public boolean buildCondition() {
+			return selector.selectFactoryUnit() == super.getBuildType();
+		}
+	}
+	
+	/**
+	 * BuildOrderItem : TrainTank
+	 * 
+	 * 전략별 비율에 따른 FactoryUnitSelector에 의해 선택된 유닛을 생산한다.
+	 */
+	public static final class TrainTank extends BuildAction {
+		private FactoryUnitSelector selector;
+		
+		public TrainTank(FactoryUnitSelector selector) {
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			this.selector = selector;
+		}
+
+		@Override
+		public boolean buildCondition() {
+			return selector.selectFactoryUnit() == super.getBuildType();
+		}
+	}
+	
+	/**
+	 * BuildOrderItem : TrainGoliath
+	 * 
+	 * 전략별 비율에 따른 FactoryUnitSelector에 의해 선택된 유닛을 생산한다.
+	 */
+	public static final class TrainGoliath extends BuildAction {
+		private FactoryUnitSelector selector;
+		
+		public TrainGoliath(FactoryUnitSelector selector) {
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Goliath), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			this.selector = selector;
+		}
+
+		@Override
+		public boolean buildCondition() {
+			return selector.selectFactoryUnit() == super.getBuildType();
 		}
 	}
 

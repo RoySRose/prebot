@@ -42,7 +42,7 @@ public class UnitUtils {
 		}
 	}
 	
-	/// 유닛 수
+	/// 유닛 수 (constructionQueue가 포함된 검색인 경우, getUnitList.size()와 수가 다를 수 있다.)
 	public static int getUnitCount(UnitType unitType, UnitFindRange unitFindRange) {
 		switch (unitFindRange) {
 		case COMPLETE:
@@ -54,7 +54,12 @@ public class UnitUtils {
 		case ALL:
 			return UnitCache.getCurrentCache().allCount(unitType);
 		case ALL_AND_CONSTRUCTION_QUEUE: default:
-			return UnitCache.getCurrentCache().underConstructionCount(unitType) + UnitCache.getCurrentCache().completeCount(unitType);
+			if (unitType.isBuilding() && !unitType.isAddon()) {
+				return UnitCache.getCurrentCache().underConstructionCount(unitType) + UnitCache.getCurrentCache().completeCount(unitType);
+			} else {
+				return UnitCache.getCurrentCache().incompleteCount(unitType) + UnitCache.getCurrentCache().completeCount(unitType);
+			}
+			
 		}
 	}
 	
@@ -129,7 +134,7 @@ public class UnitUtils {
 	}
 	
 	public static boolean isVeryOldUnitInfo(UnitInfo ui) {
-		return TimeUtils.seconds(ui.updateFrame) >= GameConstant.IGNORE_ENEMY_UNITINFO_SECONDS;
+		return TimeUtils.elapsedSeconds(ui.updateFrame) >= GameConstant.IGNORE_ENEMY_UNITINFO_SECONDS;
 	}
 
 	public static boolean isValidUnit(Unit unit) {
