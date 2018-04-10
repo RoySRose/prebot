@@ -1,4 +1,4 @@
-package prebot.manager.combat;
+package prebot.micro;
 
 import java.util.HashMap;
 import java.util.Map;

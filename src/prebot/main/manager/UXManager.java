@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -22,14 +22,14 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
+import prebot.build.BuildOrderItem;
+import prebot.build.ConstructionPlaceFinder;
+import prebot.build.ConstructionTask;
 import prebot.common.code.ConfigForUx;
 import prebot.common.code.GameConstant;
+import prebot.information.UnitInfo;
+import prebot.information.WorkerData;
 import prebot.main.PreBot;
-import prebot.manager.build.BuildOrderItem;
-import prebot.manager.build.ConstructionPlaceFinder;
-import prebot.manager.build.ConstructionTask;
-import prebot.manager.information.UnitInfo;
-import prebot.manager.information.WorkerData;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다

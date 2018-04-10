@@ -8,8 +8,8 @@ import prebot.common.code.GameConstant;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.main.PreBot;
-import prebot.manager.InformationManager;
-import prebot.manager.WorkerManager;
+import prebot.main.manager.InformationManager;
+import prebot.main.manager.WorkerManager;
 
 public class Actions {
 

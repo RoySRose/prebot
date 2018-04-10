@@ -8,13 +8,13 @@ import bwapi.Unit;
 import prebot.chat.ChatBot;
 import prebot.common.code.ConfigForDebug.DEBUG;
 import prebot.common.util.PlayerUtils;
-import prebot.manager.BuildManager;
-import prebot.manager.CombatManager;
-import prebot.manager.ConstructionManager;
-import prebot.manager.InformationManager;
-import prebot.manager.ScoutManager;
-import prebot.manager.StrategyManager;
-import prebot.manager.WorkerManager;
+import prebot.main.manager.BuildManager;
+import prebot.main.manager.CombatManager;
+import prebot.main.manager.ConstructionManager;
+import prebot.main.manager.InformationManager;
+import prebot.main.manager.ScoutManager;
+import prebot.main.manager.StrategyManager;
+import prebot.main.manager.WorkerManager;
 
 /// 실제 봇프로그램의 본체가 되는 class<br>
 /// 스타크래프트 경기 도중 발생하는 이벤트들이 적절하게 처리되도록 해당 Manager 객체에게 이벤트를 전달하는 관리자 Controller 역할을 합니다

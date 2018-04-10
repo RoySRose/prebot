@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import java.util.HashSet;
 import java.util.Set;

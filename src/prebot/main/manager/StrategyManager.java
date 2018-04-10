@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -16,15 +16,15 @@ import prebot.brain.action.Action;
 import prebot.brain.buildaction.BuildAction;
 import prebot.brain.squad.Squad;
 import prebot.brain.strategy.Strategy;
+import prebot.build.BuildOrderItem;
+import prebot.build.ConstructionPlaceFinder;
+import prebot.build.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.code.GameConstant;
 import prebot.common.util.FileUtil;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.main.PreBot;
-import prebot.manager.build.BuildOrderItem;
-import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
-import prebot.manager.build.ConstructionPlaceFinder;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>

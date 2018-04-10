@@ -1,7 +1,7 @@
 package prebot.brain.buildaction;
 
 import bwapi.UnitType;
-import prebot.manager.build.BuildOrderItem;
+import prebot.build.BuildOrderItem;
 
 public abstract class BuildAction {
 	public BuildOrderItem buildOrderItem;

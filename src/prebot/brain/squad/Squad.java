@@ -3,17 +3,20 @@ package prebot.brain.squad;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
-import bwapi.UnitType;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.util.UnitUtils;
+import prebot.information.UnitInfo;
 
 public abstract class Squad {
 
 	public final String squadName;
 	public final int priority;
+	
 	public List<Unit> unitList = new ArrayList<>();
-	public List<UnitType> squadUnitTypeList = new ArrayList<>(); /// squad 포함가능 유닛타입
+	public List<UnitInfo> enemyUnitInfoList = new ArrayList<>();
+	public Position goalPosition = Position.None;
 	
 	// private List<Unit> unitOldBies = new ArrayList<>();
 	// private List<Unit> unitNewBies = new ArrayList<>();
@@ -56,8 +59,11 @@ public abstract class Squad {
 	/// squad에 소속될수 있는 유닛인지 확인한다.
 	public abstract boolean want(Unit unit);
 
+	/// squad가 신경써야 하는 적 판단
+	public abstract void findEnemies();
+
 	/// squad 실행
-	public abstract boolean execute();
+	public abstract void execute();
 
 	/// 유효하지 않은 유닛(죽은 유닛 등)을 제거한다.
 	private void removeInvalidUnits() {

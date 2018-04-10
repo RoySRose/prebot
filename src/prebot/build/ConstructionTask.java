@@ -1,4 +1,4 @@
-package prebot.manager.build;
+package prebot.build;
 import java.util.Set;
 
 import bwapi.Color;

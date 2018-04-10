@@ -1,4 +1,4 @@
-package prebot.manager.information;
+package prebot.information;
 import bwapi.Position;
 
 public class WorkerMoveData

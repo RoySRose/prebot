@@ -1,18 +1,20 @@
 package prebot.brain.squad;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bwapi.Unit;
-import bwta.BaseLocation;
-import prebot.common.util.CommandUtils;
-import prebot.main.PreBot;
-import prebot.manager.InformationManager;
+import bwapi.UnitType;
+import prebot.information.UnitInfo;
+import prebot.main.manager.InformationManager;
+import prebot.main.manager.WorkerManager;
+import prebot.micro.control.TestControl;
 
 public class Squads {
 	
 	public static final class IdleSquad extends Squad {
-
 		public IdleSquad() {
 			super("IDLE_SQUAD", 0);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -21,17 +23,20 @@ public class Squads {
 		}
 
 		@Override
-		public boolean execute() {
-			return false;
+		public void findEnemies() {
+		}
+
+		@Override
+		public void execute() {
 		}
 	}
 	
 	
 	public static final class MainSquad extends Squad {
-
+		private TestControl testControl = new TestControl();
+		
 		public MainSquad() {
 			super("MAIN_SQUAD", 1);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -40,14 +45,43 @@ public class Squads {
 		}
 
 		@Override
-		public boolean execute() {
-			BaseLocation base = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self());
+		public void findEnemies() {
+			List<UnitInfo> enemyUnitInfoList = new ArrayList<>();
 			for (Unit unit : unitList) {
-				CommandUtils.attackMove(unit, base.getPosition());
+//				InformationManager.Instance().getNearbyForce(enemyUnitInfoList, unit.getPosition(), InformationManager.Instance().enemyPlayer, 300);
 			}
-			return true;
 		}
-		
+
+		@Override
+		public void execute() {
+			testControl.prepare(goalPosition, unitList, enemyUnitInfoList);
+			
+			for (Unit unit : unitList) {
+				testControl.control(unit);
+			}
+		}
+	}
+	
+	public static final class ScvScoutSquad extends Squad {
+		public ScvScoutSquad() {
+			super("SCOUT_SQUAD", 2);
+		}
+
+		@Override
+		public boolean want(Unit unit) {
+			if (unit.getType() != UnitType.Terran_SCV) {
+				return false;
+			}
+			return WorkerManager.Instance().isScoutWorker(unit);
+		}
+
+		@Override
+		public void findEnemies() {
+		}
+
+		@Override
+		public void execute() {
+		}
 	}
 
 }

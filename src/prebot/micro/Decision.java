@@ -1,10 +1,10 @@
-package prebot.manager.combat;
+package prebot.micro;
 
 import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
-import prebot.manager.information.UnitInfo;
+import prebot.information.UnitInfo;
 
 public class Decision {
 

@@ -1,4 +1,4 @@
-package prebot.manager.combat;
+package prebot.micro;
 
 public class KitingOption {
 

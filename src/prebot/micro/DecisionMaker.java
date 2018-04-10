@@ -1,4 +1,4 @@
-package prebot.manager.combat;
+package prebot.micro;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.code.ConfigForMicro.Flee;
+import prebot.information.UnitInfo;
 import prebot.main.PreBot;
-import prebot.manager.information.UnitInfo;
 
 public class DecisionMaker {
 	

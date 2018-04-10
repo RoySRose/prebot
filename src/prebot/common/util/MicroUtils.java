@@ -10,10 +10,10 @@ import bwapi.WeaponType;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.code.ConfigForMicro.Angles;
 import prebot.common.util.internal.MirrorBugFixed;
+import prebot.information.UnitInfo;
 import prebot.main.PreBot;
-import prebot.manager.combat.FleeOption;
-import prebot.manager.combat.KitingOption;
-import prebot.manager.information.UnitInfo;
+import prebot.micro.FleeOption;
+import prebot.micro.KitingOption;
 
 /**
  * 마이크로 컨트롤 유틸

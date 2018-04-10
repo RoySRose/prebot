@@ -1,6 +1,6 @@
-package prebot.manager.combat;
+package prebot.micro;
 
-import prebot.manager.information.UnitInfo;
+import prebot.information.UnitInfo;
 
 public class CalcTargetScore {
 	

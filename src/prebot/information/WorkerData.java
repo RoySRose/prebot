@@ -1,4 +1,4 @@
-package prebot.manager.information;
+package prebot.information;
 
 import java.util.ArrayList;
 import java.util.HashMap;

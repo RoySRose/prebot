@@ -1,4 +1,4 @@
-package prebot.manager.build;
+package prebot.build;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,12 +12,12 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import prebot.build.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.code.GameConstant;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.main.PreBot;
-import prebot.manager.InformationManager;
-import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.main.manager.InformationManager;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {

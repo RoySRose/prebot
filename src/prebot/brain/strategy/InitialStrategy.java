@@ -6,9 +6,9 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.brain.buildaction.BuildAction;
 import prebot.brain.squad.Squads;
-import prebot.manager.build.BuildOrderItem;
-import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
-import prebot.manager.build.MetaType;
+import prebot.build.BuildOrderItem;
+import prebot.build.MetaType;
+import prebot.build.BuildOrderItem.SeedPositionStrategy;
 
 public class InitialStrategy extends Strategy {
 

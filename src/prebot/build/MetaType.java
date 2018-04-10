@@ -1,4 +1,4 @@
-package prebot.manager.build;
+package prebot.build;
 
 import bwapi.Race;
 import bwapi.TechType;

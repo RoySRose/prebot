@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prebot.main.PreBot;
-import prebot.manager.UXManager;
+import prebot.main.manager.UXManager;
 
 /**
  * @author insaneojw

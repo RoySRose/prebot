@@ -1,4 +1,4 @@
-package prebot.manager.combat;
+package prebot.micro;
 
 import bwapi.Position;
 import prebot.common.code.ConfigForMicro.Angles;

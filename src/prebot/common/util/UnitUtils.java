@@ -13,11 +13,11 @@ import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.EnemyUnitFindRange;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.util.internal.UnitCache;
+import prebot.information.UnitData;
+import prebot.information.UnitInfo;
 import prebot.main.PreBot;
-import prebot.manager.InformationManager;
-import prebot.manager.WorkerManager;
-import prebot.manager.information.UnitData;
-import prebot.manager.information.UnitInfo;
+import prebot.main.manager.InformationManager;
+import prebot.main.manager.WorkerManager;
 
 /**
  * 유닛 유틸

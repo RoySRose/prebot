@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import bwapi.Color;
 import bwapi.Position;
@@ -12,10 +12,10 @@ import prebot.common.code.Code.UnitFindRange;
 import prebot.common.code.GameConstant;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
+import prebot.information.WorkerData;
+import prebot.information.WorkerMoveData;
+import prebot.information.WorkerData.WorkerJob;
 import prebot.main.PreBot;
-import prebot.manager.information.WorkerData;
-import prebot.manager.information.WorkerData.WorkerJob;
-import prebot.manager.information.WorkerMoveData;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -60,7 +60,8 @@ public class WorkerManager extends GameManager {
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
 			if (worker.isIdle()) {
 				// workerData 에서 Build / Move / Scout 로 임무지정한 경우, worker 는 즉 임무 수행 도중 (임무 완료 전) 에 일시적으로 isIdle 상태가 될 수 있다
-				if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move
+				if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build
+						&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move
 						&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout) {
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}

@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -11,10 +11,10 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
+import prebot.build.ConstructionPlaceFinder;
+import prebot.build.ConstructionTask;
 import prebot.common.util.CommandUtils;
 import prebot.main.PreBot;
-import prebot.manager.build.ConstructionPlaceFinder;
-import prebot.manager.build.ConstructionTask;
 
 /// 건물 건설 Construction 명령 목록을 리스트로 관리하고, 건물 건설 명령이 잘 수행되도록 컨트롤하는 class
 public class ConstructionManager extends GameManager {

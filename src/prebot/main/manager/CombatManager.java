@@ -1,4 +1,4 @@
-package prebot.manager;
+package prebot.main.manager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import bwapi.Unit;
 import prebot.brain.squad.Squad;
 import prebot.common.util.UnitUtils;
 import prebot.main.PreBot;
-import prebot.manager.combat.SquadData;
+import prebot.micro.SquadData;
 
 public class CombatManager extends GameManager {
 
@@ -52,6 +52,7 @@ public class CombatManager extends GameManager {
 	private void squadExecution() {
 		for (Squad squad : squadData.squadMap.values()) {
 			squad.update(); // squad 유닛 배분 및 유효하지 않은 유닛 삭제
+			squad.findEnemies(); // 스쿼드 적 파악
 			squad.execute(); // squad 유닛 명령 지시
 		}
 	}

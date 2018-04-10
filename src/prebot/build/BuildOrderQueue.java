@@ -1,4 +1,4 @@
-package prebot.manager.build;
+package prebot.build;
 
 import java.awt.Point;
 import java.util.ArrayDeque;
@@ -9,7 +9,7 @@ import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import prebot.manager.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.build.BuildOrderItem.SeedPositionStrategy;
 
 /// 빌드 오더 목록 자료구조 class
 public class BuildOrderQueue {
