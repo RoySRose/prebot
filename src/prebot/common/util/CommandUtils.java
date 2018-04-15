@@ -4,6 +4,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
+import prebot.micro.KitingOption;
 
 public class CommandUtils {
 
@@ -118,5 +119,12 @@ public class CommandUtils {
 
 		// if nothing prevents it, attack the target
 		unit.repair(target);
+	}
+
+	public static void kiting(Unit unit, Unit target, KitingOption kOption) {
+		if (unit == null || target == null) {
+			return;
+		}
+		MicroUtils.kiting(unit, target, kOption);
 	}
 }

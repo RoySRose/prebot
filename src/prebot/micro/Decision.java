@@ -98,7 +98,7 @@ public class Decision {
 		if (decisionType == DecisionType.KITING_UNIT) {
 			MicroUtils.kiting(unit, eui, kOption);
 		} else if (decisionType == DecisionType.ATTACK_UNIT) {
-			if (MicroUtils.enemyUnitInSight(eui)) {
+			if (MicroUtils.enemyUnitInSight(eui) != null) {
 				CommandUtils.attackUnit(unit, eui.unit);
 			} else {
 				CommandUtils.move(unit, eui.lastPosition);

@@ -3,6 +3,7 @@ package prebot.common.util;
 import bwapi.Player;
 import bwapi.Position;
 import bwta.BaseLocation;
+import prebot.main.PreBot;
 import prebot.main.manager.InformationManager;
 
 /**
@@ -10,6 +11,14 @@ import prebot.main.manager.InformationManager;
  *
  */
 public class PlayerUtils {
+
+	public static Player preBot() {
+		return PreBot.Broodwar.self();
+	}
+	
+	public static Player enemy() {
+		return PreBot.Broodwar.enemy();
+	}
 
 	/// player가 게임을 진행할 수 없으면 true를 반환
 	public static boolean isDisabled(Player player) {

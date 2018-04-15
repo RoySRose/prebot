@@ -20,5 +20,9 @@ public class Code {
 	public static enum StrategyRuleResult {
 		CERTAINLY, MAYBE, DISCARD
 	}
+	
+	public enum WatcherCombatPredictResult {
+		BACK, ATTACK, ATTACK_NO_MERCY
+	}
 
 }

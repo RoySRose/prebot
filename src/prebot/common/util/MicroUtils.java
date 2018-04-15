@@ -28,29 +28,31 @@ public class MicroUtils {
 	}
 	
 	public static void kiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
-		if (!enemyUnitInSight(targetInfo)) {
+		if (enemyUnitInSight(targetInfo) == null) {
 			CommandUtils.move(rangedUnit, targetInfo.lastPosition);
-			return;
+		} else {
+			kiting(rangedUnit, targetInfo.unit, kOption);
 		}
-		Unit targetUnit = targetInfo.unit;
-		
-		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
+	}
+	
+	public static void kiting(Unit unit, Unit target, KitingOption kOption) {
+		if (!killedByNShot(unit, target, 1) && killedByNShot(target, unit, 2)) {
 			kOption.cooltimeAlwaysAttack = false;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
-		} else if (groundUnitFreeKiting(rangedUnit)) {
+		} else if (groundUnitFreeKiting(unit)) {
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		}
 		
-		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
-			CommandUtils.attackUnit(rangedUnit, targetUnit);
+		if (timeToAttack(unit, target, kOption.cooltimeAlwaysAttack)) {
+			CommandUtils.attackUnit(unit, target);
 			return;
 		} else {
-			if (forwardKiting(rangedUnit, targetUnit)) {
-				rangedUnit.move(targetUnit.getPosition());
+			if (forwardKiting(unit, target)) {
+				unit.move(target.getPosition());
 			} else {
-				flee(rangedUnit, targetUnit.getPosition(), kOption.fOption);
+				flee(unit, target.getPosition(), kOption.fOption);
 			}
 		}
 	}
@@ -98,9 +100,14 @@ public class MicroUtils {
 		return false;
 	}
 
-	public static boolean enemyUnitInSight(UnitInfo enemyInfo) {
-		Unit enemy = PreBot.Broodwar.getUnit(enemyInfo.unitID);
-		return enemy != null && enemy.getType() != UnitType.Unknown;
+	/** 시야에 있는 적인가? */
+	public static Unit enemyUnitInSight(UnitInfo enemyUnitInfo) {
+		Unit enemyUnit = PreBot.Broodwar.getUnit(enemyUnitInfo.unitID);
+		if (enemyUnit != null && enemyUnit.getType() != UnitType.Unknown) {
+			return enemyUnit;
+		} else {
+			return null;
+		}
 	}
 
 	private static Position getFleePosition(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
