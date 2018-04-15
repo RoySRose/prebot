@@ -5,10 +5,9 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.brain.buildaction.BuildAction;
-import prebot.brain.squad.Squads;
 import prebot.build.BuildOrderItem;
-import prebot.build.MetaType;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.build.MetaType;
 
 public class InitialStrategy extends Strategy {
 
@@ -49,8 +48,6 @@ public class InitialStrategy extends Strategy {
 	}
 	
 	public void setUpDefaultInitialStrategy() {
-		squadList.add(new Squads.IdleSquad());
-		squadList.add(new Squads.MainSquad());
 	}
 	
 }

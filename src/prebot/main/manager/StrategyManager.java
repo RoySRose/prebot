@@ -11,14 +11,14 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.brain.Brain;
+import prebot.brain.Idea;
 import prebot.brain.RespondToStrategy;
 import prebot.brain.action.Action;
 import prebot.brain.buildaction.BuildAction;
 import prebot.brain.squad.Squad;
-import prebot.brain.strategy.Strategy;
 import prebot.build.BuildOrderItem;
-import prebot.build.ConstructionPlaceFinder;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
+import prebot.build.ConstructionPlaceFinder;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.code.GameConstant;
 import prebot.common.util.FileUtil;
@@ -33,7 +33,11 @@ import prebot.main.PreBot;
 public class StrategyManager extends GameManager {
 	
 	private Brain brain = new Brain();
-	private Strategy strategy;
+	private Idea idea;
+
+	public Idea getIdea() {
+		return idea;
+	}
 
 	private static StrategyManager instance = new StrategyManager();
 
@@ -80,7 +84,7 @@ public class StrategyManager extends GameManager {
 
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
-		strategy = brain.think(strategy);
+		idea = brain.think(idea);
 		
 		executeBuildActionList();
 		executeSquadList();
@@ -89,7 +93,7 @@ public class StrategyManager extends GameManager {
 
 	private void executeBuildActionList() {
 		BuildManager.Instance().buildQueue.clearAll();
-		for (BuildAction buildAction : strategy.buildActionList) {
+		for (BuildAction buildAction : idea.strategy.buildActionList) {
 			if (buildAction.buildCondition()) {
 				BuildManager.Instance().buildQueue.queueItem(buildAction.buildOrderItem);
 			}
@@ -97,14 +101,32 @@ public class StrategyManager extends GameManager {
 	}
 
 	private void executeSquadList() {
-		CombatManager.Instance().squadData.clearSquadMap();
-		for (Squad squad : strategy.squadList) {
-			CombatManager.Instance().squadData.addSquad(squad);
+		for (Squad squad : idea.strategy.squadList) {
+			CombatManager.Instance().squadData.addOrUpdateSquad(squad);
+		}
+
+		List<Squad> removeSquadList = new ArrayList<>();
+		for (Squad oldSquad : CombatManager.Instance().squadData.squadMap.values()) {
+			
+			boolean squadExist = false;
+			for (Squad newSquad : idea.strategy.squadList) {
+				if (newSquad.getName().equals(oldSquad.getName())) {
+					squadExist = true;
+					break;
+				}
+			}
+			if (!squadExist) {
+				removeSquadList.add(oldSquad);
+			}
+		}
+		
+		for (Squad removeSquad : removeSquadList) {
+			CombatManager.Instance().squadData.removeSquad(removeSquad);
 		}
 	}
 
 	private void executeActionList() {
-		for (Action action : strategy.actionList) {
+		for (Action action : idea.strategy.actionList) {
 			if (action.actionCondition()) {
 				action.doAction();
 			}

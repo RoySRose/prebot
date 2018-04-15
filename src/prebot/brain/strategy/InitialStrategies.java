@@ -3,6 +3,7 @@ package prebot.brain.strategy;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.brain.action.Actions;
+import prebot.brain.squad.Squads;
 
 public class InitialStrategies {
 
@@ -25,6 +26,10 @@ public class InitialStrategies {
 					add(UnitType.Terran_Vulture, true).
 					add(UnitType.Terran_Machine_Shop, true).
 					build();
+
+			squadList.add(new Squads.IdleSquad());
+			squadList.add(new Squads.MainDefenseSquad());
+			squadList.add(new Squads.WatcherSquad());
 			
 			actionList.add(new Actions.MechanicTerranGasAdjustment());
 			actionList.add(new Actions.WorkerScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));

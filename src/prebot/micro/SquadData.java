@@ -10,8 +10,19 @@ public class SquadData {
 
 	public Map<String, Squad> squadMap = new HashMap<>(); // 이름별 squad 저장
 
-	public void addSquad(Squad squad) {
-		squadMap.put(squad.squadName, squad);
+	public void addOrUpdateSquad(Squad squad) {
+		if (squadMap.get(squad.getName()) != null) {
+			Squad existSquad = squadMap.get(squad.getName());
+			existSquad.priority = squad.priority;
+			existSquad.squadAdditionalRadius = squad.squadAdditionalRadius;
+			squadMap.put(squad.getName(), existSquad);
+		} else {
+			squadMap.put(squad.getName(), squad);
+		}
+	}
+	
+	public void removeSquad(Squad squad) {
+		squadMap.remove(squad.getName());
 	}
 	
 	public void clearSquadMap() {

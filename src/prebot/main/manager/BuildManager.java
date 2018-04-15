@@ -59,14 +59,9 @@ public class BuildManager extends GameManager {
 		// the current item to be used
 		BuildOrderItem currentItem = buildQueue.getHighestItem();
 
-		// System.out.println("current HighestPriorityItem is " + currentItem.metaType.getName());
-
 		// while there is still something left in the buildQueue
 		while (!buildQueue.isEmpty()) {
 			boolean isOkToRemoveQueue = true;
-
-			// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
-			// 빌드 실행 유닛 (일꾼/건물) 결정 로직이 seedLocation 이나 seedLocationStrategy 를 잘 반영하도록 수정
 
 			// seedPosition 을 도출한다
 			Position seedPosition = null;
@@ -80,44 +75,13 @@ public class BuildManager extends GameManager {
 			// this is the unit which can produce the currentItem
 			Unit producer = getProducer(currentItem.metaType, seedPosition, currentItem.producerID);
 
-			// BasicBot 1.1 Patch End //////////////////////////////////////////////////
-
-			/*
-			 * if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType().isBuilding()) { if (producer != null) { System.out.println("Build " +
-			 * currentItem.metaType.getName() + " producer : " + producer.getType() + " ID : " + producer.getID()); } else { System.out.println("Build " +
-			 * currentItem.metaType.getName() + " producer null"); } }
-			 */
-
-			Unit secondProducer = null;
 			boolean canMake = false;
 
 			// 건물을 만들수 있는 유닛(일꾼)이나, 유닛을 만들수 있는 유닛(건물 or 유닛)이 있으면
 			if (producer != null) {
-
 				// check to see if we can make it right now
-				// 지금 해당 유닛을 건설/생산 할 수 있는지에 대해 자원, 서플라이, 테크 트리, producer 만을 갖고
-				// 판단한다
+				// 지금 해당 유닛을 건설/생산 할 수 있는지에 대해 자원, 서플라이, 테크 트리, producer 만을 갖고 판단한다
 				canMake = canMakeNow(producer, currentItem.metaType);
-
-				/*
-				 * if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType().isBuilding() ) { std::cout + "Build " + currentItem.metaType.getName() + " canMakeNow : "
-				 * + canMake + std::endl; }
-				 */
-
-				// 프로토스 종족 유닛 중 Protoss_Archon / Protoss_Dark_Archon 은 기존
-				// Protoss_High_Templar / Protoss_Dark_Templar 두 유닛을 합체시키는 기술을
-				// 써서 만들기 때문에
-				// secondProducer 을 추가로 찾아 확인한다
-				if (canMake) {
-					if (currentItem.metaType.isUnit()) {
-						if (currentItem.metaType.getUnitType() == UnitType.Protoss_Archon || currentItem.metaType.getUnitType() == UnitType.Protoss_Dark_Archon) {
-							secondProducer = getAnotherProducer(producer, producer.getPosition());
-							if (secondProducer == null) {
-								canMake = false;
-							}
-						}
-					}
-				}
 			}
 
 			// if we can make the current item, create it
@@ -138,13 +102,10 @@ public class BuildManager extends GameManager {
 						}
 						// 그외 대부분 건물의 경우
 						else {
-							// ConstructionPlaceFinder 를 통해 건설 가능 위치
-							// desiredPosition 를 알아내서
-							// ConstructionManager 의 ConstructionTask Queue에 추가를
-							// 해서 desiredPosition 에 건설을 하게 한다.
+							// ConstructionPlaceFinder 를 통해 건설 가능 위치 desiredPosition 를 알아내서
+							// ConstructionManager 의 ConstructionTask Queue에 추가를 해서 desiredPosition 에 건설을 하게 한다.
 							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시
-							// ConstructionPlaceFinder 를 통해 건설 가능 위치를
-							// desiredPosition 주위에서 찾을 것이다
+							// ConstructionPlaceFinder 를 통해 건설 가능 위치를 desiredPosition 주위에서 찾을 것이다
 							TilePosition desiredPosition = ConstructionPlaceFinder.Instance().getDesiredPosition(t.getUnitType(), currentItem.seedLocation, currentItem.seedLocationStrategy);
 							if (desiredPosition != TilePosition.None) {
 								// Send the construction task to the
@@ -265,18 +226,14 @@ public class BuildManager extends GameManager {
 						continue;
 					}
 
-					// 모건물은 건설되고 있는 중에는 isCompleted = false, isConstructing =
-					// true, canBuildAddon = false 이다가
-					// 건설이 완성된 후 몇 프레임동안은 isCompleted = true 이지만, canBuildAddon
-					// = false 인 경우가 있다
+					// 모건물은 건설되고 있는 중에는 isCompleted = false, isConstructing = true, canBuildAddon = false 이다가
+					// 건설이 완성된 후 몇 프레임동안은 isCompleted = true 이지만, canBuildAddon = false 인 경우가 있다
 					if (!unit.canBuildAddon()) {
 						continue;
 					}
 
-					// if we just told this unit to build an addon, then it will
-					// not be building another one
-					// this deals with the frame-delay of telling a unit to
-					// build an addon and it actually starting to build
+					// if we just told this unit to build an addon, then it will not be building another one
+					// this deals with the frame-delay of telling a unit to build an addon and it actually starting to build
 					if (unit.getLastCommand().getUnitCommandType() == UnitCommandType.Build_Addon // C++ : unit.getLastCommand().getType()
 							&& (TimeUtils.elapsedFrames(unit.getLastCommandFrame()) < 10)) {
 						continue;
@@ -293,22 +250,15 @@ public class BuildManager extends GameManager {
 						for (int j = 0; j < metaType.getUnitType().tileHeight(); ++j) {
 							TilePosition tilePos = new TilePosition(addonPosition.getX() + i, addonPosition.getY() + j);
 
-							// if the map won't let you build here, we can't
-							// build it.
+							// if the map won't let you build here, we can't build it.
 							// 맵 타일 자체가 건설 불가능한 타일인 경우 + 기존 건물이 해당 타일에 이미 있는경우
 							if (!PreBot.Broodwar.isBuildable(tilePos, true)) {
 								isBlocked = true;
 							}
 
-							// if there are any units on the addon tile, we
-							// can't build it
-							// 아군 유닛은 Addon 지을 위치에 있어도 괜찮음. (적군 유닛은 Addon 지을 위치에
-							// 있으면 건설 안되는지는 아직 불확실함)
+							// if there are any units on the addon tile, we can't build it
+							// 아군 유닛은 Addon 지을 위치에 있어도 괜찮음. (적군 유닛은 Addon 지을 위치에 있으면 건설 안되는지는 아직 불확실함)
 							for (Unit u : PreBot.Broodwar.getUnitsOnTile(tilePos.getX(), tilePos.getY())) {
-								// System.out.println("Construct " + t.getName() + " beside " + unit.getType() + "("
-								// + unit.getID() + ")" + ", units on Addon Tile " + tilePos.getX() + ","
-								// + tilePos.getY() + " is " + u.getType() + "(ID : " + u.getID() + " Player : "
-								// + u.getPlayer().getName() + ")");
 								if (u.getPlayer() != InformationManager.Instance().selfPlayer) {
 									isBlocked = false;
 								}
@@ -339,42 +289,6 @@ public class BuildManager extends GameManager {
 		return getProducer(t, Position.None, -1);
 	}
 
-	/// 해당 MetaType 을 build 할 수 있는, getProducer 리턴값과 다른 producer 를 찾아 반환합니다<br>
-	/// 프로토스 종족 유닛 중 Protoss_Archon / Protoss_Dark_Archon 을 빌드할 때 사용합니다
-	public Unit getAnotherProducer(Unit producer, Position closestTo) {
-		if (producer == null)
-			return null;
-
-		List<Unit> candidateProducers = new ArrayList<Unit>();
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
-			if (unit == null) {
-				continue;
-			}
-			if (unit.getType() != producer.getType()) {
-				continue;
-			}
-			if (unit.getID() == producer.getID()) {
-				continue;
-			}
-			if (!unit.isCompleted()) {
-				continue;
-			}
-			if (unit.isTraining()) {
-				continue;
-			}
-			if (!unit.exists()) {
-				continue;
-			}
-			if (unit.getHitPoints() + unit.getEnergy() <= 0) {
-				continue;
-			}
-
-			candidateProducers.add(unit); // candidateProducers.insert(unit);
-		}
-
-		return UnitUtils.getClosestUnitToPosition(candidateProducers, closestTo);
-	}
-
 	// 지금 해당 유닛을 건설/생산 할 수 있는지에 대해 자원, 서플라이, 테크 트리, producer 만을 갖고 판단한다<br>
 	// 해당 유닛이 건물일 경우 건물 지을 위치의 적절 여부 (탐색했었던 타일인지, 건설 가능한 타일인지, 주위에 Pylon이 있는지,<br>
 	// Creep이 있는 곳인지 등) 는 판단하지 않는다
@@ -388,8 +302,7 @@ public class BuildManager extends GameManager {
 		if (canMake) {
 			if (t.isUnit()) {
 				// MyBotModule.Broodwar.canMake : Checks all the requirements
-				// include resources, supply, technology tree, availability, and
-				// required units
+				// include resources, supply, technology tree, availability, and required units
 				canMake = PreBot.Broodwar.canMake(t.getUnitType(), producer);
 			} else if (t.isTech()) {
 				canMake = PreBot.Broodwar.canResearch(t.getTechType(), producer);

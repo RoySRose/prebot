@@ -1,6 +1,5 @@
 package prebot.common.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -8,26 +7,29 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
-import prebot.common.code.GameConstant;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.EnemyUnitFindRange;
 import prebot.common.code.Code.UnitFindRange;
+import prebot.common.code.GameConstant;
 import prebot.common.util.internal.UnitCache;
+import prebot.common.util.internal.UnitCondition;
 import prebot.information.UnitData;
 import prebot.information.UnitInfo;
 import prebot.main.PreBot;
 import prebot.main.manager.InformationManager;
 import prebot.main.manager.WorkerManager;
 
-/**
- * 유닛 유틸
- * 
- * @author insaneojw
- *
- */
+/** @author insaneojw
+ *  @since  2018. 4. 10.
+ *  */
 public class UnitUtils {
+	
+	/** 유효한 유닛인지 검사 */
+	public static boolean isValidUnit(Unit unit) {
+		return unit != null && unit.isCompleted() && unit.getHitPoints() > 0 && unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
+	}
 
-	/// 유닛 리스트
+	/** 유닛 리스트 */
 	public static List<Unit> getUnitList(UnitType unitType, UnitFindRange unitFindRange) {
 		
 		switch (unitFindRange) {
@@ -42,7 +44,7 @@ public class UnitUtils {
 		}
 	}
 	
-	/// 유닛 수 (constructionQueue가 포함된 검색인 경우, getUnitList.size()와 수가 다를 수 있다.)
+	/** 유닛 수 (constructionQueue가 포함된 검색인 경우, getUnitList.size()와 수가 다를 수 있다.) */
 	public static int getUnitCount(UnitType unitType, UnitFindRange unitFindRange) {
 		switch (unitFindRange) {
 		case COMPLETE:
@@ -63,18 +65,18 @@ public class UnitUtils {
 		}
 	}
 	
-	/// 유닛 보유 여부
+	/** 유닛 보유 여부 */
 	public static boolean hasUnit(UnitType unitType, UnitFindRange unitFindRange) {
 		return getUnitCount(unitType, unitFindRange) > 0;
 	}
 	
-	/// 유닛 N개이상 보유 여부
+	/** 유닛 N개이상 보유 여부 */
 	public static boolean hasUnit(UnitType unitType, UnitFindRange unitFindRange, int count) {
 		return getUnitCount(unitType, unitFindRange) >= count;
 	}
 
-	/// 적 유닛 리스트
-	public static List<UnitInfo> enemyUnitInfoList(UnitType unitType, EnemyUnitFindRange enemyUnitFindRange) {
+	/** 적 유닛 리스트 */
+	public static List<UnitInfo> getEnemyUnitInfoList(UnitType unitType, EnemyUnitFindRange enemyUnitFindRange) {
 		switch (enemyUnitFindRange) {
 		case VISIBLE:
 			return UnitCache.getCurrentCache().enemyVisibleUnitInfos(unitType);
@@ -85,8 +87,30 @@ public class UnitUtils {
 		}
 	}
 	
-	/// 현재 생산할 수 있는 상태인지 리턴
-	public final static boolean isProduceableImmediately(UnitType unitType) {
+	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
+	public static void addEnemyUnitInfoNearBy(List<UnitInfo> enemyUnitInfoList, Position position, int radius) {
+		UnitData enemyUnitData = InformationManager.Instance().getUnitData(PreBot.Broodwar.enemy());
+		for (UnitInfo enemyUnitInfo : enemyUnitData.getUnitAndUnitInfoMap().values()) {
+			if (enemyUnitInfoList.contains(enemyUnitInfo)) {
+				continue;
+			}
+			if (enemyUnitInfo.lastPosition.getDistance(position) > radius) {
+				continue;
+			}
+			if (ignorableEnemyUnitInfo(enemyUnitInfo)) {
+				continue;
+			}
+			enemyUnitInfoList.add(enemyUnitInfo);
+		}
+	}
+	
+	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
+	public static boolean ignorableEnemyUnitInfo(UnitInfo enemyUnitInfo) {
+		return TimeUtils.elapsedSeconds(enemyUnitInfo.updateFrame) >= GameConstant.IGNORE_ENEMY_UNITINFO_SECONDS;
+	}
+	
+	/** 즉시 생산할 수 있는 상태인지 판단 */
+	public static boolean isProduceableImmediately(UnitType unitType) {
 		// 생산할 수 있는 자원이 있어야 한다.
 		if (PreBot.Broodwar.self().minerals() < unitType.mineralPrice()
 				&& PreBot.Broodwar.self().gas() < unitType.gasPrice()) {
@@ -103,42 +127,60 @@ public class UnitUtils {
 		
 		return PreBot.Broodwar.canMake(unitType);
 	}
-	
-	
 
-	public static Unit getClosestUnitToPosition(final List<Unit> units, Position closestTo) {
-		return getClosestUnitToPosition(units, closestTo, null);
+	/** unitList 중 position에 가장 가까운 유닛 리턴 */
+	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return true;
+			}
+		});
+	}
+
+	/** unitList 중 position에 가장 가까운 유닛타입 유닛 리턴 */
+	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, final UnitType unitType) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return unit.getType() == unitType;
+			}
+		});
 	}
 	
-	
-	public static void getEuiList(List<UnitInfo> euiList, Position fromPosition, int radius) {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(PreBot.Broodwar.enemy());
-		for (UnitInfo eui : enemyUnitData.getUnitAndUnitInfoMap().values()) {
-			if (euiList.contains(eui)) {
-				continue;
+	/** unitList 중 position에 가장 가까운 미네랄 일꾼 리턴 */
+	public static Unit getClosestMineralWorkerToPosition(List<Unit> unitList, Position position) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return unit.getType().isWorker() && WorkerManager.Instance().isMineralWorker(unit) && !unit.isCarryingMinerals();
 			}
-			if (eui.lastPosition.getDistance(fromPosition) > (radius)) {
-				continue;
-			}
-			if (isVeryOldUnitInfo(eui)) {
-				continue;
-			}
-			euiList.add(eui);
+		});
+	}
+
+	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
+	private static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, UnitCondition unitCondition) {
+		if (unitList.size() == 0) {
+			return null;
 		}
-	}
-	
-	public static List<UnitInfo> getEuiList(Position fromPosition, int radius) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		getEuiList(euiList, fromPosition, radius);
-		return euiList;
-	}
-	
-	public static boolean isVeryOldUnitInfo(UnitInfo ui) {
-		return TimeUtils.elapsedSeconds(ui.updateFrame) >= GameConstant.IGNORE_ENEMY_UNITINFO_SECONDS;
-	}
+		if (!PositionUtils.isValidPosition(position)) {
+			return unitList.get(0);
+		}
 
-	public static boolean isValidUnit(Unit unit) {
-		return unit != null && unit.isCompleted() && unit.getHitPoints() > 0 && unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
+		Unit closestUnit = null;
+		double closestDist = CommonCode.DOUBLE_MAX;
+
+		for (Unit unit : unitList) {
+			if (!UnitUtils.isValidUnit(unit) || !unitCondition.correspond(unit)) {
+				continue;
+			}
+			double dist = unit.getDistance(position);
+			if (closestUnit == null || dist < closestDist) {
+				closestUnit = unit;
+				closestDist = dist;
+			}
+		}
+		return closestUnit;
 	}
 
 	// 미사용
@@ -210,79 +252,6 @@ public class UnitUtils {
 		}
 
 		return weapon.maxRange();
-	}
-
-	// TODO 전체 순차탐색을 하기 때문에 느리다
-	public static Unit getClosestUnitToPosition(final List<Unit> units, Position closestTo, UnitType unitType) {
-		if (units.size() == 0) {
-			return null;
-		}
-
-		// if we don't care where the unit is return the first one we have
-		if (!PositionUtils.isValidPosition(closestTo)) {
-			return units.get(0); // C++ : return units.begin();
-		}
-
-		if (unitType != null && unitType.isWorker()) {
-			return getClosestMineralWorkerToPosition(units, closestTo);
-		}
-
-		Unit closestUnit = null;
-		double closestDist = CommonCode.DOUBLE_MAX;
-
-		for (Unit unit : units) {
-			if (!UnitUtils.isValidUnit(unit)) {
-				continue;
-			}
-
-			if (unitType != null && unit.getType() != unitType) {
-				continue;
-			}
-
-			double dist = unit.getDistance(closestTo);
-			if (closestUnit == null || dist < closestDist) {
-				closestUnit = unit;
-				closestDist = dist;
-			}
-		}
-
-		return closestUnit;
-	}
-
-	/// target 으로부터 가장 가까운 Mineral 일꾼 유닛을 리턴합니다
-	public static Unit getClosestMineralWorkerToPosition(final List<Unit> workers, Position closestTo) {
-		Unit closestUnit = null;
-		double closestDist = CommonCode.DOUBLE_MAX;
-		boolean closestUnitIsCarrying = false;
-
-		for (Unit worker : workers) {
-			if (!UnitUtils.isValidUnit(worker) || !worker.getType().isWorker() || !WorkerManager.Instance().isMineralWorker(worker)) {
-				continue;
-			}
-
-			double dist = worker.getDistance(closestTo);
-			if (closestUnit == null) {
-				closestUnit = worker;
-				closestDist = dist;
-				if (worker.isCarryingMinerals() || worker.isCarryingGas()) {
-					closestUnitIsCarrying = true;
-				}
-
-			} else if (dist < closestDist) {
-				if (closestUnitIsCarrying) {
-					if (!worker.isCarryingMinerals() && !worker.isCarryingGas()) {
-						closestUnitIsCarrying = false;
-					}
-					closestUnit = worker;
-					closestDist = dist;
-				} else {
-					closestUnit = worker;
-					closestDist = dist;
-				}
-			}
-		}
-
-		return closestUnit;
 	}
 
 	// TODO all unit 루프를 돌아 메서드 수정 필요

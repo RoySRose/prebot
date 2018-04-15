@@ -10,9 +10,10 @@ public class GeneralStrategy extends Strategy {
 	public void setUpDefaultGeneralStrategy() {
 		buildActionList.add(new TrainActions.TrainSCV());
 		buildActionList.add(new BuildActions.BuildSupplyDepot());
-		
+
 		squadList.add(new Squads.IdleSquad());
-		squadList.add(new Squads.MainSquad());
+		squadList.add(new Squads.MainDefenseSquad());
+		squadList.add(new Squads.WatcherSquad());
 	}
 
 	public void setUpFactoryUnitTrainActionByRatio(int ratioVulture, int ratioTank, int ratioGoliath) {

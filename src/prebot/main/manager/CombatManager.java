@@ -32,7 +32,7 @@ public class CombatManager extends GameManager {
 		// 유효한 공격유닛 필터링(일꾼 포함)
 		List<Unit> combatUnitList = new ArrayList<>();
 		for (Unit myUnit : PreBot.Broodwar.self().getUnits()) {
-			if (!UnitUtils.isValidUnit(myUnit) || !UnitUtils.isUnitOrCombatBuilding(myUnit.getType())) {
+			if (!UnitUtils.isValidUnit(myUnit)) {
 				continue;
 			}
 			combatUnitList.add(myUnit);
@@ -51,8 +51,7 @@ public class CombatManager extends GameManager {
 
 	private void squadExecution() {
 		for (Squad squad : squadData.squadMap.values()) {
-			squad.update(); // squad 유닛 배분 및 유효하지 않은 유닛 삭제
-			squad.findEnemies(); // 스쿼드 적 파악
+			squad.update(); // 유효하지 않은 유닛 삭제, 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}
 	}
