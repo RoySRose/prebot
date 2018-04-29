@@ -1,4 +1,4 @@
-package prebot.main.manager;
+package prebot.xxxdeprecated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,9 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
-import prebot.common.code.GameConstant;
-import prebot.main.PreBot;
+import prebot.common.code.Config;
+import prebot.main.Prebot;
+import prebot.main.manager.GameManager;
 
 /// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
 @Deprecated
@@ -37,7 +38,7 @@ public class MapGrid extends GameManager {
 
 	public GridCell[] gridCells;
 
-	private static MapGrid instance = new MapGrid(PreBot.Broodwar.mapHeight() * 32, PreBot.Broodwar.mapHeight() * 32, GameConstant.MAP_GRID_SIZE);
+	private static MapGrid instance = new MapGrid(Prebot.Game.mapHeight() * 32, Prebot.Game.mapHeight() * 32, Config.MAP_GRID_SIZE);
 
 	/// static singleton 객체를 리턴합니다
 	public static MapGrid Instance() {
@@ -58,25 +59,26 @@ public class MapGrid extends GameManager {
 	}
 
 	/// 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록 등을 업데이트 합니다
-	public void update() {
+	public GameManager update() {
 		// clear the grid
 		clearGrid();
 
 		// MyBotModule.Broodwar.printf("MapGrid info: WH(%d, %d) CS(%d) RC(%d, %d) C(%d)", mapWidth, mapHeight, cellSize, rows, cols, cells.size());
 
 		// add our units to the appropriate cell
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			getCell(unit).ourUnits.add(unit);
-			getCell(unit).timeLastVisited = PreBot.Broodwar.getFrameCount();
+			getCell(unit).timeLastVisited = Prebot.Game.getFrameCount();
 		}
 
 		// add enemy units to the appropriate cell
-		for (Unit unit : PreBot.Broodwar.enemy().getUnits()) {
+		for (Unit unit : Prebot.Game.enemy().getUnits()) {
 			if (unit.getHitPoints() > 0) {
 				getCell(unit).oppUnits.add(unit);
-				getCell(unit).timeLastOpponentSeen = PreBot.Broodwar.getFrameCount();
+				getCell(unit).timeLastOpponentSeen = Prebot.Game.getFrameCount();
 			}
 		}
+		return this;
 	}
 
 	/// 해당 position 근처에 있는 아군 혹은 적군 유닛들의 목록을 UnitSet 에 저장합니다<br>
@@ -131,11 +133,11 @@ public class MapGrid extends GameManager {
 				Position cellCenter = getCellCenter(r, c);
 
 				// don't worry about places that aren't connected to our start locatin
-				if (!BWTA.isConnected(cellCenter.toTilePosition(), PreBot.Broodwar.self().getStartLocation())) {
+				if (!BWTA.isConnected(cellCenter.toTilePosition(), Prebot.Game.self().getStartLocation())) {
 					continue;
 				}
 
-				Position home = PreBot.Broodwar.self().getStartLocation().toPosition();
+				Position home = Prebot.Game.self().getStartLocation().toPosition();
 				double dist = home.getDistance(getCellByIndex(r, c).center);
 				int lastVisited = getCellByIndex(r, c).timeLastVisited;
 				if (lastVisited < minSeen || ((lastVisited == minSeen) && (dist > minSeenDist))) {

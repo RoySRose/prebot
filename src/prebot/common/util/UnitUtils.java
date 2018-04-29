@@ -1,7 +1,9 @@
 package prebot.common.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Player;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -9,13 +11,14 @@ import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.EnemyUnitFindRange;
+import prebot.common.code.Code.PlayerRange;
 import prebot.common.code.Code.UnitFindRange;
-import prebot.common.code.GameConstant;
+import prebot.common.code.Config;
+import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.UnitCache;
-import prebot.common.util.internal.UnitCondition;
 import prebot.information.UnitData;
 import prebot.information.UnitInfo;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 import prebot.main.manager.InformationManager;
 import prebot.main.manager.WorkerManager;
 
@@ -27,6 +30,17 @@ public class UnitUtils {
 	/** 유효한 유닛인지 검사 */
 	public static boolean isValidUnit(Unit unit) {
 		return unit != null && unit.isCompleted() && unit.getHitPoints() > 0 && unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
+	}
+
+
+	/** 시야에 있는 unitinfo이면 unit 정보 리턴 */
+	public static Unit unitInSight(UnitInfo eui) {
+		Unit enemyUnit = Prebot.Game.getUnit(eui.getUnitID());
+		if (UnitUtils.isValidUnit(enemyUnit)) {
+			return enemyUnit;
+		} else {
+			return null;
+		}
 	}
 
 	/** 유닛 리스트 */
@@ -88,44 +102,74 @@ public class UnitUtils {
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	public static void addEnemyUnitInfoNearBy(List<UnitInfo> enemyUnitInfoList, Position position, int radius) {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(PreBot.Broodwar.enemy());
-		for (UnitInfo enemyUnitInfo : enemyUnitData.getUnitAndUnitInfoMap().values()) {
-			if (enemyUnitInfoList.contains(enemyUnitInfo)) {
+	public static void addEnemyUnitInfoNearBy(List<UnitInfo> euiList, Position position, int radius) {
+		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Game.enemy());
+		for (UnitInfo eui : enemyUnitData.getUnitAndUnitInfoMap().values()) {
+			if (euiList.contains(eui)) {
 				continue;
 			}
-			if (enemyUnitInfo.lastPosition.getDistance(position) > radius) {
+			if (eui.getLastPosition().getDistance(position) > radius) {
 				continue;
 			}
-			if (ignorableEnemyUnitInfo(enemyUnitInfo)) {
+			if (ignorableEnemyUnitInfo(eui)) {
 				continue;
 			}
-			enemyUnitInfoList.add(enemyUnitInfo);
+			euiList.add(eui);
 		}
 	}
 	
+	/** position 근처의 유닛리스트를 리턴 */
+	public static List<Unit> getUnitsInRadius(Position position, int radius, PlayerRange playerRange) {
+		return getUnitsInRadius(position, radius, playerRange, null);
+	}
+	
+	/** position 근처의 유닛리스트를 리턴 */
+	public static List<Unit> getUnitsInRadius(Position position, int radius, PlayerRange playerRange, UnitType unitType) {
+		Player player = null;
+		if (playerRange == PlayerRange.SELF) {
+			player = Prebot.Game.self();
+		} else if (playerRange == PlayerRange.ENEMY) {
+			player = Prebot.Game.enemy();
+		} else if (playerRange == PlayerRange.NEUTRAL) {
+			player = Prebot.Game.neutral();
+		}
+		
+		List<Unit> unitsInRadius = new ArrayList<>();
+		for (Unit unit : Prebot.Game.getUnitsInRadius(position, radius)) {
+			if (player != null && player != unit.getPlayer()) {
+				continue;
+			}
+			if (unitType != null && unit.getType() != unitType) {
+				continue;
+			}
+			unitsInRadius.add(unit);
+		}
+		return unitsInRadius;
+		
+	}
+	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
-	public static boolean ignorableEnemyUnitInfo(UnitInfo enemyUnitInfo) {
-		return TimeUtils.elapsedSeconds(enemyUnitInfo.updateFrame) >= GameConstant.IGNORE_ENEMY_UNITINFO_SECONDS;
+	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
+		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= Config.IGNORE_ENEMY_UNITINFO_SECONDS;
 	}
 	
 	/** 즉시 생산할 수 있는 상태인지 판단 */
 	public static boolean isProduceableImmediately(UnitType unitType) {
 		// 생산할 수 있는 자원이 있어야 한다.
-		if (PreBot.Broodwar.self().minerals() < unitType.mineralPrice()
-				&& PreBot.Broodwar.self().gas() < unitType.gasPrice()) {
+		if (Prebot.Game.self().minerals() < unitType.mineralPrice()
+				&& Prebot.Game.self().gas() < unitType.gasPrice()) {
 			return false;
 		}
 		
 		// 서플라이가 있어야 한다.
 		if (unitType.supplyRequired() > 0) {
-			int supplySpace = PreBot.Broodwar.self().supplyTotal() - PreBot.Broodwar.self().supplyUsed();
+			int supplySpace = Prebot.Game.self().supplyTotal() - Prebot.Game.self().supplyUsed();
 			if (supplySpace < unitType.supplyRequired()) {
 				return false;
 			}
 		}
 		
-		return PreBot.Broodwar.canMake(unitType);
+		return Prebot.Game.canMake(unitType);
 	}
 
 	/** unitList 중 position에 가장 가까운 유닛 리턴 */
@@ -236,8 +280,8 @@ public class UnitUtils {
 
 		int range = weapon.maxRange();
 
-		if ((attacker.getType() == UnitType.Protoss_Dragoon) && (attacker.getPlayer() == PreBot.Broodwar.self())
-				&& PreBot.Broodwar.self().getUpgradeLevel(UpgradeType.Singularity_Charge) > 0) {
+		if ((attacker.getType() == UnitType.Protoss_Dragoon) && (attacker.getPlayer() == Prebot.Game.self())
+				&& Prebot.Game.self().getUpgradeLevel(UpgradeType.Singularity_Charge) > 0) {
 			range = 6 * 32;
 		}
 
@@ -260,7 +304,7 @@ public class UnitUtils {
 			return 0;
 		}
 		int mineralsNearDepot = 0;
-		for (Unit mineral : PreBot.Broodwar.getAllUnits()) {
+		for (Unit mineral : Prebot.Game.getAllUnits()) {
 			if (mineral.getType().isMineralField() && pointUnit.getDistance(mineral) < 200) {
 				mineralsNearDepot++;
 			}

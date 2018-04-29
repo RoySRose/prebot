@@ -6,7 +6,7 @@ import java.util.List;
 import bwapi.Unit;
 import prebot.brain.squad.Squad;
 import prebot.common.util.UnitUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 import prebot.micro.SquadData;
 
 public class CombatManager extends GameManager {
@@ -22,16 +22,17 @@ public class CombatManager extends GameManager {
 	public SquadData squadData = new SquadData();
 
 	@Override
-	public void update() {
+	public GameManager update() {
 		combatUnitArrangement();
 		squadExecution();
+		return this;
 	}
 
 	private void combatUnitArrangement() {
 
 		// 유효한 공격유닛 필터링(일꾼 포함)
 		List<Unit> combatUnitList = new ArrayList<>();
-		for (Unit myUnit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit myUnit : Prebot.Game.self().getUnits()) {
 			if (!UnitUtils.isValidUnit(myUnit)) {
 				continue;
 			}
@@ -51,7 +52,8 @@ public class CombatManager extends GameManager {
 
 	private void squadExecution() {
 		for (Squad squad : squadData.squadMap.values()) {
-			squad.update(); // 유효하지 않은 유닛 삭제, 적 탐색
+			squad.removeInvalidUnits(); // 유효하지 않은 유닛 삭제
+			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}
 	}

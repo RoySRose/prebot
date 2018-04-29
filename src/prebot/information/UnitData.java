@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 public class UnitData {
 
@@ -71,32 +71,34 @@ public class UnitData {
 //			}
 //		}
 
-		ui.unit = unit;
-		ui.unitID = unit.getID();
-		ui.player = unit.getPlayer();
-		ui.type = unit.getType();
-		ui.lastPosition = unit.getPosition();
-		ui.completed = unit.isCompleted();
+		ui.setUnit(unit);
+		ui.setUnitID(unit.getID());
+		ui.setPlayer(unit.getPlayer());
+		ui.setType(unit.getType());
+		ui.setLastPosition(unit.getPosition());
+		ui.setCompleted(unit.isCompleted());
 		
-		int updateFrameGap = PreBot.Broodwar.getFrameCount() - ui.updateFrame;
+		int updateFrameGap = Prebot.Game.getFrameCount() - ui.getUpdateFrame();
 		if (updateFrameGap > 0) {
 			if (updateFrameGap == 1) {
-				ui.hitPointsReduced = ui.lastHitPoints - unit.getHitPoints();
-				if (ui.hitPointsReduced < 0) {
-					ui.hitPointsReduced = 0;
+				int hitPointsReduced = ui.getLastHitPoints() - unit.getHitPoints();
+				int shieldsReduced = ui.getLastShields() - unit.getShields();
+				if (hitPointsReduced < 0) {
+					hitPointsReduced = 0;
 				}
-				ui.shieldsReduced = ui.lastShields - unit.getShields();
-				if (ui.shieldsReduced < 0) {
-					ui.shieldsReduced = 0;
+				if (shieldsReduced < 0) {
+					shieldsReduced = 0;
 				}
+				ui.setHitPointsReduced(hitPointsReduced);
+				ui.setShieldsReduced(shieldsReduced);
 			} else {
-				ui.hitPointsReduced = 0;
-				ui.shieldsReduced = 0;
+				ui.setHitPointsReduced(0);
+				ui.setShieldsReduced(0);
 			}
 		}
-		ui.lastHitPoints = unit.getHitPoints();
-		ui.lastShields = unit.getShields();
-		ui.updateFrame = PreBot.Broodwar.getFrameCount();
+		ui.setLastHitPoints(unit.getHitPoints());
+		ui.setLastShields(unit.getShields());
+		ui.setUpdateFrame(Prebot.Game.getFrameCount());
 
 		if (firstSeen) {
 			// TODO prebot 소스에서는 아래 부분 주석처리됨 
@@ -146,7 +148,7 @@ public class UnitData {
 		while (it.hasNext()) {
 			UnitInfo ui = unitAndUnitInfoMap.get(it.next());
 			if (isBadUnitInfo(ui)) {
-				Unit unit = ui.unit;
+				Unit unit = ui.getUnit();
 				if (numUnits.get(unit.getType().toString()) != null) {
 					numUnits.put(unit.getType().toString(), numUnits.get(unit.getType().toString()) - 1);
 				}
@@ -164,18 +166,18 @@ public class UnitData {
 	}
 
 	public final boolean isBadUnitInfo(final UnitInfo ui) {
-		if (ui.unit == null) {
+		if (ui.getUnit() == null) {
 			return false;
 		}
 
 		// Cull away any refineries/assimilators/extractors that were destroyed and reverted to vespene geysers
-		if (ui.unit.getType() == UnitType.Resource_Vespene_Geyser) {
+		if (ui.getUnit().getType() == UnitType.Resource_Vespene_Geyser) {
 			return true;
 		}
 
 		// If the unit is a building and we can currently see its position and it is not there
-		if (ui.type.isBuilding() && PreBot.Broodwar.isVisible(ui.lastPosition.getX() / 32, ui.lastPosition.getY() / 32)
-				&& !ui.unit.isVisible()) {
+		if (ui.getType().isBuilding() && Prebot.Game.isVisible(ui.getLastPosition().getX() / 32, ui.getLastPosition().getY() / 32)
+				&& !ui.getUnit().isVisible()) {
 			return true;
 		}
 

@@ -14,7 +14,7 @@ import bwta.Region;
 import prebot.build.ConstructionPlaceFinder;
 import prebot.build.ConstructionTask;
 import prebot.common.util.CommandUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 /// 건물 건설 Construction 명령 목록을 리스트로 관리하고, 건물 건설 명령이 잘 수행되도록 컨트롤하는 class
 public class ConstructionManager extends GameManager {
@@ -86,10 +86,9 @@ public class ConstructionManager extends GameManager {
 		}
 	}
 
-	public void update() {
+	public GameManager update() {
 		// 1초에 4번만 실행합니다
-		if (PreBot.Broodwar.getFrameCount() % 6 != 0)
-			return;
+//		if (Prebot.Game.getFrameCount() % 6 != 0) return;
 
 		// constructionQueue 에 들어있는 ConstructionTask 들은
 		// Unassigned . Assigned (buildCommandGiven=false) . Assigned (buildCommandGiven=true) . UnderConstruction . (Finished) 로 상태 변화된다
@@ -112,6 +111,7 @@ public class ConstructionManager extends GameManager {
 		checkForDeadTerranBuilders();
 		checkForCompletedBuildings();
 		checkForDeadlockConstruction();
+		return this;
 	}
 
 	/// 건설 진행 도중 (공격을 받아서) 건설하려던 건물이 파괴된 경우, constructionQueue 에서 삭제합니다
@@ -246,14 +246,14 @@ public class ConstructionManager extends GameManager {
 
 					// set the buildCommandGiven flag to true
 					b.setBuildCommandGiven(true);
-					b.setLastBuildCommandGivenFrame(PreBot.Broodwar.getFrameCount());
+					b.setLastBuildCommandGivenFrame(Prebot.Game.getFrameCount());
 					b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 				}
 				// if this is not the first time we've sent this guy to build this
 				// 일꾼에게 build command 를 주었지만, 도중에 자원이 미달하게 되었거나, 해당 장소에 다른 유닛들이 있어서 건설을 시작 못하게 되거나, Pylon 이나 Creep 이 없어진 경우 등이 발생할 수 있다
 				// 이 경우, 해당 일꾼의 build command 를 해제하고, 건물 상태를 Unassigned 로 바꿔서, 다시 건물 위치를 정하고, 다른 일꾼을 지정하는 식으로 처리합니다
 				else {
-					if (PreBot.Broodwar.getFrameCount() - b.getLastBuildCommandGivenFrame() > 24) {
+					if (Prebot.Game.getFrameCount() - b.getLastBuildCommandGivenFrame() > 24) {
 
 						// System.out.println(b.getType() + " (" + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY() + ")
 						// buildCommandGiven . but now Unassigned" );
@@ -286,7 +286,7 @@ public class ConstructionManager extends GameManager {
 	/// 저그 및 프로토스 종족의 경우 건설 일꾼을 해제합니다
 	public void checkForStartedConstruction() {
 		// for each building unit which is being constructed
-		for (Unit buildingThatStartedConstruction : PreBot.Broodwar.self().getUnits()) {
+		for (Unit buildingThatStartedConstruction : Prebot.Game.self().getUnits()) {
 			// filter out units which aren't buildings under construction
 			if (!buildingThatStartedConstruction.getType().isBuilding() || !buildingThatStartedConstruction.isBeingConstructed()) {
 				continue;
@@ -315,11 +315,11 @@ public class ConstructionManager extends GameManager {
 
 					// if we are zerg, make the buildingUnit null since it's morphed or destroyed
 					// Extractor 의 경우 destroyed 되고, 그외 건물의 경우 morphed 된다
-					if (PreBot.Broodwar.self().getRace() == Race.Zerg) {
+					if (Prebot.Game.self().getRace() == Race.Zerg) {
 						b.setConstructionWorker(null);
 					}
 					// if we are protoss, give the worker back to worker manager
-					else if (PreBot.Broodwar.self().getRace() == Race.Protoss) {
+					else if (Prebot.Game.self().getRace() == Race.Protoss) {
 						WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 						b.setConstructionWorker(null);
 					}
@@ -341,9 +341,9 @@ public class ConstructionManager extends GameManager {
 	/// 테란은 건설을 시작한 후, 건설 도중에 일꾼이 죽을 수 있습니다. 이 경우, 건물에 대해 다시 다른 SCV를 할당합니다<br>
 	/// 참고로, 프로토스 / 저그는 건설을 시작하면 일꾼 포인터를 null 로 만들기 때문에 (constructionWorker = null) 건설 도중에 죽은 일꾼을 신경쓸 필요 없습니다
 	public void checkForDeadTerranBuilders() {
-		if (PreBot.Broodwar.self().getRace() == Race.Terran) {
+		if (Prebot.Game.self().getRace() == Race.Terran) {
 
-			if (PreBot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) <= 0)
+			if (Prebot.Game.self().completedUnitCount(UnitType.Terran_SCV) <= 0)
 				return;
 
 			// for each of our buildings under construction
@@ -371,7 +371,7 @@ public class ConstructionManager extends GameManager {
 							b.setConstructionWorker(workerToAssign);
 							CommandUtils.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
 							b.setBuildCommandGiven(true);
-							b.setLastBuildCommandGivenFrame(PreBot.Broodwar.getFrameCount());
+							b.setLastBuildCommandGivenFrame(Prebot.Game.getFrameCount());
 							b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 						}
 					}
@@ -397,7 +397,7 @@ public class ConstructionManager extends GameManager {
 				// b.getFinalPosition().getY());
 
 				// if we are terran, give the worker back to worker manager
-				if (PreBot.Broodwar.self().getRace() == Race.Terran) {
+				if (Prebot.Game.self().getRace() == Race.Terran) {
 					WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 				}
 
@@ -447,7 +447,7 @@ public class ConstructionManager extends GameManager {
 						hasAvailableGeyser = false;
 					} else {
 						// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead lock
-						for (Unit u : PreBot.Broodwar.getUnitsOnTile(testLocation)) {
+						for (Unit u : Prebot.Game.getUnitsOnTile(testLocation)) {
 							if (u.getType().isRefinery() && u.exists()) {
 								hasAvailableGeyser = false;
 								break;
@@ -482,8 +482,8 @@ public class ConstructionManager extends GameManager {
 						if (requiredUnitType != UnitType.None) {
 
 							// 선행 건물 / 유닛이 존재하지 않고, 생산 중이지도 않고
-							if (PreBot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-									&& PreBot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+							if (Prebot.Game.self().completedUnitCount(requiredUnitType) == 0
+									&& Prebot.Game.self().incompleteUnitCount(requiredUnitType) == 0) {
 								// 선행 건물이 건설 예정이지도 않으면 dead lock
 								if (requiredUnitType.isBuilding()) {
 									if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
@@ -506,22 +506,13 @@ public class ConstructionManager extends GameManager {
 		}
 	}
 
-	// COMPLETED
-	public boolean isEvolvedBuilding(UnitType type) {
-		if (type == UnitType.Zerg_Sunken_Colony || type == UnitType.Zerg_Spore_Colony || type == UnitType.Zerg_Lair || type == UnitType.Zerg_Hive
-				|| type == UnitType.Zerg_Greater_Spire) {
-			return true;
-		}
-		return false;
-	}
-
 	public boolean isBuildingPositionExplored(final ConstructionTask b) {
 		TilePosition tile = b.getFinalPosition();
 
 		// for each tile where the building will be built
 		for (int x = 0; x < b.getType().tileWidth(); ++x) {
 			for (int y = 0; y < b.getType().tileHeight(); ++y) {
-				if (!PreBot.Broodwar.isExplored(tile.getX() + x, tile.getY() + y)) {
+				if (!Prebot.Game.isExplored(tile.getX() + x, tile.getY() + y)) {
 					return false;
 				}
 			}

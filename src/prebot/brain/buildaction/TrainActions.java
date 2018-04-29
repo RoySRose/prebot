@@ -2,11 +2,12 @@ package prebot.brain.buildaction;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.code.Code.UnitFindRange;
 import prebot.build.BuildOrderItem;
 import prebot.build.MetaType;
-import prebot.common.code.GameConstant;
+import prebot.common.code.Code.UnitFindRange;
+import prebot.common.code.Config;
 import prebot.common.util.UnitUtils;
+import prebot.main.manager.BuildManager;
 
 public class TrainActions {
 	
@@ -21,7 +22,7 @@ public class TrainActions {
 	public static final class TrainSCV extends BuildAction {
 		
 		public TrainSCV() {
-			super(new BuildOrderItem(new MetaType(UnitType.Terran_SCV), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_SCV), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, false, -1));
 		}
 		
 		@Override
@@ -41,7 +42,7 @@ public class TrainActions {
 			// 3. 가동중이지 않은 커맨드센터가 있어야 한다.
 			boolean existIdleCommandCenter = false;
 			for (Unit commandCenter : UnitUtils.getUnitList(UnitType.Terran_Command_Center, UnitFindRange.COMPLETE)) {
-				if (!commandCenter.isTraining() && commandCenter.getHitPoints() > GameConstant.UNIT_PRODUCE_HITPOINT) {
+				if (!commandCenter.isTraining() && commandCenter.getHitPoints() > Config.UNIT_PRODUCE_HITPOINT) {
 					existIdleCommandCenter = true;
 					break;
 				}
@@ -71,7 +72,7 @@ public class TrainActions {
 			
 			//TODO 아래 계산식은 오류로 보임. selfMineralCount * 2로 변경함. 테스트 필요. 
 			//selfMineralCount * 2 + 8 * PreBot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
-			return Math.min(GameConstant.MAX_WORKER_COUNT, selfMineralCount * 2);
+			return Math.min(Config.MAX_WORKER_COUNT, selfMineralCount * 2);
 		}
 	}
 	
@@ -84,12 +85,16 @@ public class TrainActions {
 		private FactoryUnitSelector selector;
 		
 		public TrainVulture(FactoryUnitSelector selector) {
-			super(new BuildOrderItem(new MetaType(UnitType.Terran_Vulture), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Vulture), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, false, -1));
 			this.selector = selector;
 		}
 
 		@Override
 		public boolean buildCondition() {
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) > 0) {
+				return false;
+			}
+			
 			return selector.selectFactoryUnit() == super.getBuildType();
 		}
 	}
@@ -103,12 +108,16 @@ public class TrainActions {
 		private FactoryUnitSelector selector;
 		
 		public TrainTank(FactoryUnitSelector selector) {
-			super(new BuildOrderItem(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, false, -1));
 			this.selector = selector;
 		}
 
 		@Override
 		public boolean buildCondition() {
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode) > 0) {
+				return false;
+			}
+			
 			return selector.selectFactoryUnit() == super.getBuildType();
 		}
 	}
@@ -122,12 +131,16 @@ public class TrainActions {
 		private FactoryUnitSelector selector;
 		
 		public TrainGoliath(FactoryUnitSelector selector) {
-			super(new BuildOrderItem(new MetaType(UnitType.Terran_Goliath), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, true, -1));
+			super(new BuildOrderItem(new MetaType(UnitType.Terran_Goliath), BuildOrderItem.SeedPositionStrategy.MainBaseLocation, 0, false, -1));
 			this.selector = selector;
 		}
 
 		@Override
 		public boolean buildCondition() {
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath) > 0) {
+				return false;
+			}
+			
 			return selector.selectFactoryUnit() == super.getBuildType();
 		}
 	}

@@ -5,7 +5,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.Region;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 /**
  * @author insaneojw
@@ -23,7 +23,7 @@ public class PositionUtils {
 		if (!isValidPosition(position)) {
 			return false;
 		}
-		return BWTA.getRegion(position) != null && PreBot.Broodwar.isWalkable(position.getX() / 8, position.getY() / 8);
+		return BWTA.getRegion(position) != null && Prebot.Game.isWalkable(position.getX() / 8, position.getY() / 8);
 	}
 
 	/// unit이 이동하기에 유효한 position이면 true
@@ -34,7 +34,7 @@ public class PositionUtils {
 
 	/// 두 position 사이를 지상으로 이동할 수 있으면 true
 	public static boolean isValidGroundPath(Position from, Position to) {
-		return PreBot.Broodwar.hasPath(from, to) && isConnected(from, to);
+		return Prebot.Game.hasPath(from, to) && isConnected(from, to);
 	}
 
 	/// 두 position이 같은 region이거나, 가까운 choke에서 서로 연결된 region이면 true

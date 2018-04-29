@@ -1,14 +1,14 @@
 package prebot.brain;
 
 import bwapi.Race;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 public class AnalyzeStrategy {
 	
 	/// 종족별 전략을 분석한다.
 	public static void analyze() {
 		
-		Race enemyRace = PreBot.Broodwar.enemy().getRace();
+		Race enemyRace = Prebot.Game.enemy().getRace();
 		
 		if (enemyRace == Race.Terran) {
 			analyzeTerranStrategy();

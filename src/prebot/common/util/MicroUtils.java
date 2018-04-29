@@ -1,5 +1,9 @@
 package prebot.common.util;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import bwapi.DamageType;
 import bwapi.Position;
 import bwapi.Unit;
@@ -8,10 +12,12 @@ import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import prebot.common.code.Code.CommonCode;
+import prebot.common.code.Code.PlayerRange;
 import prebot.common.code.ConfigForMicro.Angles;
+import prebot.common.code.ConfigForMicro.Flee;
 import prebot.common.util.internal.MirrorBugFixed;
 import prebot.information.UnitInfo;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 
@@ -23,76 +29,90 @@ import prebot.micro.KitingOption;
  */
 public class MicroUtils {
 	
+	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
+	
 	public static void flee(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
 		fleeUnit.rightClick(getFleePosition(fleeUnit, targetPosition, fOption));
 	}
 	
 	public static void kiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
-		if (enemyUnitInSight(targetInfo) == null) {
-			CommandUtils.move(rangedUnit, targetInfo.lastPosition);
+		if (UnitUtils.unitInSight(targetInfo) == null) {
+			CommandUtils.move(rangedUnit, targetInfo.getLastPosition());
 		} else {
-			kiting(rangedUnit, targetInfo.unit, kOption);
+			kiting(rangedUnit, targetInfo.getUnit(), kOption);
 		}
 	}
 	
-	public static void kiting(Unit unit, Unit target, KitingOption kOption) {
-		if (!killedByNShot(unit, target, 1) && killedByNShot(target, unit, 2)) {
+	public static void kiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption) {
+		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
 			kOption.cooltimeAlwaysAttack = false;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
-		} else if (groundUnitFreeKiting(unit)) {
+		} else if (groundUnitFreeKiting(rangedUnit)) {
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		}
 		
-		if (timeToAttack(unit, target, kOption.cooltimeAlwaysAttack)) {
-			CommandUtils.attackUnit(unit, target);
+		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
+			CommandUtils.attackUnit(rangedUnit, targetUnit);
 			return;
 		} else {
-			if (forwardKiting(unit, target)) {
-				unit.move(target.getPosition());
+			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
+			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
+				CommandUtils.attackMove(rangedUnit, targetUnit.getPosition());
 			} else {
-				flee(unit, target.getPosition(), kOption.fOption);
+				flee(rangedUnit, targetUnit.getPosition(), kOption.fOption);
 			}
 		}
 	}
 
-	private static boolean timeToAttack(Unit attackUnit, Unit targetUnit, boolean cooltimeAlwaysAttack) {
+	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, boolean cooltimeAlwaysAttack) {
 
 		// attackUnit, target 각각의 지상/공중 무기를 선택
-		WeaponType attackUnitWeapon = targetUnit.isFlying() ? attackUnit.getType().airWeapon() : attackUnit.getType().groundWeapon();
-		WeaponType targetWeapon = attackUnit.isFlying() ? targetUnit.getType().airWeapon() : targetUnit.getType().groundWeapon();
+		WeaponType attackUnitWeapon = targetUnit.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
+		WeaponType targetWeapon = rangedUnit.isFlying() ? targetUnit.getType().airWeapon() : targetUnit.getType().groundWeapon();
 		
 		// 일꾼의 공격력은 강하지 않다.
-		if (targetUnit.getType().isWorker() && !attackUnit.isUnderAttack()) {
+		if (targetUnit.getType().isWorker() && !rangedUnit.isUnderAttack()) {
 			return true;
 		}
 
-		// 건물 또는 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
-		if (PreBot.Broodwar.self().weaponMaxRange(attackUnitWeapon) <= PreBot.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
+		// 벌처는 벌처에게 카이팅하지 않는다.
+		if (rangedUnit.getType() == UnitType.Terran_Vulture) {
+			if (targetUnit.getType() == UnitType.Terran_Vulture) {
+				return true;
+			}
+		}
+		// 벌처가 아닌경우, 자신보다 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
+		else if (Prebot.Game.self().weaponMaxRange(attackUnitWeapon) <= Prebot.Game.enemy().weaponMaxRange(targetWeapon)) {
 			return true;
 		}
 		
-		int cooltime = attackUnit.isStartingAttack() ? attackUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
-				: (targetUnit.isFlying() ? attackUnit.getAirWeaponCooldown() : attackUnit.getGroundWeaponCooldown());
-		double distanceToAttack = attackUnit.getDistance(targetUnit) - PreBot.Broodwar.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
-		int catchTime = (int) (distanceToAttack / attackUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
+		int cooltime = rangedUnit.isStartingAttack() ? attackUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
+				: (targetUnit.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
+		double distanceToAttack = rangedUnit.getDistance(targetUnit) - Prebot.Game.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
+		int catchTime = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
 		
 		// 상대가 때리기 위해 거리를 좁히거나 벌려야 하는 경우(coolTime <= catchTime)
-		if (cooltime <= catchTime + PreBot.Broodwar.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
+		if (cooltime <= catchTime + Prebot.Game.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
 			return true;
 		}
 		
 		// 쿨타임이 되었을 때 항시 공격할 것인가
-		if (cooltimeAlwaysAttack && cooltime == 0) { 
-			return true;
-		}
-		return false;
+		return cooltimeAlwaysAttack && cooltime == 0; 
 	}
 	
-	public static boolean forwardKiting(Unit rangedUnit, Unit target) {
-		// TODO Auto-generated method stub
-		return false;
+	public static int forwardKitingTargetDistance(Unit rangedUnit, Unit targetUnit) {
+		if (targetUnit.getType().isBuilding()) { // 해처리 라바때문에 마인 폭사함
+			return 70;
+
+		} else if (targetUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+			return 1;
+
+		} else if (targetUnit.getType() == UnitType.Protoss_Carrier || targetUnit.getType() == UnitType.Zerg_Overlord) {
+			return 50;
+		}
+		return CommonCode.NONE;
 	}
 	
 	private static boolean groundUnitFreeKiting(Unit rangedUnit) {
@@ -100,27 +120,36 @@ public class MicroUtils {
 		return false;
 	}
 
-	/** 시야에 있는 적인가? */
-	public static Unit enemyUnitInSight(UnitInfo enemyUnitInfo) {
-		Unit enemyUnit = PreBot.Broodwar.getUnit(enemyUnitInfo.unitID);
-		if (enemyUnit != null && enemyUnit.getType() != UnitType.Unknown) {
-			return enemyUnit;
-		} else {
-			return null;
-		}
-	}
-
 	private static Position getFleePosition(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
 		double fleeRadian = oppositeDirectionRadian(fleeUnit.getPosition(), targetPosition);
 		Position fleePosition = Position.None;
-		for (int moveDistance = moveDistancePerFrame(fleeUnit, TimeUtils.SECOND); // 1초간 움직이는 거리
-				moveDistance > 10; moveDistance = (int) (moveDistance * 0.7)) {
-			fleePosition = lowestRiskPosition(fleeUnit, fleeRadian, fOption, moveDistance);
+		int moveDistanceOneSec = moveDistancePerFrame(fleeUnit, TimeUtils.SECOND); // 1초간 움직이는 거리
+		int riskRadius = getRiskRadius(fleeUnit.getType());
+		
+		for (int moveDistance = moveDistanceOneSec; moveDistanceOneSec > 10; moveDistanceOneSec = (int) (moveDistanceOneSec * 0.7)) {
+			fleePosition = lowestRiskPosition(fleeUnit, fOption, fleeRadian, moveDistance, riskRadius);
 			if (fleePosition != Position.None) {
 				break;
 			}
 		}
 		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
+	}
+	
+	public static int getRiskRadius(UnitType unitType) {
+		if (RISK_RADIUS_MAP.isEmpty()) {
+			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, Flee.RISK_RADIUS_VULTURE);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, Flee.RISK_RADIUS_TANK);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Goliath, Flee.RISK_RADIUS_GOLIATH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Wraith, Flee.RISK_RADIUS_WRAITH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Science_Vessel, Flee.RISK_RADIUS_VESSEL);
+		}
+		
+		Integer riskRadius = RISK_RADIUS_MAP.get(unitType);
+		if (riskRadius == null) {
+			riskRadius = Flee.RISK_RADIUS_DEFAULT;
+		}
+		return riskRadius;
+		
 	}
 
 	/// 반대 방향의 각도(radian)
@@ -128,7 +157,7 @@ public class MicroUtils {
 		return Math.atan2(myPosition.getX() - targetPosition.getX(), myPosition.getY() - targetPosition.getY());
 	}
 
-	private static Position lowestRiskPosition(Unit unit, double standRadian, FleeOption fOption, int moveDistance) {
+	private static Position lowestRiskPosition(Unit unit, FleeOption fOption, double standRadian, int moveDistance, int riskRadius) {
 		Position bestPosition = Position.None;
 		int minimumRisk = CommonCode.INT_MAX;
 		int distFromBestToGoal = CommonCode.INT_MAX;
@@ -146,10 +175,9 @@ public class MicroUtils {
 			}
 			
 			distFromCandiToGoal = candiPosition.getApproxDistance(fOption.goalPosition);
-			riskOfCandiPosition = riskOfPosition(unit, candiPosition, fOption.united);
+			riskOfCandiPosition = riskOfPosition(unit.getType(), candiPosition, riskRadius, fOption.united);
 			
-			if (riskOfCandiPosition < minimumRisk
-					|| (riskOfCandiPosition == minimumRisk && distFromCandiToGoal < distFromBestToGoal)) {
+			if (riskOfCandiPosition < minimumRisk || (riskOfCandiPosition == minimumRisk && distFromCandiToGoal < distFromBestToGoal)) {
 				bestPosition = candiPosition;
 				distFromBestToGoal = distFromCandiToGoal;
 				minimumRisk = riskOfCandiPosition;
@@ -173,14 +201,48 @@ public class MicroUtils {
 		return (Math.PI / 180) * ((radian * 180 / Math.PI) + angle);
 	}
 
-	private static int riskOfPosition(Unit unit, Position movePosition, boolean united) {
-		// TODO Auto-generated method stub
-		return 0;
+	private static int riskOfPosition(UnitType myUnitType, Position movePosition, int radius, boolean united) {
+		int risk = 0;
+		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(movePosition, radius, PlayerRange.ALL);
+		for (Unit unit : unitsInRadius) {
+			if (unit.getPlayer() == Prebot.Game.enemy()) { // 적군인 경우
+				if (Prebot.Game.getDamageFrom(unit.getType(), myUnitType) > 0) { // 적군이 공격할 수 있으면 위험하겠지
+					if (unit.getType().isBuilding()) { // 건물이 공격할 수 있으면 진짜 위험한거겠지
+						risk += 15;
+					} else if (!unit.getType().isFlyer()) { // 날아다니지 않으면 길막까지 하니까
+						risk += 10;
+					} else if (unit.getType().isWorker()) { // 일꾼은 그다지 위험하지 않다고 본다.
+						risk += 1;
+					} else { // 날아다니면 길막은 하지 않으니까
+						risk += 5;
+					}
+				} else { // 적군이 공격할 수 없을 때
+					if (unit.getType().isBuilding()) {
+						risk += 1;
+					} else if (!unit.getType().isFlyer()) {
+						risk += 1;
+					} else {
+						risk += 1;
+					}
+				}
+				
+			} else if (unit.getPlayer() == Prebot.Game.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
+				if (!unit.getType().isFlyer()) {
+					risk += united ? -2 : 2;
+				} else {
+					risk += united ? -1 : 1;
+				}
+				
+			} else { // 중립(미네랄, 가스 등)
+				risk += 1;
+			}
+		}
+		return risk;
 	}
 
 	private static int moveDistancePerFrame(Unit fleeUnit, int frame) {
 		double unitSpeed1 = fleeUnit.getPlayer().topSpeed(fleeUnit.getType());
-		double unitSpeed2 = fleeUnit.getType().topSpeed(); // TODO 업그레이드 시 unitSpeed1, unitSpeed2가 차이가 있는지
+		//double unitSpeed2 = fleeUnit.getType().topSpeed(); // TODO 업그레이드 시 unitSpeed1, unitSpeed2가 차이가 있는지
 		
 		return (int) (unitSpeed1 * frame); // frame의 시간동안 몇 pixel 이동 가능한지
 	}
@@ -194,7 +256,7 @@ public class MicroUtils {
 		if (attackerType == UnitType.Protoss_Zealot || attackerType == UnitType.Terran_Goliath && targetType.isFlyer()) {
 			numberOfAttack *= 2;
 		}
-		int damageExpected = PreBot.Broodwar.getDamageFrom(attackerType, targetType, attackUnit.getPlayer(), targetUnit.getPlayer()) * numberOfAttack;
+		int damageExpected = Prebot.Game.getDamageFrom(attackerType, targetType, attackUnit.getPlayer(), targetUnit.getPlayer()) * numberOfAttack;
 		
 		int targetHitPoints = targetUnit.getHitPoints();
 		if (targetType.regeneratesHP()) {

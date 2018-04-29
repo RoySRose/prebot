@@ -13,14 +13,14 @@ import bwta.BWTA;
 import prebot.common.code.ConfigForDebug.DEBUG;
 import prebot.main.manager.UXManager;
 
-public class PreBot extends DefaultBWListener {
+public class Prebot extends DefaultBWListener {
 
 	private boolean isGameLostConditionSatisfied = false; /// 자동 패배 체크 결과
 	private int gameLostConditionSatisfiedFrame = 0; /// 자동 패배 조건이 시작된 프레임 시점
 	private int maxDurationForGameLostCondition = 100; /// 자동 패배 조건이 만족된채 게임을 유지시키는 최대 프레임 수
 
 	private Mirror mirror = new Mirror();
-	public static Game Broodwar;
+	public static Game Game;
 	private GameCommander gameCommander;
 
 	public void run() {
@@ -30,25 +30,25 @@ public class PreBot extends DefaultBWListener {
 
 	@Override
 	public void onStart() {
-		Broodwar = mirror.getGame();
+		Game = mirror.getGame();
 		gameCommander = GameCommander.Instance();
-		if (Broodwar.isReplay()) {
+		if (Game.isReplay()) {
 			return;
 		}
 
 		// Config 파일 관리가 번거롭고, 배포 및 사용시 Config 파일 위치를 지정해주는 것이 번거롭기 때문에,
 		// Config 를 파일로부터 읽어들이지 않고, Config 클래스의 값을 사용하도록 한다.
 		if (DEBUG.enableCompleteMapInformation) {
-			Broodwar.enableFlag(Enum.CompleteMapInformation.getValue());
+			Game.enableFlag(Enum.CompleteMapInformation.getValue());
 		}
 
 		if (DEBUG.enableUserInput) {
-			Broodwar.enableFlag(Enum.UserInput.getValue());
+			Game.enableFlag(Enum.UserInput.getValue());
 		}
 
-		Broodwar.setCommandOptimizationLevel(1);
-		Broodwar.setLocalSpeed(DEBUG.setLocalSpeed);
-		Broodwar.setFrameSkip(DEBUG.setFrameSkip);
+		Game.setCommandOptimizationLevel(1);
+		Game.setLocalSpeed(DEBUG.setLocalSpeed);
+		Game.setFrameSkip(DEBUG.setFrameSkip);
 
 		System.out.println("Map analyzing started");
 		BWTA.readMap();
@@ -77,7 +77,7 @@ public class PreBot extends DefaultBWListener {
 	/// 경기 진행 중 매 프레임마다 발생하는 이벤트를 처리합니다
 	@Override
 	public void onFrame() {
-		if (Broodwar.isReplay()) {
+		if (Game.isReplay()) {
 			return;
 		}
 
@@ -86,12 +86,12 @@ public class PreBot extends DefaultBWListener {
 		try {
 			gameCommander.onFrame();
 		} catch (Exception e) {
-			Broodwar.printf("[Error Stack Trace]");
+			Game.printf("[Error Stack Trace]");
 			System.out.println("[Error Stack Trace]");
-			Broodwar.sendText(e.toString());
+			Game.sendText(e.toString());
 			System.out.println(e.toString());
 			for (StackTraceElement ste : e.getStackTrace()) {
-				Broodwar.sendText(ste.toString());
+				Game.sendText(ste.toString());
 				System.out.println(ste.toString());
 			}
 		}
@@ -103,7 +103,7 @@ public class PreBot extends DefaultBWListener {
 		}
 
 		if (timeToGG()) {
-			Broodwar.leaveGame();
+			Game.leaveGame();
 		}
 
 	}
@@ -111,7 +111,7 @@ public class PreBot extends DefaultBWListener {
 	/// 유닛(건물/지상유닛/공중유닛)이 Create 될 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onUnitCreate(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitCreate(unit);
 		}
 	}
@@ -119,7 +119,7 @@ public class PreBot extends DefaultBWListener {
 	/// 유닛(건물/지상유닛/공중유닛)이 Destroy 될 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onUnitDestroy(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitDestroy(unit);
 		}
 	}
@@ -128,7 +128,7 @@ public class PreBot extends DefaultBWListener {
 	/// Zerg 종족의 유닛은 건물 건설이나 지상유닛/공중유닛 생산에서 거의 대부분 Morph 형태로 진행됩니다
 	@Override
 	public void onUnitMorph(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitMorph(unit);
 		}
 	}
@@ -136,7 +136,7 @@ public class PreBot extends DefaultBWListener {
 	/// 유닛(건물/지상유닛/공중유닛)의 하던 일 (건물 건설, 업그레이드, 지상유닛 훈련 등)이 끝났을 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onUnitComplete(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitComplete(unit);
 		}
 	}
@@ -146,7 +146,7 @@ public class PreBot extends DefaultBWListener {
 	/// 종족 Dark Archon 의 Mind Control 에 의해 소속 플레이어가 바뀔 때 발생합니다
 	@Override
 	public void onUnitRenegade(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitRenegade(unit);
 		}
 	}
@@ -155,7 +155,7 @@ public class PreBot extends DefaultBWListener {
 	/// 아군 유닛이 Create 되었을 때 라든가, 적군 유닛이 Discover 되었을 때 발생합니다
 	@Override
 	public void onUnitDiscover(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitDiscover(unit);
 		}
 	}
@@ -164,7 +164,7 @@ public class PreBot extends DefaultBWListener {
 	/// 유닛이 Destroy 될 때 발생합니다
 	@Override
 	public void onUnitEvade(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitEvade(unit);
 		}
 	}
@@ -173,7 +173,7 @@ public class PreBot extends DefaultBWListener {
 	/// 아군 유닛이 Create 되었을 때 라든가, 적군 유닛이 Discover 되었을 때 발생합니다
 	@Override
 	public void onUnitShow(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitShow(unit);
 		}
 	}
@@ -182,7 +182,7 @@ public class PreBot extends DefaultBWListener {
 	/// 보이던 유닛이 Hide 될 때 발생합니다
 	@Override
 	public void onUnitHide(Unit unit) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onUnitHide(unit);
 		}
 	}
@@ -190,7 +190,7 @@ public class PreBot extends DefaultBWListener {
 	/// 핵미사일 발사가 감지되었을 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onNukeDetect(Position target) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onNukeDetect(target);
 		}
 	}
@@ -198,7 +198,7 @@ public class PreBot extends DefaultBWListener {
 	/// 다른 플레이어가 대결을 나갔을 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onPlayerLeft(Player player) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onPlayerLeft(player);
 		}
 	}
@@ -206,7 +206,7 @@ public class PreBot extends DefaultBWListener {
 	/// 게임을 저장할 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onSaveGame(String gameName) {
-		if (!Broodwar.isReplay()) {
+		if (!Game.isReplay()) {
 			gameCommander.onSaveGame(gameName);
 		}
 	}
@@ -215,13 +215,13 @@ public class PreBot extends DefaultBWListener {
 	@Override
 	public void onSendText(String text) {
 		gameCommander.onSendText(text);
-		Broodwar.sendText(text);
+		Game.sendText(text);
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다
 	@Override
 	public void onReceiveText(Player player, String text) {
-		Broodwar.printf(player.getName() + " said \"" + text + "\"");
+		Game.printf(player.getName() + " said \"" + text + "\"");
 
 		gameCommander.onReceiveText(player, text);
 	}
@@ -232,7 +232,7 @@ public class PreBot extends DefaultBWListener {
 		int canAttackBuildingCount = 0;
 		int canDoSomeThingNonBuildingUnitCount = 0;
 
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit.getType().isBuilding()) {
 
 				// 생산 가능 건물이 하나라도 있으면 게임 지속 가능.
@@ -264,12 +264,12 @@ public class PreBot extends DefaultBWListener {
 
 		// 자동 패배조건 만족하게 된 프레임 기록
 		if (canDoSomeThingNonBuildingUnitCount == 0 && canProduceBuildingCount == 0 && canAttackBuildingCount == 0 && isGameLostConditionSatisfied == false) {
-			PreBot.Broodwar.sendText("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
-			PreBot.Broodwar.sendText("GG");
+			Prebot.Game.sendText("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
+			Prebot.Game.sendText("GG");
 			System.out.println("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
 
 			isGameLostConditionSatisfied = true;
-			gameLostConditionSatisfiedFrame = PreBot.Broodwar.getFrameCount();
+			gameLostConditionSatisfiedFrame = Prebot.Game.getFrameCount();
 		}
 		// 자동 패배조건 벗어나게 되면 리셋
 		else if (canDoSomeThingNonBuildingUnitCount != 0 || canProduceBuildingCount != 0 || canAttackBuildingCount != 0) {
@@ -279,11 +279,11 @@ public class PreBot extends DefaultBWListener {
 		// 자동 패배조건 만족 상황이 일정시간 동안 지속되었으면 게임 패배로 처리
 		if (isGameLostConditionSatisfied) {
 
-			PreBot.Broodwar.drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
-			PreBot.Broodwar.drawTextScreen(250, 115,
-					"I will leave game in " + (maxDurationForGameLostCondition - (PreBot.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame)) + " frames");
+			Prebot.Game.drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
+			Prebot.Game.drawTextScreen(250, 115,
+					"I will leave game in " + (maxDurationForGameLostCondition - (Prebot.Game.getFrameCount() - gameLostConditionSatisfiedFrame)) + " frames");
 
-			if (PreBot.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame >= maxDurationForGameLostCondition) {
+			if (Prebot.Game.getFrameCount() - gameLostConditionSatisfiedFrame >= maxDurationForGameLostCondition) {
 				return true;
 			}
 		}

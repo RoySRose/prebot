@@ -6,7 +6,7 @@ import prebot.build.BuildOrderItem;
 import prebot.build.MetaType;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.util.UnitUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 public class BuildActions {
 
@@ -28,7 +28,7 @@ public class BuildActions {
 		@Override
 		public boolean buildCondition() {
 			// 서플라이수를 200를 채웠다면 더이상 지을 필요 없음
-			if (PreBot.Broodwar.self().supplyTotal() > 400) {
+			if (Prebot.Game.self().supplyTotal() > 400) {
 				return false;
 			}
 
@@ -56,7 +56,7 @@ public class BuildActions {
 			}
 
 			// 2. 부족한 서플라이 수가 0이하라면 지을 필요 없음
-			int currentSupplyShortage = PreBot.Broodwar.self().supplyUsed() + supplyMargin - PreBot.Broodwar.self().supplyTotal();
+			int currentSupplyShortage = Prebot.Game.self().supplyUsed() + supplyMargin - Prebot.Game.self().supplyTotal();
 			if (currentSupplyShortage <= 0) {
 				return false;
 			}

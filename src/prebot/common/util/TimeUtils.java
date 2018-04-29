@@ -1,7 +1,7 @@
 package prebot.common.util;
 
 import bwapi.Unit;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 public class TimeUtils {
 	
@@ -11,37 +11,37 @@ public class TimeUtils {
 	
 	/// 지나간 프레임이면 true
 	public static boolean isPassedFrame(int frame) {
-		return frame < PreBot.Broodwar.getFrameCount();
+		return frame < Prebot.Game.getFrameCount();
 	}
 
 	/// 경과시간을 frame으로 리턴
 	public static int elapsedFrames() {
-		return PreBot.Broodwar.getFrameCount();
+		return Prebot.Game.getFrameCount();
 	}
 	
 	/// 경과시간을 second로 리턴
 	public static int elapsedSeconds() {
-		return PreBot.Broodwar.getFrameCount() / SECOND;
+		return Prebot.Game.getFrameCount() / SECOND;
 	}
 	
 	/// 경과시간을 minute으로 리턴
 	public static int elapsedMiniutes() {
-		return PreBot.Broodwar.getFrameCount() / MINUTE;
+		return Prebot.Game.getFrameCount() / MINUTE;
 	}
 	
 	/// 경과시간을 frame으로 리턴
 	public static int elapsedFrames(int startFrame) {
-		return PreBot.Broodwar.getFrameCount() - startFrame;
+		return Prebot.Game.getFrameCount() - startFrame;
 	}
 
 	/// 경과시간을 second으로 리턴
 	public static int elapsedSeconds(int startFrame) {
-		return (PreBot.Broodwar.getFrameCount() - startFrame) / SECOND;
+		return (Prebot.Game.getFrameCount() - startFrame) / SECOND;
 	}
 
 	/// 경과시간을 minute으로 리턴
 	public static int elapsedMiniutes(int startFrame) {
-		return (PreBot.Broodwar.getFrameCount() - startFrame) / MINUTE;
+		return (Prebot.Game.getFrameCount() - startFrame) / MINUTE;
 	}
 
 	/// frame을 second로 단위변경하여 리턴
@@ -56,7 +56,7 @@ public class TimeUtils {
 	
 	/// 실행할 frame되어야 하는 frame이면 true
 	public static boolean executeRotation(int group, int rotationSize) {
-		return (PreBot.Broodwar.getFrameCount() % rotationSize) == group;
+		return (Prebot.Game.getFrameCount() % rotationSize) == group;
 	}
 
 	/// unit이 실행할 rotation이면 true

@@ -1,18 +1,22 @@
 
 package prebot.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import prebot.chat.ChatBot;
 import prebot.common.code.ConfigForDebug.DEBUG;
+import prebot.common.util.MapTools;
 import prebot.common.util.PlayerUtils;
 import prebot.main.manager.BuildManager;
 import prebot.main.manager.CombatManager;
 import prebot.main.manager.ConstructionManager;
+import prebot.main.manager.GameManager;
 import prebot.main.manager.InformationManager;
-import prebot.main.manager.ScoutManager;
 import prebot.main.manager.StrategyManager;
 import prebot.main.manager.WorkerManager;
 
@@ -26,11 +30,11 @@ public class GameCommander {
 		return instance;
 	}
 
-//	private List<GameManager> managerList = new ArrayList<>();
-//
-//	public List<GameManager> getManagers() {
-//		return managerList;
-//	}
+	private List<GameManager> managerList = new ArrayList<>();
+
+	public List<GameManager> getManagers() {
+		return managerList;
+	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onEnd(boolean isWinner) {
@@ -38,23 +42,28 @@ public class GameCommander {
 	}
 
 	public void onStart() {
-		TilePosition startLocation = PreBot.Broodwar.self().getStartLocation();
+		TilePosition startLocation = Prebot.Game.self().getStartLocation();
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
 		}
 
 		StrategyManager.Instance().onStart();
+		MapTools.init();
+		
+		InformationManager.Instance().setStopWatchTag("InformationManager");
+		StrategyManager.Instance().setStopWatchTag("StrategyManager");
+		BuildManager.Instance().setStopWatchTag("BuildManager");
+		ConstructionManager.Instance().setStopWatchTag("ConstructionManager");
+		WorkerManager.Instance().setStopWatchTag("WorkerManager");
+		CombatManager.Instance().setStopWatchTag("CombatManager");
 
 		// 매니저 추가(UX Manager 등에서 사용)
-//		managerList.add(InformationManager.Instance());
-//		managerList.add(MapGrid.Instance());
-//		managerList.add(WorkerManager.Instance());
-//		managerList.add(BuildManager.Instance());
-//		managerList.add(ConstructionManager.Instance());
-//		managerList.add(ScoutManager.Instance());
-//		managerList.add(StrategyManager.Instance());
-//		managerList.add(ActionManager.Instance());
-//		managerList.add(CombatManager.Instance());
+		managerList.add(InformationManager.Instance());
+		managerList.add(StrategyManager.Instance());
+		managerList.add(BuildManager.Instance());
+		managerList.add(ConstructionManager.Instance());
+		managerList.add(WorkerManager.Instance());
+		managerList.add(CombatManager.Instance());
 	}
 
 	/// 경기 진행 중 매 프레임마다 발생하는 이벤트를 처리합니다
@@ -64,24 +73,22 @@ public class GameCommander {
 		}
 		
 		// 정보수집 및 판단
-		InformationManager.Instance().update();
+		InformationManager.Instance().start().update().end();
+		StrategyManager.Instance().start().update().end();
 //		MapGrid.Instance().update(); // 사용이 필요할 경우 주석 해제
-		StrategyManager.Instance().update();
 		
 		// 자원 사용
-		BuildManager.Instance().update();
-		ConstructionManager.Instance().update();
+		BuildManager.Instance().start().update().end();
+		ConstructionManager.Instance().start().update().end();
 		
 		// 유닛 컨트롤
-		WorkerManager.Instance().update();
-		ScoutManager.Instance().update();
-		CombatManager.Instance().update();
-		
+		WorkerManager.Instance().start().update().end();
+		CombatManager.Instance().start().update().end();
 //		saveGameLog();
 	}
 
 	private boolean playableCondition() {
-		return !PreBot.Broodwar.isPaused() && !PlayerUtils.isDisabled(PreBot.Broodwar.self()) && !PlayerUtils.isDisabled(PreBot.Broodwar.enemy());
+		return !Prebot.Game.isPaused() && !PlayerUtils.isDisabled(Prebot.Game.self()) && !PlayerUtils.isDisabled(Prebot.Game.enemy());
 	}
 
 	/// 유닛(건물/지상유닛/공중유닛)이 Create 될 때 발생하는 이벤트를 처리합니다

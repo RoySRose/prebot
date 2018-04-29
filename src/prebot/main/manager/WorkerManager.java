@@ -1,21 +1,20 @@
 package prebot.main.manager;
 
-import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import prebot.brain.action.ActionVariables;
+import prebot.brain.Idea;
 import prebot.common.code.Code.UnitFindRange;
-import prebot.common.code.GameConstant;
+import prebot.common.code.Code.WorkerJob;
+import prebot.common.code.Config;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
 import prebot.information.WorkerData;
 import prebot.information.WorkerMoveData;
-import prebot.information.WorkerData.WorkerJob;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -34,7 +33,7 @@ public class WorkerManager extends GameManager {
 	}
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
-	public void update() {
+	public GameManager update() {
 		// 1초에 1번만 실행한다
 		// if (MyBotModule.Broodwar.getFrameCount() % 24 != 0)
 		// return;
@@ -43,8 +42,9 @@ public class WorkerManager extends GameManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 		handleMoveWorkers();
-		handleCombatWorkers();
-		handleRepairWorkers();
+//		handleRepairWorkers();
+		
+		return this;
 	}
 
 	public void updateWorkerStatus() {
@@ -60,31 +60,31 @@ public class WorkerManager extends GameManager {
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
 			if (worker.isIdle()) {
 				// workerData 에서 Build / Move / Scout 로 임무지정한 경우, worker 는 즉 임무 수행 도중 (임무 완료 전) 에 일시적으로 isIdle 상태가 될 수 있다
-				if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build
-						&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move
-						&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout) {
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+				if (workerData.getWorkerJob(worker) != WorkerJob.BUILD
+						&& workerData.getWorkerJob(worker) != WorkerJob.MOVE
+						&& workerData.getWorkerJob(worker) != WorkerJob.COMBAT) {
+					workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 				}
 			}
 
 			// if its job is gas
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Gas) {
+			if (workerData.getWorkerJob(worker) == WorkerJob.GAS) {
 				Unit refinery = workerData.getWorkerResource(worker);
 
 				// if the refinery doesn't exist anymore (파괴되었을 경우)
 				if (refinery == null || !refinery.exists() || refinery.getHitPoints() <= 0) {
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+					workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 				}
 			}
 
 			// if its job is repair
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Repair) {
+			if (workerData.getWorkerJob(worker) == WorkerJob.REPAIR) {
 				Unit repairTargetUnit = workerData.getWorkerRepairUnit(worker);
 
 				// 대상이 파괴되었거나, 수리가 다 끝난 경우
 				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
 						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+					workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 				}
 			}
 		}
@@ -92,10 +92,10 @@ public class WorkerManager extends GameManager {
 
 	public void handleGasWorkers() {
 		// for each unit we have
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit.getType().isWorker() && unit.isGatheringGas() && !unit.isCarryingGas()) {
-				if (workerData.getWorkerJob(unit) != WorkerJob.Gas) {
-					workerData.setWorkerJob(unit, WorkerData.WorkerJob.Idle, (Unit) null);
+				if (workerData.getWorkerJob(unit) != WorkerJob.GAS) {
+					workerData.setWorkerJob(unit, WorkerJob.IDLE, (Unit) null);
 				}
 			}
 			
@@ -107,20 +107,20 @@ public class WorkerManager extends GameManager {
 
 				// if it's less than we want it to be, fill 'er up
 				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-				WorkerJob preJob = WorkerJob.Minerals;
-				WorkerJob postJob = WorkerJob.Gas;
+				WorkerJob preJob = WorkerJob.MINERALS;
+				WorkerJob postJob = WorkerJob.GAS;
 				int numInsufficient = getAdjustedWorkersPerRefinery() - numAssigned;
 				if (numInsufficient < 0) { // 가스조절이 필요
 					numInsufficient *= -1;
-					preJob = WorkerJob.Gas;
-					postJob = WorkerJob.Minerals;
+					preJob = WorkerJob.GAS;
+					postJob = WorkerJob.MINERALS;
 				}
 				for (int i = 0; i < numInsufficient; ++i) {
 					Unit jobChangeWorker = chooseWorkerToChangeGatherJob(preJob, refinery); // mineral to gas
 					if (jobChangeWorker != null) {
-						if (postJob == WorkerJob.Gas) {
+						if (postJob == WorkerJob.GAS) {
 							workerData.setWorkerJob(jobChangeWorker, postJob, refinery);
-						} else if (postJob == WorkerJob.Minerals) {
+						} else if (postJob == WorkerJob.MINERALS) {
 							Unit resourceDepot = getClosestResourceDepotFromWorker(jobChangeWorker);
 							workerData.setWorkerJob(jobChangeWorker, postJob, resourceDepot);
 						}
@@ -131,10 +131,24 @@ public class WorkerManager extends GameManager {
 		}
 	}
 
+	/**
+	 * 기본 가스일꾼 조절 : 최소 미네랄일꾼 7기 기준
+	 * [가스통 1개]
+	 * 일꾼 00-07기 : 가스일꾼 0기
+	 * 일꾼 08-09기 : 가스일꾼 1기
+	 * 일꾼 10-11기 : 가스일꾼 2기
+	 * 일꾼 12-00기 : 가스일꾼 3기
+	 * 
+	 * [가스통 x2 기준]
+	 * 일꾼 00-09기, 가스일꾼 0기
+	 * 일꾼 10-13기, 가스일꾼 1기
+	 * 일꾼 14-17기, 가스일꾼 2기
+	 * 일꾼 18-00기, 가스일꾼 3기
+	 */
 	private int getAdjustedWorkersPerRefinery() {
-		if (ActionVariables.gasAdjustment) {
+		if (Idea.of().gasAdjustment) {
 			// specific count adjusted by action
-			return ActionVariables.gasAdjustmentWorkerCount;
+			return Idea.of().gasAdjustmentWorkerCount;
 			
 		} else {
 			int workerCount = UnitUtils.getUnitCount(UnitType.Terran_SCV, UnitFindRange.COMPLETE);
@@ -145,8 +159,8 @@ public class WorkerManager extends GameManager {
 				int refineryCount = UnitUtils.getUnitCount(UnitType.Terran_Refinery, UnitFindRange.COMPLETE);
 				int workersPerRefinery = (int) (workerCount - 7 + 1) / (refineryCount * 2);
 				
-				if (workersPerRefinery > GameConstant.WORKERS_PER_REFINERY) {
-					return GameConstant.WORKERS_PER_REFINERY;
+				if (workersPerRefinery > Config.WORKERS_PER_REFINERY) {
+					return Config.WORKERS_PER_REFINERY;
 				} else {
 					return workersPerRefinery;
 				}
@@ -162,7 +176,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// if worker's job is idle
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default) {
+			if (workerData.getWorkerJob(worker) == WorkerJob.IDLE || workerData.getWorkerJob(worker) == WorkerJob.DEFAULT) {
 				// send it to the nearest mineral patch
 				setMineralWorker(worker);
 			}
@@ -176,7 +190,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// if it is a move worker
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move) {
+			if (workerData.getWorkerJob(worker) == WorkerJob.MOVE) {
 				WorkerMoveData data = workerData.getWorkerMoveData(worker);
 
 				// 목적지에 도착한 경우 이동 명령을 해제한다
@@ -189,40 +203,23 @@ public class WorkerManager extends GameManager {
 		}
 	}
 
-	// bad micro for combat workers
-	public void handleCombatWorkers() {
-		for (Unit worker : workerData.getWorkers()) {
-			if (worker == null)
-				continue;
-
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
-				PreBot.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4, Color.Yellow, true);
-				Unit target = getClosestEnemyUnitFromWorker(worker);
-
-				if (target != null) {
-					CommandUtils.attackUnit(worker, target);
-				}
-			}
-		}
-	}
-
 	public void handleRepairWorkers() {
-		if (PreBot.Broodwar.self().getRace() != Race.Terran) {
+		if (Prebot.Game.self().getRace() != Race.Terran) {
 			return;
 		}
 
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
-			if (unit.getType().isBuilding() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()) {
+			if (unit.getType().isBuilding() && unit.isCompleted() && unit.getHitPoints() < unit.getType().maxHitPoints()) {
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 0);
 				setRepairWorker(repairWorker, unit);
 				break;
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
-			else if (unit.getType().isMechanical() && unit.isCompleted() == true && unit.getHitPoints() < unit.getType().maxHitPoints()) {
+			else if (unit.getType().isMechanical() && unit.isCompleted() && unit.getHitPoints() < unit.getType().maxHitPoints()) {
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if (unit.getType() != UnitType.Terran_SCV) {
-					Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 10 * GameConstant.TILE_SIZE);
+					Unit repairWorker = chooseRepairWorkerClosestTo(unit.getPosition(), 10 * Config.TILE_SIZE);
 					setRepairWorker(repairWorker, unit);
 					break;
 				}
@@ -255,8 +252,8 @@ public class WorkerManager extends GameManager {
 				continue;
 			}
 
-			if (worker.isCompleted() && (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle
-					|| workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move)) {
+			if (worker.isCompleted() && (workerData.getWorkerJob(worker) == WorkerJob.MINERALS || workerData.getWorkerJob(worker) == WorkerJob.IDLE
+					|| workerData.getWorkerJob(worker) == WorkerJob.MOVE)) {
 				double dist = worker.getDistance(p);
 
 				if (closestWorker == null || (dist < closestDist && worker.isCarryingMinerals() == false && worker.isCarryingGas() == false)) {
@@ -284,7 +281,7 @@ public class WorkerManager extends GameManager {
 		// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
 		if (depot != null) {
 			// update workerData with the new job
-			workerData.setWorkerJob(unit, WorkerData.WorkerJob.Minerals, depot);
+			workerData.setWorkerJob(unit, WorkerJob.MINERALS, depot);
 		}
 	}
 
@@ -302,7 +299,7 @@ public class WorkerManager extends GameManager {
 		// 완성된, 공중에 떠있지 않고 땅에 정착해있는, ResourceDepot 혹은 Lair 나 Hive로 변형중인 Hatchery 중에서
 		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
 		// 둘째로 가까운 곳을 찾는다
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit == null)
 				continue;
 
@@ -321,7 +318,7 @@ public class WorkerManager extends GameManager {
 		// 모든 ResourceDepot 이 다 일꾼수가 꽉 차있거나, 완성된 ResourceDepot 이 하나도 없고 건설중이라면,
 		// ResourceDepot 주위에 미네랄이 남아있는 곳 중에서 가까운 곳이 선택되도록 한다
 		if (closestDepot == null) {
-			for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+			for (Unit unit : Prebot.Game.self().getUnits()) {
 				if (unit == null)
 					continue;
 
@@ -340,7 +337,7 @@ public class WorkerManager extends GameManager {
 
 		// 모든 ResourceDepot 주위에 미네랄이 하나도 없다면, 일꾼에게 가장 가까운 곳을 선택한다
 		if (closestDepot == null) {
-			for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+			for (Unit unit : Prebot.Game.self().getUnits()) {
 				if (unit == null)
 					continue;
 
@@ -364,7 +361,7 @@ public class WorkerManager extends GameManager {
 		if (unit == null)
 			return;
 
-		workerData.setWorkerJob(unit, WorkerData.WorkerJob.Idle, (Unit) null);
+		workerData.setWorkerJob(unit, WorkerJob.IDLE, (Unit) null);
 	}
 
 	/// Mineral 일꾼 유닛들 중에서 Gas 임무를 수행할 일꾼 유닛을 정해서 리턴합니다<br>
@@ -400,7 +397,7 @@ public class WorkerManager extends GameManager {
 		if (worker == null)
 			return;
 
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Build, buildingType);
+		workerData.setWorkerJob(worker, WorkerJob.BUILD, buildingType);
 	}
 
 	/// buildingPosition 에서 가장 가까운 Move 혹은 Idle 혹은 Mineral 일꾼 유닛들 중에서 Construction 임무를 수행할 일꾼 유닛을 정해서 리턴합니다<br>
@@ -431,7 +428,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// Move / Idle Worker
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle)) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerJob.MOVE || workerData.getWorkerJob(unit) == WorkerJob.IDLE)) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false)) {
@@ -443,8 +440,8 @@ public class WorkerManager extends GameManager {
 			}
 
 			// Move / Idle Worker 가 없을때, 다른 Worker 중에서 차출한다
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle
-					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build)) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) != WorkerJob.MOVE && workerData.getWorkerJob(unit) != WorkerJob.IDLE
+					&& workerData.getWorkerJob(unit) != WorkerJob.BUILD)) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false)) {
@@ -460,34 +457,10 @@ public class WorkerManager extends GameManager {
 
 		// if the worker exists (one may not have been found in rare cases)
 		if (chosenWorker != null && setJobAsConstructionWorker) {
-			workerData.setWorkerJob(chosenWorker, WorkerData.WorkerJob.Build, buildingType);
+			workerData.setWorkerJob(chosenWorker, WorkerJob.BUILD, buildingType);
 		}
 
 		return chosenWorker;
-	}
-
-	/// Mineral 혹은 Idle 일꾼 유닛들 중에서 Scout 임무를 수행할 일꾼 유닛을 정해서 리턴합니다
-	public Unit getScoutWorker() {
-		// for each of our workers
-		for (Unit worker : workerData.getWorkers()) {
-			if (worker == null) {
-				continue;
-			}
-			// if it is a scout worker
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout) {
-				return worker;
-			}
-		}
-
-		return null;
-	}
-
-	// sets a worker as a scout
-	public void setScoutWorker(Unit worker) {
-		if (worker == null)
-			return;
-
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Scout, (Unit) null);
 	}
 
 	// get a worker which will move to a current location
@@ -508,7 +481,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// only consider it if it's a mineral worker
-			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals) {
+			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerJob.MINERALS) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
 				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false)) {
@@ -540,7 +513,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// only consider it if it's a mineral worker or idle worker
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle)) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerJob.MINERALS || workerData.getWorkerJob(unit) == WorkerJob.IDLE)) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
 				if (closestWorker == null || distance < closestDistance) {
@@ -551,30 +524,10 @@ public class WorkerManager extends GameManager {
 		}
 
 		if (closestWorker != null) {
-			workerData.setWorkerJob(closestWorker, WorkerData.WorkerJob.Move, new WorkerMoveData(mineralsNeeded, gasNeeded, p));
+			workerData.setWorkerJob(closestWorker, WorkerJob.MOVE, new WorkerMoveData(mineralsNeeded, gasNeeded, p));
 		} else {
 			// MyBotModule.Broodwar.printf("Error, no worker found");
 		}
-	}
-
-	/// 해당 일꾼 유닛으로부터 가장 가까운 적군 유닛을 리턴합니다
-	public Unit getClosestEnemyUnitFromWorker(Unit worker) {
-		if (worker == null)
-			return null;
-
-		Unit closestUnit = null;
-		double closestDist = 10000;
-
-		for (Unit unit : PreBot.Broodwar.enemy().getUnits()) {
-			double dist = unit.getDistance(worker);
-
-			if ((dist < 400) && (closestUnit == null || (dist < closestDist))) {
-				closestUnit = unit;
-				closestDist = dist;
-			}
-		}
-
-		return closestUnit;
 	}
 
 	/// 해당 일꾼 유닛에게 Combat 임무를 부여합니다
@@ -582,27 +535,15 @@ public class WorkerManager extends GameManager {
 		if (worker == null)
 			return;
 
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Combat, (Unit) null);
-	}
-
-	/// 모든 Combat 일꾼 유닛에 대해 임무를 해제합니다
-	public void stopCombat() {
-		for (Unit worker : workerData.getWorkers()) {
-			if (worker == null)
-				continue;
-
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
-				setMineralWorker(worker);
-			}
-		}
+		workerData.setWorkerJob(worker, WorkerJob.COMBAT, (Unit) null);
 	}
 
 	public void setRepairWorker(Unit worker, Unit unitToRepair) {
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Repair, unitToRepair);
+		workerData.setWorkerJob(worker, WorkerJob.REPAIR, unitToRepair);
 	}
 
 	public void stopRepairing(Unit worker) {
-		workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+		workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 	}
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트합니다
@@ -621,7 +562,7 @@ public class WorkerManager extends GameManager {
 		// }
 
 		// if something morphs into a building, it was a worker (Zerg Drone)
-		if (unit.getType().isBuilding() && unit.getPlayer() == PreBot.Broodwar.self() && unit.getPlayer().getRace() == Race.Zerg) {
+		if (unit.getType().isBuilding() && unit.getPlayer() == Prebot.Game.self() && unit.getPlayer().getRace() == Race.Zerg) {
 			// 해당 worker 를 workerData 에서 삭제한다
 			workerData.workerDestroyed(unit);
 			rebalanceWorkers();
@@ -659,13 +600,13 @@ public class WorkerManager extends GameManager {
 			return;
 
 		// ResourceDepot 건물이 신규 생성되면, 자료구조 추가 처리를 한 후, rebalanceWorkers 를 한다
-		if (unit.getType().isResourceDepot() && unit.getPlayer() == PreBot.Broodwar.self()) {
+		if (unit.getType().isResourceDepot() && unit.getPlayer() == Prebot.Game.self()) {
 			workerData.addDepot(unit);
 			rebalanceWorkers();
 		}
 
 		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다.
-		if (unit.getType().isWorker() && unit.getPlayer() == PreBot.Broodwar.self() && unit.getHitPoints() >= 0) {
+		if (unit.getType().isWorker() && unit.getPlayer() == Prebot.Game.self() && unit.getHitPoints() >= 0) {
 			workerData.addWorker(unit);
 			rebalanceWorkers();
 		}
@@ -677,16 +618,16 @@ public class WorkerManager extends GameManager {
 	// idle worker 에게 mineral job 을 부여할 때, mineral worker 가 부족한 resource depot 으로 이동하게 된다
 	public void rebalanceWorkers() {
 		for (Unit worker : workerData.getWorkers()) {
-			if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Minerals) {
+			if (workerData.getWorkerJob(worker) != WorkerJob.MINERALS) {
 				continue;
 			}
 
 			Unit depot = workerData.getWorkerDepot(worker);
 
 			if (depot != null && workerData.depotHasEnoughMineralWorkers(depot)) {
-				workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+				workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 			} else if (depot == null) {
-				workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
+				workerData.setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 			}
 		}
 	}
@@ -700,12 +641,12 @@ public class WorkerManager extends GameManager {
 			return;
 
 		// ResourceDepot 건물이 파괴되면, 자료구조 삭제 처리를 한 후, 일꾼들을 Idle 상태로 만들어 rebalanceWorkers 한 효과가 나게 한다
-		if (unit.getType().isResourceDepot() && unit.getPlayer() == PreBot.Broodwar.self()) {
+		if (unit.getType().isResourceDepot() && unit.getPlayer() == Prebot.Game.self()) {
 			workerData.removeDepot(unit);
 		}
 
 		// 일꾼이 죽으면, 자료구조 삭제 처리를 한 후, rebalanceWorkers 를 한다
-		if (unit.getType().isWorker() && unit.getPlayer() == PreBot.Broodwar.self()) {
+		if (unit.getType().isWorker() && unit.getPlayer() == Prebot.Game.self()) {
 			workerData.workerDestroyed(unit);
 			rebalanceWorkers();
 		}
@@ -722,21 +663,14 @@ public class WorkerManager extends GameManager {
 		if (worker == null)
 			return false;
 
-		return workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle;
-	}
-
-	public boolean isScoutWorker(Unit worker) {
-		if (worker == null)
-			return false;
-
-		return (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout);
+		return workerData.getWorkerJob(worker) == WorkerJob.MINERALS || workerData.getWorkerJob(worker) == WorkerJob.IDLE;
 	}
 
 	public boolean isConstructionWorker(Unit worker) {
 		if (worker == null)
 			return false;
 
-		return (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build);
+		return (workerData.getWorkerJob(worker) == WorkerJob.BUILD);
 	}
 
 	public int getNumMineralWorkers() {

@@ -19,10 +19,10 @@ import prebot.build.BuildOrderItem;
 import prebot.build.BuildOrderQueue;
 import prebot.build.ConstructionPlaceFinder;
 import prebot.build.MetaType;
-import prebot.common.code.GameConstant;
+import prebot.common.code.Config;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 /// 빌드(건물 건설 / 유닛 훈련 / 테크 리서치 / 업그레이드) 명령을 순차적으로 실행하기 위해 빌드 큐를 관리하고, 빌드 큐에 있는 명령을 하나씩 실행하는 class<br>
 /// 빌드 명령 중 건물 건설 명령은 ConstructionManager로 전달합니다
@@ -40,20 +40,18 @@ public class BuildManager extends GameManager {
 	}
 
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
-	public void update() {
-		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (PreBot.Broodwar.getFrameCount() % 6 != 0)
-			return;
+	public GameManager update() {
+		// 1초(24프레임)에 4번 정도만 실행해도 충분하다 if (Prebot.Game.getFrameCount() % 6 != 0) return;
 
 		if (buildQueue.isEmpty()) {
-			return;
+			return this;
 		}
 
 		// Dead Lock 을 체크해서 제거한다
 		checkBuildOrderQueueDeadlockAndAndFixIt();
 		// Dead Lock 제거후 Empty 될 수 있다
 		if (buildQueue.isEmpty()) {
-			return;
+			return this;
 		}
 
 		// the current item to be used
@@ -156,6 +154,7 @@ public class BuildManager extends GameManager {
 				break;
 			}
 		}
+		return this;
 	}
 
 	/// 해당 MetaType 을 build 할 수 있는 producer 를 찾아 반환합니다
@@ -168,7 +167,7 @@ public class BuildManager extends GameManager {
 
 		// make a set of all candidate producers
 		List<Unit> candidateProducers = new ArrayList<Unit>();
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit == null)
 				continue;
 
@@ -252,13 +251,13 @@ public class BuildManager extends GameManager {
 
 							// if the map won't let you build here, we can't build it.
 							// 맵 타일 자체가 건설 불가능한 타일인 경우 + 기존 건물이 해당 타일에 이미 있는경우
-							if (!PreBot.Broodwar.isBuildable(tilePos, true)) {
+							if (!Prebot.Game.isBuildable(tilePos, true)) {
 								isBlocked = true;
 							}
 
 							// if there are any units on the addon tile, we can't build it
 							// 아군 유닛은 Addon 지을 위치에 있어도 괜찮음. (적군 유닛은 Addon 지을 위치에 있으면 건설 안되는지는 아직 불확실함)
-							for (Unit u : PreBot.Broodwar.getUnitsOnTile(tilePos.getX(), tilePos.getY())) {
+							for (Unit u : Prebot.Game.getUnitsOnTile(tilePos.getX(), tilePos.getY())) {
 								if (u.getPlayer() != InformationManager.Instance().selfPlayer) {
 									isBlocked = false;
 								}
@@ -303,11 +302,11 @@ public class BuildManager extends GameManager {
 			if (t.isUnit()) {
 				// MyBotModule.Broodwar.canMake : Checks all the requirements
 				// include resources, supply, technology tree, availability, and required units
-				canMake = PreBot.Broodwar.canMake(t.getUnitType(), producer);
+				canMake = Prebot.Game.canMake(t.getUnitType(), producer);
 			} else if (t.isTech()) {
-				canMake = PreBot.Broodwar.canResearch(t.getTechType(), producer);
+				canMake = Prebot.Game.canResearch(t.getTechType(), producer);
 			} else if (t.isUpgrade()) {
-				canMake = PreBot.Broodwar.canUpgrade(t.getUpgradeType(), producer);
+				canMake = Prebot.Game.canUpgrade(t.getUpgradeType(), producer);
 			}
 		}
 
@@ -316,12 +315,12 @@ public class BuildManager extends GameManager {
 
 	// 사용가능 미네랄 = 현재 보유 미네랄 - 사용하기로 예약되어있는 미네랄
 	public int getAvailableMinerals() {
-		return PreBot.Broodwar.self().minerals() - ConstructionManager.Instance().getReservedMinerals();
+		return Prebot.Game.self().minerals() - ConstructionManager.Instance().getReservedMinerals();
 	}
 
 	// 사용가능 가스 = 현재 보유 가스 - 사용하기로 예약되어있는 가스
 	public int getAvailableGas() {
-		return PreBot.Broodwar.self().gas() - ConstructionManager.Instance().getReservedGas();
+		return Prebot.Game.self().gas() - ConstructionManager.Instance().getReservedGas();
 	}
 
 	// return whether or not we meet resources, including building reserves
@@ -333,7 +332,7 @@ public class BuildManager extends GameManager {
 	// selects a unit of a given type
 	public Unit selectUnitOfType(UnitType type, Position closestTo) {
 		// if we have none of the unit type, return null right away
-		if (PreBot.Broodwar.self().completedUnitCount(type) == 0) {
+		if (Prebot.Game.self().completedUnitCount(type) == 0) {
 			return null;
 		}
 
@@ -344,7 +343,7 @@ public class BuildManager extends GameManager {
 		if (closestTo != Position.None) {
 			double minDist = 1000000000;
 
-			for (Unit u : PreBot.Broodwar.self().getUnits()) {
+			for (Unit u : Prebot.Game.self().getUnits()) {
 				if (u.getType() == type) {
 					double distance = u.getDistance(closestTo);
 					if (unit == null || distance < minDist) {
@@ -358,7 +357,7 @@ public class BuildManager extends GameManager {
 			// with the least
 			// amount of training time remaining
 		} else if (type.isBuilding()) {
-			for (Unit u : PreBot.Broodwar.self().getUnits()) {
+			for (Unit u : Prebot.Game.self().getUnits()) {
 				if (u.getType() == type && u.isCompleted() && !u.isTraining() && !u.isLifted() && u.isPowered()) {
 
 					return u;
@@ -366,7 +365,7 @@ public class BuildManager extends GameManager {
 			}
 			// otherwise just return the first unit we come across
 		} else {
-			for (Unit u : PreBot.Broodwar.self().getUnits()) {
+			for (Unit u : Prebot.Game.self().getUnits()) {
 				if (u.getType() == type && u.isCompleted() && u.getHitPoints() > 0 && !u.isLifted() && u.isPowered()) {
 					return u;
 				}
@@ -386,7 +385,7 @@ public class BuildManager extends GameManager {
 	public boolean isProducerWillExist(UnitType producerType) {
 		boolean isProducerWillExist = true;
 
-		if (PreBot.Broodwar.self().completedUnitCount(producerType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(producerType) == 0) {
+		if (Prebot.Game.self().completedUnitCount(producerType) == 0 && Prebot.Game.self().incompleteUnitCount(producerType) == 0) {
 			// producer 가 건물 인 경우 : 건물이 건설 중인지 추가 파악
 			// 만들려는 unitType = Addon 건물. Lair. Hive. Greater Spire. Sunken
 			// Colony. Spore Colony. 프로토스 및 테란의 지상유닛 / 공중유닛.
@@ -401,10 +400,10 @@ public class BuildManager extends GameManager {
 				// Larva 는 시간이 지나면 Hatchery, Lair, Hive 로부터 생성되기 때문에 해당 건물이 있는지
 				// 추가 파악
 				if (producerType == UnitType.Zerg_Larva) {
-					if (PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0 && PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
-							&& PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Lair) == 0 && PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Lair) == 0
-							&& PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Hive) == 0
-							&& PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
+					if (Prebot.Game.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0 && Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
+							&& Prebot.Game.self().completedUnitCount(UnitType.Zerg_Lair) == 0 && Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Lair) == 0
+							&& Prebot.Game.self().completedUnitCount(UnitType.Zerg_Hive) == 0
+							&& Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
 						if (ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) == 0) {
@@ -415,7 +414,7 @@ public class BuildManager extends GameManager {
 				// Hydralisk, Mutalisk 는 Egg 로부터 생성되기 때문에 추가 파악
 				else if (producerType.getRace() == Race.Zerg) {
 					boolean isInEgg = false;
-					for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+					for (Unit unit : Prebot.Game.self().getUnits()) {
 						if (unit.getType() == UnitType.Zerg_Egg && unit.getBuildType() == producerType) {
 							isInEgg = true;
 						}
@@ -443,7 +442,7 @@ public class BuildManager extends GameManager {
 		// this can cause issues for the build order search system so don't plan
 		// a search on these frames
 		boolean canPlanBuildOrderNow = true;
-		for (final Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (final Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit.getRemainingTrainTime() == 0) {
 				continue;
 			}
@@ -513,7 +512,7 @@ public class BuildManager extends GameManager {
 				} else {
 					// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead
 					// lock
-					for (Unit u : PreBot.Broodwar.getUnitsOnTile(testLocation)) {
+					for (Unit u : Prebot.Game.getUnitsOnTile(testLocation)) {
 						if (u.getType().isRefinery() && u.exists()) {
 							hasAvailableGeyser = false;
 							System.out.println("Build Order Dead lock case -> Refinery Building was built already at " + testLocation.getX() + ", " + testLocation.getY());
@@ -529,8 +528,8 @@ public class BuildManager extends GameManager {
 
 			// 선행 기술 리서치가 되어있지 않고, 리서치 중이지도 않으면 dead lock
 			if (!isDeadlockCase && requiredTechType != TechType.None) {
-				if (!PreBot.Broodwar.self().hasResearched(requiredTechType)) {
-					if (!PreBot.Broodwar.self().isResearching(requiredTechType)) {
+				if (!Prebot.Game.self().hasResearched(requiredTechType)) {
+					if (!Prebot.Game.self().isResearching(requiredTechType)) {
 						isDeadlockCase = true;
 					}
 				}
@@ -556,14 +555,14 @@ public class BuildManager extends GameManager {
 
 						// 만들려는 유닛이 Zerg_Mutalisk 이거나 Zerg_Scourge 이고, 선행 유닛이 Zerg_Spire 인 경우, Zerg_Greater_Spire 가 있으면 dead lock 이 아니다
 						if ((unitType == UnitType.Zerg_Mutalisk || unitType == UnitType.Zerg_Scourge) && requiredUnitType == UnitType.Zerg_Spire
-								&& PreBot.Broodwar.self().allUnitCount(UnitType.Zerg_Greater_Spire) > 0) {
+								&& Prebot.Game.self().allUnitCount(UnitType.Zerg_Greater_Spire) > 0) {
 							isDeadlockCase = false;
 						} else
 
 						// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 
 						// 선행 건물 / 유닛이 존재하지 않고, 생산 중이지도 않고
-						if (PreBot.Broodwar.self().completedUnitCount(requiredUnitType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+						if (Prebot.Game.self().completedUnitCount(requiredUnitType) == 0 && Prebot.Game.self().incompleteUnitCount(requiredUnitType) == 0) {
 							// 선행 건물이 건설 예정이지도 않으면 dead lock
 							if (requiredUnitType.isBuilding()) {
 								if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
@@ -574,12 +573,12 @@ public class BuildManager extends GameManager {
 							// Hatchery, Lair, Hive 가 하나도 존재하지 않고, 건설
 							// 예정이지 않은 경우에 dead lock
 							else if (requiredUnitType == UnitType.Zerg_Larva) {
-								if (PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0
-										&& PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
-										&& PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Lair) == 0
-										&& PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Lair) == 0
-										&& PreBot.Broodwar.self().completedUnitCount(UnitType.Zerg_Hive) == 0
-										&& PreBot.Broodwar.self().incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
+								if (Prebot.Game.self().completedUnitCount(UnitType.Zerg_Hatchery) == 0
+										&& Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
+										&& Prebot.Game.self().completedUnitCount(UnitType.Zerg_Lair) == 0
+										&& Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Lair) == 0
+										&& Prebot.Game.self().completedUnitCount(UnitType.Zerg_Hive) == 0
+										&& Prebot.Game.self().incompleteUnitCount(UnitType.Zerg_Hive) == 0) {
 									if (ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0
 											&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0
 											&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) == 0) {
@@ -593,14 +592,14 @@ public class BuildManager extends GameManager {
 			}
 
 			// 건물이 아닌 지상/공중 유닛인 경우, 서플라이가 400 꽉 찼으면 dead lock
-			if (!isDeadlockCase && !unitType.isBuilding() && PreBot.Broodwar.self().supplyTotal() == 400
-					&& PreBot.Broodwar.self().supplyUsed() + unitType.supplyRequired() > 400) {
+			if (!isDeadlockCase && !unitType.isBuilding() && Prebot.Game.self().supplyTotal() == 400
+					&& Prebot.Game.self().supplyUsed() + unitType.supplyRequired() > 400) {
 				isDeadlockCase = true;
 			}
 
 			// 건물이 아닌 지상/공중 유닛인데, 서플라이가 부족하면 dead lock 상황이 되긴 하지만,
 			// 이 경우는 빌드를 취소하기보다는, StrategyManager 등에서 서플라이 빌드를 추가함으로써 풀도록 한다
-			if (!isDeadlockCase && !unitType.isBuilding() && PreBot.Broodwar.self().supplyUsed() + unitType.supplyRequired() > PreBot.Broodwar.self().supplyTotal()) {
+			if (!isDeadlockCase && !unitType.isBuilding() && Prebot.Game.self().supplyUsed() + unitType.supplyRequired() > Prebot.Game.self().supplyTotal()) {
 				// isDeadlockCase = true;
 			}
 
@@ -609,10 +608,10 @@ public class BuildManager extends GameManager {
 					&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
 
 				boolean hasFoundPylon = false;
-				List<Unit> ourUnits = PreBot.Broodwar.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * GameConstant.TILE_SIZE);
+				List<Unit> ourUnits = Prebot.Game.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
 
 				for (Unit u : ourUnits) {
-					if (u.getPlayer() == PreBot.Broodwar.self() && u.getType() == UnitType.Protoss_Pylon) {
+					if (u.getPlayer() == Prebot.Game.self() && u.getType() == UnitType.Protoss_Pylon) {
 						hasFoundPylon = true;
 					}
 				}
@@ -626,10 +625,10 @@ public class BuildManager extends GameManager {
 			if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresCreep()
 					&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
 				boolean hasFoundCreepGenerator = false;
-				List<Unit> ourUnits = PreBot.Broodwar.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * GameConstant.TILE_SIZE);
+				List<Unit> ourUnits = Prebot.Game.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
 
 				for (Unit u : ourUnits) {
-					if (u.getPlayer() == PreBot.Broodwar.self()
+					if (u.getPlayer() == Prebot.Game.self()
 							&& (u.getType() == UnitType.Zerg_Hatchery || u.getType() == UnitType.Zerg_Lair || u.getType() == UnitType.Zerg_Hive
 									|| u.getType() == UnitType.Zerg_Creep_Colony || u.getType() == UnitType.Zerg_Sunken_Colony || u.getType() == UnitType.Zerg_Spore_Colony)) {
 						hasFoundCreepGenerator = true;
@@ -654,9 +653,9 @@ public class BuildManager extends GameManager {
 			 * MyBotModule.Broodwar.self().completedUnitCount( producerType) + " incompleteUnitCount " + MyBotModule.Broodwar.self().incompleteUnitCount( producerType));
 			 */
 
-			if (PreBot.Broodwar.self().hasResearched(techType) || PreBot.Broodwar.self().isResearching(techType)) {
+			if (Prebot.Game.self().hasResearched(techType) || Prebot.Game.self().isResearching(techType)) {
 				isDeadlockCase = true;
-			} else if (PreBot.Broodwar.self().completedUnitCount(producerType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(producerType) == 0) {
+			} else if (Prebot.Game.self().completedUnitCount(producerType) == 0 && Prebot.Game.self().incompleteUnitCount(producerType) == 0) {
 				if (ConstructionManager.Instance().getConstructionQueueItemCount(producerType, null) == 0) {
 
 					// 테크 리서치의 producerType이 Addon 건물인 경우, Addon 건물 건설이
@@ -672,7 +671,7 @@ public class BuildManager extends GameManager {
 
 						if (producerTypeOfProducerType != UnitType.None) {
 
-							for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+							for (Unit unit : Prebot.Game.self().getUnits()) {
 								if (unit == null)
 									continue;
 								if (unit.getType() != producerTypeOfProducerType) {
@@ -702,7 +701,7 @@ public class BuildManager extends GameManager {
 				 * + std::endl;
 				 */
 
-				if (PreBot.Broodwar.self().completedUnitCount(requiredUnitType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+				if (Prebot.Game.self().completedUnitCount(requiredUnitType) == 0 && Prebot.Game.self().incompleteUnitCount(requiredUnitType) == 0) {
 					if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
 						isDeadlockCase = true;
 					}
@@ -713,8 +712,8 @@ public class BuildManager extends GameManager {
 		// 존재하지도 않고 건설예정이지도 않으면 dead lock
 		else if (currentItem.metaType.isUpgrade()) {
 			UpgradeType upgradeType = currentItem.metaType.getUpgradeType();
-			int maxLevel = PreBot.Broodwar.self().getMaxUpgradeLevel(upgradeType);
-			int currentLevel = PreBot.Broodwar.self().getUpgradeLevel(upgradeType);
+			int maxLevel = Prebot.Game.self().getMaxUpgradeLevel(upgradeType);
+			int currentLevel = Prebot.Game.self().getUpgradeLevel(upgradeType);
 			UnitType requiredUnitType = upgradeType.whatsRequired();
 
 			/*
@@ -724,9 +723,9 @@ public class BuildManager extends GameManager {
 			 * ", requiredUnitType " + requiredUnitType.getName() + std::endl;
 			 */
 
-			if (currentLevel >= maxLevel || PreBot.Broodwar.self().isUpgrading(upgradeType)) {
+			if (currentLevel >= maxLevel || Prebot.Game.self().isUpgrading(upgradeType)) {
 				isDeadlockCase = true;
-			} else if (PreBot.Broodwar.self().completedUnitCount(producerType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(producerType) == 0) {
+			} else if (Prebot.Game.self().completedUnitCount(producerType) == 0 && Prebot.Game.self().incompleteUnitCount(producerType) == 0) {
 				if (ConstructionManager.Instance().getConstructionQueueItemCount(producerType, null) == 0) {
 
 					// 업그레이드의 producerType이 Addon 건물인 경우, Addon 건물 건설이
@@ -742,7 +741,7 @@ public class BuildManager extends GameManager {
 
 						if (producerTypeOfProducerType != UnitType.None) {
 
-							for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+							for (Unit unit : Prebot.Game.self().getUnits()) {
 								if (unit == null)
 									continue;
 								if (unit.getType() != producerTypeOfProducerType) {
@@ -765,7 +764,7 @@ public class BuildManager extends GameManager {
 					}
 				}
 			} else if (requiredUnitType != UnitType.None) {
-				if (PreBot.Broodwar.self().completedUnitCount(requiredUnitType) == 0 && PreBot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+				if (Prebot.Game.self().completedUnitCount(requiredUnitType) == 0 && Prebot.Game.self().incompleteUnitCount(requiredUnitType) == 0) {
 					if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
 						isDeadlockCase = true;
 					}
@@ -777,7 +776,7 @@ public class BuildManager extends GameManager {
 			// producerID 를 지정했는데, 해당 ID 를 가진 유닛이 존재하지 않으면 dead lock
 			if (currentItem.producerID != -1) {
 				boolean isProducerAlive = false;
-				for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+				for (Unit unit : Prebot.Game.self().getUnits()) {
 					if (unit != null && unit.getID() == currentItem.producerID && unit.exists() && unit.getHitPoints() > 0) {
 						isProducerAlive = true;
 						break;

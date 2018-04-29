@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import bwapi.Unit;
+import bwapi.UnitType;
 import prebot.brain.squad.Squad;
+import prebot.main.manager.WorkerManager;
 
 public class SquadData {
 
@@ -14,7 +16,7 @@ public class SquadData {
 		if (squadMap.get(squad.getName()) != null) {
 			Squad existSquad = squadMap.get(squad.getName());
 			existSquad.priority = squad.priority;
-			existSquad.squadAdditionalRadius = squad.squadAdditionalRadius;
+			existSquad.squadRadius = squad.squadRadius;
 			squadMap.put(squad.getName(), existSquad);
 		} else {
 			squadMap.put(squad.getName(), squad);
@@ -22,6 +24,11 @@ public class SquadData {
 	}
 	
 	public void removeSquad(Squad squad) {
+		for (Unit unit : squad.unitList) {
+			if (unit.getType() == UnitType.Terran_SCV) {
+				WorkerManager.Instance().setIdleWorker(unit); // SCV를 WorkerManager에서 관리
+			}
+		}
 		squadMap.remove(squad.getName());
 	}
 	
@@ -54,6 +61,10 @@ public class SquadData {
 			previousSquad.removeUnit(unit);
 		}
 		squad.addUnit(unit);
+		
+		if (unit.getType() == UnitType.Terran_SCV) {
+			WorkerManager.Instance().setCombatWorker(unit); // SCV를 CombatManager에서 관리
+		}
 	}
 
 }

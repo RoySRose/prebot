@@ -8,7 +8,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FileUtil {
+import prebot.common.code.ConfigForDebug.BOT_INFO;
+
+public class FileUtils {
+	
+	public static final String LOG_FILE_NAME = BOT_INFO.BOT_NAME + "_LastGameLog.dat"; /// 로그 파일 이름
+	public static final String READ_DIRECTORY = "bwapi-data\\read\\"; /// 읽기 파일 경로
+	public static final String WRITE_DIRECTORY = "bwapi-data\\write\\"; /// 쓰기 파일 경로
 
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// appendTextToFile 등 메소드를 static 으로 수정

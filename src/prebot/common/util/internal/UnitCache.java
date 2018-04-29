@@ -11,7 +11,7 @@ import bwapi.UnitType;
 import prebot.build.ConstructionTask;
 import prebot.information.UnitData;
 import prebot.information.UnitInfo;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 import prebot.main.manager.ConstructionManager;
 import prebot.main.manager.InformationManager;
 
@@ -121,7 +121,7 @@ public class UnitCache {
 	}
 
 	private void putSelfData() {
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			if (unit == null) {
 				continue;
 			}
@@ -150,25 +150,25 @@ public class UnitCache {
 	}
 
 	private void putEnemyData() {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(PreBot.Broodwar.enemy());
+		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Game.enemy());
 		for (int unitId : enemyUnitData.getUnitAndUnitInfoMap().keySet()) {
 			UnitInfo unitInfo = enemyUnitData.getUnitAndUnitInfoMap().get(unitId);
 
-			List<UnitInfo> allUnitList = getUnitListReturnEmptyListIfNull(enemyAllUnitInfoMap, unitInfo.type);
-			List<UnitInfo> visibleUnitList = getUnitListReturnEmptyListIfNull(enemyVisibleUnitInfoMap, unitInfo.type);
-			List<UnitInfo> invisibleUnitList = getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitInfo.type);
+			List<UnitInfo> allUnitList = getUnitListReturnEmptyListIfNull(enemyAllUnitInfoMap, unitInfo.getType());
+			List<UnitInfo> visibleUnitList = getUnitListReturnEmptyListIfNull(enemyVisibleUnitInfoMap, unitInfo.getType());
+			List<UnitInfo> invisibleUnitList = getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitInfo.getType());
 
 			allUnitList.add(unitInfo);
-			Unit enemy = PreBot.Broodwar.getUnit(unitInfo.unitID);
+			Unit enemy = Prebot.Game.getUnit(unitInfo.getUnitID());
 			if (enemy != null && enemy.getType() != UnitType.Unknown) {
 				visibleUnitList.add(unitInfo);
 			} else {
 				invisibleUnitList.add(unitInfo);
 			}
 
-			enemyAllUnitInfoMap.put(unitInfo.type, allUnitList);
-			enemyVisibleUnitInfoMap.put(unitInfo.type, visibleUnitList);
-			enemyInvisibleUnitInfoMap.put(unitInfo.type, invisibleUnitList);
+			enemyAllUnitInfoMap.put(unitInfo.getType(), allUnitList);
+			enemyVisibleUnitInfoMap.put(unitInfo.getType(), visibleUnitList);
+			enemyInvisibleUnitInfoMap.put(unitInfo.getType(), invisibleUnitList);
 		}
 	}
 

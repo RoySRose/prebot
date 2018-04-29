@@ -24,7 +24,7 @@ import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
 import prebot.information.UnitData;
 import prebot.information.UnitInfo;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
 /// 현재 게임 상황정보는 BWAPI::Broodwar 를 조회하여 파악할 수 있지만, 과거 게임 상황정보는 BWAPI::Broodwar 를 통해 조회가 불가능하기 때문에 InformationManager에서 별도 관리하도록 합니다<br>
@@ -70,8 +70,8 @@ public class InformationManager extends GameManager {
 	}
 
 	public InformationManager() {
-		selfPlayer = PreBot.Broodwar.self();
-		enemyPlayer = PreBot.Broodwar.enemy();
+		selfPlayer = Prebot.Game.self();
+		enemyPlayer = Prebot.Game.enemy();
 		selfRace = selfPlayer.getRace();
 		enemyRace = enemyPlayer.getRace();
 
@@ -83,12 +83,12 @@ public class InformationManager extends GameManager {
 		occupiedRegions.put(selfPlayer, new HashSet<Region>());
 		occupiedRegions.put(enemyPlayer, new HashSet<Region>());
 
-		mainBaseLocations.put(selfPlayer, BWTA.getStartLocation(PreBot.Broodwar.self()));
+		mainBaseLocations.put(selfPlayer, BWTA.getStartLocation(Prebot.Game.self()));
 		mainBaseLocationChanged.put(selfPlayer, new Boolean(true));
 
 		occupiedBaseLocations.get(selfPlayer).add(mainBaseLocations.get(selfPlayer));
 		if (mainBaseLocations.get(selfPlayer) != null) {
-			updateOccupiedRegions(BWTA.getRegion(mainBaseLocations.get(selfPlayer).getTilePosition()), PreBot.Broodwar.self());
+			updateOccupiedRegions(BWTA.getRegion(mainBaseLocations.get(selfPlayer).getTilePosition()), Prebot.Game.self());
 		}
 
 		mainBaseLocations.put(enemyPlayer, null);
@@ -106,13 +106,14 @@ public class InformationManager extends GameManager {
 	}
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
-	public void update() {
+	public GameManager update() {
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (PreBot.Broodwar.getFrameCount() % 120 == 0) {
+		if (Prebot.Game.getFrameCount() % 120 == 0) {
 			updateBaseLocationInfo();
 		}
 		UnitCache.getCurrentCache().updateCache();
+		return this;
 	}
 
 	/// Unit 에 대한 정보를 업데이트합니다
@@ -166,20 +167,20 @@ public class InformationManager extends GameManager {
 
 			// if it's a combat unit we care about
 			// and it's finished!
-			if (UnitUtils.isUnitOrCombatBuilding(ui.type) && ui.completed) {
+			if (UnitUtils.isUnitOrCombatBuilding(ui.getType()) && ui.isCompleted()) {
 				// determine its attack range
 				int range = 0;
-				if (ui.type.groundWeapon() != WeaponType.None) {
-					range = ui.type.groundWeapon().maxRange() + 40;
+				if (ui.getType().groundWeapon() != WeaponType.None) {
+					range = ui.getType().groundWeapon().maxRange() + 40;
 				}
 
 				// if it can attack into the radius we care about
-				if (ui.lastPosition.getDistance(p) <= (radius + range)) {
+				if (ui.getLastPosition().getDistance(p) <= (radius + range)) {
 					// add it to the vector
 					// C++ : unitInfo.push_back(ui);
 					unitInfo.add(ui);
 				}
-			} else if (ui.type.isDetector() && ui.lastPosition.getDistance(p) <= (radius + 250)) {
+			} else if (ui.getType().isDetector() && ui.getLastPosition().getDistance(p) <= (radius + 250)) {
 				// add it to the vector
 				// C++ : unitInfo.push_back(ui);
 				unitInfo.add(ui);
@@ -246,10 +247,10 @@ public class InformationManager extends GameManager {
 	/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
 	private void updateUnitsInfo() {
 		// update our units info
-		for (Unit unit : PreBot.Broodwar.enemy().getUnits()) {
+		for (Unit unit : Prebot.Game.enemy().getUnits()) {
 			updateUnitInfo(unit);
 		}
-		for (Unit unit : PreBot.Broodwar.self().getUnits()) {
+		for (Unit unit : Prebot.Game.self().getUnits()) {
 			updateUnitInfo(unit);
 		}
 
@@ -311,7 +312,7 @@ public class InformationManager extends GameManager {
 					}
 				}
 
-				if (PreBot.Broodwar.isExplored(startLocation.getTilePosition())) {
+				if (Prebot.Game.isExplored(startLocation.getTilePosition())) {
 					// if it's explored, increment
 					exploredStartLocations++;
 				} else {
@@ -358,7 +359,7 @@ public class InformationManager extends GameManager {
 			// 적군의 빠른 앞마당 건물 건설 + 아군의 가장 마지막 정찰 방문의 경우,
 			// enemy의 mainBaseLocations를 방문안한 상태에서는 건물이 하나도 없다고 판단하여 mainBaseLocation 을 변경하는 현상이 발생해서
 			// enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.
-			if (PreBot.Broodwar.isExplored(mainBaseLocations.get(enemyPlayer).getTilePosition())) {
+			if (Prebot.Game.isExplored(mainBaseLocations.get(enemyPlayer).getTilePosition())) {
 
 				if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(enemyPlayer).getTilePosition()), enemyPlayer) == false) {
 					for (BaseLocation loaction : occupiedBaseLocations.get(enemyPlayer)) {
@@ -397,8 +398,8 @@ public class InformationManager extends GameManager {
 			// for (const auto & kv : unitData.get(enemy).getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.type.isBuilding()) {
-					updateOccupiedRegions(BWTA.getRegion(ui.lastPosition.toTilePosition()), PreBot.Broodwar.enemy());
+				if (ui.getType().isBuilding()) {
+					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()), Prebot.Game.enemy());
 				}
 			}
 		}
@@ -410,8 +411,8 @@ public class InformationManager extends GameManager {
 			// for (const auto & kv : _unitData[_self].getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(selfPlayer).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.type.isBuilding()) {
-					updateOccupiedRegions(BWTA.getRegion(ui.lastPosition.toTilePosition()), PreBot.Broodwar.self());
+				if (ui.getType().isBuilding()) {
+					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()), Prebot.Game.self());
 				}
 			}
 		}
@@ -522,8 +523,8 @@ public class InformationManager extends GameManager {
 			// for (const auto & kv : _unitData[player].getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.type.isBuilding()) {
-					TilePosition buildingPosition = ui.lastPosition.toTilePosition();
+				if (ui.getType().isBuilding()) {
+					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
 
 					if (buildingPosition.getX() >= baseLocation.getTilePosition().getX() - maxRadius
 							&& buildingPosition.getX() <= baseLocation.getTilePosition().getX() + maxRadius
@@ -556,13 +557,13 @@ public class InformationManager extends GameManager {
 		// for (const auto & kv : unitData.get(self).getUnits())
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
-			if (ui.type.isBuilding()) {
+			if (ui.getType().isBuilding()) {
 
 				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
-				if (BWTA.getRegion(ui.lastPosition) == null)
+				if (BWTA.getRegion(ui.getLastPosition()) == null)
 					continue;
 
-				if (BWTA.getRegion(ui.lastPosition) == region) {
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
 					return true;
 				}
 			}

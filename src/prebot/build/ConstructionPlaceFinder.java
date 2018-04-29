@@ -13,10 +13,10 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
-import prebot.common.code.GameConstant;
+import prebot.common.code.Config;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 import prebot.main.manager.InformationManager;
 
 /// 건설위치 탐색을 위한 class
@@ -111,36 +111,36 @@ public class ConstructionPlaceFinder {
 	public Position getSeedPositionFromSeedStrategy(SeedPositionStrategy seedPositionStrategy) {
 		Position seedPosition = null;
 		if (seedPositionStrategy == SeedPositionStrategy.MainBaseLocation) {
-			BaseLocation tempBaseLocation = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self());
+			BaseLocation tempBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self());
 			if (tempBaseLocation != null) {
 				seedPosition = tempBaseLocation.getPosition();
 			}
 
 		} else if (seedPositionStrategy == SeedPositionStrategy.MainBaseBackYard) {
-			seedPosition = getNearBasePosition(InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self()));
+			seedPosition = getNearBasePosition(InformationManager.Instance().getMainBaseLocation(Prebot.Game.self()));
 			
 		} else if (seedPositionStrategy == SeedPositionStrategy.FirstChokePoint) {
-			Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(PreBot.Broodwar.self());
+			Chokepoint tempChokePoint = InformationManager.Instance().getFirstChokePoint(Prebot.Game.self());
 			if (tempChokePoint != null) {
 				seedPosition = tempChokePoint.getCenter();
 			}
 
 		} else if (seedPositionStrategy == SeedPositionStrategy.FirstExpansionLocation) {
-			BaseLocation tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(PreBot.Broodwar.self());
+			BaseLocation tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(Prebot.Game.self());
 			if (tempBaseLocation != null) {
 				seedPosition = tempBaseLocation.getPosition();
 			}
 
 		} else if (seedPositionStrategy == SeedPositionStrategy.SecondChokePoint) {
-			Chokepoint tempChokePoint = InformationManager.Instance().getSecondChokePoint(PreBot.Broodwar.self());
+			Chokepoint tempChokePoint = InformationManager.Instance().getSecondChokePoint(Prebot.Game.self());
 			if (tempChokePoint != null) {
 				seedPosition = tempChokePoint.getCenter();
 			}
 
 		} else if (seedPositionStrategy == SeedPositionStrategy.NextExpansionLocation) {
-			List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(PreBot.Broodwar.self());
-			BaseLocation mainBaseLocation = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self());
-			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(PreBot.Broodwar.self());
+			List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(Prebot.Game.self());
+			BaseLocation mainBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self());
+			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(Prebot.Game.self());
 			for (BaseLocation tempBaseLocation : tempBaseLocationList) {
 				if (tempBaseLocation.equals(mainBaseLocation) || tempBaseLocation.equals(firstExpansion)) {
 					continue;
@@ -150,9 +150,9 @@ public class ConstructionPlaceFinder {
 			}
 			
 		} else if (seedPositionStrategy == SeedPositionStrategy.NextExpansionBackYard) {
-			List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(PreBot.Broodwar.self());
-			BaseLocation mainBaseLocation = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self());
-			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(PreBot.Broodwar.self());
+			List<BaseLocation> tempBaseLocationList = InformationManager.Instance().getOccupiedBaseLocations(Prebot.Game.self());
+			BaseLocation mainBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self());
+			BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(Prebot.Game.self());
 			for (BaseLocation tempBaseLocation : tempBaseLocationList) {
 				if (tempBaseLocation.equals(mainBaseLocation) || tempBaseLocation.equals(firstExpansion)) {
 					continue;
@@ -185,41 +185,41 @@ public class ConstructionPlaceFinder {
 		// cos(t+90), sin(t+180) 등 삼각함수 Trigonometric functions of allied angles 을 이용. y축에 대해서는 반대부호로 적용
 
 		// 1. BaseLocation 에서 ChokePoint 반대쪽 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+180) = -cos(t), sin(t+180) = -sin(t))
-		int bx = tempBaseLocation.getTilePosition().getX() - (int) (d * Math.cos(theta) / GameConstant.TILE_SIZE);
-		int by = tempBaseLocation.getTilePosition().getY() + (int) (d * Math.sin(theta) / GameConstant.TILE_SIZE);
+		int bx = tempBaseLocation.getTilePosition().getX() - (int) (d * Math.cos(theta) / Config.TILE_SIZE);
+		int by = tempBaseLocation.getTilePosition().getY() + (int) (d * Math.sin(theta) / Config.TILE_SIZE);
 		// std::cout << "i";
 		TilePosition tempTilePosition = new TilePosition(bx, by);
 
 		// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
 		if (TilePositionUtils.isBuildable(tempTilePosition, false)
-				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * GameConstant.TILE_SIZE, by * GameConstant.TILE_SIZE))) {
+				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * Config.TILE_SIZE, by * Config.TILE_SIZE))) {
 			return tempTilePosition.toPosition();
 		}
 
 		// 2. BaseLocation 에서 ChokePoint 방향에 대해 오른쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t-90) = sin(t), sin(t-90) = - cos(t))
-		bx = tempBaseLocation.getTilePosition().getX() + (int) (d * Math.sin(theta) / GameConstant.TILE_SIZE);
-		by = tempBaseLocation.getTilePosition().getY() + (int) (d * Math.cos(theta) / GameConstant.TILE_SIZE);
+		bx = tempBaseLocation.getTilePosition().getX() + (int) (d * Math.sin(theta) / Config.TILE_SIZE);
+		by = tempBaseLocation.getTilePosition().getY() + (int) (d * Math.cos(theta) / Config.TILE_SIZE);
 		tempTilePosition = new TilePosition(bx, by);
 
 		// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
 		if (TilePositionUtils.isBuildable(tempTilePosition, false)
-				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * GameConstant.TILE_SIZE, by * GameConstant.TILE_SIZE))) {
+				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * Config.TILE_SIZE, by * Config.TILE_SIZE))) {
 			return tempTilePosition.toPosition();
 		}
 
 		// 3. BaseLocation 에서 ChokePoint 방향에 대해 왼쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+90) = -sin(t), sin(t+90) = cos(t))
-		bx = tempBaseLocation.getTilePosition().getX() - (int) (d * Math.sin(theta) / GameConstant.TILE_SIZE);
-		by = tempBaseLocation.getTilePosition().getY() - (int) (d * Math.cos(theta) / GameConstant.TILE_SIZE);
+		bx = tempBaseLocation.getTilePosition().getX() - (int) (d * Math.sin(theta) / Config.TILE_SIZE);
+		by = tempBaseLocation.getTilePosition().getY() - (int) (d * Math.cos(theta) / Config.TILE_SIZE);
 		tempTilePosition = new TilePosition(bx, by);
 
 		if (TilePositionUtils.isBuildable(tempTilePosition, false)
-				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * GameConstant.TILE_SIZE, by * GameConstant.TILE_SIZE))) {
+				&& PositionUtils.isSameRegion(tempBaseLocation.getPosition(), new Position(bx * Config.TILE_SIZE, by * Config.TILE_SIZE))) {
 			return tempTilePosition.toPosition();
 		}
 
 		// 4. BaseLocation 에서 ChokePoint 방향 절반 지점의 Back Yard : 데카르트 좌표계에서 (cos(t), sin(t))
-		bx = tempBaseLocation.getTilePosition().getX() + (int) (d * Math.cos(theta) / GameConstant.TILE_SIZE);
-		by = tempBaseLocation.getTilePosition().getY() - (int) (d * Math.sin(theta) / GameConstant.TILE_SIZE);
+		bx = tempBaseLocation.getTilePosition().getX() + (int) (d * Math.cos(theta) / Config.TILE_SIZE);
+		by = tempBaseLocation.getTilePosition().getY() - (int) (d * Math.sin(theta) / Config.TILE_SIZE);
 		tempTilePosition = new TilePosition(bx, by);
 
 		if (TilePositionUtils.isBuildable(tempTilePosition, false)) {
@@ -241,15 +241,15 @@ public class ConstructionPlaceFinder {
 			return getRefineryPositionNear(desiredPosition);
 		}
 
-		if (PreBot.Broodwar.self().getRace() == Race.Protoss) {
+		if (Prebot.Game.self().getRace() == Race.Protoss) {
 			// special easy case of having no pylons
-			if (buildingType.requiresPsi() && PreBot.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon) == 0) {
+			if (buildingType.requiresPsi() && Prebot.Game.self().completedUnitCount(UnitType.Protoss_Pylon) == 0) {
 				return TilePosition.None;
 			}
 		}
 
 		if (desiredPosition == TilePosition.None || desiredPosition == TilePosition.Unknown || desiredPosition == TilePosition.Invalid || desiredPosition.isValid() == false) {
-			desiredPosition = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self()).getTilePosition();
+			desiredPosition = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self()).getTilePosition();
 		}
 
 		TilePosition testPosition = TilePosition.None;
@@ -258,28 +258,28 @@ public class ConstructionPlaceFinder {
 		int constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
 
 		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
-		int buildingGapSpace = GameConstant.BUILDING_SPACING;
+		int buildingGapSpace = Config.BUILDING_SPACING;
 
 		// ResourceDepot (Nexus, Command Center, Hatchery),
 		// Protoss_Pylon, Terran_Supply_Depot,
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = GameConstant.BUILDING_RESOUECE_DEPOT_SPACING;
+			buildingGapSpace = Config.BUILDING_RESOUECE_DEPOT_SPACING;
 		} else if (buildingType == UnitType.Protoss_Pylon) {
-			int numPylons = PreBot.Broodwar.self().completedUnitCount(UnitType.Protoss_Pylon);
+			int numPylons = Prebot.Game.self().completedUnitCount(UnitType.Protoss_Pylon);
 
 			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
 			if (numPylons < 3) {
-				buildingGapSpace = GameConstant.BULDING_PYLON_EARLY_STAGE_SPACING;
+				buildingGapSpace = Config.BULDING_PYLON_EARLY_STAGE_SPACING;
 			} else {
-				buildingGapSpace = GameConstant.BUILDING_PYLON_SPACING;
+				buildingGapSpace = Config.BUILDING_PYLON_SPACING;
 			}
 		} else if (buildingType == UnitType.Terran_Supply_Depot) {
-			buildingGapSpace = GameConstant.BUILDING_SUPPLYDEPOT_SPACING;
+			buildingGapSpace = Config.BUILDING_SUPPLYDEPOT_SPACING;
 		} else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker || buildingType == UnitType.Terran_Missile_Turret
 				|| buildingType == UnitType.Zerg_Creep_Colony) {
-			buildingGapSpace = GameConstant.BUILDING_DEFENSE_TOWER_SPACING;
+			buildingGapSpace = Config.BUILDING_DEFENSE_TOWER_SPACING;
 		}
 
 		while (buildingGapSpace >= 0) {
@@ -340,7 +340,7 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionX = 0;
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
-				if (currentX >= 0 && currentX < PreBot.Broodwar.mapWidth() && currentY >= 0 && currentY < PreBot.Broodwar.mapHeight()) {
+				if (currentX >= 0 && currentX < Prebot.Game.mapWidth() && currentY >= 0 && currentY < Prebot.Game.mapHeight()) {
 
 					isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 
@@ -416,7 +416,7 @@ public class ConstructionPlaceFinder {
 			// builderTile에 Lifted 건물이 아니고 whatBuilds 건물이 아닌 건물이 있는지 체크
 			for (int i = 0; i <= builderType.tileWidth(); ++i) {
 				for (int j = 0; j <= builderType.tileHeight(); ++j) {
-					for (Unit unit : PreBot.Broodwar.getUnitsOnTile(builderTile.getX() + i, builderTile.getY() + j)) {
+					for (Unit unit : Prebot.Game.getUnitsOnTile(builderTile.getX() + i, builderTile.getY() + j)) {
 						if ((unit.getType() != builderType) && (!unit.isLifted())) {
 							return false;
 						}
@@ -476,7 +476,7 @@ public class ConstructionPlaceFinder {
 		}
 
 		// if this rectangle doesn't fit on the map we can't build here
-		if (startx < 0 || starty < 0 || endx > PreBot.Broodwar.mapWidth() || endx < position.getX() + width || endy > PreBot.Broodwar.mapHeight()) {
+		if (startx < 0 || starty < 0 || endx > Prebot.Game.mapWidth() || endx < position.getX() + width || endy > Prebot.Game.mapHeight()) {
 			return false;
 		}
 
@@ -492,7 +492,7 @@ public class ConstructionPlaceFinder {
 
 		// This function checks for creep, power, and resource distance requirements in addition to the tiles' buildability and possible units obstructing the build location.
 		// if (!MyBotModule.Broodwar.canBuildHere(position, b.getType(), b.getConstructionWorker()))
-		if (!PreBot.Broodwar.canBuildHere(position, b.getType())) {
+		if (!Prebot.Game.canBuildHere(position, b.getType())) {
 			return false;
 		}
 
@@ -523,14 +523,14 @@ public class ConstructionPlaceFinder {
 		// Refinery 건물 건설 위치 탐색 로직 버그 수정 및 속도 개선 : seedPosition 주위에서만 geyser를 찾도록, 이미 Refinery가 지어져있는지 체크하지 않도록 수정
 
 		if (seedPosition == TilePosition.None || seedPosition == TilePosition.Unknown || seedPosition == TilePosition.Invalid || seedPosition.isValid() == false) {
-			seedPosition = InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self()).getTilePosition();
+			seedPosition = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self()).getTilePosition();
 		}
 
 		TilePosition closestGeyser = TilePosition.None;
 		double minGeyserDistanceFromSeedPosition = 100000000;
 
 		// 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
-		for (Unit geyser : PreBot.Broodwar.getStaticGeysers()) {
+		for (Unit geyser : Prebot.Game.getStaticGeysers()) {
 			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
 			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
 			Position geyserPos = geyser.getInitialPosition();
@@ -604,12 +604,12 @@ public class ConstructionPlaceFinder {
 
 		// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 체크
 		// if (BWAPI::Broodwar->isBuildable(x, y) == false)
-		if (PreBot.Broodwar.isBuildable(x, y, true) == false) {
+		if (Prebot.Game.isBuildable(x, y, true) == false) {
 			return false;
 		}
 
 		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
-		for (Unit unit : PreBot.Broodwar.getUnitsOnTile(x, y)) {
+		for (Unit unit : Prebot.Game.getUnitsOnTile(x, y)) {
 			if ((b.getConstructionWorker() != null) && (unit != b.getConstructionWorker())) {
 				return false;
 			}
@@ -699,7 +699,7 @@ public class ConstructionPlaceFinder {
 			// Island 일 경우 건물 지을 공간이 절대적으로 좁기 때문에 건물 안짓는 공간을 두지 않는다
 			if (base.isIsland())
 				continue;
-			if (BWTA.isConnected(base.getTilePosition(), InformationManager.Instance().getMainBaseLocation(PreBot.Broodwar.self()).getTilePosition()) == false)
+			if (BWTA.isConnected(base.getTilePosition(), InformationManager.Instance().getMainBaseLocation(Prebot.Game.self()).getTilePosition()) == false)
 				continue;
 
 			// dimensions of the base location

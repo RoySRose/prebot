@@ -8,26 +8,14 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.code.Code.WorkerJob;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
 public class WorkerData {
 
 	private Map<Integer, Integer> workersOnMineralPatch = new HashMap<Integer, Integer>();
-
-	/// 일꾼 유닛에게 지정하는 임무의 종류
-	public enum WorkerJob {
-		Minerals, /// < 미네랄 채취
-		Gas, /// < 가스 채취
-		Build, /// < 건물 건설
-		Combat, /// < 전투
-		Idle, /// < 하는 일 없음. 대기 상태.
-		Repair, /// < 수리. Terran_SCV 만 가능
-		Move, /// < 이동
-		Scout, /// < 정찰. Move와 다름. Mineral / Gas / Build 등의 다른 임무로 차출되지 않게 됨.
-		Default /// < 기본. 미설정 상태.
-	};
 
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
@@ -61,7 +49,7 @@ public class WorkerData {
 
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 
-		for (Unit unit : PreBot.Broodwar.getAllUnits()) {
+		for (Unit unit : Prebot.Game.getAllUnits()) {
 			if ((unit.getType() == UnitType.Resource_Mineral_Field)) {
 				workersOnMineralPatch.put(unit.getID(), 0);
 			}
@@ -83,7 +71,7 @@ public class WorkerData {
 			if (worker == null) {
 				workers.remove(worker);
 			} else {
-				if (worker.getType().isWorker() == false || worker.getPlayer() != PreBot.Broodwar.self() || worker.exists() == false
+				if (worker.getType().isWorker() == false || worker.getPlayer() != Prebot.Game.self() || worker.exists() == false
 						|| worker.getHitPoints() == 0) {
 
 					clearPreviousJob(worker);
@@ -159,7 +147,7 @@ public class WorkerData {
 		}
 
 		workers.add(unit); // C++ : workers.insert(unit);
-		workerJobMap.put(unit.getID(), WorkerJob.Idle);
+		workerJobMap.put(unit.getID(), WorkerJob.IDLE);
 	}
 
 	public void addWorker(Unit unit, WorkerJob job, Unit jobUnit) {
@@ -214,7 +202,7 @@ public class WorkerData {
 		for (Unit worker : workers) {
 			// if a worker was working at this depot
 			if (workerDepotMap.get(worker.getID()) == unit) {
-				setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+				setWorkerJob(worker, WorkerJob.IDLE, (Unit) null);
 			}
 		}
 	}
@@ -247,7 +235,7 @@ public class WorkerData {
 		clearPreviousJob(unit);
 		workerJobMap.put(unit.getID(), job);
 
-		if (job == WorkerJob.Minerals) {
+		if (job == WorkerJob.MINERALS) {
 			// increase the number of workers assigned to this nexus
 			if (depotWorkerCount.get(jobUnit.getID()) == null) {
 				depotWorkerCount.put(jobUnit.getID(), 1);
@@ -264,7 +252,7 @@ public class WorkerData {
 
 			// right click the mineral to start mining
 			CommandUtils.rightClick(unit, mineralToMine);
-		} else if (job == WorkerJob.Gas) {
+		} else if (job == WorkerJob.GAS) {
 			// increase the count of workers assigned to this refinery
 			if (refineryWorkerCount.get(jobUnit.getID()) == null) {
 				refineryWorkerCount.put(jobUnit.getID(), 1);
@@ -277,7 +265,7 @@ public class WorkerData {
 
 			// right click the refinery to start harvesting
 			CommandUtils.rightClick(unit, jobUnit);
-		} else if (job == WorkerJob.Repair) {
+		} else if (job == WorkerJob.REPAIR) {
 			// only SCV can repair
 			if (unit.getType() == UnitType.Terran_SCV) {
 
@@ -290,9 +278,9 @@ public class WorkerData {
 					CommandUtils.repair(unit, jobUnit);
 				}
 			}
-		} else if (job == WorkerJob.Scout) {
+		} else if (job == WorkerJob.COMBAT) {
 
-		} else if (job == WorkerJob.Build) {
+		} else if (job == WorkerJob.BUILD) {
 		}
 	}
 
@@ -306,7 +294,7 @@ public class WorkerData {
 		clearPreviousJob(unit);
 		workerJobMap.put(unit.getID(), job);
 
-		if (job == WorkerJob.Build) {
+		if (job == WorkerJob.BUILD) {
 			workerBuildingTypeMap.put(unit.getID(), jobUnitType);
 		}
 	}
@@ -319,11 +307,11 @@ public class WorkerData {
 		clearPreviousJob(unit);
 		workerJobMap.put(unit.getID(), job);
 
-		if (job == WorkerJob.Move) {
+		if (job == WorkerJob.MOVE) {
 			workerMoveMap.put(unit.getID(), wmd);
 		}
 
-		if (workerJobMap.get(unit.getID()) != WorkerJob.Move) {
+		if (workerJobMap.get(unit.getID()) != WorkerJob.MOVE) {
 			// BWAPI::Broodwar->printf("Something went horribly wrong");
 		}
 	}
@@ -335,7 +323,7 @@ public class WorkerData {
 
 		WorkerJob previousJob = getWorkerJob(unit);
 
-		if (previousJob == WorkerJob.Minerals) {
+		if (previousJob == WorkerJob.MINERALS) {
 			if (workerDepotMap.get(unit.getID()) != null) {
 				if (depotWorkerCount.get(workerDepotMap.get(unit.getID()).getID()) != null) {
 					depotWorkerCount.put(workerDepotMap.get(unit.getID()).getID(),
@@ -350,15 +338,15 @@ public class WorkerData {
 
 			// erase the association from the map
 			workerMineralAssignment.remove(unit.getID()); // C++ : workerMineralAssignment.erase(unit);
-		} else if (previousJob == WorkerJob.Gas) {
+		} else if (previousJob == WorkerJob.GAS) {
 			refineryWorkerCount.put(workerRefineryMap.get(unit.getID()).getID(),
 					refineryWorkerCount.get(workerRefineryMap.get(unit.getID()).getID()) - 1);
 			workerRefineryMap.remove(unit.getID()); // C++ : workerRefineryMap.erase(unit);
-		} else if (previousJob == WorkerJob.Build) {
+		} else if (previousJob == WorkerJob.BUILD) {
 			workerBuildingTypeMap.remove(unit.getID()); // C++ : workerBuildingTypeMap.erase(unit);
-		} else if (previousJob == WorkerJob.Repair) {
+		} else if (previousJob == WorkerJob.REPAIR) {
 			workerRepairMap.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
-		} else if (previousJob == WorkerJob.Move) {
+		} else if (previousJob == WorkerJob.MOVE) {
 			workerMoveMap.remove(unit.getID()); // C++ : workerMoveMap.erase(unit);
 		}
 
@@ -372,7 +360,7 @@ public class WorkerData {
 	public final int getNumMineralWorkers() {
 		int num = 0;
 		for (Unit unit : workers) {
-			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.Minerals) {
+			if (workerJobMap.get(unit.getID()) == WorkerJob.MINERALS) {
 				num++;
 			}
 		}
@@ -382,7 +370,7 @@ public class WorkerData {
 	public final int getNumGasWorkers() {
 		int num = 0;
 		for (Unit unit : workers) {
-			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.Gas) {
+			if (workerJobMap.get(unit.getID()) == WorkerJob.GAS) {
 				num++;
 			}
 		}
@@ -392,16 +380,16 @@ public class WorkerData {
 	public final int getNumIdleWorkers() {
 		int num = 0;
 		for (Unit unit : workers) {
-			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.Idle) {
+			if (workerJobMap.get(unit.getID()) == WorkerJob.IDLE) {
 				num++;
 			}
 		}
 		return num;
 	}
 
-	public WorkerData.WorkerJob getWorkerJob(Unit unit) {
+	public WorkerJob getWorkerJob(Unit unit) {
 		if (unit == null) {
-			return WorkerJob.Default;
+			return WorkerJob.DEFAULT;
 		}
 
 		if (workerJobMap.containsKey(unit.getID())) {
@@ -416,7 +404,7 @@ public class WorkerData {
 		//
 		// }
 		// }
-		return WorkerJob.Default;
+		return WorkerJob.DEFAULT;
 	}
 
 	/// ResourceDepot 에 충분한 수(미네랄 덩이 수 * mineralAndMineralWorkerRatio ) 의 미네랄 일꾼이 배정되어있는가
@@ -449,7 +437,7 @@ public class WorkerData {
 
 		int radius = 320;
 
-		for (Unit unit : PreBot.Broodwar.getAllUnits()) {
+		for (Unit unit : Prebot.Game.getAllUnits()) {
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius) {
 				mineralsNearDepot.add(unit);
 			}
@@ -457,7 +445,7 @@ public class WorkerData {
 
 		// if we didn't find any, use the whole map
 		if (mineralsNearDepot.isEmpty()) {
-			for (Unit unit : PreBot.Broodwar.getAllUnits()) {
+			for (Unit unit : Prebot.Game.getAllUnits()) {
 				if ((unit.getType() == UnitType.Resource_Mineral_Field)) {
 					mineralsNearDepot.add(unit);
 				}
@@ -473,11 +461,11 @@ public class WorkerData {
 		}
 
 		// if the worker is mining, set the iterator to the mineral map
-		if (getWorkerJob(unit) == WorkerData.WorkerJob.Minerals) {
+		if (getWorkerJob(unit) == WorkerJob.MINERALS) {
 			if (workerMineralMap.containsKey(unit.getID())) {
 				return workerMineralMap.get(unit.getID());
 			}
-		} else if (getWorkerJob(unit) == WorkerData.WorkerJob.Gas) {
+		} else if (getWorkerJob(unit) == WorkerJob.GAS) {
 			if (workerRefineryMap.containsKey(unit.getID())) {
 				return workerRefineryMap.get(unit.getID());
 			}
@@ -608,26 +596,24 @@ public class WorkerData {
 			return 'X';
 		}
 
-		WorkerData.WorkerJob j = getWorkerJob(unit);
+		WorkerJob j = getWorkerJob(unit);
 
-		if (j == WorkerData.WorkerJob.Build)
+		if (j == WorkerJob.BUILD)
 			return 'B';
-		if (j == WorkerData.WorkerJob.Combat)
+		if (j == WorkerJob.COMBAT)
 			return 'C';
-		if (j == WorkerData.WorkerJob.Default)
+		if (j == WorkerJob.DEFAULT)
 			return 'D';
-		if (j == WorkerData.WorkerJob.Gas)
+		if (j == WorkerJob.GAS)
 			return 'G';
-		if (j == WorkerData.WorkerJob.Idle)
+		if (j == WorkerJob.IDLE)
 			return 'I';
-		if (j == WorkerData.WorkerJob.Minerals)
+		if (j == WorkerJob.MINERALS)
 			return 'M';
-		if (j == WorkerData.WorkerJob.Repair)
+		if (j == WorkerJob.REPAIR)
 			return 'R';
-		if (j == WorkerData.WorkerJob.Move)
+		if (j == WorkerJob.MOVE)
 			return 'O';
-		if (j == WorkerData.WorkerJob.Scout)
-			return 'S';
 		return 'X';
 	}
 }

@@ -1,4 +1,4 @@
-package prebot.xxxdeprecated;
+package prebot.common.util.internal;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -7,9 +7,8 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
-import prebot.main.PreBot;
+import prebot.main.Prebot;
 
-@Deprecated
 public class DistanceMap {
 
 	// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 한다
@@ -53,18 +52,18 @@ public class DistanceMap {
 	
 	public DistanceMap()
 	{
-		this.dist = new int[PreBot.Broodwar.mapWidth() * PreBot.Broodwar.mapHeight()];
+		this.dist = new int[Prebot.Game.mapWidth() * Prebot.Game.mapHeight()];
 		for(int i = 0 ; i < this.dist.length ; i++)
 		{
 			this.dist[i] = -1;
 		}
-		this.moveTo = new char[PreBot.Broodwar.mapWidth() * PreBot.Broodwar.mapHeight()];
+		this.moveTo = new char[Prebot.Game.mapWidth() * Prebot.Game.mapHeight()];
 		for(int j = 0 ; j < this.moveTo.length ; j++)
 		{
 			this.moveTo[j] = 'X';
 		}
-		this.rows = PreBot.Broodwar.mapHeight();
-		this.cols = PreBot.Broodwar.mapWidth();
+		this.rows = Prebot.Game.mapHeight();
+		this.cols = Prebot.Game.mapWidth();
 		this.startRow = -1;
 		this.startCol = -1;
 	}
@@ -136,12 +135,12 @@ public class DistanceMap {
 				Position cellCenter = getCellCenter(r, c);
 
 				// don't worry about places that aren't connected to our start locatin
-				if (!BWTA.isConnected(cellCenter.toTilePosition(), PreBot.Broodwar.self().getStartLocation()))
+				if (!BWTA.isConnected(cellCenter.toTilePosition(), Prebot.Game.self().getStartLocation()))
 				{
 					continue;
 				}
 
-				Position home = PreBot.Broodwar.self().getStartLocation().toPosition();
+				Position home = Prebot.Game.self().getStartLocation().toPosition();
 				double dist = home.getDistance(getCellByIndex(r, c).center);
 				int lastVisited = getCellByIndex(r, c).timeLastVisited;
 				if (lastVisited < minSeen || ((lastVisited == minSeen) && (dist > minSeenDist)))
@@ -235,19 +234,19 @@ public class DistanceMap {
 		//MyBotModule.Broodwar.printf("MapGrid info: WH(%d, %d)  CS(%d)  RC(%d, %d)  C(%d)", mapWidth, mapHeight, cellSize, rows, cols, cells.size());
 
 		// add our units to the appropriate cell
-		for (Unit unit : PreBot.Broodwar.self().getUnits())
+		for (Unit unit : Prebot.Game.self().getUnits())
 		{
 			getCell(unit).ourUnits.getLoadedUnits().add(unit);
-			getCell(unit).timeLastVisited = PreBot.Broodwar.getFrameCount();
+			getCell(unit).timeLastVisited = Prebot.Game.getFrameCount();
 		}
 
 		// add enemy units to the appropriate cell
-		for (Unit unit : PreBot.Broodwar.enemy().getUnits())
+		for (Unit unit : Prebot.Game.enemy().getUnits())
 		{
 			if (unit.getHitPoints() > 0)
 			{
 				getCell(unit).oppUnits.getLoadedUnits().add(unit);
-				getCell(unit).timeLastOpponentSeen = PreBot.Broodwar.getFrameCount();
+				getCell(unit).timeLastOpponentSeen = Prebot.Game.getFrameCount();
 			}
 		}
 	}

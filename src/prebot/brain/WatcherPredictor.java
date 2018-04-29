@@ -8,38 +8,40 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import prebot.common.code.Code.WatcherCombatPredictResult;
-import prebot.common.util.MicroUtils;
+import prebot.common.code.Code.WatcherPredictResult;
+import prebot.common.code.ConfigForMicro.Flee;
+import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
 import prebot.information.UnitInfo;
 import prebot.main.manager.InformationManager;
 
 /** @author insaneojw
  *  */
-public class WatcherCombatPredictor {
+public class WatcherPredictor {
+	
+	public static int fleeStartFrame = 0;
 	
 	/** 벌처의 후퇴*/
-	public static WatcherCombatPredictResult predict(List<Unit> vultureList, List<Unit> enemyUnitList) {
-		int vulturePower = powerOfWatchers(vultureList);
-		int enemyPower = powerOfEnemies(enemyUnitList);
-		return getResult(vulturePower, enemyPower);
-	}
+//	public static WatcherCombatPredictResult predict(List<Unit> vultureList, List<Unit> enemyUnitList) {
+//		int vulturePower = powerOfWatchers(vultureList);
+//		int enemyPower = powerOfEnemies(enemyUnitList);
+//		return getResult(vulturePower, enemyPower);
+//	}
 	
-	public static WatcherCombatPredictResult predictByUnitInfo(List<Unit> vultures, List<UnitInfo> enemyUnitInfoList) {
+	public static WatcherPredictResult predictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
+		if (TimeUtils.elapsedSeconds(fleeStartFrame) <= Flee.WATCHER_FLEE_SECONDS) {
+			return WatcherPredictResult.BACK;
+		}
+		
 		int vulturePower = powerOfWatchers(vultures);
-		int enemyPower = powerOfEnemiesByUnitInfo(enemyUnitInfoList);
-		return getResult(vulturePower, enemyPower);
-	}
-
-	private static WatcherCombatPredictResult getResult(int vulturePower, int enemyPower) {
+		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
+		
 		if (vulturePower > enemyPower) {
-			if (vulturePower > enemyPower * 2) {
-				return WatcherCombatPredictResult.ATTACK_NO_MERCY;
-			} else {
-				return WatcherCombatPredictResult.ATTACK;
-			}
+			return WatcherPredictResult.ATTACK;
 		} else {
-			return WatcherCombatPredictResult.BACK;
+			fleeStartFrame = TimeUtils.elapsedFrames();
+			return WatcherPredictResult.BACK;
 		}
 	}
 
@@ -71,13 +73,13 @@ public class WatcherCombatPredictor {
 		return enemyTotalPower;
 	}
 	
-	public static int powerOfEnemiesByUnitInfo(List<UnitInfo> enemyUnitInfoList) {
+	public static int powerOfEnemiesByUnitInfo(List<UnitInfo> euiList) {
 		int enemyTotalPower = 0;
-		for (UnitInfo enemyUnitInfo : enemyUnitInfoList) {
+		for (UnitInfo eui : euiList) {
 			UnitType unitType = UnitType.Unknown;
 			int hitPointsAndShields = 0;
 
-			Unit enemyUnit = MicroUtils.enemyUnitInSight(enemyUnitInfo);
+			Unit enemyUnit = UnitUtils.unitInSight(eui);
 			if (enemyUnit != null) {
 				if (!enemyUnit.isCompleted()) {
 					continue;
@@ -85,8 +87,8 @@ public class WatcherCombatPredictor {
 				unitType = enemyUnit.getType();
 				hitPointsAndShields = enemyUnit.getHitPoints() + enemyUnit.getShields();
 			} else {
-				unitType = enemyUnitInfo.type;
-				hitPointsAndShields = enemyUnitInfo.type.maxHitPoints() + enemyUnitInfo.type.maxShields();
+				unitType = eui.getType();
+				hitPointsAndShields = eui.getType().maxHitPoints() + eui.getType().maxShields();
 			}
 			enemyTotalPower += powerOfUnit(unitType, hitPointsAndShields, enemyUnit);
 		}
