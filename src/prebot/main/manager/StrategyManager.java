@@ -26,6 +26,7 @@ import prebot.main.Prebot;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager extends GameManager {
 
+	public List<Knowledge> knowledgeList = new ArrayList<>();
 	public History historyData = new History();
 	private Idea idea = null;
 
@@ -40,6 +41,7 @@ public class StrategyManager extends GameManager {
 	}
 
 	public StrategyManager() {
+		knowledgeList.add(new InerrableEssentials.FindInitialStrategy());
 	}
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
@@ -76,14 +78,14 @@ public class StrategyManager extends GameManager {
 	private void learnFromKnowledge() {
 		if (idea == null) {
 			idea = new Idea();
-			idea.addKnowledge(new InerrableEssentials.FindInitialStrategy());
-			idea.addKnowledge(new InerrableEssentials.UsePrebot1BuildStrategy());
 		}
-
-		for (Knowledge knowledge : idea.knowledgeList) {
+		for (Knowledge knowledge : knowledgeList) {
 			knowledge.learning();
 		}
-		idea.arrangeKnowledgeList();
+		// actionList는 수정될 수 있으므로 별도의 loop로 처리한다.
+		for (Knowledge knowledge : idea.actionList) {
+			knowledge.learning();
+		}
 		this.setDummyIdea();
 	}
 
