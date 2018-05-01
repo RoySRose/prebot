@@ -5,46 +5,51 @@ import prebot.common.code.Code.KnowledgeActionEvaluation;
 public abstract class ActionKnowledge extends Knowledge {
 
 	protected abstract void prevent();
-	
+
 	protected abstract boolean doSomething();
 
 	protected abstract boolean doSomeOtherthing();
 
 	protected abstract KnowledgeActionEvaluation evaulateAction();
-	
+
 	@Override
-	protected void waiting() {
-		super.waiting();
+	protected boolean waiting() {
+		return super.waiting();
 	}
 
 	@Override
-	protected void verifying() {
+	protected boolean verifying() {
 		prevent();
-		super.verifying();
+		return super.verifying();
 	}
 
 	@Override
-	protected void provedTrue() {
+	protected boolean provedTrue() {
 		boolean doSomethingContinue = doSomething();
 		KnowledgeActionEvaluation evaluation = evaulateAction();
 
-		if (!doSomethingContinue && evaluation != KnowledgeActionEvaluation.DONT_KNOW)
-			super.provedTrue();
+		if (!doSomethingContinue && evaluation != KnowledgeActionEvaluation.DONT_KNOW) {
+			return super.provedTrue();
+		} else {
+			return false;
+		}
 	}
 
 	@Override
-	protected void provedFalse() {
+	protected boolean provedFalse() {
 		boolean doSomeOtherthingContinue = doSomeOtherthing();
 
-		if (!doSomeOtherthingContinue)
-			super.provedFalse();
+		if (!doSomeOtherthingContinue) {
+			return super.provedFalse();
+		} else {
+			return false;
+		}
 	}
 
 	@Override
-	protected void writeFile() {
+	protected boolean writeFile() {
 		// TODO Auto-generated method stub
-		super.writeFile();
+		return super.writeFile();
 	}
-	
-	
+
 }

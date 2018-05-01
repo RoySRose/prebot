@@ -17,16 +17,16 @@ import bwapi.WeaponType;
  */
 public class MirrorBugFixed {
 
-	private static final List<UnitType> EXPLOSIVE_UNITTYPES;
+	private static final List<UnitType> EXPLOSIVE_UNIT_TYPES;
 	private static final List<UnitType> EXPLOSIVE_TO_FLYERS_UNITTYPES;
-	private static final List<UnitType> CONCUSSIVE_UNITTYPES;
+	private static final List<UnitType> CONCUSSIVE_UNIT_TYPES;
 
-	private static final List<UnitType> LARGE_UNITTYPES;
-	private static final List<UnitType> MEDIUM_UNITTYPES;
-	private static final List<UnitType> SMALL_UNITTYPES;
+	private static final List<UnitType> LARGE_UNIT_TYPES;
+	private static final List<UnitType> MEDIUM_UNIT_TYPES;
+	private static final List<UnitType> SMALL_UNIT_TYPES;
 
 	static {
-		EXPLOSIVE_UNITTYPES = Arrays.asList(
+		EXPLOSIVE_UNIT_TYPES = Arrays.asList(
 				UnitType.Terran_Vulture_Spider_Mine,
 				UnitType.Terran_Siege_Tank_Tank_Mode,
 				UnitType.Terran_Siege_Tank_Siege_Mode,
@@ -45,12 +45,12 @@ public class MirrorBugFixed {
 				UnitType.Terran_Goliath,
 				UnitType.Protoss_Scout);
 		
-		CONCUSSIVE_UNITTYPES = Arrays.asList(
+		CONCUSSIVE_UNIT_TYPES = Arrays.asList(
 				UnitType.Terran_Vulture,
 				UnitType.Terran_Firebat,
 				UnitType.Terran_Firebat);
 
-		LARGE_UNITTYPES = Arrays.asList(
+		LARGE_UNIT_TYPES = Arrays.asList(
 				UnitType.Terran_Siege_Tank_Tank_Mode,
 				UnitType.Terran_Siege_Tank_Siege_Mode,
 				UnitType.Terran_Goliath,
@@ -70,7 +70,7 @@ public class MirrorBugFixed {
 				UnitType.Zerg_Guardian,
 				UnitType.Zerg_Devourer);
 
-		MEDIUM_UNITTYPES = Arrays.asList(
+		MEDIUM_UNIT_TYPES = Arrays.asList(
 				UnitType.Terran_Vulture,
 				UnitType.Protoss_Corsair,
 				UnitType.Zerg_Hydralisk,
@@ -78,7 +78,7 @@ public class MirrorBugFixed {
 				UnitType.Zerg_Queen,
 				UnitType.Zerg_Lurker);
 		
-		SMALL_UNITTYPES = Arrays.asList(
+		SMALL_UNIT_TYPES = Arrays.asList(
 				UnitType.Terran_Marine,
 				UnitType.Terran_Firebat,
 				UnitType.Terran_Ghost,
@@ -105,13 +105,13 @@ public class MirrorBugFixed {
 		if (weapon == null || weapon == WeaponType.Unknown) {
 			return DamageType.None;
 		}
-		if (EXPLOSIVE_UNITTYPES.contains(attackerType)) {
+		if (EXPLOSIVE_UNIT_TYPES.contains(attackerType)) {
 			return DamageType.Explosive;
 		}
 		if (EXPLOSIVE_TO_FLYERS_UNITTYPES.contains(attackerType)) {
 			return target.isFlying() ? DamageType.Explosive : DamageType.Normal;
 		}
-		if (CONCUSSIVE_UNITTYPES.contains(attackerType)) {
+		if (CONCUSSIVE_UNIT_TYPES.contains(attackerType)) {
 			return DamageType.Concussive;
 		}
 		return DamageType.Normal;
@@ -120,13 +120,13 @@ public class MirrorBugFixed {
 
 	/// UnitType.size() 오류보완 : unitType의 사이즈를 리턴(대형, 중형, 소형)
 	public static UnitSizeType getUnitSize(UnitType unitType) {
-		if (unitType.isBuilding() || LARGE_UNITTYPES.contains(unitType)) {
+		if (unitType.isBuilding() || LARGE_UNIT_TYPES.contains(unitType)) {
 			return UnitSizeType.Large;
 		}
-		if (MEDIUM_UNITTYPES.contains(unitType)) {
+		if (MEDIUM_UNIT_TYPES.contains(unitType)) {
 			return UnitSizeType.Medium;
 		}
-		if (unitType.isWorker() || SMALL_UNITTYPES.contains(unitType)) {
+		if (unitType.isWorker() || SMALL_UNIT_TYPES.contains(unitType)) {
 			return UnitSizeType.Small;
 		}
 		return UnitSizeType.Small;

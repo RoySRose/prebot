@@ -3,22 +3,23 @@ package prebot.brain.knowledge;
 import prebot.common.code.Code.KnowlegeStatus;
 
 public abstract class Knowledge {
-	
+
 	private KnowlegeStatus status = KnowlegeStatus.WAITING;
-	
-	public KnowlegeStatus learning() {
+
+	public boolean learning() {
 		if (status == KnowlegeStatus.WAITING) {
-			waiting();
+			return waiting();
 		} else if (status == KnowlegeStatus.VERIFING) {
-			verifying();
+			return verifying();
 		} else if (status == KnowlegeStatus.PROVED_TRUE) {
-			provedTrue();
+			return provedTrue();
 		} else if (status == KnowlegeStatus.PROVED_FALSE) {
-			provedFalse();
+			return provedFalse();
 		} else if (status == KnowlegeStatus.WRITE_FILE) {
-			writeFile();
+			return writeFile();
+		} else {
+			return false;
 		}
-		return status;
 	}
 
 	public String knowledgeName() {
@@ -33,31 +34,43 @@ public abstract class Knowledge {
 
 	protected abstract boolean foundCertainDisproof();
 
-	protected void waiting() {
-		if (notOccured())
+	protected boolean waiting() {
+		if (notOccured()) {
 			status = KnowlegeStatus.ENDED;
-		else if (occured())
+			return true;
+		} else if (occured()) {
 			status = KnowlegeStatus.VERIFING;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	protected void verifying() {
-		if (foundCertainProof())
+	protected boolean verifying() {
+		if (foundCertainProof()) {
 			status = KnowlegeStatus.PROVED_TRUE;
-		else if (foundCertainDisproof())
+			return true;
+		} else if (foundCertainDisproof()) {
 			status = KnowlegeStatus.PROVED_FALSE;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	protected void provedTrue() {
+	protected boolean provedTrue() {
 		status = KnowlegeStatus.WRITE_FILE;
+		return true;
 	}
 
-	protected void provedFalse() {
+	protected boolean provedFalse() {
 		status = KnowlegeStatus.WRITE_FILE;
+		return true;
 	}
 
-	protected void writeFile() {
+	protected boolean writeFile() {
 		// TODO Auto-generated method stub
 		status = KnowlegeStatus.ENDED;
+		return false;
 	}
 }
-

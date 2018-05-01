@@ -101,6 +101,18 @@ public class UnitUtils {
 		}
 	}
 	
+	/** 적 유닛  수 */
+	public static int getEnemyUnitInfoCount(UnitType unitType, EnemyUnitFindRange enemyUnitFindRange) {
+		switch (enemyUnitFindRange) {
+		case VISIBLE:
+			return UnitCache.getCurrentCache().enemyVisibleCount(unitType);
+		case INVISIBLE:
+			return UnitCache.getCurrentCache().enemyInvisibleCount(unitType);
+		case ALL: default:
+			return UnitCache.getCurrentCache().enemyAllCount(unitType);
+		}
+	}
+	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
 	public static void addEnemyUnitInfoNearBy(List<UnitInfo> euiList, Position position, int radius) {
 		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Game.enemy());
@@ -227,6 +239,11 @@ public class UnitUtils {
 		return closestUnit;
 	}
 
+	public static int remainingBuildTimeByHitPoint(Unit building) {
+		double rate = (double) (building.getType().maxHitPoints() - building.getHitPoints()) / building.getType().maxHitPoints();
+		return (int) (building.getType().buildTime() * rate);
+	}
+	
 	// 미사용
 	// public double GetDistanceBetweenTwoRectangles(Rect rect1, Rect rect2)
 	// {

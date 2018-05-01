@@ -1,15 +1,18 @@
-package prebot.brain.knowledge.inerrable;
+package prebot.brain.knowledge.inerrableaction;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.brain.Idea;
 import prebot.brain.knowledge.InerrableActionKnowledge;
+import prebot.brain.strategy.GeneralStrategies;
+import prebot.brain.strategy.StrategyInjecter;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.main.Prebot;
+import prebot.main.manager.BuildManager;
 import prebot.main.manager.InformationManager;
-import prebot.main.manager.WorkerManager;
 
 public class InerrableInitials {
 	
@@ -19,7 +22,7 @@ public class InerrableInitials {
 	public static final class MechanicGasAdjustment extends InerrableActionKnowledge {
 		@Override
 		protected boolean doSomething() {
-			if (UnitUtils.hasUnit(UnitType.Terran_Factory, UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE) || Prebot.Game.self().gas() >= 100) {
+			if (TimeUtils.elapsedSeconds() > 200 || UnitUtils.getUnitCount(UnitType.Terran_Command_Center, UnitFindRange.ALL) >= 2) {
 				Idea.of().gasAdjustment = false;
 				Idea.of().gasAdjustmentWorkerCount = 0;
 				return false;
@@ -30,7 +33,11 @@ public class InerrableInitials {
 				if (workerCount < 8) {
 					Idea.of().gasAdjustmentWorkerCount = 0;
 				} else {
-					Idea.of().gasAdjustmentWorkerCount = 3;
+					if (UnitUtils.hasUnit(UnitType.Terran_Factory, UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE) || Prebot.Game.self().gas() >= 100) {
+						Idea.of().gasAdjustmentWorkerCount = 1;
+					} else {
+						Idea.of().gasAdjustmentWorkerCount = 3;
+					}
 				}
 				return true;
 			}
@@ -43,10 +50,12 @@ public class InerrableInitials {
 	public static final class ScvScoutAfterBuild extends InerrableActionKnowledge {
 		private final UnitType buildingType;
 		private final int remainingSeconds;
+		private final int scvScoutMaxCount;
 
-		public ScvScoutAfterBuild(UnitType buildingType, int remainingSeconds) {
+		public ScvScoutAfterBuild(UnitType buildingType, int remainingSeconds, int scvScoutMaxCount) {
 			this.buildingType = buildingType;
 			this.remainingSeconds = remainingSeconds;
+			this.scvScoutMaxCount = scvScoutMaxCount;
 		}
 
 		@Override
@@ -57,10 +66,37 @@ public class InerrableInitials {
 			} else {
 				for (Unit building : UnitUtils.getUnitList(buildingType, UnitFindRange.ALL)) {
 					if (building.getType() == buildingType && TimeUtils.framesToSeconds(building.getRemainingBuildTime()) <= remainingSeconds) {
-						Idea.of().scvScoutMaxCount = 1;
+						Idea.of().scvScoutMaxCount = scvScoutMaxCount;
 						break;
 					}
 				}
+				return true;
+			}
+		}
+	}
+	
+	/** 
+	 * build큐가 empty가 되었을때 general strategy로 변경
+	 *  */
+	public static final class UsePrebot1BuildStrategy extends InerrableActionKnowledge {
+		@Override
+		protected boolean doSomething() {
+			if (BuildManager.Instance().buildQueue.isEmpty()) {
+				if (Prebot.Game.enemy().getRace() == Race.Protoss) {
+					StrategyInjecter.inject(new GeneralStrategies.GeneralStrategyForProtoss());
+					
+				} else if (Prebot.Game.enemy().getRace() == Race.Zerg) {
+					StrategyInjecter.inject(new GeneralStrategies.GeneralStrategyForZerg());
+					
+				} else if (Prebot.Game.enemy().getRace() == Race.Terran) {
+					StrategyInjecter.inject(new GeneralStrategies.GeneralStrategyForTerran());
+					
+				} else {
+					StrategyInjecter.inject(new GeneralStrategies.GeneralStrategyForProtoss());
+				}
+				return false;
+				
+			} else {
 				return true;
 			}
 		}

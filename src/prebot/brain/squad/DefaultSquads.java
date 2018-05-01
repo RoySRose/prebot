@@ -20,20 +20,20 @@ import prebot.micro.control.VultureWatcher;
 
 public class DefaultSquads {
 	
-	public static final class IdleSquad extends Squad {
-		public IdleSquad() {
-			super(0, 0);
-		}
-
-		@Override
-		public boolean want(Unit unit) {
-			return true;
-		}
-
-		@Override
-		public void execute() {
-		}
-	}
+//	public static final class IdleSquad extends Squad {
+//		public IdleSquad() {
+//			super(0, 0);
+//		}
+//
+//		@Override
+//		public boolean want(Unit unit) {
+//			return true;
+//		}
+//
+//		@Override
+//		public void execute() {
+//		}
+//	}
 	
 	
 	public static final class MainDefenseSquad extends Squad {

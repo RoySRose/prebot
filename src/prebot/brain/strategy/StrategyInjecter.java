@@ -15,17 +15,9 @@ import prebot.main.manager.BuildManager;
 public class StrategyInjecter {
 	
 	public static void inject(Strategy strategy) {
-		Idea currentIdea = Idea.of();
-		
-		currentIdea.strategyName = strategy.strategyName();
-		currentIdea.actionList = strategy.actionList;
-		currentIdea.squadList = strategy.squadList;
-
+		Idea.of().strategy = strategy;
 		if (strategy instanceof FixedStrategy) {
 			injectBuildQueue(((FixedStrategy) strategy).buildItemList);
-			currentIdea.buildActionList = new ArrayList<>();
-		} else if (strategy instanceof GeneralStrategy) {
-			currentIdea.buildActionList = ((GeneralStrategy) strategy).buildActionList;
 		}
 	}
 	

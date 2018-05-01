@@ -6,7 +6,6 @@ import bwapi.Position;
 import bwta.BaseLocation;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.util.internal.IConditions.BaseCondition;
-import prebot.main.Prebot;
 
 public class BaseLocationUtils {
 
@@ -42,15 +41,6 @@ public class BaseLocationUtils {
 			}
 		}
 		return closestBase;
-	}
-	
-	public static BaseLocation getGroundClosestBaseToPositionNotExplored(List<BaseLocation> baseList, BaseLocation fromBase) {
-		return getGroundClosestBaseToPosition(baseList, fromBase, new BaseCondition() {
-			@Override
-			public boolean correspond(BaseLocation base) {
-				return !Prebot.Game.isExplored(base.getTilePosition());
-			}
-		});
 	}
 	
 	/** baseList 중 position에 가장 가까운 base 리턴 */

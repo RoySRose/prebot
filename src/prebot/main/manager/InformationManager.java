@@ -7,8 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
+import bwapi.Color;
 import bwapi.Player;
+import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
@@ -17,6 +20,9 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.brain.Info;
+import prebot.common.code.ConfigForDebug.UX;
+import prebot.common.util.MapTools;
 import prebot.common.util.internal.UnitCache;
 import prebot.information.UnitData;
 import prebot.information.UnitInfo;
@@ -27,6 +33,11 @@ import prebot.main.Prebot;
 /// 또한, BWAPI::Broodwar 나 BWTA 등을 통해 조회할 수 있는 정보이지만 전처리 / 별도 관리하는 것이 유용한 것도 InformationManager에서 별도 관리하도록 합니다
 public class InformationManager extends GameManager {
 	private static InformationManager instance = new InformationManager();
+	private Info info = new Info();
+	
+	public Info getInfo() {
+		return info;
+	}
 
 	public Player selfPlayer; /// < 아군 Player
 	public Player enemyPlayer; /// < 아군 Player의 종족
@@ -56,6 +67,8 @@ public class InformationManager extends GameManager {
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
+	/// base location의 꼭지점 (정찰시 활용)
+	private Map<BaseLocation, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
 	
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
@@ -98,7 +111,7 @@ public class InformationManager extends GameManager {
 		secondChokePoint.put(enemyPlayer, null);
 
 		updateChokePointAndExpansionLocation();
-
+		updateBaseRegionVerticesMap();
 	}
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
@@ -109,8 +122,155 @@ public class InformationManager extends GameManager {
 			updateBaseLocationInfo();
 		}
 		UnitCache.getCurrentCache().updateCache();
+		this.setInfo();
 		return this;
 	}
+
+	private void updateBaseRegionVerticesMap() {
+//		for (BaseLocation base : BWTA.getStartLocations()) {
+//			calculateEnemyRegionVertices(base);
+//		}
+	}
+
+	private void setInfo() {
+		info.mainBaseLocations = mainBaseLocations;
+		info.mainBaseLocationChanged = mainBaseLocationChanged;
+		info.occupiedBaseLocations = occupiedBaseLocations;
+		info.occupiedRegions = occupiedRegions;
+		info.firstChokePoint = firstChokePoint;
+		info.firstExpansionLocation = firstExpansionLocation;
+		info.secondChokePoint = secondChokePoint;
+		info.unitData = unitData;
+		
+		info.baseRegionVerticesMap = baseRegionVerticesMap;
+	}
+
+	// Enemy MainBaseLocation 이 있는 Region 의 가장자리를 enemyBaseRegionVertices 에 저장한다
+	// Region 내 모든 건물을 Eliminate 시키기 위한 지도 탐색 로직 작성시 참고할 수 있다
+	public void calculateEnemyRegionVertices(BaseLocation base) {
+		if (base == null) {
+			return;
+		}
+		Region enemyRegion = base.getRegion();
+		if (enemyRegion == null) {
+			return;
+		}
+		
+		Vector<Position> regionVertices = new Vector<>();
+
+		final Position basePosition = Prebot.Game.self().getStartLocation().toPosition();
+		final Vector<TilePosition> closestTobase = MapTools.getClosestTilesTo(basePosition);
+		Set<Position> unsortedVertices = new HashSet<Position>();
+
+		// check each tile position
+		for (final TilePosition tp : closestTobase) {
+			if (BWTA.getRegion(tp) != enemyRegion) {
+				continue;
+			}
+
+			// a tile is 'surrounded' if
+			// 1) in all 4 directions there's a tile position in the current region
+			// 2) in all 4 directions there's a buildable tile
+			boolean surrounded = true;
+			if (BWTA.getRegion(new TilePosition(tp.getX() + 1, tp.getY())) != enemyRegion || !Prebot.Game.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() + 1)) != enemyRegion || !Prebot.Game.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
+					|| BWTA.getRegion(new TilePosition(tp.getX() - 1, tp.getY())) != enemyRegion || !Prebot.Game.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() - 1)) != enemyRegion || !Prebot.Game.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1))) {
+				surrounded = false;
+			}
+
+			// push the tiles that aren't surrounded
+			// Region의 가장자리 타일들만 추가한다
+			if (!surrounded && Prebot.Game.isBuildable(tp)) {
+				if (UX.DrawScoutInfo) {
+					int x1 = tp.getX() * 32 + 2;
+					int y1 = tp.getY() * 32 + 2;
+					int x2 = (tp.getX() + 1) * 32 - 2;
+					int y2 = (tp.getY() + 1) * 32 - 2;
+					Prebot.Game.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
+					Prebot.Game.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+				}
+
+				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
+			}
+		}
+
+		Vector<Position> sortedVertices = new Vector<Position>();
+		Position current = unsortedVertices.iterator().next();
+		regionVertices.add(current);
+		unsortedVertices.remove(current);
+
+		// while we still have unsorted vertices left, find the closest one remaining to current
+		while (!unsortedVertices.isEmpty()) {
+			double bestDist = 1000000;
+			Position bestPos = null;
+
+			for (final Position pos : unsortedVertices) {
+				double dist = pos.getDistance(current);
+
+				if (dist < bestDist) {
+					bestDist = dist;
+					bestPos = pos;
+				}
+			}
+
+			current = bestPos;
+			sortedVertices.add(bestPos);
+			unsortedVertices.remove(bestPos);
+		}
+
+		// let's close loops on a threshold, eliminating death grooves
+		int distanceThreshold = 100;
+
+		while (true) {
+			// find the largest index difference whose distance is less than the threshold
+			int maxFarthest = 0;
+			int maxFarthestStart = 0;
+			int maxFarthestEnd = 0;
+
+			// for each starting vertex
+			for (int i = 0; i < (int) sortedVertices.size(); ++i) {
+				int farthest = 0;
+				int farthestIndex = 0;
+
+				// only test half way around because we'll find the other one on the way back
+				for (int j = 1; j < sortedVertices.size() / 2; ++j) {
+					int jindex = (i + j) % sortedVertices.size();
+
+					if (sortedVertices.get(i).getDistance(sortedVertices.get(jindex)) < distanceThreshold) {
+						farthest = j;
+						farthestIndex = jindex;
+					}
+				}
+
+				if (farthest > maxFarthest) {
+					maxFarthest = farthest;
+					maxFarthestStart = i;
+					maxFarthestEnd = farthestIndex;
+				}
+			}
+
+			// stop when we have no long chains within the threshold
+			if (maxFarthest < 4) {
+				break;
+			}
+
+			double dist = sortedVertices.get(maxFarthestStart).getDistance(sortedVertices.get(maxFarthestEnd));
+
+			Vector<Position> temp = new Vector<Position>();
+
+			for (int s = maxFarthestEnd; s != maxFarthestStart; s = (s + 1) % sortedVertices.size()) {
+
+				temp.add(sortedVertices.get(s));
+			}
+
+			sortedVertices = temp;
+		}
+
+		regionVertices = sortedVertices;
+		baseRegionVerticesMap.put(base, regionVertices);
+	}
+	
 
 	/// Unit 에 대한 정보를 업데이트합니다
 	public void onUnitShow(Unit unit) {

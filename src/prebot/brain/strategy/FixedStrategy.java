@@ -5,6 +5,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.build.BuildOrderItem;
+import prebot.build.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.MetaType;
 
 public class FixedStrategy extends Strategy {
@@ -13,12 +14,12 @@ public class FixedStrategy extends Strategy {
 	
 	protected class FixedBuildBuilder {
 		protected FixedBuildBuilder add(UnitType unitType, boolean blocking) {
-			add(unitType, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, blocking);
+			add(new BuildOrderItem(new MetaType(unitType), SeedPositionStrategy.MainBaseLocation, 0, blocking, -1));
 			return this;
 		}
 
-		protected FixedBuildBuilder add(UnitType unitType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy, boolean blocking) {
-			buildItemList.add(new BuildOrderItem(new MetaType(unitType), seedPositionStrategy, 0, blocking, -1));
+		protected FixedBuildBuilder add(BuildOrderItem buildOrderItem) {
+			buildItemList.add(buildOrderItem);
 			return this;
 		}
 		

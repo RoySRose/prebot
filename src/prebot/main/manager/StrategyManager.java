@@ -13,7 +13,8 @@ import prebot.brain.buildaction.BuildAction;
 import prebot.brain.history.History;
 import prebot.brain.history.HistoryFrame;
 import prebot.brain.knowledge.Knowledge;
-import prebot.brain.knowledge.inerrable.InerrableEssentials;
+import prebot.brain.knowledge.inerrableaction.InerrableEssentials;
+import prebot.brain.knowledge.protoss.DarkTemplarSafeTime;
 import prebot.brain.squad.Squad;
 import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
@@ -42,6 +43,7 @@ public class StrategyManager extends GameManager {
 
 	public StrategyManager() {
 		knowledgeList.add(new InerrableEssentials.FindInitialStrategy());
+		knowledgeList.add(new DarkTemplarSafeTime());
 	}
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
@@ -80,11 +82,10 @@ public class StrategyManager extends GameManager {
 			idea = new Idea();
 		}
 		for (Knowledge knowledge : knowledgeList) {
-			knowledge.learning();
+			while (knowledge.learning());
 		}
-		// actionList는 수정될 수 있으므로 별도의 loop로 처리한다.
-		for (Knowledge knowledge : idea.actionList) {
-			knowledge.learning();
+		for (Knowledge knowledge : idea.strategy.getActionList()) {
+			while (knowledge.learning());
 		}
 		this.setDummyIdea();
 	}
@@ -95,7 +96,7 @@ public class StrategyManager extends GameManager {
 	}
 	
 	private void executeBuildActions() {
-		for (BuildAction buildAction : idea.buildActionList) {
+		for (BuildAction buildAction : idea.strategy.getBuildActionList()) {
 			if (buildAction.buildCondition()) {
 				BuildManager.Instance().buildQueue.queueItem(buildAction.buildOrderItem);
 			}
@@ -103,7 +104,7 @@ public class StrategyManager extends GameManager {
 	}
 	
 	private void updateSquadComposition() {
-		for (Squad squad : idea.squadList) {
+		for (Squad squad : idea.strategy.getSquadList()) {
 			CombatManager.Instance().squadData.addOrUpdateSquad(squad);
 		}
 
@@ -111,7 +112,7 @@ public class StrategyManager extends GameManager {
 		for (Squad oldSquad : CombatManager.Instance().squadData.squadMap.values()) {
 			
 			boolean squadExist = false;
-			for (Squad newSquad : idea.squadList) {
+			for (Squad newSquad : idea.strategy.getSquadList()) {
 				if (newSquad.getName().equals(oldSquad.getName())) {
 					squadExist = true;
 					break;
@@ -127,10 +128,6 @@ public class StrategyManager extends GameManager {
 	}
 
 	private void setDummyIdea() {
-		if (idea.strategyName == null) {
-			idea.strategyName = "DUMMY'S IDEA";
-		}
-
 		BaseLocation myBase = InformationManager.Instance().getMainBaseLocation(Prebot.Game.self());
 		if (myBase != null) {
 			idea.campPosition = myBase.getPosition();
