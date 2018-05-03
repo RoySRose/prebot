@@ -10,6 +10,7 @@ import prebot.brain.Idea;
 import prebot.build.BuildOrderItem;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.UpgradeUtils;
 import prebot.main.manager.BuildManager;
 
 public class StrategyInjecter {
@@ -26,14 +27,22 @@ public class StrategyInjecter {
 		List<BuildOrderItem> resultBuildItemList = new ArrayList<>();
 		Map<UnitType, Integer> buildUnitCountMap = new HashMap<>();
 		for (BuildOrderItem buildOrderItem : buildItemList) {
-			UnitType unitType = buildOrderItem.metaType.getUnitType();
-			Integer count = buildUnitCountMap.get(unitType);
-			count = count == null ? 1 : count + 1;
-			buildUnitCountMap.put(unitType, count);
-			if (UnitUtils.hasUnit(unitType, UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, count)) {
-				continue;
+			if (buildOrderItem.metaType.isUnit()) {
+				UnitType unitType = buildOrderItem.metaType.getUnitType();
+				Integer count = buildUnitCountMap.get(unitType);
+				count = count == null ? 1 : count + 1;
+				buildUnitCountMap.put(unitType, count);
+				if (UnitUtils.hasUnit(unitType, UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, count)) {
+					continue;
+				}
+				resultBuildItemList.add(buildOrderItem);
+				
+			} else if (buildOrderItem.metaType.isTech()) {
+				if (UpgradeUtils.hasResearched(buildOrderItem.metaType.getTechType())) {
+					continue;
+				}
+				resultBuildItemList.add(buildOrderItem);
 			}
-			resultBuildItemList.add(buildOrderItem);
 		}
 		
 		for (BuildOrderItem buildOrderItem : resultBuildItemList) {

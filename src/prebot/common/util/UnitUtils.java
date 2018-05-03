@@ -45,7 +45,6 @@ public class UnitUtils {
 
 	/** 유닛 리스트 */
 	public static List<Unit> getUnitList(UnitType unitType, UnitFindRange unitFindRange) {
-		
 		switch (unitFindRange) {
 		case COMPLETE:
 			return UnitCache.getCurrentCache().completeUnits(unitType);

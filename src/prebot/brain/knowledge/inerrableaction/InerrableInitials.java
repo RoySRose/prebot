@@ -22,7 +22,7 @@ public class InerrableInitials {
 	public static final class MechanicGasAdjustment extends InerrableActionKnowledge {
 		@Override
 		protected boolean doSomething() {
-			if (TimeUtils.elapsedSeconds() > 200 || UnitUtils.getUnitCount(UnitType.Terran_Command_Center, UnitFindRange.ALL) >= 2) {
+			if (TimeUtils.elapsedMiniutes() > 4 || UnitUtils.getUnitCount(UnitType.Terran_Command_Center, UnitFindRange.ALL) >= 2) {
 				Idea.of().gasAdjustment = false;
 				Idea.of().gasAdjustmentWorkerCount = 0;
 				return false;
@@ -37,6 +37,37 @@ public class InerrableInitials {
 						Idea.of().gasAdjustmentWorkerCount = 1;
 					} else {
 						Idea.of().gasAdjustmentWorkerCount = 3;
+					}
+				}
+				return true;
+			}
+		}
+	}
+	
+	/**
+	 * 메카닉 테란 가스 조절 기본 가스조절로직을 무시하고, gasAmount만큼 가스 채취.
+	 */
+	public static final class Terran8Barrack111GasAdjustment extends InerrableActionKnowledge {
+		@Override
+		protected boolean doSomething() {
+			if (TimeUtils.elapsedSeconds() > 300) {
+				Idea.of().gasAdjustment = false;
+				Idea.of().gasAdjustmentWorkerCount = 0;
+				return false;
+			} else if (TimeUtils.elapsedSeconds() > 180) {
+				Idea.of().gasAdjustment = true;
+				Idea.of().gasAdjustmentWorkerCount = 2;
+				return false;
+			} else {
+				Idea.of().gasAdjustment = true;
+				int workerCount = UnitUtils.getUnitCount(UnitType.Terran_SCV, UnitFindRange.COMPLETE);
+				if (workerCount < 8) {
+					Idea.of().gasAdjustmentWorkerCount = 0;
+				} else {
+					if (UnitUtils.hasUnit(UnitType.Terran_Factory, UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE) || Prebot.Game.self().gas() >= 100) {
+						Idea.of().gasAdjustmentWorkerCount = 1;
+					} else {
+						Idea.of().gasAdjustmentWorkerCount = 2;
 					}
 				}
 				return true;

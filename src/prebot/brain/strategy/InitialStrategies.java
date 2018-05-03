@@ -1,5 +1,6 @@
 package prebot.brain.strategy;
 
+import bwapi.TechType;
 import bwapi.UnitType;
 import prebot.brain.knowledge.inerrableaction.InerrableInitials;
 import prebot.brain.squad.DefaultSquads;
@@ -11,15 +12,15 @@ public class InitialStrategies {
 		public InitialStrategyForProtoss() {
 			buildItemList = new FixedBuildBuilder().
 					add(UnitType.Terran_SCV, true).times(9).
-					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_Supply_Depot, false).
 					add(UnitType.Terran_SCV, false).times(2).
 					add(UnitType.Terran_Barracks, true).
 					add(UnitType.Terran_SCV, false).times(1).
 					add(UnitType.Terran_Refinery, true).
 					add(UnitType.Terran_SCV, false).times(3).
+					add(UnitType.Terran_Factory, true).
 					add(UnitType.Terran_Marine, true).
 					add(UnitType.Terran_Supply_Depot, true).
-					add(UnitType.Terran_Factory, true).
 					add(UnitType.Terran_SCV, true).times(3).
 					add(UnitType.Terran_Vulture, true).
 					add(UnitType.Terran_Machine_Shop, true).
@@ -43,18 +44,26 @@ public class InitialStrategies {
 					add(UnitType.Terran_Barracks, true).
 					add(UnitType.Terran_SCV, true).times(1).
 					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_SCV, true).times(2).
+					add(UnitType.Terran_Refinery, false).
+					add(UnitType.Terran_Marine, false).times(3).
 					add(UnitType.Terran_SCV, false).times(2).
-					add(UnitType.Terran_Refinery, true).
-					add(UnitType.Terran_SCV, false).times(3).
-					add(UnitType.Terran_Marine, true).
-					add(UnitType.Terran_Supply_Depot, true).
 					add(UnitType.Terran_Factory, true).
-					add(UnitType.Terran_SCV, true).times(3).
-					add(UnitType.Terran_Vulture, true).
+					add(UnitType.Terran_Marine, false).times(1).
+					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_SCV, false).times(4).
+					add(UnitType.Terran_Vulture, true).times(1).
+					add(UnitType.Terran_Starport, true).
 					add(UnitType.Terran_Machine_Shop, true).
+					add(UnitType.Terran_SCV, false).times(3).
+					add(UnitType.Terran_Supply_Depot, false).
+					add(TechType.Spider_Mines, false).
+					add(UnitType.Terran_Vulture, false).times(1).
+					add(UnitType.Terran_Wraith, false).times(1).
+					add(UnitType.Terran_SCV, false).times(1).
 					build();
 			
-			actionList.add(new InerrableInitials.MechanicGasAdjustment());
+			actionList.add(new InerrableInitials.Terran8Barrack111GasAdjustment());
 			actionList.add(new InerrableInitials.ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, UnitType.Terran_Supply_Depot.buildTime(), 1));
 			actionList.add(new InerrableInitials.ScvScoutAfterBuild(UnitType.Terran_Barracks, 0, 2));
 			actionList.add(new InerrableInitials.UsePrebot1BuildStrategy());

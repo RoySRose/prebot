@@ -3,6 +3,7 @@ package prebot.brain.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.TechType;
 import bwapi.UnitType;
 import prebot.build.BuildOrderItem;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
@@ -15,6 +16,11 @@ public class FixedStrategy extends Strategy {
 	protected class FixedBuildBuilder {
 		protected FixedBuildBuilder add(UnitType unitType, boolean blocking) {
 			add(new BuildOrderItem(new MetaType(unitType), SeedPositionStrategy.MainBaseLocation, 0, blocking, -1));
+			return this;
+		}
+		
+		protected FixedBuildBuilder add(TechType techType, boolean blocking) {
+			add(new BuildOrderItem(new MetaType(techType), SeedPositionStrategy.MainBaseLocation, 0, blocking, -1));
 			return this;
 		}
 
