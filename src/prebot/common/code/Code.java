@@ -42,5 +42,9 @@ public class Code {
 	public enum WorkerJob {
 		MINERALS, GAS, BUILD, COMBAT, IDLE, REPAIR, MOVE, DEFAULT
 	};
+	
+	public enum GameMap {
+		UNKNOWN, FIGHTING_SPRIRITS
+	}
 
 }

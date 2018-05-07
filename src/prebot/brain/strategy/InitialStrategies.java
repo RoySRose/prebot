@@ -2,28 +2,39 @@ package prebot.brain.strategy;
 
 import bwapi.TechType;
 import bwapi.UnitType;
+import prebot.brain.Info;
 import prebot.brain.knowledge.inerrableaction.InerrableInitials;
 import prebot.brain.squad.DefaultSquads;
 import prebot.brain.squad.NewSquads;
+import prebot.common.util.HardCodePositionUtils;
+import prebot.common.util.internal.HardCodeInfo;
 
 public class InitialStrategies {
 
 	public static final class InitialStrategyForProtoss extends FixedStrategy {
 		public InitialStrategyForProtoss() {
+			HardCodeInfo hardCodeInfo = HardCodePositionUtils.getHardCodeInfo(Info.of().myBase.getPosition());
+			
 			buildItemList = new FixedBuildBuilder().
-					add(UnitType.Terran_SCV, true).times(9).
-					add(UnitType.Terran_Supply_Depot, false).
+					add(UnitType.Terran_Command_Center, true).
+					add(UnitType.Terran_SCV, true).times(8).
+					add(UnitType.Terran_SCV, false).times(1).
+					add(UnitType.Terran_Supply_Depot, false, hardCodeInfo.firstDepotTile).
 					add(UnitType.Terran_SCV, false).times(2).
-					add(UnitType.Terran_Barracks, true).
+					add(UnitType.Terran_Barracks, true, hardCodeInfo.firstBarracksTile).
 					add(UnitType.Terran_SCV, false).times(1).
 					add(UnitType.Terran_Refinery, true).
 					add(UnitType.Terran_SCV, false).times(3).
-					add(UnitType.Terran_Factory, true).
-					add(UnitType.Terran_Marine, true).
-					add(UnitType.Terran_Supply_Depot, true).
-					add(UnitType.Terran_SCV, true).times(3).
-					add(UnitType.Terran_Vulture, true).
+					add(UnitType.Terran_Marine, false).
+					add(UnitType.Terran_Factory, true, hardCodeInfo.firstFactoryTile).
+					add(UnitType.Terran_Supply_Depot, true, hardCodeInfo.secondDepotTile).
+					add(UnitType.Terran_Marine, false).times(3).
+					add(UnitType.Terran_SCV, false).times(4).
 					add(UnitType.Terran_Machine_Shop, true).
+					add(UnitType.Terran_Command_Center, false).
+					add(UnitType.Terran_Siege_Tank_Tank_Mode, true).
+					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_SCV, false).times(2).
 					build();
 			
 			actionList.add(new InerrableInitials.MechanicGasAdjustment());
@@ -39,18 +50,21 @@ public class InitialStrategies {
 	
 	public static final class InitialStrategyForZerg extends FixedStrategy {
 		public InitialStrategyForZerg() {
+			HardCodeInfo hardCodeInfo = HardCodePositionUtils.getHardCodeInfo(Info.of().myBase.getPosition());
+			
 			buildItemList = new FixedBuildBuilder().
+					add(UnitType.Terran_Command_Center, true).
 					add(UnitType.Terran_SCV, true).times(8).
-					add(UnitType.Terran_Barracks, true).
+					add(UnitType.Terran_Barracks, true, hardCodeInfo.firstBarracksTile).
 					add(UnitType.Terran_SCV, true).times(1).
-					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_Supply_Depot, true, hardCodeInfo.firstDepotTile).
 					add(UnitType.Terran_SCV, true).times(2).
 					add(UnitType.Terran_Refinery, false).
 					add(UnitType.Terran_Marine, false).times(3).
 					add(UnitType.Terran_SCV, false).times(2).
-					add(UnitType.Terran_Factory, true).
+					add(UnitType.Terran_Factory, true, hardCodeInfo.firstFactoryTile).
 					add(UnitType.Terran_Marine, false).times(1).
-					add(UnitType.Terran_Supply_Depot, true).
+					add(UnitType.Terran_Supply_Depot, true, hardCodeInfo.secondDepotTile).
 					add(UnitType.Terran_SCV, false).times(4).
 					add(UnitType.Terran_Vulture, true).times(1).
 					add(UnitType.Terran_Starport, true).
@@ -83,30 +97,7 @@ public class InitialStrategies {
 	
 	public static final class InitialStrategyForRandom extends FixedStrategy {
 		public InitialStrategyForRandom() {
-			buildItemList = new FixedBuildBuilder().
-					add(UnitType.Terran_SCV, false).times(8).
-					add(UnitType.Terran_Supply_Depot, true).
-					add(UnitType.Terran_SCV, false).times(2).
-					add(UnitType.Terran_Barracks, true).
-					add(UnitType.Terran_SCV, false).times(1).
-					add(UnitType.Terran_Refinery, true).
-					add(UnitType.Terran_SCV, false).times(3).
-					add(UnitType.Terran_Marine, true).
-					add(UnitType.Terran_Supply_Depot, true).
-					add(UnitType.Terran_Factory, true).
-					add(UnitType.Terran_SCV, true).times(3).
-					add(UnitType.Terran_Vulture, true).
-					add(UnitType.Terran_Machine_Shop, true).
-					build();
-			
-			actionList.add(new InerrableInitials.MechanicGasAdjustment());
-			actionList.add(new InerrableInitials.ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0, 1));
-			actionList.add(new InerrableInitials.UsePrebot1BuildStrategy());
-			
-			squadList.add(new DefaultSquads.MainDefenseSquad());
-			squadList.add(new DefaultSquads.WatcherSquad());
-			squadList.add(new DefaultSquads.CheckerSquad());
-			squadList.add(new NewSquads.ScvScoutSquad());
+			// TODO initial build for terran
 		}
 	}
 }

@@ -89,13 +89,13 @@ public class ScvScout extends Control {
 	}
 
 	private Position getScoutFleePositionFromEnemyRegionVertices(Unit scoutWorker) {
-		BaseLocation enemyBase = Info.of().mainBaseLocations.get(Prebot.Game.enemy());
+		BaseLocation enemyBase = Info.of().enemyBase;
 		
 		// calculate enemy region vertices if we haven't yet
-		Vector<Position> regionVertices = Info.of().baseRegionVerticesMap.get(enemyBase);
+		Vector<Position> regionVertices = Info.of().baseRegionVerticesMap.get(enemyBase.getPosition());
 		if (regionVertices == null || regionVertices.isEmpty()) {
 			InformationManager.Instance().calculateEnemyRegionVertices(enemyBase);
-			regionVertices = Info.of().baseRegionVerticesMap.get(enemyBase);
+			regionVertices = Info.of().baseRegionVerticesMap.get(enemyBase.getPosition());
 		}
 		
 		if (regionVertices.isEmpty()) {

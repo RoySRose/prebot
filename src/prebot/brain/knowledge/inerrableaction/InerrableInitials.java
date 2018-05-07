@@ -22,7 +22,7 @@ public class InerrableInitials {
 	public static final class MechanicGasAdjustment extends InerrableActionKnowledge {
 		@Override
 		protected boolean doSomething() {
-			if (TimeUtils.elapsedMiniutes() > 4 || UnitUtils.getUnitCount(UnitType.Terran_Command_Center, UnitFindRange.ALL) >= 2) {
+			if (TimeUtils.elapsedSeconds() > 210 || UnitUtils.getUnitCount(UnitType.Terran_Command_Center, UnitFindRange.ALL) >= 2) {
 				Idea.of().gasAdjustment = false;
 				Idea.of().gasAdjustmentWorkerCount = 0;
 				return false;

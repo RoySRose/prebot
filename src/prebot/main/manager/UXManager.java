@@ -857,6 +857,12 @@ public class UXManager {
 	public void drawUnitIdOnMap() {
 		for (Unit unit : Prebot.Game.self().getUnits()) {
 			Prebot.Game.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
+			if (unit.getType().isBuilding()) {
+				int tileX = unit.getTilePosition().getX();
+				int tileY = unit.getTilePosition().getY();
+				
+				Prebot.Game.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() - 5, "" + white + "Tile: " + tileX + ", " + tileY);
+			}
 		}
 		for (Unit unit : Prebot.Game.enemy().getUnits()) {
 			Prebot.Game.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());

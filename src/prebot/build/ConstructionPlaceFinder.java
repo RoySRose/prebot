@@ -96,7 +96,6 @@ public class ConstructionPlaceFinder {
 	/// seedPosition 주위에서 가능한 곳을 선정하거나, seedPositionStrategy 에 따라 지형 분석결과 해당 지점 주위에서 가능한 곳을 선정합니다<br>
 	/// seedPosition, seedPositionStrategy 을 입력하지 않으면, MainBaseLocation 주위에서 가능한 곳을 리턴합니다
 	public final TilePosition getBuildLocationWithSeedPositionAndStrategy(UnitType buildingType, TilePosition seedTilePosition, SeedPositionStrategy seedPositionStrategy) {
-		
 		if (seedTilePosition != TilePosition.None && seedTilePosition.isValid()) {
 			// seedPosition 을 입력한 경우 그 근처에서 찾는다
 			return getBuildLocationNear(buildingType, seedTilePosition);
@@ -236,16 +235,7 @@ public class ConstructionPlaceFinder {
 	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (다른 유닛들이 자리에 있어서, Pylon, Creep, 건물지을 타일 공간이 전혀 없는 경우 등)
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition) {
 		if (buildingType.isRefinery()) {
-			// std::cout << "getRefineryPositionNear "<< std::endl;
-
 			return getRefineryPositionNear(desiredPosition);
-		}
-
-		if (Prebot.Game.self().getRace() == Race.Protoss) {
-			// special easy case of having no pylons
-			if (buildingType.requiresPsi() && Prebot.Game.self().completedUnitCount(UnitType.Protoss_Pylon) == 0) {
-				return TilePosition.None;
-			}
 		}
 
 		if (desiredPosition == TilePosition.None || desiredPosition == TilePosition.Unknown || desiredPosition == TilePosition.Invalid || desiredPosition.isValid() == false) {
@@ -266,15 +256,15 @@ public class ConstructionPlaceFinder {
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
 			buildingGapSpace = Config.BUILDING_RESOUECE_DEPOT_SPACING;
-		} else if (buildingType == UnitType.Protoss_Pylon) {
-			int numPylons = Prebot.Game.self().completedUnitCount(UnitType.Protoss_Pylon);
-
-			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
-			if (numPylons < 3) {
-				buildingGapSpace = Config.BULDING_PYLON_EARLY_STAGE_SPACING;
-			} else {
-				buildingGapSpace = Config.BUILDING_PYLON_SPACING;
-			}
+//		} else if (buildingType == UnitType.Protoss_Pylon) {
+//			int numPylons = Prebot.Game.self().completedUnitCount(UnitType.Protoss_Pylon);
+//
+//			// Protoss_Pylon 은 특히 최초 2개 건설할때는 Config::Macro::BuildingPylonEarlyStageSpacing 값으로 설정한다
+//			if (numPylons < 3) {
+//				buildingGapSpace = Config.BULDING_PYLON_EARLY_STAGE_SPACING;
+//			} else {
+//				buildingGapSpace = Config.BUILDING_PYLON_SPACING;
+//			}
 		} else if (buildingType == UnitType.Terran_Supply_Depot) {
 			buildingGapSpace = Config.BUILDING_SUPPLYDEPOT_SPACING;
 		} else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker || buildingType == UnitType.Terran_Missile_Turret

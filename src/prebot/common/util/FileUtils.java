@@ -8,13 +8,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import prebot.common.code.ConfigForDebug.BOT_INFO;
-
 public class FileUtils {
 	
-	public static final String LOG_FILE_NAME = BOT_INFO.BOT_NAME + "_LastGameLog.dat"; /// 로그 파일 이름
-	public static final String READ_DIRECTORY = "bwapi-data\\read\\"; /// 읽기 파일 경로
-	public static final String WRITE_DIRECTORY = "bwapi-data\\write\\"; /// 쓰기 파일 경로
+//	public static final String LOG_FILE_NAME = BOT_INFO.BOT_NAME + "_LastGameLog.dat"; /// 로그 파일 이름
+	private static final String READ_DIRECTORY = "bwapi-data\\read\\"; /// 읽기 파일 경로
+	private static final String WRITE_DIRECTORY = "bwapi-data\\write\\"; /// 쓰기 파일 경로
 
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// appendTextToFile 등 메소드를 static 으로 수정
@@ -22,7 +20,7 @@ public class FileUtils {
 	/// 로그 유틸
 	public static void appendTextToFile(final String logFile, final String msg) {
 		try {
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(logFile), true));
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(WRITE_DIRECTORY + logFile), true));
 			bos.write(msg.getBytes());
 			bos.flush();
 			bos.close();
@@ -36,7 +34,7 @@ public class FileUtils {
 	/// 로그 유틸
 	public static void overwriteToFile(final String logFile, final String msg) {
 		try {
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(logFile)));
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(WRITE_DIRECTORY + logFile)));
 			bos.write(msg.getBytes());
 			bos.flush();
 			bos.close();
@@ -52,7 +50,7 @@ public class FileUtils {
 		BufferedInputStream bis;
 		StringBuilder sb = null;
 		try {
-			bis = new BufferedInputStream(new FileInputStream(new File(filename)));
+			bis = new BufferedInputStream(new FileInputStream(new File(READ_DIRECTORY + filename)));
 			sb = new StringBuilder();
 
 			while (bis.available() > 0) {

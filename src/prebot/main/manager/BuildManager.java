@@ -603,43 +603,6 @@ public class BuildManager extends GameManager {
 				// isDeadlockCase = true;
 			}
 
-			// Pylon 이 해당 지역 주위에 먼저 지어져야 하는데, Pylon 이 해당 지역 주위에 없고, 예정되어있지도 않으면 dead lock
-			if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresPsi()
-					&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
-
-				boolean hasFoundPylon = false;
-				List<Unit> ourUnits = Prebot.Game.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
-
-				for (Unit u : ourUnits) {
-					if (u.getPlayer() == Prebot.Game.self() && u.getType() == UnitType.Protoss_Pylon) {
-						hasFoundPylon = true;
-					}
-				}
-
-				if (hasFoundPylon == false) {
-					isDeadlockCase = true;
-				}
-			}
-
-			// Creep 이 해당 지역 주위에 Hatchery나 Creep Colony 등을 통해 먼저 지어져야 하는데, 해당 지역 주위에 지어지지 않고 있으면 dead lock
-			if (!isDeadlockCase && unitType.isBuilding() && unitType.requiresCreep()
-					&& currentItem.seedLocationStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
-				boolean hasFoundCreepGenerator = false;
-				List<Unit> ourUnits = Prebot.Game.getUnitsInRadius(currentItem.seedLocation.toPosition(), 4 * Config.TILE_SIZE);
-
-				for (Unit u : ourUnits) {
-					if (u.getPlayer() == Prebot.Game.self()
-							&& (u.getType() == UnitType.Zerg_Hatchery || u.getType() == UnitType.Zerg_Lair || u.getType() == UnitType.Zerg_Hive
-									|| u.getType() == UnitType.Zerg_Creep_Colony || u.getType() == UnitType.Zerg_Sunken_Colony || u.getType() == UnitType.Zerg_Spore_Colony)) {
-						hasFoundCreepGenerator = true;
-					}
-				}
-
-				if (hasFoundCreepGenerator == false) {
-					isDeadlockCase = true;
-				}
-			}
-
 		}
 		// 테크의 경우, 해당 리서치를 이미 했거나, 이미 하고있거나, 리서치를 하는 건물 및 선행건물이 존재하지않고
 		// 건설예정이지도 않으면 dead lock

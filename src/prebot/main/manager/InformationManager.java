@@ -21,6 +21,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.brain.Info;
+import prebot.common.code.Code.GameMap;
 import prebot.common.code.ConfigForDebug.UX;
 import prebot.common.util.MapTools;
 import prebot.common.util.internal.UnitCache;
@@ -39,6 +40,7 @@ public class InformationManager extends GameManager {
 		return info;
 	}
 
+	public GameMap gameMap;
 	public Player selfPlayer; /// < 아군 Player
 	public Player enemyPlayer; /// < 아군 Player의 종족
 	public Race selfRace; /// < 적군 Player
@@ -68,7 +70,7 @@ public class InformationManager extends GameManager {
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
 	/// base location의 꼭지점 (정찰시 활용)
-	private Map<BaseLocation, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
+	private Map<Position, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
 	
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
@@ -79,6 +81,7 @@ public class InformationManager extends GameManager {
 	}
 
 	public InformationManager() {
+		gameMap = gameMap();
 		selfPlayer = Prebot.Game.self();
 		enemyPlayer = Prebot.Game.enemy();
 		selfRace = selfPlayer.getRace();
@@ -114,13 +117,26 @@ public class InformationManager extends GameManager {
 		updateBaseRegionVerticesMap();
 	}
 
+	private GameMap gameMap() {
+		String mapName = Prebot.Game.mapFileName().toUpperCase();
+
+		if (mapName.matches(".*HUNT.*")) {
+			return GameMap.UNKNOWN;
+		} else if (mapName.matches(".*LOST.*") || mapName.matches(".*TEMPLE.*")) {
+			return GameMap.UNKNOWN;
+		} else if (mapName.matches(".*FIGHT.*") || mapName.matches(".*SPIRIT.*")) {
+			return GameMap.FIGHTING_SPRIRITS;
+		} else {
+			return GameMap.UNKNOWN;
+		}
+	}
+
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public GameManager update() {
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (Prebot.Game.getFrameCount() % 120 == 0) {
-			updateBaseLocationInfo();
-		}
+//		if (Prebot.Game.getFrameCount() % 120 == 0) {
+		updateBaseLocationInfo();
 		UnitCache.getCurrentCache().updateCache();
 		this.setInfo();
 		return this;
@@ -133,15 +149,21 @@ public class InformationManager extends GameManager {
 	}
 
 	private void setInfo() {
-		info.mainBaseLocations = mainBaseLocations;
-		info.mainBaseLocationChanged = mainBaseLocationChanged;
-		info.occupiedBaseLocations = occupiedBaseLocations;
-		info.occupiedRegions = occupiedRegions;
-		info.firstChokePoint = firstChokePoint;
-		info.firstExpansionLocation = firstExpansionLocation;
-		info.secondChokePoint = secondChokePoint;
-		info.unitData = unitData;
-		
+		info.gameMap = gameMap;
+		info.myBase = mainBaseLocations.get(selfPlayer);
+		info.enemyBase = mainBaseLocations.get(enemyPlayer);
+		info.myOccupiedBases = occupiedBaseLocations.get(selfPlayer);
+		info.enemyOccupiedBases = occupiedBaseLocations.get(enemyPlayer);
+		info.myOccupiedRegions = occupiedRegions.get(selfPlayer);
+		info.enemyOccupiedRegions = occupiedRegions.get(enemyPlayer);
+		info.myFirstChoke = firstChokePoint.get(selfPlayer);
+		info.enemyFirstChoke = firstChokePoint.get(enemyPlayer);
+		info.mySecondChoke = secondChokePoint.get(selfPlayer);
+		info.enemySecondChoke = secondChokePoint.get(enemyPlayer);
+		info.myFirstExpansionBase = firstExpansionLocation.get(selfPlayer);
+		info.enemyFirstExpansionBase = firstExpansionLocation.get(enemyPlayer);
+		info.myUnitData = unitData.get(selfPlayer);
+		info.enemyUnitData = unitData.get(enemyPlayer);
 		info.baseRegionVerticesMap = baseRegionVerticesMap;
 	}
 
@@ -268,7 +290,7 @@ public class InformationManager extends GameManager {
 		}
 
 		regionVertices = sortedVertices;
-		baseRegionVerticesMap.put(base, regionVertices);
+		baseRegionVerticesMap.put(base.getPosition(), regionVertices);
 	}
 	
 
