@@ -39,6 +39,7 @@ public class WorkerManager extends GameManager {
 		// return;
 
 		updateWorkerStatus();
+		updatework();
 		handleGasWorkers();
 		handleIdleWorkers();
 		handleMoveWorkers();
@@ -90,6 +91,43 @@ public class WorkerManager extends GameManager {
 		}
 	}
 
+	private void updatework() {
+		
+		for (Unit worker : workerData.getWorkers())
+		{
+			/*if(workerData.getWorkerJob(worker) == WorkerJob.SCOUT){
+				continue;
+			}*/
+			if(workerData.getWorkerJob(worker) == WorkerJob.COMBAT){
+				continue;
+			}
+			if (!worker.isCompleted())
+			{
+				continue;
+			}
+			//workerMineralMap = new HashMap<Integer, Unit>();
+			
+			if(worker.isGatheringMinerals()){
+				Unit tempMineral = workerData.getWorkerMineralAssignMent(worker);
+				if(tempMineral == null)
+					continue;
+				int planGetMineral = tempMineral.getID();
+				
+				int realGetMineral = 0;
+				if(worker.getOrderTarget() != null){
+					realGetMineral = worker.getOrderTarget().getID();
+				}
+				if(worker.isCarryingMinerals() == true || worker.getOrderTarget()  == null){
+					continue;
+				}
+				if(planGetMineral != realGetMineral){
+					worker.gather(tempMineral);
+					realGetMineral = worker.getOrderTarget().getID();
+				}
+			}
+		}	
+	}
+	
 	public void handleGasWorkers() {
 		// for each unit we have
 		for (Unit unit : Prebot.Game.self().getUnits()) {

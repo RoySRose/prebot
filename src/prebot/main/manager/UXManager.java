@@ -22,6 +22,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
+import prebot.brain.squad.Squad;
 import prebot.build.BuildOrderItem;
 import prebot.build.ConstructionPlaceFinder;
 import prebot.build.ConstructionTask;
@@ -67,6 +68,8 @@ public class UXManager {
 
 	private static UXManager instance = new UXManager();
 
+	private String[][] squadInfo = {{"ScvScoutSquad","WatcherSquad","MainDefenseSquad","CheckerSquad"},
+									{"Orange","Blue","Red","Green"}};
 	/// static singleton 객체를 리턴합니다
 	public static UXManager Instance() {
 		return instance;
@@ -93,6 +96,9 @@ public class UXManager {
 			
 		} else if (displayOption == 1) {
 			drawManagerTimeSpent(500, 220);
+		} else if (displayOption == 2) {
+			drawSquadOnMap();
+			drawSquadInfoOnMap(10,150);
 		} else {
 			drawDefault();
 		}
@@ -1052,6 +1058,38 @@ public class UXManager {
 				drawColor = red;
 			}
 			Prebot.Game.drawTextScreen(x + 103, currentY, ": " + drawColor + gameManager.getRecorded());
+		}
+	}
+	
+	private void drawSquadInfoOnMap(int x, int y) {
+		// TODO Auto-generated method stub
+		/// ConstructionQueue 를 Screen 에 표시합니다
+		Prebot.Game.drawTextScreen(x, y, white + " <Squad Name>");
+		Prebot.Game.drawTextScreen(x +100, y, white + " <Color>");
+		for (int i = 0; i < squadInfo[0].length; i++) {
+			Prebot.Game.drawTextScreen(x, y + 10, "" + white + squadInfo[0][i]);
+			Prebot.Game.drawTextScreen(x +100, y + 10, "" + white + squadInfo[1][i]);
+			y+=10;
+		}
+	}
+
+	private void drawSquadOnMap() {
+		// TODO Auto-generated method stub
+		// draw neutral units and our units
+		for (Unit unit : Prebot.Game.self().getUnits()) {
+			for (Squad sqaudName : CombatManager.Instance().squadData.squadMap.values()) {
+				if (sqaudName.hasUnit(unit)) {
+					if(sqaudName.getName().contains("ScvScoutSquad")){
+						Prebot.Game.drawCircleMap(unit.getPosition(), 20, Color.Orange);
+					}else if(sqaudName.getName().contains("WatcherSquad")){
+						Prebot.Game.drawCircleMap(unit.getPosition(), 20, Color.Blue);
+					}else if(sqaudName.getName().contains("MainDefenseSquad")){
+						Prebot.Game.drawCircleMap(unit.getPosition(), 20, Color.Red);
+					}else if(sqaudName.getName().contains("CheckerSquad")){
+						Prebot.Game.drawCircleMap(unit.getPosition(), 20, Color.Green);
+					}
+				}
+			}
 		}
 	}
 	

@@ -616,4 +616,9 @@ public class WorkerData {
 			return 'O';
 		return 'X';
 	}
+	
+	public Unit getWorkerMineralAssignMent(Unit worker) {
+		// TODO Auto-generated method stub
+		return workerMineralAssignment.get(worker.getID());
+	}
 }
