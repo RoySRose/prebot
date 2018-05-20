@@ -12,12 +12,12 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.brain.Idea;
 import prebot.brain.Info;
+import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.main.Prebot;
-import prebot.main.manager.InformationManager;
 
 public class ScvScout extends Control {
 
@@ -38,8 +38,8 @@ public class ScvScout extends Control {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Game.enemy());
 		if (enemyBaseLocation == null) {
 			BaseLocation scoutBaseLocation; 
-			if (Idea.of().enemeyExpectedBase != null) {
-				scoutBaseLocation = Idea.of().enemeyExpectedBase;
+			if (Idea.of().enemeyBaseExpected != null) {
+				scoutBaseLocation = Idea.of().enemeyBaseExpected;
 			} else {
 				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
 				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);

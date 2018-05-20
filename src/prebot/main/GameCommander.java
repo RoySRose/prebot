@@ -8,17 +8,17 @@ import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
-import prebot.chat.ChatBot;
+import prebot.brain.manager.InformationManager;
+import prebot.brain.manager.StrategyManager;
+import prebot.build.manager.BuildManager;
+import prebot.build.manager.ConstructionManager;
+import prebot.build.manager.TestManager;
+import prebot.common.chat.ChatBot;
 import prebot.common.code.ConfigForDebug.DEBUG;
 import prebot.common.util.MapTools;
 import prebot.common.util.PlayerUtils;
-import prebot.main.manager.BuildManager;
-import prebot.main.manager.CombatManager;
-import prebot.main.manager.ConstructionManager;
-import prebot.main.manager.GameManager;
-import prebot.main.manager.InformationManager;
-import prebot.main.manager.StrategyManager;
-import prebot.main.manager.WorkerManager;
+import prebot.micro.manager.CombatManager;
+import prebot.micro.manager.WorkerManager;
 
 /// 실제 봇프로그램의 본체가 되는 class<br>
 /// 스타크래프트 경기 도중 발생하는 이벤트들이 적절하게 처리되도록 해당 Manager 객체에게 이벤트를 전달하는 관리자 Controller 역할을 합니다
@@ -48,6 +48,7 @@ public class GameCommander {
 		}
 
 		StrategyManager.Instance().onStart();
+		CombatManager.Instance().onStart();
 		MapTools.init();
 		
 		InformationManager.Instance().setStopWatchTag("InformationManager");
@@ -78,6 +79,7 @@ public class GameCommander {
 //		MapGrid.Instance().update(); // 사용이 필요할 경우 주석 해제
 		
 		// 자원 사용
+		TestManager.Instance().start().update();
 		BuildManager.Instance().start().update().end();
 		ConstructionManager.Instance().start().update().end();
 		

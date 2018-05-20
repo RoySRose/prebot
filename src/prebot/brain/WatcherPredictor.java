@@ -8,13 +8,13 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
+import prebot.brain.information.UnitInfo;
+import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.WatcherPredictResult;
 import prebot.common.code.ConfigForMicro.Flee;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
-import prebot.information.UnitInfo;
-import prebot.main.manager.InformationManager;
 
 /** @author insaneojw
  *  */

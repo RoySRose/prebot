@@ -3,7 +3,7 @@ package prebot.common.util;
 import bwapi.Player;
 import bwapi.Position;
 import bwta.BaseLocation;
-import prebot.main.manager.InformationManager;
+import prebot.brain.manager.InformationManager;
 
 /**
  * @author insaneojw

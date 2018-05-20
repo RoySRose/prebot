@@ -3,7 +3,7 @@ package prebot.micro.control;
 import java.util.List;
 
 import bwapi.Unit;
-import prebot.information.UnitInfo;
+import prebot.brain.information.UnitInfo;
 
 public abstract class Control {
 	public List<Unit> unitList;

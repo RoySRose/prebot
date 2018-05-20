@@ -9,6 +9,10 @@ public abstract class Knowledge {
 
 	private KnowlegeStatus status = KnowlegeStatus.WAITING;
 
+	public KnowlegeStatus getStatus() {
+		return status;
+	}
+
 	public boolean learning() {
 		if (status == KnowlegeStatus.WAITING) {
 			return waiting();

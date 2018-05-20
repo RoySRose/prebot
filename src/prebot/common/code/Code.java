@@ -26,25 +26,29 @@ public class Code {
 		CERTAINLY, MAYBE, DISCARD
 	}
 
-	public enum WatcherPredictResult {
+	public static enum WatcherPredictResult {
 		BACK, ATTACK
 	}
 
-	public enum KnowlegeStatus {
+	public static enum KnowlegeStatus {
 		WAITING, VERIFING, PROVED_TRUE, PROVED_FALSE, WRITE_FILE, ENDED
 	}
 
-	public enum KnowledgeActionEvaluation {
+	public static enum KnowledgeActionEvaluation {
 		DONT_KNOW, GOOD_ACTION, BAD_ACTION
 	}
 
 	/// 일꾼 유닛에게 지정하는 임무의 종류
-	public enum WorkerJob {
+	public static enum WorkerJob {
 		MINERALS, GAS, BUILD, COMBAT, IDLE, REPAIR, MOVE, DEFAULT
 	};
 	
-	public enum GameMap {
+	/// 맵
+	public static enum GameMap {
 		UNKNOWN, FIGHTING_SPRIRITS
 	}
-
+	
+	public static enum InitialBuildType {
+		ONE_FACTORY_MULTI, FAST_BARRACKS_ONE_FACOTRY_MULTI, TWO_FACTORY_MULTI;
+	}
 }

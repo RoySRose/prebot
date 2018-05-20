@@ -6,9 +6,9 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.code.Code.PlayerRange;
+import prebot.brain.information.UnitInfo;
 import prebot.common.code.GameConstant;
 import prebot.common.util.UnitUtils;
-import prebot.information.UnitInfo;
 
 public class TargetScoreCalculator {
 

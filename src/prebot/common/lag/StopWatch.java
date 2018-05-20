@@ -8,7 +8,7 @@ import prebot.main.Prebot;
  * @author insaneojw
  */
 public class StopWatch {
-	private static final long DEFAULT_WARN_DURATION = 10;
+	private static final long DEFAULT_WARN_DURATION = 30;
 
 	private String tag;
 	private boolean isMicroTimeTest; // 15.625ms == 15625000nanoseconds

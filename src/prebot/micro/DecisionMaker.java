@@ -5,9 +5,9 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.brain.information.UnitInfo;
 import prebot.common.code.ConfigForMicro.Flee;
 import prebot.common.util.UnitUtils;
-import prebot.information.UnitInfo;
 import prebot.main.Prebot;
 
 public class DecisionMaker {

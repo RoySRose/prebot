@@ -12,12 +12,12 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import prebot.brain.manager.InformationManager;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.code.Config;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.main.Prebot;
-import prebot.main.manager.InformationManager;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {
@@ -96,6 +96,7 @@ public class ConstructionPlaceFinder {
 	/// seedPosition 주위에서 가능한 곳을 선정하거나, seedPositionStrategy 에 따라 지형 분석결과 해당 지점 주위에서 가능한 곳을 선정합니다<br>
 	/// seedPosition, seedPositionStrategy 을 입력하지 않으면, MainBaseLocation 주위에서 가능한 곳을 리턴합니다
 	public final TilePosition getBuildLocationWithSeedPositionAndStrategy(UnitType buildingType, TilePosition seedTilePosition, SeedPositionStrategy seedPositionStrategy) {
+		
 		if (seedTilePosition != TilePosition.None && seedTilePosition.isValid()) {
 			// seedPosition 을 입력한 경우 그 근처에서 찾는다
 			return getBuildLocationNear(buildingType, seedTilePosition);

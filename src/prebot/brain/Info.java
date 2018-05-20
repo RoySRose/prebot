@@ -10,9 +10,9 @@ import bwapi.Position;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.brain.information.UnitData;
+import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.GameMap;
-import prebot.information.UnitData;
-import prebot.main.manager.InformationManager;
 
 public class Info {
 	public static Info of() {

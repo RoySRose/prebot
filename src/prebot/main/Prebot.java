@@ -11,7 +11,6 @@ import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
 import prebot.common.code.ConfigForDebug.DEBUG;
-import prebot.main.manager.UXManager;
 
 public class Prebot extends DefaultBWListener {
 
@@ -57,6 +56,10 @@ public class Prebot extends DefaultBWListener {
 		System.out.println("Map analyzing finished");
 
 		gameCommander.onStart();
+		
+		if (DEBUG.isDebugMode) {
+			UXManager.Instance().onStart();
+		}
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다

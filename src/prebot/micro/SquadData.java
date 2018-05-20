@@ -5,8 +5,8 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.brain.squad.Squad;
-import prebot.main.manager.WorkerManager;
+import prebot.micro.manager.WorkerManager;
+import prebot.micro.squad.Squad;
 
 public class SquadData {
 

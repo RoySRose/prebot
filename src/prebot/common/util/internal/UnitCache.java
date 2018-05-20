@@ -8,12 +8,12 @@ import java.util.Vector;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.brain.information.UnitData;
+import prebot.brain.information.UnitInfo;
+import prebot.brain.manager.InformationManager;
 import prebot.build.ConstructionTask;
-import prebot.information.UnitData;
-import prebot.information.UnitInfo;
+import prebot.build.manager.ConstructionManager;
 import prebot.main.Prebot;
-import prebot.main.manager.ConstructionManager;
-import prebot.main.manager.InformationManager;
 
 /// 유닛 리스트를 부하가 걸리지 않도록 관리
 public class UnitCache {

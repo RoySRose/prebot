@@ -1,7 +1,7 @@
 package prebot.micro;
 
 import bwapi.Unit;
-import prebot.information.UnitInfo;
+import prebot.brain.information.UnitInfo;
 
 public class Decision {
 

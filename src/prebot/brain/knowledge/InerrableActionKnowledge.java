@@ -5,35 +5,35 @@ import prebot.common.code.Code.KnowledgeActionEvaluation;
 public abstract class InerrableActionKnowledge extends ActionKnowledge {
 
 	@Override
-	protected void prevent() {}
+	protected final void prevent() {}
 
 	@Override
-	protected boolean doSomeOtherthing() {
+	protected final boolean doSomeOtherthing() {
 		return false;
 	}
 
 	@Override
-	protected KnowledgeActionEvaluation evaulateAction() {
+	protected final KnowledgeActionEvaluation evaulateAction() {
 		return KnowledgeActionEvaluation.GOOD_ACTION;
 	}
 
 	@Override
-	public boolean notOccured() {
+	public final boolean notOccured() {
 		return false;
 	}
 
 	@Override
-	public boolean occured() {
+	public final boolean occured() {
 		return true;
 	}
 
 	@Override
-	public boolean foundCertainProof() {
+	public final boolean foundCertainProof() {
 		return true;
 	}
 
 	@Override
-	public boolean foundCertainDisproof() {
+	public final boolean foundCertainDisproof() {
 		return false;
 	}
 }
