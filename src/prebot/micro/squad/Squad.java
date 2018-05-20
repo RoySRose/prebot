@@ -14,8 +14,9 @@ public abstract class Squad {
 		return getClass().getSimpleName();
 	}
 
-	public int priority;
-	public int squadRadius;
+	private int priority;
+	private int squadRadius;
+	private boolean activated;
 	
 	public List<Unit> unitList = new ArrayList<>();
 	public List<UnitInfo> euiList = new ArrayList<>();
@@ -27,6 +28,23 @@ public abstract class Squad {
 	public Squad(int priority, int squadRadius) {
 		this.priority = priority;
 		this.squadRadius = squadRadius;
+		this.activated = false;
+	}
+	
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
 	}
 
 	public void addUnit(Unit unit) {

@@ -11,7 +11,6 @@ import bwta.BaseLocation;
 import prebot.brain.knowledge.Knowledge;
 import prebot.brain.manager.StrategyManager;
 import prebot.brain.stratgy.enemy.EnemyBuild;
-import prebot.build.temp.strategy.Strategy;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.InitialBuildType;
 
@@ -20,18 +19,16 @@ public class Idea {
 		return StrategyManager.Instance().getIdea();
 	}
 
-	// Common
+	// Strategy
 	public List<Knowledge> newKnowledgeList = new ArrayList<>();
-	public BaseLocation enemeyBaseExpected = null;
-	public Strategy strategy = null;
 	public List<EnemyBuild> enemyBuildList = new ArrayList<>();
+
 	
 	// Build & Construction
-	
 	/**
 	 * 초반빌드 타입
 	 */
-	public InitialBuildType initialBuildType = null;
+	public InitialBuildType initialBuildType = InitialBuildType.NONE;
 	
 	/**
 	 * 초반빌드 종료 후 팩토리 유닛 비율
@@ -71,11 +68,7 @@ public class Idea {
 	public Position campPosition = null;
 	public Position attackPosition = null;
 	
-	
-		
-	
-	public static void main(String[] ar) {
-		
-	}
+	// Worker & Combat
+	public BaseLocation enemeyBaseExpected = null;
 
 }

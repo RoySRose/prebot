@@ -1,5 +1,5 @@
 
-package prebot.main;
+package prebot.common.main;
 
 import bwapi.DefaultBWListener;
 import bwapi.Game;

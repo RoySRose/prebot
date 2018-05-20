@@ -7,8 +7,8 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.brain.information.UnitInfo;
 import prebot.common.code.ConfigForMicro.Flee;
+import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.main.Prebot;
 
 public class DecisionMaker {
 	

@@ -9,9 +9,9 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.code.Code.WorkerJob;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.Prebot;
 
 public class WorkerData {
 

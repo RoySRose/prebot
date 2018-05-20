@@ -7,7 +7,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 public class DistanceMap {
 

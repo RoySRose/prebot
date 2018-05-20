@@ -1,7 +1,7 @@
 package prebot.common.util;
 
 import bwapi.Unit;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 public class TimeUtils {
 	

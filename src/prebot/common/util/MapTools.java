@@ -6,8 +6,8 @@ import java.util.Vector;
 
 import bwapi.Position;
 import bwapi.TilePosition;
+import prebot.common.main.Prebot;
 import prebot.common.util.internal.DistanceMap;
-import prebot.main.Prebot;
 
 /// provides useful tools for analyzing the starcraft map<br>
 /// calculates connectivity and distances using flood fills

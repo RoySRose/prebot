@@ -13,12 +13,12 @@ import prebot.brain.history.History;
 import prebot.brain.history.HistoryFrame;
 import prebot.brain.knowledge.Knowledge;
 import prebot.brain.knowledge.impl.inerrableaction.FindInitialStrategy;
-import prebot.brain.knowledge.impl.inerrableaction.UsePrebot1BuildStrategy;
+import prebot.common.code.Code.InitialBuildType;
+import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.internal.UnitCache;
-import prebot.main.GameManager;
-import prebot.main.Prebot;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
@@ -46,7 +46,6 @@ public class StrategyManager extends GameManager {
 
 	public StrategyManager() {
 		knowledgeList.add(new FindInitialStrategy());
-		knowledgeList.add(new UsePrebot1BuildStrategy());
 	}
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
@@ -84,6 +83,9 @@ public class StrategyManager extends GameManager {
 		if (idea == null) {
 			idea = new Idea();
 		}
+		
+		this.resfreshIdea();
+		
 		knowledgeList.addAll(idea.newKnowledgeList);
 		idea.newKnowledgeList.clear();
 		
@@ -92,6 +94,15 @@ public class StrategyManager extends GameManager {
 		}
 		
 		this.setDummyIdea();
+	}
+	
+	/**
+	 * 한번 사용 후에 갱신되어야 하는 Idea 정보 처리
+	 */
+	private void resfreshIdea() {
+		idea.initialBuildType = InitialBuildType.NONE;
+		idea.gasAdjustment = false;
+		idea.assignScvScout = false;
 	}
 
 	private void setDummyIdea() {

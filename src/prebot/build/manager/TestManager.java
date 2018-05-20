@@ -13,11 +13,11 @@ import prebot.build.BuildOrderItem;
 import prebot.build.temp.strategy.FixedBuildBuilder;
 import prebot.common.code.Code.InitialBuildType;
 import prebot.common.code.Code.UnitFindRange;
+import prebot.common.main.GameManager;
 import prebot.common.util.HardCodePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
 import prebot.common.util.internal.HardCodeInfo;
-import prebot.main.GameManager;
 
 public class TestManager extends GameManager {
 

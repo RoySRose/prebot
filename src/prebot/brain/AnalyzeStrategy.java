@@ -1,7 +1,7 @@
 package prebot.brain;
 
 import bwapi.Race;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 public class AnalyzeStrategy {
 	

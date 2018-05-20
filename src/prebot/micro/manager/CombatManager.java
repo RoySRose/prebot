@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Unit;
+import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.main.GameManager;
-import prebot.main.Prebot;
 import prebot.micro.SquadData;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.impl.CheckerSquad;
@@ -27,10 +27,22 @@ public class CombatManager extends GameManager {
 	public SquadData squadData = new SquadData();
 	
 	public void onStart() {
-		squadData.addOrUpdateSquad(new MainDefenseSquad());
-		squadData.addOrUpdateSquad(new WatcherSquad());
-		squadData.addOrUpdateSquad(new CheckerSquad());
-		squadData.addOrUpdateSquad(new ScvScoutSquad());
+		MainDefenseSquad mainDefenseSquad = new MainDefenseSquad(1, 100);
+		WatcherSquad watcherSquad = new WatcherSquad(2, 100);
+		CheckerSquad checkerSquad = new CheckerSquad(3, 100);
+		ScvScoutSquad scvScoutSquad = new ScvScoutSquad(4, 100);
+		
+		squadData.addSquad(mainDefenseSquad);
+		squadData.activateSquad(mainDefenseSquad);
+		
+		squadData.addSquad(watcherSquad);
+		squadData.activateSquad(watcherSquad);
+		
+		squadData.addSquad(checkerSquad);
+		squadData.activateSquad(checkerSquad);
+		
+		squadData.addSquad(scvScoutSquad);
+		squadData.activateSquad(scvScoutSquad);
 	}
 
 	@Override
@@ -58,6 +70,10 @@ public class CombatManager extends GameManager {
 
 		// 스쿼드 유닛 할당
 		for (Squad squad : squadData.squadMap.values()) {
+			if (!squad.isActivated()) {
+				continue;
+			}
+			
 			for (Unit unit : combatUnitList) {
 				if (!squad.want(unit)) {
 					continue;
@@ -69,6 +85,10 @@ public class CombatManager extends GameManager {
 
 	private void squadExecution() {
 		for (Squad squad : squadData.squadMap.values()) {
+			if (!squad.isActivated()) {
+				continue;
+			}
+			
 			squad.removeInvalidUnits(); // 유효하지 않은 유닛 삭제
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시

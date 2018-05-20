@@ -8,7 +8,7 @@ import bwapi.UnitType;
 import prebot.brain.Idea;
 import prebot.brain.knowledge.InerrableActionKnowledge;
 import prebot.build.manager.BuildManager;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 /** 
  * build큐가 empty가 되었을때 general strategy로 변경

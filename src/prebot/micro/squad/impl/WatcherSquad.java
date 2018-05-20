@@ -8,8 +8,8 @@ import prebot.micro.squad.Squad;
 public class WatcherSquad extends Squad {
 	private VultureWatcher vultureWatcher = new VultureWatcher();
 	
-	public WatcherSquad() {
-		super(2, 100);
+	public WatcherSquad(int priority, int squadRadius) {
+		super(priority, squadRadius);
 	}
 
 	@Override

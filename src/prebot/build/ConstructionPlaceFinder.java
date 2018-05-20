@@ -15,9 +15,9 @@ import bwta.Chokepoint;
 import prebot.brain.manager.InformationManager;
 import prebot.build.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.code.Config;
+import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
-import prebot.main.Prebot;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {

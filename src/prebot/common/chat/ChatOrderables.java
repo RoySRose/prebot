@@ -1,7 +1,7 @@
 package prebot.common.chat;
 
-import prebot.main.Prebot;
-import prebot.main.UXManager;
+import prebot.common.main.Prebot;
+import prebot.common.main.UXManager;
 
 public class ChatOrderables {
 

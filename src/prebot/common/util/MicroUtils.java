@@ -16,8 +16,8 @@ import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.PlayerRange;
 import prebot.common.code.ConfigForMicro.Angles;
 import prebot.common.code.ConfigForMicro.Flee;
+import prebot.common.main.Prebot;
 import prebot.common.util.internal.MirrorBugFixed;
-import prebot.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 

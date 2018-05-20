@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 public class UnitData {
 

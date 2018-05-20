@@ -12,24 +12,22 @@ public class SquadData {
 
 	public Map<String, Squad> squadMap = new HashMap<>(); // 이름별 squad 저장
 
-	public void addOrUpdateSquad(Squad squad) {
-		if (squadMap.get(squad.getName()) != null) {
-			Squad existSquad = squadMap.get(squad.getName());
-			existSquad.priority = squad.priority;
-			existSquad.squadRadius = squad.squadRadius;
-			squadMap.put(squad.getName(), existSquad);
-		} else {
-			squadMap.put(squad.getName(), squad);
-		}
+	public void addSquad(Squad squad) {
+		squadMap.put(squad.getName(), squad);
 	}
 	
-	public void removeSquad(Squad squad) {
+	public void activateSquad(Squad squad) {
+		squad.setActivated(true);
+	}
+	
+	public void deactivateSquad(Squad squad) {
 		for (Unit unit : squad.unitList) {
 			if (unit.getType() == UnitType.Terran_SCV) {
 				WorkerManager.Instance().setIdleWorker(unit); // SCV를 WorkerManager에서 관리
 			}
 		}
-		squadMap.remove(squad.getName());
+		squad.unitList.clear();
+		squad.setActivated(false);
 	}
 	
 	public void clearSquadMap() {
@@ -48,7 +46,7 @@ public class SquadData {
 
 	public boolean canAssignUnitToSquad(Unit unit, Squad squad) {
 		Squad unitSqaud = getUnitSquad(unit);
-		return unitSqaud == null || unitSqaud.priority < squad.priority;
+		return unitSqaud == null || unitSqaud.getPriority() < squad.getPriority();
 	}
 
 	public void assignUnitToSquad(Unit unit, Squad squad) {

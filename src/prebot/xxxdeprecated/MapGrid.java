@@ -9,8 +9,8 @@ import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
 import prebot.common.code.Config;
-import prebot.main.GameManager;
-import prebot.main.Prebot;
+import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 
 /// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
 @Deprecated

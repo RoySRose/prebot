@@ -1,4 +1,4 @@
-package prebot.main;
+package prebot.common.main;
 
 import prebot.common.lag.StopWatch;
 

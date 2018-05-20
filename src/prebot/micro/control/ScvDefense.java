@@ -2,8 +2,8 @@ package prebot.micro.control;
 
 import bwapi.Color;
 import bwapi.Unit;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.main.Prebot;
 
 public class ScvDefense extends Control {
 

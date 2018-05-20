@@ -2,7 +2,7 @@ package prebot.common.util;
 
 import bwapi.TechType;
 import bwapi.UpgradeType;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 public class UpgradeUtils {
 

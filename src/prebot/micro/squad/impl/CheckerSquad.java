@@ -20,9 +20,9 @@ public class CheckerSquad extends Squad {
 
 	private boolean recruitEnded = false;
 	private Set<Integer> memberIdSet = new HashSet<>();
-	
-	public CheckerSquad() {
-		super(3, 100);
+
+	public CheckerSquad(int priority, int squadRadius) {
+		super(priority, squadRadius);
 	}
 
 	@Override

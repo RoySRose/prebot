@@ -13,7 +13,7 @@ import prebot.brain.information.UnitInfo;
 import prebot.brain.manager.InformationManager;
 import prebot.build.ConstructionTask;
 import prebot.build.manager.ConstructionManager;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 /// 유닛 리스트를 부하가 걸리지 않도록 관리
 public class UnitCache {

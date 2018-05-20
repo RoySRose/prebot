@@ -6,9 +6,9 @@ import prebot.brain.Idea;
 import prebot.brain.knowledge.InerrableActionKnowledge;
 import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.Prebot;
 
 /**
  * ScoutManager 기본소스에서 가져와서 수정함 unitType의 빌드완료시간이 remainingSeconds만큼 남았으면 정찰시작 (remainingSeconds이 0이면 완료시 정찰)

@@ -14,10 +14,10 @@ import prebot.brain.Idea;
 import prebot.brain.Info;
 import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.CommonCode;
+import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
-import prebot.main.Prebot;
 
 public class ScvScout extends Control {
 

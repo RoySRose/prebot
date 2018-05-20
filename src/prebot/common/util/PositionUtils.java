@@ -5,7 +5,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.Region;
-import prebot.main.Prebot;
+import prebot.common.main.Prebot;
 
 /**
  * @author insaneojw

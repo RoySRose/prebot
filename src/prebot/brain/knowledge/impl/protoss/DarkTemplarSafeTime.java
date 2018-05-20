@@ -10,18 +10,19 @@ import prebot.brain.Idea;
 import prebot.brain.information.UnitInfo;
 import prebot.brain.knowledge.Knowledge;
 import prebot.brain.stratgy.enemy.EnemyBuild;
-import prebot.build.temp.strategy.GeneralStrategy;
 import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.EnemyUnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.Prebot;
 
 public class DarkTemplarSafeTime extends Knowledge {
 	
 	private List<UnitType> hintBuildingTypeList = new ArrayList<>();
-	private int darkTemplarSafeTime = 5 * TimeUtils.MINUTE; // 5분
-	private int darkTemplarFoundTime = CommonCode.NONE;
+	private int darkTemplarSafeFrame = 5 * TimeUtils.MINUTE; // 5분
+	private int darkTemplarFoundFrame = CommonCode.NONE;
+	
+	private int notOccuredFrame = 10 * TimeUtils.MINUTE; // 10분
 	
 	public DarkTemplarSafeTime() {
 		hintBuildingTypeList.add(UnitType.Protoss_Templar_Archives);
@@ -34,21 +35,20 @@ public class DarkTemplarSafeTime extends Knowledge {
 		if (Prebot.Game.enemy().getRace() == Race.Terran || Prebot.Game.enemy().getRace() == Race.Zerg)
 			return true;
 		
-		return Idea.of().strategy != null && Idea.of().strategy instanceof GeneralStrategy;
+		return TimeUtils.elapsedFrames() > notOccuredFrame;
 	}
 
 	@Override
 	protected boolean occured() {
 		// 다크템플러를 발견 (occured)
 		if (UnitUtils.getEnemyUnitInfoCount(UnitType.Protoss_Dark_Templar, EnemyUnitFindRange.ALL) > 0) {
-			darkTemplarFoundTime = TimeUtils.elapsedFrames();
+			darkTemplarFoundFrame = TimeUtils.elapsedFrames();
 			return true;
 			
 		} else {
 			int safeTime = safeTimeByIncompleteEnemyBuilding();
-			Idea.of().darkTemplarSafeFrame = Math.max(safeTime, Idea.of().darkTemplarSafeFrame);
-			 
-			Idea.of().darkTemplarSafeFrame = safeTimeByEnemyStrategy();
+			Idea.of().darkTemplarSafeFrame = Math.max(safeTime, darkTemplarSafeFrame);
+			Idea.of().darkTemplarSafeFrame = Math.max(safeTimeByEnemyStrategy(), darkTemplarSafeFrame);
 			
 			return false;
 		}
@@ -117,12 +117,12 @@ public class DarkTemplarSafeTime extends Knowledge {
 
 	@Override
 	protected boolean foundCertainProof() {
-		return darkTemplarFoundTime >= darkTemplarSafeTime;
+		return darkTemplarFoundFrame >= darkTemplarSafeFrame;
 	}
 
 	@Override
 	protected boolean foundCertainDisproof() {
-		return darkTemplarFoundTime < darkTemplarSafeTime;
+		return darkTemplarFoundFrame < darkTemplarSafeFrame;
 	}
 
 

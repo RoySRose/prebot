@@ -1,5 +1,5 @@
 
-package prebot.main;
+package prebot.common.main;
 
 public class Main {
 

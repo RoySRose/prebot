@@ -11,11 +11,11 @@ import prebot.brain.information.WorkerData;
 import prebot.brain.information.WorkerMoveData;
 import prebot.common.code.Code.UnitFindRange;
 import prebot.common.code.Code.WorkerJob;
+import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 import prebot.common.code.Config;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
-import prebot.main.GameManager;
-import prebot.main.Prebot;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {

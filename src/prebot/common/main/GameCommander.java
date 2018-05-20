@@ -1,5 +1,5 @@
 
-package prebot.main;
+package prebot.common.main;
 
 import java.util.ArrayList;
 import java.util.List;

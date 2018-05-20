@@ -13,13 +13,13 @@ import prebot.common.code.Code.CommonCode;
 import prebot.common.code.Code.EnemyUnitFindRange;
 import prebot.common.code.Code.PlayerRange;
 import prebot.common.code.Code.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.brain.information.UnitData;
 import prebot.brain.information.UnitInfo;
 import prebot.brain.manager.InformationManager;
 import prebot.common.code.Config;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.UnitCache;
-import prebot.main.Prebot;
 import prebot.micro.manager.WorkerManager;
 
 /** @author insaneojw

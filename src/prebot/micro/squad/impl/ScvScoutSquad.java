@@ -8,8 +8,8 @@ import bwapi.UnitType;
 import bwta.Chokepoint;
 import prebot.brain.Idea;
 import prebot.brain.manager.InformationManager;
+import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.main.Prebot;
 import prebot.micro.control.ScvScout;
 import prebot.micro.manager.WorkerManager;
 import prebot.micro.squad.Squad;
@@ -20,8 +20,8 @@ public class ScvScoutSquad extends Squad {
 	private boolean recruitEnded = false;
 	private Set<Integer> memberIdSet = new HashSet<>();
 
-	public ScvScoutSquad() {
-		super(2, 100);
+	public ScvScoutSquad(int priority, int squadRadius) {
+		super(priority, squadRadius);
 	}
 
 	@Override
@@ -48,7 +48,6 @@ public class ScvScoutSquad extends Squad {
 			Unit scvNearFirstChoke = UnitUtils.getClosestMineralWorkerToPosition(WorkerManager.Instance().getWorkerData().getWorkers(), firstChoke.getCenter());
 			if (scvNearFirstChoke != null) {
 				memberIdSet.add(scvNearFirstChoke.getID());
-				Idea.of().assignScvScout = false;
 			}
 		}
 	}

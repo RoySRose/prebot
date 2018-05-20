@@ -15,9 +15,9 @@ import prebot.brain.manager.InformationManager;
 import prebot.build.ConstructionPlaceFinder;
 import prebot.build.ConstructionTask;
 import prebot.build.ConstructionTask.ConstructionStatus;
+import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.main.GameManager;
-import prebot.main.Prebot;
 import prebot.micro.manager.WorkerManager;
 
 /// 건물 건설 Construction 명령 목록을 리스트로 관리하고, 건물 건설 명령이 잘 수행되도록 컨트롤하는 class

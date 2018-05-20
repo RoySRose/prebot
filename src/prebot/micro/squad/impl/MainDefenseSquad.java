@@ -14,9 +14,9 @@ public class MainDefenseSquad extends Squad {
 	private VultureDefense vultureDefense = new VultureDefense();
 	private TankDefense tankDefense = new TankDefense();
 	private GoliathDefense goliathDefense = new GoliathDefense();
-	
-	public MainDefenseSquad() {
-		super(1, 100);
+
+	public MainDefenseSquad(int priority, int squadRadius) {
+		super(priority, squadRadius);
 	}
 
 	@Override
