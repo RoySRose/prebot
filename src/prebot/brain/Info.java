@@ -11,6 +11,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.brain.information.UnitData;
+import prebot.brain.information.UnitInfo;
 import prebot.brain.manager.InformationManager;
 import prebot.common.code.Code.GameMap;
 
@@ -36,4 +37,5 @@ public class Info {
 	public UnitData enemyUnitData;
 	
 	public Map<Position, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
+	public Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
 }

@@ -13,14 +13,16 @@ public class SquadData {
 	public Map<String, Squad> squadMap = new HashMap<>(); // 이름별 squad 저장
 
 	public void addSquad(Squad squad) {
-		squadMap.put(squad.getName(), squad);
+		squadMap.put(squad.getSquadName(), squad);
 	}
 	
-	public void activateSquad(Squad squad) {
+	public void activateSquad(String squadName) {
+		Squad squad = squadMap.get(squadName);
 		squad.setActivated(true);
 	}
 	
-	public void deactivateSquad(Squad squad) {
+	public void deactivateSquad(String squadName) {
+		Squad squad = squadMap.get(squadName);
 		for (Unit unit : squad.unitList) {
 			if (unit.getType() == UnitType.Terran_SCV) {
 				WorkerManager.Instance().setIdleWorker(unit); // SCV를 WorkerManager에서 관리
@@ -50,10 +52,6 @@ public class SquadData {
 	}
 
 	public void assignUnitToSquad(Unit unit, Squad squad) {
-		if (!canAssignUnitToSquad(unit, squad)) {
-			return;
-		}
-
 		Squad previousSquad = getUnitSquad(unit);
 		if (previousSquad != null) {
 			previousSquad.removeUnit(unit);

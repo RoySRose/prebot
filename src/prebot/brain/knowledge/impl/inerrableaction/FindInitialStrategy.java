@@ -66,6 +66,7 @@ public class FindInitialStrategy extends InerrableActionKnowledge {
 	
 	public List<Knowledge> getCommonKnowledgeList() {
 		List<Knowledge> knowledgeList = new ArrayList<>();
+		knowledgeList.add(new ActivateScoutDefense());
 		knowledgeList.add(new UsePrebot1BuildStrategy());
 		
 		return knowledgeList;

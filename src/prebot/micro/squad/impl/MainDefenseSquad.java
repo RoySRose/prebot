@@ -5,6 +5,7 @@ import java.util.List;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.code.Code.SquadName;
 import prebot.micro.control.GoliathDefense;
 import prebot.micro.control.TankDefense;
 import prebot.micro.control.VultureDefense;
@@ -16,7 +17,7 @@ public class MainDefenseSquad extends Squad {
 	private GoliathDefense goliathDefense = new GoliathDefense();
 
 	public MainDefenseSquad(int priority, int squadRadius) {
-		super(priority, squadRadius);
+		super(SquadName.MAIN_DEFENSE, priority, squadRadius);
 	}
 
 	@Override
@@ -25,6 +26,11 @@ public class MainDefenseSquad extends Squad {
 				|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
 				|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 				|| unit.getType() == UnitType.Terran_Goliath;
+	}
+
+	@Override
+	public List<Unit> recruit(List<Unit> assignableUnitList) {
+		return assignableUnitList;
 	}
 
 	@Override

@@ -101,6 +101,10 @@ public class StrategyManager extends GameManager {
 	 */
 	private void resfreshIdea() {
 		idea.initialBuildType = InitialBuildType.NONE;
+		
+		idea.squadNameToActivate.clear();
+		idea.squadNameToDeactivate.clear();
+		
 		idea.gasAdjustment = false;
 		idea.assignScvScout = false;
 	}

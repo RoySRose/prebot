@@ -1,6 +1,15 @@
 package prebot.common.code;
 
 public class Code {
+	
+	public static class SquadName {
+		public static final String CHECKER = "CHECKER";
+		public static final String IDLE = "IDLE";
+		public static final String MAIN_DEFENSE = "MAIN_DEFENSE";
+		public static final String SCOUT_DEFENSE = "SCOUT_DEFENSE";
+		public static final String SCV_SCOUT = "SCV_SCOUT";
+		public static final String WATCHER = "WATCHER";
+	}
 
 	public static class CommonCode {
 		public static final int INDEX_NOT_FOUND = -1;

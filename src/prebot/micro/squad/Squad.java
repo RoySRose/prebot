@@ -10,10 +10,7 @@ import prebot.common.util.UnitUtils;
 
 public abstract class Squad {
 	
-	public String getName() {
-		return getClass().getSimpleName();
-	}
-
+	private String squadName;
 	private int priority;
 	private int squadRadius;
 	private boolean activated;
@@ -25,18 +22,19 @@ public abstract class Squad {
 	// private List<Unit> unitOldBies = new ArrayList<>();
 	// private List<Unit> unitNewBies = new ArrayList<>();
 
-	public Squad(int priority, int squadRadius) {
+	public Squad(String squadName, int priority, int squadRadius) {
+		this.squadName = squadName;
 		this.priority = priority;
 		this.squadRadius = squadRadius;
 		this.activated = false;
 	}
 	
+	public String getSquadName() {
+		return squadName;
+	}
+	
 	public int getPriority() {
 		return priority;
-	}
-
-	public void setPriority(int priority) {
-		this.priority = priority;
 	}
 
 	public boolean isActivated() {
@@ -72,8 +70,10 @@ public abstract class Squad {
 		return CommonCode.INDEX_NOT_FOUND;
 	}
 
-	/// squad에 소속될수 있는 유닛인지 확인한다.
 	public abstract boolean want(Unit unit);
+	
+	/// 스쿼드 업데이트
+	public abstract List<Unit> recruit(List<Unit> assignableUnitList);
 	
 	/// squad 실행
 	public abstract void execute();
@@ -82,7 +82,7 @@ public abstract class Squad {
 	public void removeInvalidUnits() {
 		List<Unit> validUnits = new ArrayList<>();
 		for (Unit unit : unitList) {
-			if (UnitUtils.isValidUnit(unit) && want(unit)) {
+			if (UnitUtils.isValidUnit(unit)) {
 				validUnits.add(unit);
 			}
 		}

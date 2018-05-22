@@ -62,6 +62,9 @@ public class Idea {
 	public int gasAdjustmentWorkerCount = 0;
 	
 	// Combat
+	public List<String> squadNameToActivate = new ArrayList<>();
+	public List<String> squadNameToDeactivate = new ArrayList<>();
+	
 	public int checkerMaxCount = 0;
 	public boolean assignScvScout = false;
 	

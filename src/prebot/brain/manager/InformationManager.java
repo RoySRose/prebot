@@ -72,6 +72,8 @@ public class InformationManager extends GameManager {
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
 	/// base location의 꼭지점 (정찰시 활용)
 	private Map<Position, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
+	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
+	private Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
 	
 	/// Player - UnitData(각 Unit 과 그 Unit의 UnitInfo 를 Map 형태로 저장하는 자료구조) 를 저장하는 자료구조 객체
 	private Map<Player, UnitData> unitData = new HashMap<Player, UnitData>();
@@ -136,14 +138,18 @@ public class InformationManager extends GameManager {
 	public GameManager update() {
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-//		if (Prebot.Game.getFrameCount() % 120 == 0) {
+		// if (Prebot.Game.getFrameCount() % 120 == 0) {
+
 		updateBaseLocationInfo();
 		UnitCache.getCurrentCache().updateCache();
+		
 		this.setInfo();
+
 		return this;
 	}
 
 	private void updateBaseRegionVerticesMap() {
+		// TODO 주석 해제
 //		for (BaseLocation base : BWTA.getStartLocations()) {
 //			calculateEnemyRegionVertices(base);
 //		}
@@ -166,6 +172,7 @@ public class InformationManager extends GameManager {
 		info.myUnitData = unitData.get(selfPlayer);
 		info.enemyUnitData = unitData.get(enemyPlayer);
 		info.baseRegionVerticesMap = baseRegionVerticesMap;
+		info.euiListInMyRegion = euiListInMyRegion;
 	}
 
 	// Enemy MainBaseLocation 이 있는 Region 의 가장자리를 enemyBaseRegionVertices 에 저장한다
@@ -399,6 +406,8 @@ public class InformationManager extends GameManager {
 		for (Unit unit : Prebot.Game.self().getUnits()) {
 			updateUnitInfo(unit);
 		}
+		
+		updateEnemiesInMyRegion();
 
 		// remove bad enemy units
 		if (unitData.get(enemyPlayer) != null) {
@@ -406,6 +415,25 @@ public class InformationManager extends GameManager {
 		}
 		if (unitData.get(selfPlayer) != null) {
 			unitData.get(selfPlayer).removeBadUnits();
+		}
+	}
+
+	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
+	private void updateEnemiesInMyRegion() {
+		euiListInMyRegion.clear();
+		Set<Region> myRegionSet = occupiedRegions.get(selfPlayer);
+		for (Region region : myRegionSet) {
+			euiListInMyRegion.put(region, new ArrayList<UnitInfo>());
+		}
+		
+		Map<Integer, UnitInfo> unitAndUnitInfoMap = unitData.get(enemyPlayer).getUnitAndUnitInfoMap();
+		for (UnitInfo eui : unitAndUnitInfoMap.values()) {
+			Region region = BWTA.getRegion(eui.getLastPosition());
+			if (myRegionSet.contains(region)) {
+				List<UnitInfo> euiList = euiListInMyRegion.get(region);
+				euiList.add(eui);
+	            euiListInMyRegion.put(region, euiList);
+	        }
 		}
 	}
 

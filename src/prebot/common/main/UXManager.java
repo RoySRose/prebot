@@ -1114,11 +1114,13 @@ public class UXManager {
 		for (Squad squad : CombatManager.Instance().squadData.squadMap.values()) {
 			Color squadColor = squadColorMap.get(squad.getClass());
 			if (squadColor != null) {
-				Prebot.Game.drawTextScreen(x, y + 10, "" + colorCharacterMap.get(squadColor) + squad.getName());
+				Prebot.Game.drawTextScreen(x, y + 10, "" + colorCharacterMap.get(squadColor) + squad.getSquadName());
 				Prebot.Game.drawTextScreen(x +100, y + 10, "" + squad.unitList.size());
+				Prebot.Game.drawTextScreen(x +120, y + 10, "" + squad.isActivated());
 			} else {
-				Prebot.Game.drawTextScreen(x, y + 10, "" + white + "(NO COLOR)" + squad.getName());
+				Prebot.Game.drawTextScreen(x, y + 10, "" + white + "*" + squad.getSquadName());
 				Prebot.Game.drawTextScreen(x +100, y + 10, "" + squad.unitList.size());
+				Prebot.Game.drawTextScreen(x +120, y + 10, "" + squad.isActivated());
 			}
 			y+=10;
 		}
