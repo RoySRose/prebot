@@ -28,7 +28,7 @@ import prebot.micro.squad.Squad;
 
 public class ScoutDefenseSquad extends Squad {
 
-	private static final int REACT_RADIUS = 100;
+	private static final int REACT_RADIUS = 50;
 
 	public ScoutDefenseSquad(int priority, int squadRadius) {
 		super(SquadName.SCOUT_DEFENSE, priority, squadRadius);
@@ -36,7 +36,7 @@ public class ScoutDefenseSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_SCV;
+		return unit.getType() == UnitType.Terran_SCV && unit.getHitPoints() > 16;
 	}
 
 	@Override
@@ -94,7 +94,6 @@ public class ScoutDefenseSquad extends Squad {
 				CommandUtils.attackMove(unit, Idea.of().attackPosition);
 			}
 		}
-
 	}
 
 }

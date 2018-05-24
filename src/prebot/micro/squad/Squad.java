@@ -13,6 +13,7 @@ public abstract class Squad {
 	private String squadName;
 	private int priority;
 	private int squadRadius;
+//	private List<Position> defensePosition;
 	private boolean activated;
 	
 	public List<Unit> unitList = new ArrayList<>();
@@ -28,7 +29,7 @@ public abstract class Squad {
 		this.squadRadius = squadRadius;
 		this.activated = false;
 	}
-	
+
 	public String getSquadName() {
 		return squadName;
 	}
@@ -78,15 +79,15 @@ public abstract class Squad {
 	/// squad 실행
 	public abstract void execute();
 
-	/// 유효하지 않은 유닛(죽은 유닛 등)을 제거한다.
-	public void removeInvalidUnits() {
-		List<Unit> validUnits = new ArrayList<>();
+	/// 유효하지 않은 유닛(죽은 유닛 등)을 리턴
+	public List<Unit> invalidUnitList() {
+		List<Unit> invalidUnitList = new ArrayList<>();
 		for (Unit unit : unitList) {
-			if (UnitUtils.isValidUnit(unit)) {
-				validUnits.add(unit);
+			if (!UnitUtils.isValidUnit(unit) || !want(unit)) {
+				invalidUnitList.add(unit);
 			}
 		}
-		unitList = validUnits;
+		return invalidUnitList;
 	}
 	
 	/// 적 탐색
@@ -95,6 +96,9 @@ public abstract class Squad {
 		for (Unit unit : unitList) {
 			UnitUtils.addEnemyUnitInfoNearBy(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);
 		}
+//		for (Position position : defensePosition) {
+//			UnitUtils.addEnemyUnitInfoNearBy(euiList, position, 500 + squadRadius);
+//		}
 	}
 
 }

@@ -9,6 +9,8 @@ import prebot.brain.Idea;
 import prebot.brain.knowledge.InerrableActionKnowledge;
 import prebot.brain.knowledge.Knowledge;
 import prebot.brain.knowledge.impl.protoss.DarkTemplarSafeTime;
+import prebot.brain.knowledge.impl.squad.ActivateEarlyDefenseSquad;
+import prebot.brain.knowledge.impl.squad.ActivateScoutDefense;
 import prebot.common.code.Code.InitialBuildType;
 import prebot.common.main.Prebot;
 
@@ -67,6 +69,7 @@ public class FindInitialStrategy extends InerrableActionKnowledge {
 	public List<Knowledge> getCommonKnowledgeList() {
 		List<Knowledge> knowledgeList = new ArrayList<>();
 		knowledgeList.add(new ActivateScoutDefense());
+		knowledgeList.add(new ActivateEarlyDefenseSquad());
 		knowledgeList.add(new UsePrebot1BuildStrategy());
 		
 		return knowledgeList;

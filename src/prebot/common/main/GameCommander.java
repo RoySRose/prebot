@@ -79,7 +79,7 @@ public class GameCommander {
 //		MapGrid.Instance().update(); // 사용이 필요할 경우 주석 해제
 		
 		// 자원 사용
-		TestManager.Instance().start().update();
+		TestManager.Instance().start().update().end();
 		BuildManager.Instance().start().update().end();
 		ConstructionManager.Instance().start().update().end();
 		

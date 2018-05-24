@@ -11,8 +11,8 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.impl.CheckerSquad;
+import prebot.micro.squad.impl.EarlyDefenseSquad;
 import prebot.micro.squad.impl.MainDefenseSquad;
-import prebot.micro.squad.impl.ScoutDefenseSquad;
 import prebot.micro.squad.impl.ScvScoutSquad;
 import prebot.micro.squad.impl.WatcherSquad;
 
@@ -35,34 +35,34 @@ public class CombatManager extends GameManager {
 //		squadData.activateSquad(idleSquad.getSquadName());
 		
 		// 기본 공격병력(마린, 벌처)도 갖춰지지 않은 상태에서 상대일 때 activated상태이다.
-		ScoutDefenseSquad scvDefenseSquad = new ScoutDefenseSquad(1, 0);
-		squadData.addSquad(scvDefenseSquad);
-		squadData.activateSquad(scvDefenseSquad.getSquadName());
+//		ScoutDefenseSquad scvDefenseSquad = new ScoutDefenseSquad(1, 100);
+//		squadData.addSquad(scvDefenseSquad);
+//		squadData.activateSquad(scvDefenseSquad.getSquadName());
 		
 		// 공격명령이 내려지지 않은 상태의 메인스쿼드
-		MainDefenseSquad mainDefenseSquad = new MainDefenseSquad(2, 100);
+		MainDefenseSquad mainDefenseSquad = new MainDefenseSquad(2, 300);
 		squadData.addSquad(mainDefenseSquad);
 		squadData.activateSquad(mainDefenseSquad.getSquadName());
 		
 		// 메인스쿼드와 공격지점 사이를 움직이는 벌처부대(기본적으로 activated상태이고, 본진방어가 필요한 경우 deactivated)
-		WatcherSquad watcherSquad = new WatcherSquad(3, 100);
+		WatcherSquad watcherSquad = new WatcherSquad(3, 300);
 		squadData.addSquad(watcherSquad);
 		squadData.activateSquad(watcherSquad.getSquadName());
 		
 		// 정찰벌처 스쿼드 (마인이 많은 벌처 우선으로 선발됨)
-		CheckerSquad checkerSquad = new CheckerSquad(4, 100);
+		CheckerSquad checkerSquad = new CheckerSquad(4, 300);
 		squadData.addSquad(checkerSquad);
 		squadData.activateSquad(checkerSquad.getSquadName());
 		
 		// SCV 정찰 스쿼드 (초반 정찰을 위해 할당됨)
-		ScvScoutSquad scvScoutSquad = new ScvScoutSquad(5, 100);
+		ScvScoutSquad scvScoutSquad = new ScvScoutSquad(5, 300);
 		squadData.addSquad(scvScoutSquad);
 		squadData.activateSquad(scvScoutSquad.getSquadName());
 		
 		// 비상상태에서 발동되는 SCV 수비
-//		ScvDefenseSquad scoutDefenseSquad = new ScvDefenseSquad(5, 100);
-//		squadData.addSquad(scoutDefenseSquad);
-//		squadData.activateSquad(scoutDefenseSquad.getSquadName());
+		EarlyDefenseSquad earlyDefenseSquad = new EarlyDefenseSquad(6, 300);
+		squadData.addSquad(earlyDefenseSquad);
+		squadData.activateSquad(earlyDefenseSquad.getSquadName());
 	}
 
 	@Override
@@ -98,6 +98,10 @@ public class CombatManager extends GameManager {
 			if (!squad.isActivated()) {
 				continue;
 			}
+			for (Unit invalidUnit : squad.invalidUnitList()) {
+				squadData.excludedUnitFromSquad(invalidUnit);
+			}
+			
 			
 			List<Unit> assignableUnitList = new ArrayList<>();
 			for (Unit unit : combatUnitList) {
@@ -118,7 +122,6 @@ public class CombatManager extends GameManager {
 				continue;
 			}
 			
-			squad.removeInvalidUnits(); // 유효하지 않은 유닛 삭제
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}

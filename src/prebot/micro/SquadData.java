@@ -62,5 +62,15 @@ public class SquadData {
 			WorkerManager.Instance().setCombatWorker(unit); // SCV를 CombatManager에서 관리
 		}
 	}
+	
+	public void excludedUnitFromSquad(Unit unit) {
+		Squad previousSquad = getUnitSquad(unit);
+		if (previousSquad != null) {
+			previousSquad.removeUnit(unit);
+		}
+		if (unit.getType() == UnitType.Terran_SCV) {
+			WorkerManager.Instance().setIdleWorker(unit); // SCV를 WorkerManager에서 관리
+		}
+	}
 
 }

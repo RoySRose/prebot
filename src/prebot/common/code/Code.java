@@ -9,6 +9,7 @@ public class Code {
 		public static final String SCOUT_DEFENSE = "SCOUT_DEFENSE";
 		public static final String SCV_SCOUT = "SCV_SCOUT";
 		public static final String WATCHER = "WATCHER";
+		public static final String EARLY_DEFENSE = "EARLY_DEFENSE";
 	}
 
 	public static class CommonCode {
