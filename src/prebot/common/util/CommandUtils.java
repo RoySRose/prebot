@@ -1,102 +1,111 @@
 package prebot.common.util;
 
 import bwapi.Position;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
+import prebot.common.main.Prebot;
 
 public class CommandUtils {
-
-	public static void attackUnit(Unit attacker, Unit target) {
-		if (!invalidCommand(attacker, target, UnitCommandType.Attack_Unit)) {
-			attacker.attack(target);
+	public static void attackUnit(Unit unit, Unit target) {
+		if (validCommand(unit, target, UnitCommandType.Attack_Unit, true, false)) {
+			unit.attack(target);
 		}
 	}
 
-	public static void attackMove(Unit attacker, final Position targetPosition) {
-		if (!invalidCommand(attacker, targetPosition, UnitCommandType.Attack_Move)) {
-			attacker.attack(targetPosition);
+	public static void attackMove(Unit unit, Position targetPosition) {
+		if (validCommand(unit, targetPosition, UnitCommandType.Attack_Move, true, false)) {
+			unit.attack(targetPosition);
 		}
 	}
 
-	public static void move(Unit attacker, final Position targetPosition) {
-		if (!invalidCommand(attacker, targetPosition, UnitCommandType.Move)) {
-			attacker.move(targetPosition);
+	public static void move(Unit unit, Position targetPosition) {
+		if (validCommand(unit, targetPosition, UnitCommandType.Move, true, false)) {
+			unit.move(targetPosition);
 		}
 	}
 
 	public static void rightClick(Unit unit, Unit target) {
-		if (!invalidCommand(unit, target, UnitCommandType.Right_Click_Unit)) {
+		if (validCommand(unit, target, UnitCommandType.Right_Click_Unit, false, true)) {
 			unit.rightClick(target);
 		}
 	}
 
+	public static void rightClick(Unit unit, Position position) {
+		if (validCommand(unit, position, UnitCommandType.Right_Click_Position, false, true)) {
+			unit.rightClick(position);
+		}
+	}
+
 	public static void repair(Unit unit, Unit target) {
-		if (!invalidCommand(unit, target, UnitCommandType.Repair)) {
+		if (validCommand(unit, target, UnitCommandType.Repair, true, false)) {
 			unit.repair(target);
 		}
 	}
-	
-	public static void load(Unit bunkerOrDropShip, Unit target) {
-		if (!invalidCommand(bunkerOrDropShip, target, UnitCommandType.Load)) {
-			bunkerOrDropShip.load(target);
-		}
-	}
-	
-	public static void unload(Unit bunkerOrDropShip, Unit target) {
-		if (!invalidCommand(bunkerOrDropShip, target, UnitCommandType.Unload)) {
-			bunkerOrDropShip.unload(target);
+
+	public static void useTechPosition(Unit unit, TechType tech, Position position) {
+		if (validCommand(unit, position, UnitCommandType.Use_Tech_Position, true, false)) {
+			unit.useTech(tech, position);
 		}
 	}
 
-	private static boolean invalidCommand(Unit attacker, Unit target, UnitCommandType unitCommandType) {
-		if (attacker == null || target == null) {
-			return true;
+	public static void useTechTarget(Unit unit, TechType tech, Unit target) {
+		if (validCommand(unit, target, UnitCommandType.Use_Tech_Unit, true, false)) {
+			unit.useTech(tech, target);
 		}
+	}
 
-		// if we have issued a command to this unit already this frame, ignore this one
-		if (!TimeUtils.isPassedFrame(attacker.getLastCommandFrame()) || attacker.isAttackFrame()) {
-			return true;
+	private static boolean validCommand(Unit unit, Unit target, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean checkCommandByPosition) {
+		if (!UnitUtils.isValidUnit(unit)) {
+			return false;
 		}
-
-		// get the unit's current command
-		// if we've already told this unit to attack this target, ignore this command
-		UnitCommand currentCommand = attacker.getLastCommand();
-		if (currentCommand.getUnitCommandType() == unitCommandType) {
-			// TODO right click은 position으로 command에 저장되는가?
-			if (currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Unit) {
-				if (target.getPosition().equals(currentCommand.getTargetPosition())) {
-					return true;
+		if (!UnitUtils.isValidUnit(target)) {
+			return false;
+		}
+		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+			return false;
+		}
+		if (notIssueOnAttackFrame && unit.isAttackFrame()) {
+			return false;
+		}
+		UnitCommand currentCommand = unit.getLastCommand();
+		if (currentCommand.getUnitCommandType() == commandType) {
+			if (checkCommandByPosition) {
+				if (currentCommand.getTargetPosition().equals(target.getPosition())) {
+					return false;
 				}
-			} else {
-				if (currentCommand.getTarget().getID() == target.getID()) {
-					return true;
-				}
+			} else if (currentCommand.getTarget().getID() == target.getID()) {
+				return false;
 			}
 		}
-
-		return false;
+		return true;
 	}
 
-	private static boolean invalidCommand(Unit attacker, final Position targetPosition, UnitCommandType unitCommandType) {
-		// Position 객체에 대해서는 == 가 아니라 equals() 로 비교해야 합니다
-		if (attacker == null || !targetPosition.isValid()) {
-			return true;
+	private static boolean validCommand(Unit unit, Position position, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean issueIfNotMoving) {
+		if (!UnitUtils.isValidUnit(unit)) {
+			return false;
 		}
-
-		// if we have issued a command to this unit already this frame, ignore this one
-		if (!TimeUtils.isPassedFrame(attacker.getLastCommandFrame()) || attacker.isAttackFrame()) {
-			return true;
+		if (!PositionUtils.isValidPosition(position)) {
+			return false;
 		}
-
-		// get the unit's current command
-		// if we've already told this unit to attack this target, ignore this command
-		UnitCommand currentCommand = attacker.getLastCommand();
-		if (currentCommand.getUnitCommandType() == unitCommandType && currentCommand.getTargetPosition().equals(targetPosition)) {
-			return true;
+		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+			return false;
+		}
+		if (notIssueOnAttackFrame && unit.isAttackFrame()) {
+			return false;
 		}
 		
-		return false;
+		if (issueIfNotMoving && !unit.isMoving()) {
+			return true;
+		}
+		UnitCommand currentCommand = unit.getLastCommand();
+		if (currentCommand.getUnitCommandType() == commandType) {
+			if (currentCommand.getTargetPosition().equals(position)) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
-
 }

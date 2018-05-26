@@ -8,12 +8,12 @@ import java.util.Vector;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.brain.information.UnitData;
-import prebot.brain.information.UnitInfo;
-import prebot.brain.manager.InformationManager;
+import prebot.build.ConstructionManager;
 import prebot.build.ConstructionTask;
-import prebot.build.manager.ConstructionManager;
 import prebot.common.main.Prebot;
+import prebot.strategy.InformationManager;
+import prebot.strategy.UnitData;
+import prebot.strategy.UnitInfo;
 
 /// 유닛 리스트를 부하가 걸리지 않도록 관리
 public class UnitCache {
@@ -121,7 +121,7 @@ public class UnitCache {
 	}
 
 	private void putSelfData() {
-		for (Unit unit : Prebot.Game.self().getUnits()) {
+		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 			if (unit == null) {
 				continue;
 			}
@@ -150,7 +150,7 @@ public class UnitCache {
 	}
 
 	private void putEnemyData() {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Game.enemy());
+		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Broodwar.enemy());
 		for (int unitId : enemyUnitData.getUnitAndUnitInfoMap().keySet()) {
 			UnitInfo unitInfo = enemyUnitData.getUnitAndUnitInfoMap().get(unitId);
 
@@ -159,7 +159,7 @@ public class UnitCache {
 			List<UnitInfo> invisibleUnitList = getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitInfo.getType());
 
 			allUnitList.add(unitInfo);
-			Unit enemy = Prebot.Game.getUnit(unitInfo.getUnitID());
+			Unit enemy = Prebot.Broodwar.getUnit(unitInfo.getUnitID());
 			if (enemy != null && enemy.getType() != UnitType.Unknown) {
 				visibleUnitList.add(unitInfo);
 			} else {
