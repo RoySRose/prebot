@@ -2,7 +2,9 @@ package prebot.common.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import bwapi.Player;
 import bwapi.Position;
@@ -21,7 +23,7 @@ import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode;
+import prebot.strategy.constant.StrategyConfig;
 
 public class UnitUtils {
 	
@@ -30,6 +32,7 @@ public class UnitUtils {
 		return unit != null && unit.isCompleted() && unit.getHitPoints() > 0 && unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
 	}
 
+	@Deprecated // TODO 삭제예정
 	public static boolean isValidUnit(Unit unit, boolean excludeIncomplete, boolean excludeUndetected) {
 		if (unit == null) {
 			return false;
@@ -55,7 +58,23 @@ public class UnitUtils {
 	}
 
 	/** 유닛 리스트 */
-	public static List<Unit> getUnitList(UnitType unitType, UnitFindRange unitFindRange) {
+	public static List<Unit> getUnitList(UnitType... unitTypes) {
+		Set<Unit> unitSet = new HashSet<>();
+		for (UnitType unitType : unitTypes) {
+			unitSet.addAll(getUnitList(UnitFindRange.ALL, unitType));
+		}
+		return new ArrayList<>(unitSet);
+	}
+	
+	public static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType... unitTypes) {
+		Set<Unit> unitSet = new HashSet<>();
+		for (UnitType unitType : unitTypes) {
+			unitSet.addAll(getUnitList(unitFindRange, unitType));
+		}
+		return new ArrayList<>(unitSet);
+	}
+	
+	private static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType unitType) {
 		switch (unitFindRange) {
 		case COMPLETE:
 			return UnitCache.getCurrentCache().completeUnits(unitType);
@@ -67,9 +86,25 @@ public class UnitUtils {
 			return UnitCache.getCurrentCache().allUnits(unitType);
 		}
 	}
-	
+
 	/** 유닛 수 (constructionQueue가 포함된 검색인 경우, getUnitList.size()와 수가 다를 수 있다.) */
-	public static int getUnitCount(UnitType unitType, UnitFindRange unitFindRange) {
+	public static int getUnitCount(UnitType... unitTypes) {
+		int unitCount = 0;
+		for (UnitType unitType : unitTypes) {
+			unitCount += getUnitCount(UnitFindRange.ALL, unitType);
+		}
+		return unitCount;
+	}
+	
+	public static int getUnitCount(UnitFindRange unitFindRange, UnitType... unitTypes) {
+		int unitCount = 0;
+		for (UnitType unitType : unitTypes) {
+			unitCount += getUnitCount(unitFindRange, unitType);
+		}
+		return unitCount;
+	}
+	
+	private static int getUnitCount(UnitFindRange unitFindRange, UnitType unitType) {
 		switch (unitFindRange) {
 		case COMPLETE:
 			return UnitCache.getCurrentCache().completeCount(unitType);
@@ -90,17 +125,27 @@ public class UnitUtils {
 	}
 	
 	/** 유닛 보유 여부 */
-	public static boolean hasUnit(UnitType unitType, UnitFindRange unitFindRange) {
-		return getUnitCount(unitType, unitFindRange) > 0;
+	@Deprecated
+	public static boolean hasUnit(UnitFindRange unitFindRange, UnitType unitType) {
+		return getUnitCount(unitFindRange, unitType) > 0;
 	}
 	
 	/** 유닛 N개이상 보유 여부 */
-	public static boolean hasUnit(UnitType unitType, UnitFindRange unitFindRange, int count) {
-		return getUnitCount(unitType, unitFindRange) >= count;
+	@Deprecated
+	public static boolean hasUnit(UnitFindRange unitFindRange, int count, UnitType unitType) {
+		return getUnitCount(unitFindRange, unitType) >= count;
 	}
 
 	/** 적 유닛 리스트 */
-	public static List<UnitInfo> getEnemyUnitInfoList(UnitType unitType, EnemyUnitFindRange enemyUnitFindRange) {
+	public static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
+		Set<UnitInfo> unitSet = new HashSet<>();
+		for (UnitType unitType : unitTypes) {
+			unitSet.addAll(getEnemyUnitInfoList(enemyUnitFindRange, unitType));
+		}
+		return new ArrayList<>(unitSet);
+	}
+	
+	private static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
 		switch (enemyUnitFindRange) {
 		case VISIBLE:
 			return UnitCache.getCurrentCache().enemyVisibleUnitInfos(unitType);
@@ -110,9 +155,17 @@ public class UnitUtils {
 			return UnitCache.getCurrentCache().enemyAllUnitInfos(unitType);
 		}
 	}
-	
+
 	/** 적 유닛  수 */
-	public static int getEnemyUnitInfoCount(UnitType unitType, EnemyUnitFindRange enemyUnitFindRange) {
+	public static int getEnemyUnitInfoCount(EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
+		int unitCount = 0;
+		for (UnitType unitType : unitTypes) {
+			unitCount += getEnemyUnitInfoCount(enemyUnitFindRange, unitType);
+		}
+		return unitCount;
+	}
+	
+	private static int getEnemyUnitInfoCount(EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
 		switch (enemyUnitFindRange) {
 		case VISIBLE:
 			return UnitCache.getCurrentCache().enemyVisibleCount(unitType);
@@ -141,12 +194,12 @@ public class UnitUtils {
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static List<Unit> getUnitsInRadius(Position position, int radius, PlayerRange playerRange) {
-		return getUnitsInRadius(position, radius, playerRange, null);
+	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius) {
+		return getUnitsInRadius(playerRange, position, radius, null);
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static List<Unit> getUnitsInRadius(Position position, int radius, PlayerRange playerRange, UnitType unitType) {
+	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius, UnitType unitType) {
 		Player player = null;
 		if (playerRange == PlayerRange.SELF) {
 			player = Prebot.Broodwar.self();
@@ -170,7 +223,7 @@ public class UnitUtils {
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static void addUnitsInRadius(Collection<Unit> units, Position position, int radius, PlayerRange playerRange) {
+	public static void addUnitsInRadius(Collection<Unit> units, PlayerRange playerRange, Position position, int radius) {
 		Player player = PlayerUtil.getPlayerByRange(playerRange);
 		for (Unit unit : Prebot.Broodwar.getUnitsInRadius(position, radius)) {
 			if (player != null && player != unit.getPlayer()) {
@@ -182,7 +235,7 @@ public class UnitUtils {
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
-		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyCode.IGNORE_ENEMY_UNITINFO_SECONDS;
+		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.SCAN_DURATION;
 	}
 	
 	/** 즉시 생산할 수 있는 상태인지 판단 */

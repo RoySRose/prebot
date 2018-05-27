@@ -1,9 +1,7 @@
 package prebot.build.provider;
 
 
-import bwapi.TechType;
 import bwapi.UnitType;
-import prebot.build.MetaType;
 
 public class FactoryUnitSelector implements Selector<UnitType>{
 

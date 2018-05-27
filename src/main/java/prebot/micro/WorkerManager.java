@@ -7,13 +7,12 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import prebot.build.BlockingEntrance;
-import prebot.build.constant.BuildConfig;
+import prebot.build.prebot1.BlockingEntrance;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.CombatStrategy;
+import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class

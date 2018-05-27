@@ -1,4 +1,4 @@
-package prebot.build;
+package prebot.build.prebot1;
 
 import java.util.Set;
 

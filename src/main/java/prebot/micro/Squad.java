@@ -118,10 +118,10 @@ public class Squad {
 		// 방어병력은 눈앞의 적을 무시하고 방어를 위해 이동해야 한다.
 		Set<Unit> findNearbyEnemies = new HashSet<>();
 		if (order.getType() == SquadOrderType.DEFEND) {
-			UnitUtils.addUnitsInRadius(findNearbyEnemies, order.getPosition(), order.getRadius(), PlayerRange.ENEMY);
+			UnitUtils.addUnitsInRadius(findNearbyEnemies, PlayerRange.ENEMY, order.getPosition(), order.getRadius());
 		} else {
 			for (Unit unit : unitSet) {
-				UnitUtils.addUnitsInRadius(findNearbyEnemies, unit.getPosition(), order.getRadius(), PlayerRange.ENEMY);
+				UnitUtils.addUnitsInRadius(findNearbyEnemies, PlayerRange.ENEMY, unit.getPosition(), order.getRadius());
 			}
 		}
 		List<Unit> nearbyEnemies = new ArrayList<>(findNearbyEnemies);
@@ -430,7 +430,7 @@ public class Squad {
 
 		List<Unit> nearbyEnemies = new ArrayList<>();
 		if (order.getType() == SquadOrderType.DEFEND) {
-			nearbyEnemies = UnitUtils.getUnitsInRadius(order.getPosition(), order.getRadius(), PlayerRange.ENEMY);
+			nearbyEnemies = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, order.getPosition(), order.getRadius());
 		}
 		microMarine.setMicroInformation(order, nearbyEnemies);
 		microMarine.execute();

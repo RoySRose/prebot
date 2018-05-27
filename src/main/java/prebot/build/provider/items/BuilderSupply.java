@@ -1,12 +1,11 @@
 package prebot.build.provider.items;
 
-import bwapi.UnitType;
-import prebot.build.BuildOrderItem;
-import prebot.build.MetaType;
-import prebot.build.manager.ConstructionManager;
-import prebot.build.provider.DefaultBuildableItem;
-import prebot.common.main.Prebot;
 import bwapi.Unit;
+import bwapi.UnitType;
+import prebot.build.prebot1.ConstructionManager;
+import prebot.build.provider.DefaultBuildableItem;
+import prebot.common.MetaType;
+import prebot.common.main.Prebot;
 
 public class BuilderSupply extends DefaultBuildableItem {
 
@@ -16,7 +15,7 @@ public class BuilderSupply extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
 
-        if (Prebot.Game.self().supplyTotal() >= 400) {
+        if (Prebot.Broodwar.self().supplyTotal() >= 400) {
             return false;
         }
 
@@ -27,7 +26,7 @@ public class BuilderSupply extends DefaultBuildableItem {
         boolean factoryflag = false;
 
         if(factoryflag==false){
-            for (Unit unit : Prebot.Game.self().getUnits()) {
+            for (Unit unit : Prebot.Broodwar.self().getUnits()) {
                 if (unit.getType() == UnitType.Terran_Factory  && unit.isCompleted()) {
                     factoryflag = true;
                 }
@@ -40,7 +39,7 @@ public class BuilderSupply extends DefaultBuildableItem {
         int Faccnt=0;
         int CCcnt=0;
         int facFullOperating =0;
-        for (Unit unit : Prebot.Game.self().getUnits())
+        for (Unit unit : Prebot.Broodwar.self().getUnits())
         {
             if (unit == null) continue;
             if (unit.getType().isResourceDepot() && unit.isCompleted()){
@@ -65,7 +64,7 @@ public class BuilderSupply extends DefaultBuildableItem {
         }
 
         // currentSupplyShortage 를 계산한다
-        int currentSupplyShortage = Prebot.Game.self().supplyUsed() + supplyMargin + 1 - Prebot.Game.self().supplyTotal();
+        int currentSupplyShortage = Prebot.Broodwar.self().supplyUsed() + supplyMargin + 1 - Prebot.Broodwar.self().supplyTotal();
 
         if (currentSupplyShortage > 0) {
             // 생산/건설 중인 Supply를 센다

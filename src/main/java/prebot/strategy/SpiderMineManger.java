@@ -15,7 +15,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import prebot.build.ConstructionPlaceFinder;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;

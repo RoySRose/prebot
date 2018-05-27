@@ -1,6 +1,7 @@
 package prebot.build;
 
 import bwapi.TilePosition;
+import prebot.common.MetaType;
 
 /// 빌드 명령
 public class BuildOrderItem {

@@ -1,10 +1,11 @@
 package prebot.build.provider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import com.sun.beans.finder.ClassFinder;
-import prebot.build.MetaType;
 import prebot.build.provider.items.BuilderBarrack;
 import prebot.build.provider.items.BuilderCharonBoosters;
 import prebot.build.provider.items.BuilderIonThrusters;
@@ -12,9 +13,7 @@ import prebot.build.provider.items.BuilderSiegeTank;
 import prebot.build.provider.items.BuilderSpiderMines;
 import prebot.build.provider.items.BuilderSupply;
 import prebot.build.provider.items.BuilderTankSiegeMode;
-
-import java.util.ArrayList;
-import java.util.List;
+import prebot.common.MetaType;
 
 public final class BuildQueueProvider {
 

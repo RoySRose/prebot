@@ -1,4 +1,5 @@
 package prebot.strategy;
+
 import java.util.List;
 
 import bwapi.Position;
@@ -9,12 +10,12 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import prebot.build.BlockingEntrance;
-import prebot.build.BuildManager;
-import prebot.build.BuildOrderItem;
-import prebot.build.BuildOrderQueue;
-import prebot.build.ConstructionManager;
-import prebot.build.ConstructionPlaceFinder;
+import prebot.build.prebot1.BuildOrderItem;
+import prebot.build.prebot1.BlockingEntrance;
+import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderQueue;
+import prebot.build.prebot1.ConstructionManager;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
 import prebot.micro.CombatManager;
 import prebot.strategy.constant.EnemyStrategy.Strategy;

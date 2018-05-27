@@ -2,8 +2,7 @@ package prebot.build.provider;
 
 
 import bwapi.TechType;
-import bwapi.UnitType;
-import prebot.build.MetaType;
+import prebot.common.MetaType;
 
 public class ResearchSelector implements Selector<MetaType>{
 

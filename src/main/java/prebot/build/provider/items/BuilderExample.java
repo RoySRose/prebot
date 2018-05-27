@@ -1,8 +1,7 @@
 package prebot.build.provider.items;
 
-import bwapi.UnitType;
-import prebot.build.MetaType;
 import prebot.build.provider.DefaultBuildableItem;
+import prebot.common.MetaType;
 
 public class BuilderExample extends DefaultBuildableItem {
 

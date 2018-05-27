@@ -8,8 +8,8 @@ import java.util.Vector;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.ConstructionManager;
-import prebot.build.ConstructionTask;
+import prebot.build.prebot1.ConstructionManager;
+import prebot.build.prebot1.ConstructionTask;
 import prebot.common.main.Prebot;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitData;

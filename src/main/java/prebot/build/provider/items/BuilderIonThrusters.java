@@ -1,8 +1,8 @@
 package prebot.build.provider.items;
 
-import prebot.build.MetaType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
+import prebot.common.MetaType;
 
 public class BuilderIonThrusters extends DefaultBuildableItem {
 

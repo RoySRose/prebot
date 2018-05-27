@@ -1,19 +1,16 @@
 package prebot.build.provider;
 
-import bwapi.Game;
-import bwapi.Pair;
+import java.util.List;
+
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.brain.information.UnitInfo;
 import prebot.build.BuildOrderItem;
-import prebot.build.MetaType;
-import prebot.build.manager.BuildManager;
-import prebot.common.code.Code;
+import prebot.build.prebot1.BuildManager;
+import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-
-import java.util.List;
 
 public abstract class DefaultBuildableItem implements BuildableItem{
 
@@ -70,7 +67,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         }
         //when blocking is false check resource
         if(buildCondition.blocking == false){
-            if(metaType.mineralPrice() >= Prebot.Game.self().minerals() && metaType.gasPrice() >= Prebot.Game.self().gas()){
+            if(metaType.mineralPrice() >= Prebot.Broodwar.self().minerals() && metaType.gasPrice() >= Prebot.Broodwar.self().gas()){
                 setBuildQueue();
             }
         }else{
@@ -79,24 +76,24 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     private final void setBuildQueue(){
-        if(buildCondition.highPriority){
-
-            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
-                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
-            }else{
-                BuildManager.Instance().buildQueue.qHigh(metaType, buildCondition.blocking);
-            }
-        }else {
-            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
-                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
-            }else{
-                BuildManager.Instance().buildQueue.qLow(metaType, buildCondition.blocking);
-            }
-        }
+//        if(buildCondition.highPriority){
+//
+//            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+//                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+//            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
+//                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+//            }else{
+//                BuildManager.Instance().buildQueue.qHigh(metaType, buildCondition.blocking);
+//            }
+//        }else {
+//            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+//                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+//            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
+//                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+//            }else{
+//                BuildManager.Instance().buildQueue.qLow(metaType, buildCondition.blocking);
+//            }
+//        }
     }
 
     public final void process(){
@@ -133,7 +130,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     protected int getCurrentItemCount(){
         int currentItemCount = BuildManager.Instance().buildQueue.getItemCount(metaType.getUnitType()) +
-                Prebot.Game.self().allUnitCount(metaType.getUnitType());
+                Prebot.Broodwar.self().allUnitCount(metaType.getUnitType());
         return currentItemCount;
     }
 
@@ -159,7 +156,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     private final boolean checkSupplyForUnit(){
-        if(metaType.supplyRequired() > Prebot.Game.self().supplyTotal() -  Prebot.Game.self().supplyUsed()){
+        if(metaType.supplyRequired() > Prebot.Broodwar.self().supplyTotal() -  Prebot.Broodwar.self().supplyUsed()){
             return false;
         }
         return true;
@@ -169,7 +166,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         if(metaType.isUnit() && !metaType.getUnitType().isBuilding()){
             
             int availableProducer = 0;
-            List<Unit> producerList= UnitUtils.getUnitList(producerOfUnit, Code.UnitFindRange.COMPLETE);
+            List<Unit> producerList= UnitUtils.getUnitList(UnitFindRange.COMPLETE, producerOfUnit);
 
             for(Unit producer : producerList) {
                 //TODO check if addon is on the middle of construction

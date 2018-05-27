@@ -13,8 +13,4 @@ public class StrategyCode {
 	public static enum KnowledgeActionEvaluation {
 		DONT_KNOW, GOOD_ACTION, BAD_ACTION
 	}
-
-	public static final int ScanDuration = 240; // approximate time that a comsat scan provides vision
-
-	public static final int IGNORE_ENEMY_UNITINFO_SECONDS = 15;
 }
