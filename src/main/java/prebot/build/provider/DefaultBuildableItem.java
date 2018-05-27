@@ -5,8 +5,8 @@ import java.util.List;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.BuildOrderItem;
 import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -19,12 +19,6 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     private int recoverItemCount=-1;
     BuildCondition buildCondition;
     private final UnitType producerOfUnit;
-    
-//    private boolean blocking;
-//    private boolean highPriority; //high, low; // needed?
-//    private BuildOrderItem.SeedPositionStrategy seedPositionStrategy;
-//    private TilePosition tilePostition;
-
 
     //5개의 set 함수가 조건을 결정. 기본은 default, set 했을때는 해당 조건 반영
     //4개는 build condition 안에 들어가면 될듯
@@ -45,7 +39,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     //이놈만 유닛 변경 있을때만 확인해 주면 될듯
-    public final void setRecoverItemCount(int recoverItemCount) {
+    public void setRecoverItemCount(int recoverItemCount) {
         this.recoverItemCount = recoverItemCount;
     }
 
@@ -76,24 +70,24 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     private final void setBuildQueue(){
-//        if(buildCondition.highPriority){
-//
-//            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
-//                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-//            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-//                BuildManager.Instance().buildQueue.qHigh(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
-//            }else{
-//                BuildManager.Instance().buildQueue.qHigh(metaType, buildCondition.blocking);
-//            }
-//        }else {
-//            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
-//                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-//            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-//                BuildManager.Instance().buildQueue.qLow(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
-//            }else{
-//                BuildManager.Instance().buildQueue.qLow(metaType, buildCondition.blocking);
-//            }
-//        }
+        if(buildCondition.highPriority){
+
+            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
+                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+            }else{
+                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.blocking);
+            }
+        }else {
+            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+            }else{
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.blocking);
+            }
+        }
     }
 
     public final void process(){
