@@ -18,7 +18,8 @@ public class BuildOrderItem {
 	
 	/// 건설위치 초안 결정 정책
 	/// 향후 적진 길목, 언덕 위 등 추가
-	public enum SeedPositionStrategy { 
+	public enum SeedPositionStrategy {
+        NoLocation,                 /// < Default
 		MainBaseLocation,			///< 아군 베이스
 		MainBaseBackYard,			///< 아군 베이스 뒷편
 		FirstChokePoint,			///< 아군 첫번째 길목

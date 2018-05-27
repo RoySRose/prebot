@@ -6,6 +6,7 @@ import java.util.List;
 import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
+import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.items.BuilderBarrack;
 import prebot.build.provider.items.BuilderCharonBoosters;
 import prebot.build.provider.items.BuilderIonThrusters;
@@ -16,6 +17,12 @@ import prebot.build.provider.items.BuilderTankSiegeMode;
 import prebot.common.MetaType;
 
 public final class BuildQueueProvider {
+
+    private static BuildQueueProvider instance = new BuildQueueProvider();
+    /// static singleton 객체를 리턴합니다
+    public static BuildQueueProvider Instance() {
+        return instance;
+    }
 
     List<BuildableItem> buildableList = new ArrayList<>();
     BuildableItem tankSiegeMode;

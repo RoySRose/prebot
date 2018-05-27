@@ -3,4 +3,5 @@
 .project
 *.iml
 *.eml
+/.idea
 .idea/
