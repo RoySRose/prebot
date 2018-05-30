@@ -10,17 +10,17 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
-import prebot.micro.CombatManager;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
-import prebot.strategy.constant.EnemyStrategy.StrategyException;
+import prebot.micro.old.OldCombatManager;
 import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
+import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 /// 봇 프로그램 설정
 public class RespondToStrategy {
@@ -260,7 +260,7 @@ public class RespondToStrategy {
 		boolean blocked = true;
 		//2gate zealot
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.PROTOSSBASIC_DOUBLEPHOTO){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO){
 			
 			if(Prebot.Broodwar.getFrameCount() < 10000){
 				BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -344,7 +344,7 @@ public class RespondToStrategy {
 //				}
 //				
 		}
-		if (StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH) {
+		if (StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH) {
 			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1
 					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1) {
 				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3) {
@@ -365,7 +365,7 @@ public class RespondToStrategy {
 				}
 			}
 		}
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH){
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
 				if(center_gateway){
 					if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3){
@@ -403,13 +403,13 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH
-				||StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_PHOTONRUSH){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH
+				||StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH){
 			
 		}
 	
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
-				&& StrategyManager.Instance().getCurrentStrategyBasic() != Strategy.PROTOSSBASIC_DOUBLEPHOTO){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
+				&& StrategyManager.Instance().getCurrentStrategyBasic() != EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO){
 			
 			if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1){
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
@@ -428,12 +428,12 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_SHUTTLE){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_SHUTTLE){
 			enemy_shuttle = true;
 		}
 		
 		//protossException_Dark start
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DARK){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DARK){
 			enemy_dark_templar = true;
 			//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
 			need_vessel = true;
@@ -443,14 +443,14 @@ public class RespondToStrategy {
 		//protossException_Dark end
 		
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_ARBITER){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_ARBITER){
 			enemy_arbiter = true;
 			//if(InformationManager.Instance().getNumUnits(UnitType.Terran_Factory, MyBotModule.Broodwar.self())>4){
 			need_vessel = true;
 			max_vessel = 2;
 			//}
 		}
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_SCOUT){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_SCOUT){
 			enemy_scout = true;
 		}
 	}
@@ -458,7 +458,7 @@ public class RespondToStrategy {
 	public void RespondVsTerran() {
 		
 		max_wraith = 5;
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.TERRANBASIC_BIONIC){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.TERRANBASIC_BIONIC){
 			max_wraith = 0;
 			
 			//스타포트 지우기
@@ -486,16 +486,16 @@ public class RespondToStrategy {
 		
 		
 		//terranException_Wraith start
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.TERRANBASIC_MECHANICWITHWRAITH){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.TERRANBASIC_MECHANICWITHWRAITH){
 			enemy_wraith = true;
 		}
 		//terranException_Wraith start
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.TERRANEXCEPTION_WRAITHCLOAK){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.TERRANEXCEPTION_WRAITHCLOAK){
 			enemy_wraithcloak = true;
 			need_vessel = true;
 			max_vessel = 2;
 		}
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.TERRANBASIC_MECHANICWITHWRAITH){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.TERRANBASIC_MECHANICWITHWRAITH){
 			enemy_wraith = true;
 		}
 	}
@@ -511,19 +511,19 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.ZERGEXCEPTION_PREPARELURKER
-			||StrategyManager.Instance().getCurrentStrategyException() == StrategyException.ZERGEXCEPTION_FASTLURKER){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER
+			||StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.ZERGEXCEPTION_FASTLURKER){
 			enemy_lurker = true;
 			need_vessel = true;
 			max_vessel = 1;
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.ZERGEXCEPTION_HIGHTECH){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.ZERGEXCEPTION_HIGHTECH){
 			need_vessel = true;
 			max_vessel = 4;
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_MUTALMANY){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTALMANY){
 			
 			if(Prebot.Broodwar.self().hasResearched(TechType.Irradiate) ==false &&Prebot.Broodwar.self().isResearching(TechType.Irradiate) ==false){
 				if(BuildManager.Instance().buildQueue.getItemCount(TechType.Irradiate) < 1){
@@ -546,15 +546,15 @@ public class RespondToStrategy {
 //			}
 //		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_MUTAL ||
-                StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_MUTALMANY ||
-                        StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_HYDRAMUTAL ||
-                                StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_LINGMUTAL)
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTAL ||
+                StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTALMANY ||
+                        StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_HYDRAMUTAL ||
+                                StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_LINGMUTAL)
 		{
 			max_turret_to_mutal = 3;
 		}
 	
-		if(StrategyManager.Instance().getCurrentStrategyException() == StrategyException.ZERGEXCEPTION_ONLYLING){
+		if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.ZERGEXCEPTION_ONLYLING){
 			if(InformationManager.Instance().getNumUnits(UnitType.Terran_Vulture,InformationManager.Instance().selfPlayer) < 5	){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) < 1){
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
@@ -562,7 +562,7 @@ public class RespondToStrategy {
 			}
 		}
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ZERGBASIC_MUTAL){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTAL){
 			enemy_mutal = true;
 		}
 		
@@ -609,7 +609,7 @@ public class RespondToStrategy {
 		// }
 		
 		//marine for fast zergling and zealot start
-		if(StrategyManager.Instance().LiftChecker == false && CombatManager.Instance().FastZerglingsInOurBase > 0 || CombatManager.Instance().FastZealotInOurBase > 0){
+		if(StrategyManager.Instance().LiftChecker == false && OldCombatManager.Instance().FastZerglingsInOurBase > 0 || OldCombatManager.Instance().FastZealotInOurBase > 0){
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
@@ -817,10 +817,10 @@ public class RespondToStrategy {
 		}
 		
 		
-		if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.TERRANBASIC_BATTLECRUISER){
+		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.TERRANBASIC_BATTLECRUISER){
 			need_battlecruiser = true;
 			max_battlecruiser = 8;
-		}else if(StrategyManager.Instance().getCurrentStrategyBasic() == Strategy.ATTACKISLAND){
+		}else if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ATTACKISLAND){
 			need_battlecruiser = true;
 			max_battlecruiser = 8;
 		}else{

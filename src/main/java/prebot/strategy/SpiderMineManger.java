@@ -21,8 +21,8 @@ import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
+import prebot.micro.old.OldCombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.constant.StrategyCode.GameMap;
 
@@ -98,7 +98,7 @@ public class SpiderMineManger {
 			// 테란 스파이더마인 정책 적용
 
 			if (InformationManager.Instance().enemyRace == Race.Terran) {
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 1 * 60 * 24);
+				OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 1 * 60 * 24);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class SpiderMineManger {
 				|| Prebot.Broodwar.enemy().allUnitCount(UnitType.Protoss_Shuttle) > 0) {
 			if (mineInMyBaseLevel != 2) {
 //				MyBotModule.Broodwar.printf("mineInMyBaseLevel ................... 2");
-				CombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 50 * 24);
+				OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.VULTURE_JOIN_SQUAD, 50 * 24);
 				mineInMyBaseLevel = 2; // 본진 앞마당 전부
 			}
 			

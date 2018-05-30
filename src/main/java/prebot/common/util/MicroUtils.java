@@ -20,9 +20,9 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
-import prebot.micro.KitingOption;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.control.MicroMarine;
+import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.control.MicroMarine;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 
@@ -215,7 +215,7 @@ public class MicroUtils {
 	/**
 	 * rangeUnit은 target에 대한 카이팅을 한다.
 	 */
-	public static void preciseKiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kitingOption) {
+	public static void preciseKiting(Unit rangedUnit, UnitInfo targetInfo, OldKitingOption kitingOption) {
 		Unit target = MicroUtils.getUnitIfVisible(targetInfo);
 		if (target != null) {
 			preciseKiting(rangedUnit, target, kitingOption);
@@ -224,7 +224,7 @@ public class MicroUtils {
 		}
 	}
 	
-	public static void preciseKiting(Unit rangedUnit, Unit target, KitingOption kitingOption) {
+	public static void preciseKiting(Unit rangedUnit, Unit target, OldKitingOption kitingOption) {
 		// 유닛 유효성 검사
 		if (rangedUnit.getPlayer() != Prebot.Broodwar.self() ||
 				!UnitUtils.isValidUnit(rangedUnit) ||
@@ -312,7 +312,7 @@ public class MicroUtils {
 					fleeAngle = MicroConfig.FleeAngle.WIDE_ANGLE;
 				}
 				
-				KitingOption fleeOption = KitingOption.defaultKitingOption();
+				OldKitingOption fleeOption = OldKitingOption.defaultKitingOption();
 				fleeOption.setUnitedKiting(unitedKiting);
 				fleeOption.setGoalPosition(goalPosition);
 				fleeOption.setFleeAngle(fleeAngle);
@@ -321,11 +321,11 @@ public class MicroUtils {
 		}
 	}
 	
-	public static void preciseFlee(Unit rangedUnit, Position targetPosition, KitingOption fleeOption) {
+	public static void preciseFlee(Unit rangedUnit, Position targetPosition, OldKitingOption fleeOption) {
 		preciseFlee(rangedUnit, targetPosition, fleeOption, false);
 	}
 	
-	public static void preciseFlee(Unit rangedUnit, Position targetPosition, KitingOption fleeOption, boolean bunker) {
+	public static void preciseFlee(Unit rangedUnit, Position targetPosition, OldKitingOption fleeOption, boolean bunker) {
 		double rangedUnitSpeed = rangedUnit.getType().topSpeed() * 24.0; // 1초(24frame)에 몇 pixel가는지
 		if (rangedUnit.getType() == UnitType.Terran_Vulture) {
 			rangedUnitSpeed += MicroConfig.Upgrade.getUpgradeAdvantageAmount(UpgradeType.Ion_Thrusters);

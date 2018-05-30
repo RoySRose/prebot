@@ -1,0 +1,46 @@
+package prebot.micro.squad;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.Chokepoint;
+import prebot.common.util.UnitUtils;
+import prebot.micro.InfoUtils;
+import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.control.ScvScoutControl;
+import prebot.strategy.StrategyIdea;
+
+public class ScvScoutSquad extends Squad {
+
+	private ScvScoutControl scvScoutControl = new ScvScoutControl();
+
+	public ScvScoutSquad() {
+		super(SquadInfo.SCV_SCOUT);
+	}
+
+	@Override
+	public boolean want(Unit unit) {
+		return unit.getType() == UnitType.Terran_SCV;
+	}
+
+	@Override
+	public List<Unit> recruit(List<Unit> assignableUnitList) {
+		List<Unit> recruitList = new ArrayList<>();
+		if (StrategyIdea.assignScoutScv) {
+			Chokepoint firstChoke = InfoUtils.myFirstChoke();
+			Unit scvNearFirstChoke = UnitUtils.getClosestMineralWorkerToPosition(assignableUnitList, firstChoke.getCenter());
+			if (scvNearFirstChoke != null) {
+				recruitList.add(scvNearFirstChoke);
+				StrategyIdea.assignScoutScv = false;
+			}
+		}
+		return recruitList;
+	}
+
+	@Override
+	public void execute() {
+		scvScoutControl.control(unitList, euiList);
+	}
+}

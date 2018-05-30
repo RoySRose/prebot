@@ -23,7 +23,7 @@ public class CommonConfig {
 	}
 
 	/// 화면 표시 여부 - 게임 정보
-	public static class DrawConfig {
+	public static class UxConfig {
 
 		/// StarCraft 및 BWAPI 에서 1 Tile = 32 * 32 Point (Pixel) 입니다<br>
 		/// Position 은 Point (Pixel) 단위이고, TilePosition 은 Tile 단위입니다

@@ -1,7 +1,7 @@
 package prebot.strategy.constant;
 
 public class StrategyCode {
-
+	
 	public static enum GameMap {
 		UNKNOWN, FIGHTING_SPRIRITS, LOST_TEMPLE, THE_HUNTERS
 	}
@@ -12,5 +12,9 @@ public class StrategyCode {
 
 	public static enum KnowledgeActionEvaluation {
 		DONT_KNOW, GOOD_ACTION, BAD_ACTION
+	}
+	
+	public static enum WatcherPredictResult {
+		BACK, ATTACK
 	}
 }

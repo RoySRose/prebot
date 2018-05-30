@@ -1,6 +1,5 @@
 package prebot.strategy;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,7 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
+import bwapi.Color;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -26,10 +27,12 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.MapTools;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
@@ -105,6 +108,12 @@ public class InformationManager {
 
 	private List<BaseLocation> islandBaseLocations = new ArrayList<BaseLocation>();
 
+	/// base location의 꼭지점 (정찰시 활용)
+	private Map<Position, Vector<Position>> baseRegionVerticesMap = new HashMap<>();
+	
+	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
+	private Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
+
 	/// static singleton 객체를 리턴합니다
 	public static InformationManager Instance() {
 		return instance;
@@ -143,8 +152,8 @@ public class InformationManager {
 		
 		occupiedBaseLocations.put(selfPlayer, new ArrayList<BaseLocation>());
 		occupiedBaseLocations.put(enemyPlayer, new ArrayList<BaseLocation>());
-		occupiedRegions.put(selfPlayer, new HashSet());
-		occupiedRegions.put(enemyPlayer, new HashSet());
+		occupiedRegions.put(selfPlayer, new HashSet<Region>());
+		occupiedRegions.put(enemyPlayer, new HashSet<Region>());
 
 		mainBaseLocations.put(selfPlayer, BWTA.getStartLocation(Prebot.Broodwar.self()));
 		mainBaseLocationChanged.put(selfPlayer, new Boolean(true));
@@ -185,8 +194,10 @@ public class InformationManager {
 
 		updateFirstGasInformation();
 		updateMapSpecificInformation();
+		System.out.println("test");
 		updateChokePointAndExpansionLocation();
 //		checkTileForSupply();
+//		updateBaseRegionVerticesMap();
 	}
 
 //	private void checkTileForSupply() {
@@ -206,7 +217,6 @@ public class InformationManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
-		
 		
 		if(Prebot.Broodwar.getFrameCount() % 8 == 0) {
 			updateUnitsInfo();
@@ -350,12 +360,33 @@ public class InformationManager {
 			updateUnitInfo(unit);
 		}
 
+		updateEnemiesInMyRegion();
+		
 		// remove bad enemy units
 		if (unitData.get(enemyPlayer) != null) {
 			unitData.get(enemyPlayer).removeBadUnits();
 		}
 		if (unitData.get(selfPlayer) != null) {
 			unitData.get(selfPlayer).removeBadUnits();
+		}
+	}
+
+	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
+	private void updateEnemiesInMyRegion() {
+		euiListInMyRegion.clear();
+		Set<Region> myRegionSet = occupiedRegions.get(selfPlayer);
+		for (Region region : myRegionSet) {
+			euiListInMyRegion.put(region, new ArrayList<UnitInfo>());
+		}
+		
+		Map<Integer, UnitInfo> unitAndUnitInfoMap = unitData.get(enemyPlayer).getUnitAndUnitInfoMap();
+		for (UnitInfo eui : unitAndUnitInfoMap.values()) {
+			Region region = BWTA.getRegion(eui.getLastPosition());
+			if (myRegionSet.contains(region)) {
+				List<UnitInfo> euiList = euiListInMyRegion.get(region);
+				euiList.add(eui);
+	            euiListInMyRegion.put(region, euiList);
+	        }
 		}
 	}
 
@@ -1711,4 +1742,146 @@ public class InformationManager {
 	public MapSpecificInformation getMapSpecificInformation() {
 		return mapSpecificInformation;
 	}
+
+
+//	private void updateBaseRegionVerticesMap() {
+//		for (BaseLocation base : BWTA.getStartLocations()) {
+//			calculateEnemyRegionVertices(base);
+//		}
+//	}
+
+	// Enemy MainBaseLocation 이 있는 Region 의 가장자리를 enemyBaseRegionVertices 에 저장한다
+	// Region 내 모든 건물을 Eliminate 시키기 위한 지도 탐색 로직 작성시 참고할 수 있다
+	public void calculateEnemyRegionVertices(BaseLocation base) {
+		if (base == null) {
+			return;
+		}
+		Region enemyRegion = base.getRegion();
+		if (enemyRegion == null) {
+			return;
+		}
+		
+		Vector<Position> regionVertices = new Vector<>();
+
+		final Position basePosition = Prebot.Broodwar.self().getStartLocation().toPosition();
+		final Vector<TilePosition> closestTobase = MapTools.Instance().getClosestTilesTo(basePosition);
+		Set<Position> unsortedVertices = new HashSet<Position>();
+
+		// check each tile position
+		for (final TilePosition tp : closestTobase) {
+			if (BWTA.getRegion(tp) != enemyRegion) {
+				continue;
+			}
+
+			// a tile is 'surrounded' if
+			// 1) in all 4 directions there's a tile position in the current region
+			// 2) in all 4 directions there's a buildable tile
+			boolean surrounded = true;
+			if (BWTA.getRegion(new TilePosition(tp.getX() + 1, tp.getY())) != enemyRegion || !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() + 1)) != enemyRegion || !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
+					|| BWTA.getRegion(new TilePosition(tp.getX() - 1, tp.getY())) != enemyRegion || !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() - 1)) != enemyRegion || !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1))) {
+				surrounded = false;
+			}
+
+			// push the tiles that aren't surrounded
+			// Region의 가장자리 타일들만 추가한다
+			if (!surrounded && Prebot.Broodwar.isBuildable(tp)) {
+				if (UxConfig.drawScoutInfo) {
+					int x1 = tp.getX() * 32 + 2;
+					int y1 = tp.getY() * 32 + 2;
+					int x2 = (tp.getX() + 1) * 32 - 2;
+					int y2 = (tp.getY() + 1) * 32 - 2;
+					Prebot.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
+					Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+				}
+
+				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
+			}
+		}
+
+		Vector<Position> sortedVertices = new Vector<Position>();
+		Position current = unsortedVertices.iterator().next();
+		regionVertices.add(current);
+		unsortedVertices.remove(current);
+
+		// while we still have unsorted vertices left, find the closest one remaining to current
+		while (!unsortedVertices.isEmpty()) {
+			double bestDist = 1000000;
+			Position bestPos = null;
+
+			for (final Position pos : unsortedVertices) {
+				double dist = pos.getDistance(current);
+
+				if (dist < bestDist) {
+					bestDist = dist;
+					bestPos = pos;
+				}
+			}
+
+			current = bestPos;
+			sortedVertices.add(bestPos);
+			unsortedVertices.remove(bestPos);
+		}
+
+		// let's close loops on a threshold, eliminating death grooves
+		int distanceThreshold = 100;
+
+		while (true) {
+			// find the largest index difference whose distance is less than the threshold
+			int maxFarthest = 0;
+			int maxFarthestStart = 0;
+			int maxFarthestEnd = 0;
+
+			// for each starting vertex
+			for (int i = 0; i < (int) sortedVertices.size(); ++i) {
+				int farthest = 0;
+				int farthestIndex = 0;
+
+				// only test half way around because we'll find the other one on the way back
+				for (int j = 1; j < sortedVertices.size() / 2; ++j) {
+					int jindex = (i + j) % sortedVertices.size();
+
+					if (sortedVertices.get(i).getDistance(sortedVertices.get(jindex)) < distanceThreshold) {
+						farthest = j;
+						farthestIndex = jindex;
+					}
+				}
+
+				if (farthest > maxFarthest) {
+					maxFarthest = farthest;
+					maxFarthestStart = i;
+					maxFarthestEnd = farthestIndex;
+				}
+			}
+
+			// stop when we have no long chains within the threshold
+			if (maxFarthest < 4) {
+				break;
+			}
+
+			double dist = sortedVertices.get(maxFarthestStart).getDistance(sortedVertices.get(maxFarthestEnd));
+
+			Vector<Position> temp = new Vector<Position>();
+
+			for (int s = maxFarthestEnd; s != maxFarthestStart; s = (s + 1) % sortedVertices.size()) {
+
+				temp.add(sortedVertices.get(s));
+			}
+
+			sortedVertices = temp;
+		}
+
+		regionVertices = sortedVertices;
+		baseRegionVerticesMap.put(base.getPosition(), regionVertices);
+	}
+
+	public Vector<Position> getBaseRegionVerticesMap(BaseLocation base) {
+		return baseRegionVerticesMap.get(base.getPosition());
+	}
+
+	public List<UnitInfo> getEuiListInMyRegion(Region region) {
+		return euiListInMyRegion.get(region);
+	}
+	
 }

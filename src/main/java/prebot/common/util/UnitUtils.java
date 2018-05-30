@@ -19,9 +19,8 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.UnitCache;
+import prebot.micro.InfoUtils;
 import prebot.micro.WorkerManager;
-import prebot.strategy.InformationManager;
-import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;
 
@@ -178,9 +177,12 @@ public class UnitUtils {
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
 	public static void addEnemyUnitInfosInRadius(Collection<UnitInfo> euiList, Position position, int radius) {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Broodwar.enemy());
-		for (UnitInfo eui : enemyUnitData.getUnitAndUnitInfoMap().values()) {
+		for (UnitInfo eui : InfoUtils.enemyUnitInfoMap().values()) {
 			if (euiList.contains(eui)) {
+				continue;
+			}
+			//TODO unitinfo에 쓰레기 값 들어가는 오류 있음 information manager 확인필요 (아래는 임시 조치)
+			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
 			if (eui.getLastPosition().getDistance(position) > radius) {
@@ -195,11 +197,11 @@ public class UnitUtils {
 	
 	/** position 근처의 유닛리스트를 리턴 */
 	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius) {
-		return getUnitsInRadius(playerRange, position, radius, null);
+		return getUnitsInRadius(playerRange, position, radius, UnitType.AllUnits);
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius, UnitType unitType) {
+	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius, UnitType... unitTypes) {
 		Player player = null;
 		if (playerRange == PlayerRange.SELF) {
 			player = Prebot.Broodwar.self();
@@ -214,10 +216,16 @@ public class UnitUtils {
 			if (player != null && player != unit.getPlayer()) {
 				continue;
 			}
-			if (unitType != null && unit.getType() != unitType) {
-				continue;
+			boolean isSearchingUnitType = false;
+			for (UnitType unitType : unitTypes) {
+				if (unitType == UnitType.AllUnits || unit.getType() == unitType) {
+					isSearchingUnitType = true;
+					break;
+				}
 			}
-			unitsInRadius.add(unit);
+			if (isSearchingUnitType) {
+				unitsInRadius.add(unit);
+			}
 		}
 		return unitsInRadius;
 	}
@@ -310,11 +318,6 @@ public class UnitUtils {
 			}
 		}
 		return closestUnit;
-	}
-
-	public static int remainingBuildTimeByHitPoint(Unit building) {
-		double rate = (double) (building.getType().maxHitPoints() - building.getHitPoints()) / building.getType().maxHitPoints();
-		return (int) (building.getType().buildTime() * rate);
 	}
 
 	public static boolean canAttack(Unit attacker, Unit target) {

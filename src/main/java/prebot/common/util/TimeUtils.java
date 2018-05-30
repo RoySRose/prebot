@@ -1,6 +1,8 @@
 package prebot.common.util;
 
 import bwapi.Unit;
+import bwapi.UnitType;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 
 public class TimeUtils {
@@ -64,4 +66,32 @@ public class TimeUtils {
 		int unitGroup = unit.getID() % rotationSize;
 		return executeRotation(unitGroup, rotationSize);
 	}
+
+	/// 유닛의 빌드시간
+	public static int buildSeconds(UnitType unitType) {
+		return unitType.buildTime() / TimeUtils.SECOND;
+	}
+	
+	/// 남아있는 빌드시간
+	public static int remainBuildSeconds(Unit building) {
+		if (building.isCompleted()) {
+			return CommonCode.UNKNOWN;
+		}
+		
+		double remainRate = (double) (building.getType().maxHitPoints() - building.getHitPoints()) / building.getType().maxHitPoints();
+		int remainBuildFrames = (int) (building.getType().buildTime() * remainRate);
+		return remainBuildFrames / SECOND;
+	}
+	
+	/// 시작된 빌드시간
+	public static int buildStartSeconds(Unit building) {
+		if (building.isCompleted()) {
+			return CommonCode.UNKNOWN;
+		}
+		
+		double completeRate = (double) building.getHitPoints() / building.getType().maxHitPoints();
+		int buildStartFrames = elapsedFrames() - (int) (building.getType().buildTime() * completeRate);
+		return buildStartFrames / SECOND;
+	}
+	
 }

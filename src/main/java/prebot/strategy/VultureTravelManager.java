@@ -11,8 +11,8 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
-import prebot.micro.CombatExpectation;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.CombatExpectation;
 
 public class VultureTravelManager {
 
