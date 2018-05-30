@@ -14,10 +14,10 @@ import bwta.Chokepoint;
 import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroCode.OldSquadName;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
@@ -61,7 +61,7 @@ public class MicroBuilding extends MicroManager {
 		
 		
 		if (units != null && !units.isEmpty()) {
-			leader = MicroUtils.leaderOfUnit(units, OldCombatManager.Instance().getMainAttackLocation(OldCombatManager.Instance().squadData.getSquad(OldSquadName.MAIN_ATTACK)));
+			leader = OldMicroUtils.leaderOfUnit(units, OldCombatManager.Instance().getMainAttackLocation(OldCombatManager.Instance().squadData.getSquad(OldSquadName.MAIN_ATTACK)));
 		}
 		
 		Position LeaderPos = null;

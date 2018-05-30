@@ -6,7 +6,7 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldTargetPriority;
 
@@ -17,7 +17,7 @@ public class MicroGoliath extends MicroManager {
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> goliaths = getUnits();
-		List<Unit> goliathTargets = MicroUtils.filterTargets(targets, true);
+		List<Unit> goliathTargets = OldMicroUtils.filterTargets(targets, true);
 		
 		OldKitingOption kitingOption = OldKitingOption.defaultKitingOption();
 		kitingOption.setGoalPosition(order.getPosition());
@@ -32,14 +32,14 @@ public class MicroGoliath extends MicroManager {
 			
 			Unit target = getTarget(goliath, goliathTargets);
 			if (target != null) {
-				MicroUtils.preciseKiting(goliath, target, kitingOption);
+				OldMicroUtils.preciseKiting(goliath, target, kitingOption);
 			} else {
 				// if we're not near the order position, go there
 				if (goliath.getDistance(order.getPosition()) > order.getRadius()) {
 					CommandUtils.attackMove(goliath, order.getPosition());
 				} else {
 					if (goliath.isIdle()) {
-						Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), order.getRadius());
+						Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), order.getRadius());
 						CommandUtils.attackMove(goliath, randomPosition);
 					}
 				}

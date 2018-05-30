@@ -19,7 +19,6 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.UnitCache;
-import prebot.micro.InfoUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;

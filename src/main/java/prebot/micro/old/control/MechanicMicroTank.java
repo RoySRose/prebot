@@ -13,9 +13,9 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
@@ -40,8 +40,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	
 	public void prepareMechanic(OldSquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
-		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
-		this.flyingEnemisInfo = MicroUtils.filterFlyingTargetInfos(enemiesInfo);
+		this.enemiesInfo = OldMicroUtils.filterTargetInfos(enemiesInfo, false);
+		this.flyingEnemisInfo = OldMicroUtils.filterFlyingTargetInfos(enemiesInfo);
 	}
 	
 	public void prepareMechanicAdditional(List<Unit> vultureList, List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, int initFrame) {
@@ -93,8 +93,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				int distToOrder = tank.getDistance(order.getPosition());
 				if (tank.canUnsiege()) {
 					if(distToOrder > MicroConfig.Tank.SIEGE_MODE_MAX_RANGE
-							|| MicroUtils.existTooNarrowChoke(tank.getPosition())
-							|| MicroUtils.isExpansionPosition(tank.getPosition())) {
+							|| OldMicroUtils.existTooNarrowChoke(tank.getPosition())
+							|| OldMicroUtils.isExpansionPosition(tank.getPosition())) {
 						tank.unsiege();
 					}
 				}
@@ -103,8 +103,8 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				Position movePosition = order.getPosition();
 				if (tank.canUnsiege()) {
 					if(tank.getDistance(movePosition) > siegeModeSpreadRadius
-							|| MicroUtils.existTooNarrowChoke(tank.getPosition())
-							|| MicroUtils.isExpansionPosition(tank.getPosition())) {
+							|| OldMicroUtils.existTooNarrowChoke(tank.getPosition())
+							|| OldMicroUtils.isExpansionPosition(tank.getPosition())) {
 						tank.unsiege();
 					}
 				}
@@ -138,12 +138,12 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				retreatPosition = myBase.getPosition();
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseFlee(tank, decision.getEnemyPosition(), kOpt);
+			OldMicroUtils.preciseFlee(tank, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
 			UnitInfo targetInfo = decision.getTargetInfo();
-			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+			Unit target = OldMicroUtils.getUnitIfVisible(targetInfo);
 			Position targetPosition = targetInfo.getLastPosition();
 			UnitType targetType = targetInfo.getType();
 			if (target != null) {
@@ -157,7 +157,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					&& targetType.groundWeapon().maxRange() <= MicroConfig.Tank.SIEGE_MODE_MIN_RANGE) { // melee 타깃 카이팅(백업 유닛이 있으면 밀리유닛 상대로도 시즈모드 변경) 
 				Position kitingGoalPosition = order.getPosition();
 				kOpt.setGoalPosition(kitingGoalPosition);
-				MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
+				OldMicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
 			} else {
 				boolean shouldSiege = false;
 				int distanceToTarget = tank.getDistance(targetPosition);
@@ -188,7 +188,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				} else {
 					Position kitingGoalPosition = order.getPosition();
 					kOpt.setGoalPosition(kitingGoalPosition);
-					MicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
+					OldMicroUtils.preciseKiting(tank, decision.getTargetInfo(), kOpt);
 				}
 			}
 			break;
@@ -198,14 +198,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				// 테란전용 go
 				int distToOrder = tank.getDistance(order.getPosition());
 				if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE
-						&& !MicroUtils.existTooNarrowChoke(tank.getPosition())
-						&& !MicroUtils.isExpansionPosition(tank.getPosition())) { // orderPosition의 둘러싼 대형을 만든다.
+						&& !OldMicroUtils.existTooNarrowChoke(tank.getPosition())
+						&& !OldMicroUtils.isExpansionPosition(tank.getPosition())) { // orderPosition의 둘러싼 대형을 만든다.
 					if (tank.canSiege()) {
 						tank.siege();
 					} else {
 						if (tank.isIdle() || tank.isBraking()) {
 							if (!tank.isBeingHealed()) {
-								Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+								Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
 								CommandUtils.attackMove(tank, randomPosition);
 							}
 						}
@@ -227,14 +227,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					}
 					if (tank.isIdle() || tank.isBraking()) {
 						if (!tank.isBeingHealed()) {
-							Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+							Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
 							CommandUtils.attackMove(tank, randomPosition);
 						}
 					}
 				} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
 					if (tank.isIdle() || tank.isBraking()) {
 						if (!tank.isBeingHealed()) {
-							Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), 100);
+							Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
 							CommandUtils.attackMove(tank, randomPosition);
 						}
 					}
@@ -257,16 +257,16 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 		while (seigeNumLimit < 8) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
 				for (Integer angle : MicroConfig.FleeAngle.EIGHT_360_ANGLE) {
-					double radianAdjust = MicroUtils.rotate(0.0, angle);
+					double radianAdjust = OldMicroUtils.rotate(0.0, angle);
 				    Position fleeVector = new Position((int)(distanceFromOrderPosition * Math.cos(radianAdjust)), (int)(distanceFromOrderPosition * Math.sin(radianAdjust)));
 				    int x = order.getPosition().getX() + fleeVector.getX();
 				    int y = order.getPosition().getY() + fleeVector.getY();
 				    
 				    Position movePosition = new Position(x, y);
-				    if (MicroUtils.isValidGroundPosition(movePosition)
+				    if (OldMicroUtils.isValidGroundPosition(movePosition)
 				    		&& Prebot.Broodwar.hasPath(tank.getPosition(), movePosition)
-							&& MicroUtils.isConnectedPosition(tank.getPosition(), movePosition)) {
-				    	if (MicroUtils.existTooNarrowChoke(movePosition) || MicroUtils.isExpansionPosition(movePosition)) {
+							&& OldMicroUtils.isConnectedPosition(tank.getPosition(), movePosition)) {
+				    	if (OldMicroUtils.existTooNarrowChoke(movePosition) || OldMicroUtils.isExpansionPosition(movePosition)) {
 				    		continue;
 				    	}
 

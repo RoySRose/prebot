@@ -4,13 +4,13 @@ import java.util.List;
 
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.MicroUtils;
 import prebot.micro.TargetScoreCalculators;
 import prebot.micro.WatcherPredictor;
 import prebot.micro.constant.MicroConfig.Angles;

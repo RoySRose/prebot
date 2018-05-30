@@ -13,7 +13,6 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroCode.Combat;
 import prebot.micro.constant.MicroCode.CombatStrategy;
@@ -186,7 +185,7 @@ public class OldSquad {
 				InformationManager.Instance().getNearbyForce(nearTankEnemies, tank.getPosition(), InformationManager.Instance().enemyPlayer, 0);
 			}
 			for (UnitInfo enemyInfo : nearTankEnemies) {
-				Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
+				Unit enemy = OldMicroUtils.getUnitIfVisible(enemyInfo);
 				if (enemy != null) {
 					if (!UnitUtils.isValidUnit(enemy)) {
 						continue;

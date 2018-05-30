@@ -1,4 +1,4 @@
-package prebot.micro;
+package prebot.common.util;
 
 import java.util.List;
 import java.util.Map;

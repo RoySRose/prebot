@@ -10,9 +10,9 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
@@ -50,7 +50,7 @@ public class MicroWraith extends MicroManager {
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> wraiths = getUnits();
-		List<Unit> wraithTargets = MicroUtils.filterTargets(targets, true);
+		List<Unit> wraithTargets = OldMicroUtils.filterTargets(targets, true);
 		
 		OldKitingOption kitingOption = OldKitingOption.defaultKitingOption();
 		kitingOption.setCooltimeAlwaysAttack(false);
@@ -202,7 +202,7 @@ public class MicroWraith extends MicroManager {
 				if (target != null && !fleeing) {
 					if (target.canAttack(wraith)) {
 						System.out.println("attacking target: " + target.getType());
-						MicroUtils.preciseKiting(wraith, wraith, kitingOption);
+						OldMicroUtils.preciseKiting(wraith, wraith, kitingOption);
 					} else {
 						CommandUtils.attackUnit(wraith, target);
 					}
@@ -296,7 +296,7 @@ public class MicroWraith extends MicroManager {
 					minimumRisk = risk;
 					minimumDistanceToGoal = distanceToGoal;
 				}
-				fleeRadianAdjust = MicroUtils.rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
+				fleeRadianAdjust = OldMicroUtils.rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 		    }
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회 
 		    	moveCalcSize = moveCalcSize * 2; //TODO 보정 로직이 moveCalcsize 늘려야 하는거 같은데..또한 늘렸을시에 무한 loop 조심

@@ -19,9 +19,9 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.constant.StrategyCode.GameMap;
@@ -218,13 +218,13 @@ public class SpiderMineManger {
 		}
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
-			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
+			Unit enemy = OldMicroUtils.getUnitIfVisible(enemyInfo);
 			if (enemy != null) {
 				if (vulture.getDistance(enemy) <= MicroConfig.Vulture.MINE_ENEMY_TARGET_DISTANCE) {
 					List<Unit> spiderMinesNearEnemy = MapGrid.Instance().getUnitsNear(enemy.getPosition(), MicroConfig.Vulture.MINE_ENEMY_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine);
 					if (spiderMinesNearEnemy.size() + numOfMineReserved(enemy.getPosition(), MicroConfig.Vulture.MINE_ENEMY_RADIUS) < 1) {
 						for (int i = 0; i < 3; i++) {
-							Position minePosition = MicroUtils.randomPosition(enemy.getPosition(), MicroConfig.Vulture.MINE_ENEMY_RADIUS);
+							Position minePosition = OldMicroUtils.randomPosition(enemy.getPosition(), MicroConfig.Vulture.MINE_ENEMY_RADIUS);
 							if (noProblemToMine(minePosition)) { // 문제없다면 없다면 매설
 								mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, Prebot.Broodwar.getFrameCount()));
 								return minePosition;
@@ -248,7 +248,7 @@ public class SpiderMineManger {
 		Position nearestGoodPosition = null;
 		for (Position position : goodPositions) {
 			int distance = vulture.getDistance(position);
-			if (distance < nearestDistance && distance < MicroConfig.Vulture.MINE_SPREAD_RADIUS && MicroUtils.isSafePlace(position)) {
+			if (distance < nearestDistance && distance < MicroConfig.Vulture.MINE_SPREAD_RADIUS && OldMicroUtils.isSafePlace(position)) {
 				nearestDistance = distance;
 				nearestGoodPosition = position;
 			}
@@ -279,8 +279,8 @@ public class SpiderMineManger {
 			List<Unit> spiderMinesInExactRadius = MapGrid.Instance().getUnitsNear(position, MicroConfig.Vulture.MINE_EXACT_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine);
 			if (spiderMinesInExactRadius.size() == 0) {
 				for (int i = 0; i < 3; i++) {
-					Position minePosition = MicroUtils.randomPosition(position, MicroConfig.Vulture.MINE_EXACT_RADIUS);
-					if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
+					Position minePosition = OldMicroUtils.randomPosition(position, MicroConfig.Vulture.MINE_EXACT_RADIUS);
+					if (noProblemToMine(minePosition) && OldMicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
 						mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, Prebot.Broodwar.getFrameCount()));
 						return minePosition;
 					}
@@ -292,8 +292,8 @@ public class SpiderMineManger {
 		List<Unit> spiderMinesInSpreadRadius = MapGrid.Instance().getUnitsNear(position, MicroConfig.Vulture.MINE_SPREAD_RADIUS, true, false, UnitType.Terran_Vulture_Spider_Mine);
 		if (spiderMinesInSpreadRadius.size() + numOfMineReserved(position, MicroConfig.Vulture.MINE_SPREAD_RADIUS) < mineNumberPerPosition) {
 			for (int i = 0; i < 3; i++) {
-				Position minePosition = MicroUtils.randomPosition(position, MicroConfig.Vulture.MINE_SPREAD_RADIUS);
-				if (noProblemToMine(minePosition) && MicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
+				Position minePosition = OldMicroUtils.randomPosition(position, MicroConfig.Vulture.MINE_SPREAD_RADIUS);
+				if (noProblemToMine(minePosition) && OldMicroUtils.isSafePlace(minePosition)) { // 문제없다면 없다면 매설
 					mineReservedMap.put(vulture.getID(), new MineReserved(minePosition, Prebot.Broodwar.getFrameCount()));
 					return minePosition;
 				}
@@ -311,7 +311,7 @@ public class SpiderMineManger {
 		}
 		
 		// 마인을 심을 수 있는 장소가 아니다.
-		if (!MicroUtils.isValidGroundPosition(position)) {
+		if (!OldMicroUtils.isValidGroundPosition(position)) {
 			return false;
 		}
 		

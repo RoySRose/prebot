@@ -13,11 +13,11 @@ import bwta.Chokepoint;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.FleeAngle;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.constant.MicroConfig.Upgrade;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
@@ -30,7 +30,7 @@ public class MicroTank extends MicroManager {
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 		List<Unit> tanks = getUnits();
-		List<Unit> tankTargets = MicroUtils.filterTargets(targets, false);
+		List<Unit> tankTargets = OldMicroUtils.filterTargets(targets, false);
 		
 		if (tankTargets.isEmpty()) {
 			if (initFrame > 0) {
@@ -151,7 +151,7 @@ public class MicroTank extends MicroManager {
 					} else {
 						target = getTarget(tank, targetsInTankRange, false);
 					}
-					MicroUtils.preciseKiting(tank, target, kitingOption);
+					OldMicroUtils.preciseKiting(tank, target, kitingOption);
 					
 				} else if (initFrame == Prebot.Broodwar.getFrameCount() && tank.getDistance(initTarget) <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 150) {
 					// 1. 이니시에이트
@@ -160,7 +160,7 @@ public class MicroTank extends MicroManager {
 				} else if (!targetsInTankRange.isEmpty()) {
 					// 2. 탱크모드로 때릴 적이 있다
 					Unit target = getTarget(tank, targetsInTankRange, false);
-					MicroUtils.preciseKiting(tank, target, kitingOption);
+					OldMicroUtils.preciseKiting(tank, target, kitingOption);
 					
 				} else {
 					List<Unit> targetsInSiegeRange = MapGrid.Instance().getUnitsNear(tank.getPosition(), MicroConfig.Tank.SIEGE_MODE_MAX_RANGE, false, true, null);
@@ -172,7 +172,7 @@ public class MicroTank extends MicroManager {
 						// 포격할 수 있는 거리이면 시즈모드로 변경.
 						if (target == null || target.getType().groundWeapon().maxRange() <= MicroConfig.Tank.SIEGE_MODE_MIN_RANGE) {
 							target = getTarget(tank, targetsInSiegeRange, false);
-							MicroUtils.preciseKiting(tank, target, kitingOption);
+							OldMicroUtils.preciseKiting(tank, target, kitingOption);
 						} else {
 							tank.siege();
 						}
@@ -194,7 +194,7 @@ public class MicroTank extends MicroManager {
 							tank.siege();
 						} else {
 							Unit target = getTarget(tank, tankTargets, false);
-							MicroUtils.preciseKiting(tank, target, kitingOption);
+							OldMicroUtils.preciseKiting(tank, target, kitingOption);
 						}
 					}
 				}
@@ -217,7 +217,7 @@ public class MicroTank extends MicroManager {
 			
 		} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
 			if (tank.isIdle()) {
-				Position randomPosition = MicroUtils.randomPosition(tank.getPosition(), order.getRadius());
+				Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), order.getRadius());
 				CommandUtils.attackMove(tank, randomPosition);
 			}
 			
@@ -240,7 +240,7 @@ public class MicroTank extends MicroManager {
 		while (seigeNumLimit < 10) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
 				for (Integer angle : MicroConfig.FleeAngle.EIGHT_360_ANGLE) {
-					double radianAdjust = MicroUtils.rotate(0.0, angle);
+					double radianAdjust = OldMicroUtils.rotate(0.0, angle);
 				    Position fleeVector = new Position((int)(distanceFromOrderPosition * Math.cos(radianAdjust)), (int)(distanceFromOrderPosition * Math.sin(radianAdjust)));
 				    int x = order.getPosition().getX() + fleeVector.getX();
 				    int y = order.getPosition().getY() + fleeVector.getY();
@@ -346,7 +346,7 @@ public class MicroTank extends MicroManager {
 			
 			// 한방에 죽는다면 HP 높을 수록 우선순위가 높다.
 			// 한방에 안죽는다면 HP가 낮을 수록 우선순위가 높다.
-			if (MicroUtils.killedByNShot(tank, target, 1)) {
+			if (OldMicroUtils.killedByNShot(tank, target, 1)) {
 				hitPointScore += target.getHitPoints() / 10;
 	        } else {
 	        	hitPointScore -= target.getHitPoints() / 10;

@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.UpgradeUtils;
 import prebot.micro.constant.MicroConfig.Flee;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;

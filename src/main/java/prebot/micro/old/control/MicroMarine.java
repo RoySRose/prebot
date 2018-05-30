@@ -10,9 +10,9 @@ import bwta.BWTA;
 import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldTargetPriority;
@@ -71,7 +71,7 @@ public class MicroMarine extends MicroManager {
 							CommandUtils.move(marine, mineralpos);
 						}
 					} else {
-						MicroUtils.preciseKiting(marine, target, kitingOption);
+						OldMicroUtils.preciseKiting(marine, target, kitingOption);
 					}
 				} else {
 					if (InformationManager.Instance().enemyRace == Race.Zerg) {
@@ -118,7 +118,7 @@ public class MicroMarine extends MicroManager {
 								marine.move(bunker.getPosition());
 							}
 						} else {
-							MicroUtils.preciseKiting(marine, target, kitingOption);
+							OldMicroUtils.preciseKiting(marine, target, kitingOption);
 						}
 					}
 				} else {
@@ -263,7 +263,7 @@ public class MicroMarine extends MicroManager {
 				Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2,
 						rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 
-				int risk = MicroUtils.riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize,
+				int risk = OldMicroUtils.riskOfFleePosition(rangedUnit.getType(), movePosition, moveCalcSize,
 						unitedKiting); // 회피지점에서의 예상위험도
 				int distanceToGoal = movePosition.getApproxDistance(goalPosition); // 위험도가
 																					// 같을
@@ -277,7 +277,7 @@ public class MicroMarine extends MicroManager {
 				if (bunker) {
 					risk += distanceToGoal;
 					// 회피지점은 유효하고, 걸어다닐 수 있어야 하고, 안전해야 하고 등등
-					if (MicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid()
+					if (OldMicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid()
 							&& BWTA.getRegion(middlePosition) != null && (risk < minimumRisk
 									|| (risk == minimumRisk && distanceToGoal < minimumDistanceToGoal))) {
 
@@ -286,7 +286,7 @@ public class MicroMarine extends MicroManager {
 						minimumDistanceToGoal = distanceToGoal;
 					}
 				} else {
-					if (MicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid()
+					if (OldMicroUtils.isValidGroundPosition(movePosition) && middlePosition.isValid()
 							&& BWTA.getRegion(middlePosition) != null && (risk < minimumRisk
 									|| (risk == minimumRisk && distanceToTarget > maximumdistanceToTarget))) {
 
@@ -295,7 +295,7 @@ public class MicroMarine extends MicroManager {
 						maximumdistanceToTarget = distanceToTarget;
 					}
 				}
-				fleeRadianAdjust = MicroUtils.rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
+				fleeRadianAdjust = OldMicroUtils.rotate(fleeRadian, FLEE_ANGLE[i]); // 각도변경
 			}
 			if (safePosition == null) { // 회피지역이 없을 경우 1) 회피거리 짧게 잡고 다시 조회
 				// MyBotModule.Broodwar.sendText("safe is null : " +

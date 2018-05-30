@@ -13,7 +13,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.main.Prebot;
-import prebot.common.util.MicroUtils;
+import prebot.micro.old.OldMicroUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.RespondToStrategy;
 import prebot.strategy.StrategyManager;
@@ -141,7 +141,7 @@ public class AnalyzeStrategy {
 					// 1. 본진에 적 포톤캐논이 있는지 본다.
 					base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 					Region myRegion = base.getRegion();
-					List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,InformationManager.Instance().enemyPlayer);
+					List<Unit> enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion,InformationManager.Instance().enemyPlayer);
 					
 					
 					
@@ -157,7 +157,7 @@ public class AnalyzeStrategy {
 					if (selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
 						base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 						myRegion = base.getRegion();
-						enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
+						enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion,
 								InformationManager.Instance().enemyPlayer);
 						if(enemyUnitsInRegion.size() >0){
 							for (Unit enemy : enemyUnitsInRegion) {
@@ -174,7 +174,7 @@ public class AnalyzeStrategy {
 						base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
 						if(base!=null){
 							myRegion = base.getRegion();
-							enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,InformationManager.Instance().enemyPlayer);
+							enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion,InformationManager.Instance().enemyPlayer);
 							if(enemyUnitsInRegion.size() >0){
 								for (Unit enemy : enemyUnitsInRegion) {
 									if (enemy.getType() == UnitType.Protoss_Photon_Cannon || enemy.getType() == UnitType.Protoss_Forge

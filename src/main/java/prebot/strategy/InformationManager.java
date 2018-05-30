@@ -29,13 +29,13 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.MapTools;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.OldMicroUtils;
 import prebot.strategy.constant.StrategyCode.GameMap;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
@@ -336,7 +336,7 @@ public class InformationManager {
 			// 1. 본진에 적 포톤캐논이 있는지 본다.
 			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
 			Region myRegion = base.getRegion();
-			List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
+			List<Unit> enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion,
 			InformationManager.Instance().enemyPlayer);
 			if (enemyUnitsInRegion.size() >= 1) {
 				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {

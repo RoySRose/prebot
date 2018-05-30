@@ -21,7 +21,6 @@ import bwta.Region;
 import prebot.common.AnalyzeStrategy;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -241,7 +240,7 @@ public class OldCombatManager {
 		if (myRegion == null || !myRegion.getCenter().isValid()) {
 		    return;
 		}
-		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+		List<Unit> enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if(enemyUnitsInRegion.size() == 0){
 			return;
 		}
@@ -296,9 +295,9 @@ public class OldCombatManager {
 		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 			if (UnitUtils.isValidUnit(unit)
 					&& unit.getType() != UnitType.Terran_Vulture_Spider_Mine
-					&& !MicroUtils.isUnitContainedInUnitSet(unit, combatUnits)
+					&& !OldMicroUtils.isUnitContainedInUnitSet(unit, combatUnits)
 					&& (UnitUtils.isValidUnit(unit) || unit.getType().isWorker())) {
-				MicroUtils.addUnitToUnitSet(unit, combatUnits);
+				OldMicroUtils.addUnitToUnitSet(unit, combatUnits);
 			}
 		}
 		return combatUnits;
@@ -352,13 +351,13 @@ public class OldCombatManager {
 						}
 					}
 					if(faccnt > 2){
-						MicroUtils.smartScan(unit.getPosition());
+						OldMicroUtils.smartScan(unit.getPosition());
 						return;
 					}
 				}else if(InformationManager.Instance().enemyRace == Race.Terran){
 					List<Unit> myUnits = MapGrid.Instance().getUnitsNear(unit.getPosition(), UnitType.Terran_Wraith.sightRange(), true, false, UnitType.Terran_Goliath);
 					if(myUnits.size() > 1){
-						MicroUtils.smartScan(unit.getPosition());
+						OldMicroUtils.smartScan(unit.getPosition());
 						return;
 					}
 				}else{
@@ -377,7 +376,7 @@ public class OldCombatManager {
 						}
 					}
 					if(faccnt > 4){
-						MicroUtils.smartScan(unit.getPosition());
+						OldMicroUtils.smartScan(unit.getPosition());
 						return;
 					}
 				}
@@ -806,7 +805,7 @@ public class OldCombatManager {
 				return null;
 			}
 
-		    Position squadPosition = MicroUtils.centerOfUnits(squad.getUnitSet());
+		    Position squadPosition = OldMicroUtils.centerOfUnits(squad.getUnitSet());
 		    Position enemyFirstChokePosition = enemyFirstChoke.getCenter();
 		    if (currTargetChokeExpiredFrame != 0
 		    		&& currTargetChokeExpiredFrame < Prebot.Broodwar.getFrameCount()) { // 적의 first chokePoint 도착
@@ -1032,7 +1031,7 @@ public class OldCombatManager {
 	    }
 		
 		OldSquad earlyDefenseSquad = squadData.getSquad("EarlyDefense");
-		List<Unit> enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
+		List<Unit> enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion, InformationManager.Instance().enemyPlayer);
 		if(enemyUnitsInRegion.size() == 0){
 			if (!earlyDefenseSquad.isEmpty()) {
 				earlyDefenseSquad.clear();
@@ -1369,7 +1368,7 @@ public class OldCombatManager {
 		int minDistance = 99999;
 
 		for (Unit unit : combatUnits) {
-			if (doNotAssignMechanicUnit && MicroUtils.isFactoryUnit(unit.getType())) {
+			if (doNotAssignMechanicUnit && OldMicroUtils.isFactoryUnit(unit.getType())) {
 				continue;
 			}
 			if (doNotAssignTankNGoliath && (
@@ -1437,7 +1436,7 @@ public class OldCombatManager {
 		if (combatStrategy == CombatStrategy.ATTACK_ENEMY) {
 			List<Unit> units = squadData.getSquad(OldSquadName.MAIN_ATTACK).getUnitSet();
 			if (units.size()>0) {
-				Unit leader = MicroUtils.leaderOfUnit(units, getMainAttackLocation(squadData.getSquad(OldSquadName.MAIN_ATTACK)));
+				Unit leader = OldMicroUtils.leaderOfUnit(units, getMainAttackLocation(squadData.getSquad(OldSquadName.MAIN_ATTACK)));
 				if(leader !=null){
 					vesselOrder = new OldSquadOrder(SquadOrderType.ATTACK, leader.getPosition(), UnitType.Terran_Science_Vessel.sightRange(), "Vessel");
 				}

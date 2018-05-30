@@ -13,12 +13,12 @@ import bwta.BaseLocation;
 import bwta.Region;
 import prebot.common.MapGrid;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.SquadOrderType;
 import prebot.micro.constant.MicroConfig.Common;
 import prebot.micro.constant.MicroConfig.FleeAngle;
 import prebot.micro.constant.MicroConfig.Vulture;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
@@ -30,7 +30,7 @@ public class MicroVulture extends MicroManager {
 	@Override
 	protected void executeMicro(List<Unit> targets) {
 	    List<Unit> vultures = getUnits();
-		List<Unit> vultureTargets = MicroUtils.filterTargets(targets, false);
+		List<Unit> vultureTargets = OldMicroUtils.filterTargets(targets, false);
 		
 		final boolean cooltimeAlwaysAttack = false;
 		final boolean unitedKiting = false;
@@ -75,9 +75,9 @@ public class MicroVulture extends MicroManager {
 				}
 				Position centerPosition = null;
 				if (!nearTanks.isEmpty()) {
-					centerPosition = MicroUtils.centerOfUnits(nearTanks);
+					centerPosition = OldMicroUtils.centerOfUnits(nearTanks);
 				} else if (!nearGoliaths.isEmpty()) {
-					centerPosition = MicroUtils.centerOfUnits(nearGoliaths);
+					centerPosition = OldMicroUtils.centerOfUnits(nearGoliaths);
 				}
 				
 				// 탱크, 골리앗이 근처에 있으면 쿨타임이 돌아올때 무조건 때린다.
@@ -96,7 +96,7 @@ public class MicroVulture extends MicroManager {
 					}
 				}
 				
-				MicroUtils.preciseKiting(vulture, target, kitingOption);
+				OldMicroUtils.preciseKiting(vulture, target, kitingOption);
 //				CommandUtil.attackUnit(vulture, target);
 				
 			} else {
@@ -120,7 +120,7 @@ public class MicroVulture extends MicroManager {
 				// checker : 각각의 목표지역(travelBase)으로 이동.
 				Position movePosition = order.getPosition();
 				if (order.getType() == SquadOrderType.WATCH) { // watcher 보이지 않는 적에 대한 후퇴.
-					if (!MicroUtils.isSafePlace(vulture)) {
+					if (!OldMicroUtils.isSafePlace(vulture)) {
 						movePosition = retreatPosition;
 					}
 				} else if (order.getType() == SquadOrderType.CHECK) { // checker 벌처들은 각각의 orderPosition을 가진다.
@@ -136,7 +136,7 @@ public class MicroVulture extends MicroManager {
 					
 				} else { // 목적지 도착
 					if (vulture.isIdle() || vulture.isBraking()) {
-						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), order.getRadius());
+						Position randomPosition = OldMicroUtils.randomPosition(vulture.getPosition(), order.getRadius());
 						CommandUtils.attackMove(vulture, randomPosition);
 					}
 				}

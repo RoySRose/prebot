@@ -10,7 +10,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.main.Prebot;
-import prebot.common.util.MicroUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.Result;
 import prebot.strategy.InformationManager;
@@ -101,7 +100,7 @@ public class CombatExpectation {
 		int enemyPower = 0;
 		
 		for (UnitInfo targetInfo : targets) {
-			Unit target = MicroUtils.getUnitIfVisible(targetInfo);
+			Unit target = OldMicroUtils.getUnitIfVisible(targetInfo);
 			
 			if ((target != null && !target.isCompleted()) || VULTURE_TARGET.get(targetInfo.getType()) == null) {
 				continue;

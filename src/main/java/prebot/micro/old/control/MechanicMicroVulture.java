@@ -14,11 +14,11 @@ import bwta.Region;
 import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.constant.MicroCode.SquadOrderType;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldSquadOrder;
@@ -40,7 +40,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 	
 	public void prepareMechanic(OldSquadOrder order, List<UnitInfo> enemiesInfo) {
 		this.order = order;
-		this.enemiesInfo = MicroUtils.filterTargetInfos(enemiesInfo, false);
+		this.enemiesInfo = OldMicroUtils.filterTargetInfos(enemiesInfo, false);
 	}
 	
 	public void prepareMechanicAdditional(List<Unit> vultureList, List<Unit> tankList, List<Unit> goliathList, int saveUnitLevel, boolean attackWithMechanics) {
@@ -75,7 +75,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				}
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseFlee(vulture, decision.getEnemyPosition(), kOpt);
+			OldMicroUtils.preciseFlee(vulture, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
@@ -122,12 +122,12 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			}
 
 			if (haveToFight) {
-				Unit enemy = MicroUtils.getUnitIfVisible(decision.getTargetInfo());
+				Unit enemy = OldMicroUtils.getUnitIfVisible(decision.getTargetInfo());
 				if (enemy != null && enemy.getType() == UnitType.Terran_Vulture_Spider_Mine && vulture.isInWeaponRange(enemy)) {
 					vulture.holdPosition();
 				} else {
 					kOpt.setGoalPosition(retreatPosition);
-					MicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
+					OldMicroUtils.preciseKiting(vulture, decision.getTargetInfo(), kOpt);
 				}
 			} else {
 				CommandUtils.move(vulture, closeMechanic.getPosition());
@@ -155,7 +155,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
 					if (vulture.isIdle() || vulture.isBraking()) {
 						if (!vulture.isBeingHealed()) {
-							Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), 100);
+							Position randomPosition = OldMicroUtils.randomPosition(vulture.getPosition(), 100);
 							CommandUtils.attackMove(vulture, randomPosition);
 						}
 					}
@@ -174,7 +174,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 					
 				} else { // 목적지 도착
 					if (vulture.isIdle() || vulture.isBraking()) {
-						Position randomPosition = MicroUtils.randomPosition(vulture.getPosition(), 100);
+						Position randomPosition = OldMicroUtils.randomPosition(vulture.getPosition(), 100);
 						CommandUtils.attackMove(vulture, randomPosition);
 					}
 				}
@@ -201,7 +201,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
 			if (enemyFirstExpansion != null) {
 				int distance = vulture.getDistance(enemyFirstExpansion.getPosition());
-				if (distance < MicroConfig.Tank.SIEGE_MODE_MAX_RANGE && MicroUtils.isSafePlace(enemyFirstExpansion.getPosition())) {
+				if (distance < MicroConfig.Tank.SIEGE_MODE_MAX_RANGE && OldMicroUtils.isSafePlace(enemyFirstExpansion.getPosition())) {
 					minePosition = SpiderMineManger.Instance().positionToMine(vulture, enemyFirstExpansion.getPosition(), true, MicroConfig.Vulture.spiderMineNumPerPosition * 2);
 				}
 			}

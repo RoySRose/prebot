@@ -10,9 +10,9 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.LagObserver;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
@@ -65,7 +65,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				retreatPosition = myBase.getPosition();
 			}
 			kOpt.setGoalPosition(retreatPosition);
-			MicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
+			OldMicroUtils.preciseFlee(goliath, decision.getEnemyPosition(), kOpt);
 			break;
 			
 		case 1: // kiting
@@ -88,12 +88,12 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				}
 			}
 			if (haveToFight) {
-				Unit enemy = MicroUtils.getUnitIfVisible(decision.getTargetInfo());
+				Unit enemy = OldMicroUtils.getUnitIfVisible(decision.getTargetInfo());
 				if (enemy != null && enemy.getType() == UnitType.Terran_Vulture_Spider_Mine && goliath.isInWeaponRange(enemy)) {
 					goliath.holdPosition();
 				} else {
 					kOpt.setGoalPosition(order.getPosition());
-					MicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
+					OldMicroUtils.preciseKiting(goliath, decision.getTargetInfo(), kOpt);
 				}
 			} else {
 				// 가까운 곳에 없으면 탱크로 이동
@@ -110,7 +110,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
 					if (goliath.isIdle() || goliath.isBraking()) {
 						if (!goliath.isBeingHealed()) {
-							Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
+							Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), 100);
 							CommandUtils.attackMove(goliath, randomPosition);
 						}
 					}
@@ -129,7 +129,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				} else { // 목적지 도착
 					if (goliath.isIdle() || goliath.isBraking()) {
 						if (!goliath.isBeingHealed()) {
-							Position randomPosition = MicroUtils.randomPosition(goliath.getPosition(), 100);
+							Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), 100);
 							CommandUtils.attackMove(goliath, randomPosition);
 						}
 					}

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
-import prebot.common.util.MicroUtils;
 
 public class OldSquadData {
 	
@@ -57,7 +56,7 @@ public class OldSquadData {
 	public OldSquad getUnitSquad(Unit unit) {
 		for (String sqaudName : squads.keySet()) {
 			OldSquad squad = squads.get(sqaudName);
-			if (MicroUtils.isUnitContainedInUnitSet(unit, squad.getUnitSet())) {
+			if (OldMicroUtils.isUnitContainedInUnitSet(unit, squad.getUnitSet())) {
 				return squad;
 			}
 	    }

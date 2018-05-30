@@ -11,11 +11,11 @@ import bwapi.UnitType;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Common;
 import prebot.micro.constant.MicroConfig.Tank;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldSquadOrder;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
@@ -88,7 +88,7 @@ public class MechanicMicroDecision {
 		int closestTooFarTargetDistance = 0;
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
-			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
+			Unit enemy = OldMicroUtils.getUnitIfVisible(enemyInfo);
 			if (enemy == null) {
 
 //				int noUnitFrame = MicroSet.Common.NO_UNIT_FRAME;
@@ -163,7 +163,7 @@ public class MechanicMicroDecision {
 			distanceScore = 100 - distanceToTarget / 5;
 
 			// 시즈모드 : 한방에 죽는다면 HP 높을 수록 우선순위가 높다.
-			if (MicroUtils.killedByNShot(mechanicUnit, enemy, 1)) {
+			if (OldMicroUtils.killedByNShot(mechanicUnit, enemy, 1)) {
 				hitPointScore = 50 + enemy.getHitPoints() / 10;
 			} else {
 				hitPointScore = 50 - enemy.getHitPoints() / 10;
@@ -236,7 +236,7 @@ public class MechanicMicroDecision {
 //		int dangerousSiegeTankCount = 0;
 		
 		for (UnitInfo enemyInfo : enemiesInfo) {
-			Unit enemy = MicroUtils.getUnitIfVisible(enemyInfo);
+			Unit enemy = OldMicroUtils.getUnitIfVisible(enemyInfo);
 
 			// 접근하면 안되는 적이 있는지 판단 (성큰, 포톤캐논, 시즈탱크, 벙커)
 			boolean enemyIsComplete = enemyInfo.isCompleted();
@@ -268,7 +268,7 @@ public class MechanicMicroDecision {
 					double safeDistance = enemyGroundWeaponRange;
 					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode) {
 						if (saveUnitLevel <= 1 && (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode)) {
-							if (MicroUtils.exposedByEnemy(mechanicUnit, flyingEnemiesInfo)) { // 적에게 노출되는 포지션이면 안전거리를 잰다. 
+							if (OldMicroUtils.exposedByEnemy(mechanicUnit, flyingEnemiesInfo)) { // 적에게 노출되는 포지션이면 안전거리를 잰다. 
 								safeDistance += (MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK * 2/3);
 							} else { // 공격 사정거리를 재어 들어간다.
 								safeDistance = MicroConfig.Tank.SIEGE_MODE_SIGHT + 30; // 320 + 30

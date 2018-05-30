@@ -1,4 +1,4 @@
-package prebot.micro;
+package prebot.common.util;
 
 import bwapi.TechType;
 import bwapi.UpgradeType;
