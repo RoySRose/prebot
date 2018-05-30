@@ -12,6 +12,8 @@ import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.micro.constant.MicroCode.CombatStrategy;
+import prebot.micro.old.OldCombatManager;
+import prebot.micro.old.OldSquad;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 
@@ -147,7 +149,7 @@ public class WorkerManager {
 				//1.3 일꾼 에너지가 20이하일떄 idle 변경
 				if(worker.getHitPoints() <= 16)
 				{
-					Squad temp = CombatManager.Instance().squadData.getUnitSquad(worker);
+					OldSquad temp = OldCombatManager.Instance().squadData.getUnitSquad(worker);
 //					worker.cancelConstruction();
 					if(temp!=null){
 						temp.removeUnit(worker);
@@ -393,7 +395,7 @@ public class WorkerManager {
 		int repairWorkCnt = workerData.workerRepairMap.size();
 		
 		int repairmax = 3;
-		if(CombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+		if(OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
 			repairmax = 6;
 		}
 		if(repairWorkCnt > repairmax){

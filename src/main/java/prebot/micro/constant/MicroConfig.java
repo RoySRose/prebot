@@ -13,7 +13,47 @@ import prebot.common.main.Prebot;
 import prebot.strategy.InformationManager;
 
 public class MicroConfig {
+	
+	public static enum SquadInfo {
+		IDLE("IDLE", 0, 0),
+		EARLY_DEFENSE("EARLY_DEFENSE", 1, 30),
+		MAIN_ATTACK("MAIN_ATTACK", 2, 150),
+		WATCHER("WATCHER", 3, 150),
+		CHECKER("CHECKER", 4, 150),
+		GUERILLA("GUERILLA", 5, 150),
+		SCV_SCOUT("SCV_SCOUT", 6, 150),
+		SPECIAL("SPECIAL", 7, 500);
+		
+		private SquadInfo(String squadName, int priority, int additionalRadius) {
+			this.squadName = squadName;
+			this.priority = priority;
+			this.squadRadius = additionalRadius;
+		}
+		
+		public String squadName;
+		public int priority;
+		public int squadRadius;
+	}
 
+	public static class Angles {
+		public static final int[] NARROW = { 0, -5, +5, -10, +10, -15, +15 };
+		public static final int[] WIDE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
+		public static final int[] AROUND_360 = { 0, 45, 90, 135, 180, 225, 270, 315 };
+	}
+
+	public static class Flee {
+		public static final int BACKOFF_DIST = 64;
+		public static final int WATCHER_FLEE_SECONDS = 8;
+
+		public static final int RISK_RADIUS_DEFAULT = 150;
+		public static final int RISK_RADIUS_VULTURE = 190;
+		public static final int RISK_RADIUS_VUTRURE_SPEED = 220;
+		public static final int RISK_RADIUS_TANK = 150;
+		public static final int RISK_RADIUS_GOLIATH = 150;
+		public static final int RISK_RADIUS_WRAITH = 220;
+		public static final int RISK_RADIUS_VESSEL = 150;
+	}
+	
 //	public static class FreeKitingRadius {
 //		public static final int MARINE = (int) (UnitType.Terran_Marine.topSpeed() * UnitType.Terran_Marine.groundWeapon().damageCooldown() * 0.8);
 //		public static final int VULTURE = (int) (UnitType.Terran_Vulture.topSpeed() * UnitType.Terran_Vulture.groundWeapon().damageCooldown() * 0.8);

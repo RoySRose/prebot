@@ -17,9 +17,9 @@ import prebot.common.util.MicroUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.RespondToStrategy;
 import prebot.strategy.StrategyManager;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
-import prebot.strategy.constant.EnemyStrategy.StrategyException;
 import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
+import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 /// 봇 프로그램 설정
 public class AnalyzeStrategy {
@@ -94,7 +94,7 @@ public class AnalyzeStrategy {
 									.getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 							if (enemymainbase.isIsland()) {
 								StrategyManager.Instance()
-										.setCurrentStrategyBasic(Strategy.ATTACKISLAND);
+										.setCurrentStrategyBasic(EnemyStrategy.ATTACKISLAND);
 							}
 						}
 					}
@@ -108,29 +108,29 @@ public class AnalyzeStrategy {
 
 		// 최초 각 종족별 Basic 세팅
 		// Exception 은기본 init 처리
-		StrategyManager.Instance().setCurrentStrategyException(StrategyException.INIT);
+		StrategyManager.Instance().setCurrentStrategyException(EnemyStrategyException.INIT);
 		if (InformationManager.Instance().enemyRace == Race.Protoss) {
-			StrategyManager.Instance().setCurrentStrategyBasic(Strategy.PROTOSSBASIC);
+			StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.PROTOSSBASIC);
 		} else if (InformationManager.Instance().enemyRace == Race.Terran) {
-			StrategyManager.Instance().setCurrentStrategyBasic(Strategy.TERRANBASIC);
+			StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.TERRANBASIC);
 		} else {
-			StrategyManager.Instance().setCurrentStrategyBasic(Strategy.ZERGBASIC);
+			StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.ZERGBASIC);
 		}
 
 	}
 
 	private void AnalyzeVsProtoss() {
-		StrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
-		Strategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
+		EnemyStrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		EnemyStrategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		Chokepoint enemy_second_choke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 
 		
-		if(StrategyManager.Instance().getCurrentStrategyException() != StrategyException.PROTOSSEXCEPTION_DARK){
+		if(StrategyManager.Instance().getCurrentStrategyException() != EnemyStrategyException.PROTOSSEXCEPTION_DARK){
 			if (Prebot.Broodwar.getFrameCount() < 10000) {
 				if (Prebot.Broodwar.enemy().incompleteUnitCount(UnitType.Protoss_Nexus) >= 1
 						|| Prebot.Broodwar.enemy().completedUnitCount(UnitType.Protoss_Nexus) >= 2) {
-					selectedSE = StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS;
+					selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS;
 				}
 	
 				// 포톤이나 포지를 보았을때
@@ -148,13 +148,13 @@ public class AnalyzeStrategy {
 					if(enemyUnitsInRegion.size() >0){
 						for (Unit enemy : enemyUnitsInRegion) {
 							if (enemy.getType() == UnitType.Protoss_Photon_Cannon) {
-								selectedSE = StrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
+								selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
 								break;
 							}
 						}
 					} 
 					// 2. 앞마당 지역은 익셉션이 포톤러쉬가 아닌 상태면 찾아본다.
-					if (selectedSE != StrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
+					if (selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
 						base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 						myRegion = base.getRegion();
 						enemyUnitsInRegion = MicroUtils.getUnitsInRegion(myRegion,
@@ -162,14 +162,14 @@ public class AnalyzeStrategy {
 						if(enemyUnitsInRegion.size() >0){
 							for (Unit enemy : enemyUnitsInRegion) {
 								if (enemy.getType() == UnitType.Protoss_Photon_Cannon) {
-									selectedSE = StrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
+									selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
 									break;
 								}
 							}
 						} 
 					} 
 					
-					if (selectedSE != StrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
+					if (selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
 						
 						base = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
 						if(base!=null){
@@ -179,7 +179,7 @@ public class AnalyzeStrategy {
 								for (Unit enemy : enemyUnitsInRegion) {
 									if (enemy.getType() == UnitType.Protoss_Photon_Cannon || enemy.getType() == UnitType.Protoss_Forge
 											) {
-											selectedS = Strategy.PROTOSSBASIC_DOUBLEPHOTO;
+											selectedS = EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO;
 										break;
 									}
 								}
@@ -187,18 +187,18 @@ public class AnalyzeStrategy {
 						}
 					} 
 					// 포톤 or 포지를 보았는데 우리지역이 아니라면 더블넥서스다.
-					if (selectedSE != StrategyException.PROTOSSEXCEPTION_PHOTONRUSH && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,InformationManager.Instance().enemyPlayer) >= 1) {
-						selectedSE = StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS;
+					if (selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH && InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,InformationManager.Instance().enemyPlayer) >= 1) {
+						selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS;
 					}
 				}
 				
 				
 			}
 			
-			if(selectedS != Strategy.PROTOSSBASIC_DOUBLEPHOTO){
+			if(selectedS != EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO){
 				if(Prebot.Broodwar.getFrameCount() < 8500
-						&& (selectedSE != StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS 
-						&& selectedSE != StrategyException.PROTOSSEXCEPTION_PHOTONRUSH)){
+						&& (selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS 
+						&& selectedSE != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH)){
 					if (Prebot.Broodwar.getFrameCount() < 6000 && InformationManager.Instance().isFirstScoutAlive()) {
 						// 4300 프레임이전에
 						if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) >= 2
@@ -216,7 +216,7 @@ public class AnalyzeStrategy {
 								}
 							}
 							
-							selectedSE = StrategyException.PROTOSSEXCEPTION_READYTOZEALOT;
+							selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_READYTOZEALOT;
 						}
 			
 						if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) >= 1
@@ -225,19 +225,19 @@ public class AnalyzeStrategy {
 								|| InformationManager.Instance().getNumUnits(UnitType.Protoss_Assimilator,
 												InformationManager.Instance().enemyPlayer) == 1)) {
 							// 원게이트에서 코어 올라가면 드래군 레디
-							selectedSE = StrategyException.PROTOSSEXCEPTION_READYTODRAGOON;
+							selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON;
 						}
 					}
 			
 					// 레디투드래군 상태에서 정찰 scv가 죽으면 드래군 푸시
-					if (StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_READYTOZEALOT) {
+					if (StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_READYTOZEALOT) {
 						if (!InformationManager.Instance().isFirstScoutAlive()) {
-							selectedSE = StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
+							selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
 						}
 					}
-					if (StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_READYTODRAGOON) {
+					if (StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON) {
 						if (!InformationManager.Instance().isFirstScoutAlive()) {
-							selectedSE = StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
+							selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
 						}
 					}
 					if ((InformationManager.Instance().getNumUnits(UnitType.Protoss_Gateway,InformationManager.Instance().enemyPlayer) >= 2
@@ -245,7 +245,7 @@ public class AnalyzeStrategy {
 							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Citadel_of_Adun,	InformationManager.Instance().enemyPlayer) == 0
 							) {
 						// 원게이트에서 코어 올라가면 드래군 레디
-						selectedSE = StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
+						selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
 					}
 					
 			
@@ -255,14 +255,14 @@ public class AnalyzeStrategy {
 						int temp = 0;
 						for (Unit enemy : chkPush) {
 							if (enemy.getType() == UnitType.Protoss_Dragoon) {
-								selectedSE = StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
+								selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
 								break;
 							}
 							if (enemy.getType() == UnitType.Protoss_Zealot) {
 								temp++;
 							}
 							if (temp > 3) {
-								selectedSE = StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
+								selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
 								break;
 							}
 						}
@@ -283,24 +283,24 @@ public class AnalyzeStrategy {
 						}
 					}
 					if (dragooncnt > 2) {
-						selectedSE = StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
+						selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH;
 					}
 					if (zealotcnt > 3) {
-						selectedSE = StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
+						selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
 					}
 
 				}
 			
 	
-				if (selectedSE == StrategyException.PROTOSSEXCEPTION_READYTOZEALOT
-						|| StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_READYTOZEALOT
-						|| selectedSE == StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH
-						|| StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH) {
+				if (selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_READYTOZEALOT
+						|| StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_READYTOZEALOT
+						|| selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH
+						|| StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH) {
 					if(7000 <  Prebot.Broodwar.getFrameCount()){
 						if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot,InformationManager.Instance().enemyPlayer)
 							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot) < 4){
-							if (StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
-									|| selectedSE == StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS) {
+							if (StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
+									|| selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS) {
 								
 							}else{
 								RespondToStrategy.Instance().prepareDark = true;
@@ -309,7 +309,7 @@ public class AnalyzeStrategy {
 					}
 							 
 					if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 4) {
-						selectedSE = StrategyException.INIT;
+						selectedSE = EnemyStrategyException.INIT;
 					}
 				}
 		
@@ -317,15 +317,15 @@ public class AnalyzeStrategy {
 			 
 				
 			
-				if (selectedSE == StrategyException.PROTOSSEXCEPTION_READYTODRAGOON
-						|| StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_READYTODRAGOON
-						|| selectedSE == StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH
-						|| StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DRAGOONPUSH) {
+				if (selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON
+						|| StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON
+						|| selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH
+						|| StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH) {
 					if(7000 <  Prebot.Broodwar.getFrameCount()){
 						if(InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon,InformationManager.Instance().enemyPlayer)
 							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) < 3){
-							if (StrategyManager.Instance().getCurrentStrategyException() == StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
-									|| selectedSE == StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS) {
+							if (StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
+									|| selectedSE == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS) {
 								
 							}else{
 								RespondToStrategy.Instance().prepareDark = true;
@@ -335,93 +335,93 @@ public class AnalyzeStrategy {
 					if (Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode) 
 							&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 							+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
-						selectedSE = StrategyException.INIT;
+						selectedSE = EnemyStrategyException.INIT;
 					}
 				}
 			}
 		}
 
-	if(selectedSE==StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH||StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH)
+	if(selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH||StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH)
 
 	{
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 4) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
-	}if(selectedSE==StrategyException.PROTOSSEXCEPTION_READYTODRAGOON||StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_READYTODRAGOON)
+	}if(selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON||StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_READYTODRAGOON)
 	{
 		if (Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)
 				&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 						+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 	}
 
-	if(StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS||selectedSE==StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS)
+	if(StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS||selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS)
 	{
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 2
 				&& StrategyManager.Instance().getFacUnits() > 64) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 	}
 
-	if(StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_PHOTONRUSH||selectedSE==StrategyException.PROTOSSEXCEPTION_PHOTONRUSH)
+	if(StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH||selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH)
 	{
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 				+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) >= 3) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 	}
 
 	if(RespondToStrategy.Instance().enemy_scout==false&&(InformationManager.Instance().getNumUnits(UnitType.Protoss_Scout,InformationManager.Instance().enemyPlayer)>=1))
 	{
-		selectedSE = StrategyException.PROTOSSEXCEPTION_SCOUT;
+		selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_SCOUT;
 	}
 
-	if(StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_SCOUT||selectedSE==StrategyException.PROTOSSEXCEPTION_SCOUT)
+	if(StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_SCOUT||selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_SCOUT)
 	{
 		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,InformationManager.Instance().selfPlayer) >= 2) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 	}
 
 	if(RespondToStrategy.Instance().enemy_shuttle==false&&(InformationManager.Instance().getNumUnits(UnitType.Protoss_Shuttle,InformationManager.Instance().enemyPlayer)>=1))
 	{
-		selectedSE = StrategyException.PROTOSSEXCEPTION_SHUTTLE;
+		selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_SHUTTLE;
 	}
 
 	if(RespondToStrategy.Instance().enemy_arbiter==false&&(InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter,InformationManager.Instance().enemyPlayer)>=1||InformationManager.Instance().getNumUnits(UnitType.Protoss_Arbiter_Tribunal,InformationManager.Instance().enemyPlayer)>=1))
 	{
-		selectedSE = StrategyException.PROTOSSEXCEPTION_ARBITER;
-	}if(StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_ARBITER||selectedSE==StrategyException.PROTOSSEXCEPTION_ARBITER)
+		selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_ARBITER;
+	}if(StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_ARBITER||selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_ARBITER)
 	{
 		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Goliath,
 				InformationManager.Instance().selfPlayer) >= 4) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 	}
 
 	if(RespondToStrategy.Instance().enemy_dark_templar==false&&(InformationManager.Instance().getNumUnits(UnitType.Protoss_Templar_Archives,InformationManager.Instance().enemyPlayer)>=1||InformationManager.Instance().getNumUnits(UnitType.Protoss_Citadel_of_Adun,InformationManager.Instance().enemyPlayer)>=1||InformationManager.Instance().getNumUnits(UnitType.Protoss_Dark_Templar,InformationManager.Instance().enemyPlayer)>=1))
 	{
 
-		selectedSE = StrategyException.PROTOSSEXCEPTION_DARK;
+		selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DARK;
 	}if(RespondToStrategy.Instance().enemy_dark_templar==false)
 	{
 		for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
 			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
 					&& unit.getPosition().isValid()) {
-				selectedSE = StrategyException.PROTOSSEXCEPTION_DARK;
+				selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_DARK;
 			}
 		}
 	}
 
-	if(selectedSE==StrategyException.PROTOSSEXCEPTION_DARK||StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_DARK)
+	if(selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_DARK||StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_DARK)
 	{
 
 		boolean mainBaseTurret = RespondToStrategy.Instance().mainBaseTurret;
 		boolean firstChokeTurret = RespondToStrategy.Instance().firstChokeTurret;
 
 		if (mainBaseTurret && firstChokeTurret) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 
 	}
@@ -441,7 +441,7 @@ public class AnalyzeStrategy {
 				}
 			}
 			
-			selectedSE = StrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
+			selectedSE = EnemyStrategyException.PROTOSSEXCEPTION_ZEALOTPUSH;
 		}
 	}
 
@@ -462,24 +462,24 @@ public class AnalyzeStrategy {
 			CarrierStrategyToBasicOnTime = Prebot.Broodwar.getFrameCount() + 2500;
 		}
 
-		selectedS = Strategy.PROTOSSBASIC_CARRIER;
+		selectedS = EnemyStrategy.PROTOSSBASIC_CARRIER;
 	}
 
-	if(StrategyManager.Instance().getCurrentStrategyException()==StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS||selectedSE==StrategyException.PROTOSSEXCEPTION_DOUBLENEXUS)
+	if(StrategyManager.Instance().getCurrentStrategyException()==EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS||selectedSE==EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS)
 	{
 		if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon,
 				InformationManager.Instance().enemyPlayer) >= 4) {
-			selectedS = Strategy.PROTOSSBASIC_DOUBLEPHOTO;
+			selectedS = EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO;
 		}
 	}
 
-	if(StrategyManager.Instance().getCurrentStrategyBasic()==Strategy.PROTOSSBASIC_CARRIER)
+	if(StrategyManager.Instance().getCurrentStrategyBasic()==EnemyStrategy.PROTOSSBASIC_CARRIER)
 	{
 		if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Carrier,
 				InformationManager.Instance().enemyPlayer) == 0) {
 			if (CarrierStrategyToBasicOnTime != 0 && CarrierStrategyToBasicOnTime > 0
 					&& CarrierStrategyToBasicOnTime < Prebot.Broodwar.getFrameCount()) {
-				selectedS = Strategy.PROTOSSBASIC;
+				selectedS = EnemyStrategy.PROTOSSBASIC;
 			}
 		} else {
 			CarrierStrategyToBasicOnTime = Prebot.Broodwar.getFrameCount() + 2500;
@@ -496,8 +496,8 @@ public class AnalyzeStrategy {
 	boolean after = false;
 
 	private void AnalyzeVsTerran() {
-		StrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
-		Strategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
+		EnemyStrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		EnemyStrategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		if (after == false) {
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
@@ -505,7 +505,7 @@ public class AnalyzeStrategy {
 					&& InformationManager.Instance().getNumUnits(UnitType.Terran_Refinery,
 							InformationManager.Instance().enemyPlayer) == 1) {
 
-				selectedS = Strategy.TERRANBASIC_MECHANIC;
+				selectedS = EnemyStrategy.TERRANBASIC_MECHANIC;
 			}
 
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Marine,
@@ -513,7 +513,7 @@ public class AnalyzeStrategy {
 					|| InformationManager.Instance().getNumUnits(UnitType.Terran_Barracks,
 							InformationManager.Instance().enemyPlayer) >= 2) {
 
-				selectedS = Strategy.TERRANBASIC_BIONIC;
+				selectedS = EnemyStrategy.TERRANBASIC_BIONIC;
 			}
 
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Factory,
@@ -528,7 +528,7 @@ public class AnalyzeStrategy {
 							InformationManager.Instance().enemyPlayer) >= 1
 					|| InformationManager.Instance().getNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode,
 							InformationManager.Instance().enemyPlayer) >= 1) {
-				selectedS = Strategy.TERRANBASIC_MECHANIC;
+				selectedS = EnemyStrategy.TERRANBASIC_MECHANIC;
 			}
 		}
 
@@ -542,39 +542,39 @@ public class AnalyzeStrategy {
 		// }
 
 		if (after == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3) {
-			if (StrategyManager.Instance().getCurrentStrategyBasic() != Strategy.TERRANBASIC_BIONIC) {
-				selectedS = Strategy.TERRANBASIC_MECHANICAFTER;
+			if (StrategyManager.Instance().getCurrentStrategyBasic() != EnemyStrategy.TERRANBASIC_BIONIC) {
+				selectedS = EnemyStrategy.TERRANBASIC_MECHANICAFTER;
 				after = true;
 			}
 		}
 		if (after) {
-			selectedS = Strategy.TERRANBASIC_MECHANICAFTER;
+			selectedS = EnemyStrategy.TERRANBASIC_MECHANICAFTER;
 		}
 		if (InformationManager.Instance().getNumUnits(UnitType.Terran_Starport,
 				InformationManager.Instance().enemyPlayer) >= 1
 				|| InformationManager.Instance().getNumUnits(UnitType.Terran_Wraith,
 						InformationManager.Instance().enemyPlayer) >= 1) {
-			selectedS = Strategy.TERRANBASIC_MECHANICWITHWRAITH;
+			selectedS = EnemyStrategy.TERRANBASIC_MECHANICWITHWRAITH;
 		}
 
 		if (RespondToStrategy.Instance().enemy_wraithcloak == false && InformationManager.Instance()
 				.getNumUnits(UnitType.Terran_Control_Tower, InformationManager.Instance().enemyPlayer) >= 1) {
-			selectedSE = StrategyException.TERRANEXCEPTION_WRAITHCLOAK;
+			selectedSE = EnemyStrategyException.TERRANEXCEPTION_WRAITHCLOAK;
 		}
 
 		if (RespondToStrategy.Instance().enemy_wraithcloak == false) {
 			for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
 				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)) {
-					selectedSE = StrategyException.TERRANEXCEPTION_WRAITHCLOAK;
+					selectedSE = EnemyStrategyException.TERRANEXCEPTION_WRAITHCLOAK;
 				}
 			}
 		}
 
-		if (selectedSE == StrategyException.TERRANEXCEPTION_WRAITHCLOAK || StrategyManager.Instance()
-				.getCurrentStrategyException() == StrategyException.TERRANEXCEPTION_WRAITHCLOAK) {
+		if (selectedSE == EnemyStrategyException.TERRANEXCEPTION_WRAITHCLOAK || StrategyManager.Instance()
+				.getCurrentStrategyException() == EnemyStrategyException.TERRANEXCEPTION_WRAITHCLOAK) {
 			if (InformationManager.Instance().getNumUnits(UnitType.Terran_Comsat_Station,
 					InformationManager.Instance().selfPlayer) >= 1) {
-				selectedSE = StrategyException.INIT;
+				selectedSE = EnemyStrategyException.INIT;
 			}
 		}
 
@@ -650,8 +650,8 @@ public class AnalyzeStrategy {
 	}
 
 	private void AnalyzeVsZerg() {
-		StrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
-		Strategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
+		EnemyStrategyException selectedSE = StrategyManager.Instance().getCurrentStrategyException();
+		EnemyStrategy selectedS = StrategyManager.Instance().getCurrentStrategyBasic();
 
 		Chokepoint my_first_choke = InformationManager.Instance()
 				.getFirstChokePoint(InformationManager.Instance().selfPlayer);
@@ -678,22 +678,22 @@ public class AnalyzeStrategy {
 
 		if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Hive,
 				InformationManager.Instance().enemyPlayer) >= 1 || ultra_cnt > 0) {
-			selectedSE = StrategyException.ZERGEXCEPTION_HIGHTECH;
+			selectedSE = EnemyStrategyException.ZERGEXCEPTION_HIGHTECH;
 		}
 
-		if (selectedSE == StrategyException.ZERGEXCEPTION_HIGHTECH && InformationManager.Instance()
+		if (selectedSE == EnemyStrategyException.ZERGEXCEPTION_HIGHTECH && InformationManager.Instance()
 				.getNumUnits(UnitType.Terran_Science_Vessel, InformationManager.Instance().selfPlayer) > 3) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 
 		// hydra check with lurker
 		if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Hydralisk_Den,
 				InformationManager.Instance().enemyPlayer) >= 1 || hydra_cnt >= 1 || lurker_cnt >= 1) {
 
-			selectedS = Strategy.ZERGBASIC_HYDRAWAVE;
+			selectedS = EnemyStrategy.ZERGBASIC_HYDRAWAVE;
 
 			if (RespondToStrategy.Instance().enemy_lurker == false && cntLair >= 1) {
-				selectedSE = StrategyException.ZERGEXCEPTION_PREPARELURKER;
+				selectedSE = EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER;
 			}
 			hydraStrategy = true;
 		}
@@ -713,10 +713,10 @@ public class AnalyzeStrategy {
 						InformationManager.Instance().enemyPlayer) >= 1
 				|| (hydraStrategy == false && cntLair >= 1)) {
 
-			selectedS = Strategy.ZERGBASIC_MUTAL;
+			selectedS = EnemyStrategy.ZERGBASIC_MUTAL;
 
 			if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18) || mutal_cnt > 24) {
-				selectedS = Strategy.ZERGBASIC_MUTALMANY;
+				selectedS = EnemyStrategy.ZERGBASIC_MUTALMANY;
 			}
 
 			if (mutalStrategy == false && MutalStrategyOnTimeChecker == false) {
@@ -730,7 +730,7 @@ public class AnalyzeStrategy {
 
 		if (hydra_cnt == 0 && lurker_cnt == 0 && mutalStrategy == false
 				&& Prebot.Broodwar.getFrameCount() > 8000) {
-			selectedS = Strategy.ZERGBASIC_MUTAL;
+			selectedS = EnemyStrategy.ZERGBASIC_MUTAL;
 		}
 		// mutal exception
 
@@ -741,25 +741,25 @@ public class AnalyzeStrategy {
 				if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
 						&& unit.getPosition().isValid()) {
 					// StrategyManager.Instance().setCurrentStrategyException(StrategysException.protossException_Dark);
-					selectedSE = StrategyException.ZERGEXCEPTION_PREPARELURKER;
+					selectedSE = EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER;
 				}
 			}
 			if (lurker_cnt > 0) {
-				selectedSE = StrategyException.ZERGEXCEPTION_PREPARELURKER;
+				selectedSE = EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER;
 			}
 		}
 
 		// 러커 out 조건
 		if (RespondToStrategy.Instance().enemy_lurker == false
-				&& selectedSE == StrategyException.ZERGEXCEPTION_PREPARELURKER
+				&& selectedSE == EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER
 				|| StrategyManager.Instance()
-						.getCurrentStrategyException() == StrategyException.ZERGEXCEPTION_PREPARELURKER) {
+						.getCurrentStrategyException() == EnemyStrategyException.ZERGEXCEPTION_PREPARELURKER) {
 
 			boolean mainBaseTurret = RespondToStrategy.Instance().mainBaseTurret;
 			boolean firstChokeTurret = RespondToStrategy.Instance().firstChokeTurret;
 
 			if (mainBaseTurret && firstChokeTurret) {
-				selectedSE = StrategyException.INIT;
+				selectedSE = EnemyStrategyException.INIT;
 			}
 		}
 
@@ -768,12 +768,12 @@ public class AnalyzeStrategy {
 				&& Prebot.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost) == 1) {
 			// System.out.println("저글링 업글 상태: " +
 			// MyBotModule.Broodwar.enemy().getUpgradeLevel(UpgradeType.Metabolic_Boost));
-			selectedSE = StrategyException.ZERGEXCEPTION_ONLYLING;
+			selectedSE = EnemyStrategyException.ZERGEXCEPTION_ONLYLING;
 		}
-		if (selectedSE == StrategyException.ZERGEXCEPTION_ONLYLING && (InformationManager.Instance()
+		if (selectedSE == EnemyStrategyException.ZERGEXCEPTION_ONLYLING && (InformationManager.Instance()
 				.getNumUnits(UnitType.Terran_Vulture, InformationManager.Instance().selfPlayer) > 5
 				|| mutalStrategy == true || hydraStrategy == true)) {
-			selectedSE = StrategyException.INIT;
+			selectedSE = EnemyStrategyException.INIT;
 		}
 
 		if (selectedSE != null) {
@@ -785,42 +785,42 @@ public class AnalyzeStrategy {
 			// System.out.print(", choose betwee H,M: " );
 
 			if (MutalStrategyOnTime != 0 && MutalStrategyOnTime > Prebot.Broodwar.getFrameCount()) {
-				selectedS = Strategy.ZERGBASIC_MUTAL;
+				selectedS = EnemyStrategy.ZERGBASIC_MUTAL;
 				// System.out.print(", chose M1" );
 			} else {
 				if (mutal_cnt >= (hydra_cnt * 1.4 + lurker_cnt * 0.9)) {
-					selectedS = Strategy.ZERGBASIC_MUTAL;
+					selectedS = EnemyStrategy.ZERGBASIC_MUTAL;
 					// System.out.print(", chose M2" );
 					if ((mutal_cnt > 18 && ling_cnt + hydra_cnt + lurker_cnt < 18) || mutal_cnt > 24) {
-						selectedS = Strategy.ZERGBASIC_MUTALMANY;
+						selectedS = EnemyStrategy.ZERGBASIC_MUTALMANY;
 					}
 				} else if (mutal_cnt >= (hydra_cnt * 0.7 + lurker_cnt * 0.45)) {
-					selectedS = Strategy.ZERGBASIC_HYDRAMUTAL;
+					selectedS = EnemyStrategy.ZERGBASIC_HYDRAMUTAL;
 					// System.out.print(", chose H1" );
 				} else {
-					selectedS = Strategy.ZERGBASIC_HYDRAWAVE;
+					selectedS = EnemyStrategy.ZERGBASIC_HYDRAWAVE;
 					// System.out.print(", chose H2" );
 				}
 			}
 		}
 
-		if (selectedS == Strategy.ZERGBASIC_HYDRAWAVE && ling_cnt > 12) {
-			selectedS = Strategy.ZERGBASIC_LINGHYDRA;
+		if (selectedS == EnemyStrategy.ZERGBASIC_HYDRAWAVE && ling_cnt > 12) {
+			selectedS = EnemyStrategy.ZERGBASIC_LINGHYDRA;
 		}
 
-		if (selectedS == Strategy.ZERGBASIC_MUTAL && ling_cnt > 12) {
-			selectedS = Strategy.ZERGBASIC_LINGMUTAL;
+		if (selectedS == EnemyStrategy.ZERGBASIC_MUTAL && ling_cnt > 12) {
+			selectedS = EnemyStrategy.ZERGBASIC_LINGMUTAL;
 		}
 
-		if (selectedS != Strategy.ZERGBASIC_MUTALMANY && ultra_cnt > 0) {
-			selectedS = Strategy.ZERGBASIC_ULTRA;
+		if (selectedS != EnemyStrategy.ZERGBASIC_MUTALMANY && ultra_cnt > 0) {
+			selectedS = EnemyStrategy.ZERGBASIC_ULTRA;
 		}
 
-		if (selectedS == Strategy.ZERGBASIC_ULTRA && ling_cnt > 12) {
-			selectedS = Strategy.ZERGBASIC_LINGULTRA;
+		if (selectedS == EnemyStrategy.ZERGBASIC_ULTRA && ling_cnt > 12) {
+			selectedS = EnemyStrategy.ZERGBASIC_LINGULTRA;
 		}
 
-		if (selectedS == Strategy.ZERGBASIC_HYDRAWAVE && (hydra_cnt + lurker_cnt > 0)) {
+		if (selectedS == EnemyStrategy.ZERGBASIC_HYDRAWAVE && (hydra_cnt + lurker_cnt > 0)) {
 			MutalStrategyOnTimeChecker = true;
 		}
 

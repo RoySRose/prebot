@@ -13,8 +13,8 @@ import prebot.common.MapGrid;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.PlayerUtil;
 import prebot.micro.CombatManager;
-import prebot.micro.ScoutManager;
 import prebot.micro.WorkerManager;
+import prebot.micro.old.OldCombatManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
 
@@ -41,6 +41,7 @@ public class GameCommander {
 			return;
 		}
 		StrategyManager.Instance().onStart();
+		CombatManager.Instance().onStart();
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다
@@ -60,24 +61,17 @@ public class GameCommander {
 		try {
 //			logObserver.start();
 
-			// 아군 베이스 위치. 적군 베이스 위치. 각 유닛들의 상태정보 등을 Map 자료구조에 저장/업데이트
 			InformationManager.Instance().update();
-			MapGrid.Instance().update(); // 각 유닛의 위치를 자체 MapGrid 자료구조에 저장
-
-			// 전략적 판단 및 유닛 컨트롤
+			MapGrid.Instance().update();
 			StrategyManager.Instance().update();
 			
-			// economy and base managers
-			// 일꾼 유닛에 대한 명령 (자원 채취, 이동 정도) 지시 및 정리
-			WorkerManager.Instance().update();
-			// 빌드오더큐를 관리하며, 빌드오더에 따라 실제 실행(유닛 훈련, 테크 업그레이드 등)을 지시한다.
 			BuildManager.Instance().update();
-
-			// 빌드오더 중 건물 빌드에 대해서는, 일꾼유닛 선정, 위치선정, 건설 실시, 중단된 건물 빌드 재개를 지시한다
 			ConstructionManager.Instance().update();
-			// 게임 초기 정찰 유닛 지정 및 정찰 유닛 컨트롤을 실행한다
-			ScoutManager.Instance().update();
-			CombatManager.Instance().update();
+
+//			ScoutManager.Instance().update();
+			WorkerManager.Instance().update();
+			OldCombatManager.Instance().update();
+//			CombatManager.Instance().update();
 			
 //			logObserver.observe();
 
@@ -135,8 +129,8 @@ public class GameCommander {
 		
 		if(unit.getType() == UnitType.Terran_Command_Center  && unit.getPlayer() == InformationManager.Instance().selfPlayer ){
 			
-			if(CombatManager.Instance().getClosestMineral(unit)!=null){
-				unit.setRallyPoint(CombatManager.Instance().getClosestMineral(unit));
+			if(OldCombatManager.Instance().getClosestMineral(unit)!=null){
+				unit.setRallyPoint(OldCombatManager.Instance().getClosestMineral(unit));
 			}
 		}
 		
@@ -158,9 +152,9 @@ public class GameCommander {
 				{
 					if (myUnit.getType() == UnitType.Terran_Command_Center && myUnit.isCompleted())
 					{
-						if(CombatManager.Instance().getBestPosition(myUnit)==null){
+						if(OldCombatManager.Instance().getBestPosition(myUnit)==null){
 						}else{
-							unit.setRallyPoint(CombatManager.Instance().getBestPosition(myUnit));
+							unit.setRallyPoint(OldCombatManager.Instance().getBestPosition(myUnit));
 						}
 					}
 				}

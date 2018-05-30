@@ -55,6 +55,18 @@ public class CommandUtils {
 			unit.useTech(tech, target);
 		}
 	}
+	
+	public static void load(Unit bunkerOrDropShip, Unit target) {
+		if (validCommand(bunkerOrDropShip, target, UnitCommandType.Load, true, false)) {
+			bunkerOrDropShip.load(target);
+		}
+	}
+	
+	public static void unload(Unit bunkerOrDropShip, Unit target) {
+		if (validCommand(bunkerOrDropShip, target, UnitCommandType.Unload, true, false)) {
+			bunkerOrDropShip.unload(target);
+		}
+	}
 
 	private static boolean validCommand(Unit unit, Unit target, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean checkCommandByPosition) {
 		if (!UnitUtils.isValidUnit(unit)) {

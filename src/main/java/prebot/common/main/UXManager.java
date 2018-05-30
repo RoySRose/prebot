@@ -28,12 +28,12 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.MapGrid;
-import prebot.common.constant.CommonConfig.DrawConfig;
+import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.util.PositionUtils;
-import prebot.micro.CombatManager;
-import prebot.micro.ScoutManager;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
+import prebot.micro.old.OldCombatManager;
+import prebot.micro.old.OldScoutManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.UnitInfo;
@@ -80,36 +80,36 @@ public class UXManager {
 	public void update() {
 		drawGameInformationOnScreen(5, 5);
 
-		if (DrawConfig.drawEnemyUnitInfo) {
+		if (UxConfig.drawEnemyUnitInfo) {
 			drawUnitStatisticsOnScreen1(400, 15);
 			//drawUnitStatisticsOnScreen2(370, 50);
 		}
 
-		if (DrawConfig.drawBWTAInfo) {
+		if (UxConfig.drawBWTAInfo) {
 			drawBWTAResultOnMap();
 		}
 
-		if (DrawConfig.drawMapGrid) {
+		if (UxConfig.drawMapGrid) {
 			drawMapGrid();
 		}
 
 		// 빌드오더큐 : 빌드 실행 전
-		if (DrawConfig.drawProductionInfo) {
+		if (UxConfig.drawProductionInfo) {
 			drawBuildOrderQueueOnScreen(500, 50);
 		}
 
 		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
-		if (DrawConfig.drawProductionInfo) {
+		if (UxConfig.drawProductionInfo) {
 			drawBuildStatusOnScreen(370, 50);
 		}
 
 		// 건물 건설 큐. 건물 건설 상황
-		if (DrawConfig.drawBuildingInfo) {
+		if (UxConfig.drawBuildingInfo) {
 			drawConstructionQueueOnScreenAndMap(200, 150);
 		}
 
 		// 건물이 건설될 위치
-		if (DrawConfig.drawReservedBuildingTiles) {
+		if (UxConfig.drawReservedBuildingTiles) {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
@@ -117,12 +117,12 @@ public class UXManager {
 		}
 
 		drawLeaderUnitOnMap();
-		if (DrawConfig.drawUnitHealthBars) {
+		if (UxConfig.drawUnitHealthBars) {
 			//drawUnitExtendedInformationOnMap();
 			drawUnitIdOnMap();
 		}
 
-		if (DrawConfig.drawWorkerInfo) {
+		if (UxConfig.drawWorkerInfo) {
 			// 각 일꾼들의 임무 상황
 			drawWorkerStateOnScreen(260, 60);
 
@@ -131,17 +131,17 @@ public class UXManager {
 		}
 
 		// 일꾼 자원채취 임무 상황
-		if (DrawConfig.drawResourceInfo) {
+		if (UxConfig.drawResourceInfo) {
 			drawWorkerMiningStatusOnMap();
 		}
 
 		// 정찰
-		if (DrawConfig.drawScoutInfo) {
+		if (UxConfig.drawScoutInfo) {
 			drawScoutInformation(220,330);
 		}
 
 		// 공격
-		if (DrawConfig.drawUnitTargetInfo) {
+		if (UxConfig.drawUnitTargetInfo) {
 			drawUnitTargetOnMap();
 
 			// 미사일, 럴커의 보이지않는 공격등을 표시
@@ -149,10 +149,10 @@ public class UXManager {
 		}
 		
 		// draw tile position of mouse cursor
-		if (DrawConfig.drawMouseCursorInfo) {
+		if (UxConfig.drawMouseCursorInfo) {
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/DrawConfig.TILE_SIZE) + ", " +  (int)(mouseY/DrawConfig.TILE_SIZE) + ")");
+			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/UxConfig.TILE_SIZE) + ", " +  (int)(mouseY/UxConfig.TILE_SIZE) + ")");
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int)(mouseX) + ", " +  (int)(mouseY) + ")");
 		}
 
@@ -202,7 +202,7 @@ public class UXManager {
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + CombatManager.Instance().getCombatStrategy());
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + OldCombatManager.Instance().getCombatStrategy());
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, red + "MYKillScore : ");
@@ -733,10 +733,10 @@ public class UXManager {
 
 			// OccupiedBaseLocation 을 원으로 표시
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * DrawConfig.TILE_SIZE, Color.Blue);	
+				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * UxConfig.TILE_SIZE, Color.Blue);	
 			}
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * DrawConfig.TILE_SIZE, Color.Red);	
+				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * UxConfig.TILE_SIZE, Color.Red);	
 			}
 
 			// ChokePoint, BaseLocation 을 텍스트로 표시
@@ -1061,14 +1061,14 @@ public class UXManager {
 	/// 정찰 상태를 Screen 에 표시합니다
 	public void drawScoutInformation(int x, int y)
 	{
-		int currentScoutStatus = ScoutManager.Instance().getScoutStatus();
+		int currentScoutStatus = OldScoutManager.Instance().getScoutStatus();
 		String scoutStatusString = null;
 
-		if(currentScoutStatus == ScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()){
+		if(currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()){
 			scoutStatusString = "Moving To Another Base Location";
-		}else if(currentScoutStatus == ScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()){
+		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()){
 			scoutStatusString = "Move Around Enemy BaseLocation";
-		}else if(currentScoutStatus == ScoutManager.ScoutStatus.NoScout.ordinal()){
+		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()){
 			scoutStatusString = "No Scout";
 		}else{
 			scoutStatusString = "No Scout";
@@ -1084,12 +1084,12 @@ public class UXManager {
 			Prebot.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
 		}
 
-		if (currentScoutStatus == ScoutManager.ScoutStatus.NoScout.ordinal()) {
+		if (currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()) {
 			Prebot.Broodwar.drawTextScreen(x, y + 10, "No Scout Unit");
 		}
 		else {
 			
-			Unit scoutUnit = ScoutManager.Instance().getScoutUnit();
+			Unit scoutUnit = OldScoutManager.Instance().getScoutUnit();
 			if (scoutUnit != null) {
 				Prebot.Broodwar.drawTextScreen(x, y + 10, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
 	
@@ -1099,7 +1099,7 @@ public class UXManager {
 	
 					double currentScoutTargetDistance;
 	
-					if (currentScoutStatus == ScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()) {
+					if (currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()) {
 						if (scoutUnit.getType().isFlyer()) {
 							currentScoutTargetDistance = (int)(scoutUnit.getPosition().getDistance(scoutMoveTo));
 						}
@@ -1107,7 +1107,7 @@ public class UXManager {
 							currentScoutTargetDistance = PositionUtils.getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
 						}
 	
-						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / DrawConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / DrawConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
+						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / UxConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / UxConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
 					}
 					/*
 					else if (currentScoutStatus == ScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()) {
