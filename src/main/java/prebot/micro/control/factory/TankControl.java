@@ -1,4 +1,4 @@
-package prebot.micro.control;
+package prebot.micro.control.factory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
 import prebot.micro.Decision.DecisionType;
 import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 

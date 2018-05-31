@@ -9,7 +9,7 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.micro.control.VultureControl;
+import prebot.micro.control.factory.VultureControl;
 import prebot.strategy.StrategyIdea;
 
 public class CheckerSquad extends Squad {

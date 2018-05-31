@@ -24,7 +24,7 @@ public class MicroCode {
 	}
 	
 	public static enum MainSquadMode {
-		DEFENSE, NORMAL, FD_PRESS, ATTCK, NO_MERCY
+		DEFENSE, NORMAL, FD_PRESS, ATTCK, SPEED_ATTCK, NO_MERCY
 	}
 	
 	public static class Combat {

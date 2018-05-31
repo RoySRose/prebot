@@ -26,6 +26,14 @@ public class StrategyIdea {
 	public static Position attackPosition = null;
 	public static Position campPosition = null;
 	public static Position defensePosition = null;
+
+	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
+	public static boolean initialized = false;
+	public static boolean noCheckNoGuerilla = false;
+	
+	public static boolean gasRushed = false;
+	public static boolean photonRushed = false;
+	public static boolean pushSiegeLine = false;
 	
 //	int tankCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 //			+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
@@ -48,12 +56,8 @@ public class StrategyIdea {
 	
 	public static CombatStrategy combatStrategy = CombatStrategy.DEFENCE_CHOKEPOINT;
 	public static Chokepoint currTargetChoke = null;
-	public static boolean pushSiegeLine = false;
 	public static boolean scoutDefenseNeeded = false;
 	public static boolean isCenterOccupied = false;
-	
-	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
-	
 	
 	
 	

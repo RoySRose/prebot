@@ -56,10 +56,9 @@ public class CombatManager {
 		ScvScoutSquad scvScoutSquad = new ScvScoutSquad();
 		squadData.addSquad(scvScoutSquad);
 		
-		// 레이스, 베슬, 빌딩 스쿼드
+		// 개별 유닛 - 레이스, 베슬, 빌딩, 컴셋 등
 		SpecialSquad specialSquad = new SpecialSquad();
 		squadData.addSquad(specialSquad);
-		
 	}
 
 	public void update() {

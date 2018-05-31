@@ -2,15 +2,17 @@ package prebot.micro.squad;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroCode.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.micro.control.GoliathControl;
 import prebot.micro.control.MarineControl;
-import prebot.micro.control.TankControl;
-import prebot.micro.control.VultureControl;
+import prebot.micro.control.factory.GoliathControl;
+import prebot.micro.control.factory.TankControl;
+import prebot.micro.control.factory.VultureControl;
 import prebot.strategy.StrategyIdea;
 
 public class MainAttackSquad extends Squad {
@@ -45,25 +47,20 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public void execute() {
-		List<Unit> marineList = new ArrayList<>();
-		List<Unit> vultureList = new ArrayList<>();
-		List<Unit> tankList = new ArrayList<>();
-		List<Unit> goliathList = new ArrayList<>();
-		for (Unit unit : unitList) {
-			if (unit.getType() == UnitType.Terran_Marine) {
-				marineList.add(unit);
-			} else if (unit.getType() == UnitType.Terran_Vulture) {
-				vultureList.add(unit);
-			} else if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				tankList.add(unit);
-			} else if (unit.getType() == UnitType.Terran_Goliath) {
-				goliathList.add(unit);
-			}
-		}
-		
+		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
+
+		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
 		marineControl.control(marineList, euiList);
+		
+		List<Unit> vultureList = unitListMap.getOrDefault(UnitType.Terran_Vulture, new ArrayList<Unit>());
 		vultureControl.control(vultureList, euiList);
+		
+		List<Unit> tankList = new ArrayList<>();
+		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));
+		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Siege_Mode, new ArrayList<Unit>()));
 		tankControl.control(tankList, euiList);
+		
+		List<Unit> goliathList = unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>());
 		goliathControl.control(goliathList, euiList);
 	}
 }

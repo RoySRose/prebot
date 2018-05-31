@@ -2,8 +2,10 @@ package prebot.common.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import bwapi.Player;
@@ -319,6 +321,21 @@ public class UnitUtils {
 		return closestUnit;
 	}
 
+	public static Map<UnitType, List<Unit>> makeUnitListMap(List<Unit> sourceUnitList) {
+		Map<UnitType, List<Unit>> unitListMap = new HashMap<>();
+		for (Unit unit : sourceUnitList) {
+			List<Unit> unitList = unitListMap.get(unit.getType());
+			if (unitList == null) {
+				unitList = new ArrayList<>();
+			}
+			unitList.add(unit);
+			unitListMap.put(unit.getType(), unitList);
+		}
+		return unitListMap;
+	}
+	
+	/////////////////////////////////////////// 기본 제공 메서드 ////////////////////////////////////////////////////////////
+	
 	public static boolean canAttack(Unit attacker, Unit target) {
 		return getWeapon(attacker, target) != WeaponType.None;
 	}

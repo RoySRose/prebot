@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.micro.control.VultureControl;
+import prebot.micro.control.factory.VultureControl;
 
 public class GuerillaSquad extends Squad {
 	private VultureControl vultureControl = new VultureControl();

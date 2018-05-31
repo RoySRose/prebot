@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.micro.control.WatcherControl;
+import prebot.micro.control.factory.WatcherControl;
 
 public class WatcherSquad extends Squad {
 	private WatcherControl vultureWatcher = new WatcherControl();

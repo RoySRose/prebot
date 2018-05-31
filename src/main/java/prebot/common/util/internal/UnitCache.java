@@ -173,11 +173,12 @@ public class UnitCache {
 	}
 
 	private <T> List<T> getUnitListReturnEmptyListIfNull(Map<UnitType, List<T>> unitMap, UnitType unitType) {
-		List<T> unitList = unitMap.get(unitType);
-		if (unitList == null) {
-			return new ArrayList<T>();
-		} else {
-			return unitList;
-		}
+		return unitMap.getOrDefault(unitType, new ArrayList<T>());
+//		List<T> unitList = unitMap.get(unitType);
+//		if (unitList == null) {
+//			return new ArrayList<T>();
+//		} else {
+//			return unitList;
+//		}
 	}
 }
