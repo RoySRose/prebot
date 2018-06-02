@@ -196,6 +196,12 @@ public class UnitUtils {
 		}
 	}
 	
+	public static List<UnitInfo> getEnemyUnitInfosInRadius(Position position, int radius) {
+		List<UnitInfo> euiList = new ArrayList<>();
+		addEnemyUnitInfosInRadius(euiList, position, radius);
+		return euiList;
+	}
+	
 	/** position 근처의 유닛리스트를 리턴 */
 	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius) {
 		return getUnitsInRadius(playerRange, position, radius, UnitType.AllUnits);

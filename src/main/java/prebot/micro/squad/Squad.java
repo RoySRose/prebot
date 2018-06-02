@@ -3,6 +3,7 @@ package prebot.micro.squad;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.UnitUtils;
@@ -14,11 +15,11 @@ public abstract class Squad {
 	private String squadName;
 	private int priority;
 	private int squadRadius;
-//	private List<Position> defensePosition;
 	private boolean activated;
 	
 	public List<Unit> unitList = new ArrayList<>();
 	public List<UnitInfo> euiList = new ArrayList<>();
+	public Position targetPosition = null;
 	// public Position goalPosition = Position.None;
 	
 	// private List<Unit> unitOldBies = new ArrayList<>();
@@ -28,6 +29,15 @@ public abstract class Squad {
 		this.squadName = squadInfo.squadName;
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
+		this.targetPosition = null;
+		this.activated = true;
+	}
+	
+	public Squad(SquadInfo squadInfo, Position targetPosition) {
+		this.squadName = squadInfo.squadName + targetPosition.toString();
+		this.priority = squadInfo.priority;
+		this.squadRadius = squadInfo.squadRadius;
+		this.targetPosition = targetPosition;
 		this.activated = true;
 	}
 
@@ -72,6 +82,15 @@ public abstract class Squad {
 		return CommonCode.INDEX_NOT_FOUND;
 	}
 
+	public void update() {
+		List<Unit> invalidUnitList = new ArrayList<>();
+		for (Unit unit : unitList) {
+			if (!UnitUtils.isValidUnit(unit) || !want(unit)) {
+				invalidUnitList.add(unit);
+			}
+		}
+	}
+	
 	public abstract boolean want(Unit unit);
 	
 	/// 스쿼드 업데이트

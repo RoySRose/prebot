@@ -11,6 +11,7 @@ import bwapi.UnitType;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class CheckerSquad extends Squad {
 	private VultureControl vultureControl = new VultureControl();
@@ -21,14 +22,15 @@ public class CheckerSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Vulture;
+		return unit.getType() == UnitType.Terran_Vulture
+				&& !VultureTravelManager.Instance().checkerRetired(unit.getID());
 	}
 
 	/// checker squad는 매 frame 1회 용감한 checker부대원을 모집한다.
 	/// 스파이더마인을 많이 보유한 벌처의 우선순위가 높다.
 	@Override
 	public List<Unit> recruit(List<Unit> assignableUnitList) {
-		int openingCount = StrategyIdea.checkerMaxCount - unitList.size();
+		int openingCount = StrategyIdea.checkerMaxNumber - unitList.size();
 		if (openingCount <= 0) {
 			return Collections.emptyList();
 		}

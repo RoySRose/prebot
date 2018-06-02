@@ -1,6 +1,8 @@
 package prebot.micro;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
@@ -9,10 +11,32 @@ import prebot.micro.squad.Squad;
 
 public class SquadData {
 
-	public Map<String, Squad> squadMap = new HashMap<>(); // 이름별 squad 저장
+	private Map<String, Squad> squadMap = new HashMap<>(); // 이름별 squad 저장
+	
+	public Map<String, Squad> getSquadMap() {
+		return squadMap;
+	}
+
+	public Squad getSquad(String squadName) {
+		return squadMap.get(squadName);
+	}
+
+	public List<Squad> getSquadList(String squadName) {
+		List<Squad> squadList = new ArrayList<>();
+		for (Squad squad : squadMap.values()) {
+			if (squad.getSquadName().startsWith(squadName)) {
+				squadList.add(squad);
+			}
+		}
+		return squadList;
+	}
 
 	public void addSquad(Squad squad) {
 		squadMap.put(squad.getSquadName(), squad);
+	}
+	
+	public Squad removeSquad(String squadName) {
+		return squadMap.remove(squadName);
 	}
 	
 	public void activateSquad(String squadName) {

@@ -1,4 +1,4 @@
-package prebot.strategy;
+package prebot.strategy.manage;
 
 
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.constant.MicroConfig;
+import prebot.strategy.InformationManager;
+import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.GameMap;
 
 public class SpiderMineManger {

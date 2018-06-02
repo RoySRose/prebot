@@ -2,6 +2,7 @@ package prebot.micro.squad;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -111,17 +112,12 @@ public class EarlyDefenseSquad extends Squad {
 
 	@Override
 	public void execute() {
-		List<Unit> marineList = new ArrayList<>();
-		List<Unit> scvList = new ArrayList<>();
-		for (Unit unit : unitList) {
-			if (unit.getType() == UnitType.Terran_Marine) {
-				marineList.add(unit);
-			} else if (unit.getType() == UnitType.Terran_SCV) {
-				scvList.add(unit);
-			}
-		}
-		gundamControl.control(marineList, euiList);
+		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
+		List<Unit> scvList = unitListMap.getOrDefault(UnitType.Terran_SCV, new ArrayList<Unit>());
+		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
+		
 		marineControl.control(scvList, euiList);
+		gundamControl.control(marineList, euiList);
 	}
 
 }

@@ -14,7 +14,7 @@ public class StrategyCode {
 		DONT_KNOW, GOOD_ACTION, BAD_ACTION
 	}
 	
-	public static enum WatcherPredictResult {
+	public static enum VultureCombatResult {
 		BACK, ATTACK
 	}
 }

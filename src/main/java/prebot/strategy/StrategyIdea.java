@@ -23,17 +23,27 @@ public class StrategyIdea {
 	public static EnemyStrategy enemyStrategy;
 	public static EnemyStrategyException enemyStrategyException;
 	
-	public static Position attackPosition = null;
 	public static Position campPosition = null;
-	public static Position defensePosition = null;
+	public static Position attackPosition = null;
 
+	public static Position enemyCampPosition = null;
 	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
+	
 	public static boolean initialized = false;
 	public static boolean noCheckNoGuerilla = false;
+	public static boolean attackWithoutDelay = false;
 	
 	public static boolean gasRushed = false;
 	public static boolean photonRushed = false;
 	public static boolean pushSiegeLine = false;
+
+	// TODO 변동 값
+	public static int checkerMaxNumber = 0;
+	public static int spiderMineNumberPerPosition = 1;
+	public static int spiderMineNumberPerGoodPosition = 1;
+	
+	public static int watcherFleeStartFrame = 0;
+	
 	
 //	int tankCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode)
 //			+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode);
@@ -43,9 +53,7 @@ public class StrategyIdea {
 	public static BaseLocation enemyBaseExpected = null;
 
 	public static boolean isMechanic = false;
-	public static boolean attackStraight = false;
 	
-	public static int checkerMaxCount = 0;
 	public static boolean assignScoutScv = false;
 	
 	public static List<String> squadNameToActivate = new ArrayList<>();

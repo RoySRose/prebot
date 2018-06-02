@@ -194,7 +194,6 @@ public class InformationManager {
 
 		updateFirstGasInformation();
 		updateMapSpecificInformation();
-		System.out.println("test");
 		updateChokePointAndExpansionLocation();
 //		checkTileForSupply();
 //		updateBaseRegionVerticesMap();

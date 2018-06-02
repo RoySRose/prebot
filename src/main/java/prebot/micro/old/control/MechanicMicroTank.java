@@ -19,8 +19,8 @@ import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
-import prebot.strategy.SpiderMineManger;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.SpiderMineManger;
 
 public class MechanicMicroTank extends MechanicMicroAbstract {
 	

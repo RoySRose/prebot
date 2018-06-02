@@ -20,9 +20,10 @@ public class MicroConfig {
 		MAIN_ATTACK("MAIN_ATTACK", 2, 150),
 		WATCHER("WATCHER", 3, 150),
 		CHECKER("CHECKER", 4, 150),
-		GUERILLA("GUERILLA", 5, 150),
-		SCV_SCOUT("SCV_SCOUT", 6, 150),
-		SPECIAL("SPECIAL", 7, 500);
+		GUERILLA_("GUERILLA_", 5, 150),
+		DEFENSE_("DEFENSE_", 6, 150),
+		SCV_SCOUT("SCV_SCOUT", 7, 150),
+		SPECIAL("SPECIAL", 8, 500);
 		
 		private SquadInfo(String squadName, int priority, int additionalRadius) {
 			this.squadName = squadName;
@@ -64,20 +65,18 @@ public class MicroConfig {
 	public static final int WORKERS_PER_REFINERY = 3;
 
 	public static class Vulture {
-		public static final int GEURILLA_RADIUS = 400;
 		public static final int PELOTON_RADIUS = 400;
-		public static final int GEURILLA_EXTRA_POWER = 150;
-		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 35초
-		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // 15마리
+		public static final int GEURILLA_ENEMY_RADIUS = 400;
+		public static final int GEURILLA_EXTRA_ENEMY_POWER = 150;
+		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 게릴라지역이 선정되고 일정시간이 지나야 다시 게릴라 지역으로 선정가능
+		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // GEURILLA_INTERVAL_FRAME 대기 없이 게릴라벌처를 할당가능한 숫자
+		public static final int CHECKER_IGNORE_FRAME = 30 * 24; // 10초
 		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
+		public static final int CHECKER_RETIRE_FRAME = 20 * 24; // 20초
+		
+		public static final int CHECKER_MAX_COUNT = 3;
 
 		public static final int IGNORE_MOVE_FRAME = 5 * 24; // 5초
-
-		// TODO 변동 값
-	    public static int maxNumWatcher = 50;
-		public static int maxNumChecker = 0;
-		public static int spiderMineNumPerPosition = 1;
-		public static int spiderMineNumPerGoodPosition = 1;
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;

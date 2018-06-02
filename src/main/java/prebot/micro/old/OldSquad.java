@@ -14,12 +14,14 @@ import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroCode.Combat;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
-import prebot.micro.constant.MicroCode.Result;
 import prebot.micro.constant.MicroCode.OldSquadName;
+import prebot.micro.constant.MicroCode.Result;
 import prebot.micro.constant.MicroCode.SquadOrderType;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.control.MechanicMicroGoliath;
 import prebot.micro.old.control.MechanicMicroTank;
 import prebot.micro.old.control.MechanicMicroVulture;
@@ -31,12 +33,9 @@ import prebot.micro.old.control.MicroTank;
 import prebot.micro.old.control.MicroVessel;
 import prebot.micro.old.control.MicroVulture;
 import prebot.micro.old.control.MicroWraith;
-import prebot.micro.WorkerManager;
-import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
-import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.VultureTravelManager;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class OldSquad {
 	
@@ -353,13 +352,9 @@ public class OldSquad {
 		// 적 정보 수집. 명령이 하달된 3초간은 근처 적을 무시
 		if (name.equals(OldSquadName.CHECKER)) {
 			for (Unit vulture : microVulture.getUnits()) {
-				TravelSite site = VultureTravelManager.Instance().getSquadSiteMap().get(vulture.getID());
-				if (site != null) {
-					if (site.visitAssignedFrame != 0 && site.visitAssignedFrame > Prebot.Broodwar.getFrameCount() - MicroConfig.Vulture.IGNORE_MOVE_FRAME) {
-						continue;
-					}
+				if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(vulture.getID())) {
+					InformationManager.Instance().getNearbyForce(vultureEnemies, vulture.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 				}
-				InformationManager.Instance().getNearbyForce(vultureEnemies, vulture.getPosition(), InformationManager.Instance().enemyPlayer, order.getRadius());
 			}
 			saveUnitLevel = 2;
 		} else if (name.startsWith(OldSquadName.GUERILLA_)) {

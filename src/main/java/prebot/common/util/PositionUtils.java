@@ -4,7 +4,9 @@ import bwapi.Pair;
 import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import bwta.Region;
+import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.MapTools;
 
@@ -58,5 +60,35 @@ public class PositionUtils {
 	/// 두 position 사이의 거리를 리턴
 	public static int getGroundDistance(Position origin, Position destination) {
 		return MapTools.Instance().getGroundDistance(origin, destination);
+	}
+
+	public static PositionRegion getPositionRegion(Position position) {
+		Region positionRegion = BWTA.getRegion(position);
+		Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+		if (positionRegion == myBaseRegion) {
+			return PositionRegion.MY_BASE;
+		}
+		Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+		if (positionRegion == myExpansionRegion) {
+			return PositionRegion.MY_FIRST_EXPANSION;
+		}
+		Region enemyBaseRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
+		if (positionRegion == enemyBaseRegion) {
+			return PositionRegion.ENEMY_BASE;
+		}
+		Region enemyExpansionRegion = BWTA.getRegion(InfoUtils.enemyFirstExpansion().getPosition());
+		if (positionRegion == enemyExpansionRegion) {
+			return PositionRegion.ENEMY_FIRST_EXPANSION;
+		}
+		return PositionRegion.ETC;
+	}
+	
+	public static boolean isStartingPosition(Position position) {
+		for (BaseLocation startingBase : BWTA.getStartLocations()) {
+			if (startingBase.getPosition().equals(position)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

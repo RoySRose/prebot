@@ -1,6 +1,5 @@
 package prebot.strategy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Order;
@@ -18,7 +17,6 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.InitialBuild;
-import prebot.common.AnalyzeStrategy;
 import prebot.common.MapGrid;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
@@ -27,12 +25,11 @@ import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.old.OldCombatManager;
-import prebot.strategy.action.Action;
-import prebot.strategy.action.impl.PositionFinder;
-import prebot.strategy.action.impl.ScvScoutAfterBuild;
 import prebot.strategy.constant.StrategyCode.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
+import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.VultureTravelManager;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
@@ -74,8 +71,6 @@ public class StrategyManager {
 	public int WraithTime = 0;
 	public int nomorewraithcnt = 0;
 	public int CombatTime = 0;
-	
-	private List<Action> actionList = new ArrayList<>();
 
 	public StrategyManager() {
 		isInitialBuildOrderFinished = false;
@@ -115,9 +110,7 @@ public class StrategyManager {
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
-		
-		actionList.add(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
-		actionList.add(new PositionFinder());
+		ActionManager.init();
 	}
 
 	/// 경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다
@@ -132,13 +125,11 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 
-		updateDummyStrategyIdea();
-		updateActions();
-
 		// 전략 파악
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
+		ActionManager.updateActions();
 		
 
 		// TODO-REFACTORING 멀티지역 커맨드센터 건설
@@ -222,22 +213,6 @@ public class StrategyManager {
 			RespondToStrategy.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
 			// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
 		}
-	}
-
-	private void updateDummyStrategyIdea() {
-//		StrategyIdea.attackPosition = InfoUtils.enemyBase().getPosition();
-	}
-
-	private void updateActions() {
-		List<Action> removeActionList = new ArrayList<>();
-		for (Action action : actionList) {
-			if (action.exitCondition()) {
-				removeActionList.add(action);
-				continue;
-			}
-			action.action();
-		}
-		actionList.removeAll(removeActionList);
 	}
 
 	private static int least(double a, double b, double c, int checker) {

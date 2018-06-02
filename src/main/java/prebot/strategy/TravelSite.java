@@ -3,7 +3,7 @@ package prebot.strategy;
 import bwta.BaseLocation;
 
 public class TravelSite {
-	TravelSite(BaseLocation baseLocation, int visitFrame, int visitAssignedFrame, int guerillaExamFrame) {
+	public TravelSite(BaseLocation baseLocation, int visitFrame, int visitAssignedFrame, int guerillaExamFrame) {
 		this.baseLocation = baseLocation;
 		this.visitFrame = visitFrame;
 		this.visitAssignedFrame = visitAssignedFrame;

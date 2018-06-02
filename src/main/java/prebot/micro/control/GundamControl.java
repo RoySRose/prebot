@@ -2,7 +2,6 @@ package prebot.micro.control;
 
 import java.util.List;
 
-import bwapi.Color;
 import bwapi.Unit;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
@@ -13,7 +12,6 @@ public class GundamControl extends Control {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		for (Unit unit : unitList) {
-			Prebot.Broodwar.drawCircleMap(unit.getPosition().getX(), unit.getPosition().getY(), 4, Color.Yellow, true);
 			Unit target = getClosestEnemyUnitFromWorker(unit);
 
 			if (target != null) {

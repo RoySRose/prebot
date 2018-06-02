@@ -15,6 +15,7 @@ import prebot.common.util.PlayerUtil;
 import prebot.micro.CombatManager;
 import prebot.micro.WorkerManager;
 import prebot.micro.old.OldCombatManager;
+import prebot.micro.old.ScoutManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
 
@@ -68,7 +69,7 @@ public class GameCommander {
 			BuildManager.Instance().update();
 			ConstructionManager.Instance().update();
 
-//			ScoutManager.Instance().update();
+			ScoutManager.Instance().update();
 			WorkerManager.Instance().update();
 			OldCombatManager.Instance().update();
 //			CombatManager.Instance().update();

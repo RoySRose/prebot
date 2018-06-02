@@ -1,4 +1,4 @@
-package prebot.common;
+package prebot.strategy;
 
 import java.util.List;
 
@@ -12,11 +12,9 @@ import bwapi.UpgradeType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.micro.old.OldMicroUtils;
-import prebot.strategy.InformationManager;
-import prebot.strategy.RespondToStrategy;
-import prebot.strategy.StrategyManager;
 import prebot.strategy.constant.StrategyCode.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;

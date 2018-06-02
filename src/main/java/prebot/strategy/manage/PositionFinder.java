@@ -1,4 +1,4 @@
-package prebot.strategy.action.impl;
+package prebot.strategy.manage;
 
 import java.util.List;
 
@@ -11,34 +11,47 @@ import bwta.Chokepoint;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PlayerUtil;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.action.Action;
 
+/**
+ * 각종 Position을 찾는다.
+ * 
+ * campPosition : 수비 지점
+ * attackPosition : 공격 지점
+ * 
+ */
 public class PositionFinder extends Action {
 
 	@Override
 	public boolean exitCondition() {
-		return false;
+		return PlayerUtil.isDisabled(Prebot.Broodwar.enemy());
 	}
 
 	@Override
 	public void action() {
 		StrategyIdea.campPosition = getCampPosition();
 		StrategyIdea.attackPosition = getAttackPosition();
-		// StrategyIdea.defensePosition = getDefensePosition();
 	}
 
 	/// 주둔지
 	private Position getCampPosition() {
-		if (firstExpansionOccupied()) {
-			// return InfoUtils.mySecondChoke();
-			return firstExpansionBackwardPosition();
+		if (!firstExpansionOccupied()) {
+			if (defenseInside()) {
+				 return commandCenterInsidePosition();
+			} else {
+				return firstChokeDefensePosition();
+			}
 		} else {
-			// return commandCenterInsidePosition();
-			return firstChokeDefensePosition();
+			if (defenseSecondChoke()) {
+				 return InfoUtils.mySecondChoke().getCenter();
+			} else {
+				return firstExpansionBackwardPosition();
+			}
 		}
 	}
 
@@ -50,15 +63,21 @@ public class PositionFinder extends Action {
 		}
 
 		if (!enemyBaseDestroyed(enemyBase)) {
-			if (StrategyIdea.attackStraight) {} else {}
-			return enemyBase.getPosition();
-		} else {
-			return letsfindRatPosition();
+			if (StrategyIdea.attackWithoutDelay) {
+				return enemyBase.getPosition();
+			} else {
+				// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
+				// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
+				// 안전한 위치까지 바로 전진하도록 한다.
+				return enemyBase.getPosition();
+			}
 		}
+		
+		return letsfindRatPosition();
 	}
 
-	/// 커맨드센터와 미네랄 사이의 방어지역
-	private Position commandCenterInsidePosition() {
+	private Position getEnemyCampPosition() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -70,6 +89,25 @@ public class PositionFinder extends Action {
 				return true;
 			}
 		}
+		return false;
+	}
+
+	/// 커맨드센터 수비 필요
+	private boolean defenseInside() {
+		// TODO 초반 저글링 공격 등 타이밍상 first choke에서 수비가 불가한 경우 true
+		// 수비가 가능해지는 시점에 false로 변경
+		return false;
+	}
+
+	/// 커맨드센터와 미네랄 사이의 방어지역
+	private Position commandCenterInsidePosition() {
+		return null;
+	}
+	
+	/// 전진수비 여부
+	private boolean defenseSecondChoke() {
+		// TODO 1. 병력이 일정이상 쌓였을 때
+		// 2. 상대가 테란이면 좀더 빨리 포지션을 차지해야 한다.
 		return false;
 	}
 

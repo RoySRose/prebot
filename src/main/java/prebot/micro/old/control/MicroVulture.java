@@ -13,17 +13,15 @@ import bwta.BaseLocation;
 import bwta.Region;
 import prebot.common.MapGrid;
 import prebot.common.util.CommandUtils;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.SquadOrderType;
-import prebot.micro.constant.MicroConfig.Common;
-import prebot.micro.constant.MicroConfig.FleeAngle;
-import prebot.micro.constant.MicroConfig.Vulture;
-import prebot.micro.old.OldMicroUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
-import prebot.strategy.SpiderMineManger;
-import prebot.strategy.VultureTravelManager;
+import prebot.strategy.StrategyIdea;
+import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class MicroVulture extends MicroManager {
 	
@@ -54,7 +52,7 @@ public class MicroVulture extends MicroManager {
 				
 				// checker 벌처들은 각각의 orderPosition을 가진다.
 				if (order.getType() == SquadOrderType.CHECK) {
-					BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+					BaseLocation travelBase = VultureTravelManager.Instance().getCheckerTravelSite(vulture.getID());
 					if (travelBase != null) {
 						kitingOption.setGoalPosition(travelBase.getPosition());
 					}
@@ -101,7 +99,7 @@ public class MicroVulture extends MicroManager {
 				
 			} else {
 				// 1. 마인매설 위치 체크
-				int spiderMineNumPerPosition = MicroConfig.Vulture.spiderMineNumPerPosition;
+				int spiderMineNumPerPosition = StrategyIdea.spiderMineNumberPerPosition;
 				Position minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, spiderMineNumPerPosition);
 				if (order.getType() == SquadOrderType.WATCH) {
 					if (minePosition == null) {
@@ -124,7 +122,7 @@ public class MicroVulture extends MicroManager {
 						movePosition = retreatPosition;
 					}
 				} else if (order.getType() == SquadOrderType.CHECK) { // checker 벌처들은 각각의 orderPosition을 가진다.
-					BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+					BaseLocation travelBase = VultureTravelManager.Instance().getCheckerTravelSite(vulture.getID());
 					if (travelBase != null) {
 						movePosition = travelBase.getPosition();
 					}

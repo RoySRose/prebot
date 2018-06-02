@@ -9,6 +9,9 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.main.Prebot;
+import prebot.micro.CombatManager;
+import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.squad.Squad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.UnitInfo;
@@ -77,5 +80,14 @@ public class InfoUtils {
 	
 	public static List<UnitInfo> euiListInMyRegion(Region myRegion) {
 		return InformationManager.Instance().getEuiListInMyRegion(myRegion);
+	}
+	
+	public static int squadUnitSize(SquadInfo squadInfo) {
+		Squad squad = CombatManager.Instance().squadData.getSquad(squadInfo.squadName);
+		if (squad != null && squad.unitList != null) {
+			return squad.unitList.size();
+		} else {
+			return 0;
+		}
 	}
 }

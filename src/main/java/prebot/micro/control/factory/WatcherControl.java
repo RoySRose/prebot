@@ -12,21 +12,21 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
-import prebot.micro.WatcherPredictor;
+import prebot.micro.VultureCombatPredictor;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.WatcherPredictResult;
+import prebot.strategy.constant.StrategyCode.VultureCombatResult;
 
 /// MainSquad <-> 적 기지 or 주력병력 주둔지 이동하여 마인 매설 
 public class WatcherControl extends Control {
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		WatcherPredictResult result = WatcherPredictor.predictByUnitInfo(unitList, euiList);
+		VultureCombatResult result = VultureCombatPredictor.watcherPredictByUnitInfo(unitList, euiList);
 		
-		if (result == WatcherPredictResult.ATTACK) {
+		if (result == VultureCombatResult.ATTACK) {
 
 			DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 			FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);

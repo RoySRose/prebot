@@ -1,6 +1,7 @@
 package prebot.micro.old;
 
 
+import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
-import prebot.common.AnalyzeStrategy;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
@@ -32,12 +32,14 @@ import prebot.micro.constant.MicroCode.OldSquadName;
 import prebot.micro.constant.MicroCode.SquadOrderType;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
+import prebot.strategy.AnalyzeStrategy;
 import prebot.strategy.InformationManager;
 import prebot.strategy.RespondToStrategy;
-import prebot.strategy.SpiderMineManger;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.VultureTravelManager;
 import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class OldCombatManager {
 
@@ -1502,24 +1504,24 @@ public class OldCombatManager {
 		// 모든 정찰벌처가 하나의 스파이더 마인도 가지고 있지 않다면 정찰 스쿼드를 교체한다.
 		// 단, 이미 경로에서 벗어나 안정적으로 정찰을 하고 있는 벌처가 돌아오거나 전투중인 벌처를 갑자기 정찰로 빼는건 좋지 않은 영향이 있을 수 있다.
 		// 그러므로 VultureTravelManager에서 교체가 가능한 타이밍을 관리한다.(정찰이 마쳐진 상황)
-		if (!checkerSquad.getUnitSet().isEmpty() && VultureTravelManager.timeToShiftDuty()) {
-			boolean clearSquad = true;
-			for (Unit vulture : checkerSquad.getUnitSet()) {
-				if (vulture.getSpiderMineCount() > 0) {
-					clearSquad = false;
-					break;
-				}
-			}
-			if (clearSquad) {
-				checkerSquad.clear();
-				return;
-			}
-		}
+//		if (!checkerSquad.getUnitSet().isEmpty() && VultureTravelManager.clearCheckerSquadIfNoSpiderMine()) {
+//			boolean clearSquad = true;
+//			for (Unit vulture : checkerSquad.getUnitSet()) {
+//				if (vulture.getSpiderMineCount() > 0) {
+//					clearSquad = false;
+//					break;
+//				}
+//			}
+//			if (clearSquad) {
+//				checkerSquad.clear();
+//				return;
+//			}
+//		}
 
 		// checker 유닛 할당
 		List<Unit> spareList = new ArrayList<>();
 		for (Unit unit : combatUnits) {
-			if (checkerSquad.getUnitSet().size() >= MicroConfig.Vulture.maxNumChecker) {
+			if (checkerSquad.getUnitSet().size() >= StrategyIdea.checkerMaxNumber) {
 				break;
 			}
 			if (unit.getType() == UnitType.Terran_Vulture && squadData.canAssignUnitToSquad(unit, checkerSquad)) {
@@ -1532,7 +1534,7 @@ public class OldCombatManager {
 		}
 		
 		for (Unit unit : spareList) {
-			if (checkerSquad.getUnitSet().size() >= MicroConfig.Vulture.maxNumChecker) {
+			if (checkerSquad.getUnitSet().size() >= StrategyIdea.checkerMaxNumber) {
 				break;
 			}
 			squadData.assignUnitToSquad(unit, checkerSquad);
@@ -1572,7 +1574,7 @@ public class OldCombatManager {
 		BaseLocation bestGuerillaSite = VultureTravelManager.Instance().getBestGuerillaSite(assignableVultures);
 		if (bestGuerillaSite != null) {
 			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(bestGuerillaSite.getPosition(), InformationManager.Instance().enemyPlayer, MicroConfig.Vulture.GEURILLA_RADIUS);
+			List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(bestGuerillaSite.getPosition(), InformationManager.Instance().enemyPlayer, MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS);
 			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(enemiesInfo, false);
 			
 			if (vulturePower > enemyPower) {
@@ -1580,7 +1582,7 @@ public class OldCombatManager {
 				OldSquad guerillaSquad = squadData.getSquad(squadName);
 				// 게릴라 스쿼드 생성(포지션 별)
 				if (guerillaSquad == null) {
-	        		OldSquadOrder squadOrder = new OldSquadOrder(SquadOrderType.GUERILLA, bestGuerillaSite.getPosition(), MicroConfig.Vulture.GEURILLA_RADIUS, "Let's get it on");
+	        		OldSquadOrder squadOrder = new OldSquadOrder(SquadOrderType.GUERILLA, bestGuerillaSite.getPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS, "Let's get it on");
 	        		guerillaSquad = new OldSquad(squadName, squadOrder, Combat.GUERILLA_PRIORITY);
 	        		squadData.putSquad(guerillaSquad);
 	        	}
@@ -1591,7 +1593,7 @@ public class OldCombatManager {
         			for (Unit assignableVulture : assignableVultures) {
     					squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
     					int squadPower = CombatExpectation.getVulturePower(guerillaSquad.getUnitSet());
-    					if (squadPower > enemyPower + MicroConfig.Vulture.GEURILLA_EXTRA_POWER) { 
+    					if (squadPower > enemyPower + MicroConfig.Vulture.GEURILLA_EXTRA_ENEMY_POWER) { 
     						break; // 충분한 파워
     					}
     				}
@@ -1612,7 +1614,7 @@ public class OldCombatManager {
 			}
 			
 			if (Prebot.Broodwar.isVisible(squad.getOrder().getPosition().toTilePosition())) {
-				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroConfig.Vulture.GEURILLA_RADIUS, false, true, null);
+				List<Unit> enemies = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS, false, true, null);
 				if (enemies.isEmpty()) {
 					
 					squad.clear();
@@ -1620,9 +1622,9 @@ public class OldCombatManager {
 				}
 			}
 			
-			List<Unit> workers = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroConfig.Vulture.GEURILLA_RADIUS, false, true, InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace));
+			List<Unit> workers = MapGrid.Instance().getUnitsNear(squad.getOrder().getPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS, false, true, InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace));
 			if (workers.isEmpty()) {
-				List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroConfig.Vulture.GEURILLA_RADIUS, true);
+				List<UnitInfo> enemiesInfo = InformationManager.Instance().getNearbyForce(squad.getOrder().getPosition(), InformationManager.Instance().enemyPlayer, MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS, true);
 				Result result = CombatExpectation.expectByUnitInfo(squad.getUnitSet(), enemiesInfo, false);
 				if (result == Result.LOSS) {
 					

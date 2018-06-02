@@ -13,14 +13,13 @@ import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
 import prebot.micro.constant.MicroConfig.Flee;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.WatcherPredictResult;
+import prebot.strategy.constant.StrategyCode.VultureCombatResult;
 
 /** @author insaneojw
  *  */
-public class WatcherPredictor {
-	
-	public static int fleeStartFrame = 0;
+public class VultureCombatPredictor {
 	
 	/** 벌처의 후퇴*/
 //	public static WatcherCombatPredictResult predict(List<Unit> vultureList, List<Unit> enemyUnitList) {
@@ -29,19 +28,19 @@ public class WatcherPredictor {
 //		return getResult(vulturePower, enemyPower);
 //	}
 	
-	public static WatcherPredictResult predictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
-		if (TimeUtils.elapsedSeconds(fleeStartFrame) <= Flee.WATCHER_FLEE_SECONDS) {
-			return WatcherPredictResult.BACK;
+	public static VultureCombatResult watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
+		if (TimeUtils.elapsedSeconds(StrategyIdea.watcherFleeStartFrame) <= Flee.WATCHER_FLEE_SECONDS) {
+			return VultureCombatResult.BACK;
 		}
 		
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 		
 		if (vulturePower > enemyPower) {
-			return WatcherPredictResult.ATTACK;
+			return VultureCombatResult.ATTACK;
 		} else {
-			fleeStartFrame = TimeUtils.elapsedFrames();
-			return WatcherPredictResult.BACK;
+			StrategyIdea.watcherFleeStartFrame = TimeUtils.elapsedFrames();
+			return VultureCombatResult.BACK;
 		}
 	}
 

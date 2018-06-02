@@ -24,7 +24,18 @@ public class MicroCode {
 	}
 	
 	public static enum MainSquadMode {
-		DEFENSE, NORMAL, FD_PRESS, ATTCK, SPEED_ATTCK, NO_MERCY
+		DEFENSE(0.1),
+		NORMAL(0.8),
+		ATTCK(0.2),
+		FD_PRESS(0.0),
+		SPEED_ATTCK(0.0),
+		NO_MERCY(0.8);
+
+		private MainSquadMode(double maxGuerillaVultureRatio) {
+			this.maxGuerillaVultureRatio = maxGuerillaVultureRatio;
+		}
+		
+		public double maxGuerillaVultureRatio;
 	}
 	
 	public static class Combat {

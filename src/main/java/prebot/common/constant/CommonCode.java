@@ -20,4 +20,8 @@ public class CommonCode {
 	public static enum EnemyUnitFindRange {
 		VISIBLE, INVISIBLE, ALL
 	}
+
+	public static enum PositionRegion {
+		MY_BASE, MY_FIRST_EXPANSION, ENEMY_BASE, ENEMY_FIRST_EXPANSION, ETC
+	}
 }

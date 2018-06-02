@@ -15,17 +15,18 @@ import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.TimeUtils;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.constant.MicroCode.SquadOrderType;
-import prebot.micro.old.OldMicroUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
-import prebot.strategy.SpiderMineManger;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.VultureTravelManager;
+import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class MechanicMicroVulture extends MechanicMicroAbstract {
 
@@ -88,7 +89,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 					retreatPosition = myBase.getPosition();
 				}
 			} else if (order.getType() == SquadOrderType.CHECK) {
-				BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+				BaseLocation travelBase = VultureTravelManager.Instance().getCheckerTravelSite(vulture.getID());
 				if (travelBase != null) {
 					retreatPosition = travelBase.getPosition();
 				}
@@ -143,7 +144,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			// watcher : 목표지역(적base)으로 이동. 앞에 보이지 않는 적이 있으면 본진base로 후퇴.
 			Position movePosition = order.getPosition();
 			if (order.getType() == SquadOrderType.CHECK) {
-				BaseLocation travelBase = VultureTravelManager.Instance().getBestTravelSite(vulture.getID());
+				BaseLocation travelBase = VultureTravelManager.Instance().getCheckerTravelSite(vulture.getID());
 				if (travelBase != null) {
 					movePosition = travelBase.getPosition();
 				}
@@ -202,7 +203,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			if (enemyFirstExpansion != null) {
 				int distance = vulture.getDistance(enemyFirstExpansion.getPosition());
 				if (distance < MicroConfig.Tank.SIEGE_MODE_MAX_RANGE && OldMicroUtils.isSafePlace(enemyFirstExpansion.getPosition())) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, enemyFirstExpansion.getPosition(), true, MicroConfig.Vulture.spiderMineNumPerPosition * 2);
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, enemyFirstExpansion.getPosition(), true, StrategyIdea.spiderMineNumberPerPosition * 2);
 				}
 			}
 			
@@ -211,12 +212,12 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				
 				int distance = vulture.getDistance(enemyReadyPos);
 				if (distance <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroConfig.Vulture.spiderMineNumPerPosition);
+					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerPosition);
 				}
 			}
 			
 		} else {
-			minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, MicroConfig.Vulture.spiderMineNumPerGoodPosition);
+			minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
 			
 			if (minePosition == null && order.getType() == SquadOrderType.WATCH) {
 //				// 적 유닛에게 마인 선물하기
@@ -241,9 +242,9 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 							}
 						}
 						if (!occupiedRegion || (!vultureInMyBaseRegion && minePrepareLevel >= 1)) {
-							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroConfig.Vulture.spiderMineNumPerPosition); // 그외에는 좀 많이
+							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerPosition); // 그외에는 좀 많이
 						} else {
-							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, MicroConfig.Vulture.spiderMineNumPerGoodPosition);
+							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerGoodPosition);
 						}
 					}
 				}
