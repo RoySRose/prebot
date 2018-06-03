@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import bwapi.Position;
+import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
@@ -64,6 +65,22 @@ public class InfoUtils {
 	
 	public static List<BaseLocation> enemyOccupiedBases() {
 		return InformationManager.Instance().getOccupiedBaseLocations(Prebot.Broodwar.enemy());
+	}
+
+	public static int myNumUnits(UnitType... unitTypes) {
+		int numUnits = 0;
+		for (UnitType unitType : unitTypes) {
+			numUnits += InformationManager.Instance().getNumUnits(unitType, Prebot.Broodwar.self());
+		}
+		return numUnits;
+	}
+	
+	public static int enemyNumUnits(UnitType... unitTypes) {
+		int numUnits = 0;
+		for (UnitType unitType : unitTypes) {
+			numUnits += InformationManager.Instance().getNumUnits(unitType, Prebot.Broodwar.enemy());
+		}
+		return numUnits;
 	}
 	
 	public static Map<Integer, UnitInfo> enemyUnitInfoMap() {

@@ -22,6 +22,6 @@ public class CommonCode {
 	}
 
 	public static enum PositionRegion {
-		MY_BASE, MY_FIRST_EXPANSION, ENEMY_BASE, ENEMY_FIRST_EXPANSION, ETC
+		MY_BASE, MY_FIRST_EXPANSION, ENEMY_BASE, ENEMY_FIRST_EXPANSION, ETC, UNKNOWN
 	}
 }

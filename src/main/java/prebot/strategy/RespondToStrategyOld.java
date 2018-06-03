@@ -24,7 +24,7 @@ import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 /// 봇 프로그램 설정
-public class RespondToStrategy {
+public class RespondToStrategyOld {
 	
 	//클로킹 유닛에 대한 대처
 	public boolean enemy_dark_templar;
@@ -90,7 +90,7 @@ public class RespondToStrategy {
 	
 	public boolean center_gateway = false;
 	
-	public RespondToStrategy() {
+	public RespondToStrategyOld() {
 		//클로킹 유닛에 대한 대처
 		enemy_dark_templar = false;
 		enemy_lurker = false;

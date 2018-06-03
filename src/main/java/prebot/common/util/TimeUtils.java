@@ -12,8 +12,13 @@ public class TimeUtils {
 	public static final int MINUTE = 24 * 60;
 	
 	/// 지나간 프레임이면 true
-	public static boolean isPassedFrame(int frame) {
-		return frame < Prebot.Broodwar.getFrameCount();
+	public static boolean before(int frame) {
+		return Prebot.Broodwar.getFrameCount() < frame;
+	}
+	
+	/// 지나간 프레임이면 true
+	public static boolean after(int frame) {
+		return Prebot.Broodwar.getFrameCount() > frame;
 	}
 
 	/// 경과시간을 frame으로 리턴

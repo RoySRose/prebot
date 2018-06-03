@@ -62,7 +62,7 @@ public class PositionUtils {
 		return MapTools.Instance().getGroundDistance(origin, destination);
 	}
 
-	public static PositionRegion getPositionRegion(Position position) {
+	public static PositionRegion positionToPositionRegion(Position position) {
 		Region positionRegion = BWTA.getRegion(position);
 		Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		if (positionRegion == myBaseRegion) {
@@ -72,15 +72,37 @@ public class PositionUtils {
 		if (positionRegion == myExpansionRegion) {
 			return PositionRegion.MY_FIRST_EXPANSION;
 		}
-		Region enemyBaseRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
-		if (positionRegion == enemyBaseRegion) {
-			return PositionRegion.ENEMY_BASE;
+		if (InfoUtils.enemyBase() != null) {
+			Region enemyBaseRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
+			if (positionRegion == enemyBaseRegion) {
+				return PositionRegion.ENEMY_BASE;
+			}
+			Region enemyExpansionRegion = BWTA.getRegion(InfoUtils.enemyFirstExpansion().getPosition());
+			if (positionRegion == enemyExpansionRegion) {
+				return PositionRegion.ENEMY_FIRST_EXPANSION;
+			}
+			return PositionRegion.ETC;
 		}
-		Region enemyExpansionRegion = BWTA.getRegion(InfoUtils.enemyFirstExpansion().getPosition());
-		if (positionRegion == enemyExpansionRegion) {
-			return PositionRegion.ENEMY_FIRST_EXPANSION;
+		return PositionRegion.UNKNOWN;
+	}
+
+	public static Region positionRegionToRegion(PositionRegion positionRegion) {
+		if (positionRegion == PositionRegion.MY_BASE) {
+			return BWTA.getRegion(InfoUtils.myBase().getPosition());
 		}
-		return PositionRegion.ETC;
+		if (positionRegion == PositionRegion.MY_FIRST_EXPANSION) {
+			return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+		}
+		
+		if (InfoUtils.enemyBase() != null) {
+			if (positionRegion == PositionRegion.ENEMY_BASE) {
+				return BWTA.getRegion(InfoUtils.enemyBase().getPosition());
+			}
+			if (positionRegion == PositionRegion.ENEMY_FIRST_EXPANSION) {
+				return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+			}
+		}
+		return null;
 	}
 	
 	public static boolean isStartingPosition(Position position) {

@@ -95,7 +95,7 @@ public class ProtossBuildPhase1 extends RaceAction {
 		if (TimeUtils.elapsedFrames() < FORGE_DOUBLE_NEXUS_SEC) {
 			if (nexusList.size() >= 1) {
 				for (UnitInfo nexusInfo : nexusList) {
-					PositionRegion nexusRegion = PositionUtils.getPositionRegion(nexusInfo.getLastPosition());
+					PositionRegion nexusRegion = PositionUtils.positionToPositionRegion(nexusInfo.getLastPosition());
 					if (nexusRegion == PositionRegion.ENEMY_FIRST_EXPANSION) {
 						isDoubleNexus = true;
 						return true;
@@ -143,7 +143,7 @@ public class ProtossBuildPhase1 extends RaceAction {
 		}
 
 		UnitInfo firstSearchedPylon = enemyUnitInfoMap.get(UnitType.Protoss_Pylon).get(0);
-		PositionRegion positionRegion = PositionUtils.getPositionRegion(firstSearchedPylon.getLastPosition());
+		PositionRegion positionRegion = PositionUtils.positionToPositionRegion(firstSearchedPylon.getLastPosition());
 		if (positionRegion == PositionRegion.ENEMY_BASE) {
 			isPlyonOnExpansion = false;
 		} else if (positionRegion == PositionRegion.ENEMY_BASE) {

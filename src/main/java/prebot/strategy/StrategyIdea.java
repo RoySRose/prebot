@@ -32,7 +32,8 @@ public class StrategyIdea {
 	public static boolean initialized = false;
 	public static boolean noCheckNoGuerilla = false;
 	public static boolean attackWithoutDelay = false;
-	
+
+	public static boolean enemiesInMyBase = false;
 	public static boolean gasRushed = false;
 	public static boolean photonRushed = false;
 	public static boolean pushSiegeLine = false;

@@ -54,7 +54,7 @@ public abstract class RaceAction extends Action {
 		}
 
 		// 일정시간이 지날 때까지 전략을 알지 못하였다.
-		if (TimeUtils.isPassedFrame(phasEndSec)) {
+		if (TimeUtils.before(phasEndSec)) {
 			StrategyIdea.enemyBuildPhase1 = finalExpect();
 			return true;
 		}
@@ -89,14 +89,14 @@ public abstract class RaceAction extends Action {
 			}
 
 			for (UnitInfo euiFound : euiListFound) {
-				boolean contain = false;
+				boolean containUnit = false;
 				for (UnitInfo euiSaved : euiListSaved) {
 					if (euiFound.getUnitID() == euiSaved.getUnitID()) {
-						contain = true;
+						containUnit = true;
 						break;
 					}
 				}
-				if (!contain) {
+				if (!containUnit) {
 					euiListSaved.add(euiFound);
 					if (euiFound.getType().isBuilding()) {
 						buildStartSecMap.put(euiFound.getUnitID(), TimeUtils.buildStartSeconds(euiFound.getUnit())); // 빌드시작한 시잔 (초). 이미 완성되어 알 수 없다면 UNKNOWN

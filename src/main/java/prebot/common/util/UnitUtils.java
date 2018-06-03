@@ -14,9 +14,12 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
+import bwta.BWTA;
+import bwta.Region;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions.UnitCondition;
@@ -248,6 +251,30 @@ public class UnitUtils {
 		}
 	}
 	
+	public static List<Unit> getUnitsInRegion(PositionRegion positionRegion, PlayerRange playerRange) {
+		List<Unit> totalUnits = null;
+		if (playerRange == PlayerRange.SELF) {
+			totalUnits = Prebot.Broodwar.self().getUnits();
+		} else if (playerRange == PlayerRange.ENEMY) {
+			totalUnits = Prebot.Broodwar.enemy().getUnits();
+		} else if (playerRange == PlayerRange.NEUTRAL) {
+			totalUnits = Prebot.Broodwar.neutral().getUnits();
+		} else {
+			totalUnits = Prebot.Broodwar.getAllUnits();
+		}
+		
+		List<Unit> unitsInRegion = new ArrayList<>();
+		Region region = PositionUtils.positionRegionToRegion(positionRegion);
+	    for (Unit unit : totalUnits) {
+	    	if (UnitUtils.isValidUnit(unit)) {
+	    		if (region == BWTA.getRegion(unit.getPosition())) {
+		            unitsInRegion.add(unit);
+		        }
+	    	}
+	    }
+		return unitsInRegion;
+	}
+	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
 		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.SCAN_DURATION;
@@ -419,6 +446,22 @@ public class UnitUtils {
 		} else {
 			return true;
 		}
+	}
+	
+	public static int myFactoryUnitSupplyCount() {
+		int totalSupplyCount = 0;
+		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			if (UnitUtils.isValidUnit(unit)) {
+				continue;
+			}
+			if (unit.getType() == UnitType.Terran_Vulture
+					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+					|| unit.getType() == UnitType.Terran_Goliath) {
+				totalSupplyCount++;
+			}
+		}
+		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 
 }

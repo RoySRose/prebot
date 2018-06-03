@@ -37,6 +37,7 @@ import prebot.micro.old.OldScoutManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.AttackExpansionManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
@@ -177,11 +178,11 @@ public class UXManager {
 		
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + StrategyManager.Instance().getCurrentStrategyBasic() +" <-- "+ StrategyManager.Instance().LastStrategyBasic);
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + StrategyManager.Instance().getCurrentStrategyBasic() +" <-- "+ StrategyManager.Instance().lastStrategy);
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "Current EXStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().LastStrategyException );
+		Prebot.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().lastStrategyException );
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
@@ -189,16 +190,16 @@ public class UXManager {
 		y += 11;
 
 		Prebot.Broodwar.drawTextScreen(x, y, white + "MyunitPoint(Fac) : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + StrategyManager.Instance().MyunitPoint);
+		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + AttackExpansionManager.Instance().MyunitPoint);
 		y += 11;
 		Prebot.Broodwar.drawTextScreen(x, y, white + "ExpansionPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + StrategyManager.Instance().ExpansionPoint);
+		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + AttackExpansionManager.Instance().ExpansionPoint);
 		y += 11;
 		Prebot.Broodwar.drawTextScreen(x, y, white + "UnitPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().UnitPoint);
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + AttackExpansionManager.Instance().UnitPoint);
 		y += 11;
 		Prebot.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().Attackpoint);
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + AttackExpansionManager.Instance().Attackpoint);
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
