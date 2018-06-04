@@ -102,9 +102,9 @@ public class RespondToStrategy {
 		chk_turret = 0;
 	}
 	
-	private static RespondToStrategyOld instance = new RespondToStrategyOld();
+	private static RespondToStrategy instance = new RespondToStrategy();
 	
-	public static RespondToStrategyOld Instance() {
+	public static RespondToStrategy Instance() {
 		return instance;
 	}
 	
