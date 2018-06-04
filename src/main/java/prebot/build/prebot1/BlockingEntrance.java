@@ -6,7 +6,7 @@ import bwapi.UnitType;
 import prebot.build.constant.BuildConfig;
 import prebot.common.main.Prebot;
 import prebot.strategy.InformationManager;
-import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 
 //
 public class BlockingEntrance {

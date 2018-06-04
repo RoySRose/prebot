@@ -16,7 +16,7 @@ import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.old.OldMicroUtils;
-import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 

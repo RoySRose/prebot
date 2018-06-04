@@ -1,15 +1,13 @@
 package prebot.build.initialProvider.BlockingEntrance;
 
-import bwapi.Position;
+import java.util.HashMap;
+
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.main.Prebot;
-import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
-import prebot.strategy.constant.StrategyCode;
-
-import java.util.HashMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 
 //
 public class BlockingEntrance {
@@ -75,7 +73,7 @@ public class BlockingEntrance {
 
         //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
         Map map = Map.A;
-        if (InformationManager.Instance().getMapSpecificInformation().getMap() == StrategyCode.GameMap.THE_HUNTERS) {
+        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS) {
             map = Map.B;
         }
 

@@ -16,7 +16,7 @@ import prebot.build.constant.BuildConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.strategy.InformationManager;
-import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {

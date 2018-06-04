@@ -21,7 +21,7 @@ import prebot.build.constant.BuildConfig;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyManager;
+import prebot.strategy.TempBuildSourceCode;
 
 /// 빌드(건물 건설 / 유닛 훈련 / 테크 리서치 / 업그레이드) 명령을 순차적으로 실행하기 위해 빌드 큐를 관리하고, 빌드 큐에 있는 명령을 하나씩 실행하는 class<br>
 /// 빌드 명령 중 건물 건설 명령은 ConstructionManager로 전달합니다
@@ -986,7 +986,7 @@ public class BuildManager {
 						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								
-								if (StrategyManager.Instance().isInitialBuildOrderFinished() == true) {
+								if (TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
 									if(unit.canBuildAddon() == false){
 										continue;
 									}

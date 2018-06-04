@@ -36,6 +36,7 @@ import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldScoutManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
+import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AttackExpansionManager;
 
@@ -186,7 +187,7 @@ public class UXManager {
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + StrategyManager.Instance().vultureratio+":"+StrategyManager.Instance().tankratio+":"+StrategyManager.Instance().goliathratio);
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + TempBuildSourceCode.Instance().vultureratio+":"+TempBuildSourceCode.Instance().tankratio+":"+TempBuildSourceCode.Instance().goliathratio);
 		y += 11;
 
 		Prebot.Broodwar.drawTextScreen(x, y, white + "MyunitPoint(Fac) : ");

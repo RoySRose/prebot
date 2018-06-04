@@ -18,6 +18,7 @@ import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.old.OldCombatManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
+import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 
@@ -200,13 +201,8 @@ public class AttackExpansionManager {
 
 		} else {
 			// 공통 예외 상황
-			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && OldCombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY) {// 팩토리 유닛 130
-																																										// 이상
-																																										// 또는 서플 196
-																																										// 이상
-																																										// 사용시(스타
-																																										// 내부에서는
-																																										// 2배)
+			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && OldCombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY) {// 팩토리 유닛 130 이상 또는 서플 196 이상
+																																										// 사용시(스타 내부에서는 2배)
 
 				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
 				CombatStartCase = 1;
@@ -384,7 +380,7 @@ public class AttackExpansionManager {
 
 		// 앞마당 전
 		if (RealCCcnt == 1) {// TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
-			if (!StrategyManager.Instance().isInitialBuildOrderFinished()) {
+			if (!TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
 				return;
 			}
 

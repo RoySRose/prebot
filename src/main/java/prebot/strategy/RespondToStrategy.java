@@ -19,7 +19,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.old.OldCombatManager;
-import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
@@ -235,7 +235,7 @@ public class RespondToStrategy {
 			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1
 					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 1) {
 				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3) {
-					if (StrategyManager.Instance().LiftChecker == false
+					if (TempBuildSourceCode.Instance().LiftChecker == false
 							&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4) {
 						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1) {
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,
@@ -256,7 +256,7 @@ public class RespondToStrategy {
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) >= 1){
 				if(center_gateway){
 					if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3){
-						if(StrategyManager.Instance().LiftChecker == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+						if(TempBuildSourceCode.Instance().LiftChecker == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 							if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 							}
@@ -274,7 +274,7 @@ public class RespondToStrategy {
 				}else{
 					if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) >= 1) {
 						if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) < 3){
-							if(StrategyManager.Instance().LiftChecker == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
+							if(TempBuildSourceCode.Instance().LiftChecker == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 								if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 								}
@@ -390,7 +390,7 @@ public class RespondToStrategy {
 	boolean expanchcker = false;
 	public void RespondVsZerg() {	
 		
-		if(StrategyManager.Instance().LiftChecker == false && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){
+		if(TempBuildSourceCode.Instance().LiftChecker == false && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);
@@ -496,7 +496,7 @@ public class RespondToStrategy {
 		// }
 		
 		//marine for fast zergling and zealot start
-		if(StrategyManager.Instance().LiftChecker == false && OldCombatManager.Instance().FastZerglingsInOurBase > 0 || OldCombatManager.Instance().FastZealotInOurBase > 0){
+		if(TempBuildSourceCode.Instance().LiftChecker == false && OldCombatManager.Instance().FastZerglingsInOurBase > 0 || OldCombatManager.Instance().FastZealotInOurBase > 0){
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);

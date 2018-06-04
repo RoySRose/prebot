@@ -19,7 +19,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.constant.StrategyCode.GameMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 

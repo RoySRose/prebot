@@ -1,7 +1,6 @@
 package prebot.micro.old;
 
 
-import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,20 +23,20 @@ import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroCode.Combat;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
-import prebot.micro.constant.MicroCode.Result;
 import prebot.micro.constant.MicroCode.OldSquadName;
+import prebot.micro.constant.MicroCode.Result;
 import prebot.micro.constant.MicroCode.SquadOrderType;
-import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.AnalyzeStrategy;
 import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.RespondToStrategy;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.GameMap;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.VultureTravelManager;
 
