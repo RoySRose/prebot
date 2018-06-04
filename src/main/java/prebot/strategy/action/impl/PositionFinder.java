@@ -1,4 +1,4 @@
-package prebot.strategy.manage;
+package prebot.strategy.action.impl;
 
 import java.util.List;
 

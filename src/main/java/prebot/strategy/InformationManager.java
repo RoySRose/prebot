@@ -27,6 +27,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
@@ -53,21 +54,21 @@ public class InformationManager {
 
 	//private boolean EarlyDefenseNeeded;
 	//private boolean ScoutDefenseNeeded;
-	
-	private boolean FirstScoutAlive;
-	private boolean FirstVultureAlive;
-	private boolean ScoutStart;
-	private boolean VultureStart;
-	
+
+	private boolean scoutStart;
+	private boolean firstScoutAlive;
+	private Unit firstScout;
+	private boolean vultureStart;
+	private boolean firstVultureAlive;
+	private Unit firstVulture;
+
 	private Unit myfirstGas;
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
 	private boolean checkGasRush;
 	private boolean photonRushed;
 //	private int MainBaseSuppleLimit;
-	private Unit FirstVulture;
 	private Unit FirstCC;
-	private Position firstenemyunit;
 	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -128,18 +129,16 @@ public class InformationManager {
 		ReceivingEveryMultiInfo = false;
 //		EarlyDefenseNeeded = true;
 //		ScoutDefenseNeeded = true;
-		FirstScoutAlive = true;
-		FirstVultureAlive = true;
-		ScoutStart = false;
-		VultureStart = false;
+		firstScoutAlive = true;
+		firstVultureAlive = true;
+		scoutStart = false;
+		vultureStart = false;
 		myfirstGas = null;
 		gasRushEnemyRefi = null;
 		gasRushed = false;
 		checkGasRush = true;
 		photonRushed = false;
 //		MainBaseSuppleLimit =0;
-		FirstVulture = null;
-		
 		
 		for (Unit unit : Prebot.Broodwar.self().getUnits()){
 			if(unit.getType() == UnitType.Terran_Command_Center && FirstCC==null){
@@ -253,33 +252,9 @@ public class InformationManager {
 //				}
 //			}
 //		}
-			
-			
-		if(VultureStart == false && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) > 0){
-			VultureStart = true;
-			for (Unit unit : Prebot.Broodwar.self().getUnits()){
-				if(unit.getType() == UnitType.Terran_Vulture){
-					FirstVulture = unit; 
-					FirstVultureAlive = true;
-				}
-			}
-		}
-		if(VultureStart == true && FirstVultureAlive == true  && FirstVulture.exists() == false){
-			FirstVultureAlive = false;
-		}
-		
-		
-		if(ScoutStart == false && WorkerManager.Instance().getScoutWorker() != null){
-			ScoutStart = true;
-		}
-		if(ScoutStart == true && ((WorkerManager.Instance().getScoutWorker() != null 
-				&& WorkerManager.Instance().getScoutWorker().getHitPoints() <= 0)
-				|| WorkerManager.Instance().getScoutWorker() == null )){
-			if(InformationManager.Instance().getEnemyUnits().size() > 0){
-				firstenemyunit = InformationManager.Instance().getEnemyUnits().get(0).getLastPosition();
-			}
-			FirstScoutAlive = false;
-		}
+
+		updateFirstScout();
+		updateFirstVulture();
 		
 		if(checkGasRush == true){
 			
@@ -577,47 +552,10 @@ public class InformationManager {
 		
 		
 		//끝까지 상대 location 못 찾았을때
-		if (mainBaseLocations.get(enemyPlayer) == null && FirstScoutAlive == false && (FirstVultureAlive ==false || Prebot.Broodwar.getFrameCount() >= 8500 )) {
-			
-			List<UnitInfo> enemyUnits = null;
-			enemyUnits = InformationManager.Instance().getEnemyUnits();
-			
-			if(enemyUnits.size() > 0){
-				for(UnitInfo fogUnit : enemyUnits){
-					
-					BaseLocation closestBase = null;
-					if(fogUnit.getType().isBuilding() == true){
-						int minimumDistance = 999999;
-						for (BaseLocation startLocation : BWTA.getStartLocations()) {
-							if (startLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
-							if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {continue;}
-							
-							int dist = PositionUtils.getGroundDistance(fogUnit.getLastPosition(), startLocation.getPosition());
-							if (dist < minimumDistance) {
-								closestBase = startLocation;
-								minimumDistance = dist;
-							}
-						}
-					}
-					
-					if(closestBase ==null){
-						int minimumDistance = 999999;
-						for (BaseLocation startLocation : BWTA.getStartLocations()) {
-							if (startLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition())) continue;
-							if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {continue;}
-							
-							int dist = PositionUtils.getGroundDistance(firstenemyunit, startLocation.getPosition());
-							if (dist < minimumDistance) {
-								closestBase = startLocation;
-								minimumDistance = dist;
-							}
-						}
-					}
-					
-					mainBaseLocations.put(enemyPlayer, closestBase);
-					mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
-					break;
-				}
+		if (mainBaseLocations.get(enemyPlayer) == null && firstScoutAlive == false && (firstVultureAlive ==false || Prebot.Broodwar.getFrameCount() >= 8500 )) {
+			if (StrategyIdea.enemyBaseExpected != null) {
+				mainBaseLocations.put(enemyPlayer, StrategyIdea.enemyBaseExpected);
+				mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
 			}
 		}
 
@@ -708,28 +646,31 @@ public class InformationManager {
 		updateChokePointAndExpansionLocation();
 	}
 	
-	public List<UnitInfo> getEnemyUnits(){
+	// UnitUtils.getEnemyUnitInfoList 로 대체
+	@Deprecated
+	public List<UnitInfo> getEnemyUnits() {
 		return getEnemyUnits(null);
 	}
-	public List<UnitInfo> getEnemyUnits(UnitType type)
-	{
+
+	// UnitUtils.getEnemyUnitInfoList 로 대체
+	@Deprecated
+	public List<UnitInfo> getEnemyUnits(UnitType type) {
 		List<UnitInfo> units = new ArrayList<>();
-		
+
 		Iterator<Integer> it = null;
 		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
-		
-		
+
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
-			if(ui != null){
-				if(type == null){
+			if (ui != null) {
+				if (type == null) {
 					units.add(ui);
-				}else if(type == ui.getType()){
+				} else if (type == ui.getType()) {
 					units.add(ui);
 				}
 			}
 		}
-		
+
 		return units;
 	}
 	
@@ -1425,7 +1366,7 @@ public class InformationManager {
 //		ScoutDefenseNeeded = b;
 //	}
 	public boolean isFirstScoutAlive() {
-		return FirstScoutAlive;
+		return firstScoutAlive;
 	}
 	public boolean isGasRushed() {
 		return gasRushed;
@@ -1881,6 +1822,35 @@ public class InformationManager {
 
 	public List<UnitInfo> getEuiListInMyRegion(Region region) {
 		return euiListInMyRegion.get(region);
+	}
+
+	private void updateFirstScout() {
+		if (!scoutStart) {
+			if (WorkerManager.Instance().getScoutWorker() != null) {
+				scoutStart = true;
+				firstScout = WorkerManager.Instance().getScoutWorker();
+				firstScoutAlive = true;
+			}
+		} else {
+			if (firstScoutAlive && !UnitUtils.isValidUnit(firstScout)) {
+				firstScoutAlive = false;
+			}
+		}
+	}
+
+	private void updateFirstVulture() {
+		if (!vultureStart) {
+			List<Unit> vulture = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+			if (!vulture.isEmpty()) {
+				vultureStart = true;
+				firstVulture = vulture.get(0);
+				firstVultureAlive = true;
+			}
+		} else {
+			if (firstVultureAlive && !UnitUtils.isValidUnit(firstVulture)) {
+				firstVultureAlive = false;
+			}
+		}
 	}
 	
 }

@@ -12,6 +12,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.Chokepoint;
 import prebot.common.LagObserver;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.TimeUtils;
@@ -127,12 +128,12 @@ public class MicroBuilding extends MicroManager {
 				}
 			}
 			
-			List<UnitInfo> foggedEnemyUnits = new ArrayList<UnitInfo>();
-			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Protoss_Photon_Cannon));
-			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Zerg_Sunken_Colony));
-			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Missile_Turret));
-			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Siege_Tank_Siege_Mode));
-			foggedEnemyUnits.addAll(InformationManager.Instance().getEnemyUnits(UnitType.Terran_Bunker));
+			List<UnitInfo> foggedEnemyUnits = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL,
+					UnitType.Protoss_Photon_Cannon,
+					UnitType.Zerg_Sunken_Colony,
+					UnitType.Terran_Missile_Turret,
+					UnitType.Terran_Siege_Tank_Siege_Mode,
+					UnitType.Terran_Bunker);
 			
 			UnitInfo closestTarget = null;
 			if(foggedEnemyUnits.size() > 0){

@@ -63,31 +63,6 @@ public class RespondToStrategy {
 	//초반 터렛 건설에 대한 체크
 	private int chk_turret;
 	
-	//유닛체크values()
-	public boolean chk_scv;
-	public boolean chk_marine;
-	public boolean chk_goliath;
-	public boolean chk_vulture;
-	public boolean chk_siege_tank;
-	public boolean chk_vessel;
-	public boolean chk_wraith;
-	public boolean chk_valkyrie;
-	
-	//건물체크
-	public boolean chk_refinery;
-	public boolean chk_barrack;
-	public boolean chk_engineering_bay;
-	public boolean chk_missile_turret;
-	public boolean chk_academy;
-	public boolean chk_factory;
-	public boolean chk_machine_shop;
-	public boolean chk_armory;
-	public boolean chk_starport;
-	public boolean chk_control_tower;
-	public boolean chk_comsat_station;
-	public boolean chk_science_facility;
-	
-	
 	public boolean center_gateway = false;
 	
 	public RespondToStrategy() {
@@ -125,30 +100,6 @@ public class RespondToStrategy {
 		
 		//초반 터렛 건설에 대한 체크
 		chk_turret = 0;
-		
-		//유닛체크values()
-		chk_scv = false;
-		chk_marine = false;
-		chk_goliath = false;
-		chk_vulture = false;
-		chk_siege_tank = false;
-		chk_vessel = false;
-		chk_wraith = false;
-		chk_valkyrie = false;
-		
-		//건물체크
-		chk_refinery = false;
-		chk_barrack = false;
-		chk_engineering_bay = false;
-		chk_missile_turret = false;
-		chk_academy = false;
-		chk_factory = false;
-		chk_machine_shop = false;
-		chk_armory = false;
-		chk_starport = false;
-		chk_control_tower = false;
-		chk_comsat_station = false;
-		chk_science_facility = false;
 	}
 	
 	private static RespondToStrategyOld instance = new RespondToStrategyOld();
@@ -178,71 +129,6 @@ public class RespondToStrategy {
 //		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
 //			need_vessel = true;
 //		}
-		
-		//System.out.println("Respond Strategy Manager On Update!!!!!!!!!!!!!!! ");
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-
-			if (unit.getType() == UnitType.Terran_SCV ) {
-				chk_scv = true;
-			}
-			if (unit.getType() == UnitType.Terran_Marine) {
-				chk_marine = true;
-			}
-			if (unit.getType() == UnitType.Terran_Goliath) {
-				chk_goliath = true;
-			}
-			if (unit.getType() == UnitType.Terran_Vulture) {
-				chk_vulture = true;
-			}
-			if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-				chk_siege_tank = true;
-			}
-			if (unit.getType() == UnitType.Terran_Wraith) {
-				chk_wraith = true;
-			}
-			if (unit.getType() == UnitType.Terran_Valkyrie) {
-				chk_valkyrie = true;
-			}
-			if (unit.getType() == UnitType.Terran_Science_Vessel) {
-				chk_vessel = true;
-			}
-			if (unit.getType() == UnitType.Terran_Refinery) {
-				chk_refinery = true;
-			}
-			if (unit.getType() == UnitType.Terran_Barracks) {
-				chk_barrack = true;
-			}
-			if (unit.getType() == UnitType.Terran_Engineering_Bay) {
-				chk_engineering_bay = true;
-			}
-			if (unit.getType() == UnitType.Terran_Missile_Turret) {
-				chk_missile_turret = true;
-			}
-			if (unit.getType() == UnitType.Terran_Academy) {
-				chk_academy = true;
-			}
-			if (unit.getType() == UnitType.Terran_Comsat_Station) {
-				chk_comsat_station = true;
-			}
-			if (unit.getType() == UnitType.Terran_Factory) {
-				chk_factory = true;
-			}
-			if (unit.getType() == UnitType.Terran_Machine_Shop) {
-				chk_machine_shop = true;
-			}
-			if (unit.getType() == UnitType.Terran_Armory) {
-				chk_armory = true;
-			}
-			if (unit.getType() == UnitType.Terran_Starport) {
-				chk_starport = true;
-			}
-			if (unit.getType() == UnitType.Terran_Control_Tower) {
-				chk_control_tower = true;
-			}
-			if (unit.getType() == UnitType.Terran_Science_Facility) {
-				chk_science_facility = true;
-			}
-		}
 		
 		//최대한 로직 막 타지 않게 상대 종족별로 나누어서 진행 
 		if (InformationManager.Instance().enemyRace == Race.Protoss) {
@@ -626,9 +512,9 @@ public class RespondToStrategy {
 				need_vessel_time = Prebot.Broodwar.getFrameCount();
 			}
 
-			if (!chk_comsat_station && UnitUtils.myFactoryUnitSupplyCount() >= 32) {
+			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Comsat_Station) && UnitUtils.myFactoryUnitSupplyCount() >= 32) {
 				// 컴셋이 없다면
-				if (!chk_academy) {
+				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Academy)) {
 					// 아카데미가 없다면
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) < 1
 							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
@@ -652,7 +538,7 @@ public class RespondToStrategy {
 				}
 			}
 
-			if(chk_engineering_bay == false && (InformationManager.Instance().enemyRace != Race.Protoss || Prebot.Broodwar.getFrameCount() > 5000)){
+			if(!UnitUtils.myUnitDiscovered(UnitType.Terran_Engineering_Bay) && (InformationManager.Instance().enemyRace != Race.Protoss || Prebot.Broodwar.getFrameCount() > 5000)){
 				
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
@@ -768,7 +654,7 @@ public class RespondToStrategy {
 		}
 		
 		if(enemy_scout || enemy_shuttle || enemy_wraith){
-			if(!chk_armory){
+			if(!UnitUtils.myUnitDiscovered(UnitType.Terran_Armory)){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
 					if(Prebot.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
@@ -791,7 +677,7 @@ public class RespondToStrategy {
 		}
 		
 		if(enemy_arbiter){
-			if(!chk_armory){
+			if(!UnitUtils.myUnitDiscovered(UnitType.Terran_Armory)){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) < 1
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0){
 					if(Prebot.Broodwar.self().minerals() >= UnitType.Terran_Armory.mineralPrice() 
@@ -829,7 +715,7 @@ public class RespondToStrategy {
 
 		if (max_turret_to_mutal != 0) {
 
-			if (!chk_engineering_bay) {
+			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Engineering_Bay)) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) 
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay,	null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,

@@ -9,6 +9,7 @@ import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -421,7 +422,7 @@ public class AttackExpansionManager {
 		}
 
 		// 앞마당 이후
-		if (RealCCcnt >= 2) {
+		else if (RealCCcnt >= 2) {
 
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
@@ -571,9 +572,7 @@ public class AttackExpansionManager {
 	}
 
 	private boolean enemyExspansioning() {
-		// int cnt = MyBotModule.Broodwar.enemy().incompleteUnitCount(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
-		List<UnitInfo> enemyCC = null;
-		enemyCC = InformationManager.Instance().getEnemyUnits(InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
+		List<UnitInfo> enemyCC = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
 
 		for (UnitInfo target : enemyCC) {
 			if (target.isCompleted()) {

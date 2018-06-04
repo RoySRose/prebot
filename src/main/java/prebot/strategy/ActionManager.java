@@ -7,9 +7,10 @@ import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.strategy.action.Action;
+import prebot.strategy.action.impl.EnemyBaseFinder;
 import prebot.strategy.action.impl.InitialAction;
+import prebot.strategy.action.impl.PositionFinder;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
-import prebot.strategy.manage.PositionFinder;
 
 public class ActionManager {
 	
@@ -24,6 +25,7 @@ public class ActionManager {
 		}
 		actionList.add(new InitialAction(isRandom));
 		actionList.add(new PositionFinder());
+		actionList.add(new EnemyBaseFinder());
 	}
 	
 	public static void updateActions() {

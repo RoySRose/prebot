@@ -59,14 +59,17 @@ public class UnitUtils {
 			return null;
 		}
 	}
-
-	/** 유닛 리스트 */
+	
 	public static List<Unit> getUnitList(UnitType... unitTypes) {
 		Set<Unit> unitSet = new HashSet<>();
 		for (UnitType unitType : unitTypes) {
 			unitSet.addAll(getUnitList(UnitFindRange.ALL, unitType));
 		}
 		return new ArrayList<>(unitSet);
+	}
+
+	public static List<Unit> getUnitList(UnitFindRange unitFindRange) {
+		return getUnitList(unitFindRange, UnitType.AllUnits);
 	}
 	
 	public static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType... unitTypes) {
@@ -140,6 +143,10 @@ public class UnitUtils {
 	}
 
 	/** 적 유닛 리스트 */
+	public static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange) {
+		return getEnemyUnitInfoList(enemyUnitFindRange, UnitType.AllUnits);
+	}
+	
 	public static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
 		Set<UnitInfo> unitSet = new HashSet<>();
 		for (UnitType unitType : unitTypes) {
@@ -273,6 +280,28 @@ public class UnitUtils {
 	    	}
 	    }
 		return unitsInRegion;
+	}
+	
+	/// 유닛타입의 아군 유닛이 하나 생산되었는지 여부
+	public static boolean myUnitDiscovered(UnitType... unitTypes) {
+		Map<UnitType, Boolean> selfUnitDiscoveredMap = UnitCache.getCurrentCache().getSelfUnitDiscoveredMap();
+		return unitDiscovered(selfUnitDiscoveredMap, unitTypes);
+	}
+	
+	/// 유닛타입의 적 유닛이 하나 생산되었는지 여부
+	public static boolean enemyUnitDiscovered(UnitType... unitTypes) {
+		Map<UnitType, Boolean> enemyUnitDiscoveredMap = UnitCache.getCurrentCache().getEnemyUnitDiscoveredMap();
+		return unitDiscovered(enemyUnitDiscoveredMap, unitTypes);
+	}
+	
+	private static boolean unitDiscovered(Map<UnitType, Boolean> unitDiscoveredMap, UnitType... unitTypes) {
+		for (UnitType unitType : unitTypes) {
+			Boolean discovered = unitDiscoveredMap.get(unitType);
+			if (discovered != null && discovered == Boolean.TRUE) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
