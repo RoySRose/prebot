@@ -1,10 +1,12 @@
 package prebot.build.provider;
 
+import java.rmi.activation.ActivationGroup_Stub;
 import java.util.List;
 
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
@@ -137,6 +139,9 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     private final boolean satisfyBasicConditions(){
 
+        if(!checkInitialBuild()) {
+            return false;
+        }
         //For units check supply
         if(!checkSupplyForUnit()){
             return false;
@@ -146,6 +151,13 @@ public abstract class DefaultBuildableItem implements BuildableItem{
             return false;
         }
 
+        return true;
+    }
+
+    public boolean checkInitialBuild(){
+        if(!InitialBuildProvider.Instance().InitialBuildFinished){
+            return false;
+        }
         return true;
     }
 

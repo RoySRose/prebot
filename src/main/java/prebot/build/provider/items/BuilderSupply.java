@@ -13,6 +13,11 @@ public class BuilderSupply extends DefaultBuildableItem {
         super(metaType);
     }
 
+    @Override
+    public boolean checkInitialBuild(){
+        return true;
+    }
+
     public final boolean buildCondition(){
 
         if (Prebot.Broodwar.self().supplyTotal() >= 400) {
