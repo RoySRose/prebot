@@ -603,7 +603,7 @@ public class OldCombatManager {
 				}
 			}
 		}
-		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		AnalyzeStrategy.Instance().update();
 				
 	}
 	

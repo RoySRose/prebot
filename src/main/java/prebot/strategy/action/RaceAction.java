@@ -17,11 +17,11 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyConfig.EnemyBuild;
+import prebot.strategy.constant.EnemyStrategy.Strategy;
 
 public abstract class RaceAction extends Action {
 
-	protected EnemyBuild enemyBuildOfPhase = EnemyBuild.UNKNOWN; // TODO diplay
+	protected Strategy enemyBuildOfPhase = null; // TODO diplay
 	protected List<UnitType> foundUnitTypes = new ArrayList<>(); // TODO diplay
 
 	protected Map<UnitType, List<UnitInfo>> enemyUnitInfoMap = new HashMap<>(); // TODO display 유닛타입별 발견시점의 UnitInfo
@@ -48,14 +48,14 @@ public abstract class RaceAction extends Action {
 	@Override
 	public boolean exitCondition() {
 		// 전략이 파악되었다.
-		if (enemyBuildOfPhase != EnemyBuild.UNKNOWN) {
-			StrategyIdea.enemyBuildPhase1 = enemyBuildOfPhase;
+		if (enemyBuildOfPhase != null) {
+			StrategyIdea.phase01 = enemyBuildOfPhase;
 			return true;
 		}
 
 		// 일정시간이 지날 때까지 전략을 알지 못하였다.
 		if (TimeUtils.before(phasEndSec)) {
-			StrategyIdea.enemyBuildPhase1 = finalExpect();
+			StrategyIdea.phase01 = finalExpect();
 			return true;
 		}
 
@@ -73,7 +73,7 @@ public abstract class RaceAction extends Action {
 
 	protected abstract boolean analyse();
 	protected abstract void expectBuild();
-	protected abstract EnemyBuild finalExpect();
+	protected abstract Strategy finalExpect();
 
 	/// 유닛 발견 맵을 업데이트한다.
 	protected void updateInfo() {

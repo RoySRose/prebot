@@ -12,7 +12,7 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.action.RaceAction;
-import prebot.strategy.constant.StrategyConfig.EnemyBuild;
+import prebot.strategy.constant.EnemyStrategy.Strategy;
 
 public class ProtossBuildPhase1 extends RaceAction {
 
@@ -71,22 +71,22 @@ public class ProtossBuildPhase1 extends RaceAction {
 	@Override
 	protected void expectBuild() {
 		if (nothingInEnemyBase) {
-			enemyBuildOfPhase = EnemyBuild.PROTOSS_PHASE1_ONEGATE_GAS;
+			enemyBuildOfPhase = Strategy.PROTOSS_ONEGATE_CORE;
 		} else if (isTwoGateBuild) {
-			enemyBuildOfPhase = EnemyBuild.PROTOSS_PHASE1_TWOGATE;
+			enemyBuildOfPhase = Strategy.PROTOSS_TWOGATE;
 		} else if (isDoubleNexus) {
-			enemyBuildOfPhase = EnemyBuild.PROTOSS_PHASE1_DOUBLE_NEXSUS;
+			enemyBuildOfPhase = Strategy.PROTOSS_DOUBLE;
 		}
 	}
 
 	@Override
-	protected EnemyBuild finalExpect() {
+	protected Strategy finalExpect() {
 		if (isPlyonOnExpansion && isForgeFirstBuild) {
-			return EnemyBuild.PROTOSS_PHASE1_DOUBLE_NEXSUS;
+			return Strategy.PROTOSS_DOUBLE;
 		} else if (nothingInEnemyBase) {
-			return EnemyBuild.PROTOSS_PHASE1_TWOGATE;
+			return Strategy.PROTOSS_TWOGATE;
 		} else {
-			return EnemyBuild.FAIL_TO_RECOGNIZE;
+			return Strategy.PROTOSS_ONEGATE_CORE;
 		}
 	}
 

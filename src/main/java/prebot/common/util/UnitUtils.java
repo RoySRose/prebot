@@ -480,7 +480,7 @@ public class UnitUtils {
 	public static int myFactoryUnitSupplyCount() {
 		int totalSupplyCount = 0;
 		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-			if (UnitUtils.isValidUnit(unit)) {
+			if (!UnitUtils.isValidUnit(unit)) {
 				continue;
 			}
 			if (unit.getType() == UnitType.Terran_Vulture

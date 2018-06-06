@@ -9,16 +9,16 @@ import bwta.Chokepoint;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.MainSquadMode;
 import prebot.strategy.action.Action;
-import prebot.strategy.constant.StrategyConfig.EnemyBuild;
+import prebot.strategy.constant.EnemyStrategy.Strategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 public class StrategyIdea {
 	
 	public static List<Action> newActionList = new ArrayList<>();
-	public static EnemyBuild enemyBuildPhase1 = EnemyBuild.UNKNOWN;
-	public static EnemyBuild enemyBuildPhase2 = EnemyBuild.UNKNOWN;
-	public static EnemyBuild enemyBuildPhase3 = EnemyBuild.UNKNOWN;
+	public static Strategy phase01 = null;
+	public static Strategy phase02 = null;
+	public static Strategy phase03 = null;
 	
 	public static EnemyStrategy enemyStrategy;
 	public static EnemyStrategyException enemyStrategyException;

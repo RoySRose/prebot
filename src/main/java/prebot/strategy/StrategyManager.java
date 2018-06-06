@@ -57,7 +57,7 @@ public class StrategyManager {
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
-		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		AnalyzeStrategy.Instance().update();
 
 		ActionManager.init();
 	}
@@ -75,7 +75,7 @@ public class StrategyManager {
 	public void update() {
 
 		// 전략 파악
-		AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		AnalyzeStrategy.Instance().update();
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
 		ActionManager.updateActions();

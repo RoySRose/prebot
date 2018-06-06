@@ -9,7 +9,6 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import bwta.BaseLocation;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
@@ -19,7 +18,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
@@ -49,14 +47,7 @@ public class AnalyzeStrategy {
 		randomchecker = true;
 	}
 
-	public void AnalyzeEnemyStrategy() {
-		// config 건물 관련 여백 조정용 함수
-		// 건물 여백이 0인채로 서플 2개째를 짓고있으면 원래대로 원복
-		// if (Config.BuildingSpacing == 0 &&
-		// InfoUtils.myNumUnits(UnitType.Terran_Supply_Depot, MyBotModule.Broodwar.self()) >= 2) {
-		// BlockingEntrance.Instance().ReturnBuildSpacing();
-		// }
-
+	public void update() {
 		if (randomchecker && Prebot.Broodwar.enemy().getRace() == Race.Unknown && InformationManager.Instance().enemyRace != Race.Unknown) {
 			AnalyzeEnemyStrategyInit();
 			randomchecker = false;
@@ -70,34 +61,6 @@ public class AnalyzeStrategy {
 		} else {
 			AnalyzeVsZerg();
 		}
-
-		if (InfoUtils.mapInformation().getMap() == GameMap.LOST_TEMPLE) {
-			if (TimeUtils.after(25000)) {
-				List<BaseLocation> occupiedBaseLocation = InfoUtils.enemyOccupiedBases();
-
-				// 섬 지역 아닌곳에 상대 유닛이 있으면 패스
-				boolean checkisland = true;
-				for (BaseLocation base : occupiedBaseLocation) {
-					if (!base.isIsland()) {
-						checkisland = false;
-						break;
-					}
-				}
-
-				if (checkisland) {
-					for (BaseLocation base : occupiedBaseLocation) {
-						List<Unit> enemy = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, base.getPosition(), 600);
-						if (enemy.size() > 0) {
-							BaseLocation enemymainbase = InfoUtils.enemyBase();
-							if (enemymainbase.isIsland()) {
-								StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.ATTACKISLAND);
-							}
-						}
-					}
-				}
-			}
-		}
-
 	}
 
 	public void AnalyzeEnemyStrategyInit() {

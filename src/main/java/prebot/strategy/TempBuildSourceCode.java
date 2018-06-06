@@ -1325,7 +1325,6 @@ public class TempBuildSourceCode {
 		EnemyStrategy currentStrategy = StrategyManager.Instance().currentStrategy;
 		EnemyStrategyException currentStrategyException = StrategyManager.Instance().currentStrategyException;
 
-		EnemyStrategy lastStrategy = StrategyManager.Instance().lastStrategy;
 		EnemyStrategyException lastStrategyException = StrategyManager.Instance().lastStrategyException;
 
 		if (InformationManager.Instance().enemyRace == Race.Protoss) {
@@ -1336,12 +1335,6 @@ public class TempBuildSourceCode {
 				Current = vsProtossZealot;
 				Currentbool = vsProtossZealotbool;
 			}
-			// if(CurrentStrategyException == StrategysException.protossException_PhotonRush
-			// || (CurrentStrategyException == StrategysException.Init
-			// && LastStrategyException == StrategysException.protossException_PhotonRush)){
-			// Current = vsProtossPhoto;
-			// Currentbool = vsProtossPhotobool;
-			// }
 			if ((currentStrategyException == EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH
 					|| (currentStrategyException == EnemyStrategyException.INIT && lastStrategyException == EnemyStrategyException.PROTOSSEXCEPTION_DRAGOONPUSH))
 					|| (currentStrategyException == EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH
