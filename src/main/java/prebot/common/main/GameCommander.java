@@ -10,6 +10,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.MapGrid;
+import prebot.common.debug.chat.ChatBot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.PlayerUtil;
 import prebot.micro.CombatManager;
@@ -221,7 +222,8 @@ public class GameCommander {
 	}		
 
 	/// 텍스트를 입력 후 엔터를 하여 다른 플레이어들에게 텍스트를 전달하려 할 때 발생하는 이벤트를 처리합니다
-	public void onSendText(String text){
+	public void onSendText(String text) {
+		ChatBot.operateChatBot(text);
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다

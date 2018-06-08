@@ -641,14 +641,14 @@ public class OldScoutManager {
 			// push the tiles that aren't surrounded
 			// Region의 가장자리 타일들만 추가한다
 			if (!surrounded && Prebot.Broodwar.isBuildable(tp)) {
-				if (UxConfig.drawScoutInfo) {
-					int x1 = tp.getX() * 32 + 2;
-					int y1 = tp.getY() * 32 + 2;
-					int x2 = (tp.getX() + 1) * 32 - 2;
-					int y2 = (tp.getY() + 1) * 32 - 2;
-					// MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + MapTools.Instance().getGroundDistance(tp.toPosition(), basePosition));
-					// MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
-				}
+//				if (UxConfig.drawScoutInfo) {
+//					int x1 = tp.getX() * 32 + 2;
+//					int y1 = tp.getY() * 32 + 2;
+//					int x2 = (tp.getX() + 1) * 32 - 2;
+//					int y2 = (tp.getY() + 1) * 32 - 2;
+//					// MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + MapTools.Instance().getGroundDistance(tp.toPosition(), basePosition));
+//					// MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+//				}
 
 				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
 			}

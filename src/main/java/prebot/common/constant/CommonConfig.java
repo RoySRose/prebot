@@ -29,37 +29,37 @@ public class CommonConfig {
 		/// Position 은 Point (Pixel) 단위이고, TilePosition 은 Tile 단위입니다
 		public static final int TILE_SIZE = 32;
 
-		public static boolean drawGameInfo = true;
-
-		/// 화면 표시 여부 - 미네랄, 가스
-		public static boolean drawResourceInfo = false;
-		/// 화면 표시 여부 - 지도
-		public static boolean drawBWTAInfo = true;
-		/// 화면 표시 여부 - 바둑판
-		public static boolean drawMapGrid = false;
-
-		/// 화면 표시 여부 - 유닛 HitPoint
-		public static boolean drawUnitHealthBars = true;
-		/// 화면 표시 여부 - 유닛 통계
-		public static boolean drawEnemyUnitInfo = true;
-		/// 화면 표시 여부 - 유닛 ~ Target 간 직선
-		public static boolean drawUnitTargetInfo = true;
-
-		/// 화면 표시 여부 - 빌드 큐
-		public static boolean drawProductionInfo = true;
-
-		/// 화면 표시 여부 - 건물 Construction 상황
-		public static boolean drawBuildingInfo = false;
-		/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
-		public static boolean drawReservedBuildingTiles = true;
-
-		/// 화면 표시 여부 - 정찰 상태
-		public static boolean drawScoutInfo = true;
-		/// 화면 표시 여부 - 일꾼 목록
-		public static boolean drawWorkerInfo = false;
-
-		/// 화면 표시 여부 - 마우스 커서
-		public static boolean drawMouseCursorInfo = true;
+//		public static boolean drawGameInfo = true;
+//
+//		/// 화면 표시 여부 - 미네랄, 가스
+//		public static boolean drawResourceInfo = false;
+//		/// 화면 표시 여부 - 지도
+//		public static boolean drawBWTAInfo = true;
+//		/// 화면 표시 여부 - 바둑판
+//		public static boolean drawMapGrid = false;
+//
+//		/// 화면 표시 여부 - 유닛 HitPoint
+//		public static boolean drawUnitHealthBars = true;
+//		/// 화면 표시 여부 - 유닛 통계
+//		public static boolean drawEnemyUnitInfo = true;
+//		/// 화면 표시 여부 - 유닛 ~ Target 간 직선
+//		public static boolean drawUnitTargetInfo = true;
+//
+//		/// 화면 표시 여부 - 빌드 큐
+//		public static boolean drawProductionInfo = true;
+//
+//		/// 화면 표시 여부 - 건물 Construction 상황
+//		public static boolean drawBuildingInfo = false;
+//		/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
+//		public static boolean drawReservedBuildingTiles = true;
+//
+//		/// 화면 표시 여부 - 정찰 상태
+//		public static boolean drawScoutInfo = true;
+//		/// 화면 표시 여부 - 일꾼 목록
+//		public static boolean drawWorkerInfo = false;
+//
+//		/// 화면 표시 여부 - 마우스 커서
+//		public static boolean drawMouseCursorInfo = true;
 	}
 
 	public static class FileConfig {

@@ -12,7 +12,7 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.action.RaceAction;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class ProtossBuildPhase1 extends RaceAction {
 
@@ -71,22 +71,22 @@ public class ProtossBuildPhase1 extends RaceAction {
 	@Override
 	protected void expectBuild() {
 		if (nothingInEnemyBase) {
-			enemyBuildOfPhase = Strategy.PROTOSS_1GATE_CORE;
+			enemyBuildOfPhase = EnemyStrategy.PROTOSS_1GATE_CORE;
 		} else if (isTwoGateBuild) {
-			enemyBuildOfPhase = Strategy.PROTOSS_2GATE;
+			enemyBuildOfPhase = EnemyStrategy.PROTOSS_2GATE;
 		} else if (isDoubleNexus) {
-			enemyBuildOfPhase = Strategy.PROTOSS_DOUBLE;
+			enemyBuildOfPhase = EnemyStrategy.PROTOSS_DOUBLE;
 		}
 	}
 
 	@Override
-	protected Strategy finalExpect() {
+	protected EnemyStrategy finalExpect() {
 		if (isPlyonOnExpansion && isForgeFirstBuild) {
-			return Strategy.PROTOSS_DOUBLE;
+			return EnemyStrategy.PROTOSS_DOUBLE;
 		} else if (nothingInEnemyBase) {
-			return Strategy.PROTOSS_2GATE;
+			return EnemyStrategy.PROTOSS_2GATE;
 		} else {
-			return Strategy.PROTOSS_1GATE_CORE;
+			return EnemyStrategy.PROTOSS_1GATE_CORE;
 		}
 	}
 

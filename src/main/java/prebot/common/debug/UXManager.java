@@ -14,6 +14,7 @@ import bwapi.Color;
 import bwapi.Force;
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -36,21 +37,35 @@ import prebot.micro.WorkerManager;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldScoutManager;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.AttackExpansionManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
 public class UXManager {
+	
+	private int uxOption = 0;
 
-	private final Character brown = '';
-	private final char red = '';
-	private final char teal = '';
-//	private final char blue = '';
-	private final char purple = '';
-	private final char white = '';
+	public void setUxOption(int uxOption) {
+		this.uxOption = uxOption;
+	}
+
+	private static final char CHAR_RED = (char) 0x08;
+	private static final char CHAR_BLUE = (char) 0x0E;
+	private static final char CHAR_TEAL = (char) 0x0F;
+	private static final char CHAR_PURPLE = (char) 0x10;
+	private static final char CHAR_ORANGE = (char) 0x11;
+	private static final char CHAR_BROWN = (char) 0x15;
+	private static final char CHAR_WHITE = (char) 0x16;
+	private static final char CHAR_YELLOW = (char) 0x17;
+	private static final char CHAR_GREEN = (char) 0x18;
+	private static final char CHAR_CYAN = (char) 0x19;
+	private static final char CHAR_BLACK = (char) 0x14;
+	private static final char CHAR_GREY = (char) 0x05;
 	
 	private boolean hasSavedBWTAInfo = false;
 	private int[][] blue = null;
@@ -81,84 +96,62 @@ public class UXManager {
 
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
-		drawGameInformationOnScreen(5, 5);
-
-		if (UxConfig.drawEnemyUnitInfo) {
+		if (uxOption == 0) {
+			drawGameInformationOnScreen(5, 5);
 			drawUnitStatisticsOnScreen1(400, 15);
-			//drawUnitStatisticsOnScreen2(370, 50);
-		}
-
-		if (UxConfig.drawBWTAInfo) {
+			// drawUnitStatisticsOnScreen2(370, 50);
 			drawBWTAResultOnMap();
-		}
-
-		if (UxConfig.drawMapGrid) {
-			drawMapGrid();
-		}
-
-		// 빌드오더큐 : 빌드 실행 전
-		if (UxConfig.drawProductionInfo) {
+//			drawMapGrid();
+			// 빌드오더큐 : 빌드 실행 전
 			drawBuildOrderQueueOnScreen(500, 50);
-		}
-
-		// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
-		if (UxConfig.drawProductionInfo) {
+			// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
 			drawBuildStatusOnScreen(370, 50);
-		}
-
-		// 건물 건설 큐. 건물 건설 상황
-		if (UxConfig.drawBuildingInfo) {
+			// 건물 건설 큐. 건물 건설 상황
 			drawConstructionQueueOnScreenAndMap(200, 150);
-		}
-
-		// 건물이 건설될 위치
-		if (UxConfig.drawReservedBuildingTiles) {
+			// 건물이 건설될 위치
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
 			drawTilesToAvoidOnMap();
-		}
-
-		drawLeaderUnitOnMap();
-		if (UxConfig.drawUnitHealthBars) {
-			//drawUnitExtendedInformationOnMap();
+			drawLeaderUnitOnMap();
+			// drawUnitExtendedInformationOnMap();
 			drawUnitIdOnMap();
-		}
-
-		if (UxConfig.drawWorkerInfo) {
 			// 각 일꾼들의 임무 상황
-			drawWorkerStateOnScreen(260, 60);
-
+//			drawWorkerStateOnScreen(260, 60);
 			// 베이스캠프당 일꾼 수
-			drawWorkerCountOnMap();
-		}
-
-		// 일꾼 자원채취 임무 상황
-		if (UxConfig.drawResourceInfo) {
+//			drawWorkerCountOnMap();
+			// 일꾼 자원채취 임무 상황
 			drawWorkerMiningStatusOnMap();
-		}
-
-		// 정찰
-		if (UxConfig.drawScoutInfo) {
-			drawScoutInformation(220,330);
-		}
-
-		// 공격
-		if (UxConfig.drawUnitTargetInfo) {
+			// 정찰
+			drawScoutInformation(220, 330);
+			// 공격
 			drawUnitTargetOnMap();
-
 			// 미사일, 럴커의 보이지않는 공격등을 표시
-			//drawBulletsOnMap();
-		}
-		
-		// draw tile position of mouse cursor
-		if (UxConfig.drawMouseCursorInfo) {
+			// drawBulletsOnMap();
+
+			// draw tile position of mouse cursor
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/UxConfig.TILE_SIZE) + ", " +  (int)(mouseY/UxConfig.TILE_SIZE) + ")");
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int)(mouseX) + ", " +  (int)(mouseY) + ")");
+			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / UxConfig.TILE_SIZE) + ", " + (int) (mouseY / UxConfig.TILE_SIZE) + ")");
+			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
+		} else if (uxOption == 1) {
+			
+			drawStrategySample();
+			
 		}
+	}
 
+	private void drawStrategySample() {
+		Race enemyRace = Prebot.Broodwar.enemy().getRace();
+		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
+		Prebot.Broodwar.drawTextScreen(20, 20, "" + CHAR_YELLOW + strategy.toString());
+		
+		int y = 10;
+		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
+			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
+				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + CHAR_YELLOW + enemyStrategy.name());
+			}
+		}
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -179,46 +172,46 @@ public class UXManager {
 //		y += 11;
 		
 		
-		Prebot.Broodwar.drawTextScreen(x, y, white + "Current Strategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + StrategyManager.Instance().getCurrentStrategyBasic() +" <-- "+ StrategyManager.Instance().lastStrategy);
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "Current Strategy : ");
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + CHAR_WHITE + StrategyManager.Instance().getCurrentStrategyBasic() +" <-- "+ StrategyManager.Instance().lastStrategy);
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, white + "Current EXStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 112, y, "" + white + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().lastStrategyException );
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "Current EXStrategy : ");
+		Prebot.Broodwar.drawTextScreen(x + 112, y, "" + CHAR_WHITE + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().lastStrategyException );
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, white + "vul:tank:goli : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + TempBuildSourceCode.Instance().vultureratio+":"+TempBuildSourceCode.Instance().tankratio+":"+TempBuildSourceCode.Instance().goliathratio);
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "vul:tank:goli : ");
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + CHAR_WHITE + TempBuildSourceCode.Instance().vultureratio+":"+TempBuildSourceCode.Instance().tankratio+":"+TempBuildSourceCode.Instance().goliathratio);
 		y += 11;
 
-		Prebot.Broodwar.drawTextScreen(x, y, white + "MyunitPoint(Fac) : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + AttackExpansionManager.Instance().MyunitPoint);
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "MyunitPoint(Fac) : ");
+		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + CHAR_WHITE + AttackExpansionManager.Instance().MyunitPoint);
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, white + "ExpansionPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + white + AttackExpansionManager.Instance().ExpansionPoint);
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "ExpansionPoint : ");
+		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + CHAR_WHITE + AttackExpansionManager.Instance().ExpansionPoint);
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, white + "UnitPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + AttackExpansionManager.Instance().UnitPoint);
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "UnitPoint : ");
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + CHAR_WHITE + AttackExpansionManager.Instance().UnitPoint);
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, white + "Attackpoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + white + AttackExpansionManager.Instance().Attackpoint);
-		y += 11;
-		
-		Prebot.Broodwar.drawTextScreen(x, y, white + "CombatStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + white + OldCombatManager.Instance().getCombatStrategy());
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "Attackpoint : ");
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + CHAR_WHITE + AttackExpansionManager.Instance().Attackpoint);
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, red + "MYKillScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + red + Prebot.Broodwar.self().getKillScore());
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "CombatStrategy : ");
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + CHAR_WHITE + OldCombatManager.Instance().getCombatStrategy());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, red + "MYRazingScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + red + Prebot.Broodwar.self().getRazingScore());
+		
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_RED + "MYKillScore : ");
+		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + CHAR_RED + Prebot.Broodwar.self().getKillScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, purple + "EnemyKillScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + purple + Prebot.Broodwar.enemy().getKillScore());
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_RED + "MYRazingScore : ");
+		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + CHAR_RED + Prebot.Broodwar.self().getRazingScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, purple + "EnemyRazingScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + purple + Prebot.Broodwar.enemy().getRazingScore());
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_PURPLE + "EnemyKillScore : ");
+		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + CHAR_PURPLE + Prebot.Broodwar.enemy().getKillScore());
+		y += 11;
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_PURPLE + "EnemyRazingScore : ");
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + CHAR_PURPLE + Prebot.Broodwar.enemy().getRazingScore());
 		y += 11;
 	}
 
@@ -404,7 +397,7 @@ public class UXManager {
 		int currentY = y;
 
 		// 아군이 입은 피해 누적값
-		Prebot.Broodwar.drawTextScreen(x, currentY, white + " Self Loss:" + white + " Minerals: " + brown + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getMineralsLost() + white + " Gas: " + red + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getGasLost());
+		Prebot.Broodwar.drawTextScreen(x, currentY, CHAR_WHITE + " Self Loss:" + CHAR_WHITE + " Minerals: " + CHAR_BROWN + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getMineralsLost() + CHAR_WHITE + " Gas: " + CHAR_RED + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getGasLost());
 		currentY += 10;
 
 		// 아군 모든 유닛 숫자 합계
@@ -439,7 +432,7 @@ public class UXManager {
 		// 적군이 입은 피해 누적값
 		if(InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer) != null)
 		{
-			Prebot.Broodwar.drawTextScreen(x, currentY, brown + " Enemy Loss:" + white +" Minerals: " + red + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + white + " Gas: " + teal + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
+			Prebot.Broodwar.drawTextScreen(x, currentY, CHAR_BROWN + " Enemy Loss:" + CHAR_WHITE +" Minerals: " + CHAR_RED + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + CHAR_WHITE + " Gas: " + CHAR_TEAL + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
 		}
 	}	
 		
@@ -448,10 +441,10 @@ public class UXManager {
 		int currentY = y;
 		
 		// 적군의 UnitType 별 파악된 Unit 숫자를 표시
-		Prebot.Broodwar.drawTextScreen(x,		 currentY, white + " UNIT NAME");
+		Prebot.Broodwar.drawTextScreen(x,		 currentY, CHAR_WHITE + " UNIT NAME");
 		//MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
 		//MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
-		Prebot.Broodwar.drawTextScreen(x + 85, currentY, white + " Alive");
+		Prebot.Broodwar.drawTextScreen(x + 85, currentY, CHAR_WHITE + " Alive");
 
 		int yspace = 0;
 		
@@ -799,7 +792,7 @@ public class UXManager {
 
 	/// BuildOrderQueue 를 Screen 에 표시합니다
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
-		Prebot.Broodwar.drawTextScreen(x, y, white + " <Build Order>");
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + " <Build Order>");
 
 		/*
 		std.deque< BuildOrderItem >* queue = BuildManager.Instance().buildQueue.getQueue();
@@ -824,7 +817,7 @@ public class UXManager {
 		
 		for(int i=0 ; i<tempQueue.length ; i++){
 			BuildOrderItem currentItem = (BuildOrderItem)tempQueue[i];
-			Prebot.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + white + currentItem.metaType.getName());
+			Prebot.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + CHAR_WHITE + currentItem.metaType.getName());
 			itemCount++;
 			if (itemCount >= 24) break;
 		}
@@ -851,7 +844,7 @@ public class UXManager {
 		}
 		// C++ : std.sort(unitsUnderConstruction.begin(), unitsUnderConstruction.end(), CompareWhenStarted());
 
-		Prebot.Broodwar.drawTextScreen(x, y, white + " <Build Status>");
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + " <Build Status>");
 
 		int reps = unitsUnderConstruction.size() < 10 ? unitsUnderConstruction.size() : 10;
 
@@ -864,7 +857,7 @@ public class UXManager {
 				t = unit.getBuildType();
 			}
 
-			Prebot.Broodwar.drawTextScreen(x, y, "" + white + t + " (" + unit.getRemainingBuildTime() + ")");
+			Prebot.Broodwar.drawTextScreen(x, y, "" + CHAR_WHITE + t + " (" + unit.getRemainingBuildTime() + ")");
 		}
 
 		// Tech Research 표시
@@ -926,7 +919,7 @@ public class UXManager {
 
 	/// ConstructionQueue 를 Screen 에 표시합니다
 	public void drawConstructionQueueOnScreenAndMap(int x, int y) {
-		Prebot.Broodwar.drawTextScreen(x, y, white + " <Construction Status>");
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + " <Construction Status>");
 
 		int yspace = 0;
 
@@ -938,7 +931,7 @@ public class UXManager {
 
 			if (b.getStatus() == ConstructionTask.ConstructionStatus.Unassigned.ordinal())
 			{
-				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + white + b.getType() + " - No Worker");
+				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + CHAR_WHITE + b.getType() + " - No Worker");
 			}
 			else if (b.getStatus() == ConstructionTask.ConstructionStatus.Assigned.ordinal())
 			{
@@ -959,7 +952,7 @@ public class UXManager {
 			}
 			else if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal())
 			{
-				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + white + b.getType() + " - Under Construction");
+				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + CHAR_WHITE + b.getType() + " - Under Construction");
 			}
 			yspace++;
 		}
@@ -970,16 +963,16 @@ public class UXManager {
 		for (Unit unit : Prebot.Broodwar.self().getUnits())
 		{
 			if(unit.getType().isBuilding()){
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "" + white + unit.getTilePosition().getX() + " / " + unit.getTilePosition().getY());
+				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + CHAR_WHITE + unit.getID());
+				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "" + CHAR_WHITE + unit.getTilePosition().getX() + " / " + unit.getTilePosition().getY());
 			}else{
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
+				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + CHAR_WHITE + unit.getID());
 			}
 			
 		}
 		for (Unit unit : Prebot.Broodwar.enemy().getUnits())
 		{
-			Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
+			Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + CHAR_WHITE + unit.getID());
 		}
 	}
 
@@ -999,7 +992,7 @@ public class UXManager {
 	public void drawWorkerStateOnScreen(int x, int y) {
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
 
-		Prebot.Broodwar.drawTextScreen(x, y, white + "<Workers : " + workerData.getNumMineralWorkers() + ">");
+		Prebot.Broodwar.drawTextScreen(x, y, CHAR_WHITE + "<Workers : " + workerData.getNumMineralWorkers() + ">");
 
 		int yspace = 0;
 
@@ -1012,13 +1005,13 @@ public class UXManager {
 				continue;
 			}
 
-			Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), white + " " + unit.getID());
+			Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), CHAR_WHITE + " " + unit.getID());
 
 			if (workerData.getJobCode(unit) == 'B') {
-				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
+				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), CHAR_WHITE + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
 			}
 			else {
-				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit));
+				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), CHAR_WHITE + " " + workerData.getJobCode(unit));
 			}
 		}
 	}
@@ -1033,7 +1026,7 @@ public class UXManager {
 			int y = depot.getPosition().getY() - 32;
 
 			Prebot.Broodwar.drawBoxMap(x - 2, y - 1, x + 75, y + 14, Color.Black, true);
-			Prebot.Broodwar.drawTextMap(x, y, white + " Workers: " + WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(depot));
+			Prebot.Broodwar.drawTextMap(x, y, CHAR_WHITE + " Workers: " + WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(depot));
 		}
 	}
 
@@ -1047,7 +1040,7 @@ public class UXManager {
 
 			Position pos = worker.getTargetPosition();
 
-			Prebot.Broodwar.drawTextMap(worker.getPosition().getX(), worker.getPosition().getY() - 5, "" + white + workerData.getJobCode(worker));
+			Prebot.Broodwar.drawTextMap(worker.getPosition().getX(), worker.getPosition().getY() - 5, "" + CHAR_WHITE + workerData.getJobCode(worker));
 			
 			Prebot.Broodwar.drawLineMap(worker.getPosition().getX(), worker.getPosition().getY(), pos.getX(), pos.getY(), Color.Cyan);
 
@@ -1204,7 +1197,7 @@ public class UXManager {
 			Prebot.Broodwar.drawLineMap(p, new Position(p.getX() + (int)velocityX, p.getY() + (int)velocityY), b.getPlayer() == Prebot.Broodwar.self() ? Color.Green : Color.Red);
 			if(b.getType() != null)
 			{
-				Prebot.Broodwar.drawTextMap(p, (b.getPlayer() == Prebot.Broodwar.self() ? "" + teal : "" + red) + bulletTypeName);
+				Prebot.Broodwar.drawTextMap(p, (b.getPlayer() == Prebot.Broodwar.self() ? "" + CHAR_TEAL : "" + CHAR_RED) + bulletTypeName);
 			}
 		}
 	}

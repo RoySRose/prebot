@@ -14,7 +14,7 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.action.RaceAction;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
+import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig;
 
 public class ZergBuildPhase1 extends RaceAction {
@@ -82,50 +82,50 @@ public class ZergBuildPhase1 extends RaceAction {
 	@Override
 	protected void expectBuild() {
 		if (is5DroneBuild) {
-			enemyBuildOfPhase = Strategy.ZERG_5DRONE;
+			enemyBuildOfPhase = EnemyStrategy.ZERG_5DRONE;
 		} else if (is9DroneBuild) {
 			if (enemyGasFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasFoundSec < GAS_9DRONE_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_9DRONE_GAS;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_9DRONE_GAS;
 				}
 			} else if (enemyGasNotFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasNotFoundSec > GAS_9DRONE_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_9DRONE;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_9DRONE;
 				}
 			}
 		} else if (is12DroneBuild) {
 			if (enemyGasFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasFoundSec < GAS_12DRONE_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_OVER_POOL_GAS;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_OVERPOOL_GAS;
 				}
 			} else if (enemyGasNotFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasNotFoundSec > GAS_12DRONE_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_OVER_POOL;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_OVERPOOL;
 				}
 			}
 		} else if (is2HatcheryBuild) {
 			if (enemyGasFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasFoundSec < GAS_2HATCH_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_2HAT_GAS;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_2HAT_GAS;
 				}
 			} else if (enemyGasNotFoundSec != CommonCode.UNKNOWN) {
 				if (enemyGasNotFoundSec > GAS_2HATCH_SEC + TimeUtils.buildSeconds(UnitType.Zerg_Extractor)) {
-					enemyBuildOfPhase = Strategy.ZERG_2HAT;
+					enemyBuildOfPhase = EnemyStrategy.ZERG_2HAT;
 				}
 			}
 		}
 	}
 
 	@Override
-	protected Strategy finalExpect() {
+	protected EnemyStrategy finalExpect() {
 		if (is9DroneBuild) {
-			return Strategy.ZERG_9DRONE_GAS;
+			return EnemyStrategy.ZERG_9DRONE_GAS;
 		} else if (is12DroneBuild) {
-			return Strategy.ZERG_OVER_POOL_GAS;
+			return EnemyStrategy.ZERG_OVERPOOL_GAS;
 		} else if (is2HatcheryBuild) {
-			return Strategy.ZERG_2HAT_GAS;
+			return EnemyStrategy.ZERG_2HAT_GAS;
 		} else {
-			return Strategy.ZERG_9DRONE_GAS;
+			return EnemyStrategy.ZERG_9DRONE_GAS;
 		}
 	}
 

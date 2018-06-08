@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import bwapi.Color;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -28,7 +27,6 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
@@ -1731,15 +1729,6 @@ public class InformationManager {
 			// push the tiles that aren't surrounded
 			// Region의 가장자리 타일들만 추가한다
 			if (!surrounded && Prebot.Broodwar.isBuildable(tp)) {
-				if (UxConfig.drawScoutInfo) {
-					int x1 = tp.getX() * 32 + 2;
-					int y1 = tp.getY() * 32 + 2;
-					int x2 = (tp.getX() + 1) * 32 - 2;
-					int y2 = (tp.getY() + 1) * 32 - 2;
-					Prebot.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
-					Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
-				}
-
 				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
 			}
 		}

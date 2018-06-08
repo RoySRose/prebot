@@ -17,11 +17,11 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
+import prebot.strategy.constant.EnemyStrategy;
 
 public abstract class RaceAction extends Action {
 
-	protected Strategy enemyBuildOfPhase = null; // TODO diplay
+	protected EnemyStrategy enemyBuildOfPhase = null; // TODO diplay
 	protected List<UnitType> foundUnitTypes = new ArrayList<>(); // TODO diplay
 
 	protected Map<UnitType, List<UnitInfo>> enemyUnitInfoMap = new HashMap<>(); // TODO display 유닛타입별 발견시점의 UnitInfo
@@ -73,7 +73,7 @@ public abstract class RaceAction extends Action {
 
 	protected abstract boolean analyse();
 	protected abstract void expectBuild();
-	protected abstract Strategy finalExpect();
+	protected abstract EnemyStrategy finalExpect();
 
 	/// 유닛 발견 맵을 업데이트한다.
 	protected void updateInfo() {

@@ -9,19 +9,16 @@ import bwta.Chokepoint;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.MainSquadMode;
 import prebot.strategy.action.Action;
-import prebot.strategy.constant.EnemyStrategy.Strategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class StrategyIdea {
 	
 	public static List<Action> newActionList = new ArrayList<>();
-	public static Strategy phase01 = null;
-	public static Strategy phase02 = null;
-	public static Strategy phase03 = null;
 	
-	public static EnemyStrategy enemyStrategy;
-	public static EnemyStrategyException enemyStrategyException;
+	public static EnemyStrategy enemyStrategy = null;
+	public static EnemyStrategy phase01 = null;
+	public static EnemyStrategy phase02 = null;
+	public static EnemyStrategy phase03 = null;
 	
 	public static Position campPosition = null;
 	public static Position attackPosition = null;
@@ -52,8 +49,6 @@ public class StrategyIdea {
 //	tankCount + goliathCount >= MicroConfig.Common.DEFENSE_READY_TO_ATTACK_SIZE_TERRAN
 	
 	public static BaseLocation enemyBaseExpected = null;
-
-	public static boolean isMechanic = false;
 	
 	public static boolean assignScoutScv = false;
 	

@@ -158,4 +158,9 @@ public class MetaType {
         return true;
     }
 
+	@Override
+	public String toString() {
+		return "MetaType [type=" + type + ", race=" + race + ", unitType=" + unitType + ", techType=" + techType + ", upgradeType=" + upgradeType + "]";
+	}
+
 }

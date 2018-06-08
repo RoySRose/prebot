@@ -5,8 +5,7 @@ import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.action.Action;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
+import prebot.strategy.constant.EnemyStrategy;
 
 /**
  * 종족별 초기 전략을 불러온다.
@@ -31,16 +30,13 @@ public class InitialAction extends Action {
 	
 	public void initAction() {
 		if (Prebot.Broodwar.enemy().getRace() == Race.Protoss) {
-			StrategyIdea.enemyStrategy = EnemyStrategy.PROTOSSBASIC;
-			StrategyIdea.enemyStrategyException = EnemyStrategyException.INIT;
+			StrategyIdea.enemyStrategy = EnemyStrategy.PROTOSS_INIT;
 
 		} else if (Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
-			StrategyIdea.enemyStrategy = EnemyStrategy.ZERGBASIC;
-			StrategyIdea.enemyStrategyException = EnemyStrategyException.INIT;
+			StrategyIdea.enemyStrategy = EnemyStrategy.ZERG_INIT;
 
 		} else if (Prebot.Broodwar.enemy().getRace() == Race.Terran) {
-			StrategyIdea.enemyStrategy = EnemyStrategy.TERRANBASIC;
-			StrategyIdea.enemyStrategyException = EnemyStrategyException.INIT;
+			StrategyIdea.enemyStrategy = EnemyStrategy.TERRAN_INIT;
 		}
 	}
 
