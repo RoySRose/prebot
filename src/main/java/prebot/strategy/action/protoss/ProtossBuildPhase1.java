@@ -71,9 +71,9 @@ public class ProtossBuildPhase1 extends RaceAction {
 	@Override
 	protected void expectBuild() {
 		if (nothingInEnemyBase) {
-			enemyBuildOfPhase = Strategy.PROTOSS_ONEGATE_CORE;
+			enemyBuildOfPhase = Strategy.PROTOSS_1GATE_CORE;
 		} else if (isTwoGateBuild) {
-			enemyBuildOfPhase = Strategy.PROTOSS_TWOGATE;
+			enemyBuildOfPhase = Strategy.PROTOSS_2GATE;
 		} else if (isDoubleNexus) {
 			enemyBuildOfPhase = Strategy.PROTOSS_DOUBLE;
 		}
@@ -84,9 +84,9 @@ public class ProtossBuildPhase1 extends RaceAction {
 		if (isPlyonOnExpansion && isForgeFirstBuild) {
 			return Strategy.PROTOSS_DOUBLE;
 		} else if (nothingInEnemyBase) {
-			return Strategy.PROTOSS_TWOGATE;
+			return Strategy.PROTOSS_2GATE;
 		} else {
-			return Strategy.PROTOSS_ONEGATE_CORE;
+			return Strategy.PROTOSS_1GATE_CORE;
 		}
 	}
 
