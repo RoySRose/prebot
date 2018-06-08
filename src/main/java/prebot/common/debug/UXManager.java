@@ -1,4 +1,4 @@
-package prebot.common.main;
+package prebot.common.debug;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -29,6 +29,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonConfig.UxConfig;
+import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;

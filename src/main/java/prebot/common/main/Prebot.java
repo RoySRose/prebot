@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
 import prebot.common.constant.CommonConfig.Config;
+import prebot.common.debug.UXManager;
 
 public class Prebot extends DefaultBWListener {
 
