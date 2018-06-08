@@ -7,7 +7,7 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroCode.MainSquadMode;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.MarineControl;
 import prebot.micro.control.factory.GoliathControl;

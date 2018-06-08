@@ -7,13 +7,10 @@ import bwapi.Position;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.micro.constant.MicroCode.CombatStrategy;
-import prebot.micro.constant.MicroCode.MainSquadMode;
-import prebot.strategy.action.Action;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
 
 public class StrategyIdea {
-	
-	public static List<Action> newActionList = new ArrayList<>();
 	
 	public static EnemyStrategy enemyStrategy = null;
 	public static EnemyStrategy phase01 = null;
