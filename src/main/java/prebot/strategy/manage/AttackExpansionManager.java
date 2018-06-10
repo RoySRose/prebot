@@ -350,7 +350,6 @@ public class AttackExpansionManager {
 		UnitPoint = unitPoint;
 		Attackpoint = totPoint;
 		
-		// 신규 CombatManager 테스트를 위한 임시 코드
 		if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
 			if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) {
 				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
