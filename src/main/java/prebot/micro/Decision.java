@@ -6,7 +6,7 @@ import prebot.strategy.UnitInfo;
 public class Decision {
 
 	public enum DecisionType {
-		KITING_UNIT, ATTACK_UNIT, ATTACK_POSITION, FLEE_FROM_UNIT, FLEE_FROM_POSITION, HOLD, STOP;
+		KITING_UNIT, ATTACK_UNIT, ATTACK_POSITION, FLEE_FROM_UNIT, FLEE_FROM_POSITION, HOLD, STOP, CHANGE_MODE;
 	}
 
 	public DecisionType type;
@@ -46,8 +46,12 @@ public class Decision {
 		return new Decision(DecisionType.HOLD);
 	}
 	
-	public static Decision stop(Unit unit) {
+	public static Decision stop() {
 		return new Decision(DecisionType.STOP);
+	}
+	
+	public static Decision change() {
+		return new Decision(DecisionType.CHANGE_MODE);
 	}
 
 	@Override

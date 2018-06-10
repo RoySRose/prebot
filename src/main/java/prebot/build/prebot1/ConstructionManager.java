@@ -11,13 +11,14 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 
 /// 건물 건설 Construction 명령 목록을 리스트로 관리하고, 건물 건설 명령이 잘 수행되도록 컨트롤하는 class
-public class ConstructionManager {
+public class ConstructionManager extends GameManager {
 
 	/// 건설 필요 자원을 미리 예약해놓고, <br>
 	/// 건설 대상 장소가 미개척 장소인 경우 건설 일꾼을 이동시켜 결국 건설이 시작되게 하고, <br>

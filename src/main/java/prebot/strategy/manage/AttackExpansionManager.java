@@ -15,8 +15,10 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.old.OldCombatManager;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
@@ -347,6 +349,20 @@ public class AttackExpansionManager {
 		ExpansionPoint = expansionPoint;
 		UnitPoint = unitPoint;
 		Attackpoint = totPoint;
+		
+		// 신규 CombatManager 테스트를 위한 임시 코드
+		if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
+			if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) {
+				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
+			} else if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.NO_WAITING_CHOKE) > 0) {
+				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
+			} else {
+				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+			}
+			
+		} else {
+			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
+		}
 	}
 
 	public void executeExpansion() {

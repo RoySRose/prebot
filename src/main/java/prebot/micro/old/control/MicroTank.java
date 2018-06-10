@@ -13,12 +13,10 @@ import bwta.Chokepoint;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.PositionUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.FleeAngle;
-import prebot.micro.constant.MicroConfig.Tank;
-import prebot.micro.constant.MicroConfig.Upgrade;
-import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldTargetPriority;
 import prebot.strategy.InformationManager;
 
@@ -217,7 +215,7 @@ public class MicroTank extends MicroManager {
 			
 		} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
 			if (tank.isIdle()) {
-				Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), order.getRadius());
+				Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), order.getRadius());
 				CommandUtils.attackMove(tank, randomPosition);
 			}
 			
@@ -232,43 +230,43 @@ public class MicroTank extends MicroManager {
 	}
 	
 	private Position findPositionToSiege(int siegeAreaDist) {
-		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
-		
-		int seigeNumLimit = 1;
-		int distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
-		
-		while (seigeNumLimit < 10) {
-			while (distanceFromOrderPosition < siegeAreaDist) {
-				for (Integer angle : MicroConfig.FleeAngle.EIGHT_360_ANGLE) {
-					double radianAdjust = OldMicroUtils.rotate(0.0, angle);
-				    Position fleeVector = new Position((int)(distanceFromOrderPosition * Math.cos(radianAdjust)), (int)(distanceFromOrderPosition * Math.sin(radianAdjust)));
-				    int x = order.getPosition().getX() + fleeVector.getX();
-				    int y = order.getPosition().getY() + fleeVector.getY();
-				    
-				    Position movePosition = new Position(x, y);
-				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
-							&& Prebot.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
-				    	
-				    	if (choke.getCenter().getDistance(movePosition) >= 150) {
-				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
-							if (siegeCount < seigeNumLimit) {
-								return movePosition;
-							} 
-				    	}
-				    }
-				}
-				
-				if (distanceFromOrderPosition <= 0) {
-					distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance() + 50;
-				} else if (distanceFromOrderPosition <= MicroConfig.Tank.getSiegeArrangeDistance()) {
-					distanceFromOrderPosition -= 50;
-				} else {
-					distanceFromOrderPosition += 50;
-				}
-			}
-			distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
-			seigeNumLimit++;
-		}
+//		Chokepoint choke = BWTA.getNearestChokepoint(order.getPosition());
+//		
+//		int seigeNumLimit = 1;
+//		int distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
+//		
+//		while (seigeNumLimit < 10) {
+//			while (distanceFromOrderPosition < siegeAreaDist) {
+//				for (Integer angle : MicroConfig.FleeAngle.EIGHT_360_ANGLE) {
+//					double radianAdjust = OldMicroUtils.rotate(0.0, angle);
+//				    Position fleeVector = new Position((int)(distanceFromOrderPosition * Math.cos(radianAdjust)), (int)(distanceFromOrderPosition * Math.sin(radianAdjust)));
+//				    int x = order.getPosition().getX() + fleeVector.getX();
+//				    int y = order.getPosition().getY() + fleeVector.getY();
+//				    
+//				    Position movePosition = new Position(x, y);
+//				    if (movePosition.isValid() && BWTA.getRegion(movePosition) != null
+//							&& Prebot.Broodwar.isWalkable(movePosition.getX() / 8, movePosition.getY() / 8)) {
+//				    	
+//				    	if (choke.getCenter().getDistance(movePosition) >= 150) {
+//				    		int siegeCount = MapGrid.Instance().getUnitsNear(movePosition, 100, true, false, UnitType.Terran_Siege_Tank_Siege_Mode).size();
+//							if (siegeCount < seigeNumLimit) {
+//								return movePosition;
+//							} 
+//				    	}
+//				    }
+//				}
+//				
+//				if (distanceFromOrderPosition <= 0) {
+//					distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance() + 50;
+//				} else if (distanceFromOrderPosition <= MicroConfig.Tank.getSiegeArrangeDistance()) {
+//					distanceFromOrderPosition -= 50;
+//				} else {
+//					distanceFromOrderPosition += 50;
+//				}
+//			}
+//			distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
+//			seigeNumLimit++;
+//		}
 		
 //		MyBotModule.Broodwar.sendText("findPositionToSiege is null");
 		return null;

@@ -34,7 +34,7 @@ public class MicroConfig {
 		EARLY_DEFENSE("EARLY_DEFENSE", 1, 30),
 		MAIN_ATTACK("MAIN_ATTACK", 2, 150),
 		WATCHER("WATCHER", 3, 150),
-		CHECKER("CHECKER", 4, 150),
+		CHECKER("CHECKER", 4, 0),
 		GUERILLA_("GUERILLA_", 5, 150),
 		DEFENSE_("DEFENSE_", 6, 150),
 		SCV_SCOUT("SCV_SCOUT", 7, 150),
@@ -99,10 +99,6 @@ public class MicroConfig {
 		public static final int MINE_ENEMY_RADIUS = 50;
 		public static final int MINE_ENEMY_TARGET_DISTANCE = 500;
 		public static final int MINE_MAX_NUM = 150;
-
-		public static final int MINE_BETWEEN_DIST = 50;
-		public static final int MINE_REMOVE_TANK_DIST = 150;
-		public static final int RESV_EXPIRE_FRAME = 24 * 3;
 		
 		public static final int VULTURE_JOIN_SQUAD_FRAME = 13 * 24;
 		public static final int VULTURE_JOIN_SQUAD_FRAME_TERRAN = 18 * 24;
@@ -128,26 +124,6 @@ public class MicroConfig {
 		
 		public static final int SIEGE_LINK_DISTANCE = 250;
 		public static final int OTHER_UNIT_COUNT_SIEGE_AGAINST_MELEE = 6;
-		
-		public static final int SIEGE_ARRANGE_DISTANCE = 150;
-		public static final int SIEGE_ARRANGE_DISTANCE_TERRAN = 20;
-		
-		public static final int SIEGE_ARRANGE_DISTANCE_ADJUST = 50;
-		public static final int SIEGE_ARRANGE_DISTANCE_ADJUST_TERRAN = 20;
-		
-		public static final int getSiegeArrangeDistance() {
-			if (InformationManager.Instance().enemyRace == Race.Terran) {
-				return SIEGE_ARRANGE_DISTANCE_TERRAN;
-			}
-			return SIEGE_ARRANGE_DISTANCE;
-		}
-		
-		public static final int getSiegeArrangeDistanceAdjust() {
-			if (InformationManager.Instance().enemyRace == Race.Terran) {
-				return SIEGE_ARRANGE_DISTANCE_ADJUST_TERRAN;
-			}
-			return SIEGE_ARRANGE_DISTANCE_ADJUST;
-		}
 	}
 	
 	public static class Common {

@@ -49,7 +49,7 @@ public class CheckerSquad extends Squad {
 		// 마인이 많은 순서대로 벌처 할당
 		List<Unit> recruitList = new ArrayList<>();
 		for (int mineCount = 3; mineCount >= 0; mineCount--) {
-			List<Unit> vultureList = vultureIdByMineCount.get(new Integer(mineCount));
+			List<Unit> vultureList = vultureIdByMineCount.getOrDefault(new Integer(mineCount), new ArrayList<Unit>());
 			for (Unit vulture : vultureList) {
 				recruitList.add(vulture);
 				openingCount--;

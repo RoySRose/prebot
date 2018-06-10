@@ -16,7 +16,6 @@ import prebot.common.util.PlayerUtil;
 import prebot.micro.CombatManager;
 import prebot.micro.WorkerManager;
 import prebot.micro.old.OldCombatManager;
-import prebot.micro.old.ScoutManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
 
@@ -63,17 +62,17 @@ public class GameCommander {
 		try {
 //			logObserver.start();
 
-			InformationManager.Instance().update();
-			MapGrid.Instance().update();
-			StrategyManager.Instance().update();
+			InformationManager.Instance().updateTimeCheck();
+			MapGrid.Instance().updateTimeCheck();
+			StrategyManager.Instance().updateTimeCheck();
 			
-			BuildManager.Instance().update();
-			ConstructionManager.Instance().update();
+			BuildManager.Instance().updateTimeCheck();
+			ConstructionManager.Instance().updateTimeCheck();
 
-			ScoutManager.Instance().update();
-			WorkerManager.Instance().update();
-			OldCombatManager.Instance().update();
-//			CombatManager.Instance().update();
+//			ScoutManager.Instance().updateTimeCheck();
+			WorkerManager.Instance().updateTimeCheck();
+			OldCombatManager.Instance().updateTimeCheck();
+//			CombatManager.Instance().updateTimeCheck();
 			
 //			logObserver.observe();
 

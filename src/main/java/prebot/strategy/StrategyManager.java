@@ -1,17 +1,19 @@
 package prebot.strategy;
 
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.TankPositionManager;
 import prebot.strategy.manage.VultureTravelManager;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
 /// BuildManager 의 buildQueue에 빌드 (건물 건설 / 유닛 훈련 / 테크 리서치 / 업그레이드) 명령을 입력합니다.<br>
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
-public class StrategyManager {
+public class StrategyManager extends GameManager {
 
 	private static StrategyManager instance = new StrategyManager();
 
@@ -78,6 +80,7 @@ public class StrategyManager {
 		AnalyzeStrategy.Instance().update();
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
+		TankPositionManager.Instance().update();
 		ActionManager.updateActions();
 		
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){

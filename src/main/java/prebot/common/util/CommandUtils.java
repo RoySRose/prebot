@@ -68,6 +68,38 @@ public class CommandUtils {
 		}
 	}
 
+	public static void siege(Unit tank) {
+		if (tank.canSiege() && validCommand(tank, UnitCommandType.Siege)) {
+			tank.siege();
+		}
+	}
+	
+	public static void unsiege(Unit tank) {
+		if (tank.canUnsiege() && validCommand(tank, UnitCommandType.Unsiege)) {
+			tank.unsiege();
+		}
+	}
+
+	public static void holdPosition(Unit unit) {
+		if (validCommand(unit, UnitCommandType.Hold_Position)) {
+			unit.holdPosition();
+		}
+	}
+
+	private static boolean validCommand(Unit unit, UnitCommandType commandType) {
+		if (!UnitUtils.isValidUnit(unit)) {
+			return false;
+		}
+		if (!TimeUtils.after(unit.getLastCommandFrame())) {
+			return false;
+		}
+		UnitCommand currentCommand = unit.getLastCommand();
+		if (currentCommand.getUnitCommandType() == commandType) {
+			return false;
+		}
+		return true;
+	}
+	
 	private static boolean validCommand(Unit unit, Unit target, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean checkCommandByPosition) {
 		if (!UnitUtils.isValidUnit(unit)) {
 			return false;
@@ -75,7 +107,7 @@ public class CommandUtils {
 		if (!UnitUtils.isValidUnit(target)) {
 			return false;
 		}
-		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+		if (!TimeUtils.after(unit.getLastCommandFrame())) {
 			return false;
 		}
 		if (notIssueOnAttackFrame && unit.isAttackFrame()) {

@@ -19,6 +19,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.MapGrid;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
@@ -40,7 +41,7 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.VultureTravelManager;
 
-public class OldCombatManager {
+public class OldCombatManager extends GameManager {
 
 	private static Chokepoint currTargetChoke = null;
 	private static int currTargetChokeExpiredFrame = 0;

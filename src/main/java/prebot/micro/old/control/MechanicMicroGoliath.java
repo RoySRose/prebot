@@ -10,10 +10,11 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.LagObserver;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
@@ -110,7 +111,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
 					if (goliath.isIdle() || goliath.isBraking()) {
 						if (!goliath.isBeingHealed()) {
-							Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(goliath.getPosition(), 100);
 							CommandUtils.attackMove(goliath, randomPosition);
 						}
 					}
@@ -129,7 +130,7 @@ public class MechanicMicroGoliath extends MechanicMicroAbstract {
 				} else { // 목적지 도착
 					if (goliath.isIdle() || goliath.isBraking()) {
 						if (!goliath.isBeingHealed()) {
-							Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(goliath.getPosition(), 100);
 							CommandUtils.attackMove(goliath, randomPosition);
 						}
 					}

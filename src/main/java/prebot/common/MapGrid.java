@@ -9,12 +9,13 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import prebot.build.constant.BuildConfig;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.strategy.InformationManager;
 import prebot.strategy.constant.StrategyConfig;
 
 /// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
-public class MapGrid {
+public class MapGrid extends GameManager {
 
 	/// 지도를 바둑판처럼 Cell 들로 나누기 위해서 정의한 하나의 Cell
 	public class GridCell

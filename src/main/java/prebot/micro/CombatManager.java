@@ -8,6 +8,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroCode.Result;
@@ -27,7 +28,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
 
-public class CombatManager {
+public class CombatManager extends GameManager {
 	private static CombatManager instance = new CombatManager();
 
 	public static CombatManager Instance() {

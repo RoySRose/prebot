@@ -21,6 +21,7 @@ import bwta.Region;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.control.MicroMarine;
@@ -70,40 +71,6 @@ public class OldMicroUtils {
 			double backOffDist = ui.getType().isBuilding() ? MicroConfig.Common.BACKOFF_DIST_DEF_TOWER : 0.0;
 			
 			 // 근처의 모든 적에 대해 안전거리 확보 : 안전거리 = 사정거리 + topSpeed() * 24 (적이 1.0초 이동거리)
-			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
-				isSafe = false;
-				break;
-			}
-		}
-		
-		return isSafe;
-	}
-	
-	 // (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다. 탱크, 방어건물 등 포함
-	public static boolean isSafePlace(Position position) {
-		boolean isSafe = true;
-		List<UnitInfo> nearEnemisUnitInfos = InformationManager.Instance().getNearbyForce(position, InformationManager.Instance().enemyPlayer, MicroConfig.Tank.SIEGE_MODE_MAX_RANGE);
-		
-		for (UnitInfo ui : nearEnemisUnitInfos) {
-//			if (!safeMine) {
-//				Unit unit = MyBotModule.Broodwar.getUnit(ui.getUnitID());
-//				if (unit != null && unit.getType() != UnitType.Unknown) {
-//					if (!unit.isCompleted() && unit.getHitPoints() + 10 <= unit.getType().maxHitPoints()) {
-//						continue;
-//					}
-//				}
-//			}
-			
-			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {
-				continue;
-			}
-			
-			double distanceToNearEnemy = position.getDistance(ui.getLastPosition());
-			WeaponType nearEnemyWeapon = ui.getType().groundWeapon();
-			int enemyWeaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
-			double enmeyTopSpeed = Prebot.Broodwar.enemy().topSpeed(ui.getType());
-			double backOffDist = ui.getType().isBuilding() ? MicroConfig.Common.BACKOFF_DIST_DEF_TOWER : 0.0;
-			
 			if (distanceToNearEnemy <= enemyWeaponMaxRange + enmeyTopSpeed * 24 + backOffDist) {
 				isSafe = false;
 				break;
@@ -536,13 +503,6 @@ public class OldMicroUtils {
 		return units;
 	}
 	
-	public static boolean typeCanAttackGround(UnitType attacker) {
-		return attacker.groundWeapon() != WeaponType.None ||
-				attacker == UnitType.Terran_Bunker ||
-				attacker == UnitType.Protoss_Carrier ||
-				attacker == UnitType.Protoss_Reaver;
-	}
-	
 	public static boolean killedByNShot(Unit attacker, Unit target, int shot) {
 		UnitType attackerType = attacker.getType();
 		UnitType targetType = target.getType();
@@ -699,7 +659,7 @@ public class OldMicroUtils {
 		if (!isValidGroundPosition(centerPosition)) {
 			Position tempPosition = null;
 			for (int i = 0; i < 3; i++) {
-				tempPosition = randomPosition(centerPosition, 100);
+				tempPosition = PositionUtils.randomPosition(centerPosition, 100);
 				if (isValidGroundPosition(tempPosition)) {
 					centerPosition = tempPosition;
 					break;
@@ -742,14 +702,6 @@ public class OldMicroUtils {
 		}
 		return false;
 	}
-	
-	public static Position randomPosition(Position sourcePosition, int dist) {
-		int x = sourcePosition.getX() + (int) (Math.random() * dist) - dist / 2;
-		int y = sourcePosition.getY() + (int) (Math.random() * dist) - dist / 2;
-		Position destPosition = new Position(x, y);
-		return destPosition;
-	}
-	
 	
 	public static Unit leaderOfUnit(List<Unit> units, Position goalPosition) {
 		

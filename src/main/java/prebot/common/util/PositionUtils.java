@@ -1,11 +1,14 @@
 package prebot.common.util;
 
+import java.util.List;
+
 import bwapi.Pair;
 import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.MapTools;
@@ -112,5 +115,33 @@ public class PositionUtils {
 			}
 		}
 		return false;
+	}
+	
+	/** positionList 중 position에 가장 가까운 position 리턴 */
+	public static Position getClosestPositionToPosition(List<Position> positionList, Position position) {
+		if (positionList.size() == 0) {
+			return null;
+		}
+		if (!PositionUtils.isValidPosition(position)) {
+			return positionList.get(0);
+		}
+
+		Position closestPosition = null;
+		double closestDist = CommonCode.DOUBLE_MAX;
+
+		for (Position p : positionList) {
+			double dist = p.getDistance(position);
+			if (closestPosition == null || dist < closestDist) {
+				closestPosition = p;
+				closestDist = dist;
+			}
+		}
+		return closestPosition;
+	}
+	
+	public static Position randomPosition(Position sourcePosition, int dist) {
+		int x = sourcePosition.getX() + (int) (Math.random() * dist) - dist / 2;
+		int y = sourcePosition.getY() + (int) (Math.random() * dist) - dist / 2;
+		return new Position(x, y);
 	}
 }

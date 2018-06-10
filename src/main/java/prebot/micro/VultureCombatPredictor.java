@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Race;
+import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
@@ -102,15 +103,15 @@ public class VultureCombatPredictor {
 
 		if (InformationManager.Instance().enemyRace == Race.Zerg) {
 			if (unitType == UnitType.Zerg_Zergling) {
-				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Anabolic_Synthesis)) {
-					enemyPower += BONUS_ANABOLIC_SYNTHESIS;
+				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Metabolic_Boost)) {
+					enemyPower += BONUS_ZERGLING_SPEED;
 				}
 			} else if (unitType == UnitType.Zerg_Hydralisk) {
 				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Muscular_Augments)) {
-					enemyPower += BONUS_MUSCULAR_AUGMENTS;
+					enemyPower += BONUS_HYDRA_SPEED;
 				}
 				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Grooved_Spines)) {
-					enemyPower += BONUS_GROOVED_SPINES;
+					enemyPower += BONUS_HYDRA_RANGE;
 				}
 				enemyPower += hitPointsAndShields; // 80
 			} else if (unitType == UnitType.Zerg_Lurker) {
@@ -121,32 +122,43 @@ public class VultureCombatPredictor {
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			if (unitType == UnitType.Protoss_Zealot) {
 				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Leg_Enhancements)) {
-					enemyPower += BONUS_LEG_ENHANCEMENTS;
+					enemyPower += BONUS_ZEALOT_SPEED;
 				}
 			} else if (unitType == UnitType.Protoss_Dragoon) {
 				if (UpgradeUtils.isEnemyUpgraded(UpgradeType.Singularity_Charge)) {
-					enemyPower += BONUS_SINGULARITY_CHARGE;
+					enemyPower += BONUS_DRAGOON_RANGE;
 				}
 				enemyPower += hitPointsAndShields; // 80 + 100
 			}
 			
 		} else if (InformationManager.Instance().enemyRace == Race.Terran) {
-			// TODO
+			if (unitType == UnitType.Terran_Marine) {
+				if (UpgradeUtils.hasEnemyResearched(TechType.Stim_Packs)) {
+					enemyPower += BONUS_MARINE_STIM;
+				} else if (UpgradeUtils.isEnemyUpgraded(UpgradeType.U_238_Shells)) {
+					enemyPower += BONUS_MARINE_RANGE;
+				}
+			} else if (unitType == UnitType.Terran_Vulture) {
+				enemyPower += BONUS_ION_THRUSTERS;
+			}
 		}
 		
 		return enemyPower;
 	}
 	
 	private static final int VULTURE_POWER = 30;
-	private static final int BONUS_ION_THRUSTERS = 30;
+	private static final int BONUS_ION_THRUSTERS = 15;
 	
-	private static final int BONUS_ANABOLIC_SYNTHESIS = 5;
-	private static final int BONUS_MUSCULAR_AUGMENTS = 25;
-	private static final int BONUS_GROOVED_SPINES = 25;
+	private static final int BONUS_ZERGLING_SPEED = 5;
+	private static final int BONUS_HYDRA_SPEED = 10;
+	private static final int BONUS_HYDRA_RANGE = 10;
 	private static final int BONUS_LURKER_BURROWED = 300;
 	
-	private static final int BONUS_LEG_ENHANCEMENTS = 10;
-	private static final int BONUS_SINGULARITY_CHARGE = 30;
+	private static final int BONUS_ZEALOT_SPEED = 10;
+	private static final int BONUS_DRAGOON_RANGE = 30;
+	
+	private static final int BONUS_MARINE_STIM = 10;
+	private static final int BONUS_MARINE_RANGE = 20;
 	
 	private static final Map<UnitType, Integer> VULTURE_TARGET = new HashMap<>();
 	
@@ -178,8 +190,7 @@ public class VultureCombatPredictor {
 		VULTURE_TARGET.put(UnitType.Protoss_Reaver, 400);
 		VULTURE_TARGET.put(UnitType.Protoss_Photon_Cannon, 600);
 		
-		
-		VULTURE_TARGET.put(UnitType.Terran_Marine, 30); // 하템 암살해야됨
+		VULTURE_TARGET.put(UnitType.Terran_Marine, 30);
 		VULTURE_TARGET.put(UnitType.Terran_Medic, 30);
 		VULTURE_TARGET.put(UnitType.Terran_Firebat, 30);
 		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Tank_Mode, 400);

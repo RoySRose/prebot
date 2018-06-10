@@ -27,7 +27,10 @@ public class ScvScoutAfterBuild extends Action {
 
 	@Override
 	public boolean exitCondition() {
-		if (assigned || InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()) != null) {
+		if (assigned) {
+			if (InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()) == null) {
+				StrategyIdea.assignScoutScv = true;
+			}
 			return true;
 		}
 		
@@ -39,7 +42,7 @@ public class ScvScoutAfterBuild extends Action {
 		if (!assigned) {
 			for (Unit building : UnitUtils.getUnitList(UnitFindRange.ALL, buildingType)) {
 				if (building.getType() == buildingType && TimeUtils.framesToSeconds(building.getRemainingBuildTime()) <= remainingSeconds) {
-					StrategyIdea.assignScoutScv = assigned = true;
+					assigned = true;
 					break;
 				}
 			}

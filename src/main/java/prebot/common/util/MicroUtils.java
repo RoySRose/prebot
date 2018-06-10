@@ -17,8 +17,10 @@ import prebot.common.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.MirrorBugFixed;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.constant.MicroConfig.Flee;
+import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
 
 /**
@@ -102,7 +104,7 @@ public class MicroUtils {
 		return cooltimeAlwaysAttack && cooltime == 0; 
 	}
 	
-	public static int forwardKitingTargetDistance(Unit rangedUnit, Unit targetUnit) {
+	private static int forwardKitingTargetDistance(Unit rangedUnit, Unit targetUnit) {
 		if (targetUnit.getType().isBuilding()) { // 해처리 라바때문에 마인 폭사함
 			return 70;
 
@@ -135,7 +137,7 @@ public class MicroUtils {
 		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
 	}
 	
-	public static int getRiskRadius(UnitType unitType) {
+	private static int getRiskRadius(UnitType unitType) {
 		if (RISK_RADIUS_MAP.isEmpty()) {
 			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, Flee.RISK_RADIUS_VULTURE);
 			RISK_RADIUS_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, Flee.RISK_RADIUS_TANK);
@@ -197,7 +199,7 @@ public class MicroUtils {
 	/// 공식: radian = (π / 180) * 각도
 	/// -> 각도 = (radian * 180) / π
 	/// -> 회원 radian = (π / 180) * ((radian * 180) / π + 회전각)
-	private static double rotate(double radian, int angle) {
+	public static double rotate(double radian, int angle) {
 		return (Math.PI / 180) * ((radian * 180 / Math.PI) + angle);
 	}
 
@@ -299,5 +301,59 @@ public class MicroUtils {
 			}
 		}
 		return damage;
+	}
+	
+	public static boolean isRemovableEnemySpiderMine(Unit unit, UnitInfo eui) {
+		Unit target = UnitUtils.unitInSight(eui);
+		if (target == null) {
+			return false;
+		}
+		
+		return target.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isAttackFrame() && unit.isInWeaponRange(target);
+	}
+	
+	// (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다.
+	public static boolean isSafePlace(Position position) {
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(position, 0);
+		
+		for (UnitInfo ui : euiList) {
+			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {
+				continue;
+			}
+			
+			double distanceToNearEnemy = position.getDistance(ui.getLastPosition());
+			WeaponType nearEnemyWeapon = ui.getType().groundWeapon();
+			int enemyWeaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enemyTopSpeed = Prebot.Broodwar.enemy().topSpeed(ui.getType());
+			double backOffDist = ui.getType().isBuilding() ? MicroConfig.Common.BACKOFF_DIST_DEF_TOWER : 0.0;
+			
+			if (distanceToNearEnemy <= enemyWeaponMaxRange + enemyTopSpeed * 24 + backOffDist) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private static boolean typeCanAttackGround(UnitType attacker) {
+		return attacker.groundWeapon() != WeaponType.None ||
+				attacker == UnitType.Terran_Bunker ||
+				attacker == UnitType.Protoss_Carrier ||
+				attacker == UnitType.Protoss_Reaver;
+	}
+	
+	public static boolean isMeleeUnit(UnitType unitType) {
+		return unitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE; // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
+	}
+	
+	public static boolean arrivedToPosition(Unit unit, Position position) {
+		int sightRange = unit.getType().sightRange();
+		int distance = unit.getDistance(position);
+		
+		return sightRange >= distance;
+	}
+	
+	public static boolean timeToRandomMove(Unit unit) {
+		return !unit.isBeingHealed() && (unit.isIdle() || unit.isBraking());
 	}
 }

@@ -13,16 +13,20 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldSquadOrder;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.SpiderMineManger;
 
 public class MechanicMicroTank extends MechanicMicroAbstract {
+	
+	private static final int ARRAGNE_DIST = 150;
+	private static final int ADJUST_DIST = 20;
 	
 	private OldSquadOrder order;
 	private List<UnitInfo> enemiesInfo;
@@ -73,7 +77,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 
 		// Decision -> 0: stop, 1: kiting(attack unit), 2: change
 		MechanicMicroDecision decision = MechanicMicroDecision.makeDecisionForSiegeMode(tank, enemiesInfo, tankList, order, saveUnitLevel);
-		SpiderMineManger.Instance().addRemoveList(tank);
+		SpiderMineManger.Instance().addRemoveMineNearTank(tank);
 		switch (decision.getDecision()) {
 		case -1: // do nothing
 			break;
@@ -205,7 +209,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					} else {
 						if (tank.isIdle() || tank.isBraking()) {
 							if (!tank.isBeingHealed()) {
-								Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
+								Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), 100);
 								CommandUtils.attackMove(tank, randomPosition);
 							}
 						}
@@ -227,14 +231,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 					}
 					if (tank.isIdle() || tank.isBraking()) {
 						if (!tank.isBeingHealed()) {
-							Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), 100);
 							CommandUtils.attackMove(tank, randomPosition);
 						}
 					}
 				} else if (tank.getDistance(order.getPosition()) <= order.getRadius()) {
 					if (tank.isIdle() || tank.isBraking()) {
 						if (!tank.isBeingHealed()) {
-							Position randomPosition = OldMicroUtils.randomPosition(tank.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), 100);
 							CommandUtils.attackMove(tank, randomPosition);
 						}
 					}
@@ -252,7 +256,7 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 	
 	private Position findPositionToSiege(Unit tank, int siegeAreaDist) {
 		int seigeNumLimit = 1;
-		int distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
+		int distanceFromOrderPosition = ARRAGNE_DIST;
 		
 		while (seigeNumLimit < 8) {
 			while (distanceFromOrderPosition < siegeAreaDist) {
@@ -293,14 +297,14 @@ public class MechanicMicroTank extends MechanicMicroAbstract {
 				}
 				
 				if (distanceFromOrderPosition <= 0) {
-					distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance() + MicroConfig.Tank.getSiegeArrangeDistanceAdjust();
-				} else if (distanceFromOrderPosition <= MicroConfig.Tank.getSiegeArrangeDistance()) {
-					distanceFromOrderPosition -= MicroConfig.Tank.getSiegeArrangeDistanceAdjust();
+					distanceFromOrderPosition = ARRAGNE_DIST + ADJUST_DIST;
+				} else if (distanceFromOrderPosition <= ARRAGNE_DIST) {
+					distanceFromOrderPosition -= ADJUST_DIST;
 				} else {
-					distanceFromOrderPosition += MicroConfig.Tank.getSiegeArrangeDistanceAdjust();
+					distanceFromOrderPosition += ADJUST_DIST;
 				}
 			}
-			distanceFromOrderPosition = MicroConfig.Tank.getSiegeArrangeDistance();
+			distanceFromOrderPosition = ARRAGNE_DIST;
 			seigeNumLimit++;
 		}
 		

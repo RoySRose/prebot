@@ -14,6 +14,7 @@ import bwta.Region;
 import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.constant.MicroCode.SquadOrderType;
@@ -27,6 +28,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.VultureTravelManager;
+import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 public class MechanicMicroVulture extends MechanicMicroAbstract {
 
@@ -80,7 +82,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			break;
 			
 		case 1: // kiting
-			if (useReservedSpiderMine(vulture) || reserveSpiderMine(vulture) || removeSpiderMine(vulture)) {
+			if (spiderMineOrderIssue(vulture)) {
 				break;
 			}
 			if (order.getType() == SquadOrderType.WATCH) {
@@ -136,7 +138,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 			break;
 			
 		case 2: // attack move
-			if (useReservedSpiderMine(vulture) || reserveSpiderMine(vulture) || removeSpiderMine(vulture)) {
+			if (spiderMineOrderIssue(vulture)) {
 				break;
 			}
 			
@@ -156,7 +158,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 				if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 50) { // orderPosition의 둘러싼 대형을 만든다.
 					if (vulture.isIdle() || vulture.isBraking()) {
 						if (!vulture.isBeingHealed()) {
-							Position randomPosition = OldMicroUtils.randomPosition(vulture.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(vulture.getPosition(), 100);
 							CommandUtils.attackMove(vulture, randomPosition);
 						}
 					}
@@ -175,7 +177,7 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 					
 				} else { // 목적지 도착
 					if (vulture.isIdle() || vulture.isBraking()) {
-						Position randomPosition = OldMicroUtils.randomPosition(vulture.getPosition(), 100);
+						Position randomPosition = PositionUtils.randomPosition(vulture.getPosition(), 100);
 						CommandUtils.attackMove(vulture, randomPosition);
 					}
 				}
@@ -184,80 +186,24 @@ public class MechanicMicroVulture extends MechanicMicroAbstract {
 		}
 	}
 	
-	private boolean useReservedSpiderMine(Unit vulture) {
-		// 마인매설이 예약된 벌처라면 매설실행
+	private boolean spiderMineOrderIssue(Unit vulture) {
 		Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
+		if (positionToMine == null) {
+			positionToMine = SpiderMineManger.Instance().reserveSpiderMine(vulture, MinePositionLevel.NOT_MY_OCCUPIED);
+		}
 		if (positionToMine != null) {
 			CommandUtils.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);
 			return true;
 		}
-		return false;
-	}
-	
-	private boolean reserveSpiderMine(Unit vulture) {
 		
-		Position minePosition = null;
-		
-		if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN) > 0) {
-			BaseLocation enemyFirstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-			if (enemyFirstExpansion != null) {
-				int distance = vulture.getDistance(enemyFirstExpansion.getPosition());
-				if (distance < MicroConfig.Tank.SIEGE_MODE_MAX_RANGE && OldMicroUtils.isSafePlace(enemyFirstExpansion.getPosition())) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, enemyFirstExpansion.getPosition(), true, StrategyIdea.spiderMineNumberPerPosition * 2);
-				}
-			}
-			
-			if (minePosition == null) {
-				Position enemyReadyPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().enemyPlayer);
-				
-				int distance = vulture.getDistance(enemyReadyPos);
-				if (distance <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
-					minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerPosition);
-				}
-			}
-			
-		} else {
-			minePosition = SpiderMineManger.Instance().goodPositionToMine(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
-			
-			if (minePosition == null && order.getType() == SquadOrderType.WATCH) {
-//				// 적 유닛에게 마인 선물하기
-//				if (InformationManager.Instance().enemyRace == Race.Terran && saveUnitLevel == 0) {
-//					minePosition = SpiderMineManger.Instance().enemyPositionToMine(vulture, enemiesInfo);
-//				}
-				int mineCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Vulture_Spider_Mine);
-				if (mineCount <= MicroConfig.Vulture.MINE_MAX_NUM) {
-					// 맵 구석구석 마인 심기
-					Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-					BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-					List<BaseLocation> occupiedBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-
-					int minePrepareLevel = SpiderMineManger.Instance().getMineInMyBaseLevel(); // 0: 본진매설X, 점령지역조금, 1: 본진매설X, 점령지역많이, 2: 본진조금, 점령지역많이
-					boolean vultureInMyBaseRegion = vultureRegion == BWTA.getRegion(base.getPosition());
-					if (!vultureInMyBaseRegion || minePrepareLevel >= 2) { // 본진 region에는 마인 설치안함(단 패스트 다크, 패스트 럴커 등인 경우 매설)
-						boolean occupiedRegion = false;
-						for (BaseLocation occupiedBase : occupiedBases) { // 앞마당 포함한 점령지역에 마인을 적게 매설함(단, 히드라웨이브, 드라군 푸시인 경우 많이 매설)
-							if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
-								occupiedRegion = true;
-								break;
-							}
-						}
-						if (!occupiedRegion || (!vultureInMyBaseRegion && minePrepareLevel >= 1)) {
-							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerPosition); // 그외에는 좀 많이
-						} else {
-							minePosition = SpiderMineManger.Instance().positionToMine(vulture, vulture.getPosition(), false, StrategyIdea.spiderMineNumberPerGoodPosition);
-						}
-					}
-				}
-			}
-		}
-		if (minePosition != null) { // 매설할 마인이 있다면 종료
+		Unit spiderMineToRemove = SpiderMineManger.Instance().mineToRemove(vulture);
+		if (spiderMineToRemove != null) {
+			CommandUtils.attackUnit(vulture, spiderMineToRemove);
 			return true;
 		}
+		
 		return false;
 	}
 	
-	private boolean removeSpiderMine(Unit vulture) {
-		return SpiderMineManger.Instance().removeMine(vulture);
-	}
 
 }

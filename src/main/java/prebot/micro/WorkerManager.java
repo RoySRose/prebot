@@ -9,6 +9,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import prebot.build.prebot1.BlockingEntrance;
 import prebot.common.MapGrid;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.micro.constant.MicroCode.CombatStrategy;
@@ -18,7 +19,7 @@ import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
-public class WorkerManager {
+public class WorkerManager extends GameManager {
 
 	/// 각 Worker 에 대한 WorkerJob 상황을 저장하는 자료구조 객체
 	private WorkerData workerData = new WorkerData();

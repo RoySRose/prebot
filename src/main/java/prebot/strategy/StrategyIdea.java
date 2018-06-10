@@ -17,13 +17,16 @@ public class StrategyIdea {
 	public static EnemyStrategy phase02 = null;
 	public static EnemyStrategy phase03 = null;
 	
+	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
+	public static Position mainSquadPosition = null;
+	public static Position enemySquadPosition = null;
+	
 	public static Position campPosition = null;
 	public static Position attackPosition = null;
-
-	public static Position enemyCampPosition = null;
-	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
 	
-	public static boolean initialized = false;
+
+	
+	public static boolean initiated = false;
 	public static boolean noCheckNoGuerilla = false;
 	public static boolean attackWithoutDelay = false;
 
@@ -36,6 +39,7 @@ public class StrategyIdea {
 	public static int checkerMaxNumber = 0;
 	public static int spiderMineNumberPerPosition = 1;
 	public static int spiderMineNumberPerGoodPosition = 1;
+	
 	
 	public static int watcherFleeStartFrame = 0;
 	

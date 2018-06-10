@@ -6,8 +6,9 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
-import prebot.micro.old.OldMicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.micro.old.OldKitingOption;
+import prebot.micro.old.OldMicroUtils;
 import prebot.micro.old.OldTargetPriority;
 
 public class MicroGoliath extends MicroManager {
@@ -39,7 +40,7 @@ public class MicroGoliath extends MicroManager {
 					CommandUtils.attackMove(goliath, order.getPosition());
 				} else {
 					if (goliath.isIdle()) {
-						Position randomPosition = OldMicroUtils.randomPosition(goliath.getPosition(), order.getRadius());
+						Position randomPosition = PositionUtils.randomPosition(goliath.getPosition(), order.getRadius());
 						CommandUtils.attackMove(goliath, randomPosition);
 					}
 				}

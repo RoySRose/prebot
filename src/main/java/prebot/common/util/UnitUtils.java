@@ -196,7 +196,11 @@ public class UnitUtils {
 			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
-			if (eui.getLastPosition().getDistance(position) > radius) {
+			int weoponrange = 0;
+			if (eui.getType().groundWeapon() != WeaponType.None) {
+				weoponrange = eui.getType().groundWeapon().maxRange() + 40;
+			}
+			if (eui.getLastPosition().getDistance(position) > radius + weoponrange) {
 				continue;
 			}
 			if (ignorableEnemyUnitInfo(eui)) {
