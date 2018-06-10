@@ -71,8 +71,8 @@ public class GameCommander {
 
 //			ScoutManager.Instance().updateTimeCheck();
 			WorkerManager.Instance().updateTimeCheck();
-			OldCombatManager.Instance().updateTimeCheck();
-//			CombatManager.Instance().updateTimeCheck();
+//			OldCombatManager.Instance().updateTimeCheck();
+			CombatManager.Instance().updateTimeCheck();
 			
 //			logObserver.observe();
 

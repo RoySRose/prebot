@@ -13,11 +13,11 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
+import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
-import prebot.micro.Decision.DecisionType;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -25,8 +25,8 @@ import prebot.strategy.UnitInfo;
 public class MarineControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+		Region campRegion = BWTA.getRegion(targetPosition);
 		Unit bunker = getCompleteBunker(campRegion);
 		if (bunker == null) {
 			bunker = getIncompleteBunker(campRegion);
@@ -50,7 +50,7 @@ public class MarineControl extends Control {
 				} else if (decision.type == DecisionType.KITING_UNIT) {
 					MicroUtils.kiting(marine, decision.eui, kOption);
 				} else {
-					CommandUtils.attackMove(marine, StrategyIdea.campPosition);
+					CommandUtils.attackMove(marine, targetPosition);
 				}
 			}
 			

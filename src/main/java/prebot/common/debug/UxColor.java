@@ -5,8 +5,11 @@ import java.util.Map;
 
 import bwapi.Color;
 import prebot.micro.squad.CheckerSquad;
+import prebot.micro.squad.EarlyDefenseSquad;
+import prebot.micro.squad.GuerillaSquad;
 import prebot.micro.squad.MainAttackSquad;
 import prebot.micro.squad.ScvScoutSquad;
+import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 
@@ -29,11 +32,13 @@ public class UxColor {
 	public static final Map<Color, Character> COLOR_TO_CHARACTER = new HashMap<>();
 	
 	static {
+		SQUAD_COLOR.put(EarlyDefenseSquad.class, Color.Yellow);
 		SQUAD_COLOR.put(MainAttackSquad.class, Color.Red);
 		SQUAD_COLOR.put(WatcherSquad.class, Color.Blue);
-		SQUAD_COLOR.put(ScvScoutSquad.class, Color.Orange);
-		SQUAD_COLOR.put(CheckerSquad.class, Color.Green);
-
+		SQUAD_COLOR.put(CheckerSquad.class, Color.Orange);
+		SQUAD_COLOR.put(ScvScoutSquad.class, Color.Black);
+		SQUAD_COLOR.put(SpecialSquad.class, Color.Purple);
+		
 	    COLOR_TO_CHARACTER.put(Color.Red, CHAR_RED);
 	    COLOR_TO_CHARACTER.put(Color.Blue, CHAR_BLUE);
 	    COLOR_TO_CHARACTER.put(Color.Teal, (char) CHAR_TEAL);

@@ -9,12 +9,9 @@ import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
-import prebot.micro.constant.MicroConfig.Flee;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.VultureCombatResult;
 
@@ -30,17 +27,12 @@ public class VultureCombatPredictor {
 //	}
 	
 	public static VultureCombatResult watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
-		if (TimeUtils.elapsedSeconds(StrategyIdea.watcherFleeStartFrame) <= Flee.WATCHER_FLEE_SECONDS) {
-			return VultureCombatResult.BACK;
-		}
-		
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 		
 		if (vulturePower > enemyPower) {
 			return VultureCombatResult.ATTACK;
 		} else {
-			StrategyIdea.watcherFleeStartFrame = TimeUtils.elapsedFrames();
 			return VultureCombatResult.BACK;
 		}
 	}

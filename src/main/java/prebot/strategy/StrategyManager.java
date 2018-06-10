@@ -5,6 +5,7 @@ import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.AttackExpansionManager;
+import prebot.strategy.manage.PositionFinder;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.TankPositionManager;
 import prebot.strategy.manage.VultureTravelManager;
@@ -81,6 +82,7 @@ public class StrategyManager extends GameManager {
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
 		TankPositionManager.Instance().update();
+		PositionFinder.Instance().update();
 		ActionManager.updateActions();
 		
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){

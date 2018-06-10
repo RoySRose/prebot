@@ -1,4 +1,4 @@
-package prebot.strategy.action.impl;
+package prebot.strategy.manage;
 
 import java.util.List;
 
@@ -11,12 +11,11 @@ import bwta.Chokepoint;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.PlayerUtil;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.action.Action;
 
 /**
  * 각종 Position을 찾는다.
@@ -25,17 +24,23 @@ import prebot.strategy.action.Action;
  * attackPosition : 공격 지점
  * 
  */
-public class PositionFinder extends Action {
+public class PositionFinder {
+	
+	private static PositionFinder instance = new PositionFinder();
 
-	@Override
-	public boolean exitCondition() {
-		return PlayerUtil.isDisabled(Prebot.Broodwar.enemy());
+	public static PositionFinder Instance() {
+		return instance;
 	}
 
-	@Override
-	public void action() {
+	public void update() {
 		StrategyIdea.campPosition = getCampPosition();
 		StrategyIdea.attackPosition = getAttackPosition();
+		
+		if (!StrategyIdea.mainSquadMode.isAttackMode) {
+			StrategyIdea.mainSquadPosition = StrategyIdea.campPosition;
+		} else {
+			StrategyIdea.mainSquadPosition = StrategyIdea.attackPosition;
+		}
 	}
 
 	/// 주둔지
@@ -63,7 +68,7 @@ public class PositionFinder extends Action {
 		}
 
 		if (!enemyBaseDestroyed(enemyBase)) {
-			if (StrategyIdea.attackWithoutDelay) {
+			if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
 				return enemyBase.getPosition();
 			} else {
 				// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요

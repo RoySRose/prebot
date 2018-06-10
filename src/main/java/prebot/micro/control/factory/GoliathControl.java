@@ -21,7 +21,7 @@ import prebot.strategy.UnitInfo;
 public class GoliathControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, false);
@@ -41,7 +41,7 @@ public class GoliathControl extends Control {
 						CommandUtils.attackMove(unit, randomPosition);
 					}
 				} else {
-					CommandUtils.attackMove(unit, StrategyIdea.attackPosition);
+					CommandUtils.attackMove(unit, targetPosition);
 				}
 			}
 		}

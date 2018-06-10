@@ -24,7 +24,6 @@ import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
 
@@ -80,12 +79,6 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateSquadData() {
-		for (String squadName : StrategyIdea.squadNameToActivate) {
-			squadData.activateSquad(squadName);
-		}
-		for (String squadName : StrategyIdea.squadNameToDeactivate) {
-			squadData.deactivateSquad(squadName);
-		}
 	}
 
 	private void combatUnitArrangement() {
@@ -134,6 +127,7 @@ public class CombatManager extends GameManager {
 				continue;
 			}
 
+			squad.setTargetPosition();
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}

@@ -15,18 +15,21 @@ import prebot.strategy.InformationManager;
 public class MicroConfig {
 
 	public static enum MainSquadMode {
-		DEFENSE(0.1),
-		NORMAL(0.8),
-		ATTCK(0.2),
-		FD_PRESS(0.0),
-		SPEED_ATTCK(0.0),
-		NO_MERCY(0.8);
+		DEFENSE(0.1, false),
+		NORMAL(0.8, false),
+		ATTCK(0.2, true),
+		FD_PRESS(0.0, true),
+		SPEED_ATTCK(0.0, true),
+		NO_MERCY(0.8, true);
 
-		private MainSquadMode(double maxGuerillaVultureRatio) {
+
+		private MainSquadMode(double maxGuerillaVultureRatio, boolean isAttackMode) {
 			this.maxGuerillaVultureRatio = maxGuerillaVultureRatio;
+			this.isAttackMode = isAttackMode;
 		}
 		
 		public double maxGuerillaVultureRatio;
+		public boolean isAttackMode;
 	}
 	
 	public static enum SquadInfo {
@@ -59,7 +62,6 @@ public class MicroConfig {
 
 	public static class Flee {
 		public static final int BACKOFF_DIST = 64;
-		public static final int WATCHER_FLEE_SECONDS = 8;
 
 		public static final int RISK_RADIUS_DEFAULT = 150;
 		public static final int RISK_RADIUS_VULTURE = 190;

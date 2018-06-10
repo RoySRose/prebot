@@ -41,12 +41,14 @@ import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldScoutManager;
 import prebot.micro.old.ScoutManager;
 import prebot.micro.squad.Squad;
+import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.StrategyCode.VultureCombatResult;
 import prebot.strategy.manage.AttackExpansionManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
@@ -1203,12 +1205,22 @@ public class UXManager {
 				continue;
 			}
 			String squadName = squad.getSquadName();
+			
+			VultureCombatResult vultureCombatResult = null;
+			if (squad instanceof WatcherSquad) {
+				vultureCombatResult = ((WatcherSquad) squad).getVultureCombatResult();
+			}
+			
 			if (squadName.length() > 4) {
 				squadName = squadName.substring(0, 4);
 			}
+
 			for (Unit unit : squad.unitList) {
 				Prebot.Broodwar.drawCircleMap(unit.getPosition(), 10, color);
 				Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 30, squadName);
+				if (vultureCombatResult != null && vultureCombatResult == VultureCombatResult.BACK) {
+					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + vultureCombatResult.toString());
+				}
 			}
 		}
 	}

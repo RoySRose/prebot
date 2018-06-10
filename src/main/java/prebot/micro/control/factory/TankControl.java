@@ -34,7 +34,7 @@ public class TankControl extends Control {
 	private int siegeModeSpreadRadius = 200; // siegeModeSpreadRadius > ORDER.RADIUS
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
 		
 		siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(unitList.size()) * 11);
 		
@@ -50,7 +50,7 @@ public class TankControl extends Control {
 		}
 
 		executeSiegeMode(siegeModeList, euiList);
-		executeTankMode(tankModeList, euiList);
+		executeTankMode(tankModeList, euiList, targetPosition);
 	}
 
 	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
@@ -70,7 +70,7 @@ public class TankControl extends Control {
 		}
 	}
 
-	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList) {
+	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList, Position targetPosition) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forTankMode);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, false);
@@ -93,9 +93,9 @@ public class TankControl extends Control {
 
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
 				Position positionToSiege = TankPositionManager.Instance().getSiegeModePosition(tank.getID());
-				boolean arrived = MicroUtils.arrivedToPosition(tank, StrategyIdea.campPosition);
+				boolean arrived = MicroUtils.arrivedToPosition(tank, targetPosition);
 				if (arrived && positionToSiege == null) {
-					positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(StrategyIdea.campPosition, tank, siegeModeSpreadRadius);
+					positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(targetPosition, tank, siegeModeSpreadRadius);
 				}
 
 				if (positionToSiege != null) {
@@ -112,7 +112,7 @@ public class TankControl extends Control {
 						}
 
 					} else {
-						CommandUtils.attackMove(tank, StrategyIdea.campPosition);
+						CommandUtils.attackMove(tank, targetPosition);
 					}
 				}
 

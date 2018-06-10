@@ -14,7 +14,6 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
-import prebot.micro.VultureCombatPredictor;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
@@ -25,23 +24,25 @@ import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 /// MainSquad <-> 적 기지 or 주력병력 주둔지 이동하여 마인 매설 
 public class WatcherControl extends Control {
+
+	private static final int REGROUP_UNIT_RADIUS = 300;
+	private VultureCombatResult vultureCombatResult;
+
+	public void setVultureCombatResult(VultureCombatResult vultureCombatResult) {
+		this.vultureCombatResult = vultureCombatResult;
+	}
 	
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		VultureCombatResult result = VultureCombatResult.ATTACK;
-		if (!StrategyIdea.initiated) {
-			result = VultureCombatPredictor.watcherPredictByUnitInfo(unitList, euiList);
-		}
-		
-		if (result == VultureCombatResult.ATTACK) {
-			fight(unitList, euiList);
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+		if (vultureCombatResult == VultureCombatResult.ATTACK) {
+			fight(unitList, euiList, targetPosition);
 
-		} else if (result == VultureCombatResult.BACK) {
-			regroup(unitList);
+		} else if (vultureCombatResult == VultureCombatResult.BACK) {
+			regroup(unitList, targetPosition);
 		}
 	}
 
-	private void fight(List<Unit> unitList, List<UnitInfo> euiList) {
+	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, false);
@@ -58,18 +59,18 @@ public class WatcherControl extends Control {
 				
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
 				if (!spiderMineOrderIssue(unit)) {
-					CommandUtils.attackMove(unit, StrategyIdea.attackPosition);
+					CommandUtils.attackMove(unit, targetPosition);
 				}
 			}
 		}
 	}
 
-	private void regroup(List<Unit> unitList) {
+	private void regroup(List<Unit> unitList, Position targetPosition) {
 		// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
-		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.attackPosition);
+		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, targetPosition);
 		for (Unit unit : unitList) {
-			if (unit.getID() == leader.getID() || unit.getDistance(leader) <= 300) {
-				CommandUtils.move(unit, StrategyIdea.campPosition);
+			if (unit.getID() == leader.getID() || unit.getDistance(leader) <= REGROUP_UNIT_RADIUS) {
+				CommandUtils.move(unit, StrategyIdea.mainSquadPosition);
 			} else {
 				CommandUtils.move(unit, leader.getPosition());
 			}

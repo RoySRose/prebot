@@ -15,6 +15,7 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class EarlyDefenseSquad extends Squad {
@@ -111,13 +112,18 @@ public class EarlyDefenseSquad extends Squad {
 	}
 
 	@Override
+	public void setTargetPosition() {
+		targetPosition = StrategyIdea.campPosition;
+	}
+
+	@Override
 	public void execute() {
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		List<Unit> scvList = unitListMap.getOrDefault(UnitType.Terran_SCV, new ArrayList<Unit>());
 		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
 		
-		marineControl.control(scvList, euiList);
-		gundamControl.control(marineList, euiList);
+		marineControl.control(scvList, euiList, targetPosition);
+		gundamControl.control(marineList, euiList, targetPosition);
 	}
 
 }

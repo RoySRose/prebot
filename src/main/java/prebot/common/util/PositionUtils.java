@@ -35,7 +35,7 @@ public class PositionUtils {
 	/// unit이 이동하기에 유효한 position이면 true
 	public static boolean isValidPositionToMove(Position position, Unit unit) {
 		return unit.isFlying() ? PositionUtils.isValidPosition(position)
-				: PositionUtils.isValidGroundPosition(position) && PositionUtils.isValidGroundPath(unit.getPosition(), position);
+				: (PositionUtils.isValidGroundPosition(position) && PositionUtils.isValidGroundPath(unit.getPosition(), position));
 	}
 
 	/// 두 position 사이를 지상으로 이동할 수 있으면 true

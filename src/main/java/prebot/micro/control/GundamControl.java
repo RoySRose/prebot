@@ -2,6 +2,7 @@ package prebot.micro.control;
 
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
@@ -10,12 +11,14 @@ import prebot.strategy.UnitInfo;
 public class GundamControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
 		for (Unit unit : unitList) {
 			Unit target = getClosestEnemyUnitFromWorker(unit);
 
 			if (target != null) {
 				CommandUtils.attackUnit(unit, target);
+			} else {
+				CommandUtils.attackMove(unit, targetPosition);
 			}
 		}
 	}

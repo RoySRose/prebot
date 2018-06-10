@@ -9,7 +9,6 @@ import prebot.common.main.Prebot;
 import prebot.strategy.action.Action;
 import prebot.strategy.action.impl.EnemyBaseFinder;
 import prebot.strategy.action.impl.InitialAction;
-import prebot.strategy.action.impl.PositionFinder;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
 public class ActionManager {
@@ -24,7 +23,6 @@ public class ActionManager {
 			actionList.add(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
 		}
 		actionList.add(new InitialAction(isRandom));
-		actionList.add(new PositionFinder());
 		actionList.add(new EnemyBaseFinder());
 	}
 	
