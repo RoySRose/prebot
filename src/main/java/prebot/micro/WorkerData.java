@@ -420,6 +420,10 @@ public class WorkerData {
 
 	        // erase the association from the map
 	        workerMineralAssignment.remove(unit.getID()); // C++ : workerMineralAssignment.erase(unit);
+
+	        workerStateMap.remove(unit.getID()); // C++ : workerMineralAssignment.erase(unit);
+	        workerInterMineralMap.remove(unit.getID()); // C++ : workerMineralAssignment.erase(unit);
+	        workerIntermidiateMap.remove(unit.getID()); // C++ : workerMineralAssignment.erase(unit);
 		}
 		else if (previousJob == WorkerJob.Gas)
 		{
