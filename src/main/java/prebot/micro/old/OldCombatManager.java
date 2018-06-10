@@ -14,6 +14,7 @@ import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -1311,10 +1312,10 @@ public class OldCombatManager extends GameManager {
 		int flyingDefendersInSquad = 0;
 		int groundDefendersInSquad = 0;
 		for (Unit unit : squadUnits) {
-			if (UnitUtils.canAttackAir(unit)) {
+			if (unit.getType().airWeapon() != WeaponType.None) {
 				flyingDefendersInSquad++;
 			}
-			if (UnitUtils.canAttackGround(unit)) {
+			if (unit.getType().groundWeapon() != WeaponType.None) {
 				groundDefendersInSquad++;
 			}
 		}
@@ -1379,10 +1380,11 @@ public class OldCombatManager extends GameManager {
 					|| unit.getType() == UnitType.Terran_Goliath)) {
 				continue;
 			}
-			if ((flyingDefender && !UnitUtils.canAttackAir(unit)) ||
-				(!flyingDefender && !UnitUtils.canAttackGround(unit))) {
+			if ((flyingDefender && unit.getType().airWeapon() == WeaponType.None) ||
+				(!flyingDefender && unit.getType().groundWeapon() == WeaponType.None)) {
 	            continue;
 	        }
+			
 	        if (!squadData.canAssignUnitToSquad(unit, defenseSquad)) {
 	            continue;
 	        }

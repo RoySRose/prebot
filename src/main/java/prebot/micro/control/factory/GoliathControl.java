@@ -8,11 +8,11 @@ import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.micro.Decision;
+import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
-import prebot.micro.Decision.DecisionType;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
@@ -27,6 +27,10 @@ public class GoliathControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, false);
 
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
+			
 			Decision decision = decisionMaker.makeDecision(unit, euiList);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);

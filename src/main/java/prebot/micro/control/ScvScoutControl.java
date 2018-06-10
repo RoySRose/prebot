@@ -28,6 +28,9 @@ public class ScvScoutControl extends Control {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
 			moveScoutUnit(unit);
 		}
 	}

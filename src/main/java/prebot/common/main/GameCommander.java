@@ -9,6 +9,7 @@ import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.debug.chat.ChatBot;
 import prebot.common.util.CommandUtils;
@@ -26,8 +27,9 @@ public class GameCommander {
 	/// 디버깅용 플래그 : 어느 Manager 가 에러를 일으키는지 알기위한 플래그
 //	private LagObserver logObserver = new LagObserver();
 	public boolean scoutFlag = false;
-	
+
 	private static GameCommander instance = new GameCommander();
+	private LagObserver logObserver = new LagObserver();
 	
 	/// static singleton 객체를 리턴합니다
 	public static GameCommander Instance() {
@@ -60,7 +62,7 @@ public class GameCommander {
 		}
 
 		try {
-//			logObserver.start();
+			logObserver.start();
 
 			InformationManager.Instance().updateTimeCheck();
 			MapGrid.Instance().updateTimeCheck();
@@ -74,7 +76,7 @@ public class GameCommander {
 //			OldCombatManager.Instance().updateTimeCheck();
 			CombatManager.Instance().updateTimeCheck();
 			
-//			logObserver.observe();
+			logObserver.observe();
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -65,6 +65,6 @@ public class MainAttackSquad extends Squad {
 	}
 
 	private void updateInitiatedFlag() {
-		StrategyIdea.initiated = euiList.isEmpty();
+		StrategyIdea.initiated = !euiList.isEmpty();
 	}
 }

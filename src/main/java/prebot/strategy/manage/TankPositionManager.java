@@ -72,7 +72,7 @@ public class TankPositionManager {
 		}
 	}
 
-	public Position findPositionToSiegeAndReserve(Position centerPosition, Unit tank, int maxRadius) {
+	public Position findPositionToSiegeAndReserve(Position centerPosition, Unit tank, int maxSpreadRadius) {
 		if (!tank.canSiege()) {
 			return null;
 		}
@@ -112,7 +112,7 @@ public class TankPositionManager {
 						}
 				    }
 				}
-				distanceFromCenter = adjustDistance(distanceFromCenter, maxRadius);
+				distanceFromCenter = adjustDistance(distanceFromCenter, maxSpreadRadius);
 			}
 			seigeNumLimit++;
 		}
@@ -129,7 +129,7 @@ public class TankPositionManager {
 			}
 		} else {
 			adjustedDistance += SIEGE_ARRANGE_DISTANCE_FROM_CENTER_ADJUST;
-			if (maxDistance >= maxDistance) {
+			if (adjustedDistance > maxDistance) {
 				return CommonCode.NONE;
 			}
 		}

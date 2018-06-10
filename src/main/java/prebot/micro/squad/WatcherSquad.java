@@ -13,7 +13,7 @@ import prebot.strategy.constant.StrategyCode.VultureCombatResult;
 
 public class WatcherSquad extends Squad {
 
-	private static final int WATCHER_FLEE_SECONDS = 7;
+	private static final int WATCHER_FLEE_SECONDS = 8;
 	private VultureCombatResult vultureCombatResult = VultureCombatResult.ATTACK;
 	private int watcherFleeStartFrame = 0;
 	

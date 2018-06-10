@@ -42,6 +42,9 @@ public class TankControl extends Control {
 		List<Unit> siegeModeList = new ArrayList<>();
 
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
 			if (unit.isSieged()) {
 				siegeModeList.add(unit);
 			} else {
@@ -49,11 +52,11 @@ public class TankControl extends Control {
 			}
 		}
 
-		executeSiegeMode(siegeModeList, euiList);
+		executeSiegeMode(siegeModeList, euiList, targetPosition);
 		executeTankMode(tankModeList, euiList, targetPosition);
 	}
 
-	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
+	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList, Position targetPosition) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forSiegeMode);
 
 		for (Unit siege : siegeModeList) {
@@ -66,6 +69,12 @@ public class TankControl extends Control {
 				CommandUtils.holdPosition(siege);
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
 				CommandUtils.unsiege(siege);
+			} else if (decision.type == DecisionType.ATTACK_POSITION) {
+				if (siege.getDistance(targetPosition) > siegeModeSpreadRadius) {
+					CommandUtils.unsiege(siege);
+				} else {
+					CommandUtils.holdPosition(siege);
+				}
 			}
 		}
 	}

@@ -12,7 +12,6 @@ import bwapi.Player;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.Region;
@@ -197,7 +196,7 @@ public class UnitUtils {
 				continue;
 			}
 			int weoponrange = 0;
-			if (eui.getType().groundWeapon() != WeaponType.None) {
+			if (eui.getType().groundWeapon() != WeaponType.None) { // radius 안의 공격범위가 닿는 적까지 포함
 				weoponrange = eui.getType().groundWeapon().maxRange() + 40;
 			}
 			if (eui.getLastPosition().getDistance(position) > radius + weoponrange) {
@@ -310,7 +309,7 @@ public class UnitUtils {
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
-		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.SCAN_DURATION;
+		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 	}
 	
 	/** 즉시 생산할 수 있는 상태인지 판단 */
@@ -401,62 +400,6 @@ public class UnitUtils {
 	}
 	
 	/////////////////////////////////////////// 기본 제공 메서드 ////////////////////////////////////////////////////////////
-	
-	public static boolean canAttack(Unit attacker, Unit target) {
-		return getWeapon(attacker, target) != WeaponType.None;
-	}
-
-	public static boolean canAttackAir(Unit unit) {
-		return unit.getType().airWeapon() != WeaponType.None;
-	}
-
-	public static boolean canAttackGround(Unit unit) {
-		return unit.getType().groundWeapon() != WeaponType.None;
-	}
-
-	public static double calculateLTD(Unit attacker, Unit target) {
-		WeaponType weapon = getWeapon(attacker, target);
-		if (weapon == WeaponType.None) {
-			return 0;
-		}
-
-		return 0; // C++ : static_cast<double>(weapon.damageAmount()) / weapon.damageCooldown();
-	}
-
-	public static WeaponType getWeapon(Unit attacker, Unit target) {
-		return target.isFlying() ? attacker.getType().airWeapon() : attacker.getType().groundWeapon();
-	}
-
-	public static WeaponType getWeapon(UnitType attacker, UnitType target) {
-		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
-	}
-
-	public static int getAttackRange(Unit attacker, Unit target) {
-		WeaponType weapon = getWeapon(attacker, target);
-
-		if (weapon == WeaponType.None) {
-			return 0;
-		}
-
-		int range = weapon.maxRange();
-
-		if ((attacker.getType() == UnitType.Protoss_Dragoon) && (attacker.getPlayer() == Prebot.Broodwar.self())
-				&& Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Singularity_Charge) > 0) {
-			range = 6 * 32;
-		}
-
-		return range;
-	}
-
-	public static int getAttackRange(UnitType attacker, UnitType target) {
-		WeaponType weapon = getWeapon(attacker, target);
-
-		if (weapon == WeaponType.None) {
-			return 0;
-		}
-
-		return weapon.maxRange();
-	}
 
 	// TODO all unit 루프를 돌아 메서드 수정 필요
 	public static int getNearMineralsCount(Unit pointUnit) {

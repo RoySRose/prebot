@@ -44,6 +44,9 @@ public class MarineControl extends Control {
 		// TODO 초반 저글링 디펜스가 필요한 경우 일꾼 사이로 위치 고정
 		if (bunker == null) {
 			for (Unit marine : unitList) {
+				if (skipControl(marine)) {
+					continue;
+				}
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
@@ -56,6 +59,9 @@ public class MarineControl extends Control {
 			
 		} else {
 			for (Unit marine : unitList) {
+				if (skipControl(marine)) {
+					continue;
+				}
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.KITING_UNIT) {
 					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);

@@ -29,6 +29,10 @@ public class VultureControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, false);
 		
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
+			
 			Decision decision = decisionMaker.makeDecision(unit, euiList);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);

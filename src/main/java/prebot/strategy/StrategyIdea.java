@@ -2,8 +2,6 @@ package prebot.strategy;
 
 import bwapi.Position;
 import bwta.BaseLocation;
-import bwta.Chokepoint;
-import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
 

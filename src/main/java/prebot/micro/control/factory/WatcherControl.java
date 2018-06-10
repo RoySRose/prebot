@@ -48,6 +48,10 @@ public class WatcherControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, false);
 		
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
+			
 			Decision decision = decisionMaker.makeDecision(unit, euiList);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
@@ -69,6 +73,10 @@ public class WatcherControl extends Control {
 		// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
 		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, targetPosition);
 		for (Unit unit : unitList) {
+			if (skipControl(unit)) {
+				continue;
+			}
+			
 			if (unit.getID() == leader.getID() || unit.getDistance(leader) <= REGROUP_UNIT_RADIUS) {
 				CommandUtils.move(unit, StrategyIdea.mainSquadPosition);
 			} else {

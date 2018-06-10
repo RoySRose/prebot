@@ -7,6 +7,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Flee;
 import prebot.micro.constant.MicroConfig.Tank;
@@ -29,10 +30,21 @@ public class DecisionMaker {
 		Unit tooCloseTarget = null;
 		Unit tooFarTarget = null;
 		int closestTooFarTargetDistance = CommonCode.INT_MAX;
+		boolean targetInRangeButOutOfSight = false;
 		
 		for (UnitInfo eui : euiList) {
+			if (!MicroUtils.canAttack(myUnit, eui)) {
+				continue;
+			}
 			Unit enemyUnit = UnitUtils.unitInSight(eui);
 			if (enemyUnit == null) {
+				if (bestTargetUnitInfo == null) {
+					int distanceToTarget = myUnit.getDistance(eui.getLastPosition());
+					if (distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE) {
+						bestTargetUnitInfo = eui;
+						targetInRangeButOutOfSight = true;
+					}
+				}
 				continue;
 			}
 			if (isCloseUndetectedDarkTemplar(myUnit, eui)) {
@@ -57,22 +69,27 @@ public class DecisionMaker {
 			if (score > highestScore) {
 				bestTargetUnitInfo = eui;
 				highestScore = score;
+				targetInRangeButOutOfSight = false;
 			}
 		}
 
-		if (bestTargetUnitInfo == null) {
-			if (undetectedDarkTemplar != null || tooCloseTarget != null) {
-				return Decision.change();
-			} else if (tooFarTarget != null && closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
-				return Decision.change();
+		if (bestTargetUnitInfo != null) {
+			if (targetInRangeButOutOfSight || highestScore <= 0) {
+				return Decision.stop();
 			} else {
-				return Decision.hold();
+				return Decision.attackUnit(bestTargetUnitInfo);
 			}
 		} else {
-			if (highestScore > 0) {
-				return Decision.attackUnit(bestTargetUnitInfo);
+			if (undetectedDarkTemplar != null || tooCloseTarget != null) {
+				return Decision.change();
+			} else if (tooFarTarget != null) {
+				if (closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
+					return Decision.change();
+				} else {
+					return Decision.hold();
+				}
 			} else {
-				return Decision.stop();
+				return Decision.attackPosition();
 			}
 		}
 	}
@@ -81,6 +98,9 @@ public class DecisionMaker {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		for (UnitInfo eui : euiList) {
+			if (!MicroUtils.canAttack(myUnit, eui)) {
+				continue;
+			}
 			if (isCloseDangerousTarget(myUnit, eui) || isCloseUndetectedDarkTemplar(myUnit, eui)) {
 				return Decision.fleeFromUnit(eui);
 			}
@@ -92,8 +112,9 @@ public class DecisionMaker {
 		}
 		if (bestTargetUnitInfo != null) {
 			return Decision.kitingUnit(bestTargetUnitInfo);
+		} else {
+			return Decision.attackPosition();
 		}
-		return Decision.attackPosition();
 	}
 
 	private boolean isCloseDangerousTarget(Unit myUnit, UnitInfo eui) {

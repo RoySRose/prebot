@@ -356,4 +356,24 @@ public class MicroUtils {
 	public static boolean timeToRandomMove(Unit unit) {
 		return !unit.isBeingHealed() && (unit.isIdle() || unit.isBraking());
 	}
+
+	public static boolean canAttack(Unit myUnit, UnitInfo eui) {
+		WeaponType weaponType = WeaponType.None;
+		Unit enemy = UnitUtils.unitInSight(eui);
+		if (enemy != null) {
+			weaponType = getWeapon(myUnit, enemy);
+		} else {
+			weaponType = getWeapon(myUnit.getType(), eui.getType());
+		}
+		return weaponType != WeaponType.None;
+	}
+
+	private static WeaponType getWeapon(Unit attacker, Unit target) {
+		return target.isFlying() ? attacker.getType().airWeapon() : attacker.getType().groundWeapon();
+	}
+
+	private static WeaponType getWeapon(UnitType attacker, UnitType target) {
+		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
+	}
+
 }
