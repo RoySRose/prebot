@@ -1079,6 +1079,7 @@ public class WorkerManager extends GameManager {
 		if (unit.getType().isResourceDepot() && unit.getPlayer() == Prebot.Broodwar.self())	
 		{			
 			workerData.addDepot(unit);
+			mineralPath(unit); //cc 완성되면 미네랄path 적용위해 호출 (본진에서 cc짓고 멀티 이동시 검토 필요)
 			rebalanceWorkers();
 		}		
 		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다. 		
