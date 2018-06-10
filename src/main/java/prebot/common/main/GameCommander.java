@@ -45,6 +45,7 @@ public class GameCommander {
 		}
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
+		WorkerManager.Instance().onStart(); //미네랄 path
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다

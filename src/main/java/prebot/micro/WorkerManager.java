@@ -1,6 +1,8 @@
 package prebot.micro;
+import java.util.ArrayList;
 import java.util.Iterator;
 
+import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
@@ -12,6 +14,7 @@ import prebot.common.MapGrid;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.micro.WorkerData.SCVSTATE;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldSquad;
@@ -34,46 +37,25 @@ public class WorkerManager extends GameManager {
 		return instance;
 	}
 	
+	public void onStart() {
+		// TODO Auto-generated method stub
+		defaltMineralInfo();
+	}
+	
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
 
 		// 1초에 1번만 실행한다
 		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-		if(Prebot.Broodwar.getFrameCount() < 8000){
-			if (Prebot.Broodwar.getFrameCount() % 3 == 0){
-			
+				drawPathData();
 				updateWorkerStatus();
 				handleGasWorkers();
 				handleIdleWorkers();
-			}
-			if (Prebot.Broodwar.getFrameCount() % 3 == 0){//TODO 5,7 을 고려해 보자.
-				//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
-				updatework();
-			}
-			if (Prebot.Broodwar.getFrameCount() % 5 == 0){
+				handleMineralWorkers();
 				//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 				handleMoveWorkers();
 				handleCombatWorkers();
 				handleRepairWorkers();
-			}
-		}else {
-			if (Prebot.Broodwar.getFrameCount() % 19 == 0){
-				
-				updateWorkerStatus();
-				handleGasWorkers();
-				handleIdleWorkers();
-			}
-			if (Prebot.Broodwar.getFrameCount() % 3 == 0){//TODO 5,7 을 고려해 보자.
-				//미네랄 락 , 일꾼 재배치 숨기고 싶으면 updatework() 주석
-				updatework();
-			}
-			if (Prebot.Broodwar.getFrameCount() % 19 == 0){
-				//cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
-				handleMoveWorkers();
-				handleCombatWorkers();
-				handleRepairWorkers();
-			}
-		}
 	}
 	
 	public void updateWorkerStatus() 
@@ -292,7 +274,7 @@ public class WorkerManager extends GameManager {
         }
     }
 
-	private void updatework() {
+	private void handleMineralWorkers() {
 		
 		for (Unit worker : workerData.getWorkers())
 		{
@@ -306,35 +288,109 @@ public class WorkerManager extends GameManager {
 			{
 				continue;
 			}
-			//workerMineralMap = new HashMap<Integer, Unit>();
+				
+			Unit tempMineral = workerData.workerMineralAssignment.get(worker.getID());
+			Unit interMineral = workerData.workerInterMineralMap.get(worker.getID());
+			Position interMidiate = workerData.workerIntermidiateMap.get(worker.getID());
 			
-			if(worker.isGatheringMinerals()){
-				/*
-				 * se-min.park 일꾼재배치
-				 */
-				int maxSCV = 0;
-				int lowSCV = 10000;
-				int sCvCnt = 0;	
-				
-				
-				Unit tempMineral = workerData.workerMineralAssignment.get(worker.getID());
-				if(tempMineral == null)
-					continue;
-				int planGetMineral = tempMineral.getID();
-				
-				int realGetMineral = 0;
-				if(worker.getOrderTarget() != null){
-					realGetMineral = worker.getOrderTarget().getID();
-				}
-				if(worker.isCarryingMinerals() == true || worker.getOrderTarget()  == null){
+			if(tempMineral == null)
+				continue;
+			if(workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.NoTrick){
+				if( worker.isCarryingMinerals() || worker.getOrderTarget() == null ){
 					continue;
 				}
-				if(planGetMineral != realGetMineral){
+				if( worker.getOrderTarget().getID()  !=  tempMineral.getID()){
 					worker.gather(tempMineral);
-					realGetMineral = worker.getOrderTarget().getID();
 				}
+				
+				continue;
 			}
-		}	
+			
+			
+			if( worker.getOrderTarget() != null &&
+				workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ExtraMoveToMineral &&
+				worker.getOrderTarget().getID() != interMineral.getID()  ){
+				worker.gather(interMineral);
+				//Prebot.Broodwar.printf("Gathering mineral");
+			}
+			
+			if(workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ExtraMoveToPos &&
+				interMidiate != bwapi.Position.None &&
+			    worker.getOrder() != bwapi.Order.Move){
+				worker.move(interMidiate );
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+		  if( worker.getOrderTarget() != null &&
+			   workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.MovingToMineral &&
+			   worker.getOrderTarget().getID() != tempMineral.getID()  ){
+			   worker.gather(tempMineral);
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ExtraMoveToPos && worker.getDistance(tempMineral) < 40  ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.MovingToMineral);
+			   worker.gather(tempMineral);
+			//   Prebot.Broodwar.printf("Now changing to mineral patch");
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ExtraMoveToPos){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.MovingToMineral);
+			   worker.gather(tempMineral);
+			   //Unit depot = getClosestResourceDepotFromWorker(worker);
+			   //workerData.setWorkerJob(worker, WorkerData.WorkerJob.Minerals, depot);
+			  // Prebot.Broodwar.printf("Collsion: using gather");
+		   }
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.MovingToMineral  && interMidiate != bwapi.Position.None
+			    && worker.getDistance(tempMineral) >= 40
+				&& worker.getDistance(interMidiate) < 10 ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.ExtraMoveToPos);
+			   worker.move(interMidiate);
+			   //Prebot.Broodwar.printf("No Collsion: using move");
+		   }
+		   if( workerData.workerStateMap.get(worker.getID())  == WorkerData.SCVSTATE.ExtraMoveToPos && worker.getDistance(  interMidiate ) < 20  ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.MovingToMineral);
+			   worker.gather( tempMineral );
+			  // Prebot.Broodwar.printf("Now changing to mineral patch: postion too close");
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+
+
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ExtraMoveToMineral && worker.getDistance(  tempMineral ) < 40  ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.MovingToMineral);
+			   worker.gather(tempMineral );
+			  // Prebot.Broodwar.printf("Now changing to mineral patch");
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.MovingToMineral && worker.getOrder() == bwapi.Order.MiningMinerals  ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.GatheringMineral);
+			 //Prebot.Broodwar.printf("Gathering mineral");
+		   }
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.GatheringMineral &&  worker.isCarryingMinerals()  ){
+			   workerData.workerStateMap.remove(worker.getID());
+			   workerData.workerStateMap.put(worker.getID(), SCVSTATE.ReturningMineral);
+		   }
+		   
+
+		   if( workerData.workerStateMap.get(worker.getID()) == WorkerData.SCVSTATE.ReturningMineral &&  !worker.isCarryingMinerals()  ){
+			   if( interMidiate != bwapi.Position.None ){
+				   workerData.workerStateMap.remove(worker.getID());
+				   workerData.workerStateMap.put(worker.getID(), SCVSTATE.ExtraMoveToPos);
+				   worker.move(interMidiate);
+			   } else if(interMineral  != null ){
+				   workerData.workerStateMap.remove(worker.getID());
+				   workerData.workerStateMap.put(worker.getID(), SCVSTATE.ExtraMoveToMineral);
+				   worker.gather(interMineral);
+			   } 
+
+		   }
+	   }
 	}
 
 
@@ -1042,6 +1098,10 @@ public class WorkerManager extends GameManager {
 			{
 				continue;
 			}
+			//아래 추가 안할시 미네랄수*2 이상일때 scv가 먹통됨.
+			if(worker.isGatheringMinerals() || worker.isCarryingMinerals()){
+				continue;
+			}
 
 			Unit depot = workerData.getWorkerDepot(worker);
 			
@@ -1143,5 +1203,208 @@ public class WorkerManager extends GameManager {
 	public WorkerData getWorkerData()
 	{
 		return workerData;
+	}
+	
+	/*
+	 * 초기 미네랄 패스 위해 정보 (초기1회)
+	 * */
+	public void defaltMineralInfo(){
+		for(int x=0; x<Prebot.Broodwar.mapWidth()*4 ; x++){
+		  for(int y=0; y<Prebot.Broodwar.mapHeight()*4; y++){
+			  Mineral.Instance().walkData[x][y] = 0;
+		  }
+		}
+		//Block minerals locations
+		for(Unit minerala : Prebot.Broodwar.getMinerals() ){
+			for(int x=minerala.getTilePosition().getX()*4; x<(minerala.getTilePosition().getX()+2)*4; x++){
+		    for(int y=minerala.getTilePosition().getY()*4; y<(minerala.getTilePosition().getY()+1)*4; y++){
+		    	Mineral.Instance().walkData[x][y] = 1;
+		    }
+		  }
+		}
+	    
+		
+		for (Unit unit : Prebot.Broodwar.self().getUnits())
+	    {
+		  if (unit.getType() == UnitType.Terran_Command_Center )
+	      {
+			  mineralPath(unit);
+		  }
+	    }
+	}
+	
+	boolean isLeft(Position a, Position b, Position c){
+	     return ((b.getX() - a.getX())*(c.getY()- a.getY()) - (b.getY() - a.getY())*(c.getX() - a.getX())) >= 0;
+	}
+	
+	public void mineralPath(Unit depot){
+		
+		Mineral.Instance().CCtrick = new Position(depot.getTilePosition().getX()*32 - 8, depot.getTilePosition().getY()*32 - 8 );
+		Mineral.Instance().ourCC = depot;
+		
+		workerData.getMineralPatchesNearDepot(depot);
+
+		Position ccPoint 		= Mineral.Instance().ourCC.getPosition();
+		Position topLeft 		= new Position(ccPoint.getX() - 32*10, ccPoint.getY() - 32*10 ); 
+		Position bottomRight	= new Position(ccPoint.getX() + 32*10, ccPoint.getY() + 32*10 ); 
+		Position bottomLeft 	= new Position(ccPoint.getX() - 32*10, ccPoint.getY() + 32*10 ); 
+		Position topRight 		= new Position(ccPoint.getX() + 32*10, ccPoint.getY() - 32*10 ); 
+		Boolean isUpLeft 		= false; 
+		Boolean isBotLeft 		= false;
+		for(int i=0; i < Mineral.Instance().Minerals.size(); i++){
+			isUpLeft 		= false; 
+			isBotLeft 		= false;
+			if(isLeft(topLeft, bottomRight, Mineral.Instance().Minerals.get(i).miner.getPosition())){
+				isBotLeft = true;
+			}
+			if(isLeft(topRight, bottomLeft, Mineral.Instance().Minerals.get(i).miner.getPosition())){
+				isUpLeft = true;
+			}
+			if(isBotLeft == true && isUpLeft == false){
+				Mineral.Instance().Minerals.get(i).Facing = "D";
+			}
+			if(isBotLeft == true && isUpLeft == true){
+				Mineral.Instance().Minerals.get(i).Facing = "L";
+			}
+			if(isBotLeft == false && isUpLeft == true){
+				Mineral.Instance().Minerals.get(i).Facing = "U";
+			}
+			if(isBotLeft == false && isUpLeft == false){
+				Mineral.Instance().Minerals.get(i).Facing = "R";
+			}
+		} 
+		
+		for(int i=0; i<Mineral.Instance().Minerals.size(); i++){
+			//bool isLeftM = isLeft( Point1, Point2, Mineral.Instance().Minerals.get(i).miner.getPosition() );
+			 if("D".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at top of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k<Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16
+						&& Mineral.Instance().Minerals.get(k).mineralTrick == null
+						&& "D".equals(Mineral.Instance().Minerals.get(k).Facing) 
+						&& Mineral.Instance().Minerals.get(k).miner.getPosition().getY() < Mineral.Instance().Minerals.get(i).miner.getPosition().getY() ){
+							PossibleTrick.add(k);
+							Mineral.Instance().Minerals.get(k).mineralTrick = Mineral.Instance().Minerals.get(i).miner;
+					}
+				}
+			} else if("L".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at left  of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16
+						&& Mineral.Instance().Minerals.get(k).mineralTrick == null
+						&& "L".equals(Mineral.Instance().Minerals.get(k).Facing) 
+						&& Mineral.Instance().Minerals.get(k).miner.getPosition().getX() > Mineral.Instance().Minerals.get(i).miner.getPosition().getX() ){
+						PossibleTrick.add(k);
+						Mineral.Instance().Minerals.get(k).mineralTrick = Mineral.Instance().Minerals.get(i).miner;
+					}
+				}
+			} else if("R".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at left  of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16
+						&& Mineral.Instance().Minerals.get(k).mineralTrick == null
+						&& "R".equals(Mineral.Instance().Minerals.get(k).Facing) 
+						&& Mineral.Instance().Minerals.get(k).miner.getPosition().getX() < Mineral.Instance().Minerals.get(i).miner.getPosition().getX() ){
+						PossibleTrick.add(k);
+						Mineral.Instance().Minerals.get(k).mineralTrick = Mineral.Instance().Minerals.get(i).miner;
+					}
+				}
+			} else if("U".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at top of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k<Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16
+						&& Mineral.Instance().Minerals.get(k).mineralTrick == null
+						&& "U".equals(Mineral.Instance().Minerals.get(k).Facing) 
+						&& Mineral.Instance().Minerals.get(k).miner.getPosition().getY() > Mineral.Instance().Minerals.get(i).miner.getPosition().getY() ){
+							PossibleTrick.add(k);
+							Mineral.Instance().Minerals.get(k).mineralTrick = Mineral.Instance().Minerals.get(i).miner;
+					}
+				}
+			}
+		}
+		
+		for(int i=0; i < Mineral.Instance().Minerals.size(); i++){
+			if("D".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at top of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				String isPos = "";
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16 ){
+							isPos = Mineral.Instance().Minerals.get(k).Facing;
+							PossibleTrick.add(k);
+					}
+				}
+				if( PossibleTrick.size() == 1 && Mineral.Instance().Minerals.get(i).mineralTrick == null ){
+					if("L".equals(isPos)){
+						Position trickPos = new Position( Mineral.Instance().Minerals.get(i).miner.getPosition().getX() + 32, Mineral.Instance().Minerals.get(i).miner.getPosition().getY() + 32 );
+						Mineral.Instance().Minerals.get(i).posTrick = trickPos;
+					}else{
+						Position trickPos = new Position( Mineral.Instance().Minerals.get(i).miner.getPosition().getX() - 32, Mineral.Instance().Minerals.get(i).miner.getPosition().getY() + 32 );
+						Mineral.Instance().Minerals.get(i).posTrick = trickPos;
+					}
+				}
+			}  else if("L".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at left  of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16 ){
+							PossibleTrick.add(k);
+					}
+				}
+				if( PossibleTrick.size() == 1 && Mineral.Instance().Minerals.get(i).mineralTrick == null ){
+	                Position trickPos = new Position( Mineral.Instance().Minerals.get(i).miner.getPosition().getX() - 32, Mineral.Instance().Minerals.get(i).miner.getPosition().getY() + 32 );
+	                Mineral.Instance().Minerals.get(i).posTrick = trickPos;
+				}
+			} else if("R".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at left  of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16 ){
+							PossibleTrick.add(k);
+					}
+				}
+				if( PossibleTrick.size() == 1 && Mineral.Instance().Minerals.get(i).mineralTrick == null ){
+	                Position trickPos = new Position( Mineral.Instance().Minerals.get(i).miner.getPosition().getX() + 32, Mineral.Instance().Minerals.get(i).miner.getPosition().getY() - 32 );
+	                Mineral.Instance().Minerals.get(i).posTrick = trickPos;
+				}
+				
+			} else if("U".equals(Mineral.Instance().Minerals.get(i).Facing)){ //scv arrives at top of mineral
+				ArrayList<Integer> PossibleTrick = new ArrayList<Integer>();
+				for(int k=0; k< Mineral.Instance().Minerals.size(); k++){
+					if( i != k && Mineral.Instance().Minerals.get(k).miner.getDistance( Mineral.Instance().Minerals.get(i).miner ) <= 1*16 ){
+							PossibleTrick.add(k);
+					}
+				}
+				if( PossibleTrick.size() == 1 && Mineral.Instance().Minerals.get(i).mineralTrick == null ){
+					Position trickPos = new Position( Mineral.Instance().Minerals.get(i).miner.getPosition().getX() - 32, Mineral.Instance().Minerals.get(i).miner.getPosition().getY() - 32 );
+					Mineral.Instance().Minerals.get(i).posTrick = trickPos;
+				}
+			} 
+		}
+	}
+	
+	void drawPathData(){
+		
+
+		for(int i=0; i< Mineral.Instance().Minerals.size(); i++){
+			if( Mineral.Instance().Minerals.get(i).mineralTrick != null ){
+				Prebot.Broodwar.drawCircleMap( Mineral.Instance().Minerals.get(i).miner.getPosition().getX(),Mineral.Instance().Minerals.get(i).miner.getPosition().getY(),4,Color.Blue,true );
+				Prebot.Broodwar.drawCircleMap( Mineral.Instance().Minerals.get(i).mineralTrick.getPosition().getX(),Mineral.Instance().Minerals.get(i).mineralTrick.getPosition().getY(),4,Color.Purple,true );
+
+			}
+		}
+
+
+		for(int i=0; i< Mineral.Instance().Minerals.size(); i++){
+			if( Mineral.Instance().Minerals.get(i).posTrick != bwapi.Position.None ){
+				Prebot.Broodwar.drawCircleMap( Mineral.Instance().Minerals.get(i).posTrick.getX(),Mineral.Instance().Minerals.get(i).posTrick.getY(),4,Color.Red,true );
+				Prebot.Broodwar.drawCircleMap( Mineral.Instance().Minerals.get(i).miner.getPosition().getX(),Mineral.Instance().Minerals.get(i).miner.getPosition().getY(),4,Color.Yellow,true );
+			}
+		}
+
+		//Broodwar->drawCircleMap(Minerals[0].posTrick.x(),Minerals[0].posTrick.y(),2,Colors::Purple,true);
+
+		//Prebot.Broodwar.drawCircleMap(Mineral.Instance().CCtrick.getX(),Mineral.Instance().CCtrick.getY(),2,Color.Brown,true);
+		for(int i=0; i< Mineral.Instance().Minerals.size(); i++){
+			//Prebot.Broodwar.drawTextMap(  Mineral.Instance().Minerals.get(i).miner.getPosition().getX(), Mineral.Instance().Minerals.get(i).miner.getPosition().getY(), "(" + (int)(Mineral.Instance().Minerals.get(i).MinToCC) + (int)(Mineral.Instance().Minerals.get(i).CCToMin)  + ")");
+		}
+		
 	}
 }

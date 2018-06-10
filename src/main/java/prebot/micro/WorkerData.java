@@ -6,8 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.micro.constant.MicroCode.WorkerJob;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 
@@ -29,6 +31,15 @@ public class WorkerData {
 		NongBongG,	///< 농봉 가스 붙어있는 상태
 		NongBongGS,	///< 농봉 가스(shift) 붙어있는 상태
 		NongBongAT	///< 농봉 공격중 상태
+	};
+	
+	public enum SCVSTATE{
+		MovingToMineral,
+		GatheringMineral,
+		ReturningMineral,
+		ExtraMoveToMineral, //used for the path trick
+		ExtraMoveToPos,
+		NoTrick //used for the path trick
 	};
 	
 	/// 미네랄 숫자 대비 미네랄 일꾼 숫자의 적정 비율
@@ -62,6 +73,11 @@ public class WorkerData {
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	
+	//일꾼 유닛과 임무 관계
+	public Map<Integer, SCVSTATE> workerStateMap = new HashMap<Integer, SCVSTATE>();
+	public Map<Integer, Unit> workerInterMineralMap = new HashMap<Integer, Unit>();
+	public Map<Integer, Position> workerIntermidiateMap = new HashMap<Integer, Position>();
+		
 	public WorkerData() 
 	{
 		// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
@@ -252,17 +268,13 @@ public class WorkerData {
 	{
 		if (unit == null) { return; }
 		
-		/*
-		if (job == Idle)
-		{
-			std::cout << "set worker " << unit.getID() << " job " << workerJobMap[unit] << " . 4 (idle) " << std::endl;
-		}
-		*/
-		
 		clearPreviousJob(unit);
 		workerJobMap.put(unit.getID(), job);
 		if (job == WorkerJob.Minerals)
 		{
+			/*if(unit.isGatheringMinerals()){
+				return;
+			}*/
 			// 커멘드 센터에 연결된 일꾼 수 증가
 			if(depotWorkerCount.get(jobUnit.getID()) == null)
 			{
@@ -272,15 +284,40 @@ public class WorkerData {
 			{
 				depotWorkerCount.put(jobUnit.getID(), depotWorkerCount.get(jobUnit.getID()) + 1);
 			}
-
 			// set the mineral the worker is working on
 			workerDepotMap.put(unit.getID(), jobUnit);
 
-	        Unit mineralToMine = getMineralToMine(unit);
-	        workerMineralAssignment.put(unit.getID(), mineralToMine);
-	        addToMineralPatch(mineralToMine, 1);
-	        
-	        CommandUtils.rightClick(unit, mineralToMine);
+	        int closMin = getMineralToMine(unit);
+	        if(Mineral.Instance().Minerals.get(closMin).mineralTrick != null ){
+	        	//CommandUtils.rightClick(unit, Mineral.Instance().Minerals.get(closMin).mineralTrick);
+	        	unit.gather(Mineral.Instance().Minerals.get(closMin).mineralTrick);
+	        	workerStateMap.put(unit.getID(), SCVSTATE.ExtraMoveToMineral);
+	        	workerInterMineralMap.put(unit.getID(), Mineral.Instance().Minerals.get(closMin).miner);
+	        	workerIntermidiateMap.put(unit.getID(), bwapi.Position.None);
+	        	
+	        	workerMineralAssignment.put(unit.getID(), Mineral.Instance().Minerals.get(closMin).miner);
+	        	addToMineralPatch(Mineral.Instance().Minerals.get(closMin).miner, 1);
+			 } else if( Mineral.Instance().Minerals.get(closMin).posTrick != bwapi.Position.None ){
+				 //unit.move( Mineral.Instance().Minerals.get(closMin).posTrick );
+				 CommandUtils.rightClick(unit, Mineral.Instance().Minerals.get(closMin).posTrick );
+				 workerIntermidiateMap.put(unit.getID(), Mineral.Instance().Minerals.get(closMin).posTrick);
+				 workerStateMap.put(unit.getID(), SCVSTATE.ExtraMoveToPos);
+	           
+				 workerMineralAssignment.put(unit.getID(), Mineral.Instance().Minerals.get(closMin).miner);
+				 addToMineralPatch(Mineral.Instance().Minerals.get(closMin).miner, 1);
+
+			 } else {
+				//CommandUtils.rightClick(unit, Mineral.Instance().Minerals.get(closMin).miner);
+				unit.gather(Mineral.Instance().Minerals.get(closMin).miner);
+				workerIntermidiateMap.put(unit.getID(), bwapi.Position.None);
+				workerStateMap.put(unit.getID(), SCVSTATE.NoTrick);
+				
+				workerMineralAssignment.put(unit.getID(), Mineral.Instance().Minerals.get(closMin).miner);
+				addToMineralPatch(Mineral.Instance().Minerals.get(closMin).miner, 1);
+			 }
+
+			//Mineral.Instance().Minerals.get(closMin).SCVcount++;
+	        //CommandUtils.rightClick(unit, mineralToMine);
 		}
 		else if (job == WorkerJob.Gas)
 		{
@@ -545,26 +582,38 @@ public class WorkerData {
 		}
 	}
 
-	public List<Unit> getMineralPatchesNearDepot(Unit depot)
+	public List<Mineral> getMineralPatchesNearDepot(Unit depot)
 	{
 	    // if there are minerals near the depot, add them to the set
-		List<Unit> mineralsNearDepot = new ArrayList<Unit>();
+		//List<Unit> mineralsNearDepot = new ArrayList<Unit>();
+		
 		/*
 		 * 1.3 초기 일꾼 한마리 노는거 방지 TF 가 알려준 소스 반영 getAllUnits -> getMinerals
 		 * */
 		//BaseLocation baselocation = BWTA.getNearestBaseLocation(depot.getPosition());
 	    int radius = 320;
+	    int c = 0;
 	    for (Unit unit : Prebot.Broodwar.getMinerals())
 //	    for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
-			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
+			if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < radius)
 			{
-	            mineralsNearDepot.add(unit);
+	            //mineralsNearDepot.add(unit);
+				Mineral newMineral = new Mineral();
+				newMineral.ID = unit.getID();
+				newMineral.CCToMin = depot.getDistance(unit);
+				newMineral.MinToCC = unit.getDistance(depot);
+				//min.ID = mineral.getID();
+				newMineral.miner = unit;
+				//min.miner = mineral;
+				Mineral.Instance().Minerals.add(newMineral);
+				c++;
 			}
 		}
 
 	    // if we didn't find any, use the whole map
-	    if (mineralsNearDepot.isEmpty())
+	   // if (mineralsNearDepot.isEmpty())
+	    if (Mineral.Instance().Minerals.size() == 0)
 	    {
 	        for (Unit unit : Prebot.Broodwar.getAllUnits())
 //	    	for (Unit unit : MyBotModule.Broodwar.self().getUnits())
@@ -573,13 +622,19 @@ public class WorkerData {
 	        		continue;*/
 			    if ((unit.getType() == UnitType.Resource_Mineral_Field))
 			    {
-			    	//if(unit.getDistance(depot) < unit.getDistance(depot))
-			    		mineralsNearDepot.add(unit);
+			    	Mineral newMineral = new Mineral();
+					newMineral.ID = unit.getID();
+					newMineral.CCToMin = depot.getDistance(unit);
+					newMineral.MinToCC = unit.getDistance(depot);
+					//min.ID = mineral.getID();
+					newMineral.miner = unit;
+					//min.miner = mineral;
+					Mineral.Instance().Minerals.add(newMineral);
 			    }
 		    }
 	    }
 
-	    return mineralsNearDepot;
+	    return Mineral.Instance().Minerals;
 	}
 
 	/// ResourceDepot 반경 200 point 이내의 미네랄 덩이 수를 반환합니다
@@ -642,34 +697,32 @@ public class WorkerData {
 	}
 
 
-	public Unit getMineralToMine(Unit worker)
+	public int getMineralToMine(Unit worker)
 	{
-		if (worker == null) { return null; }
+		if (worker == null) { return 0; }
 
 		// get the depot associated with this unit
 		Unit depot = getWorkerDepot(worker);
-		Unit bestMineral = null;
+		int bestMineral = 0;
 		double bestDist = 100000000;
 	    double bestNumAssigned = 10000000;
 	    int workerCnt = depotWorkerCount.get(depot.getID());
 	    int minCnt = 0;
-	    
 		if (depot != null)
 		{
 			//se-min.park
-	        List<Unit> mineralPatches = getMineralPatchesNearDepot(depot);
-	        minCnt = mineralPatches.size();
+	        minCnt = Mineral.Instance().Minerals.size();
 	        if( workerCnt > minCnt){
 	        	bestDist = 0;
 	        }
-			for (Unit mineral : mineralPatches)
-			{
-					double dist = mineral.getDistance(depot);
-	                double numAssigned = workersOnMineralPatch.get(mineral.getID());
+	        for(int i=0; i < minCnt; i++){
+					double dist = Mineral.Instance().Minerals.get(i).miner.getDistance(depot);;
+	                double numAssigned = workersOnMineralPatch.get(Mineral.Instance().Minerals.get(i).ID);
+	               
 	                if( workerCnt <= minCnt){
 	                	if (numAssigned < bestNumAssigned)
 		                {
-		                    bestMineral = mineral;
+		                    bestMineral = i;
 		                    bestDist = dist;
 		                    bestNumAssigned = numAssigned;
 		                }
@@ -677,34 +730,29 @@ public class WorkerData {
 						{
 							if (dist < bestDist)
 		                    {
-		                        bestMineral = mineral;
+								bestMineral = i;
 		                        bestDist = dist;
 		                        bestNumAssigned = numAssigned;
 		                    }
 						}
 	                }else{
-	                	if (numAssigned < bestNumAssigned)
-		                {
-		                    bestMineral = mineral;
-		                    bestDist = dist;
-		                    bestNumAssigned = numAssigned;
-		                }
-						else if (numAssigned == bestNumAssigned)
-						{
-							if (dist > bestDist)
-		                    {
-		                        bestMineral = mineral;
-		                        bestDist = dist;
-		                        bestNumAssigned = numAssigned;
-		                    }
-						}
+		                	if (numAssigned < bestNumAssigned)
+			                {
+			                    bestMineral = i;
+			                    bestDist = dist;
+			                    bestNumAssigned = numAssigned;
+			                }else if (numAssigned == bestNumAssigned)
+							{
+								if (dist > bestDist)
+			                    {
+			                        bestMineral = i;
+			                        bestDist = dist;
+			                        bestNumAssigned = numAssigned;
+			                    }
+							} 
 	                }
-	                
-	                
-			
 			}
 		}
-
 		return bestMineral;
 	}
 	
