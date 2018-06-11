@@ -11,11 +11,6 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.DropshipControl;
 import prebot.micro.control.airforce.VesselControl;
 import prebot.micro.control.airforce.WraithControl;
-import prebot.micro.control.building.BarracksControl;
-import prebot.micro.control.building.CommandCenterControl;
-import prebot.micro.control.building.ComsatControl;
-import prebot.micro.control.building.EngineeringBayControl;
-import prebot.micro.control.building.ScienceFacilityControl;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
@@ -24,11 +19,6 @@ public class SpecialSquad extends Squad {
 	private WraithControl wraithControl = new WraithControl();
 	private DropshipControl dropshipControl = new DropshipControl();
 	private VesselControl vesselControl = new VesselControl();
-	private BarracksControl barracksControl = new BarracksControl();
-	private EngineeringBayControl engineeringBayControl = new EngineeringBayControl();
-	private CommandCenterControl commandCenterControl = new CommandCenterControl();
-	private ScienceFacilityControl scienceFacilityControl = new ScienceFacilityControl();
-	private ComsatControl comsatControl = new ComsatControl();
 
 	public SpecialSquad() {
 		super(SquadInfo.SPECIAL);
@@ -38,12 +28,7 @@ public class SpecialSquad extends Squad {
 	public boolean want(Unit unit) {
 		return unit.getType() == UnitType.Terran_Wraith
 				|| unit.getType() == UnitType.Terran_Dropship
-				|| unit.getType() == UnitType.Terran_Science_Vessel
-				|| unit.getType() == UnitType.Terran_Barracks
-				|| unit.getType() == UnitType.Terran_Engineering_Bay
-				|| unit.getType() == UnitType.Terran_Command_Center
-				|| unit.getType() == UnitType.Terran_Science_Facility
-				|| unit.getType() == UnitType.Terran_Comsat_Station;
+				|| unit.getType() == UnitType.Terran_Science_Vessel;
 	}
 
 	@Override
@@ -71,26 +56,6 @@ public class SpecialSquad extends Squad {
 		List<Unit> scienceVesselList = unitListMap.getOrDefault(UnitType.Terran_Science_Vessel, new ArrayList<Unit>());
 		List<UnitInfo> scienceVesselEuiList = findEnemies(scienceVesselList);
 		vesselControl.control(scienceVesselList, scienceVesselEuiList, null);
-		
-		List<Unit> barracksList = unitListMap.getOrDefault(UnitType.Terran_Barracks, new ArrayList<Unit>());
-		List<UnitInfo> barracksEuiList = findEnemies(barracksList);
-		barracksControl.control(barracksList, barracksEuiList, null);
-		
-		List<Unit> engineeringBayList = unitListMap.getOrDefault(UnitType.Terran_Engineering_Bay, new ArrayList<Unit>());
-		List<UnitInfo> engineeringBayEuiList = findEnemies(engineeringBayList);
-		engineeringBayControl.control(engineeringBayList, engineeringBayEuiList, null);
-		
-		List<Unit> commandCenterList = unitListMap.getOrDefault(UnitType.Terran_Command_Center, new ArrayList<Unit>());
-		List<UnitInfo> commandCenterEuiList = findEnemies(commandCenterList);
-		commandCenterControl.control(commandCenterList, commandCenterEuiList, null);
-		
-		List<Unit> scienceFacilityList = unitListMap.getOrDefault(UnitType.Terran_Science_Facility, new ArrayList<Unit>());
-		List<UnitInfo> scienceFacilityEuiList = findEnemies(scienceFacilityList);
-		scienceFacilityControl.control(scienceFacilityList, scienceFacilityEuiList, null);
-		
-		List<Unit> combatList = unitListMap.getOrDefault(UnitType.Terran_Comsat_Station, new ArrayList<Unit>());
-		List<UnitInfo> comsatEuiList = findEnemies(combatList);
-		comsatControl.control(combatList, comsatEuiList, null);
 	}
 	
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {

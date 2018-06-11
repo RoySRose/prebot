@@ -38,6 +38,7 @@ public class UxColor {
 		SQUAD_COLOR.put(CheckerSquad.class, Color.Orange);
 		SQUAD_COLOR.put(ScvScoutSquad.class, Color.Black);
 		SQUAD_COLOR.put(SpecialSquad.class, Color.Purple);
+		SQUAD_COLOR.put(GuerillaSquad.class, Color.Cyan);
 		
 	    COLOR_TO_CHARACTER.put(Color.Red, CHAR_RED);
 	    COLOR_TO_CHARACTER.put(Color.Blue, CHAR_BLUE);

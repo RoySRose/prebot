@@ -16,6 +16,7 @@ import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.old.CombatExpectation;
+import prebot.micro.squad.BuildingSquad;
 import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
 import prebot.micro.squad.GuerillaSquad;
@@ -70,6 +71,9 @@ public class CombatManager extends GameManager {
 		// 개별 유닛 - 레이스, 베슬, 빌딩, 컴셋 등
 		SpecialSquad specialSquad = new SpecialSquad();
 		squadData.addSquad(specialSquad);
+		
+		BuildingSquad buildingSquad = new BuildingSquad();
+		squadData.addSquad(buildingSquad);
 	}
 
 	public void update() {
@@ -98,6 +102,7 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
 		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
 		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
+		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
 
 		updateDefenseSquad(combatUnitList);
 		updateGuerillaSquad(combatUnitList);

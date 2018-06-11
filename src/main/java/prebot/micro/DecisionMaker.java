@@ -9,12 +9,12 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.Flee;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
 
 public class DecisionMaker {
-	
+
+	private static final int BACKOFF_DIST = 64;
 	private static final int TOO_TOO_FAR_DISTANCE = 600;
 	private TargetScoreCalculator targetScoreCalculator;
 
@@ -147,7 +147,7 @@ public class DecisionMaker {
 				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
 			}
 		}
-		return distanceToNearEnemy <= enemyWeaponRange + Flee.BACKOFF_DIST;
+		return distanceToNearEnemy <= enemyWeaponRange + BACKOFF_DIST;
 	}
 
 	// 접근하면 안되는 적이 있는지 판단 (성큰, 포톤캐논, 시즈탱크, 벙커)

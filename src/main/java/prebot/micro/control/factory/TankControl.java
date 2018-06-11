@@ -31,13 +31,18 @@ public class TankControl extends Control {
 	private static final int SIEGE_MODE_RANGE_MARGIN_DISTANCE = 5;
 
 	boolean hasEnoughBackUpUnitToSiege = false;
-	private int siegeModeSpreadRadius = 200; // siegeModeSpreadRadius > ORDER.RADIUS
+	private int siegeModeSpreadRadius;
+
+	public void setSiegeModeSpreadRadius(int tankCount) {
+		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tankCount) * 11);
+	}
+
+	public int getSiegeModeSpreadRadius() {
+		return siegeModeSpreadRadius;
+	}
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
-		
-		siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(unitList.size()) * 11);
-		
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();
 

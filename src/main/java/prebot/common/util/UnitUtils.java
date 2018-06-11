@@ -262,6 +262,15 @@ public class UnitUtils {
 	}
 	
 	public static List<Unit> getUnitsInRegion(PositionRegion positionRegion, PlayerRange playerRange) {
+		return getUnitsInRegion(positionRegion, playerRange, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return true;
+			}
+		});
+	}
+	
+	public static List<Unit> getUnitsInRegion(PositionRegion positionRegion, PlayerRange playerRange, UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
 		if (playerRange == PlayerRange.SELF) {
 			totalUnits = Prebot.Broodwar.self().getUnits();
@@ -276,7 +285,7 @@ public class UnitUtils {
 		List<Unit> unitsInRegion = new ArrayList<>();
 		Region region = PositionUtils.positionRegionToRegion(positionRegion);
 	    for (Unit unit : totalUnits) {
-	    	if (UnitUtils.isValidUnit(unit)) {
+	    	if (UnitUtils.isValidUnit(unit) && unitCondition.correspond(unit)) {
 	    		if (region == BWTA.getRegion(unit.getPosition())) {
 		            unitsInRegion.add(unit);
 		        }

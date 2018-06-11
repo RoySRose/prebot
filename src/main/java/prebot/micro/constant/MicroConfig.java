@@ -41,7 +41,8 @@ public class MicroConfig {
 		GUERILLA_("GUERILLA_", 5, 150),
 		DEFENSE_("DEFENSE_", 6, 150),
 		SCV_SCOUT("SCV_SCOUT", 7, 150),
-		SPECIAL("SPECIAL", 8, 500);
+		SPECIAL("SPECIAL", 8, 500),
+		BUILDING("BUILDING", 8, 500);
 		
 		private SquadInfo(String squadName, int priority, int additionalRadius) {
 			this.squadName = squadName;
@@ -61,8 +62,6 @@ public class MicroConfig {
 	}
 
 	public static class Flee {
-		public static final int BACKOFF_DIST = 64;
-
 		public static final int RISK_RADIUS_DEFAULT = 150;
 		public static final int RISK_RADIUS_VULTURE = 190;
 		public static final int RISK_RADIUS_VUTRURE_SPEED = 220;
@@ -78,11 +77,11 @@ public class MicroConfig {
 //		public static final int GOLIATH = (int) (UnitType.Terran_Goliath.topSpeed() * UnitType.Terran_Goliath.groundWeapon().damageCooldown() * 0.8);
 //		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
 //	}
+	
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static final int WORKERS_PER_REFINERY = 3;
 
 	public static class Vulture {
-		public static final int PELOTON_RADIUS = 400;
 		public static final int GEURILLA_ENEMY_RADIUS = 400;
 		public static final int GEURILLA_EXTRA_ENEMY_POWER = 150;
 		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 게릴라지역이 선정되고 일정시간이 지나야 다시 게릴라 지역으로 선정가능

@@ -112,9 +112,6 @@ public abstract class Squad {
 		for (Unit unit : unitList) {
 			UnitUtils.addEnemyUnitInfosInRadius(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);
 		}
-		// for (Position position : defensePosition) {
-		// UnitUtils.addEnemyUnitInfoNearBy(euiList, position, 500 + squadRadius);
-		// }
 	}
 
 }

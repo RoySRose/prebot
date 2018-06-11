@@ -3,10 +3,6 @@ package prebot.micro.constant;
 public class MicroCode {
 	
 	/// 일꾼 유닛에게 지정하는 임무의 종류
-	public static enum WorkerJob {
-		MINERALS, GAS, BUILD, COMBAT, IDLE, REPAIR, MOVE, DEFAULT
-	}
-
 	public static enum CombatStrategy {
 		DEFENCE_INSIDE, DEFENCE_CHOKEPOINT, ATTACK_ENEMY // , READY_TO_ATTACK
 	}
@@ -60,19 +56,5 @@ public class MicroCode {
 		public static final String WRAITH = "Wraith";
 		public static final String VESSEL = "Vessel";
 		public static final String BUILDING = "Building";
-	}
-
-	public static class UxColor {
-		public static final char BLUE = (char) 0x0E;
-		public static final char TEAL = (char) 0x0F;
-		public static final char PURPLE = (char) 0x10;
-		public static final char ORANGE = (char) 0x11;
-		public static final char BROWN = (char) 0x15;
-		public static final char WHITE = (char) 0x16;
-		public static final char YELLOW = (char) 0x17;
-		public static final char GREEN = (char) 0x18;
-		public static final char CYAN = (char) 0x19;
-		public static final char BLACK = (char) 0x14;
-		public static final char GREY = (char) 0x5;
 	}
 }

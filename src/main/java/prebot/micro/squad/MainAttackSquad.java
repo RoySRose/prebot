@@ -6,7 +6,10 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.MarineControl;
@@ -58,6 +61,7 @@ public class MainAttackSquad extends Squad {
 		List<Unit> tankList = new ArrayList<>();
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Siege_Mode, new ArrayList<Unit>()));
+		tankControl.setSiegeModeSpreadRadius(tankList.size());
 		tankControl.control(tankList, euiList, targetPosition);
 		
 		List<Unit> goliathList = unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>());
@@ -66,5 +70,22 @@ public class MainAttackSquad extends Squad {
 
 	private void updateInitiatedFlag() {
 		StrategyIdea.initiated = !euiList.isEmpty();
+	}
+	
+	@Override
+	public void findEnemies() {
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			super.findEnemies();
+		} else {
+			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(PositionRegion.MY_BASE, PlayerRange.SELF, new UnitCondition() {
+				@Override public boolean correspond(Unit unit) {
+					return unit.getType().isBuilding() && !unit.isFlying();
+				}
+			});
+			euiList.clear();
+			for (Unit building : myBuildings) {
+				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+			}
+		}
 	}
 }
