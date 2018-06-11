@@ -33,6 +33,7 @@ import prebot.common.MapGrid;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.WorkerData;
@@ -137,7 +138,7 @@ public class UXManager {
 	}
 
 	private void drawStrategySample() {
-		Race enemyRace = Prebot.Broodwar.enemy().getRace();
+		Race enemyRace = InfoUtils.enemyRace();
 		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
 		Prebot.Broodwar.drawTextScreen(20, 20, "" + UxColor.CHAR_YELLOW + strategy.toString());
 		

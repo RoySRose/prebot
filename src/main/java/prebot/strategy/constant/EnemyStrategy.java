@@ -158,8 +158,9 @@ public enum EnemyStrategy {
 	TERRAN_MECHANIC_VULTURE_TANK(TERRAN_MECHANIC_DEFAULT),
 	TERRAN_MECHANIC_GOLIATH_TANK(TERRAN_MECHANIC_DEFAULT),
 	TERRAN_MECHANIC_WRAITH_TANK(0, 3, 1, UpgradeOrder.TS_VM_VS_GR),
-	TERRAN_MECHANIC_BATTLE(0, 2, 1, UpgradeOrder.TS_VM_VS_GR);
-	
+	TERRAN_MECHANIC_BATTLE(0, 2, 1, UpgradeOrder.TS_VM_VS_GR),
+
+	UNKNOWN(ZERG_INIT);
 	
 	private EnemyStrategy(EnemyStrategy strategy) {
 		this.ratio = strategy.ratio;

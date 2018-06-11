@@ -4,8 +4,12 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
+import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AttackExpansionManager;
+import prebot.strategy.manage.EnemyBaseFinder;
+import prebot.strategy.manage.InitialAction;
 import prebot.strategy.manage.PositionFinder;
+import prebot.strategy.manage.RaceActionManager;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.TankPositionManager;
 import prebot.strategy.manage.VultureTravelManager;
@@ -61,8 +65,6 @@ public class StrategyManager extends GameManager {
 	public void onStart() {
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
 		AnalyzeStrategy.Instance().update();
-
-		ActionManager.init();
 	}
 
 	/// 경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다
@@ -78,12 +80,16 @@ public class StrategyManager extends GameManager {
 	public void update() {
 
 		// 전략 파악
-		AnalyzeStrategy.Instance().update();
+		InitialAction.Instance().update();
+		RaceActionManager.Instance().update();
+		ActionManager.Instance().update();
+		
+		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
 		TankPositionManager.Instance().update();
 		PositionFinder.Instance().update();
-		ActionManager.updateActions();
+		EnemyBaseFinder.Instance().update();
 		
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
 			AttackExpansionManager.Instance().executeCombat();

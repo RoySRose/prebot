@@ -1,4 +1,4 @@
-package prebot.strategy.action;
+package prebot.strategy.manage;
 
 public class CenterOccupied {
 //	private boolean centerIsOccupied(Player player) {

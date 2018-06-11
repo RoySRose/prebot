@@ -7,10 +7,10 @@ import prebot.strategy.constant.EnemyStrategy;
 
 public class StrategyIdea {
 	
-	public static EnemyStrategy enemyStrategy = null;
-	public static EnemyStrategy phase01 = null;
-	public static EnemyStrategy phase02 = null;
-	public static EnemyStrategy phase03 = null;
+	public static EnemyStrategy enemyStrategy = EnemyStrategy.UNKNOWN;
+	public static EnemyStrategy phase01 = EnemyStrategy.UNKNOWN;
+	public static EnemyStrategy phase02 = EnemyStrategy.UNKNOWN;
+	public static EnemyStrategy phase03 = EnemyStrategy.UNKNOWN;
 	
 	public static boolean initiated = false;
 	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;

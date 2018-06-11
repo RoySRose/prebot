@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -18,6 +19,14 @@ import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.UnitInfo;
 
 public class InfoUtils {
+	
+	public static Race myRace() {
+		return InformationManager.Instance().selfRace;
+	}
+	
+	public static Race enemyRace() {
+		return InformationManager.Instance().enemyRace;
+	}
 	
 	public static BaseLocation myBase() {
 		return InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self());

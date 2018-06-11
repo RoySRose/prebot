@@ -1,23 +1,15 @@
 package prebot.strategy.action;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class Action {
-	protected List<Action> nextActions = new ArrayList<>();
+	protected Action nextAction = null;
 	
-	public List<Action> getNextActions() {
-		return nextActions;
+	public Action getNextAction() {
+		return nextAction;
 	}
-	public void getNextActions(List<Action> nextActions) {
-		this.nextActions = nextActions;
+	public void setNextAction(Action nextAction) {
+		this.nextAction = nextAction;
 	}
 	
 	public abstract boolean exitCondition();
 	public abstract void action();
-
-	@Override
-	public boolean equals(Object obj) {
-		return getClass().equals(obj.getClass());
-	}
 }

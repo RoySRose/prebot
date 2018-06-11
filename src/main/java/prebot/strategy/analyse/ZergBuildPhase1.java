@@ -1,4 +1,4 @@
-package prebot.strategy.action.zerg;
+package prebot.strategy.analyse;
 
 import java.util.ArrayList;
 import java.util.List;
