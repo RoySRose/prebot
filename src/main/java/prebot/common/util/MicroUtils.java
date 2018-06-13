@@ -30,70 +30,108 @@ import prebot.strategy.UnitInfo;
  *
  */
 public class MicroUtils {
-	
-	private static final int AIR_DRIVING_POSITION_DEPTH = 4;
+
+	private static final int WRAITH_MOVE_DISTANCE_SEC = moveDistancePerFrame(UnitType.Terran_Wraith, TimeUtils.SECOND); // 1초간 움직이는 거리
+	private static final int AIR_DRIVING_PRE_EXPECT_SECS = 5;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
-	
-	public static void airFlee(Unit drivingUnit, Position endPosition) {
-//		drivingUnit.rightClick(getAirFleePosition(drivingUnit, endPosition));
-	}
-	
-	private static Position getAirFleePosition(Unit drivingUnit, Position endPosition) {
-//		double fleeRadian = oppositeDirectionRadian(drivingUnit.getPosition(), endPosition);
-//		Position fleePosition = Position.None;
-//		int moveDistanceOneSec = moveDistancePerFrame(drivingUnit, TimeUtils.SECOND); // 1초간 움직이는 거리
-//		int riskRadius = getRiskRadius(drivingUnit.getType());
+
+	/// 레이쓰 전용
+	public static Position airDrivingPosition(Position startPosition, Position endPosition) {
+		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
+		double moveRadian = 0.0d;
+		Position candiPosition = Position.None;
 		
-//		for (int moveDistance = moveDistanceOneSec; moveDistanceOneSec > 10; moveDistanceOneSec = (int) (moveDistanceOneSec * 0.7)) {
-//			fleePosition = lowestRiskPosition(drivingUnit, fOption, fleeRadian, moveDistance, riskRadius);
-//			if (fleePosition != Position.None) {
-//				break;
-//			}
-//		}
-//		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
-		return null;
-	}
-	
-	public static void airDriving(Unit drivingUnit, Position endPosition) {
-		Position airDrivingPosition = getAirDrivingPosition(drivingUnit.getPosition(), endPosition, 0);
+		double minimumDistance = CommonCode.DOUBLE_MAX;
+		Position fastPosition = null;
 		
-		if (endPosition != null) {
-			CommandUtils.move(drivingUnit, airDrivingPosition);
+		for (int angle : Angles.AIR_FORCE_DRIVE) {
+			moveRadian = rotate(radianToMovePosition, angle);
+			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
+			if (!PositionUtils.isValidPosition(candiPosition)) {
+				continue;
+			}
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			if (!enemyDefTowerList.isEmpty()) {
+				continue;
+			}
+			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
+			if (distance < minimumDistance) {
+				minimumDistance = distance;
+				fastPosition = candiPosition;
+			}
+		}
+		
+		if (fastPosition == null) {
+			return endPosition;
 		} else {
-			CommandUtils.move(drivingUnit, endPosition);
+			return fastPosition;
+		}
+	}
+
+	/// 레이쓰 전용
+	public static Position airFleePosition(Position startPosition, Position endPosition) {
+		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
+		double moveRadian = 0.0d;
+		Position candiPosition = Position.None;
+		
+		double minimumDistance = CommonCode.DOUBLE_MAX;
+		Position fastPosition = null;
+		
+		for (int angle : Angles.AIR_FORCE_DRIVE) {
+			moveRadian = rotate(radianToMovePosition, angle);
+			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
+			if (!PositionUtils.isValidPosition(candiPosition)) {
+				continue;
+			}
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			if (!enemyDefTowerList.isEmpty()) {
+				continue;
+			}
+//			List<UnitInfo> killerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.wraithKillerUnitType());
+//			if (!killerList.isEmpty()) {
+//				continue;
+//			}
+			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
+			if (distance < minimumDistance) { // 킬러들이 많으면 그쪽으로 가면 안됨
+				minimumDistance = distance;
+				fastPosition = candiPosition;
+			}
+		}
+		
+		if (fastPosition == null) {
+			return endPosition;
+		} else {
+			return fastPosition;
 		}
 	}
 	
-	
-	private static Position getAirDrivingPosition(Position startPosition, Position endPosition, int positionDepth) {
-		if (startPosition.getDistance(endPosition) < 100
-				|| positionDepth >= AIR_DRIVING_POSITION_DEPTH) {
-			return endPosition;
+	private static double getDistanceAfterSeconds(Position startPosition, Position endPosition, int seconds) {
+		if (seconds == 0) {
+			return startPosition.getDistance(endPosition);
 		}
 		
 		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
 		double moveRadian = 0.0d;
 		Position candiPosition = Position.None;
-		int moveDistanceOneSec = moveDistancePerFrame(UnitType.Terran_Wraith, TimeUtils.SECOND); // 1초간 움직이는 거리
+		
+		double minimumDistance = CommonCode.DOUBLE_MAX;
 		
 		for (int angle : Angles.AIR_FORCE_DRIVE) {
 			moveRadian = rotate(radianToMovePosition, angle);
-			candiPosition = getMovePosition(startPosition, moveRadian, moveDistanceOneSec);
+			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitType.Terran_Missile_Turret, UnitType.Protoss_Photon_Cannon, UnitType.Zerg_Spore_Colony);
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
-			Position movePosition = getAirDrivingPosition(candiPosition, endPosition, positionDepth + 1);
-			if (movePosition == null) {
-				continue;
+			double distance = getDistanceAfterSeconds(candiPosition, endPosition, seconds - 1);
+			if (distance < minimumDistance) {
+				minimumDistance = distance;
 			}
-			return movePosition;
 		}
-		
-		return null;
+		return minimumDistance;
 	}
 
 	public static void flee(Unit fleeUnit, Position targetPosition, FleeOption fOption) {

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
@@ -474,6 +475,30 @@ public class UnitUtils {
 			}
 		}
 		return totalSupplyCount * 4; // 인구수 기준이므로
+	}
+	
+	public static UnitType[] enemyAirDefenseUnitType() {
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			return new UnitType[] { UnitType.Protoss_Photon_Cannon };
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			return new UnitType[] { UnitType.Zerg_Spore_Colony };
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			return new UnitType[] { UnitType.Terran_Missile_Turret, UnitType.Terran_Bunker };
+		} else {
+			return new UnitType[] {};
+		}
+	}
+
+	public static UnitType[] wraithKillerUnitType() {
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			return new UnitType[] { UnitType.Protoss_Dragoon, UnitType.Protoss_Archon };
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			return new UnitType[] { UnitType.Zerg_Hydralisk, UnitType.Zerg_Scourge };
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			return new UnitType[] { UnitType.Terran_Goliath };
+		} else {
+			return new UnitType[] {};
+		}
 	}
 
 }

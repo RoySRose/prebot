@@ -18,8 +18,10 @@ public class GasAdjustmentMechanic extends Action {
 		if (TimeUtils.elapsedSeconds() > 210 || UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) >= 2) {
 			StrategyIdea.gasAdjustment = false;
 			StrategyIdea.gasAdjustmentWorkerCount = 0;
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class MicroConfig {
 	public static class Angles {
 		public static final int[] NARROW = { 0, -5, +5, -10, +10, -15, +15 };
 		public static final int[] WIDE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
-		public static final int[] AIR_FORCE_DRIVE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
+		public static final int[] AIR_FORCE_DRIVE = { 0, -15, +15, -30, +30, -45, +45, -70, +70, -120, +120};
 		public static final int[] AIR_FORCE_RETREAT_LEFT = { -80, -70, -60, -50, -40, -30, -20, -10, 0, +10, +20, +30, +40, +50, +60, +70, +80 };
 		public static final int[] AIR_FORCE_RETREAT_RIGHT = { +80, +70, +60, +50, +40, +30, +20, +10, 0, -10, -20, -30, -40, -50, -60, -70, -80 };
 		public static final int[] AROUND_360 = { 0, 45, 90, 135, 180, 225, 270, 315 };

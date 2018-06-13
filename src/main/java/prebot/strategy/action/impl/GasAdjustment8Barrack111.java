@@ -19,8 +19,9 @@ public class GasAdjustment8Barrack111 extends Action {
 			StrategyIdea.gasAdjustment = false;
 			StrategyIdea.gasAdjustmentWorkerCount = 0;
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
 	@Override

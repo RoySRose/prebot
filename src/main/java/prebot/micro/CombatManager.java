@@ -16,7 +16,6 @@ import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.old.CombatExpectation;
-import prebot.micro.squad.AirForceSquad;
 import prebot.micro.squad.BuildingSquad;
 import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
@@ -70,8 +69,8 @@ public class CombatManager extends GameManager {
 		squadData.addSquad(specialSquad);
 
 		// 레이쓰 특공대
-		AirForceSquad airForceSquad = new AirForceSquad();
-		squadData.addSquad(airForceSquad);
+//		AirForceSquad airForceSquad = new AirForceSquad();
+//		squadData.addSquad(airForceSquad);
 
 		BuildingSquad buildingSquad = new BuildingSquad();
 		squadData.addSquad(buildingSquad);
@@ -103,7 +102,7 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
 		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
 		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
-		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
+//		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
 		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
 
 		updateDefenseSquad(combatUnitList);

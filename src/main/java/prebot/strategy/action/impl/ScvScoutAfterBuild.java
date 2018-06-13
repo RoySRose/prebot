@@ -32,19 +32,20 @@ public class ScvScoutAfterBuild extends Action {
 				StrategyIdea.assignScoutScv = true;
 			}
 			return true;
+		} else {
+			return false;
 		}
-		
-		return false;
 	}
 
 	@Override
 	public void action() {
-		if (!assigned) {
-			for (Unit building : UnitUtils.getUnitList(UnitFindRange.ALL, buildingType)) {
-				if (building.getType() == buildingType && TimeUtils.framesToSeconds(building.getRemainingBuildTime()) <= remainingSeconds) {
-					assigned = true;
-					break;
-				}
+		if (assigned) {
+			return;
+		}
+		for (Unit building : UnitUtils.getUnitList(UnitFindRange.ALL, buildingType)) {
+			if (building.getType() == buildingType && TimeUtils.framesToSeconds(building.getRemainingBuildTime()) <= remainingSeconds) {
+				assigned = true;
+				break;
 			}
 		}
 	}
