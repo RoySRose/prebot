@@ -29,6 +29,9 @@ public class InitialBuildProvider {
 	public boolean InitialBuildFinished = false;
 
     public InitialBuildProvider(){
+    	
+    	System.out.println("InitialBuildProvider start");
+    	 
         BlockingEntrance blockingEntrance = new BlockingEntrance();
 
         TilePosition firstSupplyPos = blockingEntrance.first_supple;
@@ -36,10 +39,12 @@ public class InitialBuildProvider {
         TilePosition secondSupplyPos = blockingEntrance.second_supple;
         TilePosition factoryPos = blockingEntrance.factory;
         TilePosition bunkerPos = blockingEntrance.bunker;
+        //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 
         if (InformationManager.Instance().enemyRace == Race.Terran) {
             new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
         }else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+        	System.out.println("ememy is protoss");
             new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
         }else{
             new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
