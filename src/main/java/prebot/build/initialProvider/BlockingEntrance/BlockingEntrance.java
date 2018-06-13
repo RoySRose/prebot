@@ -175,13 +175,18 @@ public class BlockingEntrance {
         factory = postitionStorage.get(combine(map, loc, Building.FACTORY));
         bunker = postitionStorage.get(combine(map, loc, Building.BUNKER));
         //entrance_turret = postitionStorage.get(combine(map, loc, Building.ENTRANCE_TURRET));
-
-//      avoid supply 설정
-      	ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+        
         
         loc_t = loc;
-        
         System.out.println("loc_t.getValue() ==>> " + loc_t.getValue());
+
+//      avoid supply 설정
+        System.out.println("before setTilesToAvoidSupply");
+      	//ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+        
+        
+        
+        
 
     }
 
