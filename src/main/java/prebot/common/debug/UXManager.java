@@ -35,6 +35,8 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.micro.CombatManager;
+import prebot.micro.MineralManager;
+import prebot.micro.Minerals;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
 import prebot.micro.old.OldCombatManager;
@@ -129,11 +131,13 @@ public class UXManager {
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / UxConfig.TILE_SIZE) + ", " + (int) (mouseY / UxConfig.TILE_SIZE) + ")");
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
+			//미네랄PATH
+			drawPathData();
 		} else if (uxOption == 1) {
-			
 			drawStrategySample();
 			drawManagerTimeSpent(500, 220);
-		}
+			drawPathData();
+		} 
 	}
 
 	private void drawStrategySample() {
@@ -1249,6 +1253,31 @@ public class UXManager {
 				drawColor = UxColor.CHAR_RED;
 			}
 			Prebot.Broodwar.drawTextScreen(x + 103, currentY, ": " + drawColor + gameManager.getRecorded());
+		}
+	}
+	
+	void drawPathData(){
+		for(Minerals minr : MineralManager.Instance().minerals){
+			if(minr.mineralTrick != null ){
+				Prebot.Broodwar.drawCircleMap(minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(),4,Color.Blue,true );
+				Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
+
+			}
+		}
+
+
+		for(Minerals minr : MineralManager.Instance().minerals){
+			if( minr.posTrick != bwapi.Position.None ){
+				Prebot.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
+				Prebot.Broodwar.drawCircleMap(minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(),4,Color.Yellow,true );
+			}
+		}
+
+		//Broodwar->drawCircleMap(Minerals[0].posTrick.x(),Minerals[0].posTrick.y(),2,Colors::Purple,true);
+
+		//Prebot.Broodwar.drawCircleMap(Mineral.Instance().CCtrick.getX(),Mineral.Instance().CCtrick.getY(),2,Color.Brown,true);
+		for(int i=0; i< MineralManager.Instance().minerals.size(); i++){
+			//Prebot.Broodwar.drawTextMap( minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(), "(" + (int)(MineralManager.Instance().minerals.get(i).MinToCC) + (int)(MineralManager.Instance().minerals.get(i).CCToMin)  + ")");
 		}
 	}
 }
