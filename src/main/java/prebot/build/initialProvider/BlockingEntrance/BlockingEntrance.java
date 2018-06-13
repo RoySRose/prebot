@@ -5,6 +5,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -57,6 +58,11 @@ public class BlockingEntrance {
     private final int SMALL = 42;
     private final int BIG = 84;
     private final int CENTER = 64;
+    
+    private static Location loc_t = null;
+    
+    private static int fix_supplyX[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int fix_supplyY[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
 
     private HashMap<Integer, TilePosition> postitionStorage = new HashMap<>();
 
@@ -170,6 +176,13 @@ public class BlockingEntrance {
         bunker = postitionStorage.get(combine(map, loc, Building.BUNKER));
         //entrance_turret = postitionStorage.get(combine(map, loc, Building.ENTRANCE_TURRET));
 
+//      avoid supply 설정
+      	ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+        
+        loc_t = loc;
+        
+        System.out.println("loc_t.getValue() ==>> " + loc_t.getValue());
+
     }
 
     public BlockingEntrance() {
@@ -178,6 +191,12 @@ public class BlockingEntrance {
     	
 //    	맵 : Over_wath
     	if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.OVERWATCH) {
+    		
+    		
+			int[] fix_supplyXX = { 0, 115, 94, 0, 21 };
+			fix_supplyX = fix_supplyXX;
+			int[] fix_supplyYY = { 0, 28, 121, 95, 0 };
+			fix_supplyY = fix_supplyYY;
     		
     		if (InformationManager.Instance().enemyRace == Race.Protoss
 					|| InformationManager.Instance().enemyRace == Race.Terran) {
@@ -249,6 +268,11 @@ public class BlockingEntrance {
     	}
     	
     	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
+    		
+    		int[] fix_supplyXX = { 0, 101, 101, 15, 15 };
+			fix_supplyX = fix_supplyXX;
+			int[] fix_supplyYY = { 0, 0, 121, 121, 0 };
+			fix_supplyY = fix_supplyYY;
     	
     	
 //    	맵 : CIRCUITBREAKER
@@ -351,6 +375,43 @@ public class BlockingEntrance {
 
         SetBlockingTilePosition();
     }
+    
+    
+    /*public void CheckBlockingPosition() {
+		if(InformationManager.Instance().enemyRace == Race.Protoss || InformationManager.Instance().enemyRace == Race.Terran){
+			for (Unit unit : Broodwar.self().getUnits()) {
+				if(unit.getType() == UnitType.Terran_Supply_Depot){
+					build_first_suppleX = unit.getTilePosition().getX(); //unit.getPosition().getX();// getTilePosition().getX();
+					build_first_suppleY = unit.getTilePosition().getY();
+					if(first_suppleX != build_first_suppleX || first_suppleY != build_first_suppleY){
+						blockingEntranceNow = false;
+					}
+				}
+				if(unit.getType() == UnitType.Terran_Barracks){
+					build_barrackX = unit.getTilePosition().getX(); //unit.getPosition().getX();// getTilePosition().getX();
+					build_barrackY = unit.getTilePosition().getY();
+					if(barrackX != build_barrackX || barrackY != build_barrackY){
+						blockingEntranceNow = false;
+					}
+				}
+			}
+		}
+	}*/
+	
+	
+	public final TilePosition getSupplyPosition(TilePosition tilepos)
+	{
+		
+			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
+			return supply_pos;
+
+	}
+	
+	public final TilePosition getSupplyPosition()
+	{
+			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
+			return supply_pos;
+	}
 }
 
 
