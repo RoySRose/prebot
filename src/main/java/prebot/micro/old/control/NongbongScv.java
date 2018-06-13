@@ -9,7 +9,6 @@ import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
-import prebot.micro.WorkerData.WorkerJob;
 
 /// 봇 프로그램 설정
 public class NongbongScv {
@@ -51,7 +50,7 @@ public class NongbongScv {
 				}
 				depot = WorkerManager.Instance().getWorkerData().getWorkerDepot(NongBong_InfoWorker) ;
 				//System.out.println("depot ==>>>>>>>> " + depot);
-				mineralPatches = WorkerManager.Instance().getWorkerData().getMineralPatchesNearDepot(depot);
+//				mineralPatches = WorkerManager.Instance().getWorkerData().getMineralPatchesNearDepot(depot);
 				//System.out.println(" 미네랄 개수 =====>>>>  " + mineralPatches.size());
 				
 				int radius = 320;
