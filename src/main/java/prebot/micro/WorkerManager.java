@@ -7,15 +7,15 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import prebot.build.prebot1.BlockingEntrance;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.MapGrid;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.micro.constant.MicroCode.CombatStrategy;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.OldCombatManager;
 import prebot.micro.old.OldSquad;
-import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
@@ -674,8 +674,8 @@ public class WorkerManager extends GameManager {
 	
 	public boolean isCheckEnemy(Unit depot)
 	{
-		if (depot.getTilePosition().getX() == BlockingEntrance.Instance().startingX 
-				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().startingY ){
+		if (depot.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() 
+				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()){
 				return false;
 			}
 			

@@ -1,22 +1,25 @@
 package prebot.build.initialProvider.BlockingEntrance;
 
-import bwapi.Position;
+import java.util.HashMap;
+
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
-import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
-import prebot.strategy.constant.StrategyCode;
-
-
-import java.util.HashMap;
+import prebot.strategy.MapSpecificInformation.GameMap;
 
 //
 public class BlockingEntrance {
+
+	private static BlockingEntrance instance = new BlockingEntrance();
+	
+	public static BlockingEntrance Instance() {
+		return instance;
+	}
+	
     //필요한것
     //스타팅 위치
     //첫 서플 위치
@@ -85,7 +88,7 @@ public class BlockingEntrance {
 
         //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
         Map map = Map.OVERWATCH;
-        if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
+        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
             map = Map.CIRCUITBREAKER;
         }
         System.out.println("this map ==>> " + map.toString());

@@ -9,13 +9,12 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwta.BaseLocation;
-import prebot.build.prebot1.BlockingEntrance;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
-import prebot.build.prebot1.InitialBuild;
 import prebot.common.MapGrid;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
@@ -48,7 +47,7 @@ public class TempBuildSourceCode {
 	private static TempBuildSourceCode instance = new TempBuildSourceCode();
 
 	public TempBuildSourceCode() {
-		InitialBuild.Instance().setInitialBuildOrder();
+//		InitialBuild.Instance().setInitialBuildOrder();
 		InitFaccnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
 		setCombatUnitRatio();
 	}
@@ -165,7 +164,7 @@ public class TempBuildSourceCode {
 					if (unit.getType() != UnitType.Terran_Command_Center) {
 						continue;
 					}
-					if (unit.getTilePosition().getX() == BlockingEntrance.Instance().startingX && unit.getTilePosition().getY() == BlockingEntrance.Instance().startingY) {
+					if (unit.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() && unit.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
 						continue;
 					} else {
 						checkCC = unit;
@@ -618,8 +617,8 @@ public class TempBuildSourceCode {
 						if (checkunit.getType() != UnitType.Terran_Command_Center) {
 							continue;
 						}
-						if (checkunit.getTilePosition().getX() == BlockingEntrance.Instance().startingX
-								&& checkunit.getTilePosition().getY() == BlockingEntrance.Instance().startingY) {
+						if (checkunit.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX()
+								&& checkunit.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
 							continue;
 						} else {
 							checkCC = checkunit;
@@ -1457,7 +1456,7 @@ public class TempBuildSourceCode {
 				if (unit.getType() != UnitType.Terran_Command_Center) {
 					continue;
 				}
-				if (unit.getTilePosition().getX() == BlockingEntrance.Instance().startingX && unit.getTilePosition().getY() == BlockingEntrance.Instance().startingY) {
+				if (unit.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() && unit.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
 					continue;
 				} else {
 					checkCC = unit;
@@ -1528,8 +1527,8 @@ public class TempBuildSourceCode {
 				for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 					if (unit.isLifted() == true && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
 						if (unit.isLifted()) {
-							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY))) {
-								unit.land(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY));
+							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrack.getX(), BlockingEntrance.Instance().barrack.getY()))) {
+								unit.land(new TilePosition(BlockingEntrance.Instance().barrack.getX(), BlockingEntrance.Instance().barrack.getY()));
 								LiftChecker = false;
 							} else {
 								unit.land(unit.getTilePosition());
@@ -1580,8 +1579,8 @@ public class TempBuildSourceCode {
 				for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 					if (unit.isLifted() == true && (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Engineering_Bay) && unit.isCompleted()) {
 						if (unit.isLifted()) {
-							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY))) {
-								unit.land(new TilePosition(BlockingEntrance.Instance().barrackX, BlockingEntrance.Instance().barrackY));
+							if (unit.canLand(new TilePosition(BlockingEntrance.Instance().barrack.getX(), BlockingEntrance.Instance().barrack.getY()))) {
+								unit.land(new TilePosition(BlockingEntrance.Instance().barrack.getX(), BlockingEntrance.Instance().barrack.getY()));
 								LiftChecker = false;
 							} else {
 								unit.land(unit.getTilePosition());

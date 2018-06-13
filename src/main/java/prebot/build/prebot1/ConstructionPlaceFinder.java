@@ -13,10 +13,10 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.build.constant.BuildConfig;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.strategy.InformationManager;
-import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {
@@ -85,25 +85,7 @@ public class ConstructionPlaceFinder {
 			switch (seedPositionStrategy) {
 
 			case MainBaseLocation:
-				
 				tempTilePosition = InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition();
-				
-				//헌터 3시 예외상황
-				if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS){
-					
-					if(BlockingEntrance.Instance().getStartingInt() == 3){		
-						int temp=0;
-						for(Unit unit : Prebot.Broodwar.self().getUnits()){
-							if(unit.getType().isBuilding()){
-								temp++;
-							}
-						}
-						if(temp>=12){//TODO 12개가 안들어가는 케이스이면... 아래 로직을 타서... 무조건 다른데 다 짓는다
-							tempTilePosition = new TilePosition(116,58);
-						}
-					}
-				}
-				
 				desiredPosition = getBuildLocationNear(buildingType, tempTilePosition, true);
 				
 				if(desiredPosition == null){

@@ -354,6 +354,12 @@ public class InformationManager extends GameManager {
 		
 		Map<Integer, UnitInfo> unitAndUnitInfoMap = unitData.get(enemyPlayer).getUnitAndUnitInfoMap();
 		for (UnitInfo eui : unitAndUnitInfoMap.values()) {
+			if (!PositionUtils.isValidPosition(eui.getLastPosition())) {
+				Prebot.Broodwar.printf("updateEnemiesInMyRegion. invalid eui=" + eui); //TODO 테스트 코드 추후 삭제
+				System.out.println("updateEnemiesInMyRegion. invalid eui=" + eui);
+				continue;
+			}
+			
 			Region region = BWTA.getRegion(eui.getLastPosition());
 			if (myRegionSet.contains(region)) {
 				List<UnitInfo> euiList = euiListInMyRegion.get(region);
@@ -1610,77 +1616,27 @@ public class InformationManager extends GameManager {
 		}
 	}
 	public void updateMapSpecificInformation() {
+		// name으로 map 판단
+		GameMap gameMap = GameMap.UNKNOWN;
+		String mapName = Prebot.Broodwar.mapFileName().toUpperCase();
+		if (mapName.matches(".*CIRCUIT.*")) {
+			gameMap = GameMap.CIRCUITBREAKER;
+		} else if (mapName.matches(".*OVER.*")) {
+			gameMap = GameMap.OVERWATCH;
+		}
+
 		List<BaseLocation> startingBase = new ArrayList<>();
-		GameMap candiMapByPosition = null;
 		for (BaseLocation base : BWTA.getStartLocations()) {
 			if (base.isStartLocation()) {
 				startingBase.add(base);
 			}
 		}
 		
-		// position으로 map 판단
-		final int posFighting[][] = new int[][]{{288, 3760}, {288, 240}, {3808, 272}, {3808, 3792}};
-		final int posLost[][] = new int[][]{{288, 2832}, {928, 3824}, {3808, 912}, {1888, 240}};
-		if (startingBase.size() == 8) {
-			candiMapByPosition = GameMap.THE_HUNTERS;
-		} else if (startingBase.size() == 4) {
-			Position basePos = mainBaseLocations.get(selfPlayer).getPosition();
-			for (int[] pos : posFighting) {
-				if (basePos.equals(new Position(pos[0], pos[1]))) {
-					candiMapByPosition = GameMap.FIGHTING_SPRIRITS;
-					break;
-				}
-			}
-			if (candiMapByPosition == null) {
-				for (int[] pos : posLost) {
-					if (basePos.equals(new Position(pos[0], pos[1]))) {
-						candiMapByPosition = GameMap.LOST_TEMPLE;
-						break;
-					}
-				}
-			}
-		} else {
-			candiMapByPosition = GameMap.UNKNOWN;
-		}
+		MapSpecificInformation mapInfo = new MapSpecificInformation();
+		mapInfo.setMap(gameMap);
+		mapInfo.setStartingBaseLocation(startingBase);
 		
-		// name으로 map 판단
-		GameMap candiMapByName = null;
-		String mapName = Prebot.Broodwar.mapFileName().toUpperCase();
-		if (mapName.matches(".*CIRCUIT.*")) {
-			candiMapByName = GameMap.UNKNOWN;
-		} else if (mapName.matches(".*OVER.*")) {
-			candiMapByName = GameMap.UNKNOWN;
-		} else if (mapName.matches(".*HUNT.*")) {
-			candiMapByName = GameMap.THE_HUNTERS;
-		} else if (mapName.matches(".*LOST.*") || mapName.matches(".*TEMPLE.*")) {
-			candiMapByName = GameMap.LOST_TEMPLE;
-		} else if (mapName.matches(".*FIGHT.*") || mapName.matches(".*SPIRIT.*")) {
-			candiMapByName = GameMap.FIGHTING_SPRIRITS;
-		}
-
-		// 최종 결정
-		GameMap mapDecision = GameMap.LOST_TEMPLE;
-		if (candiMapByPosition == candiMapByName) {
-			mapDecision = candiMapByPosition;
-//			System.out.println("map : " + candiMapByPosition + "(100%)");
-		} else {
-			if (candiMapByPosition != GameMap.UNKNOWN) {
-				mapDecision = candiMapByPosition;
-//				System.out.println("map : " + mapDecision + "(mapByName is -> " + candiMapByName + ")");
-			} else if (candiMapByName != GameMap.UNKNOWN) {
-				mapDecision = candiMapByName;
-//				System.out.println("map : " + mapDecision + "(mapByPosition is -> " + candiMapByPosition + ")");
-			}
-		}
-		
-		//mapDecision = GameMap.FIGHTING_SPRIRITS; // TODO 수정필요
-		mapDecision = GameMap.CIRCUITBREAKER; // TODO 수정필요
-
-		MapSpecificInformation tempMapInfo = new MapSpecificInformation();
-		tempMapInfo.setMap(mapDecision);
-		tempMapInfo.setStartingBaseLocation(startingBase);
-		
-		mapSpecificInformation = tempMapInfo;
+		this.mapSpecificInformation = mapInfo;
 	}
 	
 	public MapSpecificInformation getMapSpecificInformation() {

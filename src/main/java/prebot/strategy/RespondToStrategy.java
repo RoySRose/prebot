@@ -10,7 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import prebot.build.prebot1.BlockingEntrance;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
@@ -265,9 +265,10 @@ public class RespondToStrategy {
 								&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Bunker) < 1
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Bunker, null) == 0){
 
-							TilePosition bunkerPos = new TilePosition(BlockingEntrance.Instance().bunkerX,BlockingEntrance.Instance().bunkerY);
-							ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker, bunkerPos,true);
+							// BlockingEntrance Prebot2버전을 사용하도록 하면서 주석처리
+//							TilePosition bunkerPos = new TilePosition(BlockingEntrance.Instance().bunkerX,BlockingEntrance.Instance().bunkerY);
+//							ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
+//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Bunker, bunkerPos,true);
 
 						}
 					}

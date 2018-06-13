@@ -2,19 +2,15 @@ package prebot.build.initialProvider;
 
 
 import bwapi.Race;
-import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.UnitType;
-import bwapi.UpgradeType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.build.initialProvider.buildSets.BaseBuild;
 import prebot.build.initialProvider.buildSets.VsProtoss;
 import prebot.build.initialProvider.buildSets.VsTerran;
 import prebot.build.initialProvider.buildSets.VsZerg;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
-import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.strategy.InformationManager;
 
 /// 봇 프로그램 설정
@@ -27,11 +23,10 @@ public class InitialBuildProvider {
 	}
 
 	public boolean InitialBuildFinished = false;
-
-    public InitialBuildProvider(){
-    	
-    	System.out.println("InitialBuildProvider start");
-    	 
+	
+	public void onStart() {
+		System.out.println("InitialBuildProvider start");
+   	 
         BlockingEntrance blockingEntrance = new BlockingEntrance();
 
         TilePosition firstSupplyPos = blockingEntrance.first_supple;
@@ -41,14 +36,17 @@ public class InitialBuildProvider {
         TilePosition bunkerPos = blockingEntrance.bunker;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 
-        if (InformationManager.Instance().enemyRace == Race.Terran) {
-            new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
-        }else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-        	System.out.println("ememy is protoss");
-            new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
-        }else{
-            new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
-        }
+		if (InformationManager.Instance().enemyRace == Race.Terran) {
+			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+			System.out.println("ememy is protoss");
+			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+		} else {
+			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+		}
+	}
+
+    public InitialBuildProvider(){
     }
 
     public void updateInitialBuild(){
