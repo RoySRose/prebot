@@ -5,7 +5,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import prebot.build.prebot1.BlockingEntrance;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
@@ -699,8 +699,8 @@ public class WorkerManager extends GameManager {
 	
 	public boolean isCheckEnemy(Unit depot)
 	{
-		if (depot.getTilePosition().getX() == BlockingEntrance.Instance().startingX 
-				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().startingY ){
+		if (depot.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() 
+				&& depot.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()){
 				return false;
 			}
 			

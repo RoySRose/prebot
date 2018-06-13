@@ -7,7 +7,8 @@ public enum Building {
     BARRACK(3),
     FACTORY(4),
     FACTORY2(5),
-    BUNKER(6)
+    BUNKER(6),
+    ENTRANCE_TURRET(7)
     ;
 
     private final int value;

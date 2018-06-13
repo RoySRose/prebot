@@ -1,8 +1,8 @@
 package prebot.build.initialProvider.BlockingEntrance;
 
 public enum Map {
-    A(1),
-    B(2);
+    OVERWATCH(1),
+    CIRCUITBREAKER(2);
 
     private final int value;
 
