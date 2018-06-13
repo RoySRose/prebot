@@ -1673,7 +1673,8 @@ public class InformationManager extends GameManager {
 			}
 		}
 		
-		mapDecision = GameMap.FIGHTING_SPRIRITS; // TODO 수정필요
+		//mapDecision = GameMap.FIGHTING_SPRIRITS; // TODO 수정필요
+		mapDecision = GameMap.CIRCUITBREAKER; // TODO 수정필요
 
 		MapSpecificInformation tempMapInfo = new MapSpecificInformation();
 		tempMapInfo.setMap(mapDecision);

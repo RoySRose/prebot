@@ -5,9 +5,11 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.constant.StrategyCode;
 
 
@@ -56,6 +58,11 @@ public class BlockingEntrance {
     private final int SMALL = 42;
     private final int BIG = 84;
     private final int CENTER = 64;
+    
+    private static Location loc_t = null;
+    
+    private static int fix_supplyX[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int fix_supplyY[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
 
     private HashMap<Integer, TilePosition> postitionStorage = new HashMap<>();
 
@@ -77,8 +84,8 @@ public class BlockingEntrance {
 
 
         //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
-        Map map = Map.;
-        if (InformationManager.Instance().getMapSpecificInformation().getMap() == StrategyCode.GameMap.CIRCUITBREAKER) {
+        Map map = Map.OVERWATCH;
+        if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
             map = Map.CIRCUITBREAKER;
         }
         System.out.println("this map ==>> " + map.toString());
@@ -168,15 +175,42 @@ public class BlockingEntrance {
         factory = postitionStorage.get(combine(map, loc, Building.FACTORY));
         bunker = postitionStorage.get(combine(map, loc, Building.BUNKER));
         entrance_turret = postitionStorage.get(combine(map, loc, Building.ENTRANCE_TURRET));
+        
+//      avoid supply 설정
+        ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+        
+        loc_t = loc;
+        
+        System.out.println("loc_t of getValue ==>> " + loc_t.getValue());
 
     }
+    
+    
+    public final TilePosition getSupplyPosition(TilePosition tilepos)
+	{
+		
+		TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
+		return supply_pos;
+
+	}
+	
+	public final TilePosition getSupplyPosition()
+	{
+			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
+			return supply_pos;
+	}
 
     public BlockingEntrance() {
 //    	기존 프리봇1 에서 입구 터렛 위치 추가
     	
     	
 //    	맵 : Over_wath
-    	if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.OVERWATCH) {
+
+    	if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.OVERWATCH) {
+    		int[] fix_supplyXX = { 0, 115, 94, 0, 21 };
+			fix_supplyX = fix_supplyXX;
+			int[] fix_supplyYY = { 0, 28, 121, 95, 0 };
+			fix_supplyY = fix_supplyYY;
     		
     		if (InformationManager.Instance().enemyRace == Race.Protoss
 					|| InformationManager.Instance().enemyRace == Race.Terran) {
@@ -247,8 +281,11 @@ public class BlockingEntrance {
     		}
     	}
     	
-    	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-    	
+    	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
+    		int[] fix_supplyXX = { 0, 101, 101, 15, 15 };
+			fix_supplyX = fix_supplyXX;
+			int[] fix_supplyYY = { 0, 0, 121, 121, 0 };
+			fix_supplyY = fix_supplyYY;
     	
 //    	맵 : CIRCUITBREAKER
     		if (InformationManager.Instance().enemyRace == Race.Protoss
