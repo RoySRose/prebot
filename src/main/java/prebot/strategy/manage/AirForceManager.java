@@ -8,6 +8,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.UnitInfo;
 
 public class AirForceManager {
@@ -19,13 +20,14 @@ public class AirForceManager {
 		return instance;
 	}
 
-	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
-	private int targetTryCount = 0;
-	private int currentTargetIndex = 0;
-	private boolean directionReservse = false; // 타깃포지션 변경 역방향 여부
-
 	private static final int TARGET_POSITIONS_SIZE = 4; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
+	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
+	
 	private List<Position> targetPositions = new ArrayList<>(); // 타깃포지션
+	private int currentTargetIndex = 0;
+	private int targetTryCount = 0;
+	private boolean directionReservse = false; // 타깃포지션 변경 역방향 여부
+	public int[] fleeRadius = Angles.AIR_FORCE_RETREAT_LEFT;
 
 	private BaseLocation firstBase = null; // 시작 공격 베이스
 	private BaseLocation secondBase = null; // 다음 공격 베이스

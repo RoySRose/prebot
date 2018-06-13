@@ -34,6 +34,26 @@ public class MicroUtils {
 	private static final int AIR_DRIVING_POSITION_DEPTH = 4;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
 	
+	public static void airFlee(Unit drivingUnit, Position endPosition) {
+//		drivingUnit.rightClick(getAirFleePosition(drivingUnit, endPosition));
+	}
+	
+	private static Position getAirFleePosition(Unit drivingUnit, Position endPosition) {
+//		double fleeRadian = oppositeDirectionRadian(drivingUnit.getPosition(), endPosition);
+//		Position fleePosition = Position.None;
+//		int moveDistanceOneSec = moveDistancePerFrame(drivingUnit, TimeUtils.SECOND); // 1초간 움직이는 거리
+//		int riskRadius = getRiskRadius(drivingUnit.getType());
+		
+//		for (int moveDistance = moveDistanceOneSec; moveDistanceOneSec > 10; moveDistanceOneSec = (int) (moveDistanceOneSec * 0.7)) {
+//			fleePosition = lowestRiskPosition(drivingUnit, fOption, fleeRadian, moveDistance, riskRadius);
+//			if (fleePosition != Position.None) {
+//				break;
+//			}
+//		}
+//		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
+		return null;
+	}
+	
 	public static void airDriving(Unit drivingUnit, Position endPosition) {
 		Position airDrivingPosition = getAirDrivingPosition(drivingUnit.getPosition(), endPosition, 0);
 		
@@ -56,7 +76,7 @@ public class MicroUtils {
 		Position candiPosition = Position.None;
 		int moveDistanceOneSec = moveDistancePerFrame(UnitType.Terran_Wraith, TimeUtils.SECOND); // 1초간 움직이는 거리
 		
-		for (int angle : Angles.AIR_FORCE) {
+		for (int angle : Angles.AIR_FORCE_DRIVE) {
 			moveRadian = rotate(radianToMovePosition, angle);
 			candiPosition = getMovePosition(startPosition, moveRadian, moveDistanceOneSec);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
