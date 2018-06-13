@@ -1259,7 +1259,7 @@ public class UXManager {
 	void drawPathData(){
 		for(Minerals minr : MineralManager.Instance().minerals){
 			if(minr.mineralTrick != null ){
-				Prebot.Broodwar.drawCircleMap(minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(),4,Color.Blue,true );
+				Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
 				Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
 
 			}
@@ -1269,7 +1269,7 @@ public class UXManager {
 		for(Minerals minr : MineralManager.Instance().minerals){
 			if( minr.posTrick != bwapi.Position.None ){
 				Prebot.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
-				Prebot.Broodwar.drawCircleMap(minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(),4,Color.Yellow,true );
+				Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Yellow,true );
 			}
 		}
 
