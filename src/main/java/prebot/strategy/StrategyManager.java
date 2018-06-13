@@ -1,5 +1,6 @@
 package prebot.strategy;
 
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
@@ -64,6 +65,7 @@ public class StrategyManager extends GameManager {
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {
+		InitialBuildProvider.Instance();
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
 		AnalyzeStrategy.Instance().update();
 	}
