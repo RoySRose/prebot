@@ -242,7 +242,7 @@ public class VultureTravelManager {
 				continue;
 			}
 
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) { // 적군이 존재하지 않음
 				continue;
 			}

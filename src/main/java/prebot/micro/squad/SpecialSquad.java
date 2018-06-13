@@ -61,7 +61,7 @@ public class SpecialSquad extends Squad {
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadius(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.SPECIAL.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.SPECIAL.squadRadius);
 		}
 		return euiList;
 	}

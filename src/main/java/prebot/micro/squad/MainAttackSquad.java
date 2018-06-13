@@ -84,7 +84,7 @@ public class MainAttackSquad extends Squad {
 			});
 			euiList.clear();
 			for (Unit building : myBuildings) {
-				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 			}
 		}
 	}

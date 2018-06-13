@@ -5,20 +5,20 @@ import java.util.List;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
-import prebot.micro.VultureCombatPredictor;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.WatcherControl;
+import prebot.micro.predictor.VultureFightPredictor;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.StrategyCode.VultureCombatResult;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 
 public class WatcherSquad extends Squad {
 
 	private static final int WATCHER_FLEE_SECONDS = 8;
-	private VultureCombatResult vultureCombatResult = VultureCombatResult.ATTACK;
+	private SmallFightPredict smallFightPredict = SmallFightPredict.ATTACK;
 	private int watcherFleeStartFrame = 0;
 	
-	public VultureCombatResult getVultureCombatResult() {
-		return vultureCombatResult;
+	public SmallFightPredict getSmallFightPredict() {
+		return smallFightPredict;
 	}
 
 	private WatcherControl vultureWatcher = new WatcherControl();
@@ -45,20 +45,20 @@ public class WatcherSquad extends Squad {
 	@Override
 	public void execute() {
 		if (StrategyIdea.initiated) {
-			vultureCombatResult = VultureCombatResult.ATTACK;
+			smallFightPredict = SmallFightPredict.ATTACK;
 		} else {
 			if (TimeUtils.elapsedSeconds(watcherFleeStartFrame) <= WATCHER_FLEE_SECONDS) {
-				vultureCombatResult = VultureCombatResult.BACK;
+				smallFightPredict = SmallFightPredict.BACK;
 			} else {
-				vultureCombatResult = VultureCombatPredictor.watcherPredictByUnitInfo(unitList, euiList);
-				if (vultureCombatResult == VultureCombatResult.BACK) {
+				smallFightPredict = VultureFightPredictor.watcherPredictByUnitInfo(unitList, euiList);
+				if (smallFightPredict == SmallFightPredict.BACK) {
 					watcherFleeStartFrame = TimeUtils.elapsedFrames();
 				}
 			}
 		}
 		
 		if (!unitList.isEmpty()) {
-			vultureWatcher.setVultureCombatResult(vultureCombatResult);
+			vultureWatcher.setSmallFightPredict(smallFightPredict);
 			vultureWatcher.control(unitList, euiList, targetPosition);
 		}
 	}

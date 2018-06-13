@@ -10,7 +10,7 @@ public class StrategyCode {
 		DONT_KNOW, GOOD_ACTION, BAD_ACTION
 	}
 	
-	public static enum VultureCombatResult {
+	public static enum SmallFightPredict {
 		BACK, ATTACK
 	}
 }

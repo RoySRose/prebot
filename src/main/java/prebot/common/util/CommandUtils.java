@@ -15,13 +15,13 @@ public class CommandUtils {
 	}
 
 	public static void attackMove(Unit unit, Position targetPosition) {
-		if (validCommand(unit, targetPosition, UnitCommandType.Attack_Move, true, false)) {
+		if (validCommand(unit, targetPosition, UnitCommandType.Attack_Move, true, true)) {
 			unit.attack(targetPosition);
 		}
 	}
 
 	public static void move(Unit unit, Position targetPosition) {
-		if (validCommand(unit, targetPosition, UnitCommandType.Move, true, false)) {
+		if (validCommand(unit, targetPosition, UnitCommandType.Move, true, true)) {
 			unit.move(targetPosition);
 		}
 	}

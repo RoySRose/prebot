@@ -15,6 +15,14 @@ public class ChatBot {
 		chatExecuters.add(chatExecuter);
 	}
 
+	/*****************************************************************************
+	 * 설명
+	 * 
+	 * 1) 게임스피드 조절	: s + 숫자	ex) s0=매우빠름, s24=bot경기스피드, s42=fastest
+	 * 2) UX 타입 변경	: d + 숫자	ex) d1=?, d0=prebot1 display
+	 * 3) 전략 변경		: $ + 전략명	ex) $TERRAN INIT
+	 * 
+	 *****************************************************************************/
 	static {
 		chatExecuters.add(new GameSpeedAdjuster('s'));
 		chatExecuters.add(new UxOptionChanger('d'));

@@ -42,7 +42,8 @@ public class MicroConfig {
 		DEFENSE_("DEFENSE_", 6, 150),
 		SCV_SCOUT("SCV_SCOUT", 7, 150),
 		SPECIAL("SPECIAL", 8, 500),
-		BUILDING("BUILDING", 8, 500);
+		AIR_FORCE("AIR_FORCE", 9, 150),
+		BUILDING("BUILDING", 10, 500);
 		
 		private SquadInfo(String squadName, int priority, int additionalRadius) {
 			this.squadName = squadName;
@@ -58,6 +59,7 @@ public class MicroConfig {
 	public static class Angles {
 		public static final int[] NARROW = { 0, -5, +5, -10, +10, -15, +15 };
 		public static final int[] WIDE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
+		public static final int[] AIR_FORCE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90 };
 		public static final int[] AROUND_360 = { 0, 45, 90, 135, 180, 225, 270, 315 };
 	}
 

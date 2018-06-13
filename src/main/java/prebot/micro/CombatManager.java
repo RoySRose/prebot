@@ -16,6 +16,7 @@ import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.old.CombatExpectation;
+import prebot.micro.squad.AirForceSquad;
 import prebot.micro.squad.BuildingSquad;
 import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
@@ -60,10 +61,6 @@ public class CombatManager extends GameManager {
 		CheckerSquad checkerSquad = new CheckerSquad();
 		squadData.addSquad(checkerSquad);
 
-		// 게랄라 벌처
-		// GuerillaSquad guerillaSquad = new GuerillaSquad();
-		// squadData.addSquad(guerillaSquad);
-
 		// 초반 정찰용 SCV
 		ScvScoutSquad scvScoutSquad = new ScvScoutSquad();
 		squadData.addSquad(scvScoutSquad);
@@ -71,7 +68,11 @@ public class CombatManager extends GameManager {
 		// 개별 유닛 - 레이스, 베슬, 빌딩, 컴셋 등
 		SpecialSquad specialSquad = new SpecialSquad();
 		squadData.addSquad(specialSquad);
-		
+
+		// 레이쓰 특공대
+		AirForceSquad airForceSquad = new AirForceSquad();
+		squadData.addSquad(airForceSquad);
+
 		BuildingSquad buildingSquad = new BuildingSquad();
 		squadData.addSquad(buildingSquad);
 	}
@@ -102,6 +103,7 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
 		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
 		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
+		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
 		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
 
 		updateDefenseSquad(combatUnitList);
@@ -163,7 +165,6 @@ public class CombatManager extends GameManager {
 		}
 
 		newGuerillaSquad(assignableVultures);
-		
 
 		List<Squad> guerillaSquads = squadData.getSquadList(SquadInfo.GUERILLA_.squadName);
 		for (Squad squad : guerillaSquads) {
@@ -178,10 +179,10 @@ public class CombatManager extends GameManager {
 		BaseLocation bestGuerillaSite = VultureTravelManager.Instance().getBestGuerillaSite(assignableVultures);
 		if (bestGuerillaSite != null) {
 			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(euiList, false);
 			int vulturePower = CombatExpectation.getVulturePower(assignableVultures);
-			
+
 			if (vulturePower > enemyPower) {
 				String squadName = SquadInfo.GUERILLA_.squadName + bestGuerillaSite.getPosition().toString();
 				Squad guerillaSquad = squadData.getSquad(squadName);
@@ -212,11 +213,11 @@ public class CombatManager extends GameManager {
 
 		// 게릴라 지역에 적군이 없다.
 		if (Prebot.Broodwar.isVisible(squad.targetPosition.toTilePosition())) {
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(squad.targetPosition, Vulture.GEURILLA_ENEMY_RADIUS);
+			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(squad.targetPosition, Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) {
 				return true;
 			}
-			
+
 			// 일꾼이 없는 경우
 			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.targetPosition, Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {

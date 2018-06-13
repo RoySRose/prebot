@@ -1,4 +1,4 @@
-package prebot.micro;
+package prebot.micro.predictor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,34 +13,25 @@ import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.VultureCombatResult;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 
-/** @author insaneojw
- *  */
-public class VultureCombatPredictor {
+public class WraithFightPredictor {
 	
-	/** 벌처의 후퇴*/
-//	public static WatcherCombatPredictResult predict(List<Unit> vultureList, List<Unit> enemyUnitList) {
-//		int vulturePower = powerOfWatchers(vultureList);
-//		int enemyPower = powerOfEnemies(enemyUnitList);
-//		return getResult(vulturePower, enemyPower);
-//	}
-	
-	public static VultureCombatResult watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
-		int vulturePower = powerOfWatchers(vultures);
+	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
+		int wraithPower = powerOfAirForce(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 		
-		if (vulturePower > enemyPower) {
-			return VultureCombatResult.ATTACK;
+		if (wraithPower > enemyPower) {
+			return SmallFightPredict.ATTACK;
 		} else {
-			return VultureCombatResult.BACK;
+			return SmallFightPredict.BACK;
 		}
 	}
 
 	// 벌처 한기 최대 점수 : 70점 (업그레이드시 100점)
-	public static int powerOfWatchers(List<Unit> vultureList) {
+	public static int powerOfAirForce(List<Unit> wraithList) {
 		int totalPower = 0;
-		for (Unit vulture : vultureList) {
+		for (Unit vulture : wraithList) {
 			totalPower += VULTURE_POWER;
 			if (UpgradeUtils.isUpgraded(UpgradeType.Ion_Thrusters)) {
 				totalPower += BONUS_ION_THRUSTERS;

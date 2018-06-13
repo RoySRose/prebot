@@ -31,8 +31,51 @@ import prebot.strategy.UnitInfo;
  */
 public class MicroUtils {
 	
+	private static final int AIR_DRIVING_POSITION_DEPTH = 4;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
 	
+	public static void airDriving(Unit drivingUnit, Position endPosition) {
+		Position airDrivingPosition = getAirDrivingPosition(drivingUnit.getPosition(), endPosition, 0);
+		
+		if (endPosition != null) {
+			CommandUtils.move(drivingUnit, airDrivingPosition);
+		} else {
+			CommandUtils.move(drivingUnit, endPosition);
+		}
+	}
+	
+	
+	private static Position getAirDrivingPosition(Position startPosition, Position endPosition, int positionDepth) {
+		if (startPosition.getDistance(endPosition) < 100
+				|| positionDepth >= AIR_DRIVING_POSITION_DEPTH) {
+			return endPosition;
+		}
+		
+		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
+		double moveRadian = 0.0d;
+		Position candiPosition = Position.None;
+		int moveDistanceOneSec = moveDistancePerFrame(UnitType.Terran_Wraith, TimeUtils.SECOND); // 1초간 움직이는 거리
+		
+		for (int angle : Angles.AIR_FORCE) {
+			moveRadian = rotate(radianToMovePosition, angle);
+			candiPosition = getMovePosition(startPosition, moveRadian, moveDistanceOneSec);
+			if (!PositionUtils.isValidPosition(candiPosition)) {
+				continue;
+			}
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitType.Terran_Missile_Turret, UnitType.Protoss_Photon_Cannon, UnitType.Zerg_Spore_Colony);
+			if (!enemyDefTowerList.isEmpty()) {
+				continue;
+			}
+			Position movePosition = getAirDrivingPosition(candiPosition, endPosition, positionDepth + 1);
+			if (movePosition == null) {
+				continue;
+			}
+			return movePosition;
+		}
+		
+		return null;
+	}
+
 	public static void flee(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
 		fleeUnit.rightClick(getFleePosition(fleeUnit, targetPosition, fOption));
 	}
@@ -121,7 +164,7 @@ public class MicroUtils {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	private static Position getFleePosition(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
 		double fleeRadian = oppositeDirectionRadian(fleeUnit.getPosition(), targetPosition);
 		Position fleePosition = Position.None;
@@ -156,7 +199,7 @@ public class MicroUtils {
 
 	/// 반대 방향의 각도(radian)
 	private static double oppositeDirectionRadian(Position myPosition, Position targetPosition) {
-		return Math.atan2(myPosition.getX() - targetPosition.getX(), myPosition.getY() - targetPosition.getY());
+		return Math.atan2(myPosition.getY() - targetPosition.getY(), myPosition.getX() - targetPosition.getX());
 	}
 
 	private static Position lowestRiskPosition(Unit unit, FleeOption fOption, double standRadian, int moveDistance, int riskRadius) {
@@ -245,7 +288,11 @@ public class MicroUtils {
 	private static int moveDistancePerFrame(Unit fleeUnit, int frame) {
 		double unitSpeed1 = fleeUnit.getPlayer().topSpeed(fleeUnit.getType());
 		//double unitSpeed2 = fleeUnit.getType().topSpeed(); // TODO 업그레이드 시 unitSpeed1, unitSpeed2가 차이가 있는지
-		
+		return (int) (unitSpeed1 * frame); // frame의 시간동안 몇 pixel 이동 가능한지
+	}
+	
+	private static int moveDistancePerFrame(UnitType unitType, int frame) {
+		double unitSpeed1 = unitType.topSpeed();
 		return (int) (unitSpeed1 * frame); // frame의 시간동안 몇 pixel 이동 가능한지
 	}
 	
@@ -314,7 +361,7 @@ public class MicroUtils {
 	
 	// (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다.
 	public static boolean isSafePlace(Position position) {
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(position, 0);
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(position, 0);
 		
 		for (UnitInfo ui : euiList) {
 			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {

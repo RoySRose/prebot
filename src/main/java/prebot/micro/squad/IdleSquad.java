@@ -4,7 +4,6 @@ import java.util.List;
 
 import bwapi.Unit;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.strategy.StrategyIdea;
 
 public class IdleSquad extends Squad {
 	public IdleSquad() {

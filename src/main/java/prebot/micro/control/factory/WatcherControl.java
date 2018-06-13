@@ -18,7 +18,7 @@ import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.VultureCombatResult;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
@@ -26,18 +26,18 @@ import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 public class WatcherControl extends Control {
 
 	private static final int REGROUP_UNIT_RADIUS = 300;
-	private VultureCombatResult vultureCombatResult;
+	private SmallFightPredict smallFightPredict;
 
-	public void setVultureCombatResult(VultureCombatResult vultureCombatResult) {
-		this.vultureCombatResult = vultureCombatResult;
+	public void setSmallFightPredict(SmallFightPredict smallFightPredict) {
+		this.smallFightPredict = smallFightPredict;
 	}
 	
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
-		if (vultureCombatResult == VultureCombatResult.ATTACK) {
+		if (smallFightPredict == SmallFightPredict.ATTACK) {
 			fight(unitList, euiList, targetPosition);
 
-		} else if (vultureCombatResult == VultureCombatResult.BACK) {
+		} else if (smallFightPredict == SmallFightPredict.BACK) {
 			regroup(unitList, targetPosition);
 		}
 	}

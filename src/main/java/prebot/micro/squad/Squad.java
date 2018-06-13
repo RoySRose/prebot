@@ -90,6 +90,9 @@ public abstract class Squad {
 	/// 스쿼드 업데이트
 	public abstract List<Unit> recruit(List<Unit> assignableUnitList);
 
+	/// 목표 지점 설정
+	public abstract void setTargetPosition();
+
 	/// squad 실행
 	public abstract void execute();
 
@@ -104,13 +107,11 @@ public abstract class Squad {
 		return invalidUnitList;
 	}
 
-	public abstract void setTargetPosition();
-
 	/// 적 탐색
 	public void findEnemies() {
 		euiList.clear();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadius(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);
 		}
 	}
 

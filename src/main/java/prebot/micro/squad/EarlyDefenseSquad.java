@@ -122,8 +122,8 @@ public class EarlyDefenseSquad extends Squad {
 		List<Unit> scvList = unitListMap.getOrDefault(UnitType.Terran_SCV, new ArrayList<Unit>());
 		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
 		
-		marineControl.control(scvList, euiList, targetPosition);
-		gundamControl.control(marineList, euiList, targetPosition);
+		marineControl.control(marineList, euiList, targetPosition);
+		gundamControl.control(scvList, euiList, targetPosition);
 	}
 
 }

@@ -5,6 +5,7 @@ import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
+import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
@@ -88,6 +89,7 @@ public class StrategyManager extends GameManager {
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
 		TankPositionManager.Instance().update();
+		AirForceManager.Instance().update();
 		PositionFinder.Instance().update();
 		EnemyBaseFinder.Instance().update();
 		

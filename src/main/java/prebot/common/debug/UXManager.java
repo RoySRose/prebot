@@ -49,7 +49,7 @@ import prebot.strategy.StrategyManager;
 import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.StrategyCode.VultureCombatResult;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.AttackExpansionManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
@@ -1207,9 +1207,9 @@ public class UXManager {
 			}
 			String squadName = squad.getSquadName();
 			
-			VultureCombatResult vultureCombatResult = null;
+			SmallFightPredict smallFightPredict = null;
 			if (squad instanceof WatcherSquad) {
-				vultureCombatResult = ((WatcherSquad) squad).getVultureCombatResult();
+				smallFightPredict = ((WatcherSquad) squad).getSmallFightPredict();
 			}
 			
 			if (squadName.length() > 4) {
@@ -1219,8 +1219,8 @@ public class UXManager {
 			for (Unit unit : squad.unitList) {
 				Prebot.Broodwar.drawCircleMap(unit.getPosition(), 10, color);
 				Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 30, squadName);
-				if (vultureCombatResult != null && vultureCombatResult == VultureCombatResult.BACK) {
-					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + vultureCombatResult.toString());
+				if (smallFightPredict != null && smallFightPredict == SmallFightPredict.BACK) {
+					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + smallFightPredict.toString());
 				}
 			}
 		}
