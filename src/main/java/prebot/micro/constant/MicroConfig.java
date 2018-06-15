@@ -22,7 +22,6 @@ public class MicroConfig {
 		SPEED_ATTCK(0.0, true),
 		NO_MERCY(0.8, true);
 
-
 		private MainSquadMode(double maxGuerillaVultureRatio, boolean isAttackMode) {
 			this.maxGuerillaVultureRatio = maxGuerillaVultureRatio;
 			this.isAttackMode = isAttackMode;
@@ -41,8 +40,8 @@ public class MicroConfig {
 		GUERILLA_("GUERILLA_", 5, 150),
 		DEFENSE_("DEFENSE_", 6, 150),
 		SCV_SCOUT("SCV_SCOUT", 7, 150),
-		SPECIAL("SPECIAL", 8, 500),
-		AIR_FORCE("AIR_FORCE", 9, 150),
+		AIR_FORCE("AIR_FORCE", 8, 150),
+		SPECIAL("SPECIAL", 9, 500),
 		BUILDING("BUILDING", 10, 500);
 		
 		private SquadInfo(String squadName, int priority, int additionalRadius) {
@@ -59,9 +58,10 @@ public class MicroConfig {
 	public static class Angles {
 		public static final int[] NARROW = { 0, -5, +5, -10, +10, -15, +15 };
 		public static final int[] WIDE = { 0, -10, +10, -20, +20, -30, +30, -40, +40, -50, +50, -60, +60, -70, +70, -80, +80, -90, +90, -100, +100 };
-		public static final int[] AIR_FORCE_DRIVE = { 0, -15, +15, -30, +30, -45, +45, -70, +70, -120, +120};
-		public static final int[] AIR_FORCE_RETREAT_LEFT = { -80, -70, -60, -50, -40, -30, -20, -10, 0, +10, +20, +30, +40, +50, +60, +70, +80 };
-		public static final int[] AIR_FORCE_RETREAT_RIGHT = { +80, +70, +60, +50, +40, +30, +20, +10, 0, -10, -20, -30, -40, -50, -60, -70, -80 };
+		public static final int[] AIR_FORCE_DRIVE = { 0, -5, +5, -10, +10 -15, +15, -20, +20, -30, +30, -40, +40, -50, +50, -70, +70, -100, +100, -120, +120};
+		public static final int[] AIR_FORCE_DRIVE_DETAIL = { 0, -5, +5, -10, +10 -15, +15, -20, +20, -30, +30, -40, +40, -50, +50, -70, +70, -100, +100, -120, +120};
+		public static final int[] AIR_FORCE_DRIVE_LEFT = { 0, -5, -10, -15, -20, -25, -30, -35, -40, -45, -50, -55 - 60, -65, -70, -80, -90, -100, -110, -120, -130 };
+		public static final int[] AIR_FORCE_DRIVE_RIGHT = { 0, +5, +10, +15, +20, +25, +30, +35, +40, +45, +50, +55 + 60, +65, +70, +80, +90, +100, +110, +120, +130 };
 		public static final int[] AROUND_360 = { 0, 45, 90, 135, 180, 225, 270, 315 };
 	}
 

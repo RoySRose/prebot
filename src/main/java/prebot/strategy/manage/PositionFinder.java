@@ -121,10 +121,10 @@ public class PositionFinder {
 		Pair<Position, Position> pairPosition = InfoUtils.myFirstChoke().getSides();
 		Position p1 = new Position(pairPosition.first.getX(), pairPosition.second.getY());
 		Position p2 = new Position(pairPosition.second.getX(), pairPosition.first.getY());
-
+		
 		BaseLocation myBase = InfoUtils.myBase();
 		double p1FromMyBase = p1.getApproxDistance(myBase.getPosition());
-		double p2FromMyBase = p1.getApproxDistance(myBase.getPosition());
+		double p2FromMyBase = p2.getApproxDistance(myBase.getPosition());
 		return p1FromMyBase < p2FromMyBase ? p1 : p2;
 	}
 

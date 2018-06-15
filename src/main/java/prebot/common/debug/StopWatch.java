@@ -1,7 +1,5 @@
 package prebot.common.debug;
 
-import prebot.common.main.Prebot;
-
 /**
  * 테스트를 위해 소요되는 시간을 체크
  */
@@ -51,24 +49,24 @@ public class StopWatch {
 	private void warning(long timeSpent) {
 		long warnDuration = DEFAULT_WARN_DURATION;
 		if (isMicroTimeTest){
-			warnDuration = DEFAULT_WARN_DURATION * 1000; 
+			warnDuration = DEFAULT_WARN_DURATION * 1000;
 		}
 		if (timeSpent < warnDuration) {
 			return;
 		}
 		
-		for (StackTraceElement ste : new Throwable().getStackTrace()) {
-			if (ste.getClassName().endsWith(this.getClass().getSimpleName())) {
-				continue;
-			}
-			String[] classTrace = ste.getClassName().split("\\.");
-			String className = classTrace[classTrace.length - 1];
-			
-			String warnTag = tag == null ? "" : tag + " @ ";
-			String warnDetail = className + " (L" + ste.getLineNumber() + ", timeSpent: " + timeSpent + ")";
-			Prebot.Broodwar.printf("WARNING : " + warnTag + warnDetail);
-			break;
-		}
+//		for (StackTraceElement ste : new Throwable().getStackTrace()) {
+//			if (ste.getClassName().endsWith(this.getClass().getSimpleName())) {
+//				continue;
+//			}
+//			String[] classTrace = ste.getClassName().split("\\.");
+//			String className = classTrace[classTrace.length - 1];
+//			
+//			String warnTag = tag == null ? "" : tag + " @ ";
+//			String warnDetail = className + " (L" + ste.getLineNumber() + ", timeSpent: " + timeSpent + ")";
+//			Prebot.Broodwar.printf("WARNING : " + warnTag + warnDetail);
+//			break;
+//		}
 	}
 
 }

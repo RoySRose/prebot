@@ -31,78 +31,69 @@ import prebot.strategy.UnitInfo;
  */
 public class MicroUtils {
 
-	private static final int WRAITH_MOVE_DISTANCE_SEC = moveDistancePerFrame(UnitType.Terran_Wraith, TimeUtils.SECOND); // 1초간 움직이는 거리
-	private static final int AIR_DRIVING_PRE_EXPECT_SECS = 5;
+	private static final int WRAITH_MOVE_DISTANCE_48_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 48); // 1.5초간 움직이는 거리
+	private static final int WRAITH_MOVE_DISTANCE_24_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 24); // 1.0초간 움직이는 거리
+	private static final int WRAITH_MOVE_DISTANCE_12_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 12); // 0.5초간 움직이는 거리
+	
+	private static final int AIR_DRIVING_PRE_EXPECT_SECS = 0;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
 
 	/// 레이쓰 전용
-	public static Position airDrivingPosition(Position startPosition, Position endPosition) {
+	public static Position airDrivingPosition(Position startPosition, Position endPosition, int[] driveAngle) {
+		if (startPosition.getDistance(endPosition) <= WRAITH_MOVE_DISTANCE_12_FRAMES) {
+			return endPosition;
+		}
+		
 		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
 		double moveRadian = 0.0d;
 		Position candiPosition = Position.None;
 		
 		double minimumDistance = CommonCode.DOUBLE_MAX;
-		Position fastPosition = null;
+		double minimumDistanceRadian = 0.0d;
 		
-		for (int angle : Angles.AIR_FORCE_DRIVE) {
+		for (int angle : driveAngle) {
 			moveRadian = rotate(radianToMovePosition, angle);
-			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
+			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_48_FRAMES);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 80, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
 			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
 			if (distance < minimumDistance) {
 				minimumDistance = distance;
-				fastPosition = candiPosition;
+				minimumDistanceRadian = moveRadian;
 			}
 		}
 		
-		if (fastPosition == null) {
-			return endPosition;
-		} else {
-			return fastPosition;
+		if (minimumDistance == CommonCode.DOUBLE_MAX) {
+			return null;
 		}
-	}
-
-	/// 레이쓰 전용
-	public static Position airFleePosition(Position startPosition, Position endPosition) {
-		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
-		double moveRadian = 0.0d;
-		Position candiPosition = Position.None;
 		
-		double minimumDistance = CommonCode.DOUBLE_MAX;
-		Position fastPosition = null;
-		
-		for (int angle : Angles.AIR_FORCE_DRIVE) {
-			moveRadian = rotate(radianToMovePosition, angle);
-			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
+		double realMoveRadian = minimumDistanceRadian;
+		double adjustedRadian = 0.0d;
+		for (int angle : Angles.AIR_FORCE_DRIVE_DETAIL) {
+			adjustedRadian = rotate(minimumDistanceRadian, angle);
+			candiPosition = getMovePosition(startPosition, adjustedRadian, WRAITH_MOVE_DISTANCE_12_FRAMES);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
-			if (!enemyDefTowerList.isEmpty()) {
-				continue;
-			}
-//			List<UnitInfo> killerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.wraithKillerUnitType());
-//			if (!killerList.isEmpty()) {
-//				continue;
-//			}
-			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
-			if (distance < minimumDistance) { // 킬러들이 많으면 그쪽으로 가면 안됨
-				minimumDistance = distance;
-				fastPosition = candiPosition;
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 80, UnitUtils.enemyAirDefenseUnitType());
+			if (enemyDefTowerList.isEmpty()) {
+				realMoveRadian = adjustedRadian;
+				break;
 			}
 		}
-		
-		if (fastPosition == null) {
-			return endPosition;
-		} else {
-			return fastPosition;
+		Position airDrivingPosition = getMovePosition(startPosition, realMoveRadian, WRAITH_MOVE_DISTANCE_48_FRAMES);
+		if (!PositionUtils.isValidPosition(airDrivingPosition)) {
+			airDrivingPosition = getMovePosition(startPosition, realMoveRadian, WRAITH_MOVE_DISTANCE_24_FRAMES);
 		}
+		if (!PositionUtils.isValidPosition(airDrivingPosition)) {
+			airDrivingPosition = getMovePosition(startPosition, realMoveRadian, WRAITH_MOVE_DISTANCE_12_FRAMES);
+		}
+		return airDrivingPosition;
 	}
 	
 	private static double getDistanceAfterSeconds(Position startPosition, Position endPosition, int seconds) {
@@ -118,7 +109,7 @@ public class MicroUtils {
 		
 		for (int angle : Angles.AIR_FORCE_DRIVE) {
 			moveRadian = rotate(radianToMovePosition, angle);
-			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_SEC);
+			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_48_FRAMES);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}

@@ -213,12 +213,12 @@ public class UnitUtils {
 			}
 			int weoponrange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			if (enemyAirWeopon) {
-				if (eui.getType().groundWeapon() != WeaponType.None) {
-					weoponrange = eui.getType().groundWeapon().maxRange() + 40;
+				if (eui.getType().airWeapon() != WeaponType.None) {
+					weoponrange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 				}
 			} else {
-				if (eui.getType().airWeapon() != WeaponType.None) {
-					weoponrange = eui.getType().airWeapon().maxRange() + 40;
+				if (eui.getType().groundWeapon() != WeaponType.None) {
+					weoponrange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon());
 				}
 			}
 			if (eui.getLastPosition().getDistance(position) > radius + weoponrange) {

@@ -30,11 +30,13 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.MapGrid;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.MineralManager;
 import prebot.micro.Minerals;
@@ -94,6 +96,9 @@ public class UXManager {
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
 		if (uxOption == 0) {
+			drawDebugginUxMenu();
+			
+		} else if (uxOption == 1) {
 			drawGameInformationOnScreen(5, 5);
 			drawUnitStatisticsOnScreen1(400, 15);
 			// drawUnitStatisticsOnScreen2(370, 50);
@@ -134,24 +139,24 @@ public class UXManager {
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
 			//미네랄PATH
 			drawPathData();
-		} else if (uxOption == 1) {
+		} else if (uxOption == 2) {
 			drawStrategySample();
 			drawManagerTimeSpent(500, 220);
 			drawPathData();
-		} 
+			
+		} else if (uxOption == 3) {
+			drawPositionInformation();
+			
+		} else if (uxOption == 4) {
+			drawEnemyAirDefenseRange();
+		}
 	}
 
-	private void drawStrategySample() {
-		Race enemyRace = InfoUtils.enemyRace();
-		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
-		Prebot.Broodwar.drawTextScreen(20, 20, "" + UxColor.CHAR_YELLOW + strategy.toString());
-		
-		int y = 10;
-		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
-			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
-				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
-			}
-		}
+	private void drawDebugginUxMenu() {
+		Prebot.Broodwar.drawTextScreen(20, 20, "1. Default Information");
+		Prebot.Broodwar.drawTextScreen(20, 35, "2. Strategy Information");
+		Prebot.Broodwar.drawTextScreen(20, 50, "3. Position Finder Test");
+		Prebot.Broodwar.drawTextScreen(20, 65, "4. Air Micro Test");
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -1257,7 +1262,7 @@ public class UXManager {
 		}
 	}
 	
-	void drawPathData(){
+	private void drawPathData(){
 		for(Minerals minr : MineralManager.Instance().minerals){
 			if(minr.mineralTrick != null ){
 				Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
@@ -1281,4 +1286,53 @@ public class UXManager {
 			//Prebot.Broodwar.drawTextMap( minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(), "(" + (int)(MineralManager.Instance().minerals.get(i).MinToCC) + (int)(MineralManager.Instance().minerals.get(i).CCToMin)  + ")");
 		}
 	}
+
+	private void drawStrategySample() {
+		Race enemyRace = InfoUtils.enemyRace();
+		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
+		Prebot.Broodwar.drawTextScreen(20, 20, "" + UxColor.CHAR_YELLOW + strategy.toString());
+		
+		int y = 10;
+		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
+			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
+				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
+			}
+		}
+	}
+	
+	private void drawEnemyAirDefenseRange() {
+		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
+		for (UnitInfo eui : airDefenseEuiList) {
+			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
+		}
+		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());
+		for (UnitInfo eui : wraithKillerEuiList) {
+			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.Grey);
+		}
+		
+		for (Unit unit : UnitUtils.getUnitList(UnitType.Terran_Wraith)) {
+			if (unit.isMoving()) {
+				Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
+				Prebot.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
+				Prebot.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
+			}
+		}
+	}
+
+	private void drawPositionInformation() {
+		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
+		Prebot.Broodwar.drawTextScreen(10, 30, "attackPosition : " + StrategyIdea.attackPosition);
+		Prebot.Broodwar.drawTextScreen(10, 50, "enemySquadPosition : " + StrategyIdea.enemySquadPosition);
+		
+		if (StrategyIdea.campPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, "campPosition");
+		}
+		if (StrategyIdea.attackPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.attackPosition, "attackPosition");
+		}
+		if (StrategyIdea.enemySquadPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.enemySquadPosition, "enemySquadPosition");
+		}
+	}
+
 }

@@ -29,7 +29,8 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		if (StrategyIdea.mainSquadMode == MainSquadMode.FD_PRESS) {
+		if (StrategyIdea.mainSquadMode == MainSquadMode.FD_PRESS
+				|| StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
 			if (unit.getType() == UnitType.Terran_Marine) {
 				return true;
 			}

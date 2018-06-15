@@ -45,33 +45,43 @@ public class CombatManager extends GameManager {
 		// squadData.addSquad(idleSquad);
 		// squadData.activateSquad(idleSquad.getSquadName());
 
-		// SCV + 마린 (남는 마린은 벙커 또는 수비 또는 예상확장기지로 이동
+		// SCV + 마린
+		// * 포지션: campPosition
+		// * 초반 수비(정찰일꾼 견제, 일꾼러시, 가스러시, 파일런러시, 포톤러시, 초반 저글링/마린/질럿 등)
 		EarlyDefenseSquad earlyDefenseSquad = new EarlyDefenseSquad();
 		squadData.addSquad(earlyDefenseSquad);
 
-		// (마린) + 벌처 + 탱크 + 골리앗
+		// (마린) + 탱크 + 골리앗
+		// * 본진 수비 및 적 공격
+		// * 정찰 SCV와 연계된 벙커링 (TBD)
 		MainAttackSquad mainAttackSquad = new MainAttackSquad();
 		squadData.addSquad(mainAttackSquad);
 
+		// 감시 벌처
+		// * 적 감시 및 견제, 적 공격, 마인매설(NOT_MY_OCCUPIED OR ANYWHERE)
 		WatcherSquad watcherSquad = new WatcherSquad();
 		squadData.addSquad(watcherSquad);
 
-		// 정찰용 벌처
+		// 정찰 벌처
+		// * 적 진영 정찰, 마인매설(ONLY_GOOD_POSITION)
 		CheckerSquad checkerSquad = new CheckerSquad();
 		squadData.addSquad(checkerSquad);
 
 		// 초반 정찰용 SCV
+		// * 적 base 탐색, 일꾼견제
+		// * 12드론 앞마당시 벙커링 (TBD)
 		ScvScoutSquad scvScoutSquad = new ScvScoutSquad();
 		squadData.addSquad(scvScoutSquad);
-
-		// 개별 유닛 - 레이스, 베슬, 빌딩, 컴셋 등
-		SpecialSquad specialSquad = new SpecialSquad();
-		squadData.addSquad(specialSquad);
 
 		// 레이쓰 특공대
 //		AirForceSquad airForceSquad = new AirForceSquad();
 //		squadData.addSquad(airForceSquad);
 
+		// 개별 유닛 - 베슬, 드랍십
+		SpecialSquad specialSquad = new SpecialSquad();
+		squadData.addSquad(specialSquad);
+
+		// 배럭, 컴셋 등 빌딩
 		BuildingSquad buildingSquad = new BuildingSquad();
 		squadData.addSquad(buildingSquad);
 	}
@@ -101,8 +111,8 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.WATCHER, combatUnitList);
 		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
 		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
-		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
 //		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
+		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
 		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
 
 		updateDefenseSquad(combatUnitList);

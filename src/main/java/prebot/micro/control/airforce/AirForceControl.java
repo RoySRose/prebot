@@ -26,13 +26,31 @@ public class AirForceControl extends Control {
 				Decision decision = decision(wraith, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					// TODO region 밖일 경우
-					Position airFleePosition = MicroUtils.airFleePosition(wraith.getPosition(), StrategyIdea.campPosition);
-					CommandUtils.move(wraith, airFleePosition);
+					Position airDrivingPosition = MicroUtils.airDrivingPosition(wraith.getPosition(), StrategyIdea.campPosition, airForceUnit.driveAngle);
+					if (airDrivingPosition == null) {
+						airForceUnit.switchDriveAngle();
+						airDrivingPosition = MicroUtils.airDrivingPosition(wraith.getPosition(), StrategyIdea.campPosition, airForceUnit.driveAngle);
+					}
+					if (airDrivingPosition == null) {
+						airDrivingPosition = StrategyIdea.campPosition;
+					}
+					CommandUtils.move(wraith, airDrivingPosition);
 					AirForceManager.Instance().retreat(wraith.getID());
-					airForceUnit.leaderOrderPosition = airFleePosition;
+					airForceUnit.leaderOrderPosition = airDrivingPosition;
 					
 				} else {
-					Position airDrivingPosition = MicroUtils.airDrivingPosition(wraith.getPosition(), airForceUnit.getTargetPosition());
+					Position airDrivingPosition = MicroUtils.airDrivingPosition(wraith.getPosition(), airForceUnit.getTargetPosition(), airForceUnit.driveAngle);
+					if (airDrivingPosition == null) {
+						airForceUnit.switchDriveAngle();
+						airDrivingPosition = MicroUtils.airDrivingPosition(wraith.getPosition(), airForceUnit.getTargetPosition(), airForceUnit.driveAngle);
+					}
+					if (airDrivingPosition == null) {
+						airDrivingPosition = airForceUnit.getTargetPosition();
+					}
+					
+					if (airDrivingPosition.getDistance(airForceUnit.getTargetPosition()) < 10) {
+						AirForceManager.Instance().changeTargetIndex(airForceUnit);
+					}
 					CommandUtils.move(wraith, airDrivingPosition);
 					airForceUnit.leaderOrderPosition = airDrivingPosition;
 				}

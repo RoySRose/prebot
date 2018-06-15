@@ -123,8 +123,7 @@ public class UnitInfo {
 
 	@Override
 	public String toString() {
-		return "UnitInfo [unitID=" + unitID + ", lastHealth=" + lastHealth + ", lastShields=" + lastShields
-				+ ", player=" + player + ", unit=" + unit + ", lastPosition=" + lastPosition + ", type=" + type
+		return "UnitInfo [unitID=" + unitID + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", type=" + type
 				+ ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
 	}
 

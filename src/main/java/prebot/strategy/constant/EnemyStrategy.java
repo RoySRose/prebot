@@ -31,7 +31,7 @@ public enum EnemyStrategy {
 			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION
 	
 	PROTOSS_FORGE(1, 1, 0, UpgradeOrder.TS_VM_VS,
-			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), //
+			MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), //
 	// 넥서스가 소환되지 않는 경우 포톤러시를 의심해야 한다.
 	
 	PROTOSS_FORGE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS,

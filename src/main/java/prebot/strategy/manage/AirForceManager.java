@@ -22,7 +22,7 @@ public class AirForceManager {
 		public int currentTargetIndex = 0;
 		public int targetTryCount = 0;
 		public boolean directionReservse;
-		public int[] retreatAngle;
+		public int[] driveAngle;
 		public Position leaderOrderPosition;
 		
 		public AirForceUnit(Unit leaderUnit) {
@@ -30,7 +30,7 @@ public class AirForceManager {
 			this.currentTargetIndex = 0; // 현재 타겟 index
 			this.targetTryCount = 0; // 공격 재시도 count
 			this.directionReservse = false; // 타깃포지션 변경 역방향 여부
-			this.retreatAngle = Angles.AIR_FORCE_RETREAT_LEFT;
+			this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 			this.leaderOrderPosition = null;
 		}
 
@@ -38,9 +38,22 @@ public class AirForceManager {
 			List<Position> targetPositions = AirForceManager.instance.targetPositions;
 			if (targetPositions.isEmpty()) {
 				return null;
-			} else {
-				return targetPositions.get(currentTargetIndex);
 			}
+			return targetPositions.get(currentTargetIndex);
+		}
+		
+		public void switchDriveAngle() {
+			if (driveAngle == Angles.AIR_FORCE_DRIVE_LEFT) {
+				driveAngle = Angles.AIR_FORCE_DRIVE_RIGHT;
+			} else {
+				driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "AirForceUnit [leaderUnit=" + leaderUnit.getID() + ", currentTargetIndex=" + currentTargetIndex + ", targetTryCount=" + targetTryCount + ", directionReservse="
+					+ directionReservse + "]";
 		}
 	}
 
@@ -82,23 +95,23 @@ public class AirForceManager {
 		}
 	}
 
-	private void changeTargetIndex(AirForceUnit airForceSquadGroup) {
-		airForceSquadGroup.targetTryCount = 0;
+	public void changeTargetIndex(AirForceUnit airForceUnit) {
+		airForceUnit.targetTryCount = 0;
 		int foundCount = TARGET_POSITIONS_SIZE;
 		while (foundCount > 0) {
-			airForceSquadGroup.currentTargetIndex = airForceSquadGroup.directionReservse ? airForceSquadGroup.currentTargetIndex - 1 : airForceSquadGroup.currentTargetIndex + 1;
+			airForceUnit.currentTargetIndex = airForceUnit.directionReservse ? airForceUnit.currentTargetIndex - 1 : airForceUnit.currentTargetIndex + 1;
 
-			if (airForceSquadGroup.currentTargetIndex < 0) {
-				airForceSquadGroup.currentTargetIndex = 1;
-				airForceSquadGroup.directionReservse = false;
+			if (airForceUnit.currentTargetIndex < 0) {
+				airForceUnit.currentTargetIndex = 1;
+				airForceUnit.directionReservse = false;
 
-			} else if (airForceSquadGroup.currentTargetIndex >= TARGET_POSITIONS_SIZE) {
-				airForceSquadGroup.currentTargetIndex = TARGET_POSITIONS_SIZE - 2;
-				airForceSquadGroup.directionReservse = true;
+			} else if (airForceUnit.currentTargetIndex >= TARGET_POSITIONS_SIZE) {
+				airForceUnit.currentTargetIndex = TARGET_POSITIONS_SIZE - 2;
+				airForceUnit.directionReservse = true;
 			}
 
-			Position nextPosition = targetPositions.get(airForceSquadGroup.currentTargetIndex);
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(nextPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			Position nextPosition = targetPositions.get(airForceUnit.currentTargetIndex);
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(nextPosition, 20, UnitUtils.enemyAirDefenseUnitType());
 
 			foundCount = !enemyDefTowerList.isEmpty() ? foundCount - 1 : 0;
 		}
@@ -115,6 +128,19 @@ public class AirForceManager {
 			firstBase = secondBase = null;
 			targetPositions.clear();
 			setTargetPositions();
+		}
+		
+		for (AirForceUnit airForceUnit : airForceUnitMap.values()) {
+			Position targetPosition = airForceUnit.getTargetPosition();
+			if (targetPosition == null) {
+				continue;
+			}
+
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(targetPosition, 20, UnitUtils.enemyAirDefenseUnitType());
+			if (enemyDefTowerList.isEmpty()) {
+				continue;
+			}
+			changeTargetIndex(airForceUnit);
 		}
 	}
 

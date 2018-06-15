@@ -10,13 +10,11 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.DropshipControl;
 import prebot.micro.control.airforce.VesselControl;
-import prebot.micro.control.airforce.WraithControl;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class SpecialSquad extends Squad {
 
-	private WraithControl wraithControl = new WraithControl();
 	private DropshipControl dropshipControl = new DropshipControl();
 	private VesselControl vesselControl = new VesselControl();
 
@@ -26,8 +24,7 @@ public class SpecialSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Wraith
-				|| unit.getType() == UnitType.Terran_Dropship
+		return unit.getType() == UnitType.Terran_Dropship
 				|| unit.getType() == UnitType.Terran_Science_Vessel;
 	}
 
@@ -44,10 +41,6 @@ public class SpecialSquad extends Squad {
 	@Override
 	public void execute() {
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
-		
-		List<Unit> wraithList = unitListMap.getOrDefault(UnitType.Terran_Wraith, new ArrayList<Unit>());
-		List<UnitInfo> wraithEuiList = findEnemies(wraithList);
-		wraithControl.control(wraithList, wraithEuiList, null);
 		
 		List<Unit> dropshipList = unitListMap.getOrDefault(UnitType.Terran_Dropship, new ArrayList<Unit>());
 		List<UnitInfo> dropshipEuiList = findEnemies(dropshipList);

@@ -13,4 +13,8 @@ public class StrategyCode {
 	public static enum SmallFightPredict {
 		BACK, ATTACK
 	}
+	
+	public static enum EnemyUnitStatus {
+		SLEEPING, COMMING, IN_MY_REGION
+	}
 }
