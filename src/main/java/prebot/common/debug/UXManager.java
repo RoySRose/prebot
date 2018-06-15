@@ -35,6 +35,7 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.MineralManager;
 import prebot.micro.Minerals;
@@ -133,12 +134,11 @@ public class UXManager {
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / UxConfig.TILE_SIZE) + ", " + (int) (mouseY / UxConfig.TILE_SIZE) + ")");
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
 			//미네랄PATH
-			drawPathData();
 		} else if (uxOption == 1) {
 			drawStrategySample();
 			drawManagerTimeSpent(500, 220);
-			drawPathData();
 		} 
+		drawPathData();
 	}
 
 	private void drawStrategySample() {
@@ -1257,28 +1257,31 @@ public class UXManager {
 		}
 	}
 	
-	void drawPathData(){
-		for(Minerals minr : MineralManager.Instance().minerals){
-			if(minr.mineralTrick != null ){
-				Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
-				Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
+	private void drawPathData(){
+		for (Unit depot : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
+			for(Minerals minr : WorkerData.depotMineral.get(depot)){
+				if(minr.mineralTrick != null ){
+					Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
+					Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
 
+				}
 			}
-		}
 
 
-		for(Minerals minr : MineralManager.Instance().minerals){
-			if( minr.posTrick != bwapi.Position.None ){
-				Prebot.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
-				Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Yellow,true );
+			for(Minerals minr : WorkerData.depotMineral.get(depot)){
+				if( minr.posTrick != bwapi.Position.None ){
+					Prebot.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
+					Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Yellow,true );
+				}
 			}
-		}
 
-		//Broodwar->drawCircleMap(Minerals[0].posTrick.x(),Minerals[0].posTrick.y(),2,Colors::Purple,true);
+			//Broodwar->drawCircleMap(Minerals[0].posTrick.x(),Minerals[0].posTrick.y(),2,Colors::Purple,true);
 
-		//Prebot.Broodwar.drawCircleMap(Mineral.Instance().CCtrick.getX(),Mineral.Instance().CCtrick.getY(),2,Color.Brown,true);
-		for(int i=0; i< MineralManager.Instance().minerals.size(); i++){
-			//Prebot.Broodwar.drawTextMap( minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(), "(" + (int)(MineralManager.Instance().minerals.get(i).MinToCC) + (int)(MineralManager.Instance().minerals.get(i).CCToMin)  + ")");
+			//Prebot.Broodwar.drawCircleMap(Mineral.Instance().CCtrick.getX(),Mineral.Instance().CCtrick.getY(),2,Color.Brown,true);
+			//for(int i=0; i< MineralManager.Instance().minerals.size(); i++){
+				//Prebot.Broodwar.drawTextMap( minr.mineral.getPosition().getX(),minr.mineral.getPosition().getY(), "(" + (int)(MineralManager.Instance().minerals.get(i).MinToCC) + (int)(MineralManager.Instance().minerals.get(i).CCToMin)  + ")");
+			//}
 		}
+		
 	}
 }

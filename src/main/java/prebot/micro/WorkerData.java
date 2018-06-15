@@ -70,6 +70,8 @@ public class WorkerData {
 	public Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
+	//CC에 배정된 미네랄 리스트(미네랄 트릭 위해)
+	public static Map<Unit, ArrayList<Minerals>> depotMineral = new HashMap<Unit, ArrayList<Minerals>>();
 	
 		
 	public WorkerData() 
@@ -564,7 +566,7 @@ public class WorkerData {
 		}
 	}
 
-	public List<Minerals> getMineralPatchesNearDepot(Unit depot)
+	public ArrayList<Minerals> getMineralPatchesNearDepot(Unit depot)
 	{
 	    // if there are minerals near the depot, add them to the set
 		//List<Unit> mineralsNearDepot = new ArrayList<Unit>();
@@ -572,9 +574,9 @@ public class WorkerData {
 		/*
 		 * 1.3 초기 일꾼 한마리 노는거 방지 TF 가 알려준 소스 반영 getAllUnits -> getMinerals
 		 * */
-		//BaseLocation baselocation = BWTA.getNearestBaseLocation(depot.getPosition());
 	    int radius = 320;
 	    int c = 0;
+	    ArrayList<Minerals> mineralList = new ArrayList<Minerals>();
 	    for (Unit unit : Prebot.Broodwar.getMinerals())
 		{
 			if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < radius)
@@ -583,15 +585,14 @@ public class WorkerData {
 				Minerals newMineral = new Minerals();
 				newMineral.unitId = unit.getID();
 				newMineral.mineralUnit = unit;
-				MineralManager.Instance().minerals.add(newMineral);
+				mineralList.add(newMineral);
 				c++;
 			}
 		}
 
-	    // if we didn't find any, use the whole map
-	   // if (mineralsNearDepot.isEmpty())
-	    if (MineralManager.Instance().minerals.size() == 0)
+	    if (mineralList.size() == 0)
 	    {
+	    	mineralList = new ArrayList<Minerals>();
 	    	for (Unit unit : Prebot.Broodwar.getMinerals()) {
 	        	/*if(unit.getDistance(enemyBaseLocation) < radius)
 	        		continue;*/
@@ -600,12 +601,12 @@ public class WorkerData {
 			    	Minerals newMineral = new Minerals();
 					newMineral.unitId = unit.getID();
 					newMineral.mineralUnit = unit;
-					MineralManager.Instance().minerals.add(newMineral);
+					mineralList.add(newMineral);
 			    }
 		    }
+	    	//depotMineral.put(depot, mineralList);
 	    }
-
-	    return MineralManager.Instance().minerals;
+	    return mineralList;
 	}
 
 	/// ResourceDepot 반경 200 point 이내의 미네랄 덩이 수를 반환합니다
@@ -679,11 +680,17 @@ public class WorkerData {
 		double bestDist = 100000000;
 	    double bestNumAssigned = 10000000;
 	    int workerCnt = depotWorkerCount.get(depot.getID());
-	    int minCnt = MineralManager.Instance().minerals.size();
+	    //아직 cc와 미네랄간의 배정이 안끝났을경우 ex) 본진에서 cc짓고 멀티 보낸다던지 null값 나오므로 
+	    if(depotMineral.get(depot) == null){
+	    	return null;
+	    }
+	    
+	    int minCnt = depotMineral.get(depot).size();
         if( workerCnt > minCnt){
         	bestDist = 0;
         }
-		for (Minerals minr : MineralManager.Instance().minerals) {
+		
+        for (Minerals minr : depotMineral.get(depot)) {
 			double dist = minr.mineralUnit.getDistance(depot);
 			double numAssigned = workersOnMineralPatch.get(minr.unitId);
 
