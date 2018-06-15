@@ -8,6 +8,7 @@ import bwapi.UnitType;
 import bwta.Chokepoint;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.ScvScoutControl;
 import prebot.strategy.StrategyIdea;
@@ -33,6 +34,8 @@ public class ScvScoutSquad extends Squad {
 			Unit scvNearFirstChoke = UnitUtils.getClosestMineralWorkerToPosition(assignableUnitList, firstChoke.getCenter());
 			if (scvNearFirstChoke != null) {
 				recruitList.add(scvNearFirstChoke);
+				//정찰가면서 미네랄 명령이랑 겹치는 현상 발생
+				WorkerManager.Instance().setScoutWorker(scvNearFirstChoke);
 				StrategyIdea.assignScoutScv = false;
 			}
 		}

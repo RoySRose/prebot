@@ -7,6 +7,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -25,6 +26,7 @@ import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
+import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
 
@@ -83,6 +85,22 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateSquadData() {
+		bwta.BaseLocation base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
+		bwta.Region myRegion = base.getRegion();
+		if (myRegion == null || !myRegion.getCenter().isValid()) {
+		    return;
+		}
+		
+		Squad earlyDefenseSquad = squadData.getSquad("EARLY_DEFENSE");
+		if(earlyDefenseSquad != null){
+			List<Unit> enemyUnitsInRegion = UnitUtils.getUnitsInRegion(PositionRegion.MY_BASE, PlayerRange.ENEMY);
+			if(enemyUnitsInRegion.size() == 0){
+				if (!earlyDefenseSquad.isEmpty()) {
+					earlyDefenseSquad.clear();
+				}
+				return;
+			}
+		}
 	}
 
 	private void combatUnitArrangement() {
