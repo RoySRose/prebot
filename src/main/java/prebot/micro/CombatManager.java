@@ -143,7 +143,6 @@ public class CombatManager extends GameManager {
 				continue;
 			}
 
-			squad.setTargetPosition();
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}
@@ -177,9 +176,11 @@ public class CombatManager extends GameManager {
 
 		List<Squad> guerillaSquads = squadData.getSquadList(SquadInfo.GUERILLA_.squadName);
 		for (Squad squad : guerillaSquads) {
-			if (removeGuerilla(squad)) {
-				squadData.deactivateSquad(squad.getSquadName());
-				squadData.removeSquad(squad.getSquadName());
+			if (squad instanceof GuerillaSquad) {
+				if (removeGuerilla((GuerillaSquad) squad)) {
+					squadData.deactivateSquad(squad.getSquadName());
+					squadData.removeSquad(squad.getSquadName());
+				}
 			}
 		}
 	}
@@ -215,20 +216,20 @@ public class CombatManager extends GameManager {
 		}
 	}
 
-	private boolean removeGuerilla(Squad squad) {
+	private boolean removeGuerilla(GuerillaSquad squad) {
 		if (squad.unitList.isEmpty()) {
 			return true;
 		}
 
 		// 게릴라 지역에 적군이 없다.
-		if (Prebot.Broodwar.isVisible(squad.targetPosition.toTilePosition())) {
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(squad.targetPosition, Vulture.GEURILLA_ENEMY_RADIUS);
+		if (Prebot.Broodwar.isVisible(squad.getTargetPosition().toTilePosition())) {
+			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) {
 				return true;
 			}
 
 			// 일꾼이 없는 경우
-			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.targetPosition, Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
+			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {
 				Result result = CombatExpectation.expectByUnitInfo(squad.unitList, euiList, false);
 				if (result == Result.LOSS) {

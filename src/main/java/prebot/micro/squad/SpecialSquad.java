@@ -10,7 +10,6 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.DropshipControl;
 import prebot.micro.control.airforce.VesselControl;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class SpecialSquad extends Squad {
@@ -34,21 +33,16 @@ public class SpecialSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-		targetPosition = StrategyIdea.mainSquadPosition;
-	}
-
-	@Override
 	public void execute() {
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		
 		List<Unit> dropshipList = unitListMap.getOrDefault(UnitType.Terran_Dropship, new ArrayList<Unit>());
 		List<UnitInfo> dropshipEuiList = findEnemies(dropshipList);
-		dropshipControl.control(dropshipList, dropshipEuiList, null);
+		dropshipControl.control(dropshipList, dropshipEuiList);
 		
 		List<Unit> scienceVesselList = unitListMap.getOrDefault(UnitType.Terran_Science_Vessel, new ArrayList<Unit>());
 		List<UnitInfo> scienceVesselEuiList = findEnemies(scienceVesselList);
-		vesselControl.control(scienceVesselList, scienceVesselEuiList, null);
+		vesselControl.control(scienceVesselList, scienceVesselEuiList);
 	}
 	
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {

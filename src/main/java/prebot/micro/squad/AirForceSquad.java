@@ -8,7 +8,6 @@ import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.AirForceControl;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.manage.AirForceManager;
 
 public class AirForceSquad extends Squad {
@@ -27,11 +26,6 @@ public class AirForceSquad extends Squad {
 	@Override
 	public List<Unit> recruit(List<Unit> assignableUnitList) {
 		return assignableUnitList;
-	}
-
-	@Override
-	public void setTargetPosition() {
-		this.targetPosition = StrategyIdea.attackPosition;
 	}
 
 	@Override
@@ -54,8 +48,8 @@ public class AirForceSquad extends Squad {
 		}
 		
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행하게 된다.
-		airForceControl.control(leaderUnits, euiList, targetPosition);
-		airForceControl.control(memberUnits, euiList, targetPosition);
+		airForceControl.control(leaderUnits, euiList);
+		airForceControl.control(memberUnits, euiList);
 	}
 
 	@Override

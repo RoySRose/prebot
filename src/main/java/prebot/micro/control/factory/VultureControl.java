@@ -22,10 +22,10 @@ import prebot.strategy.manage.VultureTravelManager;
 public class VultureControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
-		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, false);
 		
 		for (Unit unit : unitList) {
@@ -50,7 +50,7 @@ public class VultureControl extends Control {
 		if (checkerTargetBase != null) {
 			return checkerTargetBase.getPosition();
 		} else {
-			return StrategyIdea.campPosition;
+			return StrategyIdea.mainSquadCenter;
 		}
 	}
 }

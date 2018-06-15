@@ -10,6 +10,7 @@ import bwta.Region;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
@@ -25,8 +26,8 @@ import prebot.strategy.UnitInfo;
 public class MarineControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
-		Region campRegion = BWTA.getRegion(targetPosition);
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = getCompleteBunker(campRegion);
 		if (bunker == null) {
 			bunker = getIncompleteBunker(campRegion);
@@ -53,7 +54,14 @@ public class MarineControl extends Control {
 				} else if (decision.type == DecisionType.KITING_UNIT) {
 					MicroUtils.kiting(marine, decision.eui, kOption);
 				} else {
-					CommandUtils.attackMove(marine, targetPosition);
+					if (MicroUtils.arrivedToPosition(marine, StrategyIdea.campPosition)) {
+						if (MicroUtils.timeToRandomMove(marine)) {
+							Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 20);
+							CommandUtils.attackMove(marine, randomPosition);
+						}
+					} else {
+						CommandUtils.attackMove(marine, StrategyIdea.campPosition);
+					}
 				}
 			}
 			

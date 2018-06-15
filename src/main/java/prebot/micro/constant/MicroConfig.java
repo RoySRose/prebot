@@ -84,6 +84,7 @@ public class MicroConfig {
 	
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static final int WORKERS_PER_REFINERY = 3;
+	public static final int RANDOM_MOVE_DISTANCE = 90;
 
 	public static class Vulture {
 		public static final int GEURILLA_ENEMY_RADIUS = 400;

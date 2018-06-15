@@ -40,11 +40,7 @@ public class ScvScoutSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-	}
-
-	@Override
 	public void execute() {
-		scvScoutControl.control(unitList, euiList, null);
+		scvScoutControl.control(unitList, euiList);
 	}
 }

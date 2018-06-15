@@ -77,10 +77,6 @@ public class ScoutDefenseSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-	}
-
-	@Override
 	public void execute() {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
@@ -95,7 +91,7 @@ public class ScoutDefenseSquad extends Squad {
 				MicroUtils.kiting(unit, decision.eui, kOption);
 
 			} else {
-				CommandUtils.attackMove(unit, StrategyIdea.attackPosition);
+				CommandUtils.attackMove(unit, StrategyIdea.mainPosition);
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -27,22 +28,19 @@ import prebot.strategy.manage.TankPositionManager;
 
 public class TankControl extends Control {
 
+	private static final int ENOUGH_BACKUP_VULTURE_AND_GOLIATH = 7;
 	private static final int POSITION_TO_SIEGE_ARRIVE_DISTANCE = 30;
 	private static final int SIEGE_MODE_RANGE_MARGIN_DISTANCE = 5;
 
-	boolean hasEnoughBackUpUnitToSiege = false;
+	private boolean hasEnoughBackUpUnitToSiege = false;
 	private int siegeModeSpreadRadius;
 
-	public void setSiegeModeSpreadRadius(int tankCount) {
-		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(tankCount) * 11);
-	}
-
-	public int getSiegeModeSpreadRadius() {
-		return siegeModeSpreadRadius;
-	}
-
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
+		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
+		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(unitList.size()) * 11);
+		
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();
 
@@ -57,11 +55,11 @@ public class TankControl extends Control {
 			}
 		}
 
-		executeSiegeMode(siegeModeList, euiList, targetPosition);
-		executeTankMode(tankModeList, euiList, targetPosition);
+		executeSiegeMode(siegeModeList, euiList);
+		executeTankMode(tankModeList, euiList);
 	}
 
-	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList, Position targetPosition) {
+	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forSiegeMode);
 
 		for (Unit siege : siegeModeList) {
@@ -75,7 +73,7 @@ public class TankControl extends Control {
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
 				CommandUtils.unsiege(siege);
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
-				if (siege.getDistance(targetPosition) > siegeModeSpreadRadius) {
+				if (siege.getDistance(StrategyIdea.mainPosition) > siegeModeSpreadRadius) {
 					CommandUtils.unsiege(siege);
 				} else {
 					CommandUtils.holdPosition(siege);
@@ -84,7 +82,7 @@ public class TankControl extends Control {
 		}
 	}
 
-	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList, Position targetPosition) {
+	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forTankMode);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, false);
@@ -107,9 +105,9 @@ public class TankControl extends Control {
 
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
 				Position positionToSiege = TankPositionManager.Instance().getSiegeModePosition(tank.getID());
-				boolean arrived = MicroUtils.arrivedToPosition(tank, targetPosition);
+				boolean arrived = MicroUtils.arrivedToPosition(tank, StrategyIdea.mainPosition);
 				if (arrived && positionToSiege == null) {
-					positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(targetPosition, tank, siegeModeSpreadRadius);
+					positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(StrategyIdea.mainPosition, tank, siegeModeSpreadRadius);
 				}
 
 				if (positionToSiege != null) {
@@ -121,12 +119,12 @@ public class TankControl extends Control {
 				} else {
 					if (arrived) {
 						if (MicroUtils.timeToRandomMove(tank)) {
-							Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), 100);
+							Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
 							CommandUtils.attackMove(tank, randomPosition);
 						}
 
 					} else {
-						CommandUtils.attackMove(tank, targetPosition);
+						CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
 					}
 				}
 

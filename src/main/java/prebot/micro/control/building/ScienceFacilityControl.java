@@ -10,7 +10,7 @@ import prebot.strategy.UnitInfo;
 public class ScienceFacilityControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
 		
 	}

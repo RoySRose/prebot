@@ -6,8 +6,10 @@ import bwapi.Pair;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import bwta.Region;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
@@ -16,16 +18,16 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
 
 /**
  * 각종 Position을 찾는다.
  * 
- * campPosition : 수비 지점
- * attackPosition : 공격 지점
+ * campPosition : 수비 지점 attackPosition : 공격 지점
  * 
  */
 public class PositionFinder {
-	
+
 	private static PositionFinder instance = new PositionFinder();
 
 	public static PositionFinder Instance() {
@@ -34,12 +36,27 @@ public class PositionFinder {
 
 	public void update() {
 		StrategyIdea.campPosition = getCampPosition();
-		StrategyIdea.attackPosition = getAttackPosition();
-		
-		if (!StrategyIdea.mainSquadMode.isAttackMode) {
-			StrategyIdea.mainSquadPosition = StrategyIdea.campPosition;
+		StrategyIdea.mainPosition = getMainPosition();
+
+		StrategyIdea.mainSquadCenter = StrategyIdea.mainPosition; // 계산필요
+		StrategyIdea.watcherPosition = getWatcherPosition(); // 계산필요
+
+		// 분리 필요
+		BaseLocation myBase = InfoUtils.myBase();
+		Region myRegion = BWTA.getRegion(myBase.getPosition());
+		List<UnitInfo> euiList = InfoUtils.euiListInMyRegion(myRegion);
+		if (euiList.isEmpty()) {
+			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.SLEEPING;
 		} else {
-			StrategyIdea.mainSquadPosition = StrategyIdea.attackPosition;
+			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.IN_MY_REGION;
+		}
+	}
+
+	private Position getWatcherPosition() {
+		if (InfoUtils.enemyBase() != null) {
+			return InfoUtils.enemyBase().getPosition();
+		} else {
+			return InfoUtils.mySecondChoke().getCenter();
 		}
 	}
 
@@ -47,38 +64,41 @@ public class PositionFinder {
 	private Position getCampPosition() {
 		if (!firstExpansionOccupied()) {
 			if (defenseInside()) {
-				 return commandCenterInsidePosition();
+				return commandCenterInsidePosition();
 			} else {
 				return firstChokeDefensePosition();
 			}
 		} else {
 			if (defenseSecondChoke()) {
-				 return InfoUtils.mySecondChoke().getCenter();
+				return InfoUtils.mySecondChoke().getCenter();
 			} else {
 				return firstExpansionBackwardPosition();
 			}
 		}
 	}
 
-	/// 공격지점
-	private Position getAttackPosition() {
-		BaseLocation enemyBase = InfoUtils.enemyBase();
-		if (enemyBase == null) {
-			return InfoUtils.mySecondChoke().getCenter();
-		}
-
-		if (!enemyBaseDestroyed(enemyBase)) {
-			if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
-				return enemyBase.getPosition();
-			} else {
-				// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
-				// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
-				// 안전한 위치까지 바로 전진하도록 한다.
-				return enemyBase.getPosition();
+	/// 메인부대 위치 지점
+	private Position getMainPosition() {
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			BaseLocation enemyBase = InfoUtils.enemyBase();
+			if (enemyBase == null) {
+				return InfoUtils.mySecondChoke().getCenter();
 			}
+			if (!enemyBaseDestroyed(enemyBase)) {
+				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
+					return enemyBase.getPosition();
+				} else {
+					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
+					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
+					// 안전한 위치까지 바로 전진하도록 한다.
+					return enemyBase.getPosition();
+				}
+			}
+			return letsfindRatPosition();
+
+		} else {
+			return getCampPosition();
 		}
-		
-		return letsfindRatPosition();
 	}
 
 	private Position getEnemyCampPosition() {
@@ -108,7 +128,7 @@ public class PositionFinder {
 	private Position commandCenterInsidePosition() {
 		return null;
 	}
-	
+
 	/// 전진수비 여부
 	private boolean defenseSecondChoke() {
 		// TODO 1. 병력이 일정이상 쌓였을 때
@@ -121,7 +141,7 @@ public class PositionFinder {
 		Pair<Position, Position> pairPosition = InfoUtils.myFirstChoke().getSides();
 		Position p1 = new Position(pairPosition.first.getX(), pairPosition.second.getY());
 		Position p2 = new Position(pairPosition.second.getX(), pairPosition.first.getY());
-		
+
 		BaseLocation myBase = InfoUtils.myBase();
 		double p1FromMyBase = p1.getApproxDistance(myBase.getPosition());
 		double p2FromMyBase = p2.getApproxDistance(myBase.getPosition());

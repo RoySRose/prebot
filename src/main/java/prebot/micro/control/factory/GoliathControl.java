@@ -13,6 +13,7 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
@@ -21,9 +22,9 @@ import prebot.strategy.UnitInfo;
 public class GoliathControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
-		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, false);
 
 		for (Unit unit : unitList) {
@@ -39,13 +40,13 @@ public class GoliathControl extends Control {
 				MicroUtils.kiting(unit, decision.eui, kOption);
 
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
-				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.campPosition)) {
+				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainPosition)) {
 					if (MicroUtils.timeToRandomMove(unit)) {
-						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), 100);
+						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
 						CommandUtils.attackMove(unit, randomPosition);
 					}
 				} else {
-					CommandUtils.attackMove(unit, targetPosition);
+					CommandUtils.attackMove(unit, StrategyIdea.mainPosition);
 				}
 			}
 		}

@@ -19,7 +19,6 @@ public abstract class Squad {
 
 	public List<Unit> unitList = new ArrayList<>();
 	public List<UnitInfo> euiList = new ArrayList<>();
-	public Position targetPosition = null;
 	// public Position goalPosition = Position.None;
 
 	// private List<Unit> unitOldBies = new ArrayList<>();
@@ -29,7 +28,6 @@ public abstract class Squad {
 		this.squadName = squadInfo.squadName;
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
-		this.targetPosition = null;
 		this.activated = true;
 	}
 
@@ -37,7 +35,6 @@ public abstract class Squad {
 		this.squadName = squadInfo.squadName + targetPosition.toString();
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
-		this.targetPosition = targetPosition;
 		this.activated = true;
 	}
 
@@ -89,9 +86,6 @@ public abstract class Squad {
 
 	/// 스쿼드 업데이트
 	public abstract List<Unit> recruit(List<Unit> assignableUnitList);
-
-	/// 목표 지점 설정
-	public abstract void setTargetPosition();
 
 	/// squad 실행
 	public abstract void execute();

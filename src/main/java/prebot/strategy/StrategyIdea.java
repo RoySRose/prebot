@@ -50,9 +50,10 @@ public class StrategyIdea {
 	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
 	
 	// [포지션 정보]
-	public static Position mainSquadPosition = null; // 메인스쿼드 포지션
-	public static Position campPosition = null; // 수비지점
-	public static Position attackPosition = null; // 공격지점
+	public static Position campPosition = null; // 수비 포지션
+	public static Position mainPosition = null; // 메인스쿼드 목표 포지션
+	public static Position watcherPosition = null; // watcher 포지션
+	public static Position mainSquadCenter = null; // 메인스쿼드 유닛들의 센터 포지션
 
 	public static BaseLocation enemyBaseExpected = null; // 적base 예상 지점
 

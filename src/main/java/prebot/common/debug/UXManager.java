@@ -1321,14 +1321,14 @@ public class UXManager {
 
 	private void drawPositionInformation() {
 		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
-		Prebot.Broodwar.drawTextScreen(10, 30, "attackPosition : " + StrategyIdea.attackPosition);
+		Prebot.Broodwar.drawTextScreen(10, 30, "attackPosition : " + StrategyIdea.mainPosition);
 		Prebot.Broodwar.drawTextScreen(10, 50, "enemySquadPosition : " + StrategyIdea.enemySquadPosition);
 		
 		if (StrategyIdea.campPosition != null) {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, "campPosition");
 		}
-		if (StrategyIdea.attackPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.attackPosition, "attackPosition");
+		if (StrategyIdea.mainPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.mainPosition, "attackPosition");
 		}
 		if (StrategyIdea.enemySquadPosition != null) {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.enemySquadPosition, "enemySquadPosition");

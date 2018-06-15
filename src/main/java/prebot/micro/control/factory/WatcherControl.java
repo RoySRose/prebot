@@ -5,8 +5,11 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
+import bwapi.UnitType;
+import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
@@ -14,7 +17,9 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.TargetScoreCalculators;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig.Common;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -33,18 +38,18 @@ public class WatcherControl extends Control {
 	}
 	
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		if (smallFightPredict == SmallFightPredict.ATTACK) {
-			fight(unitList, euiList, targetPosition);
+			fight(unitList, euiList);
 
 		} else if (smallFightPredict == SmallFightPredict.BACK) {
-			regroup(unitList, targetPosition);
+			regroup(unitList);
 		}
 	}
 
-	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	private void fight(List<Unit> unitList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
-		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, false);
 		
 		for (Unit unit : unitList) {
@@ -57,28 +62,53 @@ public class WatcherControl extends Control {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 				
 			} else if (decision.type == DecisionType.KITING_UNIT) {
-				if (!spiderMineOrderIssue(unit)) {
+				if (spiderMineOrderIssue(unit)) {
+					continue;
+				}
+				List<Unit> otherMechanics = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(), Common.MAIN_SQUAD_COVERAGE,
+						UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
+				Unit enemyUnit = UnitUtils.unitInSight(decision.eui);
+				if (!otherMechanics.isEmpty()) {
+					if (enemyUnit != null) {
+						if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
+							CommandUtils.holdPosition(unit);
+						} else {
+							CommandUtils.attackUnit(unit, enemyUnit);
+						}
+					} else {
+						CommandUtils.attackMove(unit, decision.eui.getLastPosition());
+					}
+				} else {
 					MicroUtils.kiting(unit, decision.eui, kOption);
 				}
 				
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
-				if (!spiderMineOrderIssue(unit)) {
-					CommandUtils.attackMove(unit, targetPosition);
+				if (spiderMineOrderIssue(unit)) {
+					continue;
+				}
+				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.watcherPosition)) {
+					if (MicroUtils.timeToRandomMove(unit)) {
+						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+						CommandUtils.attackMove(unit, randomPosition);
+					}
+
+				} else {
+					CommandUtils.attackMove(unit, StrategyIdea.watcherPosition);
 				}
 			}
 		}
 	}
 
-	private void regroup(List<Unit> unitList, Position targetPosition) {
+	private void regroup(List<Unit> unitList) {
 		// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
-		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, targetPosition);
+		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
 				continue;
 			}
 			
 			if (unit.getID() == leader.getID() || unit.getDistance(leader) <= REGROUP_UNIT_RADIUS) {
-				CommandUtils.move(unit, StrategyIdea.mainSquadPosition);
+				CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
 			} else {
 				CommandUtils.move(unit, leader.getPosition());
 			}

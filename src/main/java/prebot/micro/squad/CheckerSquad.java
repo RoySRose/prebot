@@ -62,11 +62,7 @@ public class CheckerSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-	}
-
-	@Override
 	public void execute() {
-		vultureControl.control(unitList, euiList, null);
+		vultureControl.control(unitList, euiList);
 	}
 }

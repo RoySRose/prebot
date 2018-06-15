@@ -2,16 +2,16 @@ package prebot.micro.control;
 
 import java.util.List;
 
-import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class GundamControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
 				continue;
@@ -21,7 +21,7 @@ public class GundamControl extends Control {
 			if (target != null) {
 				CommandUtils.attackUnit(unit, target);
 			} else {
-				CommandUtils.attackMove(unit, targetPosition);
+				CommandUtils.attackMove(unit, StrategyIdea.campPosition);
 			}
 		}
 	}

@@ -38,11 +38,6 @@ public class WatcherSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-		targetPosition = StrategyIdea.attackPosition;
-	}
-
-	@Override
 	public void execute() {
 		if (StrategyIdea.initiated) {
 			smallFightPredict = SmallFightPredict.ATTACK;
@@ -53,13 +48,13 @@ public class WatcherSquad extends Squad {
 				smallFightPredict = VultureFightPredictor.watcherPredictByUnitInfo(unitList, euiList);
 				if (smallFightPredict == SmallFightPredict.BACK) {
 					watcherFleeStartFrame = TimeUtils.elapsedFrames();
-				}
+				}	
 			}
 		}
 		
 		if (!unitList.isEmpty()) {
 			vultureWatcher.setSmallFightPredict(smallFightPredict);
-			vultureWatcher.control(unitList, euiList, targetPosition);
+			vultureWatcher.control(unitList, euiList);
 		}
 	}
 }

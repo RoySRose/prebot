@@ -9,10 +9,16 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 
 public class GuerillaSquad extends Squad {
+	private Position targetPosition;
 	private VultureControl vultureControl = new VultureControl();
+	
+	public Position getTargetPosition() {
+		return targetPosition;
+	}
 
 	public GuerillaSquad(Position position) {
 		super(SquadInfo.GUERILLA_, position);
+		this.targetPosition = position;
 	}
 
 	@Override
@@ -28,11 +34,7 @@ public class GuerillaSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-	}
-
-	@Override
 	public void execute() {
-		vultureControl.control(unitList, euiList, targetPosition);
+		vultureControl.control(unitList, euiList);
 	}
 }

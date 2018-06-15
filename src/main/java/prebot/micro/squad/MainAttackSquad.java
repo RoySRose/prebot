@@ -16,6 +16,7 @@ import prebot.micro.control.MarineControl;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
 	
@@ -47,30 +48,33 @@ public class MainAttackSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-		targetPosition = StrategyIdea.mainSquadPosition;
-	}
-
-	@Override
 	public void execute() {
 		updateInitiatedFlag();
 		
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
-		marineControl.control(marineList, euiList, targetPosition);
+		marineControl.control(marineList, euiList);
 		
 		List<Unit> tankList = new ArrayList<>();
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Siege_Mode, new ArrayList<Unit>()));
-		tankControl.setSiegeModeSpreadRadius(tankList.size());
-		tankControl.control(tankList, euiList, targetPosition);
+		tankControl.control(tankList, euiList);
 		
 		List<Unit> goliathList = unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>());
-		goliathControl.control(goliathList, euiList, targetPosition);
+		goliathControl.control(goliathList, euiList);
 	}
 
 	private void updateInitiatedFlag() {
-		StrategyIdea.initiated = !euiList.isEmpty();
+		for (UnitInfo eui : euiList) {
+			if (eui.getType() != UnitType.Terran_Vulture_Spider_Mine
+					&& eui.getType() != UnitType.Zerg_Larva
+					&& !eui.getType().isBuilding()
+					&& !eui.getType().isWorker()
+					&& !eui.getType().isFlyer()) {
+				StrategyIdea.initiated = true;
+			}
+		}
+		StrategyIdea.initiated = false;
 	}
 	
 	@Override

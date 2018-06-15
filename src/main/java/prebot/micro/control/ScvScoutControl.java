@@ -26,7 +26,7 @@ public class ScvScoutControl extends Control {
 	private Map<Integer, Integer> scoutVertexIndexMap = new HashMap<>();
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
 				continue;

@@ -17,7 +17,7 @@ import prebot.strategy.manage.AirForceManager.AirForceUnit;
 public class AirForceControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 
 		for (Unit wraith : unitList) {
 			AirForceUnit airForceUnit = AirForceManager.Instance().getAirForceUnit(wraith.getID());

@@ -21,10 +21,6 @@ public class IdleSquad extends Squad {
 	}
 
 	@Override
-	public void setTargetPosition() {
-	}
-
-	@Override
 	public void execute() {
 	}
 }
