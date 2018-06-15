@@ -71,7 +71,7 @@ public class WorkerData {
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	//CC에 배정된 미네랄 리스트(미네랄 트릭 위해)
-	public static Map<Unit, ArrayList<Minerals>> depotMineral = new HashMap<Unit, ArrayList<Minerals>>();
+	public static Map<Unit, List<Minerals>> depotMineral = new HashMap<Unit, List<Minerals>>();
 	
 		
 	public WorkerData() 
@@ -566,7 +566,7 @@ public class WorkerData {
 		}
 	}
 
-	public ArrayList<Minerals> getMineralPatchesNearDepot(Unit depot)
+	public List<Minerals> getMineralPatchesNearDepot(Unit depot)
 	{
 	    // if there are minerals near the depot, add them to the set
 		//List<Unit> mineralsNearDepot = new ArrayList<Unit>();

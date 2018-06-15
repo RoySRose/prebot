@@ -1,6 +1,6 @@
 package prebot.micro;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import bwapi.Position;
 import bwapi.Race;
@@ -19,7 +19,6 @@ import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.old.OldCombatManager;
-import prebot.micro.old.OldSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 
@@ -50,7 +49,7 @@ public class WorkerManager extends GameManager {
 		handleMineralWorkers();
 		// cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 		handleMoveWorkers();
-		handleCombatWorkers();
+//		handleCombatWorkers();
 		handleRepairWorkers();
 	}
 
@@ -116,20 +115,6 @@ public class WorkerManager extends GameManager {
 			// }
 			// }
 
-			// 1.3 추가 공격하고 있을떄 일꾼 에너지 20이하이면 idle
-			// if its job is Build
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
-				// 대상이 파괴되었거나, 수리가 다 끝난 경우
-				// 1.3 일꾼 에너지가 20이하일떄 idle 변경
-				if (worker.getHitPoints() <= 16) {
-					OldSquad temp = OldCombatManager.Instance().squadData.getUnitSquad(worker);
-					// worker.cancelConstruction();
-					if (temp != null) {
-						temp.removeUnit(worker);
-					}
-					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
-				}
-			}
 		}
 	}
 
@@ -362,22 +347,22 @@ public class WorkerManager extends GameManager {
 	}
 
 	// bad micro for combat workers
-	public void handleCombatWorkers() {
-		for (Unit worker : workerData.getWorkers()) {
-			if (worker == null)
-				continue;
-
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
-				// MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(),
-				// worker.getPosition().getY(), 4, Color.Yellow, true);
-				Unit target = getClosestEnemyUnitFromWorker(worker);
-
-				if (target != null) {
-					CommandUtils.attackUnit(worker, target);
-				}
-			}
-		}
-	}
+//	public void handleCombatWorkers() {
+//		for (Unit worker : workerData.getWorkers()) {
+//			if (worker == null)
+//				continue;
+//
+//			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
+//				// MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(),
+//				// worker.getPosition().getY(), 4, Color.Yellow, true);
+//				Unit target = getClosestEnemyUnitFromWorker(worker);
+//
+//				if (target != null) {
+//					CommandUtils.attackUnit(worker, target);
+//				}
+//			}
+//		}
+//	}
 
 	public void handleRepairWorkers() {
 		if (Prebot.Broodwar.self().getRace() != Race.Terran) {
@@ -1112,7 +1097,7 @@ public class WorkerManager extends GameManager {
 	}
 
 	public void mineralPath(Unit depot) {
-		ArrayList<Minerals> minerals  = workerData.getMineralPatchesNearDepot(depot);
+		List<Minerals> minerals  = workerData.getMineralPatchesNearDepot(depot);
 		//CCtrick = BWAPI::Position( Comm  )
 
 		Position ccPoint 		= depot.getPosition();

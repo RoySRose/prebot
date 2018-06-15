@@ -10,6 +10,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.PositionRegion;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -31,8 +32,16 @@ public class EarlyDefenseSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Marine ||
-				(unit.getType() == UnitType.Terran_SCV && unit.getHitPoints() > 16);
+		if (unit.getType() == UnitType.Terran_Marine) {
+			return true;
+		}
+		if (unit.getType() == UnitType.Terran_SCV) {
+			List<Unit> enemyUnitsInRegion = UnitUtils.getUnitsInRegion(PositionRegion.MY_BASE, PlayerRange.ENEMY);
+			if (!enemyUnitsInRegion.isEmpty()) {
+				return unit.getHitPoints() > 16;
+			}
+		}
+		return false;
 	}
 
 	@Override

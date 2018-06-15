@@ -81,12 +81,6 @@ public class SquadData {
 		}
 		squad.addUnit(unit);
 		
-		//정찰 유닛이 상대 scv발견후 어택명령이랑 꼬여서 추가
-		if(squad.getSquadName() == "SCV_SCOUT"){
-			System.out.println("squad.getSquadName() : " + squad.getSquadName());
-			return;
-		}
-		
 		if (unit.getType() == UnitType.Terran_SCV) {
 			WorkerManager.Instance().setCombatWorker(unit); // SCV를 CombatManager에서 관리
 		}

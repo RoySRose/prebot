@@ -37,7 +37,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
-import prebot.micro.MineralManager;
 import prebot.micro.Minerals;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
