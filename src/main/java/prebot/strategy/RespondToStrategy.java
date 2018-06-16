@@ -388,7 +388,7 @@ public class RespondToStrategy {
 		}
 	}
 		
-	boolean expanchcker = false;
+	public boolean expanchcker = false;
 	public void RespondVsZerg() {	
 		
 		if(TempBuildSourceCode.Instance().LiftChecker == false && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) > 1){

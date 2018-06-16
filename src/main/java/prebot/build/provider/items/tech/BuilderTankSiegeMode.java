@@ -1,14 +1,14 @@
-package prebot.build.provider.items;
+package prebot.build.provider.items.tech;
 
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
 
-public class BuilderCharonBoosters extends DefaultBuildableItem {
+public class BuilderTankSiegeMode extends DefaultBuildableItem {
 
     ResearchSelector researchSelector;
 
-    public BuilderCharonBoosters(MetaType metaType, ResearchSelector researchSelector){
+    public BuilderTankSiegeMode(MetaType metaType, ResearchSelector researchSelector){
         super(metaType);
         this.researchSelector = researchSelector;
     }

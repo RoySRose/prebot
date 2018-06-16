@@ -1,14 +1,15 @@
-package prebot.build.provider.items;
+package prebot.build.provider.items.upgrade;
 
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
+import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
 
-public class BuilderIonThrusters extends DefaultBuildableItem {
+public class BuilderCharonBoosters extends DefaultBuildableItem {
 
     ResearchSelector researchSelector;
 
-    public BuilderIonThrusters(MetaType metaType, ResearchSelector researchSelector){
+    public BuilderCharonBoosters(MetaType metaType, UpgradeSelector upgradeSelector){
         super(metaType);
         this.researchSelector = researchSelector;
     }
