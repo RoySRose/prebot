@@ -2,56 +2,46 @@ package prebot.micro.control.airforce;
 
 import java.util.List;
 
+import bwapi.Order;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
-import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
-import prebot.micro.KitingOption;
-import prebot.micro.TargetScoreCalculators;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.StrategyManager;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class VesselControl extends Control {
 
-	private final static double sVesselCheckSpeed = UnitType.Terran_Science_Vessel.topSpeed() * 8;
-	private final static int sVesselCheckRadius = UnitType.Terran_Science_Vessel.sightRange();
+	private final static double VESSEL_CHECK_SPEED = UnitType.Terran_Science_Vessel.topSpeed() * 8;
+	private final static int VESSEL_SIGHT = UnitType.Terran_Science_Vessel.sightRange();
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position targetPosition) {
+	public void control(List<Unit> unitList, List<UnitInfo> euiList, Position none) {
 		// TODO Auto-generated method stub
 
-		FleeOption fOption = new FleeOption(targetPosition, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, false);
-
-		Position orderPosition = targetPosition;
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadPosition, false, Angles.WIDE);
 
 		for (Unit vessel : unitList) {
-			/*
-			 * 오리더 체크 - 렉 체크 하는것 같아서 일단 주석 if
-			 * (!TimeUtils.executeUnitRotation(vessel, LagObserver.groupsize()))
-			 * { continue; }
-			 */
-			if (StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTALMANY) {
+			if (skipControl(vessel)) {
+				continue;
+			}
 
-				// 싸베 이리디 쓰기
+			// 싸베 이리디 쓰기
+			if (StrategyIdea.enemyStrategy == EnemyStrategy.ZERG_MUTAL_MANY) {
 				if (vessel.getEnergy() >= 75) {
-					List<Unit> matrix_targets = null;
-					matrix_targets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), sVesselCheckRadius + 300,UnitType.Zerg_Mutalisk); 
-					for (Unit target : matrix_targets) {
+					List<Unit> irradiateTargets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), VESSEL_SIGHT + 300, UnitType.Zerg_Mutalisk); 
+					for (Unit target : irradiateTargets) {
 						if (target.getHitPoints() > target.getType().maxHitPoints() * 0.9) {
 							CommandUtils.useTechTarget(vessel, TechType.Irradiate, target);
 							return;
@@ -61,15 +51,14 @@ public class VesselControl extends Control {
 			}
 			// 싸베 디펜시브 매트릭스 쓰기
 			else if (vessel.getEnergy() >= 100) {
-				List<Unit> matrix_targets = null;
-					matrix_targets = UnitUtils.getUnitsInRadius(PlayerRange.SELF, vessel.getPosition(), sVesselCheckRadius + 300); 
-				for (Unit target : matrix_targets) {
+				List<Unit> matrixTargets = UnitUtils.getUnitsInRadius(PlayerRange.SELF, vessel.getPosition(), VESSEL_SIGHT + 300); 
+				for (Unit target : matrixTargets) {
 					if (target.getType() == UnitType.Terran_SCV	|| target.getType() == UnitType.Terran_Vulture_Spider_Mine) {
 						continue;
 					}
-					if (target.isUnderAttack() && target.getHitPoints() < target.getType().maxHitPoints() * 0.7
-							&& !target.isDefenseMatrixed()
-							&& target.getHitPoints() > target.getType().maxHitPoints() * 0.15) {
+					if (target.isUnderAttack() && !target.isDefenseMatrixed()
+							&& target.getHitPoints() > target.getType().maxHitPoints() * 0.15
+							&& target.getHitPoints() < target.getType().maxHitPoints() * 0.7) {
 						CommandUtils.useTechTarget(vessel, TechType.Defensive_Matrix, target);
 						return;
 					}
@@ -94,12 +83,13 @@ public class VesselControl extends Control {
 				}
 			}
 
+			Position orderPosition = null;
+			
 			if (invisibleEnemyUnit == null) {
 				closestDistToVessel = 100000;
 				for (UnitInfo unitInfo : euiList) {
 					Unit unit = unitInfo.getUnit();
-					if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == unit.getOrder().Burrowing)
-							&& unit.getPosition().isValid()) {
+					if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)) {
 						int tempdist = unit.getDistance(vessel);
 						if (tempdist < closestDistToVessel) {
 							invisibleEnemyUnit = unit;
@@ -107,14 +97,13 @@ public class VesselControl extends Control {
 						}
 					}
 				}
-			}
-
-			if (invisibleEnemyUnit != null) {
-				List<Unit> nearallies = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
+			} else {
+				List<Unit> nearallies = UnitUtils.getUnitsInRadius(PlayerRange.SELF, vessel.getPosition(), VESSEL_SIGHT);
 				if (nearallies.size() > 2) {
-					orderPosition = invisibleEnemyUnit.getPosition();// 움직이시오.
 					if (invisibleEnemyUnit.getDistance(vessel) < UnitType.Terran_Science_Vessel.sightRange() * 2 / 3) {
 						orderPosition = vessel.getPosition();
+					} else {
+						orderPosition = invisibleEnemyUnit.getPosition();// 움직이시오.
 					}
 				}
 			}
@@ -122,12 +111,9 @@ public class VesselControl extends Control {
 			Unit mostDangerousTarget = null;
 			double mostDangercheck = -99999;
 
-			List<Unit> dangerous_targets = null;
-			dangerous_targets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), sVesselCheckRadius); 
+			List<Unit> dangerous_targets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), VESSEL_SIGHT); 
 			for (Unit target : dangerous_targets) {
-
-				double temp = target.getType().airWeapon().maxRange()
-						- target.getPosition().getDistance(vessel.getPosition());
+				double temp = target.getType().airWeapon().maxRange() - target.getPosition().getDistance(vessel.getPosition());
 				if (temp > mostDangercheck) {
 					mostDangerousTarget = target;
 					mostDangercheck = temp;
@@ -139,12 +125,12 @@ public class VesselControl extends Control {
 			if (mostDangerousTarget != null) {
 				double temp = 0;
 				if (!mostDangerousTarget.getType().isBuilding()) {
-					temp = sVesselCheckSpeed * 3;
+					temp = VESSEL_CHECK_SPEED * 3;
 				}
 				if (mostDangerousTarget.isInWeaponRange(vessel)
 						|| (vessel.getDistance(mostDangerousTarget) <= Prebot.Broodwar.enemy().weaponMaxRange(
-								mostDangerousTarget.getType().airWeapon()) + sVesselCheckSpeed + temp)) {
-					Position fleePosition = getFleePosition(vessel, mostDangerousTarget.getPosition(), (int) sVesselCheckSpeed,fOption);
+								mostDangerousTarget.getType().airWeapon()) + VESSEL_CHECK_SPEED + temp)) {
+					Position fleePosition = getFleePosition(vessel, mostDangerousTarget.getPosition(), (int) VESSEL_CHECK_SPEED,fOption);
 					vessel.move(fleePosition);
 					fleeing = true;
 				}
@@ -223,12 +209,12 @@ public class VesselControl extends Control {
 		double risk = 0;
 		
 		List<Unit> dangerous_targets = null;
-		dangerous_targets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, position, sVesselCheckRadius, UnitType.Terran_Missile_Turret); 
-		dangerous_targets.addAll(UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, position, sVesselCheckRadius, UnitType.Terran_Goliath));
+		dangerous_targets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, position, VESSEL_SIGHT, UnitType.Terran_Missile_Turret); 
+		dangerous_targets.addAll(UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, position, VESSEL_SIGHT, UnitType.Terran_Goliath));
 			for (Unit enemyunits : dangerous_targets) {
 				
 				double inrange =  Prebot.Broodwar.enemy().weaponMaxRange(enemyunits.getType().airWeapon());
-				double additionalrange = sVesselCheckSpeed;		
+				double additionalrange = VESSEL_CHECK_SPEED;		
 				double distance = enemyunits.getDistance(position);
 				if(enemyunits.getType().airWeapon() != WeaponType.None){
 					if(distance<inrange){
