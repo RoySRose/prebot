@@ -140,10 +140,6 @@ public class CombatManager extends GameManager {
 
 	private void squadExecution() {
 		for (Squad squad : squadData.getSquadMap().values()) {
-			if (!squad.isActivated()) {
-				continue;
-			}
-
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
 		}
@@ -179,7 +175,6 @@ public class CombatManager extends GameManager {
 		for (Squad squad : guerillaSquads) {
 			if (squad instanceof GuerillaSquad) {
 				if (removeGuerilla((GuerillaSquad) squad)) {
-					squadData.deactivateSquad(squad.getSquadName());
 					squadData.removeSquad(squad.getSquadName());
 				}
 			}

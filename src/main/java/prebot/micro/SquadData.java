@@ -36,15 +36,6 @@ public class SquadData {
 	}
 	
 	public Squad removeSquad(String squadName) {
-		return squadMap.remove(squadName);
-	}
-	
-	public void activateSquad(String squadName) {
-		Squad squad = squadMap.get(squadName);
-		squad.setActivated(true);
-	}
-	
-	public void deactivateSquad(String squadName) {
 		Squad squad = squadMap.get(squadName);
 		for (Unit unit : squad.unitList) {
 			if (unit.getType() == UnitType.Terran_SCV) {
@@ -52,7 +43,7 @@ public class SquadData {
 			}
 		}
 		squad.unitList.clear();
-		squad.setActivated(false);
+		return squadMap.remove(squadName);
 	}
 	
 	public void clearSquadMap() {

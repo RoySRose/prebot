@@ -15,7 +15,6 @@ public abstract class Squad {
 	private String squadName;
 	private int priority;
 	private int squadRadius;
-	private boolean activated;
 
 	public List<Unit> unitList = new ArrayList<>();
 	public List<UnitInfo> euiList = new ArrayList<>();
@@ -28,14 +27,12 @@ public abstract class Squad {
 		this.squadName = squadInfo.squadName;
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
-		this.activated = true;
 	}
 
 	public Squad(SquadInfo squadInfo, Position targetPosition) {
 		this.squadName = squadInfo.squadName + targetPosition.toString();
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
-		this.activated = true;
 	}
 
 	public String getSquadName() {
@@ -44,14 +41,6 @@ public abstract class Squad {
 
 	public int getPriority() {
 		return priority;
-	}
-
-	public boolean isActivated() {
-		return activated;
-	}
-
-	public void setActivated(boolean activated) {
-		this.activated = activated;
 	}
 
 	public void addUnit(Unit unit) {
