@@ -5,21 +5,18 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
-import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.micro.old.OldCombatManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
+import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
@@ -497,7 +494,7 @@ public class RespondToStrategy {
 		// }
 		
 		//marine for fast zergling and zealot start
-		if(TempBuildSourceCode.Instance().LiftChecker == false && OldCombatManager.Instance().FastZerglingsInOurBase > 0 || OldCombatManager.Instance().FastZealotInOurBase > 0){
+		if(TempBuildSourceCode.Instance().LiftChecker == false && StrategyIdea.enemyUnitStatus == EnemyUnitStatus.IN_MY_REGION){
 			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 4){
 				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine) < 1){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Marine, true);

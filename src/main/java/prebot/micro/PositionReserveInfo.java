@@ -12,4 +12,9 @@ public class PositionReserveInfo {
 		this.position = position;
 		this.reservedFrame = reservedFrame;
 	}
+
+	@Override
+	public String toString() {
+		return "PositionReserveInfo [unitId=" + unitId + ", position=" + position + ", reservedFrame=" + reservedFrame + "]";
+	}
 }

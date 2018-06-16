@@ -15,7 +15,7 @@ import prebot.strategy.UnitInfo;
 public class DecisionMaker {
 
 	private static final int BACKOFF_DIST = 64;
-	private static final int TOO_TOO_FAR_DISTANCE = 600;
+	private static final int TOO_TOO_FAR_DISTANCE = 450;
 	private TargetScoreCalculator targetScoreCalculator;
 
 	public DecisionMaker(TargetScoreCalculator targetScoreCalculator) {

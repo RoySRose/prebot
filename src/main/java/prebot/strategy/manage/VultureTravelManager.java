@@ -15,7 +15,8 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
-import prebot.micro.old.CombatExpectation;
+import prebot.micro.predictor.GuerillaScore;
+import prebot.micro.predictor.VultureFightPredictor;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
@@ -231,7 +232,7 @@ public class VultureTravelManager {
 			return null;
 		}
 
-		int vulturePower = CombatExpectation.getVulturePower(assignableVultures);
+		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
 		int currFrame = Prebot.Broodwar.getFrameCount();
 
 		int bestScore = 0;
@@ -248,8 +249,8 @@ public class VultureTravelManager {
 			}
 
 			// 안개속의 적 구성을 가늠해 게릴라 타게팅이 가능한지 확인한다.
-			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(euiList, false);
-			int score = CombatExpectation.guerillaScoreByUnitInfo(euiList);
+			int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
+			int score = GuerillaScore.guerillaScoreByUnitInfo(euiList);
 
 			if (vulturePower > enemyPower && score > bestScore) {
 				bestScore = score;

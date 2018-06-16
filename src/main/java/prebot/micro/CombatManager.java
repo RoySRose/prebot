@@ -11,11 +11,11 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroCode.Result;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
-import prebot.micro.old.CombatExpectation;
+import prebot.micro.predictor.GuerillaScore;
+import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.BuildingSquad;
 import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
@@ -26,6 +26,7 @@ import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class CombatManager extends GameManager {
@@ -190,8 +191,8 @@ public class CombatManager extends GameManager {
 		if (bestGuerillaSite != null) {
 			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
 			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
-			int enemyPower = CombatExpectation.enemyPowerByUnitInfo(euiList, false);
-			int vulturePower = CombatExpectation.getVulturePower(assignableVultures);
+			int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
+			int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
 
 			if (vulturePower > enemyPower) {
 				String squadName = SquadInfo.GUERILLA_.squadName + bestGuerillaSite.getPosition().toString();
@@ -205,7 +206,7 @@ public class CombatManager extends GameManager {
 				if (guerillaSquad.unitList.isEmpty()) {
 					for (Unit assignableVulture : assignableVultures) {
 						squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
-						int squadPower = CombatExpectation.getVulturePower(guerillaSquad.unitList);
+						int squadPower = VultureFightPredictor.powerOfWatchers(guerillaSquad.unitList);
 						if (squadPower > enemyPower + Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
 							break; // 충분한 파워
 						}
@@ -231,12 +232,12 @@ public class CombatManager extends GameManager {
 			// 일꾼이 없는 경우
 			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {
-				Result result = CombatExpectation.expectByUnitInfo(squad.unitList, euiList, false);
-				if (result == Result.LOSS) {
+				SmallFightPredict predict = VultureFightPredictor.watcherPredictByUnitInfo(squad.unitList, euiList);
+				if (predict == SmallFightPredict.BACK) {
 					return true;
 				}
 
-				int guerillaScore = CombatExpectation.guerillaScoreByUnitInfo(euiList);
+				int guerillaScore = GuerillaScore.guerillaScoreByUnitInfo(euiList);
 				if (guerillaScore <= 0) {
 					return true;
 				}

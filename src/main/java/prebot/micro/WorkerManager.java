@@ -13,10 +13,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
-import prebot.micro.constant.MicroCode.CombatStrategy;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.old.OldCombatManager;
-import prebot.micro.old.OldSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 
@@ -118,23 +115,6 @@ public class WorkerManager extends GameManager {
 //					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit)null);
 //				}
 //			}
-			
-			//1.3 추가  공격하고 있을떄 일꾼 에너지 20이하이면 idle
-			// if its job is Build
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat)
-			{
-				// 대상이 파괴되었거나, 수리가 다 끝난 경우
-				//1.3 일꾼 에너지가 20이하일떄 idle 변경
-				if(worker.getHitPoints() <= 16)
-				{
-					OldSquad temp = OldCombatManager.Instance().squadData.getUnitSquad(worker);
-//					worker.cancelConstruction();
-					if(temp!=null){
-						temp.removeUnit(worker);
-					}
-					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit)null);
-				}
-			}
 		}
 	}
 
@@ -421,7 +401,7 @@ public class WorkerManager extends GameManager {
 		int repairWorkCnt = workerData.workerRepairMap.size();
 		
 		int repairmax = 3;
-		if(OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY){
+		if(StrategyIdea.mainSquadMode.isAttackMode){
 			repairmax = 6;
 		}
 		if(repairWorkCnt > repairmax){

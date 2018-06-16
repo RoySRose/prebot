@@ -35,16 +35,12 @@ import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.MineralManager;
 import prebot.micro.Minerals;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
-import prebot.micro.old.OldCombatManager;
-import prebot.micro.old.OldScoutManager;
-import prebot.micro.old.ScoutManager;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
@@ -200,10 +196,6 @@ public class UXManager {
 		y += 11;
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Attackpoint : ");
 		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_WHITE + AttackExpansionManager.Instance().Attackpoint);
-		y += 11;
-		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "CombatStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + OldCombatManager.Instance().getCombatStrategy());
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
@@ -1062,18 +1054,18 @@ public class UXManager {
 	/// 정찰 상태를 Screen 에 표시합니다
 	public void drawScoutInformation(int x, int y)
 	{
-		int currentScoutStatus = OldScoutManager.Instance().getScoutStatus();
-		String scoutStatusString = null;
-
-		if(currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()){
-			scoutStatusString = "Moving To Another Base Location";
-		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()){
-			scoutStatusString = "Move Around Enemy BaseLocation";
-		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()){
-			scoutStatusString = "No Scout";
-		}else{
-			scoutStatusString = "No Scout";
-		}
+//		int currentScoutStatus = OldScoutManager.Instance().getScoutStatus();
+//		String scoutStatusString = null;
+//
+//		if(currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()){
+//			scoutStatusString = "Moving To Another Base Location";
+//		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()){
+//			scoutStatusString = "Move Around Enemy BaseLocation";
+//		}else if(currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()){
+//			scoutStatusString = "No Scout";
+//		}else{
+//			scoutStatusString = "No Scout";
+//		}
 
 		// get the enemy base location, if we have one
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
@@ -1085,46 +1077,46 @@ public class UXManager {
 			Prebot.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
 		}
 
-		if (currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()) {
-			Prebot.Broodwar.drawTextScreen(x, y + 10, "No Scout Unit");
-		}
-		else {
-			
-			Unit scoutUnit = OldScoutManager.Instance().getScoutUnit();
-			if (scoutUnit != null) {
-				Prebot.Broodwar.drawTextScreen(x, y + 10, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
-	
-				Position scoutMoveTo = scoutUnit.getTargetPosition();
-	
-				if (scoutMoveTo != null && scoutMoveTo != Position.None && scoutMoveTo.isValid()) {
-	
-					double currentScoutTargetDistance;
-	
-					if (currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()) {
-						if (scoutUnit.getType().isFlyer()) {
-							currentScoutTargetDistance = (int)(scoutUnit.getPosition().getDistance(scoutMoveTo));
-						}
-						else {
-							currentScoutTargetDistance = PositionUtils.getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
-						}
-	
-						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / UxConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / UxConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
-					}
-					/*
-					else if (currentScoutStatus == ScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()) {
-	
-						Vector<Position> vertices = ScoutManager.Instance().getEnemyRegionVertices();
-						for (int i = 0 ; i < vertices.size() ; ++i)
-						{
-							MyBotModule.Broodwar.drawCircleMap(vertices.get(i), 4, Color.Green, false);
-							MyBotModule.Broodwar.drawTextMap(vertices.get(i), "" + i);
-						}
-						MyBotModule.Broodwar.drawCircleMap(scoutMoveTo, 5, Color.Red, true);
-					}
-					*/
-				}
-			}
-		}
+//		if (currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()) {
+//			Prebot.Broodwar.drawTextScreen(x, y + 10, "No Scout Unit");
+//		}
+//		else {
+//			
+//			Unit scoutUnit = OldScoutManager.Instance().getScoutUnit();
+//			if (scoutUnit != null) {
+//				Prebot.Broodwar.drawTextScreen(x, y + 10, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
+//	
+//				Position scoutMoveTo = scoutUnit.getTargetPosition();
+//	
+//				if (scoutMoveTo != null && scoutMoveTo != Position.None && scoutMoveTo.isValid()) {
+//	
+//					double currentScoutTargetDistance;
+//	
+//					if (currentScoutStatus == OldScoutManager.ScoutStatus.MovingToAnotherBaseLocation.ordinal()) {
+//						if (scoutUnit.getType().isFlyer()) {
+//							currentScoutTargetDistance = (int)(scoutUnit.getPosition().getDistance(scoutMoveTo));
+//						}
+//						else {
+//							currentScoutTargetDistance = PositionUtils.getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
+//						}
+//	
+//						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / UxConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / UxConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
+//					}
+//					/*
+//					else if (currentScoutStatus == ScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()) {
+//	
+//						Vector<Position> vertices = ScoutManager.Instance().getEnemyRegionVertices();
+//						for (int i = 0 ; i < vertices.size() ; ++i)
+//						{
+//							MyBotModule.Broodwar.drawCircleMap(vertices.get(i), 4, Color.Green, false);
+//							MyBotModule.Broodwar.drawTextMap(vertices.get(i), "" + i);
+//						}
+//						MyBotModule.Broodwar.drawCircleMap(scoutMoveTo, 5, Color.Red, true);
+//					}
+//					*/
+//				}
+//			}
+//		}
 	}
 
 	/// Unit 의 Target 으로 잇는 선을 Map 에 표시합니다
@@ -1242,10 +1234,8 @@ public class UXManager {
 				MapGrid.Instance(),
 				BuildManager.Instance(),
 				ConstructionManager.Instance(),
-				ScoutManager.Instance(),
 				WorkerManager.Instance(),
-				CombatManager.Instance(),
-				OldCombatManager.Instance());
+				CombatManager.Instance());
 		
 		
 		int currentY = y;

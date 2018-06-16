@@ -29,7 +29,8 @@ public class TankPositionManager {
 	
 	private static final int NARROW_WIDTH = 250;
 	private static final int NEAR_BUILDING_DISTANCE = 100;
-	private static final int NEAR_CHOKE_DISTANCE = 150;
+	private static final int NEAR_CHOKE_DISTANCE = 200;
+	private static final int NEAR_CHOKE_DISTANCE_RELAXED = 250;
 	
 	private static final int POSITION_EXPIRE_FRAME = 24 * 4;
 
@@ -47,7 +48,7 @@ public class TankPositionManager {
 		return instance;
 	}
 
-	private Map<Integer, PositionReserveInfo> siegeModeReservedMap = new HashMap<>();
+	private Map<Integer, PositionReserveInfo> siegeModeReservedMap = new HashMap<>(); // key : tank id
 
 	public void update() {
 		List<Integer> expiredList = new ArrayList<>();
@@ -97,10 +98,7 @@ public class TankPositionManager {
 					int yVector = (int) (distanceFromCenter * Math.sin(radianAdjust));
 				    Position movePosition = new Position(centerPosition.getX() + xVector, centerPosition.getY() + yVector);
 					if (PositionUtils.isValidGroundPosition(movePosition) && PositionUtils.isValidGroundPath(tank.getPosition(), movePosition)) {
-				    	if (narrowChokeExist(movePosition)
-				    			|| isExpansionPosition(movePosition)
-				    			|| addOnBuildingOnTheLeft(movePosition)
-				    			|| buildingExistPosition(movePosition)) {
+				    	if (!isProperPositionToSiege(movePosition, true)) {
 				    		continue;
 				    	}
 				    	
@@ -108,6 +106,8 @@ public class TankPositionManager {
 				    	int reservedCount = getPositionReserveCountInRadius(movePosition, SIEGE_ARRANGE_RADIUS);
 				    	
 						if (siegeModeTanks.size() + reservedCount < seigeNumLimit) {
+							PositionReserveInfo reserveInfo = new PositionReserveInfo(tank.getID(), movePosition, TimeUtils.elapsedFrames());
+							siegeModeReservedMap.put(tank.getID(), reserveInfo);
 							return movePosition;
 						}
 				    }
@@ -150,19 +150,51 @@ public class TankPositionManager {
 		return count;
 	}
 
-	private boolean narrowChokeExist(Position position) {
+	public boolean isProperPositionToSiege(Position position, boolean marginDistanceExist) {
+		if (narrowChokeExist(position, marginDistanceExist)) {
+			return false;
+		}
+		if (isExpansionPosition(position, marginDistanceExist)) {
+			return false;
+		}
+		if (addOnBuildingOnTheLeft(position, marginDistanceExist)) {
+			return false;
+		}
+		if (buildingOrManyGroundUnitsExistPosition(position)) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean narrowChokeExist(Position position, boolean marginDistanceExist) {
+		int nearChokeDistance = NEAR_CHOKE_DISTANCE;
+		if (marginDistanceExist) {
+			nearChokeDistance =+ 100;
+		}
+		
 		Chokepoint nearChoke = BWTA.getNearestChokepoint(position);
-		return nearChoke.getWidth() < NARROW_WIDTH && position.getDistance(nearChoke.getCenter()) < NEAR_CHOKE_DISTANCE;
+		boolean narrowChokeExist = nearChoke.getWidth() < NARROW_WIDTH && position.getDistance(nearChoke.getCenter()) < nearChokeDistance;
+		return narrowChokeExist;
 	}
 	
-	private boolean isExpansionPosition(Position position) {
+	private boolean isExpansionPosition(Position position, boolean marginDistanceExist) {
+		int nearBuildingDistance = NEAR_BUILDING_DISTANCE;
+		if (marginDistanceExist) {
+			nearBuildingDistance =+ 100;
+		}
+		
 		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
-    	return position.getDistance(expansionBase.getPosition()) < NEAR_BUILDING_DISTANCE;
+		boolean isExpansionPosition = position.getDistance(expansionBase.getPosition()) < nearBuildingDistance;
+    	return isExpansionPosition;
 	}
 	
-	private boolean addOnBuildingOnTheLeft(Position position) {
+	private boolean addOnBuildingOnTheLeft(Position position, boolean marginDistanceExist) {
+		int nearBuildingDistance = NEAR_BUILDING_DISTANCE;
+		if (marginDistanceExist) {
+			nearBuildingDistance =+ 100;
+		}
 		Position leftPosition = new Position(position.getX() - 50, position.getY());
-		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, leftPosition, NEAR_BUILDING_DISTANCE);
+		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, leftPosition, nearBuildingDistance);
     	for (Unit nearUnit : nearUnitList) {
     		if (nearUnit.getType().isBuilding() && nearUnit.getType().canBuildAddon()) {
 				return true;
@@ -171,7 +203,7 @@ public class TankPositionManager {
     	return false;
 	}
 
-	private boolean buildingExistPosition(Position position) {
+	private boolean buildingOrManyGroundUnitsExistPosition(Position position) {
 		List<Unit> unitList = Prebot.Broodwar.getUnitsOnTile(position.toTilePosition());
     	for (Unit unit : unitList) {
     		if (unit.getType().isBuilding()) {

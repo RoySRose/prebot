@@ -29,7 +29,7 @@ import prebot.strategy.manage.TankPositionManager;
 public class TankControl extends Control {
 
 	private static final int ENOUGH_BACKUP_VULTURE_AND_GOLIATH = 7;
-	private static final int POSITION_TO_SIEGE_ARRIVE_DISTANCE = 30;
+	private static final int POSITION_TO_SIEGE_ARRIVE_DISTANCE = 20;
 	private static final int SIEGE_MODE_RANGE_MARGIN_DISTANCE = 5;
 
 	private boolean hasEnoughBackUpUnitToSiege = false;
@@ -72,8 +72,10 @@ public class TankControl extends Control {
 				CommandUtils.holdPosition(siege);
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
 				CommandUtils.unsiege(siege);
-			} else if (decision.type == DecisionType.ATTACK_POSITION) {
-				if (siege.getDistance(StrategyIdea.mainPosition) > siegeModeSpreadRadius) {
+			} else if (decision.type == DecisionType.ATTACK_POSITION) { // NO ENEMY
+				if (siege.getDistance(StrategyIdea.mainPosition) > siegeModeSpreadRadius
+						|| !TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition(), true)) {
+					System.out.println(siege.getPosition() + " = not properPosition");
 					CommandUtils.unsiege(siege);
 				} else {
 					CommandUtils.holdPosition(siege);
@@ -111,7 +113,9 @@ public class TankControl extends Control {
 				}
 
 				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE) {
+					if (tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE
+							&& TankPositionManager.Instance().isProperPositionToSiege(positionToSiege, true)) {
+						System.out.println(positionToSiege + " = not properPosition");
 						CommandUtils.siege(tank);
 					} else {
 						CommandUtils.attackMove(tank, positionToSiege);

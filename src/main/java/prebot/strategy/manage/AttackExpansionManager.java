@@ -13,10 +13,7 @@ import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
-import prebot.micro.constant.MicroCode.CombatStrategy;
-import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
-import prebot.micro.old.OldCombatManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
@@ -151,6 +148,10 @@ public class AttackExpansionManager {
 
 		// 내 팩토리 유닛 인구수 만큼 추가
 		totPoint = myunitPoint + expansionPoint + unitPoint;
+		
+		boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
+		boolean fastAttack = StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK;
+		boolean noMercyAttack = StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY;
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int plus = 0;
@@ -160,88 +161,86 @@ public class AttackExpansionManager {
 
 			if (unitPoint > 10 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4 + plus) {
-				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				isAttackMode = true;
 			} else if (unitPoint > 0 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5 + plus) {
-				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				isAttackMode = true;
 			} else if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6 + plus) {
-				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				isAttackMode = true;
 			}
 
 			int CC = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
-			if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && unitPoint < 0) {
+			if (isAttackMode && unitPoint < 0) {
 				if (CC == 1 && myunitPoint + unitPoint < 0) {
-					OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					isAttackMode = false;
 				}
 				if (CC == 2 && myunitPoint + unitPoint / 2 < 0) {
-					OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					isAttackMode = false;
 				}
 				if (CC > 3 && myunitPoint < 20) {
-					OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					isAttackMode = false;
 				}
 			}
 			if (CC > 4) {
 				CC = 4;
 			}
-			if ((myunitPoint > 250 - CC * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
-				OldCombatManager.Instance().pushSiegeLine = true;
-				CombatStartCase = 1;
-			}
-
-			if (CombatStartCase == 1 && myunitPoint < 90) {
-				OldCombatManager.Instance().pushSiegeLine = false;
-			}
-
-			if (myunitPoint > 100 && unitPoint > 40) {
-				OldCombatManager.Instance().pushSiegeLine = true;
-				CombatStartCase = 2;
-			}
-			if (CombatStartCase == 2 && unitPoint < 10) {
-				OldCombatManager.Instance().pushSiegeLine = false;
-			}
+//			if ((myunitPoint > 250 - CC * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
+//				OldCombatManager.Instance().pushSiegeLine = true;
+//				CombatStartCase = 1;
+//			}
+//
+//			if (CombatStartCase == 1 && myunitPoint < 90) {
+//				OldCombatManager.Instance().pushSiegeLine = false;
+//			}
+//
+//			if (myunitPoint > 100 && unitPoint > 40) {
+//				OldCombatManager.Instance().pushSiegeLine = true;
+//				CombatStartCase = 2;
+//			}
+//			if (CombatStartCase == 2 && unitPoint < 10) {
+//				OldCombatManager.Instance().pushSiegeLine = false;
+//			}
 
 		} else {
 			// 공통 예외 상황
-			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && OldCombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY) {// 팩토리 유닛 130 이상 또는 서플 196 이상
-																																										// 사용시(스타 내부에서는 2배)
-
-				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
+				isAttackMode = true;
 				CombatStartCase = 1;
 			}
 
-			if (totPoint > 120 && OldCombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY && myunitPoint > 80) {// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
+			if (totPoint > 120 && isAttackMode && myunitPoint > 80) {// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 
 				if (InformationManager.Instance().enemyRace == Race.Zerg
 						&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
 					if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) < Prebot.Broodwar.self()
 							.completedUnitCount(UnitType.Terran_Goliath)) {
-						OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+						isAttackMode = true;
 					}
 					// triple hatchery
 				} else {
-					OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+					isAttackMode = true;
 				}
 				CombatStartCase = 2;
 			}
 
-			if ((StrategyManager.Instance().lastStrategy == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO || StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO)
-					&& OldCombatManager.Instance().getCombatStrategy() != CombatStrategy.ATTACK_ENEMY
+			if ((StrategyManager.Instance().lastStrategy == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO
+					|| StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO)
+					&& !isAttackMode
 					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 							+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
-				OldCombatManager.Instance().setCombatStrategy(CombatStrategy.ATTACK_ENEMY);
+				isAttackMode = true;
+				fastAttack = true;
 				CombatStartCase = 5;
-				OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_CHECK_NO_GUERILLA, 500 * 24);
-				OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.NO_WAITING_CHOKE, 500 * 24);
 
 				if (CombatTime == 0) {
 					CombatTime = Prebot.Broodwar.getFrameCount() + 5000;
 				}
 			}
 
-			if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
+			if (isAttackMode) {
 				if (CombatStartCase == 1 && myunitPoint < 30) {
-					OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+					isAttackMode = false;
 				}
 				if (CombatStartCase == 2) {
 
@@ -249,21 +248,21 @@ public class AttackExpansionManager {
 							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
 						if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > Prebot.Broodwar.self()
 								.completedUnitCount(UnitType.Terran_Goliath)) {
-							OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							isAttackMode = false;
 						}
 						// triple hatchery
 						if (totPoint < 50) {
-							OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							isAttackMode = false;
 						}
 					} else if (totPoint < 50) {
-						OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+						isAttackMode = false;
 					}
 				}
 				if (CombatStartCase == 5) {
 
 					if (CombatTime < Prebot.Broodwar.getFrameCount() && ((myunitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
 
-						OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+						isAttackMode = false;
 						if (StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO) {
 							StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.PROTOSSBASIC);
 						}
@@ -274,26 +273,13 @@ public class AttackExpansionManager {
 							+ InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer)
 							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20) {
 						if (totPoint < 50) {
-							OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+							isAttackMode = false;
 							if (StrategyManager.Instance().currentStrategy == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO) {
 								StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.PROTOSSBASIC);
 							}
 						}
 					}
 				}
-				// if(CombatStartCase == 3 && (myunitPoint < 8 || unitPoint < -20) ){
-				// if(Config.BroodwarDebugYN){
-				// MyBotModule.Broodwar.printf("Retreat3");
-				// }
-				// CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-				// }
-				// if(CombatStartCase == 4 && myunitPoint < 60){
-				// if(Config.BroodwarDebugYN){
-				// MyBotModule.Broodwar.printf("Retreat4");
-				// }
-				// LastStrategyException = StrategysException.Init;
-				// CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
-				// }
 
 				if (InformationManager.Instance().enemyRace == Race.Protoss) {
 					if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
@@ -301,7 +287,7 @@ public class AttackExpansionManager {
 						for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
 							if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() == false) {
 								Prebot.Broodwar.printf("dark and no comsat or vessel");
-								OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+								isAttackMode = false;
 							}
 						}
 					} else if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Comsat_Station) > 0) {
@@ -319,28 +305,26 @@ public class AttackExpansionManager {
 								}
 							}
 							if (energy == false) {
-								OldCombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_CHOKEPOINT);
+								isAttackMode = false;
 							}
 						}
 					}
 				}
 
-				if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && expansionPoint >= 0 && myunitPoint > 120 && unitPoint + totPoint * 0.1 > 55) {
+				if (isAttackMode && expansionPoint >= 0 && myunitPoint > 120 && unitPoint + totPoint * 0.1 > 55) {
 					if (InformationManager.Instance().enemyRace == Race.Protoss
 							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <= 3) {
-						OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500 * 24);
+						noMercyAttack = true;
 					}
 					if (InformationManager.Instance().enemyRace == Race.Zerg
 							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <= 3) {
-						OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 500 * 24);
+						noMercyAttack = true;
 					}
 
 				}
 
-				if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.DEFENCE_CHOKEPOINT
-						|| (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0
-								&& (expansionPoint < 0 || (myunitPoint < 40 || unitPoint < 10)))) {
-					OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.ATTACK_NO_MERCY, 0);
+				if (!isAttackMode || (noMercyAttack && (expansionPoint < 0 || (myunitPoint < 40 || unitPoint < 10)))) {
+					noMercyAttack = false;
 				}
 			}
 		}
@@ -350,15 +334,15 @@ public class AttackExpansionManager {
 		UnitPoint = unitPoint;
 		Attackpoint = totPoint;
 		
-		if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
-			if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.ATTACK_NO_MERCY) > 0) {
+		if (isAttackMode) {
+			if (noMercyAttack) {
 				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
-			} else if (OldCombatManager.Instance().getDetailStrategyFrame(CombatStrategyDetail.NO_WAITING_CHOKE) > 0) {
+			} else if (fastAttack) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
 			} else {
 				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
 			}
-			
+
 		} else {
 			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
 		}
@@ -434,6 +418,8 @@ public class AttackExpansionManager {
 
 		// 앞마당 이후
 		else if (RealCCcnt >= 2) {
+			
+			boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
 
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
@@ -443,7 +429,7 @@ public class AttackExpansionManager {
 				}
 			}
 			// 공격시 돈 250 넘으면 멀티하기
-			if (OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY && Prebot.Broodwar.self().minerals() > 250) {
+			if (isAttackMode && Prebot.Broodwar.self().minerals() > 250) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
@@ -489,7 +475,7 @@ public class AttackExpansionManager {
 					temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
 				}
 			}
-			if (temp < 8000 && OldCombatManager.Instance().getCombatStrategy() == CombatStrategy.ATTACK_ENEMY) {
+			if (temp < 8000 && isAttackMode) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Position;
-import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
@@ -24,10 +23,8 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.PositionReserveInfo;
-import prebot.micro.constant.MicroCode.CombatStrategyDetail;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
-import prebot.micro.old.OldCombatManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.StrategyIdea;
@@ -92,11 +89,6 @@ public class SpiderMineManger {
 			goodPositions.add(enemySecondChoke.getCenter());
 			goodPositions.add(enemyFirstExpansion.getPosition());
 			
-			// 제거해야되는 마인리스트
-			// 테란 스파이더마인 정책 적용
-			if (InformationManager.Instance().enemyRace == Race.Terran) {
-				OldCombatManager.Instance().setDetailStrategy(CombatStrategyDetail.MINE_STRATEGY_FOR_TERRAN, 1 * 60 * 24);
-			}
 			return true;
 		}
 		return false;

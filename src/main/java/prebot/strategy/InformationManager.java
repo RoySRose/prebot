@@ -29,13 +29,13 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.MapTools;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.old.OldMicroUtils;
 import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
@@ -305,12 +305,8 @@ public class InformationManager extends GameManager {
 		}
 		//10000프레임 이전까지만 포톤러쉬 확인.
 		if (Prebot.Broodwar.getFrameCount() < 10000) {
-			BaseLocation base = null;
 			// 1. 본진에 적 포톤캐논이 있는지 본다.
-			base = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-			Region myRegion = base.getRegion();
-			List<Unit> enemyUnitsInRegion = OldMicroUtils.getUnitsInRegion(myRegion,
-			InformationManager.Instance().enemyPlayer);
+			List<UnitInfo> enemyUnitsInRegion = InfoUtils.euiListInMyRegion(InfoUtils.myBase().getRegion());
 			if (enemyUnitsInRegion.size() >= 1) {
 				for (int enemy = 0; enemy < enemyUnitsInRegion.size(); enemy++) {
 					if (enemyUnitsInRegion.get(enemy).getType() == getAdvancedRushBuildingType(enemyRace)) {
