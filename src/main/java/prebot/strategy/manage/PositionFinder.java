@@ -15,7 +15,10 @@ import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
+import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.squad.Squad;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
@@ -38,8 +41,8 @@ public class PositionFinder {
 		StrategyIdea.campPosition = getCampPosition();
 		StrategyIdea.mainPosition = getMainPosition();
 
-		StrategyIdea.mainSquadCenter = StrategyIdea.mainPosition; // 계산필요
-		StrategyIdea.watcherPosition = getWatcherPosition(); // 계산필요
+		StrategyIdea.mainSquadCenter = getMainSquadCenter();
+		StrategyIdea.watcherPosition = getWatcherPosition(); // TODO 변경필요
 
 		// 분리 필요
 		BaseLocation myBase = InfoUtils.myBase();
@@ -49,6 +52,16 @@ public class PositionFinder {
 			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.SLEEPING;
 		} else {
 			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.IN_MY_REGION;
+		}
+	}
+
+	private Position getMainSquadCenter() {
+		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		Unit leader = UnitUtils.leaderOfUnit(squad.unitList, StrategyIdea.mainPosition);
+		if (UnitUtils.isValidUnit(leader)) {
+			return leader.getPosition();
+		} else {
+			return getMainPosition();
 		}
 	}
 

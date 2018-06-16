@@ -15,6 +15,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import bwta.Region;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
@@ -379,11 +380,16 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 가장 가까운 유닛타입 유닛 리턴 */
-	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, final UnitType unitType) {
+	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, final UnitType... unitTypes) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
-				return unit.getType() == unitType;
+				for (UnitType unitType : unitTypes) {
+					if (unitType == unit.getType()) {
+						return true;
+					}
+				}
+				return false;
 			}
 		});
 	}
@@ -475,6 +481,31 @@ public class UnitUtils {
 			}
 		}
 		return totalSupplyCount * 4; // 인구수 기준이므로
+	}
+
+	public static Unit leaderOfUnit(List<Unit> unitList, Position goalPosition) {
+		if (unitList.isEmpty()) {
+			return null;
+		}
+		if (InfoUtils.enemyBase() == null) {
+			return null;
+		}
+		boolean expansionOccupied = false;
+		List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
+		for (BaseLocation enemyBase : enemyBases) {
+			if (enemyBase.equals(InfoUtils.enemyFirstExpansion())) {
+				expansionOccupied = true;
+				break;
+			}
+		}
+
+		BaseLocation attackBase = expansionOccupied ? InfoUtils.enemyFirstExpansion() : InfoUtils.enemyBase();
+
+		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, attackBase.getPosition(), UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		if (leader == null) {
+			leader = UnitUtils.getClosestUnitToPosition(unitList, attackBase.getPosition(), UnitType.Terran_Goliath);
+		}
+		return leader;
 	}
 	
 	public static UnitType[] enemyAirDefenseUnitType() {

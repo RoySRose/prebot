@@ -68,15 +68,11 @@ public class WatcherControl extends Control {
 				List<Unit> otherMechanics = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(), Common.MAIN_SQUAD_COVERAGE,
 						UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 				Unit enemyUnit = UnitUtils.unitInSight(decision.eui);
-				if (!otherMechanics.isEmpty()) {
-					if (enemyUnit != null) {
-						if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
-							CommandUtils.holdPosition(unit);
-						} else {
-							CommandUtils.attackUnit(unit, enemyUnit);
-						}
+				if (!otherMechanics.isEmpty() && enemyUnit != null) {
+					if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
+						CommandUtils.holdPosition(unit);
 					} else {
-						CommandUtils.attackMove(unit, decision.eui.getLastPosition());
+						CommandUtils.attackUnit(unit, enemyUnit);
 					}
 				} else {
 					MicroUtils.kiting(unit, decision.eui, kOption);

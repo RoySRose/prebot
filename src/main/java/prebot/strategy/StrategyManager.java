@@ -7,6 +7,7 @@ import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AttackExpansionManager;
+import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
 import prebot.strategy.manage.PositionFinder;
@@ -84,6 +85,7 @@ public class StrategyManager extends GameManager {
 		InitialAction.Instance().update();
 		RaceActionManager.Instance().update();
 		ActionManager.Instance().update();
+		DefenseTowerTimer.Instance().update();
 		
 		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
 		SpiderMineManger.Instance().update();
