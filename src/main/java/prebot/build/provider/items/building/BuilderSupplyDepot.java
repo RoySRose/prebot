@@ -1,4 +1,4 @@
-package prebot.build.provider.items;
+package prebot.build.provider.items.building;
 
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -7,9 +7,9 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 
-public class BuilderSupply extends DefaultBuildableItem {
+public class BuilderSupplyDepot extends DefaultBuildableItem {
 
-    public BuilderSupply(MetaType metaType){
+    public BuilderSupplyDepot(MetaType metaType){
         super(metaType);
     }
 
