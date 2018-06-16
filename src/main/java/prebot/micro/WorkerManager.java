@@ -46,7 +46,6 @@ public class WorkerManager extends GameManager {
 		handleMineralWorkers();
 		// cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
 		handleMoveWorkers();
-		handleCombatWorkers();
 		handleRepairWorkers();
 	}
 	
@@ -364,27 +363,6 @@ public class WorkerManager extends GameManager {
 			}
 		}
 	}
-
-	// bad micro for combat workers
-	public void handleCombatWorkers()
-	{
-		for (Unit worker : workerData.getWorkers())
-		{
-			if (worker == null) continue;
-
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat)
-			{
-//				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4, Color.Yellow, true);
-				Unit target = getClosestEnemyUnitFromWorker(worker);
-
-				if (target != null)
-				{
-					CommandUtils.attackUnit(worker, target);
-				}
-			}
-		}
-	}
-
 
 	public void handleRepairWorkers()
 	{
