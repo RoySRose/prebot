@@ -54,7 +54,7 @@ public class MarineControl extends Control {
 				} else if (decision.type == DecisionType.KITING_UNIT) {
 					MicroUtils.kiting(marine, decision.eui, kOption);
 				} else {
-					if (MicroUtils.arrivedToPosition(marine, StrategyIdea.campPosition)) {
+					if (marine.getDistance(StrategyIdea.campPosition) < 30) { // TODO 추후 변경
 						if (MicroUtils.timeToRandomMove(marine)) {
 							Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 20);
 							CommandUtils.attackMove(marine, randomPosition);
