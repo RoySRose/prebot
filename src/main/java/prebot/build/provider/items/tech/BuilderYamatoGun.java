@@ -1,14 +1,14 @@
-package prebot.build.provider.items;
+package prebot.build.provider.items.tech;
 
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
 
-public class BuilderSpiderMines extends DefaultBuildableItem {
+public class BuilderYamatoGun extends DefaultBuildableItem {
 
     ResearchSelector researchSelector;
 
-    public BuilderSpiderMines(MetaType metaType, ResearchSelector researchSelector){
+    public BuilderYamatoGun(MetaType metaType, ResearchSelector researchSelector){
         super(metaType);
         this.researchSelector = researchSelector;
     }

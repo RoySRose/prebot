@@ -1,4 +1,4 @@
-package prebot.build.provider.items;
+package prebot.build.provider.items.unit;
 
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
