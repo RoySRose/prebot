@@ -25,7 +25,7 @@ public final class BuildQueueProvider {
     
     
     /*upgrade*/
-    BuildableItem apolloReactor;
+    BuildableItem apolloReactor; 
     BuildableItem caduceusReactor;
     BuildableItem charonBoosters;
     BuildableItem colossusReactor;
