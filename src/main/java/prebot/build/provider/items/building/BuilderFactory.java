@@ -65,7 +65,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 			}else{*/
 				maxFaccnt = 3;
 			//}
-		}else if(CCcnt == 2){
+		}else if(CCcnt == 2){ 
 			/*if(InformationManager.Instance().getMapSpecificInformation().getMap() == MAP.TheHunters){
 				maxFaccnt = 6;
 			}else{*/
