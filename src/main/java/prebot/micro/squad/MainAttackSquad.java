@@ -7,7 +7,7 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.PositionRegion;
+import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
@@ -82,7 +82,7 @@ public class MainAttackSquad extends Squad {
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			super.findEnemies();
 		} else {
-			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(PositionRegion.MY_BASE, PlayerRange.SELF, new UnitCondition() {
+			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
 				@Override public boolean correspond(Unit unit) {
 					return unit.getType().isBuilding() && !unit.isFlying();
 				}

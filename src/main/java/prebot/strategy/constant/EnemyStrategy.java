@@ -27,16 +27,20 @@ public enum EnemyStrategy {
 	PROTOSS_2GATE(6, 1, 0, UpgradeOrder.VM_TS_VS,
 			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // 
 	
+	PROTOSS_2GATE_CENTER(PROTOSS_2GATE),
+	
 	PROTOSS_DOUBLE(1, 1, 0, UpgradeOrder.VM_TS_VS,
 			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION
 	
-	PROTOSS_FORGE(1, 1, 0, UpgradeOrder.TS_VM_VS,
+	PROTOSS_FORGE_DEFENSE(PROTOSS_DOUBLE), //
+	PROTOSS_FORGE_CANNON_RUSH(1, 1, 0, UpgradeOrder.TS_VM_VS,
 			MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), //
-	// 넥서스가 소환되지 않는 경우 포톤러시를 의심해야 한다.
 	
 	PROTOSS_FORGE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS,
 			MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY), // camp=S_CHOKE, 공격실패시 F_EXPANSION
 	
+	PROTOSS_GATE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS,
+			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION, 공격실패시 F_EXPANSION
 	
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// 원게이트 코어 정석빌드에서 연계되는 것에 대한 대비. 더블이나 투게이트 이후 연계는 이미 대비가 되어 있을 것이므로 아마 곧바로 종료.

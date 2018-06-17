@@ -21,7 +21,7 @@ public class CommonCode {
 		VISIBLE, INVISIBLE, ALL
 	}
 
-	public static enum PositionRegion {
+	public static enum RegionType {
 		MY_BASE, MY_FIRST_EXPANSION, ENEMY_BASE, ENEMY_FIRST_EXPANSION, ETC, UNKNOWN
 	}
 }

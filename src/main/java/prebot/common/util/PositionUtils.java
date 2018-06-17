@@ -9,7 +9,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PositionRegion;
+import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.MapTools;
 
@@ -65,43 +65,43 @@ public class PositionUtils {
 		return MapTools.Instance().getGroundDistance(origin, destination);
 	}
 
-	public static PositionRegion positionToPositionRegion(Position position) {
+	public static RegionType positionToRegionType(Position position) {
 		Region positionRegion = BWTA.getRegion(position);
 		Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		if (positionRegion == myBaseRegion) {
-			return PositionRegion.MY_BASE;
+			return RegionType.MY_BASE;
 		}
 		Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		if (positionRegion == myExpansionRegion) {
-			return PositionRegion.MY_FIRST_EXPANSION;
+			return RegionType.MY_FIRST_EXPANSION;
 		}
 		if (InfoUtils.enemyBase() != null) {
 			Region enemyBaseRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
 			if (positionRegion == enemyBaseRegion) {
-				return PositionRegion.ENEMY_BASE;
+				return RegionType.ENEMY_BASE;
 			}
 			Region enemyExpansionRegion = BWTA.getRegion(InfoUtils.enemyFirstExpansion().getPosition());
 			if (positionRegion == enemyExpansionRegion) {
-				return PositionRegion.ENEMY_FIRST_EXPANSION;
+				return RegionType.ENEMY_FIRST_EXPANSION;
 			}
-			return PositionRegion.ETC;
+			return RegionType.ETC;
 		}
-		return PositionRegion.UNKNOWN;
+		return RegionType.UNKNOWN;
 	}
 
-	public static Region positionRegionToRegion(PositionRegion positionRegion) {
-		if (positionRegion == PositionRegion.MY_BASE) {
+	public static Region regionTypeToRegion(RegionType regionType) {
+		if (regionType == RegionType.MY_BASE) {
 			return BWTA.getRegion(InfoUtils.myBase().getPosition());
 		}
-		if (positionRegion == PositionRegion.MY_FIRST_EXPANSION) {
+		if (regionType == RegionType.MY_FIRST_EXPANSION) {
 			return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		}
 		
 		if (InfoUtils.enemyBase() != null) {
-			if (positionRegion == PositionRegion.ENEMY_BASE) {
+			if (regionType == RegionType.ENEMY_BASE) {
 				return BWTA.getRegion(InfoUtils.enemyBase().getPosition());
 			}
-			if (positionRegion == PositionRegion.ENEMY_FIRST_EXPANSION) {
+			if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
 				return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 			}
 		}

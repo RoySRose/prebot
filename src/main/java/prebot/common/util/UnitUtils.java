@@ -20,7 +20,7 @@ import bwta.Region;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.PositionRegion;
+import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions.UnitCondition;
@@ -290,8 +290,8 @@ public class UnitUtils {
 		}
 	}
 	
-	public static List<Unit> getUnitsInRegion(PositionRegion positionRegion, PlayerRange playerRange) {
-		return getUnitsInRegion(positionRegion, playerRange, new UnitCondition() {
+	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange) {
+		return getUnitsInRegion(regionType, playerRange, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return true;
@@ -299,7 +299,7 @@ public class UnitUtils {
 		});
 	}
 	
-	public static List<Unit> getUnitsInRegion(PositionRegion positionRegion, PlayerRange playerRange, UnitCondition unitCondition) {
+	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange, UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
 		if (playerRange == PlayerRange.SELF) {
 			totalUnits = Prebot.Broodwar.self().getUnits();
@@ -312,7 +312,7 @@ public class UnitUtils {
 		}
 		
 		List<Unit> unitsInRegion = new ArrayList<>();
-		Region region = PositionUtils.positionRegionToRegion(positionRegion);
+		Region region = PositionUtils.regionTypeToRegion(regionType);
 	    for (Unit unit : totalUnits) {
 	    	if (UnitUtils.isValidUnit(unit) && unitCondition.correspond(unit)) {
 	    		if (region == BWTA.getRegion(unit.getPosition())) {
