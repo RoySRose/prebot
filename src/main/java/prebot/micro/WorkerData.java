@@ -8,6 +8,7 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BaseLocation;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 
@@ -643,6 +644,23 @@ public class WorkerData {
 		}
 
 		return mineralsNearDepot;
+	}
+	
+	public Unit getGasNearDepot(BaseLocation base)
+	{
+		if (base == null) { return null; }
+
+		Unit gasNearDepot = null;
+		for (Unit geyser : Prebot.Broodwar.getStaticGeysers())
+		{
+			if (geyser.getDistance(base) < 320)
+			{
+				gasNearDepot = geyser;
+				return gasNearDepot;
+			}
+		}
+		return gasNearDepot;
+
 	}
 
 	public Unit getWorkerResource(Unit unit)

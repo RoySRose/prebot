@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -144,6 +145,8 @@ public class UXManager {
 			
 		} else if (uxOption == 4) {
 			drawEnemyAirDefenseRange();
+		} else if (uxOption == 5) {
+			drawEnemyBaseToBaseTime();
 		}
 	}
 
@@ -152,6 +155,7 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(20, 35, "2. Strategy Information");
 		Prebot.Broodwar.drawTextScreen(20, 50, "3. Position Finder Test");
 		Prebot.Broodwar.drawTextScreen(20, 65, "4. Air Micro Test");
+		Prebot.Broodwar.drawTextScreen(20, 80, "5. Unit Bast To Base");
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -1289,6 +1293,14 @@ public class UXManager {
 				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
 			}
 		}
+	}
+	
+	private void drawEnemyBaseToBaseTime() {
+		int y = 10;
+		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseTobaseUnit.entrySet()) {
+			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
+		}
+		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
 	}
 	
 	private void drawEnemyAirDefenseRange() {
