@@ -1,7 +1,7 @@
 package prebot.strategy.action;
 
 public abstract class Action {
-	protected Action nextAction = null;
+	private Action nextAction = null;
 	
 	public Action getNextAction() {
 		return nextAction;

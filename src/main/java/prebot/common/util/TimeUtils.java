@@ -99,8 +99,8 @@ public class TimeUtils {
 		return buildStartFrames / SECOND;
 	}
 	
-	public static int timeToFrames(int miniutes, int seconds) {
-		return miniutes * MINUTE + seconds * SECOND;
+	public static int timeToFrames(int minutes, int seconds) {
+		return minutes * MINUTE + seconds * SECOND;
 	}
 	
 }

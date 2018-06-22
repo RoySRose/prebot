@@ -6,7 +6,7 @@ import prebot.strategy.action.RaceAction;
 public class ZergBuildPhase1 extends RaceAction {
 
 	public ZergBuildPhase1(Race race, int phasEndSec) {
-		super(race, phasEndSec);
+		super(race, 0, phasEndSec);
 		// TODO Auto-generated constructor stub
 	}
 

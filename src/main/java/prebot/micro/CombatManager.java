@@ -16,6 +16,7 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
+import prebot.micro.squad.AirForceSquad;
 import prebot.micro.squad.BuildingSquad;
 import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
@@ -75,8 +76,8 @@ public class CombatManager extends GameManager {
 		squadData.addSquad(scvScoutSquad);
 
 		// 레이쓰 특공대
-//		AirForceSquad airForceSquad = new AirForceSquad();
-//		squadData.addSquad(airForceSquad);
+		AirForceSquad airForceSquad = new AirForceSquad();
+		squadData.addSquad(airForceSquad);
 
 		// 개별 유닛 - 베슬, 드랍십
 		SpecialSquad specialSquad = new SpecialSquad();
@@ -112,7 +113,7 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.WATCHER, combatUnitList);
 		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
 		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
-//		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
+		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
 		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
 		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
 

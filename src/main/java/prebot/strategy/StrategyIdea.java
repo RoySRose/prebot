@@ -1,5 +1,8 @@
 package prebot.strategy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bwapi.Position;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
@@ -15,9 +18,7 @@ public class StrategyIdea {
 	// - watcher : 전략에 따라 벌처의 MinePositionLevel이 변경된다.
 	// - barrack : 입구봉쇄, 위치 변경 등
 	public static EnemyStrategy enemyStrategy = EnemyStrategy.UNKNOWN;
-	public static EnemyStrategy phase01 = EnemyStrategy.UNKNOWN;
-	public static EnemyStrategy phase02 = EnemyStrategy.UNKNOWN;
-	public static EnemyStrategy phase03 = EnemyStrategy.UNKNOWN;
+	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
 
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 
 	public static int bunkerNeedFrame = CommonCode.INT_MAX;
