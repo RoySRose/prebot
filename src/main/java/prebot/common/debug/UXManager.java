@@ -6,9 +6,9 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import bwapi.Bullet;
 import bwapi.BulletType;
@@ -1295,14 +1295,6 @@ public class UXManager {
 		}
 	}
 	
-	private void drawEnemyBaseToBaseTime() {
-		int y = 10;
-		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseTobaseUnit.entrySet()) {
-			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
-		}
-		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
-	}
-	
 	private void drawEnemyAirDefenseRange() {
 		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
 		for (UnitInfo eui : airDefenseEuiList) {
@@ -1319,6 +1311,15 @@ public class UXManager {
 				Prebot.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
 				Prebot.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
 			}
+		}
+	}
+	
+	private void drawEnemyBaseToBaseTime() {
+		int y = 35;
+		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
+		Prebot.Broodwar.drawTextScreen(10, 20, "enemyCampPosition : " + InfoUtils.enemyFirstExpansion().getPosition());
+		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseTobaseUnit.entrySet()) {
+			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
 		}
 	}
 
