@@ -17,7 +17,7 @@ public class BuilderAcademy extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("Academy build condition check");
+        //System.out.println("Academy build condition check");
         
         if (RespondToStrategy.Instance().enemy_dark_templar 
         		|| RespondToStrategy.Instance().enemy_wraith 

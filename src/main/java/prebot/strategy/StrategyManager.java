@@ -1,5 +1,6 @@
 package prebot.strategy;
 
+import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -102,6 +103,8 @@ public class StrategyManager extends GameManager {
 		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
 			AttackExpansionManager.Instance().executeExpansion();
 		}
+		
+		
 		
 		//건물 생성 연결중
 		BuildQueueProvider.Instance().process();

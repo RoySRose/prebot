@@ -2,10 +2,14 @@ package prebot.build.provider.items.building;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderItem;
+import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 
 public class BuilderSupplyDepot extends DefaultBuildableItem {
 
@@ -19,10 +23,17 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
+    	
+    	if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
+    		
+    		return false;
+    	}
 
         if (Prebot.Broodwar.self().supplyTotal() >= 400) {
             return false;
         }
+        
+        
 
         // 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼 부족해지면 새 서플라이를 짓도록 한다
         // 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
@@ -82,6 +93,8 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
             if (currentSupplyShortage > onBuildingSupplyCount) {
                 this.setHighPriority(true);
                 //this.setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
+                //System.out.println("return supply true");
+                //FileUtils.appendTextToFile("log.txt", "\n return supply true ==>>> ");
                 return true;
             }
         }

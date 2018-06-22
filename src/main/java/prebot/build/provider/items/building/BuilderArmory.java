@@ -18,7 +18,7 @@ public class BuilderArmory extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("Armory build condition check");
+        //System.out.println("Armory build condition check");
         
         boolean chk_armory = UnitUtils.myUnitDiscovered(UnitType.Terran_Armory);
         

@@ -16,7 +16,7 @@ public class BuilderComsatStation extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("ComsatStation build condition check");
+        //System.out.println("ComsatStation build condition check");
         
         
         if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Comsat_Station) && UnitUtils.myFactoryUnitSupplyCount() >= 32) {

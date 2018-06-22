@@ -11,6 +11,7 @@ import prebot.build.initialProvider.buildSets.VsZerg;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
+import prebot.common.util.FileUtils;
 import prebot.strategy.InformationManager;
 
 /// 봇 프로그램 설정
@@ -47,7 +48,9 @@ public class InitialBuildProvider {
 
     public void updateInitialBuild(){
         if(BuildManager.Instance().buildQueue.isEmpty()){
+        	
             InitialBuildFinished = true;
+            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
         }
 
 

@@ -19,7 +19,7 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("EngineeringBay build condition check");
+        //System.out.println("EngineeringBay build condition check");
         
         if(!UnitUtils.myUnitDiscovered(UnitType.Terran_Engineering_Bay) && (InformationManager.Instance().enemyRace != Race.Protoss || Prebot.Broodwar.getFrameCount() > 5000)){
 			

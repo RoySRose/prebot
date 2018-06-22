@@ -24,7 +24,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("CommandCenter build condition check");
+        //System.out.println("CommandCenter build condition check");
         if(StrategyManager.Instance().getCurrentStrategyException() == EnemyStrategyException.PROTOSSEXCEPTION_DOUBLENEXUS
 				&& StrategyManager.Instance().getCurrentStrategyBasic() != EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO){
 			

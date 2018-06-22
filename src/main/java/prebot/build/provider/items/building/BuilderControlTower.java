@@ -16,7 +16,7 @@ public class BuilderControlTower extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("ControlTower build condition check");
+        //System.out.println("ControlTower build condition check");
         int cc = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center);
         
         if ((RespondToStrategy.Instance().need_vessel == true && cc >= 2) || cc >= 3) {
