@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import bwapi.Player;
 import bwapi.Position;
@@ -48,7 +49,7 @@ public class InformationManager extends GameManager {
 	public Player enemyPlayer;		///< 적군 Player		
 	public Race selfRace;			///< 아군 Player의 종족
 	public Race enemyRace;			///< 적군 Player의 종족  
-	public Boolean firstBaseToBaseUnit = false;			///< 적군 Player의 종족
+	public Boolean firstBaseToBaseUnit = false;			///< 적군 Player의 종족  
 
 	private boolean ReceivingEveryMultiInfo;
 
@@ -95,6 +96,7 @@ public class InformationManager extends GameManager {
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
 	private Map<Player, Chokepoint> thirdChokePointDonotUse = new HashMap<Player, Chokepoint>();
+	
 	public Position tighteningPoint = null;
 	
 	// 나머지 멀티 location (가까운 순으로 sorting)
@@ -115,9 +117,8 @@ public class InformationManager extends GameManager {
 	
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
 	private Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
-	
-	public  Map<UnitType, Integer> baseTobaseUnit = new HashMap<UnitType, Integer>();
 
+	public  Map<UnitType, Integer> baseTobaseUnit = new HashMap<UnitType, Integer>();
 	/// static singleton 객체를 리턴합니다
 	public static InformationManager Instance() {
 		return instance;
@@ -198,6 +199,7 @@ public class InformationManager extends GameManager {
 		updateFirstGasInformation();
 		updateMapSpecificInformation();
 		updateChokePointAndExpansionLocation();
+		
 //		checkTileForSupply();
 //		updateBaseRegionVerticesMap();
 	}
@@ -230,7 +232,6 @@ public class InformationManager extends GameManager {
 //			setEveryMultiInfo();
 		}
 		UnitCache.getCurrentCache().updateCache();
-		
 		if(firstBaseToBaseUnit != true){
 			baseToBaseUnit(enemyRace);
 		}
@@ -1390,6 +1391,12 @@ public class InformationManager extends GameManager {
 	public Unit getMyfirstGas() {
 		return myfirstGas;
 	}
+	
+	public Unit getEnemyFirstGas() {
+		return enemyFirstGas;
+	}
+	
+	
 //	public int getMainBaseSuppleLimit() {
 //		return MainBaseSuppleLimit;
 //	}
@@ -1812,7 +1819,8 @@ public class InformationManager extends GameManager {
 		}
 	}
 	
-	protected void baseToBaseUnit(Race race) {
+	
+	private void baseToBaseUnit(Race race) {
 		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
 		if (enemyBaseLocation != null) {
 			if(race == Race.Protoss){
@@ -1842,8 +1850,14 @@ public class InformationManager extends GameManager {
 		// 대략적인 firstExpansion <-> myExpansion 사이에 unitType이 이동하는데 걸리는 시간 리턴 (단위 frame)
 	}
 	
-	protected int baseToBaseFrame(UnitType unitType) {
-		int speed = (int) (getFirstExpansionLocation(selfPlayer).getGroundDistance(getFirstExpansionLocation(enemyPlayer)) / (unitType.topSpeed()));
+	private int baseToBaseFrame(UnitType unitType) {
+		int speed = 0;
+		
+		if(unitType.isFlyer()){
+			speed = (int) (getFirstExpansionLocation(selfPlayer).getGroundDistance(getFirstExpansionLocation(enemyPlayer)) / (unitType.topSpeed()));
+		}else{
+			speed = (int) (getFirstExpansionLocation(selfPlayer).getAirDistance(getFirstExpansionLocation(enemyPlayer)) / (unitType.topSpeed()));
+		}
 		return speed;
 	}
 	
