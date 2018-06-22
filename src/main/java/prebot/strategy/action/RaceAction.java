@@ -23,6 +23,30 @@ public abstract class RaceAction extends Action {
 	protected enum LastCheckType {
 		BASE, FIRST_EXPANSION, GAS
 	}
+
+	@Override
+	public boolean exitCondition() {
+		// 전략이 파악되었거나, 일정시간이 지날 때까지 전략을 알지 못하였다.
+		if (enemyStrategy != EnemyStrategy.UNKNOWN || TimeUtils.after(phasEndSec)) {
+			if (enemyStrategy == EnemyStrategy.UNKNOWN) {
+				setEnemyStrategy(enemyStrategyExpect, RaceActionManager.Instance().clues.toString());
+			}
+			StrategyIdea.strategyHistory.add(phaseIndex, enemyStrategy);
+			return true;
+			
+		} else {
+			return false;
+		}
+		
+	}
+
+	@Override
+	public void action() {
+		analyse();
+		StrategyIdea.enemyStrategy = enemyStrategyExpect;
+	}
+
+	protected abstract void analyse();
 	
 	protected int lastCheckFrame(LastCheckType lastCheckType) {
 		if (lastCheckType == LastCheckType.BASE) {
@@ -34,6 +58,10 @@ public abstract class RaceAction extends Action {
 		} else {
 			return CommonCode.NONE;
 		}
+	}
+	
+	protected boolean unknownEnemyStrategy() {
+		return enemyStrategy == EnemyStrategy.UNKNOWN;
 	}
 	
 	protected class FoundInfo {
@@ -51,14 +79,16 @@ public abstract class RaceAction extends Action {
 	
 	private Race race;
 	private int phasEndSec;
+	protected int phaseIndex;
 	
 	public Race getRace() {
 		return race;
 	}
 
-	public RaceAction(Race race, int phasEndSec) {
+	public RaceAction(Race race, int phaseIndex, int phasEndSec) {
 		super();
 		this.race = race;
+		this.phaseIndex = phaseIndex;
 		this.phasEndSec = phasEndSec;
 	}
 	
@@ -129,6 +159,14 @@ public abstract class RaceAction extends Action {
 			}
 			return new FoundInfo(unitType, euiList, buildStartFrame);
 		}
+	}
+	
+	protected int buildStart(FoundInfo foundInfo) {
+		return buildStart(foundInfo.euiList.get(0));
+	}
+	
+	protected int buildStart(UnitInfo eui) {
+		return RaceActionManager.Instance().buildStartFrameMap.get(eui.getUnitID());
 	}
 	
 	// 발견 당시에 막 건설완료됐다고 가정 (최대한 늦게 건설되었다고 가정)
@@ -217,29 +255,4 @@ public abstract class RaceAction extends Action {
 			Prebot.Broodwar.printf(color + " - " + message);	
 		}
 	}
-	
-	protected boolean unknownEnemyStrategy() {
-		return enemyStrategy == EnemyStrategy.UNKNOWN;
-	}
-
-	@Override
-	public boolean exitCondition() {
-		// 전략이 파악되었거나, 일정시간이 지날 때까지 전략을 알지 못하였다.
-		if (enemyStrategy != EnemyStrategy.UNKNOWN || TimeUtils.after(phasEndSec)) {
-			if (enemyStrategy == EnemyStrategy.UNKNOWN) {
-				setEnemyStrategy(enemyStrategyExpect, RaceActionManager.Instance().clues.toString());
-			}
-			StrategyIdea.phase01 = enemyStrategy;
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void action() {
-		analyse();
-		StrategyIdea.enemyStrategy = enemyStrategyExpect;
-	}
-
-	protected abstract void analyse();
 }

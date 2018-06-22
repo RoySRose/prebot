@@ -2,8 +2,10 @@ package prebot.strategy.constant;
 
 import java.util.List;
 
+import bwapi.UnitType;
 import prebot.common.MetaType;
 import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
+import prebot.strategy.constant.EnemyStrategyOptions.DefaultTimeMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio;
 import prebot.strategy.constant.EnemyStrategyOptions.MarineCount;
@@ -19,28 +21,52 @@ public enum EnemyStrategy {
 	// : (입구막기) 1팩 -> 마린6기 -> 애드온 -> 탱크 -> 마인업 -> 벌처 -> 앞마당전진(FD) -> 멀티 -> 시즈업
 	
 	// PHASE1 : 시작 ~ 코어완료 OR 일정시간 경과
-	PROTOSS_INIT(1, 1, 0, UpgradeOrder.VM_TS_VS,
-			MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), // INIT DEFAULT
+	PROTOSS_INIT(1, 1, 0,UpgradeOrder.VM_TS_VS // INIT DEFAULT
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Gateway, 1, 20)
+								  .put(UnitType.Protoss_Assimilator, 1, 30)
+								  .put(UnitType.Protoss_Cybernetics_Core, 2, 00)),
 	
 	PROTOSS_1GATE_CORE(PROTOSS_INIT), //
 	
-	PROTOSS_2GATE(6, 1, 0, UpgradeOrder.VM_TS_VS,
-			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // 
+	PROTOSS_2GATE(6, 1, 0, UpgradeOrder.VM_TS_VS //
+			, MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Gateway, 1, 20)
+								  .put(UnitType.Protoss_Gateway, 1, 45)
+								  .put(UnitType.Protoss_Assimilator, 3, 00)
+								  .put(UnitType.Protoss_Cybernetics_Core, 3, 20)), 
 	
 	PROTOSS_2GATE_CENTER(PROTOSS_2GATE),
 	
-	PROTOSS_DOUBLE(1, 1, 0, UpgradeOrder.VM_TS_VS,
-			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION
+	PROTOSS_DOUBLE(1, 1, 0, UpgradeOrder.VM_TS_VS // camp=F_EXPANSION
+			, MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Nexus, 1, 55)
+								  .put(UnitType.Protoss_Gateway, 2, 5)
+								  .put(UnitType.Protoss_Assimilator, 2, 20)
+								  .put(UnitType.Protoss_Gateway, 2, 45)
+								  .put(UnitType.Protoss_Cybernetics_Core, 2, 55)),
 	
 	PROTOSS_FORGE_DEFENSE(PROTOSS_DOUBLE), //
-	PROTOSS_FORGE_CANNON_RUSH(1, 1, 0, UpgradeOrder.TS_VM_VS,
-			MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), //
 	
-	PROTOSS_FORGE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS,
-			MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY), // camp=S_CHOKE, 공격실패시 F_EXPANSION
+	PROTOSS_FORGE_CANNON_RUSH(1, 1, 0, UpgradeOrder.TS_VM_VS
+			, MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
+								  .put(UnitType.Protoss_Photon_Cannon, 2, 15)
+								  .put(UnitType.Protoss_Cybernetics_Core, 4, 20)), //
 	
-	PROTOSS_GATE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS,
-			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION, 공격실패시 F_EXPANSION
+	PROTOSS_FORGE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS // camp=S_CHOKE, 공격실패시 F_EXPANSION
+			, MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
+			  					  .put(UnitType.Protoss_Photon_Cannon, 2, 15)
+			  					  .put(UnitType.Protoss_Nexus, 2, 30)
+			  					  .put(UnitType.Protoss_Cybernetics_Core, 3, 50)),
+	
+	PROTOSS_GATE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS, // camp=F_EXPANSION, 공격실패시 F_EXPANSION
+			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
+			  					  .put(UnitType.Protoss_Gateway, 2, 15)
+			  					  .put(UnitType.Protoss_Nexus, 2, 30)
+			  					  .put(UnitType.Protoss_Cybernetics_Core, 3, 50)),
 	
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// 원게이트 코어 정석빌드에서 연계되는 것에 대한 대비. 더블이나 투게이트 이후 연계는 이미 대비가 되어 있을 것이므로 아마 곧바로 종료.
@@ -49,12 +75,14 @@ public enum EnemyStrategy {
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 벌처 일정량 이상 보유.
 	
-	PROTOSS_MORE_GATE(1, 1, 0, UpgradeOrder.TS_VM_VS,
-			MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), // camp=F_EXPANSION
+	PROTOSS_MORE_GATE(1, 1, 0, UpgradeOrder.TS_VM_VS
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION
 	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
 	
-	PROTOSS_ROBOTICS(5, 5, 2, UpgradeOrder.VM_TS_VS,
-			MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY), //
+	PROTOSS_ROBOTICS(5, 5, 2, UpgradeOrder.VM_TS_VS
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, new DefaultTimeMap()), //
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
@@ -71,52 +99,65 @@ public enum EnemyStrategy {
 
 	// PHASE1 : 시작 ~ 레어발견 OR 일정시간 경과
 	ZERG_INIT(2, 1, 2, UpgradeOrder.VM_GR_TS_VS
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // INIT DEFAULT, camp=S_CHOKE,
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // INIT DEFAULT, camp=S_CHOKE,
 	
 	ZERG_5DRONE(7, 1, 1, UpgradeOrder.VS_VM_GR_TS
-			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=BASE, 벙커
+			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=BASE, 벙커
 	
 	ZERG_9DRONE(2, 1, 2, UpgradeOrder.VM_GR_TS_VS,
-			MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_CHOKE, 벙커
+			MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_CHOKE, 벙커
 	
 	ZERG_9DRONE_GAS(2, 1, 2, UpgradeOrder.VS_VM_GR_TS,
-			MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // 마린=MORE, camp=F_CHOKE, 벙커
+			MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // 마린=MORE, camp=F_CHOKE, 벙커
 	
 	ZERG_OVERPOOL(2, 1, 2, UpgradeOrder.VM_GR_TS_VS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_CHOKE
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_CHOKE
 	
 	ZERG_OVERPOOL_GAS(2, 1, 2, UpgradeOrder.VS_VM_GR_TS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_CHOKE
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_CHOKE
 	
 	ZERG_2HAT(2, 1, 2, UpgradeOrder.VM_GR_TS_VS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=S_CHOKE, 벙커(공격)
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=S_CHOKE, 벙커(공격)
 	
 	ZERG_2HAT_GAS(2, 1, 2, UpgradeOrder.VM_GR_VS_TS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=S_CHOKE, 벙커(공격)
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=S_CHOKE, 벙커(공격)
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	ZERG_NO_LAIR_LING(3, 1, 0, UpgradeOrder.VS_VM_GR_TS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_EXPANSION, 벙커
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION, 벙커
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 벌처 일정량 이상 보유. 
 	
 	ZERG_NO_LAIR_HYDRA(1, 5, 0, UpgradeOrder.VM_TS_VS_GR,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_EXPANSION, 벙커
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION, 벙커
 	// + WATCHER : 마인매설(+촘촘하게)
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 탱크 일정량 이상 보유.
 	
 	ZERG_LAIR_HYDRA_TECH(1, 5, 2, UpgradeOrder.VM_TS_VS_GR,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_EXPANSION
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION
 	
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 탱크 일정량 이상 보유.
 	
 	ZERG_LAIR_SPIRE_TECH(1, 1, 15, UpgradeOrder.VM_GR_VS_TS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_EXPANSION
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
 	
 	ZERG_LAIR_MIXTED_TECH(1, 3, 5, UpgradeOrder.VM_GR_VS_TS,
-			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY), // camp=F_EXPANSION
+			MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()), // camp=F_EXPANSION
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
 	
 	// PHASE3 : PHASE2 종료 ~
@@ -134,7 +175,8 @@ public enum EnemyStrategy {
 	
 	// PHASE1 : 시작 ~ 팩토리 또는 아카데미 발견 OR 일정시간 경과
 	TERRAN_INIT(1, 1, 0, UpgradeOrder.TS,
-			MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT),
+			MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, new DefaultTimeMap()),
 	
 	TERRAN_NO_BARRACKS(TERRAN_INIT),
 	
@@ -143,7 +185,8 @@ public enum EnemyStrategy {
 	TERRAN_1BARRACKS_GAS(TERRAN_INIT),
 	
 	TERRAN_2BARRACKS(2, 1, 0, UpgradeOrder.VS_TS_VM,
-			MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY),
+			MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, new DefaultTimeMap()),
 	
 	TERRAN_DOUBLE(TERRAN_INIT),
 	
@@ -172,6 +215,7 @@ public enum EnemyStrategy {
 		this.marineCount = strategy.marineCount;
 		this.addOnOption = strategy.addOnOption;
 		this.expansionOption = strategy.expansionOption;
+		this.defaultTimeMap = strategy.defaultTimeMap;
 	}
 	
 	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade) {
@@ -180,14 +224,16 @@ public enum EnemyStrategy {
 		this.marineCount = MarineCount.SIX_MARINE;
 		this.addOnOption = AddOnOption.VULTURE_FIRST;
 		this.expansionOption = ExpansionOption.TWO_FACTORY;
+		this.defaultTimeMap = new DefaultTimeMap();
 	}
 
-	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade, int marineCount, AddOnOption addOnOption, ExpansionOption expansionOption) {
+	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade, int marineCount, AddOnOption addOnOption, ExpansionOption expansionOption, DefaultTimeMap defaultTimeMap) {
 		this.ratio = FactoryRatio.ratio(vulture, tank, goliath);
 		this.upgrade = upgrade;
 		this.marineCount = marineCount;
 		this.addOnOption = addOnOption;
 		this.expansionOption = expansionOption;
+		this.defaultTimeMap = defaultTimeMap;
 	}
 	
 	public FactoryRatio ratio;
@@ -195,6 +241,7 @@ public enum EnemyStrategy {
 	public int marineCount;
 	public AddOnOption addOnOption;
 	public ExpansionOption expansionOption;
+	public DefaultTimeMap defaultTimeMap;
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder().append("[").append(name()).append("]").append("\n").append(ratio.toString()).append("\n");
@@ -207,7 +254,8 @@ public enum EnemyStrategy {
 				sb.append(metaType.getUpgradeType()).append(" / ");
 			}
 		}
-		sb.append("\n").append("MARINE COUNT=").append(marineCount).append("\n").append(addOnOption).append("\n").append(expansionOption).append("\n");
+		sb.append("\n").append("MARINE COUNT=").append(marineCount).append("\n").append(addOnOption).append("\n").append(expansionOption).append("");
+		sb.append("\n\n").append(defaultTimeMap);
 		return sb.toString();
 	}
 }
