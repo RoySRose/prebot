@@ -2,9 +2,135 @@ package prebot.build.provider;
 
 
 import bwapi.UnitType;
+import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderItem;
+import prebot.common.main.Prebot;
+import prebot.strategy.StrategyManager;
+import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 public class FactoryUnitSelector implements Selector<UnitType>{
 
+	public int vultureratio = 0;
+	public int tankratio = 0;
+	public int goliathratio = 0;
+	public int wgt = 1;
+	
+	public int GetCurrentTot(UnitType checkunit) {
+		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + Prebot.Broodwar.self().allUnitCount(checkunit);
+	}
+
+	public int GetCurrentTotBlocked(UnitType checkunit) {
+		int cnt = Prebot.Broodwar.self().allUnitCount(checkunit);
+		return cnt;
+	}
+	
+	public static UnitType chooseunit(int ratea, int rateb, int ratec, int wgt, int tota, int totb, int totc) {
+
+		if (wgt < 1 || wgt > 3) {
+			wgt = 1;
+		}
+		double tempa = 0;
+		double tempb = 0;
+		double tempc = 0;
+		if (ratea == 0) {
+			tempa = 99999999;
+		} else {
+			tempa = 1.0 / ratea * tota;
+		}
+		if (rateb == 0) {
+			tempb = 99999999;
+		} else {
+			tempb = 1.0 / rateb * totb;
+		}
+		if (ratec == 0) {
+			tempc = 99999999;
+		} else {
+			tempc = 1.0 / ratec * totc;
+		}
+		int num = least(tempa, tempb, tempc, wgt);
+		if (num == 3) {// 1:벌쳐, 2:시즈, 3:골리앗
+			return UnitType.Terran_Goliath;
+		} else if (num == 2) {
+			return UnitType.Terran_Siege_Tank_Tank_Mode;
+		} else {
+			return UnitType.Terran_Vulture;
+		}
+	}
+	
+	public static int least(double a, double b, double c, int checker) {
+
+		int ret = 0;
+		if (a > b) {
+			if (b > c) {
+				ret = 3; // a>b>c
+			} else {
+				ret = 2; // a>b, b>=c
+			}
+		} else {
+			if (a > c) { // a<=b, a>c
+				ret = 3;
+			} else { // a<=b, a<=c
+				ret = 1;
+			}
+		}
+		if (ret == 1) {
+			if (a == b && checker != 3) {
+				ret = checker;
+			} else if (a == c && checker != 2) {
+				ret = checker;
+			}
+		} else if (ret == 2) {
+			if (b == a && checker != 3) {
+				ret = checker;
+			} else if (b == c && checker != 1) {
+				ret = checker;
+			}
+		} else if (ret == 3) {
+			if (c == a && checker != 2) {
+				ret = checker;
+			} else if (c == b && checker != 1) {
+				ret = checker;
+			}
+		}
+		return ret;
+	}
+	
+	public void setCombatUnitRatio() {
+		vultureratio = 0;
+		tankratio = 0;
+		goliathratio = 0;
+		wgt = 1;
+
+		// config setting 가지고 오기
+		if (StrategyManager.Instance().currentStrategyException == EnemyStrategyException.INIT) {
+			vultureratio = StrategyManager.Instance().currentStrategy.vultureRatio;
+			tankratio = StrategyManager.Instance().currentStrategy.tankRatio;
+			goliathratio = StrategyManager.Instance().currentStrategy.goliathRatio;
+			wgt = StrategyManager.Instance().currentStrategy.weight;
+		} else {
+			vultureratio = StrategyManager.Instance().currentStrategyException.vultureRatio;
+			tankratio = StrategyManager.Instance().currentStrategyException.tankRatio;
+			goliathratio = StrategyManager.Instance().currentStrategyException.goliathRatio;
+			wgt = StrategyManager.Instance().currentStrategyException.weight;
+
+			if (vultureratio == 0 && tankratio == 0 && goliathratio == 0) {
+				vultureratio = StrategyManager.Instance().currentStrategy.vultureRatio;
+				tankratio = StrategyManager.Instance().currentStrategy.tankRatio;
+				goliathratio = StrategyManager.Instance().currentStrategy.goliathRatio;
+				wgt = StrategyManager.Instance().currentStrategy.weight;
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+//	original source ======================
+	
     UnitType unitType;
     //BuildCondition buildCondition;
 
@@ -13,6 +139,26 @@ public class FactoryUnitSelector implements Selector<UnitType>{
     }
 
     public final void select(){
-        unitType = UnitType.Terran_Goliath;
+    	setCombatUnitRatio();
+        unitType = UnitType.Terran_Vulture;
+    	
+    	int tot_vulture = GetCurrentTot(UnitType.Terran_Vulture);
+		int tot_tank = GetCurrentTot(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTot(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int tot_goliath = GetCurrentTot(UnitType.Terran_Goliath);
+
+		UnitType selected = null;
+		int currentinbuildqueuecnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null)
+				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode, null)
+				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath, null);
+
+		if (currentinbuildqueuecnt == 0) {
+			selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
+
+			if (selected.mineralPrice() < Prebot.Broodwar.self().minerals() && selected.gasPrice() < Prebot.Broodwar.self().gas() && Prebot.Broodwar.self().supplyUsed() <= 392) {
+				//BuildManager.Instance().buildQueue.queueAsLowestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+				unitType = selected;
+			}
+		}
+		//unitType = UnitType.Terran_Vulture;
     }
 }

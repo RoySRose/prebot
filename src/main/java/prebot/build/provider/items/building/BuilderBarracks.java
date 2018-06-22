@@ -10,7 +10,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("barracks build condition check");
+        //System.out.println("barracks build condition check");
         return true;
     }
 

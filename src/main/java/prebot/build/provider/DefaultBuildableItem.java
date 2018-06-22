@@ -1,5 +1,9 @@
 package prebot.build.provider;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.rmi.activation.ActivationGroup_Stub;
 import java.util.List;
 
@@ -12,9 +16,12 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.UnitUtils;
+import prebot.common.util.*;
+//import prebot.common.util.UnitUtils;
 
 public abstract class DefaultBuildableItem implements BuildableItem{
+	
+	
 
     public final MetaType metaType;
 
@@ -36,8 +43,8 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         this.buildCondition.seedPositionStrategy = seedPositionStrategy;
     }
 
-    public final void setTilePostition(TilePosition tilePostition) {
-        this.buildCondition.tilePostition = tilePostition;
+    public final void settilePosition(TilePosition tilePosition) {
+        this.buildCondition.tilePosition = tilePosition;
     }
 
     //이놈만 유닛 변경 있을때만 확인해 주면 될듯
@@ -57,44 +64,86 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     private final void build(){
+    	//FileUtils.appendTextToFile("log.txt", "\n test log build()");
 
-        if(!metaType.isUnit() && (!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation) || !buildCondition.tilePostition.equals(TilePosition.None))) {
+        //if(!metaType.isUnit() && (!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation) || !buildCondition.tilePosition.equals(TilePosition.None))) {
+    	if(!metaType.isUnit() && 
+    			(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation
+    			|| buildCondition.tilePosition != TilePosition.None)
+    		) {
             System.out.println("Only UnitType can have position attribute");
         }
         //when blocking is false check resource
         if(buildCondition.blocking == false){
-            if(metaType.mineralPrice() >= Prebot.Broodwar.self().minerals() && metaType.gasPrice() >= Prebot.Broodwar.self().gas()){
+        	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.blocking == false && metaType ==>> " + metaType.getName());
+        	/*FileUtils.appendTextToFile("log.txt", "\n metaType.mineralPrice() : " + metaType.mineralPrice()
+        										+ "  /  Prebot.minerals() : " + Prebot.Broodwar.self().minerals()
+        										+ "  /  metaType.gasPrice() : " + metaType.gasPrice()
+        										+ "  /  Prebot.gas() : " + Prebot.Broodwar.self().gas());*/
+            if(metaType.mineralPrice() <= Prebot.Broodwar.self().minerals() && metaType.gasPrice() <= Prebot.Broodwar.self().gas()){
+            	//FileUtils.appendTextToFile("log.txt", "\n test log enough mineral == false");
                 setBuildQueue();
             }
         }else{
+        	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.blocking != false");
             setBuildQueue();
         }
     }
 
     private final void setBuildQueue(){
-        if(buildCondition.highPriority){
+    	
+    	/*if(buildCondition.tilePosition != null) {
+    		System.out.println("\n test log ==>>> " + buildCondition.tilePosition.toString());
+    		//FileUtils.appendTextToFile("log.txt", "\n test log ==>>> " + buildCondition.tilePosition.toString());
 
-            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+    	}else {
+    		System.out.println("buildCondition.tilePosition ==>>> null");
+    		//FileUtils.appendTextToFile("log.txt", "\nbuildCondition.tilePosition ==>>> null");
+    		buildCondition.tilePosition = TilePosition.None;
+    		//FileUtils.appendTextToFile("log.txt", "\nafter input buildCondition.tilePosition ==>>> None ==> " + buildCondition.tilePosition.getLength());
+    	}*/
+    	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue()==>>> " + metaType.getName());
+        if(buildCondition.highPriority){
+        	
+        	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue() OF buildCondition.highPriority TRUE==>>> " + metaType.getName());
+            //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+        	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
+        		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
                 BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+            //}else if(!buildCondition.tilePosition == TilePosition.None){
+            }else if(buildCondition.tilePosition != TilePosition.None){
+            	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
+                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.tilePosition, buildCondition.blocking);
             }else{
                 BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.blocking);
+                //FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! " + metaType.getUnitType());
+                //FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! " + buildCondition.blocking);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.blocking);
             }
         }else {
-            if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+        	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue() OF buildCondition.highPriority FALSE==>>> " + metaType.getName());
+            //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
+        	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
+        		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
                 BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
-            }else if(!buildCondition.tilePostition.equals(TilePosition.None)){
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.tilePostition, buildCondition.blocking);
+            //}else if(!buildCondition.tilePosition.equals(TilePosition.None)){
+            }else if(buildCondition.tilePosition != TilePosition.None){
+            	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.tilePosition, buildCondition.blocking);
             }else{
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.blocking);
+            	//FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! ");
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.blocking);
             }
         }
     }
 
     public final void process(){
+    	
+    	//FileUtils.appendTextToFile("log.txt", "\n test log process()==>>> " + metaType.getName());
 
         setDefaultConditions();
+        
+        ////FileUtils.appendTextToFile("log.txt", "\n build()'s chk_test ==>>> " + buildCondition.tilePosition);
 
         if(satisfyBasicConditions()){
             if(activateRecovery()){
@@ -102,6 +151,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
                 build();
             }else{
                 if(buildCondition()) {
+                	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition return true");
                     build();
                 }
             }
@@ -134,7 +184,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         this.buildCondition.blocking = false;
         this.buildCondition.highPriority = false;
         this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
-        this.buildCondition.tilePostition = TilePosition.None;
+        this.buildCondition.tilePosition = TilePosition.None;
     }
 
     private final boolean satisfyBasicConditions(){
@@ -170,6 +220,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     private final boolean checkProducerOfUnit(){
         if(metaType.isUnit() && !metaType.getUnitType().isBuilding()){
+        	FileUtils.appendTextToFile("log.txt", "\n checkProducerOfUnit metaType is Unit ==>> " + metaType.getName());
             
             int availableProducer = 0;
             List<Unit> producerList= UnitUtils.getUnitList(UnitFindRange.COMPLETE, producerOfUnit);

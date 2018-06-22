@@ -10,7 +10,7 @@ public class BuilderBunker extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("Bunker build condition check");
+        //System.out.println("Bunker build condition check");
         return true;
     }
 

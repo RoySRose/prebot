@@ -10,7 +10,7 @@ public class BuilderCovertOps extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("CovertOps build condition check");
+        //System.out.println("CovertOps build condition check");
         return true;
     }
 
