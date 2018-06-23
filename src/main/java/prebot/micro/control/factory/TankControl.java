@@ -116,7 +116,11 @@ public class TankControl extends Control {
 							&& TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
 						CommandUtils.siege(tank);
 					} else {
-						CommandUtils.attackMove(tank, positionToSiege);
+						if(tank.getPosition().equals(positionToSiege)){
+							CommandUtils.siege(tank);
+						}else{
+							tank.move(positionToSiege);
+						}
 					}
 				} else {
 					if (arrived) {
