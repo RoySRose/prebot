@@ -10,8 +10,8 @@ import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class HatcheryAnalyser extends UnitAnalyser {
 
@@ -44,7 +44,7 @@ public class HatcheryAnalyser extends UnitAnalyser {
 			}
 			
 		} else {
-			int expansionLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
 			if (expansionLastCheckFrame > nineDroneFrame) { // 더블 타이밍 지남
 				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_LATE);
 			}

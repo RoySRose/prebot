@@ -102,4 +102,10 @@ public class TimeUtils {
 		return minutes * MINUTE + seconds * SECOND;
 	}
 	
+	public static String framesToTimeString(int frames) {
+		int minutes = framesToMinutes(frames);
+		int seconds = framesToSeconds(frames - minutes * MINUTE);
+		return minutes + "min " + seconds + "sec";
+	}
+	
 }

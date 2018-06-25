@@ -10,8 +10,8 @@ import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class NexsusAnalyser extends UnitAnalyser {
 
@@ -36,7 +36,7 @@ public class NexsusAnalyser extends UnitAnalyser {
 					ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FAST_DOUBLE);
 				}
 			} else {
-				int expansionLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+				int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
 				if (expansionLastCheckFrame > forgeDoubleFrame) { // 더블 타이밍 지남
 					ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_NOT_DOUBLE);
 				}

@@ -6,11 +6,9 @@ import java.util.List;
 import bwapi.Race;
 import bwapi.TilePosition;
 import prebot.common.constant.CommonCode;
-import prebot.common.debug.UxColor;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.ProtossStrategist;
 import prebot.strategy.analyse.Strategist;
 import prebot.strategy.analyse.TerranStrategist;
@@ -34,17 +32,16 @@ import prebot.strategy.analyse.zerg.OverloadAnalyser;
 import prebot.strategy.analyse.zerg.SpawningPoolAnalyser;
 import prebot.strategy.analyse.zerg.SpireAnalyser;
 import prebot.strategy.analyse.zerg.ZerglingAnalyser;
-import prebot.strategy.constant.EnemyStrategy;
 
-public class RaceActionManager {
+public class StrategyAnalyseManager {
 	
 	public enum LastCheckLocation {
 		BASE, FIRST_EXPANSION, GAS
 	}
 	
-	private static RaceActionManager instance = new RaceActionManager();
+	private static StrategyAnalyseManager instance = new StrategyAnalyseManager();
 	
-	public static RaceActionManager Instance() {
+	public static StrategyAnalyseManager Instance() {
 		return instance;
 	}
 	
@@ -64,13 +61,13 @@ public class RaceActionManager {
 		}
 
 		if (strategist != null) {
-			EnemyStrategy strategyToApply = strategist.strategyToApply();
-			
-			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.enemyStrategy != strategyToApply) {
-				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
-				StrategyIdea.strategyHistory.add(StrategyIdea.enemyStrategy);
-				StrategyIdea.enemyStrategy = strategyToApply;
-			}
+//			EnemyStrategy strategyToApply = strategist.strategyToApply();
+//			
+//			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.enemyStrategy != strategyToApply) {
+//				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+//				StrategyIdea.strategyHistory.add(StrategyIdea.enemyStrategy);
+//				StrategyIdea.enemyStrategy = strategyToApply;
+//			}
 		}
 	}
 
@@ -114,7 +111,7 @@ public class RaceActionManager {
 		}
 		
 		TilePosition enemyBaseTile = InfoUtils.enemyBase().getTilePosition();
-		TilePosition enemyGasTile = InfoUtils.enemyBase().getTilePosition(); // TODO 가스 위치로 수정 (INFOMATION MANAGER)
+		TilePosition enemyGasTile = InfoUtils.enemyBaseGas().getTilePosition();
 		TilePosition enemyFirstExpansionTile = InfoUtils.enemyFirstExpansion().getTilePosition();
 		
 		if (Prebot.Broodwar.isVisible(enemyBaseTile)) {
@@ -130,11 +127,11 @@ public class RaceActionManager {
 	
 	public int lastCheckFrame(LastCheckLocation lastCheckLocation) {
 		if (lastCheckLocation == LastCheckLocation.BASE) {
-			return RaceActionManager.Instance().lastCheckFrameBase;
+			return StrategyAnalyseManager.Instance().lastCheckFrameBase;
 		} else if (lastCheckLocation == LastCheckLocation.FIRST_EXPANSION) {
-			return RaceActionManager.Instance().lastCheckFrameFirstExpansion;
+			return StrategyAnalyseManager.Instance().lastCheckFrameFirstExpansion;
 		} else if (lastCheckLocation == LastCheckLocation.GAS) {
-			return RaceActionManager.Instance().lastCheckFrameGas;
+			return StrategyAnalyseManager.Instance().lastCheckFrameGas;
 		} else {
 			return CommonCode.NONE;
 		}

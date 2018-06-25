@@ -8,8 +8,8 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class BarracksAnalyser extends UnitAnalyser {
 
@@ -43,7 +43,7 @@ public class BarracksAnalyser extends UnitAnalyser {
 			}
 		} else {
 			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Barracks, 15);
-			int baseLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
+			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > mechanicFirstBarrackFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_NOT_FOUND);
 			}

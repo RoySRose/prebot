@@ -23,7 +23,7 @@ public enum EnemyStrategy {
 	// : (입구막기) 1팩 -> 마린6기 -> 애드온 -> 탱크 -> 마인업 -> 벌처 -> 앞마당전진(FD) -> 멀티 -> 시즈업
 	
 	// PHASE1 : 시작 ~ 코어완료 OR 일정시간 경과
-	PROTOSS_INIT(1, 1, 0,UpgradeOrder.VM_TS_VS // INIT DEFAULT
+	PROTOSS_INIT(1, 1, 0, UpgradeOrder.VM_TS_VS // INIT DEFAULT
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
 			, new DefaultTimeMap().put(UnitType.Protoss_Gateway, 1, 20)
 								  .put(UnitType.Protoss_Assimilator, 1, 30)
@@ -72,23 +72,38 @@ public enum EnemyStrategy {
 	
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// 원게이트 코어 정석빌드에서 연계되는 것에 대한 대비. 더블이나 투게이트 이후 연계는 이미 대비가 되어 있을 것이므로 아마 곧바로 종료.
-	PROTOSS_TEMPLAR(PROTOSS_INIT), // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
+	PROTOSS_FAST_DARK(PROTOSS_INIT // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
+			, PROTOSS_INIT.defaultTimeMap.putAll(
+					new DefaultTimeMap().put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
+										.put(UnitType.Protoss_Templar_Archives, 3, 20))),
 	// + WATCHER : 마인매설(+본진, 앞마당), attack=S_CHOKE
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 벌처 일정량 이상 보유.
 	
-	PROTOSS_MORE_GATE(1, 1, 0, UpgradeOrder.TS_VM_VS
+	PROTOSS_DARK_DROP(PROTOSS_FAST_DARK),
+	
+	PROTOSS_FAST_DRAGOON(1, 2, 0, UpgradeOrder.TS_VM_VS // camp=F_EXPANSION
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap()), // camp=F_EXPANSION
+			, PROTOSS_INIT.defaultTimeMap.putAll(
+					new DefaultTimeMap().put(UpgradeType.Singularity_Charge, 2, 50)
+										.put(UnitType.Protoss_Gateway, 3, 10))),
 	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
 	
-	PROTOSS_ROBOTICS(5, 5, 2, UpgradeOrder.VM_TS_VS
+	PROTOSS_ROBOTICS_REAVER(5, 5, 2, UpgradeOrder.VM_TS_VS //
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap()), //
+			, new DefaultTimeMap()),
+	
+	PROTOSS_ROBOTICS_OB_DRAGOON(5, 5, 2, UpgradeOrder.VM_TS_VS //
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, PROTOSS_INIT.defaultTimeMap.putAll(
+					new DefaultTimeMap().put(UpgradeType.Singularity_Charge, 2, 50)
+										.put(UnitType.Protoss_Robotics_Facility, 3, 40)
+										.put(UnitType.Protoss_Gateway, 4, 0)
+										.put(UnitType.Protoss_Observatory, 4, 40))),
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
-	PROTOSS_STARGATE(PROTOSS_ROBOTICS), //
+	PROTOSS_STARGATE(PROTOSS_ROBOTICS_REAVER), //
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 
 	// PHASE3 - PHASE2 종료 ~
@@ -315,6 +330,15 @@ public enum EnemyStrategy {
 		this.addOnOption = strategy.addOnOption;
 		this.expansionOption = strategy.expansionOption;
 		this.defaultTimeMap = strategy.defaultTimeMap;
+	}
+	
+	private EnemyStrategy(EnemyStrategy strategy, DefaultTimeMap addTimeMap) {
+		this.ratio = strategy.ratio;
+		this.upgrade = strategy.upgrade;
+		this.marineCount = strategy.marineCount;
+		this.addOnOption = strategy.addOnOption;
+		this.expansionOption = strategy.expansionOption;
+		this.defaultTimeMap = strategy.defaultTimeMap.putAll(addTimeMap);
 	}
 	
 	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade) {

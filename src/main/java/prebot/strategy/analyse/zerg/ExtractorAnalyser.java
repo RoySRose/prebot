@@ -9,8 +9,8 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class ExtractorAnalyser extends UnitAnalyser {
 
@@ -37,7 +37,7 @@ public class ExtractorAnalyser extends UnitAnalyser {
 				ClueManager.Instance().addClueInfo(ClueInfo.EXTRACTOR_LATE);
 			}
 		} else {
-			int gasLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
+			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
 			if (gasLastCheckFrame > doubleHatchFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.NO_EXTRACTOR);
 			}
