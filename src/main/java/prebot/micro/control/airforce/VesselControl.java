@@ -37,9 +37,10 @@ public class VesselControl extends Control {
 			}
 
 			// 싸베 이리디 쓰기
-			if (StrategyIdea.enemyStrategy == EnemyStrategy.ZERG_MUTAL_MANY) {
+			if (StrategyIdea.enemyStrategy == EnemyStrategy.ZERG_AIR1
+					|| StrategyIdea.enemyStrategy == EnemyStrategy.ZERG_AIR2) {
 				if (vessel.getEnergy() >= 75) {
-					List<Unit> irradiateTargets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), VESSEL_SIGHT + 300, UnitType.Zerg_Mutalisk); 
+					List<Unit> irradiateTargets = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, vessel.getPosition(), VESSEL_SIGHT + 300, UnitType.Zerg_Mutalisk, UnitType.Zerg_Guardian); 
 					for (Unit target : irradiateTargets) {
 						if (target.getHitPoints() > target.getType().maxHitPoints() * 0.9) {
 							CommandUtils.useTechTarget(vessel, TechType.Irradiate, target);
