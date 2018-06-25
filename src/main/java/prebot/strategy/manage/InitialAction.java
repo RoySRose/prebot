@@ -35,7 +35,7 @@ public class InitialAction {
 				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
 				assignedFirstScout = true;
 			}
-//			RaceActionManager.Instance().setAction(new ProtossBuildPhase1());
+			RaceActionManager.Instance().setUp(Race.Protoss);
 			terminated = true;
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
@@ -45,7 +45,7 @@ public class InitialAction {
 			}
 			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));
 			ActionManager.Instance().addAction(new GasAdjustment8Barrack111());
-//			RaceActionManager.Instance().setAction(new ZergBuildPhase1());
+			RaceActionManager.Instance().setUp(Race.Zerg);
 			terminated = true;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
@@ -54,7 +54,7 @@ public class InitialAction {
 				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
 				assignedFirstScout = true;
 			}
-//			RaceActionManager.Instance().setAction(new TerranBuildPhase1());
+			RaceActionManager.Instance().setUp(Race.Terran);
 			terminated = true;
 			
 		} else {

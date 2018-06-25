@@ -89,14 +89,13 @@ public class TimeUtils {
 	}
 	
 	/// 시작된 빌드시간
-	public static int buildStartSeconds(Unit building) {
+	public static int buildStartFrames(Unit building) {
 		if (building.isCompleted()) {
 			return CommonCode.UNKNOWN;
 		}
 		
 		double completeRate = (double) building.getHitPoints() / building.getType().maxHitPoints();
-		int buildStartFrames = elapsedFrames() - (int) (building.getType().buildTime() * completeRate);
-		return buildStartFrames / SECOND;
+		return elapsedFrames() - (int) (building.getType().buildTime() * completeRate);
 	}
 	
 	public static int timeToFrames(int minutes, int seconds) {
