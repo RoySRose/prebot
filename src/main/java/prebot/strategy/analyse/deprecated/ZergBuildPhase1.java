@@ -1,20 +1,20 @@
-package prebot.strategy.analyse;
+package prebot.strategy.analyse.deprecated;
 
 import bwapi.Race;
 import prebot.strategy.action.RaceAction;
 
 public class ZergBuildPhase1 extends RaceAction {
 
-	public ZergBuildPhase1(Race race, int phasEndSec) {
-		super(race, 0, phasEndSec);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	protected void analyse() {
-		// TODO Auto-generated method stub
-		
-	}
+//	public ZergBuildPhase1(Race race, int phasEndSec) {
+//		super(race, 0, phasEndSec);
+//		// TODO Auto-generated constructor stub
+//	}
+//
+//	@Override
+//	protected void analyse() {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 //	private static final int PHASE1_END_SEC = 180; // TODO 일반적인 3해처리가 건설 시작되는 시간 (초)
 //	private static final int ERROR_RANGE_SEC = 5; // TODO 오차범위(초)

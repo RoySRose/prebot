@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import bwapi.Player;
 import bwapi.Position;
@@ -364,8 +363,8 @@ public class InformationManager extends GameManager {
 		Map<Integer, UnitInfo> unitAndUnitInfoMap = unitData.get(enemyPlayer).getUnitAndUnitInfoMap();
 		for (UnitInfo eui : unitAndUnitInfoMap.values()) {
 			if (!PositionUtils.isValidPosition(eui.getLastPosition())) {
-				Prebot.Broodwar.printf("updateEnemiesInMyRegion. invalid eui=" + eui); //TODO 테스트 코드 추후 삭제
-				System.out.println("updateEnemiesInMyRegion. invalid eui=" + eui);
+//				Prebot.Broodwar.printf("updateEnemiesInMyRegion. invalid eui=" + eui); //TODO 테스트 코드 추후 삭제
+//				System.out.println("updateEnemiesInMyRegion. invalid eui=" + eui);
 				continue;
 			}
 			

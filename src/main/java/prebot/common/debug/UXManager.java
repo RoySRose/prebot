@@ -51,6 +51,7 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.AttackExpansionManager;
+import prebot.strategy.manage.ClueManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
@@ -1286,13 +1287,15 @@ public class UXManager {
 		Race enemyRace = InfoUtils.enemyRace();
 		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
 		Prebot.Broodwar.drawTextScreen(20, 20, "" + UxColor.CHAR_YELLOW + strategy.toString());
-		
+
 		int y = 10;
 		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
 			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
 				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
 			}
 		}
+		
+		Prebot.Broodwar.drawTextScreen(20, 280, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
 	}
 	
 	private void drawEnemyAirDefenseRange() {

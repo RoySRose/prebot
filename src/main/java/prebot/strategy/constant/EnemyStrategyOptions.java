@@ -105,6 +105,12 @@ public class EnemyStrategyOptions {
 		private Map<TechType, Integer> techTimer = new HashMap<>();
 		private Map<UpgradeType, Integer> upgradeTimer = new HashMap<>();
 		
+		public DefaultTimeMap putAll(DefaultTimeMap defaultTimeMap) {
+			buildingTimer.putAll(defaultTimeMap.buildingTimer);
+			techTimer.putAll(defaultTimeMap.techTimer);
+			upgradeTimer.putAll(defaultTimeMap.upgradeTimer);
+			return this;
+		}
 		public DefaultTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			List<Integer> defaultTimeList = buildingTimer.get(unitType);
@@ -129,7 +135,7 @@ public class EnemyStrategyOptions {
 			return timeOfIndex(unitType, 0);
 		}
 		public int time(UnitType unitType, int margin) {
-			return timeOfIndex(unitType, 0) + margin;
+			return timeOfIndex(unitType, 0) + margin * TimeUtils.SECOND;
 		}
 		public int timeOfIndex(UnitType unitType, int index) {
 			List<Integer> defaultTimeList = buildingTimer.get(unitType);
@@ -139,21 +145,21 @@ public class EnemyStrategyOptions {
 			return defaultTimeList.get(index);
 		}
 		public int timeOfIndex(UnitType unitType, int index, int margin) {
-			return timeOfIndex(unitType, index) + margin;
+			return timeOfIndex(unitType, index) + margin * TimeUtils.SECOND;
 		}
 		public int time(TechType techType) {
 			Integer defaultTime = techTimer.get(techType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
 		public int time(TechType techType, int margin) {
-			return time(techType) + margin;
+			return time(techType) + margin * TimeUtils.SECOND;
 		}
 		public int time(UpgradeType upgradeType) {
 			Integer defaultTime = upgradeTimer.get(upgradeType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
 		public int time(UpgradeType upgradeType, int margin) {
-			return time(upgradeType) + margin;
+			return time(upgradeType) + margin * TimeUtils.SECOND;
 		}
 		@Override
 		public String toString() {
