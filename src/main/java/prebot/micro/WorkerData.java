@@ -646,21 +646,17 @@ public class WorkerData {
 		return mineralsNearDepot;
 	}
 	
-	public Unit getGasNearDepot(BaseLocation base)
-	{
-		if (base == null) { return null; }
+	public Unit getGasNearDepot(BaseLocation base) {
+		if (base == null) {
+			return null;
+		}
 
-		Unit gasNearDepot = null;
-		for (Unit geyser : Prebot.Broodwar.getStaticGeysers())
-		{
-			if (geyser.getDistance(base) < 320)
-			{
-				gasNearDepot = geyser;
-				return gasNearDepot;
+		for (Unit geyser : Prebot.Broodwar.getGeysers()) {
+			if (geyser.getDistance(base) < 320) {
+				return geyser;
 			}
 		}
-		return gasNearDepot;
-
+		return null;
 	}
 
 	public Unit getWorkerResource(Unit unit)

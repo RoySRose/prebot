@@ -57,7 +57,7 @@ public class PositionFinder {
 
 	private Position getMainSquadCenter() {
 		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
-		Unit leader = UnitUtils.leaderOfUnit(squad.unitList, StrategyIdea.mainPosition);
+		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (UnitUtils.isValidUnit(leader)) {
 			return leader.getPosition();
 		} else {

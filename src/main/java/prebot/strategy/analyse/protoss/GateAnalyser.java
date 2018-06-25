@@ -8,8 +8,8 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class GateAnalyser extends UnitAnalyser {
 
@@ -43,7 +43,7 @@ public class GateAnalyser extends UnitAnalyser {
 			}
 		} else {
 			int twoGateFirstGateFrame = EnemyStrategy.PROTOSS_2GATE.defaultTimeMap.time(UnitType.Protoss_Gateway, 20);
-			int baseLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
+			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > twoGateFirstGateFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.GATE_NOT_FOUND);
 			}

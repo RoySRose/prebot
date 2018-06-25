@@ -483,7 +483,7 @@ public class UnitUtils {
 		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 
-	public static Unit leaderOfUnit(List<Unit> unitList, Position goalPosition) {
+	public static Unit leaderOfUnit(List<Unit> unitList) {
 		if (unitList.isEmpty()) {
 			return null;
 		}

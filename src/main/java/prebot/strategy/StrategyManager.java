@@ -11,7 +11,7 @@ import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
 import prebot.strategy.manage.PositionFinder;
-import prebot.strategy.manage.RaceActionManager;
+import prebot.strategy.manage.StrategyAnalyseManager;
 import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.TankPositionManager;
 import prebot.strategy.manage.VultureTravelManager;
@@ -83,7 +83,7 @@ public class StrategyManager extends GameManager {
 
 		// 전략 파악
 		InitialAction.Instance().update();
-		RaceActionManager.Instance().update();
+		StrategyAnalyseManager.Instance().update();
 		ActionManager.Instance().update();
 		DefenseTowerTimer.Instance().update();
 		

@@ -6,6 +6,7 @@ import java.util.List;
 import bwapi.Position;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.RegionType;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
@@ -23,11 +24,13 @@ public class StrategyIdea {
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 
 	public static int bunkerNeedFrame = CommonCode.INT_MAX;
 	public static int bunkerBuildStartFrame = CommonCode.INT_MAX;
+	public static RegionType bunkerRegionType = RegionType.MY_BASE;
 
 	// 터렛이 필요한 frame (turretBuildStartFrame 이전에는 터렛을 짓지 않는다.)
 	public static int turretNeedFrame = CommonCode.INT_MAX;
 	public static int turretBuildStartFrame = CommonCode.INT_MAX;
 	public static int engineeringBayBuildStartFrame = CommonCode.INT_MAX;
+	public static List<RegionType> turretRegionType = new ArrayList<>();
 
 	// 적 전략 특이사항
 	public static boolean gasRushed = false;

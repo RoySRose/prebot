@@ -101,34 +101,34 @@ public class EnemyStrategyOptions {
 	}
 	
 	public static class DefaultTimeMap {
-		private Map<UnitType, List<Integer>> buildingTimer = new HashMap<>();
-		private Map<TechType, Integer> techTimer = new HashMap<>();
-		private Map<UpgradeType, Integer> upgradeTimer = new HashMap<>();
+		private Map<UnitType, List<Integer>> buildingTime = new HashMap<>();
+		private Map<TechType, Integer> techTime = new HashMap<>();
+		private Map<UpgradeType, Integer> upgradeTime = new HashMap<>();
 		
-		public DefaultTimeMap putAll(DefaultTimeMap defaultTimeMap) {
-			buildingTimer.putAll(defaultTimeMap.buildingTimer);
-			techTimer.putAll(defaultTimeMap.techTimer);
-			upgradeTimer.putAll(defaultTimeMap.upgradeTimer);
-			return this;
-		}
 		public DefaultTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
-			List<Integer> defaultTimeList = buildingTimer.get(unitType);
+			List<Integer> defaultTimeList = buildingTime.get(unitType);
 			if (defaultTimeList == null) {
 				defaultTimeList = new ArrayList<>();
 			}
 			defaultTimeList.add(defaultTime);
-			buildingTimer.put(unitType, defaultTimeList);
+			buildingTime.put(unitType, defaultTimeList);
 			return this;
 		}
 		public DefaultTimeMap put(TechType techType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
-			techTimer.put(techType, defaultTime);
+			techTime.put(techType, defaultTime);
 			return this;
 		}
 		public DefaultTimeMap put(UpgradeType upgradeType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
-			upgradeTimer.put(upgradeType, defaultTime);
+			upgradeTime.put(upgradeType, defaultTime);
+			return this;
+		}
+		public DefaultTimeMap putAll(DefaultTimeMap defaultTimeMap) {
+			buildingTime.putAll(defaultTimeMap.buildingTime);
+			techTime.putAll(defaultTimeMap.techTime);
+			upgradeTime.putAll(defaultTimeMap.upgradeTime);
 			return this;
 		}
 		public int time(UnitType unitType) {
@@ -138,7 +138,7 @@ public class EnemyStrategyOptions {
 			return timeOfIndex(unitType, 0) + margin * TimeUtils.SECOND;
 		}
 		public int timeOfIndex(UnitType unitType, int index) {
-			List<Integer> defaultTimeList = buildingTimer.get(unitType);
+			List<Integer> defaultTimeList = buildingTime.get(unitType);
 			if (defaultTimeList == null || defaultTimeList.size() <= index) {
 				return CommonCode.UNKNOWN;
 			}
@@ -148,14 +148,14 @@ public class EnemyStrategyOptions {
 			return timeOfIndex(unitType, index) + margin * TimeUtils.SECOND;
 		}
 		public int time(TechType techType) {
-			Integer defaultTime = techTimer.get(techType);
+			Integer defaultTime = techTime.get(techType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
 		public int time(TechType techType, int margin) {
 			return time(techType) + margin * TimeUtils.SECOND;
 		}
 		public int time(UpgradeType upgradeType) {
-			Integer defaultTime = upgradeTimer.get(upgradeType);
+			Integer defaultTime = upgradeTime.get(upgradeType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
 		public int time(UpgradeType upgradeType, int margin) {
@@ -163,7 +163,25 @@ public class EnemyStrategyOptions {
 		}
 		@Override
 		public String toString() {
-			return "DefaultTimeMap [buildingTimer=" + buildingTimer + ", techTimer=" + techTimer + ", upgradeTimer=" + upgradeTimer + "]";
+			StringBuilder sb = new StringBuilder();
+			for (UnitType unitType : buildingTime.keySet()) {
+				List<Integer> times = buildingTime.get(unitType);
+				List<String> timeStrings = new ArrayList<>();
+				for (int time : times) {
+					timeStrings.add(TimeUtils.framesToTimeString(time));
+				}
+				sb.append(unitType).append(timeStrings).append("\n");
+			}
+			for (TechType techType : techTime.keySet()) {
+				Integer time = techTime.get(techType);
+				sb.append(techType).append(TimeUtils.framesToTimeString(time)).append("\n");
+			}
+			for (UpgradeType upgradeType : upgradeTime.keySet()) {
+				Integer time = upgradeTime.get(upgradeType);
+				sb.append(upgradeType).append(TimeUtils.framesToTimeString(time)).append("\n");
+			}
+			
+			return "[DefaultTimeMap]\n" + sb.toString();
 		}
 	}
 }

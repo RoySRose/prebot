@@ -7,8 +7,8 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
-import prebot.strategy.manage.RaceActionManager;
-import prebot.strategy.manage.RaceActionManager.LastCheckLocation;
+import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class ZergStrategist extends Strategist {
 
@@ -194,7 +194,7 @@ public class ZergStrategist extends Strategist {
 
 	private void updateExpectFrame(EnemyStrategy enemyStrategy) {
 		if (hasInfo(ClueInfo.NO_LAIR)) {
-			int baseLastCheckFrame = RaceActionManager.Instance().lastCheckFrame(LastCheckLocation.BASE) + 5 * TimeUtils.SECOND;
+			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE) + 5 * TimeUtils.SECOND;
 			ClueManager.Instance().updateExpectBuildIfBigger(UnitType.Zerg_Lair, baseLastCheckFrame);
 		} else {
 			int lairTimeByStrategy = enemyStrategy.defaultTimeMap.time(UnitType.Zerg_Lair);

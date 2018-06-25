@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -74,6 +75,26 @@ public class InfoUtils {
 	
 	public static List<BaseLocation> enemyOccupiedBases() {
 		return InformationManager.Instance().getOccupiedBaseLocations(Prebot.Broodwar.enemy());
+	}
+	
+	public static Unit myBaseGas() {
+		if (myBase() != null) {
+			List<Unit> geysers = myBase().getGeysers();
+			if (geysers != null && !geysers.isEmpty()) {
+				return geysers.get(0);
+			}
+		}
+		return null;
+	}
+	
+	public static Unit enemyBaseGas() {
+		if (enemyBase() != null) {
+			List<Unit> geysers = enemyBase().getGeysers();
+			if (geysers != null && !geysers.isEmpty()) {
+				return geysers.get(0);
+			}
+		}
+		return null;
 	}
 
 	public static int myNumUnits(UnitType... unitTypes) {
