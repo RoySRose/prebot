@@ -21,25 +21,31 @@ public class NexsusAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		if (!ClueManager.Instance().containsClueType(ClueType.FAST_NEXSUS)) {
-			int doubleFrame = EnemyStrategy.PROTOSS_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
-			int forgeDoubleFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
+		fastNexsus();
+	}
+
+	private void fastNexsus() {
+		if (ClueManager.Instance().containsClueType(ClueType.FAST_NEXSUS)) {
+			return;
+		}
+		
+		int doubleFrame = EnemyStrategy.PROTOSS_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
+		int forgeDoubleFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
+		
+		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
+		if (!found.isEmpty()) {
+			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			
-			List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
-			if (!found.isEmpty()) {
-				int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
+			if (buildFrame < doubleFrame) { // 생더블 확정
+				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE);
 				
-				if (buildFrame < doubleFrame) { // 생더블 확정
-					ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE);
-					
-				} else if (buildFrame < forgeDoubleFrame) { // 포지더블, 게이트더블
-					ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FAST_DOUBLE);
-				}
-			} else {
-				int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
-				if (expansionLastCheckFrame > forgeDoubleFrame) { // 더블 타이밍 지남
-					ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_NOT_DOUBLE);
-				}
+			} else if (buildFrame < forgeDoubleFrame) { // 포지더블, 게이트더블
+				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FAST_DOUBLE);
+			}
+		} else {
+			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+			if (expansionLastCheckFrame > forgeDoubleFrame) { // 더블 타이밍 지남
+				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_NOT_DOUBLE);
 			}
 		}
 	}

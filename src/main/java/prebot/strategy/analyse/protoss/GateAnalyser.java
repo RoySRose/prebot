@@ -19,6 +19,10 @@ public class GateAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastGateway();
+	}
+
+	private void fastGateway() {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			if (found.size() >= 2) { // 게이트 웨이 2개 이상

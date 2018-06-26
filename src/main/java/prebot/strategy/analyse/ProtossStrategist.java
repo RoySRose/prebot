@@ -1,33 +1,44 @@
 package prebot.strategy.analyse;
 
+import bwapi.UnitType;
+import prebot.common.util.TimeUtils;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ProtossStrategist extends Strategist {
 
-	private boolean coreComplete = false;
-	
 	@Override
 	public EnemyStrategy strategyToApply() {
-		if (!coreComplete) {
-			return beforeCoreComplete();
+		if (phase01()) {
+			return StrategyIdea.startStrategy = strategyPhase01();
+		} else if (phase02()) {
+			return strategyPhase02();
+		} else {
+			return strategyPhase03();
 		}
-		
-		return EnemyStrategy.PROTOSS_INIT;
 	}
 
-	private EnemyStrategy beforeCoreComplete() {
+	private boolean phase01() {
+		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Cybernetics_Core);
+		return TimeUtils.before(buildTimeExpect) || TimeUtils.before(TimeUtils.timeToFrames(4, 0));
+	}
+
+	private boolean phase02() {
+		return TimeUtils.before(10 * TimeUtils.MINUTE); // TODO 조정
+	}
+
+	private EnemyStrategy strategyPhase01() {
 		if (hasType(ClueType.FAST_NEXSUS)) {
-			if (!hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
+			if (hasInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
+				return EnemyStrategy.PROTOSS_DOUBLE;
+			} else if (hasInfo(ClueInfo.NEXSUS_FAST_DOUBLE)) {
 				if (hasAnyType(ClueType.FAST_FORGE, ClueType.FAST_CANNON)) {
 					return EnemyStrategy.PROTOSS_FORGE_DOUBLE;
 				} else {
-					if (hasInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
-						return EnemyStrategy.PROTOSS_DOUBLE;
-					} else {
-						return EnemyStrategy.PROTOSS_GATE_DOUBLE;
-					}
+					return EnemyStrategy.PROTOSS_GATE_DOUBLE;
 				}
 			}
 		}
@@ -67,6 +78,52 @@ public class ProtossStrategist extends Strategist {
 		}
 		
 		return EnemyStrategy.PROTOSS_INIT;
+	}
+
+	private EnemyStrategy strategyPhase02() {
+		if (hasAnyInfo(ClueInfo.TEMPLAR_ARCH_FAST, ClueInfo.ADUN_FAST)) {
+			if (hasInfo(ClueInfo.ROBO_FAST)) {
+				return EnemyStrategy.PROTOSS_DARK_DROP;
+			} else {
+				return EnemyStrategy.PROTOSS_FAST_DARK;
+			}
+		}
+		
+		if (hasAnyInfo(ClueInfo.ROBO_FAST)) {
+			if (hasInfo(ClueInfo.ROBO_SUPPORT_FAST)) {
+				return EnemyStrategy.PROTOSS_ROBOTICS_REAVER;
+			} else if (hasInfo(ClueInfo.OBSERVER_FAST)) {
+				return EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON;
+			} else {
+				return EnemyStrategy.PROTOSS_DARK_DROP;
+			}
+		}
+		
+		if (hasAnyInfo(ClueInfo.STARGATE_ONEGATE_FAST)) {
+			return EnemyStrategy.PROTOSS_STARGATE;
+		}
+		
+		if (hasAnyInfo(ClueInfo.DRAGOON_RANGE_FAST)) {
+			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+		}
+		
+		// if 더블인가
+		if (StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_DOUBLE
+				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_FORGE_DOUBLE
+				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_GATE_DOUBLE) {
+			if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
+				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
+			} else {
+				return EnemyStrategy.PROTOSS_DOUBLE_GROUND;
+			}
+		}
+		
+		return EnemyStrategy.PROTOSS_FAST_DARK;
+	}
+
+	private EnemyStrategy strategyPhase03() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

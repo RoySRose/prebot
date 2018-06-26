@@ -3,10 +3,10 @@ package prebot.strategy.analyse.zerg;
 import java.util.List;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -21,6 +21,14 @@ public class SpawningPoolAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastPool();
+	}
+
+	private void fastPool() {
+		if (ClueManager.Instance().containsClueType(ClueType.POOL)) {
+			return;
+		}
+		
 		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 5);
 		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 5);
 		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
@@ -28,20 +36,14 @@ public class SpawningPoolAnalyser extends UnitAnalyser {
 		
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {
-			
-			int buildFrame = buildStartFrame(found.get(0));
-			boolean assume = false;
-			if (buildFrame == CommonCode.UNKNOWN) {
-				buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-				assume = true;
-			}
+			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			if (buildFrame < fiveDroneFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.POOL_5DRONE);
 			} else if (buildFrame < nineDroneFrame) {
-				ClueManager.Instance().addClueInfo(assume? ClueInfo.POOL_9DRONE_UNDER : ClueInfo.POOL_9DRONE);
+				ClueManager.Instance().addClueInfo(ClueInfo.POOL_9DRONE);
 			} else if (buildFrame < overPoolFrame) {
-				ClueManager.Instance().addClueInfo(assume? ClueInfo.POOL_OVERPOOL_UNDER : ClueInfo.POOL_OVERPOOL);
-			} else if (buildFrame < overPoolFrame) {
+				ClueManager.Instance().addClueInfo(ClueInfo.POOL_OVERPOOL);
+			} else if (buildFrame < doubleFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.POOL_2HAT);
 			} else {
 				ClueManager.Instance().addClueInfo(ClueInfo.POOL_2HAT); // 아주 늦은 스포닝풀

@@ -18,7 +18,8 @@ public class StrategyIdea {
 	// 컴뱃매니저: 상대 전략에 따른 마이크로 변화 (TBD)
 	// - watcher : 전략에 따라 벌처의 MinePositionLevel이 변경된다.
 	// - barrack : 입구봉쇄, 위치 변경 등
-	public static EnemyStrategy enemyStrategy = EnemyStrategy.UNKNOWN;
+	public static EnemyStrategy startStrategy = EnemyStrategy.UNKNOWN;
+	public static EnemyStrategy currentStrategy = EnemyStrategy.UNKNOWN;
 	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
 
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 

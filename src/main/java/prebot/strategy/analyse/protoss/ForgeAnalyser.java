@@ -18,6 +18,10 @@ public class ForgeAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastForge();
+	}
+
+	private void fastForge() {
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));

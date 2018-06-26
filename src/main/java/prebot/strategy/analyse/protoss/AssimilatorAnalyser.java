@@ -20,6 +20,10 @@ public class AssimilatorAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastAssimilator();
+	}
+
+	private void fastAssimilator() {
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
