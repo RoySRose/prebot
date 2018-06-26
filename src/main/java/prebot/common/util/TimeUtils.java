@@ -93,6 +93,9 @@ public class TimeUtils {
 		if (building.isCompleted()) {
 			return CommonCode.UNKNOWN;
 		}
+		if (building.getType() == UnitType.Zerg_Lair || building.getType() == UnitType.Zerg_Hive) { // 레어, 하이브 제외
+			return CommonCode.UNKNOWN;
+		}
 		
 		double completeRate = (double) building.getHitPoints() / building.getType().maxHitPoints();
 		return elapsedFrames() - (int) (building.getType().buildTime() * completeRate);

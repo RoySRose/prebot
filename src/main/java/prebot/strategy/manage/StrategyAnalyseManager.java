@@ -54,6 +54,7 @@ public class StrategyAnalyseManager {
 	
 	public void update() {
 		updateVisitFrame();
+		EnemyBuildTimer.Instance().update();
 		
 		for (UnitAnalyser analyser : analysers) {
 			analyser.upateFoundInfo();
@@ -63,10 +64,10 @@ public class StrategyAnalyseManager {
 		if (strategist != null) {
 //			EnemyStrategy strategyToApply = strategist.strategyToApply();
 //			
-//			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.enemyStrategy != strategyToApply) {
+//			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
 //				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
-//				StrategyIdea.strategyHistory.add(StrategyIdea.enemyStrategy);
-//				StrategyIdea.enemyStrategy = strategyToApply;
+//				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
+//				StrategyIdea.currentStrategy = strategyToApply;
 //			}
 		}
 	}
@@ -136,4 +137,5 @@ public class StrategyAnalyseManager {
 			return CommonCode.NONE;
 		}
 	}
+
 }

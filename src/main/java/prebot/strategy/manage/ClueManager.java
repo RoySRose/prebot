@@ -1,19 +1,13 @@
 package prebot.strategy.manage;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 
 public class ClueManager {
-	
-	// lair, hydraden, spire, core, adun, templar arch, robotics, robo support, factory, starport 
-	public Map<UnitType, Integer> buildTimeExpectMap = new HashMap<>();
 	
 	private static ClueManager instance = new ClueManager();
 	
@@ -56,22 +50,6 @@ public class ClueManager {
 	
 	public boolean containsClueInfo(ClueInfo info) {
 		return clueInfoSet.contains(info);
-	}
-	
-	public int getExpectBuildFrame(UnitType buildingType) {
-		Integer expectFrame = buildTimeExpectMap.get(buildingType);
-		return expectFrame == null ? CommonCode.UNKNOWN : expectFrame;
-	}
-	
-	public void updateExpectBuildFrame(UnitType buildingType, int frame) {
-		buildTimeExpectMap.put(buildingType, frame);
-	}
-	
-	public void updateExpectBuildIfBigger(UnitType buildingType, int frame) {
-		int expectFrame = getExpectBuildFrame(buildingType);
-		if (expectFrame == CommonCode.UNKNOWN || frame > expectFrame) {
-			updateExpectBuildFrame(buildingType, frame);
-		}
 	}
 	
 	public int baseToBaseFrame(UnitType unitType) {

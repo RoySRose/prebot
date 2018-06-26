@@ -18,6 +18,10 @@ public class CannonAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastCannon();
+	}
+
+	private void fastCannon() {
 		int forgeDoulbeCannonFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Photon_Cannon, 15);
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {

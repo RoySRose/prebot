@@ -18,7 +18,7 @@ public class StrategeChanger extends ChatExecuter {
 
 		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
 			if (enemyStrategy.name().toUpperCase().equals(inputStrategyName)) {
-				StrategyIdea.enemyStrategy = enemyStrategy;
+				StrategyIdea.currentStrategy = enemyStrategy;
 				return;
 			}
 		}

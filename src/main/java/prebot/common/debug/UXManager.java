@@ -1285,7 +1285,7 @@ public class UXManager {
 
 	private void drawStrategySample() {
 		Race enemyRace = InfoUtils.enemyRace();
-		EnemyStrategy strategy = StrategyIdea.enemyStrategy;
+		EnemyStrategy strategy = StrategyIdea.currentStrategy;
 		Prebot.Broodwar.drawTextScreen(20, 20, "" + UxColor.CHAR_YELLOW + strategy.toString());
 
 		int y = 10;

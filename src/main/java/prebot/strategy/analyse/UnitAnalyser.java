@@ -13,8 +13,6 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.StrategyAnalyseManager;
-import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public abstract class UnitAnalyser {
 	
@@ -101,15 +99,6 @@ public abstract class UnitAnalyser {
 		int buildStartFrame = buildStartFrame(eui);
 		if (buildStartFrame == CommonCode.UNKNOWN) {
 			return eui.getUpdateFrame() - eui.getType().buildTime();
-		} else {
-			return buildStartFrame;
-		}
-	}
-
-	protected int buildStartFrameDefaultLastCheck(UnitInfo eui, LastCheckLocation lastCheckLocation) {
-		int buildStartFrame = buildStartFrame(eui);
-		if (buildStartFrame == CommonCode.UNKNOWN) {
-			return StrategyAnalyseManager.Instance().lastCheckFrame(lastCheckLocation) - eui.getType().buildTime(); 
 		} else {
 			return buildStartFrame;
 		}

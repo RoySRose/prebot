@@ -23,88 +23,73 @@ public enum EnemyStrategy {
 	// : (입구막기) 1팩 -> 마린6기 -> 애드온 -> 탱크 -> 마인업 -> 벌처 -> 앞마당전진(FD) -> 멀티 -> 시즈업
 	
 	// PHASE1 : 시작 ~ 코어완료 OR 일정시간 경과
-	PROTOSS_INIT(1, 1, 0, UpgradeOrder.VM_TS_VS // INIT DEFAULT
+	PROTOSS_INIT(1, 1, 0, UpgradeOrder.VM_TS_VS
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Gateway, 1, 20)
-								  .put(UnitType.Protoss_Assimilator, 1, 30)
-								  .put(UnitType.Protoss_Cybernetics_Core, 2, 00)),
+			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
-	PROTOSS_1GATE_CORE(PROTOSS_INIT), //
+	PROTOSS_1GATE_CORE(PROTOSS_INIT
+			, TimeMapForProtoss.PROTOSS_1GATE_CORE()), //
 	
 	PROTOSS_2GATE(6, 1, 0, UpgradeOrder.VM_TS_VS //
 			, MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Gateway, 1, 20)
-								  .put(UnitType.Protoss_Gateway, 1, 45)
-								  .put(UnitType.Protoss_Assimilator, 3, 00)
-								  .put(UnitType.Protoss_Cybernetics_Core, 3, 20)), 
+			, TimeMapForProtoss.PROTOSS_2GATE()),
 	
 	PROTOSS_2GATE_CENTER(PROTOSS_2GATE),
 	
 	PROTOSS_DOUBLE(1, 1, 0, UpgradeOrder.VM_TS_VS // camp=F_EXPANSION
 			, MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Nexus, 1, 55)
-								  .put(UnitType.Protoss_Gateway, 2, 5)
-								  .put(UnitType.Protoss_Assimilator, 2, 20)
-								  .put(UnitType.Protoss_Gateway, 2, 45)
-								  .put(UnitType.Protoss_Cybernetics_Core, 2, 55)),
+			, TimeMapForProtoss.PROTOSS_DOUBLE()),
 	
-	PROTOSS_FORGE_DEFENSE(PROTOSS_DOUBLE), //
+	PROTOSS_FORGE_DEFENSE(1, 1, 0, UpgradeOrder.TS_VM_VS
+			, MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_FORGE_DEFENSE()), //
 	
 	PROTOSS_FORGE_CANNON_RUSH(1, 1, 0, UpgradeOrder.TS_VM_VS
-			, MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
-								  .put(UnitType.Protoss_Photon_Cannon, 2, 15)
-								  .put(UnitType.Protoss_Cybernetics_Core, 4, 20)), //
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_FORGE_CANNON_RUSH()),
 	
 	PROTOSS_FORGE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS // camp=S_CHOKE, 공격실패시 F_EXPANSION
 			, MarineCount.NO_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
-			  					  .put(UnitType.Protoss_Photon_Cannon, 2, 15)
-			  					  .put(UnitType.Protoss_Nexus, 2, 30)
-			  					  .put(UnitType.Protoss_Cybernetics_Core, 3, 50)),
+			, TimeMapForProtoss.PROTOSS_FORGE_DOUBLE()),
 	
 	PROTOSS_GATE_DOUBLE(1, 1, 0, UpgradeOrder.TS_VM_VS, // camp=F_EXPANSION, 공격실패시 F_EXPANSION
 			MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap().put(UnitType.Protoss_Forge, 1, 40)
-			  					  .put(UnitType.Protoss_Gateway, 2, 15)
-			  					  .put(UnitType.Protoss_Nexus, 2, 30)
-			  					  .put(UnitType.Protoss_Cybernetics_Core, 3, 50)),
+			, TimeMapForProtoss.PROTOSS_GATE_DOUBLE()),
 	
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
-	// 원게이트 코어 정석빌드에서 연계되는 것에 대한 대비. 더블이나 투게이트 이후 연계는 이미 대비가 되어 있을 것이므로 아마 곧바로 종료.
-	PROTOSS_FAST_DARK(PROTOSS_INIT // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
-			, PROTOSS_INIT.defaultTimeMap.putAll(
-					new DefaultTimeMap().put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
-										.put(UnitType.Protoss_Templar_Archives, 3, 20))),
+	PROTOSS_FAST_DRAGOON(1, 2, 0, UpgradeOrder.TS_VM_VS // camp=F_EXPANSION
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()),
+	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
+	
+	PROTOSS_FAST_DARK(1, 2, 0, UpgradeOrder.VM_TS_VS // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_FAST_DARK()),
 	// + WATCHER : 마인매설(+본진, 앞마당), attack=S_CHOKE
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 벌처 일정량 이상 보유.
 	
-	PROTOSS_DARK_DROP(PROTOSS_FAST_DARK),
-	
-	PROTOSS_FAST_DRAGOON(1, 2, 0, UpgradeOrder.TS_VM_VS // camp=F_EXPANSION
+	PROTOSS_DARK_DROP(1, 2, 0, UpgradeOrder.VM_TS_VS // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, PROTOSS_INIT.defaultTimeMap.putAll(
-					new DefaultTimeMap().put(UpgradeType.Singularity_Charge, 2, 50)
-										.put(UnitType.Protoss_Gateway, 3, 10))),
-	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
+			, TimeMapForProtoss.PROTOSS_DARK_DROP()),
 	
 	PROTOSS_ROBOTICS_REAVER(5, 5, 2, UpgradeOrder.VM_TS_VS //
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, new DefaultTimeMap()),
+			, TimeMapForProtoss.PROTOSS_ROBOTICS_REAVER()),
 	
 	PROTOSS_ROBOTICS_OB_DRAGOON(5, 5, 2, UpgradeOrder.VM_TS_VS //
 			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
-			, PROTOSS_INIT.defaultTimeMap.putAll(
-					new DefaultTimeMap().put(UpgradeType.Singularity_Charge, 2, 50)
-										.put(UnitType.Protoss_Robotics_Facility, 3, 40)
-										.put(UnitType.Protoss_Gateway, 4, 0)
-										.put(UnitType.Protoss_Observatory, 4, 40))),
+			, TimeMapForProtoss.PROTOSS_ROBOTICS_OB_DRAGOON()),
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
 	PROTOSS_STARGATE(PROTOSS_ROBOTICS_REAVER), //
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
+	
+	PROTOSS_DOUBLE_GROUND(PROTOSS_ROBOTICS_REAVER), //
+	
+	PROTOSS_DOUBLE_CARRIER(PROTOSS_ROBOTICS_REAVER), //
+	
 
 	// PHASE3 - PHASE2 종료 ~
 	PROTOSS_DEFAULT(1, 1, 0, UpgradeOrder.VM_TS_VS),
@@ -117,98 +102,99 @@ public enum EnemyStrategy {
 	// PHASE1 : 시작 ~ 레어발견 OR 일정시간 경과
 	ZERG_INIT(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Spawning_Pool, 1, 15)
-			  					  .put(UnitType.Zerg_Overlord, 1, 35)
-			  					  .put(UnitType.Zerg_Hatchery, 2, 25)
-			  					  .put(UnitType.Zerg_Lair, 3, 40)),
+			, TimeMapForZerg.ZERG_9DRONE()),
 	
 	ZERG_5DRONE(7, 1, 1, UpgradeOrder.VS_VM_GR_TS // camp=BASE, 벙커
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Spawning_Pool, 0, 45)
-								  .put(UnitType.Zerg_Lair, 10, 0)),
+			, TimeMapForZerg.ZERG_5DRONE()),
 	
 	ZERG_9DRONE(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // camp=F_CHOKE, 벙커
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_INIT.defaultTimeMap),
+			, TimeMapForZerg.ZERG_9DRONE()),
 	
 	ZERG_9DRONE_GAS(2, 1, 2, UpgradeOrder.VS_VM_GR_TS // 마린=MORE, camp=F_CHOKE, 벙커
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Spawning_Pool, 1, 15)
-								  .put(UnitType.Zerg_Extractor, 1, 20)
-								  .put(UnitType.Zerg_Overlord, 1, 30)
-								  .put(UnitType.Zerg_Lair, 2, 40)),
+			, TimeMapForZerg.ZERG_9DRONE_GAS()),
+	
+	ZERG_9DRONE_GAS_DOUBLE(2, 1, 2, UpgradeOrder.VS_VM_GR_TS // 마린=MORE, camp=F_CHOKE, 벙커
+			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_9DRONE_GAS_DOUBLE()),
 	
 	ZERG_OVERPOOL(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // camp=F_CHOKE
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Overlord, 0, 55)
-			  					  .put(UnitType.Zerg_Spawning_Pool, 1, 20)
-			  					  .put(UnitType.Zerg_Hatchery, 2, 5)
-			  					  .put(UnitType.Zerg_Lair, 3, 30)),
+			, TimeMapForZerg.ZERG_OVERPOOL()),
 	
 	ZERG_OVERPOOL_GAS(2, 1, 2, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Overlord, 0, 55)
-								  .put(UnitType.Zerg_Spawning_Pool, 1, 20)
-								  .put(UnitType.Zerg_Extractor, 1, 30)
-								  .put(UnitType.Zerg_Lair, 2, 45)),
+			, TimeMapForZerg.ZERG_OVERPOOL_GAS()),
+	
+	ZERG_OVERPOOL_GAS_DOUBLE(2, 1, 2, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_OVERPOOL_GAS_DOUBLE()),
 	
 	ZERG_2HAT_GAS(2, 1, 2, UpgradeOrder.VM_GR_VS_TS // camp=S_CHOKE, 벙커(공격)
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Overlord, 0, 55)
-								  .put(UnitType.Zerg_Hatchery, 1, 50)
-								  .put(UnitType.Zerg_Spawning_Pool, 2, 5)
-								  .put(UnitType.Zerg_Extractor, 2, 20)
-								  .put(UnitType.Zerg_Lair, 3, 5)),
+			, TimeMapForZerg.ZERG_2HAT_GAS()),
 	
 	ZERG_TWIN_HAT(ZERG_2HAT_GAS),
 	
 	ZERG_3HAT(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // camp=S_CHOKE, 벙커(공격)
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Zerg_Overlord, 0, 55)
-								  .put(UnitType.Zerg_Hatchery, 1, 50)
-								  .put(UnitType.Zerg_Spawning_Pool, 2, 5)
-								  .put(UnitType.Zerg_Hatchery, 2, 50)
-								  .put(UnitType.Zerg_Extractor, 3, 0)
-								  .put(UnitType.Zerg_Lair, 3, 50)),
+			, TimeMapForZerg.ZERG_3HAT()),
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
-	ZERG_1HAT_FAST_MUTAL(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_9DRONE_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Zerg_Spire, 3, 50))),
+	ZERG_FAST_MUTAL(1, 0, 3, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
 	
-	ZERG_1HAT_FAST_LURKER(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_OVERPOOL_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Zerg_Hydralisk_Den, 3, 15)
-								  .put(TechType.Lurker_Aspect, 3, 45))),
+	ZERG_FAST_LURKER(2, 1, 1, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
 	
-	ZERG_NO_LAIR_LING(3, 1, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_EXPANSION, 벙커
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_OVERPOOL_GAS.defaultTimeMap),
-	// + CHECKER : 할당량 감소(거의 할당하지 않음)
-	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 벌처 일정량 이상 보유. 
+	ZERG_NO_LAIR_LING(3, 1, 1, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
 	
-	ZERG_NO_LAIR_HYDRA(1, 5, 0, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION, 벙커
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_OVERPOOL.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Zerg_Hatchery, 3, 00)
-								  .put(UnitType.Zerg_Extractor, 3, 00)
-								  .put(UnitType.Zerg_Hydralisk_Den, 3, 35)
-								  .put(UpgradeType.Muscular_Augments, 4, 10)
-								  .put(UpgradeType.Grooved_Spines, 4, 10))),
-	// + WATCHER : 마인매설(+촘촘하게)
-	// + CHECKER : 할당량 감소(거의 할당하지 않음)
-	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 탱크 일정량 이상 보유.
+	ZERG_NO_LAIR_HYDRA(1, 2, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
 	
-	ZERG_LAIR_HYDRA_TECH(1, 5, 2, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_2HAT_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-					  .put(UpgradeType.Metabolic_Boost, 3, 30)
-					  .put(UnitType.Zerg_Hydralisk_Den, 4, 00)
-					  .put(TechType.Lurker_Aspect, 4, 25)
-					  .put(UpgradeType.Ventral_Sacs, 4, 45))),
+	ZERG_LAIR_MIXED(1, 2, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
+			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
+//	
+//	ZERG_1HAT_FAST_MUTAL(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
+//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+//			, ZERG_9DRONE_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
+//								  .put(UnitType.Zerg_Spire, 3, 50))),
+//	
+//	ZERG_1HAT_FAST_LURKER(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
+//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+//			, ZERG_OVERPOOL_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
+//								  .put(UnitType.Zerg_Hydralisk_Den, 3, 15)
+//								  .put(TechType.Lurker_Aspect, 3, 45))),
+//	
+//	ZERG_NO_LAIR_LING(3, 1, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_EXPANSION, 벙커
+//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+//			, ZERG_OVERPOOL_GAS.defaultTimeMap),
+//	// + CHECKER : 할당량 감소(거의 할당하지 않음)
+//	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 벌처 일정량 이상 보유. 
+//	
+//	ZERG_NO_LAIR_HYDRA(1, 5, 0, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION, 벙커
+//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+//			, ZERG_OVERPOOL.defaultTimeMap.putAll(new DefaultTimeMap()
+//								  .put(UnitType.Zerg_Hatchery, 3, 00)
+//								  .put(UnitType.Zerg_Extractor, 3, 00)
+//								  .put(UnitType.Zerg_Hydralisk_Den, 3, 35)
+//								  .put(UpgradeType.Muscular_Augments, 4, 10)
+//								  .put(UpgradeType.Grooved_Spines, 4, 10))),
+//	// + WATCHER : 마인매설(+촘촘하게)
+//	// + CHECKER : 할당량 감소(거의 할당하지 않음)
+//	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 탱크 일정량 이상 보유.
+//	
+//	ZERG_LAIR_HYDRA_TECH(1, 5, 2, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION
+//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+//			, ZERG_2HAT_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
+//					  .put(UpgradeType.Metabolic_Boost, 3, 30)
+//					  .put(UnitType.Zerg_Hydralisk_Den, 4, 00)
+//					  .put(TechType.Lurker_Aspect, 4, 25)
+//					  .put(UpgradeType.Ventral_Sacs, 4, 45))),
 	
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 탱크 일정량 이상 보유.
 	

@@ -7,8 +7,9 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 
@@ -20,6 +21,14 @@ public class ZerglingAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastPoolByZergling();
+	}
+
+	private void fastPoolByZergling() {
+		if (ClueManager.Instance().containsClueType(ClueType.POOL_ASSUME)) {
+			return;
+		}
+		
 		List<UnitInfo> found = found();
 		if (found.isEmpty()) {
 			return;
@@ -44,7 +53,6 @@ public class ZerglingAnalyser extends UnitAnalyser {
 		}
 		
 		int foundFrame = found.get(0).getUpdateFrame();
-		
 		if (foundFrame < fiveDroneFrame + buildToZerglingFrame + movedFrame) {
 			ClueManager.Instance().addClueInfo(ClueInfo.POOL_5DRONE);
 		} else if (foundFrame < nineDroneFrame + buildToZerglingFrame + movedFrame) {

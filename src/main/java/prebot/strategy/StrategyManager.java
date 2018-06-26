@@ -11,8 +11,8 @@ import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
 import prebot.strategy.manage.PositionFinder;
-import prebot.strategy.manage.StrategyAnalyseManager;
 import prebot.strategy.manage.SpiderMineManger;
+import prebot.strategy.manage.StrategyAnalyseManager;
 import prebot.strategy.manage.TankPositionManager;
 import prebot.strategy.manage.VultureTravelManager;
 
