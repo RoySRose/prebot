@@ -151,7 +151,7 @@ public class VesselControl extends Control {
 		double minimumRisk = 99999;
 		int minimumDistanceToGoal = 99999;
 
-		Integer[] FLEE_ANGLE = (Integer[]) (fleeOption.angles != null ? fleeOption.angles : MicroConfig.FleeAngle.getFleeAngle(rangedUnit.getType()));
+		int[] FLEE_ANGLE = (int[]) (fleeOption.angles != null ? fleeOption.angles : MicroConfig.FleeAngle.getFleeAngle(rangedUnit.getType()));
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
 		int moveCalcSize = moveDistPerSec; // 이동 회피지점의 거리 = 유닛의 초당이동거리
 		

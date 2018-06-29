@@ -34,6 +34,7 @@ public class GameCommander {
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onStart() 
 	{
+		System.out.println("onStart() started");
 		TilePosition startLocation = Prebot.Broodwar.self().getStartLocation();
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
@@ -41,6 +42,7 @@ public class GameCommander {
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
+		System.out.println("onStart() finished");
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다

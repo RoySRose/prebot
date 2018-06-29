@@ -34,6 +34,8 @@ public class CoreAnalyser extends UnitAnalyser {
 
 			if (buildFrame < normalCoreFrame) { // 생더블 확정
 				ClueManager.Instance().addClueInfo(ClueInfo.CORE_FAST);
+			} else {
+				ClueManager.Instance().addClueInfo(ClueInfo.CORE_FOUND);
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.ProtossStrategist;
 import prebot.strategy.analyse.Strategist;
 import prebot.strategy.analyse.TerranStrategist;
@@ -32,6 +33,7 @@ import prebot.strategy.analyse.zerg.OverloadAnalyser;
 import prebot.strategy.analyse.zerg.SpawningPoolAnalyser;
 import prebot.strategy.analyse.zerg.SpireAnalyser;
 import prebot.strategy.analyse.zerg.ZerglingAnalyser;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class StrategyAnalyseManager {
 	
@@ -62,13 +64,13 @@ public class StrategyAnalyseManager {
 		}
 
 		if (strategist != null) {
-//			EnemyStrategy strategyToApply = strategist.strategyToApply();
-//			
-//			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
+			EnemyStrategy strategyToApply = strategist.strategyToApply();
+			
+			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
 //				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
-//				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
-//				StrategyIdea.currentStrategy = strategyToApply;
-//			}
+				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
+				StrategyIdea.currentStrategy = strategyToApply;
+			}
 		}
 	}
 

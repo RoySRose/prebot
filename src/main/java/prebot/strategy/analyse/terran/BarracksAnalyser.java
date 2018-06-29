@@ -19,20 +19,27 @@ public class BarracksAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastBarracks();
+	}
+
+	private void fastBarracks() {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
-			if (found.size() >= 2) { // 게이트 웨이 2개 이상
+			if (found.size() >= 2) { // 배럭 2개 이상
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int secondBuildFrame = buildStartFrameDefaultJustBefore(found.get(1));
 				int twoBarrackSecondBarrackFrame = EnemyStrategy.TERRAN_2BARRACKS.defaultTimeMap.timeOfIndex(UnitType.Terran_Barracks, 1, 20);
+				int bbsSecondBarrackFrame = EnemyStrategy.TERRAN_BBS.defaultTimeMap.timeOfIndex(UnitType.Terran_Barracks, 1, 20);
 				
-				if (firstBuildFrame < twoBarrackSecondBarrackFrame && secondBuildFrame < twoBarrackSecondBarrackFrame) {
+				if (firstBuildFrame < bbsSecondBarrackFrame && secondBuildFrame < bbsSecondBarrackFrame) {
+					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FASTEST_TWO);
+				} else if (firstBuildFrame < twoBarrackSecondBarrackFrame && secondBuildFrame < twoBarrackSecondBarrackFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FAST_TWO);
 				} else {
 					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_TWO);
 				}
 			
-			} else if (found.size() == 1) { // 게이트 웨이 1개
+			} else if (found.size() == 1) { // 배럭 1개
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Barracks, 15);
 				if (firstBuildFrame < mechanicFirstBarrackFrame) {

@@ -9,9 +9,11 @@ import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 
 public abstract class UnitAnalyser {
@@ -22,6 +24,7 @@ public abstract class UnitAnalyser {
 	private List<UnitInfo> foundInMyBase = new ArrayList<>();
 	private List<UnitInfo> foundInMyExpansion = new ArrayList<>();
 	private List<UnitInfo> foundEtc = new ArrayList<>();
+	private List<UnitInfo> foundUnknown = new ArrayList<>();
 	
 	private Map<Integer, Integer> buildStartFrameMap = new HashMap<>();
 	
@@ -34,42 +37,61 @@ public abstract class UnitAnalyser {
 	public abstract void analyse();
 	
 	public void upateFoundInfo() {
-		List<UnitInfo> units = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, unitType);
-		if (units.isEmpty()) {
+		if (!foundUnknown.isEmpty() && InfoUtils.enemyBase() != null) {
+			for (UnitInfo found : foundUnknown) {
+				RegionType regionType = PositionUtils.positionToRegionType(found.getLastPosition());
+				if (regionType == RegionType.ENEMY_BASE) {
+					foundFoundInEnemyBase.add(found);
+				} else if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
+					foundInEnemyExpansion.add(found);
+				} else if (regionType == RegionType.MY_BASE) {
+					foundInMyBase.add(found);
+				} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
+					foundInMyExpansion.add(found);
+				} else if (regionType == RegionType.ETC) {
+					foundEtc.add(found);
+				}
+			}
+			foundUnknown.clear();
+		}
+		
+		
+		List<UnitInfo> unitInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, unitType);
+		if (unitInfos.isEmpty()) {
 			return;
 		}
 		
-		for (UnitInfo unit : units) {
+		for (UnitInfo unitInfo : unitInfos) {
 			boolean containUnit = false;
 			for (UnitInfo found : foundAll) {
-				if (unit.getUnitID() == found.getUnitID()) {
+				if (unitInfo.getUnitID() == found.getUnitID()) {
 					containUnit = true;
 					break;
 				}
 			}
 			if (!containUnit) {
-				RegionType regionType = PositionUtils.positionToRegionType(unit.getLastPosition());
-				if (regionType == RegionType.UNKNOWN) {
-					continue;
-				} else if (regionType == RegionType.ENEMY_BASE) {
-					foundFoundInEnemyBase.add(unit);
+				RegionType regionType = PositionUtils.positionToRegionType(unitInfo.getLastPosition());
+				if (regionType == RegionType.ENEMY_BASE) {
+					foundFoundInEnemyBase.add(unitInfo);
 				} else if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
-					foundInEnemyExpansion.add(unit);
+					foundInEnemyExpansion.add(unitInfo);
 				} else if (regionType == RegionType.MY_BASE) {
-					foundInMyBase.add(unit);
+					foundInMyBase.add(unitInfo);
 				} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
-					foundInMyExpansion.add(unit);
+					foundInMyExpansion.add(unitInfo);
+				} else if (regionType == RegionType.ETC) {
+					foundEtc.add(unitInfo);
 				} else {
-					foundEtc.add(unit);
+					foundUnknown.add(unitInfo);
 				}
-				foundAll.add(unit);
+				foundAll.add(unitInfo);
 				
 				 // 빌드시작한 시잔 (초). 이미 완성되어 알 수 없다면 UNKNOWN
-				buildStartFrameMap.put(unit.getUnitID(), TimeUtils.buildStartFrames(unit.getUnit()));
+				buildStartFrameMap.put(unitInfo.getUnitID(), TimeUtils.buildStartFrames(unitInfo.getUnit()));
 			}
 		}
 	}
-	
+
 	protected List<UnitInfo> found(RegionType... regionTypes) {
 		if (regionTypes == null || regionTypes.length == 0) {
 			return foundAll;
@@ -84,8 +106,10 @@ public abstract class UnitAnalyser {
 				foundList.addAll(foundInMyBase);
 			} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
 				foundList.addAll(foundInMyExpansion);
-			} else {
+			} else if (regionType == RegionType.ETC) {
 				foundList.addAll(foundEtc);
+			} else {
+				foundList.addAll(foundUnknown);
 			}
 		}
 		return foundList;
@@ -105,7 +129,7 @@ public abstract class UnitAnalyser {
 	}
 	
 	protected int baseToBaseFrame(UnitType unitType) {
-		return 0;
+		return InformationManager.Instance().baseToBaseFrame(unitType);
 	}
 
 }

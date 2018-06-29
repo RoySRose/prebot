@@ -6,9 +6,9 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import bwapi.Bullet;
 import bwapi.BulletType;
@@ -36,6 +36,7 @@ import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.Minerals;
@@ -57,7 +58,7 @@ import prebot.strategy.manage.ClueManager;
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
 public class UXManager {
 	
-	private int uxOption = 0;
+	private int uxOption = 2;
 
 	public void setUxOption(int uxOption) {
 		this.uxOption = uxOption;
@@ -138,7 +139,6 @@ public class UXManager {
 			drawPathData();
 		} else if (uxOption == 2) {
 			drawStrategySample();
-			drawManagerTimeSpent(500, 220);
 			drawPathData();
 			
 		} else if (uxOption == 3) {
@@ -148,6 +148,8 @@ public class UXManager {
 			drawEnemyAirDefenseRange();
 		} else if (uxOption == 5) {
 			drawEnemyBaseToBaseTime();
+		} else {
+			drawManagerTimeSpent(500, 220);
 		}
 	}
 
@@ -1258,7 +1260,17 @@ public class UXManager {
 	
 	private void drawPathData(){
 		for (Unit depot : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
-			for(Minerals minr : WorkerData.depotMineral.get(depot)){
+			List<Minerals> mineralsList = WorkerData.depotMineral.get(depot);
+			if (mineralsList == null) { // TODO
+				System.out.println("mineralsList is null.");
+				if (depot != null) {
+					System.out.println("depot=" + depot.getID());
+				} else {
+					System.out.println("depot is null");
+				}
+			}
+			
+			for(Minerals minr : mineralsList){
 				if(minr.mineralTrick != null ){
 					Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
 					Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
@@ -1295,7 +1307,13 @@ public class UXManager {
 			}
 		}
 		
-		Prebot.Broodwar.drawTextScreen(20, 280, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
+		Prebot.Broodwar.drawTextScreen(20, 260, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
+		
+		Prebot.Broodwar.drawTextScreen(20, 275, TimeUtils.framesToTimeString(TimeUtils.elapsedFrames()) + "(" + TimeUtils.elapsedFrames() + ")");
+		Prebot.Broodwar.drawTextScreen(20, 290, UxColor.CHAR_YELLOW
+				+ TimeUtils.framesToTimeString(StrategyIdea.turretNeedFrame) + " / "
+				+ TimeUtils.framesToTimeString(StrategyIdea.turretBuildStartFrame) + " / "
+				+ TimeUtils.framesToTimeString(StrategyIdea.engineeringBayBuildStartFrame));
 	}
 	
 	private void drawEnemyAirDefenseRange() {
@@ -1321,7 +1339,7 @@ public class UXManager {
 		int y = 35;
 		Prebot.Broodwar.drawTextScreen(10, 10, "campPosition : " + StrategyIdea.campPosition);
 		Prebot.Broodwar.drawTextScreen(10, 20, "enemyCampPosition : " + InfoUtils.enemyFirstExpansion().getPosition());
-		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseTobaseUnit.entrySet()) {
+		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseToBaseUnit.entrySet()) {
 			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
 		}
 	}

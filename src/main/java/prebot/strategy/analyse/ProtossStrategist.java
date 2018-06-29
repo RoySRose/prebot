@@ -1,7 +1,10 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
@@ -22,8 +25,11 @@ public class ProtossStrategist extends Strategist {
 	}
 
 	private boolean phase01() {
-		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Cybernetics_Core);
-		return TimeUtils.before(buildTimeExpect) || TimeUtils.before(TimeUtils.timeToFrames(4, 0));
+		if (TimeUtils.before(TimeUtils.timeToFrames(4, 0))) {
+			int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Cybernetics_Core);
+			return buildTimeExpect == CommonCode.UNKNOWN || TimeUtils.before(buildTimeExpect);
+		}
+		return false;
 	}
 
 	private boolean phase02() {
@@ -118,12 +124,42 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
+		if (StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_2GATE
+				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_2GATE_CENTER) {
+			if (hasType(ClueType.FAST_CORE)) {
+				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+			} else if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
+				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
+			}
+		}
+		
 		return EnemyStrategy.PROTOSS_FAST_DARK;
 	}
 
 	private EnemyStrategy strategyPhase03() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		int zealotCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot);
+		int dragoonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dragoon);
+		int darkCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dark_Templar);
+		int highCount = InfoUtils.enemyNumUnits(UnitType.Protoss_High_Templar);
+		int archonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Archon);
 
+		boolean carrierExist = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Fleet_Beacon, UnitType.Protoss_Carrier);
+		if (carrierExist) {
+			int groundUnitPoint = zealotCount + dragoonCount + darkCount + highCount + archonCount;
+			if (groundUnitPoint < 10) {
+				return EnemyStrategy.PROTOSS_PROTOSS_AIR3;
+			} else {
+				return EnemyStrategy.PROTOSS_PROTOSS_AIR2;
+			}
+		}
+		
+		boolean airUnitExsit = UnitUtils.enemyUnitDiscovered(
+				UnitType.Protoss_Arbiter_Tribunal, UnitType.Protoss_Stargate, UnitType.Protoss_Arbiter, UnitType.Protoss_Scout);
+		
+		if (airUnitExsit) {
+			return EnemyStrategy.PROTOSS_PROTOSS_AIR1;
+		} else {
+			return EnemyStrategy.PROTOSS_GROUND;
+		}
+	}
 }
