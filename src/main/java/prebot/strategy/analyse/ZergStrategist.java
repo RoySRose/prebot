@@ -1,8 +1,10 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
@@ -23,8 +25,11 @@ public class ZergStrategist extends Strategist {
 	}
 
 	private boolean phase01() {
-		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
-		return TimeUtils.before(buildTimeExpect) || TimeUtils.before(TimeUtils.timeToFrames(4, 0));
+		if (TimeUtils.before(TimeUtils.timeToFrames(4, 0))) {
+			int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
+			return buildTimeExpect == CommonCode.UNKNOWN || TimeUtils.before(buildTimeExpect);
+		}
+		return false;
 	}
 
 	private boolean phase02() {
@@ -42,30 +47,28 @@ public class ZergStrategist extends Strategist {
 			return EnemyStrategy.ZERG_TWIN_HAT; // twin은 좋지 않은 빌드이다.
 		}
 		
-		if (hasType(ClueType.POOL)) {
-			if (hasInfo(ClueInfo.POOL_5DRONE)) {
-				return EnemyStrategy.ZERG_5DRONE;
-				
-			} else if (hasAnyInfo(ClueInfo.POOL_9DRONE, ClueInfo.POOL_9DRONE_UNDER)) {
-				if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
-					return EnemyStrategy.ZERG_9DRONE_GAS;
-				} else {
-					return EnemyStrategy.ZERG_9DRONE;
-				}
-				
-			} else if (hasAnyInfo(ClueInfo.POOL_OVERPOOL, ClueInfo.POOL_OVERPOOL_UNDER)) {
-				if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
-					return EnemyStrategy.ZERG_OVERPOOL_GAS;
-				} else {
-					return EnemyStrategy.ZERG_OVERPOOL;
-				}
-				
-			} else if (hasAnyInfo(ClueInfo.POOL_2HAT, ClueInfo.NO_POOL)) {
-				if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR)) {
-					return EnemyStrategy.ZERG_3HAT;
-				} else {
-					return EnemyStrategy.ZERG_2HAT_GAS;
-				}
+		if (hasInfo(ClueInfo.POOL_5DRONE)) {
+			return EnemyStrategy.ZERG_5DRONE;
+			
+		} else if (hasAnyInfo(ClueInfo.POOL_9DRONE, ClueInfo.POOL_9DRONE_UNDER)) {
+			if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
+				return EnemyStrategy.ZERG_9DRONE_GAS;
+			} else {
+				return EnemyStrategy.ZERG_9DRONE;
+			}
+			
+		} else if (hasAnyInfo(ClueInfo.POOL_OVERPOOL, ClueInfo.POOL_OVERPOOL_UNDER)) {
+			if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
+				return EnemyStrategy.ZERG_OVERPOOL_GAS;
+			} else {
+				return EnemyStrategy.ZERG_OVERPOOL;
+			}
+			
+		} else if (hasAnyInfo(ClueInfo.POOL_2HAT, ClueInfo.NO_POOL)) {
+			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR)) {
+				return EnemyStrategy.ZERG_3HAT;
+			} else {
+				return EnemyStrategy.ZERG_2HAT_GAS;
 			}
 		}
 		
@@ -128,7 +131,7 @@ public class ZergStrategist extends Strategist {
 		int mutalCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Mutalisk);
 		int guardianCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Guardian);
 
-		boolean hydradenExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Hydralisk_Den) > 0;
+		boolean hydraDiscovered = UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Hydralisk, UnitType.Zerg_Lurker, UnitType.Zerg_Hydralisk_Den);
 		boolean spireExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Spire, UnitType.Zerg_Greater_Spire) > 0;
 		
 		int groundUnitPoint = (hydraCount * 1) + (lurkerCount * 2) + (ultraCount * 5) + (defilerCount * 3);
@@ -144,7 +147,7 @@ public class ZergStrategist extends Strategist {
 				return EnemyStrategy.ZERG_MIXED;
 			}
 		} else {
-			if (groundUnitPoint == 0 && !hydradenExist) {
+			if (groundUnitPoint == 0 && !hydraDiscovered) {
 				return EnemyStrategy.ZERG_AIR2;
 			} else {
 				return EnemyStrategy.ZERG_AIR1;

@@ -14,6 +14,7 @@ import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
@@ -24,6 +25,11 @@ public class EnemyBuildTimer {
 	private Map<UnitType, Integer> buildTimeExpectMap = new HashMap<>();
 	private Map<UnitType, Integer> buildTimeMinimumMap = new HashMap<>();
 	private Set<UnitType> buildTimeCertain = new HashSet<>();
+	
+	private int darkTemplarInMyBaseFrame = CommonCode.UNKNOWN;
+	private int reaverInMyBaseFrame = CommonCode.UNKNOWN;
+	private int mutaliskInMyBaseFrame = CommonCode.UNKNOWN;
+	private int lurkerInMyBaseFrame = CommonCode.UNKNOWN;
 
 	public int getBuildStartFrameExpect(UnitType buildingType) {
 		Integer expectFrame = buildTimeExpectMap.get(buildingType);
@@ -77,6 +83,85 @@ public class EnemyBuildTimer {
 			// updateEngineeringExpectTime();
 			// updateTurretExpectTime();
 		}
+		
+		setImportantTime();
+	}
+
+	private void setImportantTime() {
+		Race enemyRace = InfoUtils.enemyRace();
+		if (enemyRace == Race.Protoss) {
+			if (!UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)) {
+				int templarArchFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Templar_Archives);
+				if (templarArchFrame != CommonCode.UNKNOWN) {
+					darkTemplarInMyBaseFrame = templarArchFrame + UnitType.Protoss_Templar_Archives.buildTime() + UnitType.Protoss_Dark_Templar.buildTime()
+									+ InformationManager.Instance().baseToBaseFrame(UnitType.Protoss_Dark_Templar);
+				}
+			}
+			
+			if (!UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Reaver)) {
+				int roboSupportFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Robotics_Support_Bay);
+				if (roboSupportFrame != CommonCode.UNKNOWN) {
+					reaverInMyBaseFrame = roboSupportFrame + UnitType.Protoss_Robotics_Support_Bay.buildTime() + UnitType.Protoss_Reaver.buildTime()
+									+ InformationManager.Instance().baseToBaseFrame(UnitType.Protoss_Shuttle);
+				}
+			}
+			
+			if (darkTemplarInMyBaseFrame != CommonCode.UNKNOWN) {
+				if (reaverInMyBaseFrame == CommonCode.UNKNOWN || darkTemplarInMyBaseFrame < reaverInMyBaseFrame) {
+					StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame;
+					StrategyIdea.turretBuildStartFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+					StrategyIdea.engineeringBayBuildStartFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+				} else {
+					StrategyIdea.turretNeedFrame = reaverInMyBaseFrame;
+					StrategyIdea.turretBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+					StrategyIdea.engineeringBayBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+				}
+			} else if (reaverInMyBaseFrame != CommonCode.UNKNOWN) {
+				StrategyIdea.turretNeedFrame = reaverInMyBaseFrame;
+				StrategyIdea.turretBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+				StrategyIdea.engineeringBayBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+			}
+			
+		} else if (enemyRace == Race.Zerg) {
+			if (!UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Mutalisk)) {
+				int spireFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Spire);
+				if (spireFrame != CommonCode.UNKNOWN) {
+					mutaliskInMyBaseFrame = spireFrame + UnitType.Zerg_Spire.buildTime() + UnitType.Zerg_Mutalisk.buildTime()
+									+ InformationManager.Instance().baseToBaseFrame(UnitType.Zerg_Mutalisk);
+				}
+			}
+			
+			if (!UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker)) {
+				int hydradenFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Hydralisk_Den);
+				int lairFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
+				
+				if (hydradenFrame != CommonCode.UNKNOWN && lairFrame != CommonCode.UNKNOWN) {
+					lurkerInMyBaseFrame = Math.max(hydradenFrame, lairFrame) + TechType.Lurker_Aspect.researchTime() + UnitType.Zerg_Lurker.buildTime()
+									+ InformationManager.Instance().baseToBaseFrame(UnitType.Zerg_Lurker);
+				}
+			}
+			
+			if (mutaliskInMyBaseFrame != CommonCode.UNKNOWN) {
+				if (lurkerInMyBaseFrame == CommonCode.UNKNOWN || mutaliskInMyBaseFrame < lurkerInMyBaseFrame) {
+					StrategyIdea.turretNeedFrame = mutaliskInMyBaseFrame;
+					StrategyIdea.turretBuildStartFrame = mutaliskInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+					StrategyIdea.engineeringBayBuildStartFrame = mutaliskInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+				} else {
+					StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame;
+					StrategyIdea.turretBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+					StrategyIdea.engineeringBayBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+				}
+			} else if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
+				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame;
+				StrategyIdea.turretBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
+				StrategyIdea.engineeringBayBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+			}
+			
+		} else {
+			
+		}
+		
+		
 	}
 
 	private void updateCoreExpectTime() {

@@ -2,9 +2,6 @@ package prebot.strategy.constant;
 
 import java.util.List;
 
-import bwapi.TechType;
-import bwapi.UnitType;
-import bwapi.UpgradeType;
 import prebot.common.MetaType;
 import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 import prebot.strategy.constant.EnemyStrategyOptions.DefaultTimeMap;
@@ -28,7 +25,7 @@ public enum EnemyStrategy {
 			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
 	PROTOSS_1GATE_CORE(PROTOSS_INIT
-			, TimeMapForProtoss.PROTOSS_1GATE_CORE()), //
+			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
 	PROTOSS_2GATE(6, 1, 0, UpgradeOrder.VM_TS_VS //
 			, MarineCount.NO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
@@ -83,6 +80,10 @@ public enum EnemyStrategy {
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
+	PROTOSS_HARDCORE_ZEALOT(1, 1, 0, UpgradeOrder.VM_VS_TS // camp=F_EXPANSION
+			, MarineCount.SIX_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()),
+	
 	PROTOSS_STARGATE(PROTOSS_ROBOTICS_REAVER), //
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
@@ -92,9 +93,10 @@ public enum EnemyStrategy {
 	
 
 	// PHASE3 - PHASE2 종료 ~
-	PROTOSS_DEFAULT(1, 1, 0, UpgradeOrder.VM_TS_VS),
-	PROTOSS_PROTOSS_ARBITER(5, 5, 1, UpgradeOrder.VM_TS_VS_GR),
-	PROTOSS_PROTOSS_CARRIER(1, 1, 8, UpgradeOrder.VM_TS_VS_GR),
+	PROTOSS_GROUND(1, 1, 0, UpgradeOrder.VM_TS_VS),
+	PROTOSS_PROTOSS_AIR1(5, 5, 1, UpgradeOrder.VM_TS_VS_GR),
+	PROTOSS_PROTOSS_AIR2(1, 5, 5, UpgradeOrder.VM_TS_VS_GR),
+	PROTOSS_PROTOSS_AIR3(1, 1, 8, UpgradeOrder.VM_TS_VS_GR),
 	
 	// [저그전 기본전략 : 8배럭벙커링후 2팩토리 메카닉]
 	// : 8배럭 -> 2scv정찰 -> 마린6기 -> 1팩 -> 벌처 -> 애드온 -> 마인업 -> 2팩 -> 멀티
@@ -158,65 +160,9 @@ public enum EnemyStrategy {
 	
 	ZERG_LAIR_MIXED(1, 2, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
 			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new DefaultTimeMap()),
-//	
-//	ZERG_1HAT_FAST_MUTAL(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
-//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-//			, ZERG_9DRONE_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-//								  .put(UnitType.Zerg_Spire, 3, 50))),
-//	
-//	ZERG_1HAT_FAST_LURKER(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // INIT DEFAULT, camp=S_CHOKE,
-//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-//			, ZERG_OVERPOOL_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-//								  .put(UnitType.Zerg_Hydralisk_Den, 3, 15)
-//								  .put(TechType.Lurker_Aspect, 3, 45))),
-//	
-//	ZERG_NO_LAIR_LING(3, 1, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_EXPANSION, 벙커
-//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-//			, ZERG_OVERPOOL_GAS.defaultTimeMap),
-//	// + CHECKER : 할당량 감소(거의 할당하지 않음)
-//	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 벌처 일정량 이상 보유. 
-//	
-//	ZERG_NO_LAIR_HYDRA(1, 5, 0, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION, 벙커
-//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-//			, ZERG_OVERPOOL.defaultTimeMap.putAll(new DefaultTimeMap()
-//								  .put(UnitType.Zerg_Hatchery, 3, 00)
-//								  .put(UnitType.Zerg_Extractor, 3, 00)
-//								  .put(UnitType.Zerg_Hydralisk_Den, 3, 35)
-//								  .put(UpgradeType.Muscular_Augments, 4, 10)
-//								  .put(UpgradeType.Grooved_Spines, 4, 10))),
-//	// + WATCHER : 마인매설(+촘촘하게)
-//	// + CHECKER : 할당량 감소(거의 할당하지 않음)
-//	// + 위험종료 : BASE근처에 적이 없음. 벙커 완성. 탱크 일정량 이상 보유.
-//	
-//	ZERG_LAIR_HYDRA_TECH(1, 5, 2, UpgradeOrder.VM_TS_VS_GR // camp=F_EXPANSION
-//			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-//			, ZERG_2HAT_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-//					  .put(UpgradeType.Metabolic_Boost, 3, 30)
-//					  .put(UnitType.Zerg_Hydralisk_Den, 4, 00)
-//					  .put(TechType.Lurker_Aspect, 4, 25)
-//					  .put(UpgradeType.Ventral_Sacs, 4, 45))),
-	
-	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 탱크 일정량 이상 보유.
-	
-	ZERG_2HAT_SPIRE(1, 1, 15, UpgradeOrder.VM_GR_VS_TS // camp=F_EXPANSION
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_2HAT_GAS.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UpgradeType.Metabolic_Boost, 3, 30)
-								  .put(UnitType.Zerg_Spire, 4, 10))),
-	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
-	
-	ZERG_3HAT_SPIRE(2, 1, 2, UpgradeOrder.VM_GR_TS_VS // camp=S_CHOKE, 벙커(공격)
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_3HAT.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Zerg_Spire, 5, 10))),
-	
-	ZERG_LAIR_MIXTED_TECH(1, 3, 5, UpgradeOrder.VM_GR_VS_TS // camp=F_EXPANSION
-			, MarineCount.SIX_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, ZERG_2HAT_GAS.defaultTimeMap.putAll(new DefaultTimeMap())),
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
 	
 	// PHASE3 : PHASE2 종료 ~
-	ZERG_DEFAULT(1, 2, 6, UpgradeOrder.VM_GR_TS_VS),
 	ZERG_GROUND3(1, 5, 1, UpgradeOrder.VM_TS_VS_GR),
 	ZERG_GROUND2(1, 5, 2, UpgradeOrder.VM_TS_VS_GR),
 	ZERG_GROUND1(1, 5, 3, UpgradeOrder.VM_TS_VS_GR),
@@ -231,81 +177,69 @@ public enum EnemyStrategy {
 	// PHASE1 : 시작 ~ 팩토리 또는 아카데미 발견 OR 일정시간 경과
 	TERRAN_INIT(1, 1, 0, UpgradeOrder.TS
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, new DefaultTimeMap().put(UnitType.Terran_Supply_Depot, 1, 0)
-								  .put(UnitType.Terran_Barracks, 1, 30)
-								  .put(UnitType.Terran_Refinery, 1, 50)
-								  .put(UnitType.Terran_Factory, 2, 40)),
+			, TimeMapForTerran.TERRAN_MECHANIC()),
 	
-	TERRAN_MECHANIC(TERRAN_INIT),
+	TERRAN_MECHANIC(TERRAN_INIT
+			, TimeMapForTerran.TERRAN_MECHANIC()),
 	
 	TERRAN_2BARRACKS(2, 1, 0, UpgradeOrder.VS_TS_VM
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Terran_Supply_Depot, 1, 0)
-								  .put(UnitType.Terran_Barracks, 1, 30)
-								  .put(UnitType.Terran_Barracks, 2, 0)
-								  .put(UnitType.Terran_Refinery, 2, 45)),
+			, TimeMapForTerran.TERRAN_2BARRACKS()),
 	
 	TERRAN_BBS(2, 1, 0, UpgradeOrder.VS_TS_VM
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, new DefaultTimeMap().put(UnitType.Terran_Barracks, 1, 00)
-								  .put(UnitType.Terran_Barracks, 1, 25)
-								  .put(UnitType.Terran_Supply_Depot, 1, 45)),
-	
-	TERRAN_NO_BARRACKS_DOUBLE(1, 1, 0, UpgradeOrder.TS
-			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, new DefaultTimeMap().put(UnitType.Terran_Supply_Depot, 1, 0)
-								  .put(UnitType.Terran_Command_Center, 2, 10)
-								  .put(UnitType.Terran_Barracks, 2, 20)
-								  .put(UnitType.Terran_Refinery, 2, 35)
-								  .put(UnitType.Terran_Factory, 3, 30)),
+			, TimeMapForTerran.TERRAN_BBS()),
 	
 	TERRAN_1BARRACKS_DOUBLE(1, 1, 0, UpgradeOrder.TS
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, new DefaultTimeMap().put(UnitType.Terran_Supply_Depot, 1, 0)
-								  .put(UnitType.Terran_Barracks, 1, 30)
-								  .put(UnitType.Terran_Command_Center, 2, 30)
-								  .put(UnitType.Terran_Refinery, 2, 50)
-								  .put(UnitType.Terran_Factory, 3, 40)),
+			, TimeMapForTerran.TERRAN_1BARRACKS_DOUBLE()),
+	
+	TERRAN_NO_BARRACKS_DOUBLE(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.NO_BARRACKS_DOUBLE()),
 
 	// PHASE2 : PHASE1 종료 ~ ?
+	TERRAN_1FAC_DOUBLE(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE()),
+	
+	TERRAN_1FAC_DOUBLE_1STAR(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_1STAR()),
+	
+	TERRAN_1FAC_DOUBLE_ARMORY(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()),
+	
+	TERRAN_2FAC(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_2FAC()),
+	
+	TERRAN_1FAC_1STAR(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_1FAC_1STAR()),
+	
+	TERRAN_2STAR(1, 1, 0, UpgradeOrder.TS
+			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForTerran.TERRAN_2STAR()),
+	
 	TERRAN_BIONIC(2, 1, 0, UpgradeOrder.VS_TS_VM
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, TERRAN_2BARRACKS.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Terran_Academy, 3, 0)
-								  .put(TechType.Stim_Packs, 3, 50))),
+			, TimeMapForTerran.TERRAN_BIONIC()),
 	
 	TERRAN_2BARRACKS_1FAC(1, 1, 0, UpgradeOrder.VS_TS_VM
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, TERRAN_2BARRACKS.defaultTimeMap.putAll(new DefaultTimeMap()
-								  .put(UnitType.Terran_Factory, 3, 35))),
+			, TimeMapForTerran.TERRAN_2BARRACKS_1FAC()),
 	
-	TERRAN_1FAC_DOUBLE(1, 1, 0, UpgradeOrder.TS
-			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TERRAN_INIT.defaultTimeMap.putAll(new DefaultTimeMap()
-								.put(UnitType.Terran_Command_Center, 3, 40)
-								.put(TechType.Tank_Siege_Mode, 4, 10)
-								.put(UnitType.Terran_Starport, 4, 30))),
-	TERRAN_2FAC(1, 1, 0, UpgradeOrder.TS
-			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TERRAN_INIT.defaultTimeMap.putAll(new DefaultTimeMap()
-								.put(UnitType.Terran_Factory, 4, 0)
-								.put(UnitType.Terran_Vulture_Spider_Mine, 4, 10))),
-	TERRAN_1FAC_1STAR(1, 1, 0, UpgradeOrder.TS
-			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TERRAN_INIT.defaultTimeMap.putAll(new DefaultTimeMap()
-								.put(UnitType.Terran_Starport, 3, 30))),
-	TERRAN_2STAR(1, 1, 0, UpgradeOrder.TS
-			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TERRAN_INIT.defaultTimeMap.putAll(new DefaultTimeMap()
-								.put(UnitType.Terran_Starport, 3, 30)
-								.put(UnitType.Terran_Starport, 3, 30))),
+	TERRAN_DOUBLE_BIONIC(TERRAN_2STAR), //
+	
+	TERRAN_DOUBLE_MECHANIC(TERRAN_2STAR), //
 
 	// PHASE3 : PHASE2 종료 ~
-	TERRAN_MECHANIC_DEFAULT(0, 5, 1, UpgradeOrder.TS_VM_VS_GR),
-	TERRAN_MECHANIC_VULTURE_TANK(TERRAN_MECHANIC_DEFAULT),
-	TERRAN_MECHANIC_GOLIATH_TANK(TERRAN_MECHANIC_DEFAULT),
-	TERRAN_MECHANIC_WRAITH_TANK(0, 3, 1, UpgradeOrder.TS_VM_VS_GR),
-	TERRAN_MECHANIC_BATTLE(0, 2, 1, UpgradeOrder.TS_VM_VS_GR),
+	TERRAN_MECHANIC_VULTURE_TANK(0, 8, 1, UpgradeOrder.TS_VM_VS_GR),
+	TERRAN_MECHANIC_GOLIATH_TANK(0, 4, 1, UpgradeOrder.TS_VM_VS_GR),
+	TERRAN_MECHANIC_WRAITH_TANK(0, 1, 0, UpgradeOrder.TS_VM_VS_GR),
+//	TERRAN_MECHANIC_BATTLE_TANK(0, 4, 1, UpgradeOrder.TS_VM_VS_GR),
 
 	UNKNOWN(ZERG_INIT);
 	

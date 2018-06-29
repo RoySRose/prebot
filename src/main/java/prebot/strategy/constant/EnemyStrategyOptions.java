@@ -68,6 +68,11 @@ public class EnemyStrategyOptions {
 		public static final List<MetaType> VS_TS_VM = Arrays.asList(new MetaType(UpgradeType.Ion_Thrusters)
 				, new MetaType(TechType.Tank_Siege_Mode)
 				, new MetaType(TechType.Spider_Mines));
+
+		// 마인업-속도업-시즈업
+		public static final List<MetaType> VM_VS_TS = Arrays.asList(new MetaType(TechType.Spider_Mines)
+				, new MetaType(UpgradeType.Ion_Thrusters)
+				, new MetaType(TechType.Tank_Siege_Mode));
 		
 		// 마인업-시즈업-속도업-골리앗업
 		public static final List<MetaType> VM_TS_VS_GR = Arrays.asList(new MetaType(TechType.Spider_Mines)

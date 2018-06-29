@@ -49,22 +49,22 @@ public class EnemyBaseFinder {
 				}
 			}
 
-			if (closestBase == null) {
-				int minimumDistance = 999999;
-				for (BaseLocation startLocation : BWTA.getStartLocations()) {
-					if (startLocation.getTilePosition().equals(InfoUtils.myBase().getTilePosition()))
-						continue;
-					if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
-						continue;
-					}
-
-					int dist = PositionUtils.getGroundDistance(eui.getLastPosition(), startLocation.getPosition());
-					if (dist < minimumDistance) {
-						closestBase = startLocation;
-						minimumDistance = dist;
-					}
-				}
-			}
+//			if (closestBase == null) {
+//				int minimumDistance = 999999;
+//				for (BaseLocation startLocation : BWTA.getStartLocations()) {
+//					if (startLocation.getTilePosition().equals(InfoUtils.myBase().getTilePosition()))
+//						continue;
+//					if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+//						continue;
+//					}
+//
+//					int dist = PositionUtils.getGroundDistance(eui.getLastPosition(), startLocation.getPosition());
+//					if (dist < minimumDistance) {
+//						closestBase = startLocation;
+//						minimumDistance = dist;
+//					}
+//				}
+//			}
 
 			StrategyIdea.enemyBaseExpected = closestBase;
 			break;

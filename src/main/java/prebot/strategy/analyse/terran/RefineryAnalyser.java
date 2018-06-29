@@ -20,6 +20,10 @@ public class RefineryAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		fastRefinery();
+	}
+
+	private void fastRefinery() {
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));

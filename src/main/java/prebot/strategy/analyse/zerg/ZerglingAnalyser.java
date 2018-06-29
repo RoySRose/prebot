@@ -49,7 +49,7 @@ public class ZerglingAnalyser extends UnitAnalyser {
 				|| foundRegionType == RegionType.MY_BASE) {
 			movedFrame = baseToBaseFrame(UnitType.Zerg_Zergling) + 5 * TimeUtils.SECOND;
 		} else {
-			movedFrame = 5 * TimeUtils.SECOND; // 발견위치로 더 상세하게 판단 가능
+			movedFrame = 10 * TimeUtils.SECOND; // 발견위치로 더 상세하게 판단 가능
 		}
 		
 		int foundFrame = found.get(0).getUpdateFrame();
