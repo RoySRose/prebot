@@ -68,7 +68,9 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
 	        	
 	        	if (Prebot.Broodwar.getFrameCount() > 17000) {
 	//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
-	        		if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Engineering_Bay)) {
+//	        		if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Engineering_Bay)) {
+	        		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay, null)
+							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 	        			return true;
 	        		}
 				}
@@ -80,7 +82,8 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
 				}
 	        	
 	        	if(cc>=2) {
-	        		if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Engineering_Bay)) {
+	        		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay, null)
+							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 	        			return true;
 	        		}
 				}
@@ -117,7 +120,8 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
 	    		|| RespondToStrategy.Instance().enemy_wraith 
 	    		|| RespondToStrategy.Instance().enemy_lurker 
 	    		|| RespondToStrategy.Instance().enemy_shuttle) && (!BuildConditionChecker.Instance().engineering)){
-		        	if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Engineering_Bay)) {
+	        		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay, null)
+						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 			        	setBlocking(true);
 			        	setHighPriority(true);
 						return true;
