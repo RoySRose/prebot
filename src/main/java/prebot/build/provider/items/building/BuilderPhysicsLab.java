@@ -10,8 +10,8 @@ public class BuilderPhysicsLab extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("PhysicsLab build condition check");
-        return true;
+//        System.out.println("PhysicsLab build condition check");
+        return false;
     }
 
 

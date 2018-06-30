@@ -24,6 +24,13 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
+    	BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+		BuildOrderItem checkItem = null;
+    	
+    	
+//    	frame으로 처리되어 있는 이유. initial이 끝난 후로 하면 되지 않나?
+//    	일단 기존 조건대로 처리. 셀렉터는 이니셜 빌드 이후에 도므로 아래 조건의 필요 유무 판단
+    	
     	if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
     		
     		return false;
@@ -32,6 +39,34 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
         if (Prebot.Broodwar.self().supplyTotal() >= 400) {
             return false;
         }
+        
+        
+        if (!tempbuildQueue.isEmpty()) {
+			checkItem = tempbuildQueue.getHighestPriorityItem();
+			while (true) {
+				if (checkItem.blocking == true) {
+					break;
+				}
+				// if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType().isAddon()){
+				// return;
+				// }
+				if (checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Missile_Turret) {
+					return false;
+				}
+				if (checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot) {
+					return false;
+				}
+				if (tempbuildQueue.canSkipCurrentItem() == true) {
+					tempbuildQueue.skipCurrentItem();
+				} else {
+					break;
+				}
+				checkItem = tempbuildQueue.getItem();
+			}
+			if (checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot) {
+				return false;
+			}
+		}
         
         
 
@@ -91,7 +126,8 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
                     * UnitType.Terran_Supply_Depot.supplyProvided();
 
             if (currentSupplyShortage > onBuildingSupplyCount) {
-                this.setHighPriority(true);
+                setHighPriority(true);
+                setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
                 //this.setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
                 //System.out.println("return supply true");
                 //FileUtils.appendTextToFile("log.txt", "\n return supply true ==>>> ");

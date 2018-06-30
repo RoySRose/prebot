@@ -3,8 +3,13 @@ package prebot.build.provider.items.building;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.BuildOrderItem;
+import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.build.provider.BuildConditionChecker;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
@@ -18,66 +23,46 @@ public class BuilderRefinery extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("Refinery build condition check");
-        
-        boolean isInitialBuildOrderFinished = false;
-        
-     // initial이 끝났는지에 대한 체크
- 		if (!isInitialBuildOrderFinished && BuildManager.Instance().buildQueue.isEmpty()) {
- 			isInitialBuildOrderFinished = true;
- 		}
-        
-        
-        for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-        	// 가스 start
-			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted()) {
+//        System.out.println("Refinery build condition check");
+    	if(BuildQueueProvider.Instance().respondSet) {
+    		return false;
+    	}else {
+    		if (InitialBuildProvider.Instance().InitialBuildFinished == false && Prebot.Broodwar.getFrameCount() % 23 == 0) {
+    			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null) + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Refinery)
+    					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Refinery, null) == 0) {
+    				if (InformationManager.Instance().isGasRushed() == false) {
+    					int barrack = 0;
+    					int supple = 0;
+    					int scv = 0;
+    					for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+    						if (unit == null)
+    							continue;
+    						if (unit.getType() == UnitType.Terran_Barracks) {
+    							barrack++;
+    						}
+    						if (unit.getType() == UnitType.Terran_Supply_Depot && unit.isCompleted()) {
+    							supple++;
+    						}
+    						if (unit.getType() == UnitType.Terran_SCV && unit.isCompleted()) {
+    							scv++;
+    						}
+    					}
+    					if (barrack > 0 && supple > 0 && scv > 10) {
+//    						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Refinery, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+    						setBlocking(true);
+    						setHighPriority(true);
+    						setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
+    						return true;
+    					}
+    				}
+    			}
+    		}
+	        if(BuildConditionChecker.Instance().buildGas) {
+	        	settilePosition(BuildConditionChecker.Instance().findGeyser);
+	        	return true;
+	        }
 
-				Unit geyserAround = null;
-
-				boolean refineryAlreadyBuilt = false;
-				for (Unit unitsAround : Prebot.Broodwar.getUnitsInRadius(unit.getPosition(), 300)) {
-					if (unitsAround == null)
-						continue;
-					if (unitsAround.getType() == UnitType.Terran_Refinery || unitsAround.getType() == UnitType.Zerg_Extractor
-							|| unitsAround.getType() == UnitType.Protoss_Assimilator) {
-						refineryAlreadyBuilt = true;
-						break;
-					}
-					if (unitsAround.getType() == UnitType.Resource_Vespene_Geyser) {
-						geyserAround = unitsAround;
-					}
-				}
-
-				if (isInitialBuildOrderFinished == false && geyserAround != null) {
-					if (InformationManager.Instance().getMyfirstGas() != null) {
-						if (geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())) {
-							continue;
-						}
-					}
-				}
-
-				if (refineryAlreadyBuilt == false) {
-					TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(unit.getTilePosition());
-					if (findGeyser != null) {
-						if (findGeyser.getDistance(unit.getTilePosition()) * 32 > 300) {
-							continue;
-						}
-						if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 9) {
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
-								//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery, findGeyser, false);
-								return true;
-							}
-						}
-					}
-				}
-
-				/*if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 8) {
-					CC++;
-				}*/
-			}
-			// 가스 end
-        }
-        
+    	}
         
         return false;
     }

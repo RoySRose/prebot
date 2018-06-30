@@ -11,6 +11,10 @@ public class BuildCondition {
     public boolean highPriority=false;
     public BuildOrderItem.SeedPositionStrategy seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
     public TilePosition tilePosition = TilePosition.None;
+	/*public static boolean blocking=false;
+    public static boolean highPriority=false;
+    public static BuildOrderItem.SeedPositionStrategy seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
+    public static TilePosition tilePosition = TilePosition.None;*/
     
     
 
@@ -28,6 +32,13 @@ public class BuildCondition {
         this.seedPositionStrategy = seedPositionStrategy;
         this.tilePosition = tilePostition;
     }
+    
+    /*public BuildCondition(boolean blockingVar, boolean highPriorityVar, BuildOrderItem.SeedPositionStrategy seedPositionStrategyVar, TilePosition tilePostitionVar) {
+        blocking = blockingVar;
+        highPriority = highPriorityVar;
+        seedPositionStrategy = seedPositionStrategyVar;
+        tilePosition = tilePostitionVar;
+    }*/
 
 
 }

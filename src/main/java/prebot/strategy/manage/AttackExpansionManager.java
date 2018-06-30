@@ -596,7 +596,7 @@ public class AttackExpansionManager {
 		return cnt;
 	}
 
-	private int getValidMineralsForExspansionNearDepot(Unit depot) {
+	public int getValidMineralsForExspansionNearDepot(Unit depot) {
 		if (depot == null) {
 			return 0;
 		}

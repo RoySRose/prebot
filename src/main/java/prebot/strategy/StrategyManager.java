@@ -100,9 +100,9 @@ public class StrategyManager extends GameManager {
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
 			AttackExpansionManager.Instance().executeCombat();
 		}
-		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
-			AttackExpansionManager.Instance().executeExpansion();
-		}
+//		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
+//			AttackExpansionManager.Instance().executeExpansion();
+//		}
 		
 		
 		

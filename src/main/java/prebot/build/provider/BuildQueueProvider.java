@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.TechType;
+import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.build.initialProvider.InitialBuildProvider;
@@ -15,6 +16,9 @@ import prebot.build.provider.items.upgrade.*;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.common.util.UnitUtils;
+import prebot.strategy.RespondToStrategy;
+import prebot.strategy.manage.AttackExpansionManager;
 
 public final class BuildQueueProvider {
 
@@ -30,6 +34,8 @@ public final class BuildQueueProvider {
 		return isInitialBuildOrderFinished;
 	}*/
 
+    private boolean sysout = false;
+    public boolean respondSet = false;
 
     List<BuildableItem> buildableList = new ArrayList<>();
     
@@ -67,8 +73,9 @@ public final class BuildQueueProvider {
 
     
     
-    
+    //BuildCountChecker buildCountChecker;
     ResearchSelector researchSelector;
+    //ResearchSelector2 researchSelector2;
     UpgradeSelector upgradeSelector;
     BarrackUnitSelector barrackUnitSelector;
     FactoryUnitSelector factoryUnitSelector;
@@ -77,6 +84,7 @@ public final class BuildQueueProvider {
     public BuildQueueProvider(){
 
         researchSelector = new ResearchSelector();
+        //researchSelector2 = new ResearchSelector2();
         upgradeSelector = new UpgradeSelector();
         barrackUnitSelector = new BarrackUnitSelector();
         factoryUnitSelector = new FactoryUnitSelector();
@@ -102,32 +110,38 @@ public final class BuildQueueProvider {
         buildableList.add(new BuilderScienceVessel        (new MetaType(UnitType.Terran_Science_Vessel), starportUnitSelector));
         buildableList.add(new BuilderValkyrie             (new MetaType(UnitType.Terran_Valkyrie), starportUnitSelector));
         buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith), starportUnitSelector));*/
+        
+        
+        /*SCV*/
+        buildableList.add(new BuilderSCV              (new MetaType(UnitType.Terran_SCV)));
 
         /*building*/
-        /*buildableList.add(new BuilderAcademy              (new MetaType(UnitType.Terran_Academy)));
+        buildableList.add(new BuilderAcademy              (new MetaType(UnitType.Terran_Academy)));
         buildableList.add(new BuilderArmory               (new MetaType(UnitType.Terran_Armory)));
         buildableList.add(new BuilderBarracks             (new MetaType(UnitType.Terran_Barracks)));
         buildableList.add(new BuilderBunker               (new MetaType(UnitType.Terran_Bunker)));
         buildableList.add(new BuilderCommandCenter        (new MetaType(UnitType.Terran_Command_Center)));
         buildableList.add(new BuilderComsatStation        (new MetaType(UnitType.Terran_Comsat_Station)));
         buildableList.add(new BuilderControlTower         (new MetaType(UnitType.Terran_Control_Tower)));
-        buildableList.add(new BuilderCovertOps            (new MetaType(UnitType.Terran_Covert_Ops)));
+        //buildableList.add(new BuilderCovertOps            (new MetaType(UnitType.Terran_Covert_Ops)));
         buildableList.add(new BuilderEngineeringBay       (new MetaType(UnitType.Terran_Engineering_Bay)));
         buildableList.add(new BuilderFactory              (new MetaType(UnitType.Terran_Factory)));
         buildableList.add(new BuilderMachineShop          (new MetaType(UnitType.Terran_Machine_Shop)));
         buildableList.add(new BuilderMissileTurret        (new MetaType(UnitType.Terran_Missile_Turret)));
-        buildableList.add(new BuilderNuclearSilo          (new MetaType(UnitType.Terran_Nuclear_Silo)));
-        buildableList.add(new BuilderPhysicsLab           (new MetaType(UnitType.Terran_Physics_Lab)));
+        //buildableList.add(new BuilderNuclearSilo          (new MetaType(UnitType.Terran_Nuclear_Silo)));
+        //buildableList.add(new BuilderPhysicsLab           (new MetaType(UnitType.Terran_Physics_Lab)));
         buildableList.add(new BuilderRefinery             (new MetaType(UnitType.Terran_Refinery)));
         buildableList.add(new BuilderScienceFacility      (new MetaType(UnitType.Terran_Science_Facility)));
         buildableList.add(new BuilderStarport             (new MetaType(UnitType.Terran_Starport)));
-        buildableList.add(new BuilderSupplyDepot          (new MetaType(UnitType.Terran_Supply_Depot)));*/
-        
-        buildableList.add(new BuilderFactory              (new MetaType(UnitType.Terran_Factory)));
-        buildableList.add(new BuilderMachineShop          (new MetaType(UnitType.Terran_Machine_Shop)));
         buildableList.add(new BuilderSupplyDepot          (new MetaType(UnitType.Terran_Supply_Depot)));
+        
+        //buildableList.add(new BuilderFactory              (new MetaType(UnitType.Terran_Factory)));
+        //buildableList.add(new BuilderMachineShop          (new MetaType(UnitType.Terran_Machine_Shop)));
+        //buildableList.add(new BuilderSupplyDepot          (new MetaType(UnitType.Terran_Supply_Depot)));
 
-        /*upgrade*/
+        /*upgrade(tech)*/
+        ionThrusters               = new BuilderIonThrusters         (new MetaType(UpgradeType.Ion_Thrusters  ), researchSelector);
+        charonBoosters             = new BuilderCharonBoosters       (new MetaType(UpgradeType.Charon_Boosters  ), researchSelector);
         /*
         apolloReactor              = new BuilderApolloReactor        (new MetaType(UpgradeType.Apollo_Reactor  ), upgradeSelector);
         caduceusReactor            = new BuilderCaduceusReactor      (new MetaType(UpgradeType.Caduceus_Reactor  ), upgradeSelector);
@@ -146,23 +160,27 @@ public final class BuildQueueProvider {
         u238Shells                 = new BuilderU238Shells           (new MetaType(UpgradeType.U_238_Shells  ), upgradeSelector);*/
 
         /*Research(tech)*/
-        /*cloakingField              = new BuilderCloakingField        (new MetaType(TechType.Cloaking_Field    ), researchSelector);
-        empShockwave               = new BuilderEMPShockwave         (new MetaType(TechType.EMP_Shockwave    ), researchSelector);
-        irradiate                  = new BuilderIrradiate            (new MetaType(TechType.Irradiate    ), researchSelector);
-        lockdown                   = new BuilderLockdown             (new MetaType(TechType.Lockdown    ), researchSelector);
-        nuclearStrike              = new BuilderNuclearStrike        (new MetaType(TechType.Nuclear_Strike    ), researchSelector);
-        opticalFlare               = new BuilderOpticalFlare         (new MetaType(TechType.Optical_Flare    ), researchSelector);
-        personnelCloaking          = new BuilderPersonnelCloaking    (new MetaType(TechType.Personnel_Cloaking    ), researchSelector);
-        restoration                = new BuilderRestoration          (new MetaType(TechType.Restoration    ), researchSelector);
         spiderMines                = new BuilderSpiderMines          (new MetaType(TechType.Spider_Mines    ), researchSelector);
-        stimPacks                  = new BuilderStimPacks            (new MetaType(TechType.Stim_Packs    ), researchSelector);
         tankSiegeMode              = new BuilderTankSiegeMode        (new MetaType(TechType.Tank_Siege_Mode    ), researchSelector);
-        yamatoGun                  = new BuilderYamatoGun            (new MetaType(TechType.Yamato_Gun    ), researchSelector);*/
+        /*cloakingField              = new BuilderCloakingField        (new MetaType(TechType.Cloaking_Field    ), researchSelector2);
+        empShockwave               = new BuilderEMPShockwave         (new MetaType(TechType.EMP_Shockwave    ), researchSelector2);
+        irradiate                  = new BuilderIrradiate            (new MetaType(TechType.Irradiate    ), researchSelector2);
+        lockdown                   = new BuilderLockdown             (new MetaType(TechType.Lockdown    ), researchSelector2);
+        nuclearStrike              = new BuilderNuclearStrike        (new MetaType(TechType.Nuclear_Strike    ), researchSelector2);
+        opticalFlare               = new BuilderOpticalFlare         (new MetaType(TechType.Optical_Flare    ), researchSelector2);
+        personnelCloaking          = new BuilderPersonnelCloaking    (new MetaType(TechType.Personnel_Cloaking    ), researchSelector2);
+        restoration                = new BuilderRestoration          (new MetaType(TechType.Restoration    ), researchSelector2);
+        spiderMines                = new BuilderSpiderMines          (new MetaType(TechType.Spider_Mines    ), researchSelector2);
+        stimPacks                  = new BuilderStimPacks            (new MetaType(TechType.Stim_Packs    ), researchSelector2);
+        tankSiegeMode              = new BuilderTankSiegeMode        (new MetaType(TechType.Tank_Siege_Mode    ), researchSelector2);
+        yamatoGun                  = new BuilderYamatoGun            (new MetaType(TechType.Yamato_Gun    ), researchSelector2);*/
 
 
 
         //Activate
         /*upgrade*/
+        buildableList.add(charonBoosters);
+        buildableList.add(ionThrusters);
         /*buildableList.add(apolloReactor);
         buildableList.add(caduceusReactor);
         buildableList.add(charonBoosters);
@@ -180,6 +198,8 @@ public final class BuildQueueProvider {
         buildableList.add(u238Shells);*/
 
         /*tech*/
+        buildableList.add(spiderMines);
+        buildableList.add(tankSiegeMode);
         /*buildableList.add(cloakingField);
         buildableList.add(empShockwave);
         buildableList.add(irradiate);
@@ -232,25 +252,78 @@ public final class BuildQueueProvider {
 
     public void process(){
     	
+    	
+    	if (BuildConditionChecker.Instance().EXOK == false && Prebot.Broodwar.getFrameCount() % 2 == 0) {
+    		BuildConditionChecker.Instance().executeFirstex();
+		}
+    	
+    	
+    	if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
+	        researchSelector.select();
+	        //researchSelector2.select();
+		}
+    	
     	if(!InitialBuildProvider.Instance().InitialBuildFinished) {
     		InitialBuildProvider.Instance().updateInitialBuild();
     	}
-    	
-    	/*if (!isInitialBuildOrderFinished && BuildManager.Instance().buildQueue.isEmpty()) {
-    		System.out.println("InitialBuildOrder is Finished");
-			isInitialBuildOrderFinished = true;
-		}*/
-
-    	//if(isInitialBuildOrderFinished) {
-	        /*researchSelector.select();
-	        upgradeSelector.select();
-	        barrackUnitSelector.select();*/
+    		
+    		//셀렉터들에 필요한 유닛카운트 미리 집계
+    		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
+    			BuildConditionChecker.Instance().executeSustainUnits();
+    		}
+    		
+    		if (Prebot.Broodwar.getFrameCount() < 10000) {
+    			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
+    				BuildConditionChecker.Instance().executeFly();
+    			}
+    		} else {
+    			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
+    				BuildConditionChecker.Instance().executeFly();
+    			}
+    		}
+    		
+    		
+    		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
+		        upgradeSelector.select();
+    		}
+	        //barrackUnitSelector.select();
 	        factoryUnitSelector.select();
 	        //starportUnitSelector.select();
+	        
+	        /*if(!sysout) {
+	        	
+	        	for(BuildableItem buildableItem: buildableList) {
+	        		FileUtils.appendTextToFile("log.txt", "\n BuildableItem || " + buildableItem.toString());
+	        	}
+	        	sysout = true;
+	        	
+	        }*/
 	
 	        for(BuildableItem buildableItem: buildableList) {
+	        	FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() before|| " + buildableItem.toString());
         		buildableItem.process();
+        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() after|| " + buildableItem.toString());
         	}
+	        
+	        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
+					|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
+				RespondToStrategy.Instance().update();
+				// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+				// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+			}
+	        if(respondSet) {
+			    researchSelector.select();
+			    upgradeSelector.select();
+			    //barrackUnitSelector.select();
+			    factoryUnitSelector.select();
+	        	for(BuildableItem buildableItem: buildableList) {
+		        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() || " + buildableItem.toString());
+	        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet before|| " + buildableItem.toString());
+	        		buildableItem.process();
+	        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet after|| " + buildableItem.toString());
+	        	}
+	        	respondSet = false;
+	        }
     	//}
     }
 }
