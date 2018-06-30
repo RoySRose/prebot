@@ -61,7 +61,9 @@ public class BuilderComsatStation extends DefaultBuildableItem {
 					if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.canBuildAddon()
 							&& Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Comsat_Station) < 4) {
 		
-						if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
+//						if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
+						if (Prebot.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
+								&& Prebot.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()) {
 //							if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Comsat_Station)) {
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null)
 									+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {

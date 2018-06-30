@@ -465,14 +465,14 @@ public class BuildConditionChecker {
 		}
 	
 		// 컴샛 start
-		if (aca == false) {
-			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 15000) {
-				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0 && BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
-				}
-			}
-		}
+//		if (aca == false) {
+//			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 15000) {
+//				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0 && BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy, false);
+//				}
+//			}
+//		}
 		if (acaComplete) {
 			if (EXOK == false) {
 				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
@@ -520,101 +520,101 @@ public class BuildConditionChecker {
 					}
 				}
 			}
-			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-				if (unit == null)
-					continue;
-				if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.canBuildAddon()
-						&& Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Comsat_Station) < 4) {
-	
-					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
-						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null)
-								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
-							break;
-						}
-					}
-				}
-			}
+//			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+//				if (unit == null)
+//					continue;
+//				if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted() && unit.canBuildAddon()
+//						&& Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Comsat_Station) < 4) {
+//	
+//					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
+//						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null)
+//								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
+//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
+//							break;
+//						}
+//					}
+//				}
+//			}
 		}
 		// 컴샛 end
 	
 		// barrack start
-		if (InitialBuildProvider.Instance().InitialBuildFinished == true && (barrackcnt == 0 || (barrackcnt == 1 && barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3))) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
-			}
-		}
+//		if (InitialBuildProvider.Instance().InitialBuildFinished == true && (barrackcnt == 0 || (barrackcnt == 1 && barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3))) {
+//			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
+//					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
+//			}
+//		}
 		// barrack end
 	
 		// engineering start
-		if (InitialBuildProvider.Instance().InitialBuildFinished == true
-				&& (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints() / 3))
-				&& Prebot.Broodwar.getFrameCount() > 11000) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
-			}
-		}
-		// engineering end
-	
-		// engineering start1
-		if (engineering == false) {
-			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 17000) {
-				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0
-						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
-				}
-			}
-		}
+//		if (InitialBuildProvider.Instance().InitialBuildFinished == true
+//				&& (engineeringcnt == 0 || (engineeringcnt == 1 && engineeringUnit.getHitPoints() < UnitType.Terran_Engineering_Bay.maxHitPoints() / 3))
+//				&& Prebot.Broodwar.getFrameCount() > 11000) {
+//			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
+//					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
+//			}
+//		}
+//		// engineering end
+//	
+//		// engineering start1
+//		if (engineering == false) {
+//			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 17000) {
+//				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0
+//						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
+//				}
+//			}
+//		}
 		// engineering end2
 	
 		// scienceVessel start
-		if ((RespondToStrategy.Instance().need_vessel == true && CC >= 2) || CC >= 3) {
-			if (star == false) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
-				}
-			}
-			if (starComplete) {
-				// 컨트롤 타워가 없다면
-				if (starportUnit != null && starportUnit.canBuildAddon()) {
-					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
-						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower, null)
-								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
-						}
-					}
-				}
-			}
-			if (science == false && starComplete) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Facility, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, false);
-				}
-			}
-			if (starComplete && scienceComplete && controltower) {
-				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel) < RespondToStrategy.Instance().max_vessel) {
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Vessel, null)
-							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Vessel, null) == 0) {
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Vessel, false);
-					}
-				}
-			}
-		}
+//		if ((RespondToStrategy.Instance().need_vessel == true && CC >= 2) || CC >= 3) {
+//			if (star == false) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+//				}
+//			}
+//			if (starComplete) {
+//				// 컨트롤 타워가 없다면
+//				if (starportUnit != null && starportUnit.canBuildAddon()) {
+//					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
+//						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower, null)
+//								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
+//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
+//						}
+//					}
+//				}
+//			}
+//			if (science == false && starComplete) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Facility, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Facility, false);
+//				}
+//			}
+//			if (starComplete && scienceComplete && controltower) {
+//				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel) < RespondToStrategy.Instance().max_vessel) {
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Vessel, null)
+//							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Vessel, null) == 0) {
+//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Science_Vessel, false);
+//					}
+//				}
+//			}
+//		}
 		// scienceVessel end
 	
 		// armory start1
-		if (armory == false) {
-			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 15000) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Armory, false);
-				}
-			}
-		}
+//		if (armory == false) {
+//			if (CC >= 2 || Prebot.Broodwar.getFrameCount() > 15000) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Armory) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Armory, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Armory, false);
+//				}
+//			}
+//		}
 		// armory end2
 	
 		// battlecruiser start
@@ -685,26 +685,26 @@ public class BuildConditionChecker {
 		// battlecruiser end
 	
 		// wraith for TvT start
-		if (RespondToStrategy.Instance().max_wraith > wraithcnt && nomorewraithcnt <= RespondToStrategy.Instance().max_wraith) {
-	
-			if (CC >= 2) {
-				if (star == false) {
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
-							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
-					}
-				}
-			}
-			if (starComplete) {
-				if (starportUnit.isTraining() == false && (Prebot.Broodwar.getFrameCount() - WraithTime > 2400 || wraithcnt < 1)) { // TODO && wraithcnt <= needwraith){
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
-						WraithTime = Prebot.Broodwar.getFrameCount();
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
-						nomorewraithcnt++;
-					}
-				}
-			}
-		}
+//		if (RespondToStrategy.Instance().max_wraith > wraithcnt && nomorewraithcnt <= RespondToStrategy.Instance().max_wraith) {
+//	
+//			if (CC >= 2) {
+//				if (star == false) {
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
+//							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) {
+//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Starport, false);
+//					}
+//				}
+//			}
+//			if (starComplete) {
+//				if (starportUnit.isTraining() == false && (Prebot.Broodwar.getFrameCount() - WraithTime > 2400 || wraithcnt < 1)) { // TODO && wraithcnt <= needwraith){
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+//						WraithTime = Prebot.Broodwar.getFrameCount();
+//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Wraith, false);
+//						nomorewraithcnt++;
+//					}
+//				}
+//			}
+//		}
 		// wraith for TvT end
 	
 		// //valkyrie for TvT start
