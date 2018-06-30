@@ -184,8 +184,8 @@ public class BlockingEntrance {
         //System.out.println("loc_t.getValue() ==>> " + loc_t.getValue());
 
 //      avoid supply 설정
-        System.out.println("before setTilesToAvoidSupply");
-      	//ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+//      System.out.println("before setTilesToAvoidSupply");
+//      ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
         
         
         

@@ -40,20 +40,20 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public final void setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
-        this.buildCondition.seedPositionStrategy = seedPositionStrategy;
+    	this.buildCondition.seedPositionStrategy = seedPositionStrategy;
     }
 
     public final void settilePosition(TilePosition tilePosition) {
-        this.buildCondition.tilePosition = tilePosition;
+    	this.buildCondition.tilePosition = tilePosition;
     }
 
     //이놈만 유닛 변경 있을때만 확인해 주면 될듯
-    public void setRecoverItemCount(int recoverItemCount) {
+    public void setRecoverItemCount(int recoverItemCountVar) {
         this.recoverItemCount = recoverItemCount;
     }
 
     public DefaultBuildableItem(MetaType metaType) {
-        buildCondition= new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.NoLocation, TilePosition.None);
+        buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.NoLocation, TilePosition.None);
         this.metaType = metaType;
         //setProducerOfUnit();
         if(metaType.isUnit() && (!metaType.getUnitType().isBuilding() || metaType.getUnitType().isAddon())) {
@@ -109,11 +109,12 @@ public abstract class DefaultBuildableItem implements BuildableItem{
             //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
         	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
         		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
-                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+                //BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+        		BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
             //}else if(!buildCondition.tilePosition == TilePosition.None){
             }else if(buildCondition.tilePosition != TilePosition.None){
             	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
-                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.tilePosition, buildCondition.blocking);
+                BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
             }else{
                 BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.blocking);
                 //FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! " + metaType.getUnitType());
@@ -125,14 +126,14 @@ public abstract class DefaultBuildableItem implements BuildableItem{
             //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
         	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
         		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
             //}else if(!buildCondition.tilePosition.equals(TilePosition.None)){
             }else if(buildCondition.tilePosition != TilePosition.None){
             	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.tilePosition, buildCondition.blocking);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
             }else{
             	//FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! ");
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType.getUnitType(), buildCondition.blocking);
+                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.blocking);
             }
         }
     }
@@ -220,8 +221,6 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     private final boolean checkProducerOfUnit(){
         if(metaType.isUnit() && !metaType.getUnitType().isBuilding()){
-        	FileUtils.appendTextToFile("log.txt", "\n checkProducerOfUnit metaType is Unit ==>> " + metaType.getName());
-            
             int availableProducer = 0;
             List<Unit> producerList= UnitUtils.getUnitList(UnitFindRange.COMPLETE, producerOfUnit);
 

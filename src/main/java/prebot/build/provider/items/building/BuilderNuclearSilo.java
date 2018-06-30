@@ -10,8 +10,8 @@ public class BuilderNuclearSilo extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("NuclearSilo build condition check");
-        return true;
+//        System.out.println("NuclearSilo build condition check");
+        return false;
     }
 
 

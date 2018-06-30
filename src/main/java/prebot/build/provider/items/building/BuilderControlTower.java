@@ -3,6 +3,7 @@ package prebot.build.provider.items.building;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
+import prebot.build.provider.BuildConditionChecker;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
@@ -25,8 +26,9 @@ public class BuilderControlTower extends DefaultBuildableItem {
 				// 컨트롤 타워가 없다면
 				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Control_Tower)) {
 					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
-						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower, null)
-								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
+						if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Control_Tower)) {
+//						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower, null)
+//								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
 							//BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
 							return true;
 						}
@@ -35,7 +37,23 @@ public class BuilderControlTower extends DefaultBuildableItem {
 			}
 		}
         
-        return true;
+        
+        if ((RespondToStrategy.Instance().need_vessel == true && BuildConditionChecker.Instance().CC >= 2) || BuildConditionChecker.Instance().CC >= 3) {
+			if (BuildConditionChecker.Instance().starComplete) {
+				// 컨트롤 타워가 없다면
+				if (BuildConditionChecker.Instance().starportUnit != null && BuildConditionChecker.Instance().starportUnit.canBuildAddon()) {
+					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
+						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower, null)
+								+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) {
+//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
+							return true;
+						}
+					}
+				}
+			}
+		}
+        
+        return false;
     }
 
 

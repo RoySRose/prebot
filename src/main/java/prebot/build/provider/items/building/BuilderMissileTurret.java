@@ -30,7 +30,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
     	boolean firstChokeTurret;
     	int max_turret_to_mutal = RespondToStrategy.Instance().max_turret_to_mutal;
     	
-        System.out.println("MissileTurret build condition check");
+//        System.out.println("MissileTurret build condition check");
         
         if (UnitUtils.myUnitDiscovered(UnitType.Terran_Engineering_Bay)) {
         

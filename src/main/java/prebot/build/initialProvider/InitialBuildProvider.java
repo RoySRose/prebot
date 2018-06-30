@@ -26,7 +26,7 @@ public class InitialBuildProvider {
 	public boolean InitialBuildFinished = false;
 	
 	public void onStart() {
-		System.out.println("InitialBuildProvider start");
+//		System.out.println("InitialBuildProvider start");
    	 
         BlockingEntrance blockingEntrance = new BlockingEntrance();
 
@@ -50,7 +50,7 @@ public class InitialBuildProvider {
         if(BuildManager.Instance().buildQueue.isEmpty()){
         	
             InitialBuildFinished = true;
-            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
+//            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
         }
 
 
