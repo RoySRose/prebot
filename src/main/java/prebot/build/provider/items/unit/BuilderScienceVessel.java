@@ -28,7 +28,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
         }else{
         	
         	if(BuildQueueProvider.Instance().respondSet) {
-        		
+        		return false;
         	}else {
         	
 	        	if ((RespondToStrategy.Instance().need_vessel == true && BuildConditionChecker.Instance().CC >= 2) || BuildConditionChecker.Instance().CC >= 3) {

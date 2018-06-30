@@ -25,10 +25,14 @@ public class BuilderBarracks extends DefaultBuildableItem {
     		return false;
     	}else {
     	
-    		if (InitialBuildProvider.Instance().InitialBuildFinished == true && (BuildConditionChecker.Instance().barrackcnt == 0 || (BuildConditionChecker.Instance().barrackcnt == 1 && BuildConditionChecker.Instance().barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3))) {
+    		if (InitialBuildProvider.Instance().InitialBuildFinished == true 
+    				&& 
+    				(BuildConditionChecker.Instance().barrackcnt == 0 
+    				|| (BuildConditionChecker.Instance().barrackcnt == 1 && BuildConditionChecker.Instance().barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3))) {
     			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
     					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
-    				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
+//    				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
+    				return true;
     			}
     		}
 //	        //System.out.println("barracks build condition check");
