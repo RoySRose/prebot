@@ -38,9 +38,8 @@ public class BuilderComsatStation extends DefaultBuildableItem {
 				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Comsat_Station) && UnitUtils.myFactoryUnitSupplyCount() >= 32) {
 					if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) > 0) {
 						// 아카데미가 완성되었고
-						if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Comsat_Station)) {
-	//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1
-	//							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
+						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station) < 1
+								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
 							// 빌드큐에 컴셋이 없는데, 아카데미가 완성되었다면빌드큐에 컴셋 입력
 							if (Prebot.Broodwar.self().minerals() >= UnitType.Terran_Comsat_Station.mineralPrice()
 									&& Prebot.Broodwar.self().gas() >= UnitType.Terran_Comsat_Station.gasPrice()) {
@@ -63,9 +62,9 @@ public class BuilderComsatStation extends DefaultBuildableItem {
 							&& Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Comsat_Station) < 4) {
 		
 						if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
-							if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Comsat_Station)) {
-		//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null)
-		//							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
+//							if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Comsat_Station)) {
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Comsat_Station, null)
+									+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Comsat_Station, null) == 0) {
 		//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Comsat_Station, true);
 		//						break;
 								setBlocking(true);
