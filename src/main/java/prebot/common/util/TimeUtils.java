@@ -106,6 +106,10 @@ public class TimeUtils {
 	}
 	
 	public static String framesToTimeString(int frames) {
+		if (frames == CommonCode.UNKNOWN) {
+			return "unknown";
+		}
+		
 		int minutes = framesToMinutes(frames);
 		int seconds = framesToSeconds(frames - minutes * MINUTE);
 		return minutes + "min " + seconds + "sec";

@@ -16,6 +16,7 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.MirrorBugFixed;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -139,7 +140,7 @@ public class MicroUtils {
 	
 	public static void kiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption) {
 		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
-			kOption.cooltimeAlwaysAttack = false;
+			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		} else if (groundUnitFreeKiting(rangedUnit)) {
@@ -148,7 +149,17 @@ public class MicroUtils {
 		}
 		
 		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
-			CommandUtils.attackUnit(rangedUnit, targetUnit);
+			if (targetUnit.isVisible()) {
+				CommandUtils.attackUnit(rangedUnit, targetUnit);
+			} else {
+				// TODO 테스트 필요
+				if (!rangedUnit.isInWeaponRange(targetUnit)) {
+					flee(rangedUnit, targetUnit.getPosition(), kOption.fOption);
+				} else {
+					CommandUtils.attackUnit(rangedUnit, targetUnit);
+				}
+			}
+			
 			return;
 		} else {
 			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
@@ -160,7 +171,7 @@ public class MicroUtils {
 		}
 	}
 
-	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, boolean cooltimeAlwaysAttack) {
+	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, CoolTimeAttack cooltimeAttack) {
 
 		// attackUnit, target 각각의 지상/공중 무기를 선택
 		WeaponType attackUnitWeapon = targetUnit.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();
@@ -192,8 +203,14 @@ public class MicroUtils {
 			return true;
 		}
 		
+		// TODO 테스트 필요. 사정거리를 유지
+		if (cooltimeAttack == CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE) {
+			if (!rangedUnit.isInWeaponRange(targetUnit)) {
+				return true;
+			}
+		}
 		// 쿨타임이 되었을 때 항시 공격할 것인가
-		return cooltimeAlwaysAttack && cooltime == 0; 
+		return cooltimeAttack.coolTimeAlwaysAttack && cooltime == 0;
 	}
 	
 	private static int forwardKitingTargetDistance(Unit rangedUnit, Unit targetUnit) {
@@ -210,8 +227,19 @@ public class MicroUtils {
 	}
 	
 	private static boolean groundUnitFreeKiting(Unit rangedUnit) {
-		// TODO Auto-generated method stub
-		return false;
+		List<Unit> nearUnits = UnitUtils.getUnitsInRadius(PlayerRange.SELF, rangedUnit.getPosition(), (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8));
+		boolean freeKiting = true;
+		int myGroundUnitCount = 0;
+		for (Unit unit : nearUnits) {
+			if (unit.getType().isWorker() || unit.isFlying() || unit.getType().isBuilding()) {
+				continue;
+			}
+			if (++myGroundUnitCount > 2) {
+				freeKiting = false;
+				break;
+			}
+		}
+		return freeKiting;
 	}
 	
 	private static Position getFleePosition(Unit fleeUnit, Position targetPosition, FleeOption fOption) {

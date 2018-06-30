@@ -24,7 +24,7 @@ public class ObservatoryAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int fastObFrame = EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON.defaultTimeMap.time(UnitType.Protoss_Observatory, 30);
+			int fastObFrame = EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON.defaultTimeMap.frame(UnitType.Protoss_Observatory, 30);
 
 			if (buildFrame < fastObFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.OBSERVER_FAST);

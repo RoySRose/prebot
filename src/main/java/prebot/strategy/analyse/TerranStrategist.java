@@ -128,9 +128,12 @@ public class TerranStrategist extends Strategist {
 			if (isBionic) {
 				return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
 			} else {
-				return EnemyStrategy.TERRAN_MECHANIC_WRAITH_TANK;
+				if (goliathCount == 0) {
+					return EnemyStrategy.TERRAN_MECHANIC_WRAITH_TANK;
+				} else {
+					return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
+				}
 			}
-			
 		} else {
 			return EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK;
 		}

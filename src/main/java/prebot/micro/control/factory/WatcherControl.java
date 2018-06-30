@@ -1,5 +1,6 @@
 package prebot.micro.control.factory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -16,6 +17,7 @@ import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.TargetScoreCalculators;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -43,14 +45,14 @@ public class WatcherControl extends Control {
 			fight(unitList, euiList);
 
 		} else if (smallFightPredict == SmallFightPredict.BACK) {
-			regroup(unitList);
+			regroup(unitList, euiList);
 		}
 	}
 
 	private void fight(List<Unit> unitList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, false);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -95,11 +97,17 @@ public class WatcherControl extends Control {
 		}
 	}
 
-	private void regroup(List<Unit> unitList) {
+	private void regroup(List<Unit> unitList, List<UnitInfo> euiList) {
+		List<Unit> fightUnitList = new ArrayList<>();
+			
 		// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
 		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
+				continue;
+			}
+			if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainSquadCenter)) {
+				fightUnitList.add(unit);
 				continue;
 			}
 			
@@ -109,6 +117,11 @@ public class WatcherControl extends Control {
 				CommandUtils.move(unit, leader.getPosition());
 			}
 		}
+		
+		if (!fightUnitList.isEmpty()) {
+			fight(fightUnitList, euiList);
+		}
+		
 	}
 	
 	private boolean spiderMineOrderIssue(Unit vulture) {

@@ -14,6 +14,7 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -86,7 +87,7 @@ public class TankControl extends Control {
 	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forTankMode);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, false);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 
 		for (Unit tank : tankModeList) {
 			Decision decision = decisionMaker.makeDecision(tank, euiList);

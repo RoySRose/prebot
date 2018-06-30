@@ -16,6 +16,7 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -80,7 +81,7 @@ public class ScoutDefenseSquad extends Squad {
 	public void execute() {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, false);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
 		for (Unit unit : unitList) {
 			Decision decision = decisionMaker.makeDecision(unit, euiList);

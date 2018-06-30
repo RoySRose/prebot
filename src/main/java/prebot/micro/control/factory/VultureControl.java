@@ -9,6 +9,7 @@ import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -26,7 +27,7 @@ public class VultureControl extends Control {
 		
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, false);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {

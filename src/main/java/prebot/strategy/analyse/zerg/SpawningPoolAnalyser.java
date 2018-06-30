@@ -29,10 +29,10 @@ public class SpawningPoolAnalyser extends UnitAnalyser {
 			return;
 		}
 		
-		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 5);
-		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 5);
-		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
-		int doubleFrame = EnemyStrategy.ZERG_2HAT_GAS.defaultTimeMap.time(UnitType.Zerg_Spawning_Pool, 10);
+		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
+		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
+		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
+		int doubleFrame = EnemyStrategy.ZERG_2HAT_GAS.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 10);
 		
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {

@@ -1,16 +1,28 @@
 package prebot.micro;
 
-import bwapi.Unit;
 import prebot.strategy.UnitInfo;
 
 public class Decision {
 
 	public enum DecisionType {
-		KITING_UNIT, ATTACK_UNIT, ATTACK_POSITION, FLEE_FROM_UNIT, FLEE_FROM_POSITION, HOLD, STOP, CHANGE_MODE, RIGHT_CLICK;
+		KITING_UNIT("KU"),
+		ATTACK_UNIT("AU"),
+		ATTACK_POSITION("AP"),
+		FLEE_FROM_UNIT("FU"),
+		FLEE_FROM_POSITION("FP"),
+		HOLD("H"),
+		STOP("S"),
+		CHANGE_MODE("C"),
+		RIGHT_CLICK("R");
+		
+		private DecisionType(String shortName) {
+			this.SHORTNAME = shortName;
+		}
+		
+		public String SHORTNAME;
 	}
 
 	public DecisionType type;
-	public Unit unit;
 	public UnitInfo eui;
 	
 	private Decision(DecisionType type) {
@@ -60,6 +72,10 @@ public class Decision {
 
 	@Override
 	public String toString() {
-		return "Decision [type=" + type + ", unit=" + unit + ", eui=" + eui + "]";
+		if (eui == null) {
+			return type.SHORTNAME;
+		} else {
+			return type.SHORTNAME + " -> " + eui.getType();
+		}
 	}
 }

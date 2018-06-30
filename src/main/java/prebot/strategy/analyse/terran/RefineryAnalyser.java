@@ -27,7 +27,7 @@ public class RefineryAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Refinery, 25);
+			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.frame(UnitType.Terran_Refinery, 25);
 			if (buildFrame < mechanicGasFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.REFINERY_FAST);
 			} else {
@@ -35,7 +35,7 @@ public class RefineryAnalyser extends UnitAnalyser {
 			}
 		} else {
 			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
-			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Refinery, 25);
+			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.frame(UnitType.Terran_Refinery, 25);
 			if (gasLastCheckFrame > mechanicGasFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.NO_REFINERY);
 			}

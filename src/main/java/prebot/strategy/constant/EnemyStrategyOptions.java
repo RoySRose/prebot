@@ -35,7 +35,7 @@ public class EnemyStrategyOptions {
 	}
 	
 	public static class MarineCount {
-		public static final int NO_MARINE = 0;
+		public static final int ONE_MARINE = 0;
 		public static final int TWO_MARINE = 2;
 		public static final int FOUR_MARINE = 4;
 		public static final int SIX_MARINE = 6;
@@ -105,12 +105,23 @@ public class EnemyStrategyOptions {
 				new MetaType(UpgradeType.Ion_Thrusters));
 	}
 	
-	public static class DefaultTimeMap {
+	public static class BuildTimeMap {
+		private boolean isDouble = false;
+		private boolean isMechanic = false;
+		
 		private Map<UnitType, List<Integer>> buildingTime = new HashMap<>();
 		private Map<TechType, Integer> techTime = new HashMap<>();
 		private Map<UpgradeType, Integer> upgradeTime = new HashMap<>();
 		
-		public DefaultTimeMap put(UnitType unitType, int minutes, int seconds) {
+		public BuildTimeMap setDouble() {
+			this.isDouble = true;
+			return this;
+		}
+		public BuildTimeMap setMechanic() {
+			this.isMechanic = true;
+			return this;
+		}
+		public BuildTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			List<Integer> defaultTimeList = buildingTime.get(unitType);
 			if (defaultTimeList == null) {
@@ -120,51 +131,57 @@ public class EnemyStrategyOptions {
 			buildingTime.put(unitType, defaultTimeList);
 			return this;
 		}
-		public DefaultTimeMap put(TechType techType, int minutes, int seconds) {
+		public BuildTimeMap put(TechType techType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			techTime.put(techType, defaultTime);
 			return this;
 		}
-		public DefaultTimeMap put(UpgradeType upgradeType, int minutes, int seconds) {
+		public BuildTimeMap put(UpgradeType upgradeType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			upgradeTime.put(upgradeType, defaultTime);
 			return this;
 		}
-		public DefaultTimeMap putAll(DefaultTimeMap defaultTimeMap) {
+		public BuildTimeMap putAll(BuildTimeMap defaultTimeMap) {
 			buildingTime.putAll(defaultTimeMap.buildingTime);
 			techTime.putAll(defaultTimeMap.techTime);
 			upgradeTime.putAll(defaultTimeMap.upgradeTime);
 			return this;
 		}
-		public int time(UnitType unitType) {
-			return timeOfIndex(unitType, 0);
+		public int frame(UnitType unitType) {
+			return frameOfIndex(unitType, 0);
 		}
-		public int time(UnitType unitType, int margin) {
-			return timeOfIndex(unitType, 0) + margin * TimeUtils.SECOND;
+		public int frame(UnitType unitType, int margin) {
+			return frameOfIndex(unitType, 0) + margin * TimeUtils.SECOND;
 		}
-		public int timeOfIndex(UnitType unitType, int index) {
+		public int frameOfIndex(UnitType unitType, int index) {
 			List<Integer> defaultTimeList = buildingTime.get(unitType);
 			if (defaultTimeList == null || defaultTimeList.size() <= index) {
 				return CommonCode.UNKNOWN;
 			}
 			return defaultTimeList.get(index);
 		}
-		public int timeOfIndex(UnitType unitType, int index, int margin) {
-			return timeOfIndex(unitType, index) + margin * TimeUtils.SECOND;
+		public int frameOfIndex(UnitType unitType, int index, int margin) {
+			return frameOfIndex(unitType, index) + margin * TimeUtils.SECOND;
 		}
-		public int time(TechType techType) {
+		public int frame(TechType techType) {
 			Integer defaultTime = techTime.get(techType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
-		public int time(TechType techType, int margin) {
-			return time(techType) + margin * TimeUtils.SECOND;
+		public int frame(TechType techType, int margin) {
+			return frame(techType) + margin * TimeUtils.SECOND;
 		}
-		public int time(UpgradeType upgradeType) {
+		public int frame(UpgradeType upgradeType) {
 			Integer defaultTime = upgradeTime.get(upgradeType);
 			return defaultTime != null ? defaultTime : CommonCode.UNKNOWN;
 		}
-		public int time(UpgradeType upgradeType, int margin) {
-			return time(upgradeType) + margin * TimeUtils.SECOND;
+		public int frame(UpgradeType upgradeType, int margin) {
+			return frame(upgradeType) + margin * TimeUtils.SECOND;
+		}
+		public boolean isDouble() {
+			return isDouble;
+		}
+		public boolean isMechanic() {
+			return isMechanic;
 		}
 		@Override
 		public String toString() {

@@ -29,9 +29,9 @@ public class CommandCenterAnalyser extends UnitAnalyser {
 			return;
 		}
 		
-		int doubleFrame = EnemyStrategy.TERRAN_NO_BARRACKS_DOUBLE.defaultTimeMap.time(UnitType.Terran_Command_Center, 20);
-		int oneBarrackDoubleFrame = EnemyStrategy.TERRAN_1BARRACKS_DOUBLE.defaultTimeMap.time(UnitType.Terran_Command_Center, 20);
-		int oneFacDoubleFrame = EnemyStrategy.TERRAN_1FAC_DOUBLE.defaultTimeMap.time(UnitType.Terran_Command_Center, 30);
+		int doubleFrame = EnemyStrategy.TERRAN_NO_BARRACKS_DOUBLE.defaultTimeMap.frame(UnitType.Terran_Command_Center, 20);
+		int oneBarrackDoubleFrame = EnemyStrategy.TERRAN_1BARRACKS_DOUBLE.defaultTimeMap.frame(UnitType.Terran_Command_Center, 20);
+		int oneFacDoubleFrame = EnemyStrategy.TERRAN_1FAC_DOUBLE.defaultTimeMap.frame(UnitType.Terran_Command_Center, 30);
 		
 		List<UnitInfo> found = found();
 		if (found.isEmpty()) {

@@ -6,6 +6,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
+import prebot.common.debug.UXManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
@@ -13,7 +14,7 @@ import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
 
 public class DecisionMaker {
-
+	
 	private static final int BACKOFF_DIST = 64;
 	private static final int TOO_TOO_FAR_DISTANCE = 450;
 	private TargetScoreCalculator targetScoreCalculator;
@@ -73,25 +74,28 @@ public class DecisionMaker {
 			}
 		}
 
+		Decision decision;
 		if (bestTargetUnitInfo != null) {
 			if (targetInRangeButOutOfSight || highestScore <= 0) {
-				return Decision.stop();
+				decision = Decision.stop();
 			} else {
-				return Decision.attackUnit(bestTargetUnitInfo);
+				decision = Decision.attackUnit(bestTargetUnitInfo);
 			}
 		} else {
 			if (undetectedDarkTemplar != null || tooCloseTarget != null) {
-				return Decision.change();
+				decision = Decision.change();
 			} else if (tooFarTarget != null) {
 				if (closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
-					return Decision.change();
+					decision = Decision.change();
 				} else {
-					return Decision.hold();
+					decision = Decision.hold();
 				}
 			} else {
-				return Decision.attackPosition();
+				decision = Decision.attackPosition();
 			}
 		}
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 
 	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList) {
@@ -110,11 +114,15 @@ public class DecisionMaker {
 				highestScore = score;
 			}
 		}
+
+		Decision decision;
 		if (bestTargetUnitInfo != null) {
-			return Decision.kitingUnit(bestTargetUnitInfo);
+			decision = Decision.kitingUnit(bestTargetUnitInfo);
 		} else {
-			return Decision.attackPosition();
+			decision = Decision.attackPosition();
 		}
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 
 	private boolean isCloseDangerousTarget(Unit myUnit, UnitInfo eui) {

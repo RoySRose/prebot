@@ -30,7 +30,7 @@ public class CoreAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int normalCoreFrame = EnemyStrategy.PROTOSS_1GATE_CORE.defaultTimeMap.time(UnitType.Protoss_Cybernetics_Core, 20);
+			int normalCoreFrame = EnemyStrategy.PROTOSS_1GATE_CORE.defaultTimeMap.frame(UnitType.Protoss_Cybernetics_Core, 20);
 
 			if (buildFrame < normalCoreFrame) { // 생더블 확정
 				ClueManager.Instance().addClueInfo(ClueInfo.CORE_FAST);

@@ -29,7 +29,7 @@ public class StarportAnalyser extends UnitAnalyser {
 		if (found.size() >= 2) { // 스타포트 2개 이상
 			int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int secondBuildFrame = buildStartFrameDefaultJustBefore(found.get(1));
-			int twoFacSecondFacFrame = EnemyStrategy.TERRAN_2STAR.defaultTimeMap.timeOfIndex(UnitType.Terran_Starport, 1, 20);
+			int twoFacSecondFacFrame = EnemyStrategy.TERRAN_2STAR.defaultTimeMap.frameOfIndex(UnitType.Terran_Starport, 1, 20);
 			
 			if (firstBuildFrame < twoFacSecondFacFrame && secondBuildFrame < twoFacSecondFacFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_FAST_TWO);
@@ -39,7 +39,7 @@ public class StarportAnalyser extends UnitAnalyser {
 		
 		} else if (found.size() == 1) { // 스타포트 1개
 			int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_2STAR.defaultTimeMap.time(UnitType.Terran_Starport, 15);
+			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_2STAR.defaultTimeMap.frame(UnitType.Terran_Starport, 15);
 			if (firstBuildFrame < mechanicFirstBarrackFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_FAST_ONE);
 			} else {

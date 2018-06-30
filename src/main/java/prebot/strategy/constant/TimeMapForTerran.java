@@ -2,36 +2,36 @@ package prebot.strategy.constant;
 
 import bwapi.TechType;
 import bwapi.UnitType;
-import prebot.strategy.constant.EnemyStrategyOptions.DefaultTimeMap;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
 
 public class TimeMapForTerran {
 	
 	// PHASE1
-	public static DefaultTimeMap TERRAN_MECHANIC() {
-		return new DefaultTimeMap()
+	public static BuildTimeMap TERRAN_MECHANIC() {
+		return new BuildTimeMap().setMechanic()
 		.put(UnitType.Terran_Supply_Depot, 0, 55)
 		.put(UnitType.Terran_Barracks, 1, 40)
 		.put(UnitType.Terran_Refinery, 1, 45)
 		.put(UnitType.Terran_Factory, 2, 40);
 	}
 	
-	public static DefaultTimeMap TERRAN_BBS() {
-		return new DefaultTimeMap()
+	public static BuildTimeMap TERRAN_BBS() {
+		return new BuildTimeMap()
 		.put(UnitType.Terran_Barracks, 1, 00)
 		.put(UnitType.Terran_Barracks, 1, 25)
 		.put(UnitType.Terran_Supply_Depot, 1, 45);
 	}
 	
-	public static DefaultTimeMap TERRAN_2BARRACKS() {
-		return new DefaultTimeMap()
+	public static BuildTimeMap TERRAN_2BARRACKS() {
+		return new BuildTimeMap()
 		.put(UnitType.Terran_Supply_Depot, 0, 55)
 		.put(UnitType.Terran_Barracks, 1, 30)
 		.put(UnitType.Terran_Barracks, 2, 0)
 		.put(UnitType.Terran_Refinery, 2, 45);
 	}
 	
-	public static DefaultTimeMap TERRAN_1BARRACKS_DOUBLE() {
-		return new DefaultTimeMap()
+	public static BuildTimeMap TERRAN_1BARRACKS_DOUBLE() {
+		return new BuildTimeMap().setDouble().setMechanic()
 		.put(UnitType.Terran_Supply_Depot, 0, 55)
 		.put(UnitType.Terran_Barracks, 1, 30)
 		.put(UnitType.Terran_Command_Center, 2, 30)
@@ -39,8 +39,8 @@ public class TimeMapForTerran {
 		.put(UnitType.Terran_Factory, 3, 40);
 	}
 	
-	public static DefaultTimeMap NO_BARRACKS_DOUBLE() {
-		return new DefaultTimeMap()
+	public static BuildTimeMap NO_BARRACKS_DOUBLE() {
+		return new BuildTimeMap().setDouble().setMechanic()
 		.put(UnitType.Terran_Supply_Depot, 0, 55)
 		.put(UnitType.Terran_Command_Center, 2, 10)
 		.put(UnitType.Terran_Barracks, 2, 20)
@@ -49,49 +49,49 @@ public class TimeMapForTerran {
 	}
 	
 	// PHASE2
-	public static DefaultTimeMap TERRAN_1FAC_DOUBLE() {
+	public static BuildTimeMap TERRAN_1FAC_DOUBLE() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Command_Center, 3, 40);
 	}
 	
-	public static DefaultTimeMap TERRAN_1FAC_DOUBLE_1STAR() {
+	public static BuildTimeMap TERRAN_1FAC_DOUBLE_1STAR() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Command_Center, 3, 40)
 		.put(TechType.Tank_Siege_Mode, 4, 10)
 		.put(UnitType.Terran_Starport, 4, 30);
 	}
 	
-	public static DefaultTimeMap TERRAN_1FAC_DOUBLE_ARMORY() {
+	public static BuildTimeMap TERRAN_1FAC_DOUBLE_ARMORY() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Command_Center, 3, 40)
 		.put(UnitType.Terran_Armory, 4, 30)
 		.put(UnitType.Terran_Academy, 5, 30);
 	}
 	
-	public static DefaultTimeMap TERRAN_2FAC() {
+	public static BuildTimeMap TERRAN_2FAC() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Factory, 4, 0)
 		.put(UnitType.Terran_Vulture_Spider_Mine, 4, 10);
 	}
 	
-	public static DefaultTimeMap TERRAN_1FAC_1STAR() {
+	public static BuildTimeMap TERRAN_1FAC_1STAR() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Starport, 3, 30);
 	}
 	
-	public static DefaultTimeMap TERRAN_2STAR() {
+	public static BuildTimeMap TERRAN_2STAR() {
 		return TERRAN_MECHANIC()
 		.put(UnitType.Terran_Starport, 3, 30)
 		.put(UnitType.Terran_Starport, 3, 30);
 	}
 	
-	public static DefaultTimeMap TERRAN_BIONIC() {
+	public static BuildTimeMap TERRAN_BIONIC() {
 		return TERRAN_2BARRACKS()
 		  .put(UnitType.Terran_Academy, 3, 0)
 		  .put(TechType.Stim_Packs, 3, 50);
 	}
 	
-	public static DefaultTimeMap TERRAN_2BARRACKS_1FAC() {
+	public static BuildTimeMap TERRAN_2BARRACKS_1FAC() {
 		return TERRAN_2BARRACKS()
 		  .put(UnitType.Terran_Factory, 3, 35);
 	}

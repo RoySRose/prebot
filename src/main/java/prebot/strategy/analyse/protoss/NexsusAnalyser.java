@@ -29,8 +29,8 @@ public class NexsusAnalyser extends UnitAnalyser {
 			return;
 		}
 		
-		int doubleFrame = EnemyStrategy.PROTOSS_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
-		int forgeDoubleFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.time(UnitType.Protoss_Nexus, 20);
+		int doubleFrame = EnemyStrategy.PROTOSS_DOUBLE.defaultTimeMap.frame(UnitType.Protoss_Nexus, 20);
+		int forgeDoubleFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.frame(UnitType.Protoss_Nexus, 20);
 		
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {

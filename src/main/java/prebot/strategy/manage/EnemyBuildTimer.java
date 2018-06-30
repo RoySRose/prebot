@@ -22,14 +22,14 @@ import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 public class EnemyBuildTimer {
 
 	// lair, hydraden, spire, core, adun, templar arch, robotics, robo support, factory, starport
-	private Map<UnitType, Integer> buildTimeExpectMap = new HashMap<>();
-	private Map<UnitType, Integer> buildTimeMinimumMap = new HashMap<>();
-	private Set<UnitType> buildTimeCertain = new HashSet<>();
-	
-	private int darkTemplarInMyBaseFrame = CommonCode.UNKNOWN;
-	private int reaverInMyBaseFrame = CommonCode.UNKNOWN;
-	private int mutaliskInMyBaseFrame = CommonCode.UNKNOWN;
-	private int lurkerInMyBaseFrame = CommonCode.UNKNOWN;
+	public Map<UnitType, Integer> buildTimeExpectMap = new HashMap<>();
+	public Map<UnitType, Integer> buildTimeMinimumMap = new HashMap<>();
+	public Set<UnitType> buildTimeCertain = new HashSet<>();
+
+	public int darkTemplarInMyBaseFrame = CommonCode.UNKNOWN;
+	public int reaverInMyBaseFrame = CommonCode.UNKNOWN;
+	public int mutaliskInMyBaseFrame = CommonCode.UNKNOWN;
+	public int lurkerInMyBaseFrame = CommonCode.UNKNOWN;
 
 	public int getBuildStartFrameExpect(UnitType buildingType) {
 		Integer expectFrame = buildTimeExpectMap.get(buildingType);
@@ -96,6 +96,8 @@ public class EnemyBuildTimer {
 					darkTemplarInMyBaseFrame = templarArchFrame + UnitType.Protoss_Templar_Archives.buildTime() + UnitType.Protoss_Dark_Templar.buildTime()
 									+ InformationManager.Instance().baseToBaseFrame(UnitType.Protoss_Dark_Templar);
 				}
+			} else {
+				
 			}
 			
 			if (!UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Reaver)) {
@@ -104,13 +106,15 @@ public class EnemyBuildTimer {
 					reaverInMyBaseFrame = roboSupportFrame + UnitType.Protoss_Robotics_Support_Bay.buildTime() + UnitType.Protoss_Reaver.buildTime()
 									+ InformationManager.Instance().baseToBaseFrame(UnitType.Protoss_Shuttle);
 				}
+			} else {
+				
 			}
 			
 			if (darkTemplarInMyBaseFrame != CommonCode.UNKNOWN) {
 				if (reaverInMyBaseFrame == CommonCode.UNKNOWN || darkTemplarInMyBaseFrame < reaverInMyBaseFrame) {
-					StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame;
-					StrategyIdea.turretBuildStartFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
-					StrategyIdea.engineeringBayBuildStartFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime();
+					StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame - 5 * TimeUtils.SECOND;
+					StrategyIdea.turretBuildStartFrame = StrategyIdea.turretNeedFrame - UnitType.Terran_Missile_Turret.buildTime() - 5 * TimeUtils.SECOND;
+					StrategyIdea.engineeringBayBuildStartFrame = StrategyIdea.turretBuildStartFrame - UnitType.Terran_Engineering_Bay.buildTime() - 5 * TimeUtils.SECOND;
 				} else {
 					StrategyIdea.turretNeedFrame = reaverInMyBaseFrame;
 					StrategyIdea.turretBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime();
@@ -161,7 +165,6 @@ public class EnemyBuildTimer {
 			
 		}
 		
-		
 	}
 
 	private void updateCoreExpectTime() {
@@ -199,45 +202,40 @@ public class EnemyBuildTimer {
 	}
 
 	private void updateLairExpectTime() {
-		if (isCertainBuildTime(UnitType.Zerg_Lair)) {
-			return;
-		}
 		updateByBuilding(UnitType.Zerg_Lair, UnitType.Zerg_Spire);
 		updateByFlagUnit(UnitType.Zerg_Lair, UnitType.Zerg_Lurker);
 		updateByFlagUnit(UnitType.Zerg_Lair, UnitType.Zerg_Mutalisk);
 	}
 
 	private void updateHydradenExpectTime() {
-		if (isCertainBuildTime(UnitType.Zerg_Hydralisk_Den)) {
-			return;
-		}
-		
 		int lairInProgressExpect = getBuildStartFrameExpect(UnitType.Zerg_Lair) + (int) (UnitType.Zerg_Lair.buildTime() * 0.4);
 		updateByBuilding(lairInProgressExpect, UnitType.Zerg_Hydralisk_Den);
 		updateByFlagUnit(UnitType.Zerg_Hydralisk_Den, UnitType.Zerg_Hydralisk);
 	}
 
 	private void updateSpireExpectTime() {
-		if (isCertainBuildTime(UnitType.Zerg_Spire)) {
-			return;
-		}
-		
 		int lairCompleteExpect = getBuildStartFrameExpect(UnitType.Zerg_Lair) + UnitType.Zerg_Lair.buildTime();
 		updateByBuilding(lairCompleteExpect, UnitType.Zerg_Spire);
 		updateByFlagUnit(UnitType.Zerg_Spire, UnitType.Zerg_Mutalisk);
 	}
 	
 	private void updateByBuilding(UnitType buildingType, UnitType... nextBuildingTypes) {
-		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.time(buildingType);
+		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.frame(buildingType);
+		if (buildFrameByStrategy == CommonCode.UNKNOWN) {
+			buildFrameByStrategy = StrategyIdea.startStrategy.defaultTimeMap.frame(buildingType);
+		}
 		updateByBuilding(buildFrameByStrategy, buildingType, nextBuildingTypes);
 	}
 	
 	private void updateByBuilding(int buildFrameByStrategy, UnitType buildingType, UnitType... nextBuildingTypes) {
-		List<UnitInfo> coreInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, buildingType);
-		if (!coreInfos.isEmpty()) {
-			if (coreInfos.get(0).isCompleted()) {
+		if (isCertainBuildTime(buildingType)) {
+			return;
+		}
+		List<UnitInfo> buildingInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, buildingType);
+		if (!buildingInfos.isEmpty()) {
+			if (buildingInfos.get(0).isCompleted()) {
 				// 완성된 건물 발견. 막 완성되었다고 가정한 시간과 전략별 시간 중 빠른 값 선택
-				int expectBuildFrame = coreInfos.get(0).getUpdateFrame() - buildingType.buildTime();
+				int expectBuildFrame = buildingInfos.get(0).getUpdateFrame() - buildingType.buildTime();
 				if (buildFrameByStrategy != CommonCode.UNKNOWN && buildFrameByStrategy < expectBuildFrame) {
 					expectBuildFrame = buildFrameByStrategy;
 				}
@@ -249,7 +247,7 @@ public class EnemyBuildTimer {
 
 			} else {
 				// 미완성 건물 발견. 에너지로 빌드시간 추측 가능
-				int expectBuildFrame = TimeUtils.buildStartFrames(coreInfos.get(0).getUnit());
+				int expectBuildFrame = TimeUtils.buildStartFrames(buildingInfos.get(0).getUnit());
 				if (expectBuildFrame == CommonCode.UNKNOWN) {
 					expectBuildFrame = buildFrameByStrategy;
 				}
@@ -258,6 +256,9 @@ public class EnemyBuildTimer {
 				}
 				updateBuildTimeExpect(buildingType, expectBuildFrame);
 				addCertainBuildTime(buildingType);
+				for (UnitType nextBuildingType : nextBuildingTypes) {
+					updateBuildTimeMinimum(nextBuildingType, expectBuildFrame + buildingType.buildTime());
+				}
 			}
 
 		} else {
@@ -271,12 +272,21 @@ public class EnemyBuildTimer {
 					minimumFrame = minimumFrame < expansionLastCheckFrame ? minimumFrame : expansionLastCheckFrame;
 					updateBuildTimeMinimum(buildingType, minimumFrame);
 				}
+				if (buildingType.gasPrice() > 0 && InfoUtils.enemyBaseGas() != null) {
+					if (InfoUtils.enemyNumUnits(UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor, UnitType.Terran_Refinery) == 0) {
+						updateBuildTimeMinimum(buildingType, gasLastCheckFrame + UnitType.Terran_Refinery.buildTime() + 10 * TimeUtils.SECOND); // 모든 가스기지 빌드타임 동일
+					}
+				}
+				
 				updateBuildTimeExpect(buildingType, buildFrameByStrategy);
 			}
 		}
 	}
 
 	private void updateByFlagUnit(UnitType buildingType, UnitType unitType) {
+		if (isCertainBuildTime(buildingType)) {
+			return;
+		}
 		if (UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, unitType).isEmpty()) {
 			return;
 		}
@@ -301,9 +311,14 @@ public class EnemyBuildTimer {
 			}
 		}
 
-		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.time(buildingType);
+		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.frame(buildingType);
 		if (buildFrameByStrategy != CommonCode.UNKNOWN && buildFrameByStrategy < expectBuildTime) {
 			expectBuildTime = buildFrameByStrategy;
+		} else {
+			buildFrameByStrategy = StrategyIdea.startStrategy.defaultTimeMap.frame(buildingType);
+			if (buildFrameByStrategy != CommonCode.UNKNOWN && buildFrameByStrategy < expectBuildTime) {
+				expectBuildTime = buildFrameByStrategy;
+			}
 		}
 		updateBuildTimeExpect(buildingType, expectBuildTime);
 		addCertainBuildTime(buildingType);
@@ -329,7 +344,10 @@ public class EnemyBuildTimer {
 		if (frame == CommonCode.UNKNOWN) {
 			return;
 		}
-		buildTimeMinimumMap.put(buildingType, frame);
+		Integer buildTimeMinimum = buildTimeMinimumMap.get(buildingType);
+		if (buildTimeMinimum == null || frame > buildTimeMinimum) {
+			buildTimeMinimumMap.put(buildingType, frame);
+		}
 	}
 
 	private void addCertainBuildTime(UnitType buildingType) {

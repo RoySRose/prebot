@@ -9,6 +9,7 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -25,7 +26,7 @@ public class GoliathControl extends Control {
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, false);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Pair;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -11,6 +12,8 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
@@ -75,19 +78,78 @@ public class PositionFinder {
 
 	/// 주둔지
 	private Position getCampPosition() {
-		if (!firstExpansionOccupied()) {
-			if (defenseInside()) {
-				return commandCenterInsidePosition();
-			} else {
-				return firstChokeDefensePosition();
+		int factoryUnitCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,
+				UnitType.Terran_Siege_Tank_Siege_Mode , UnitType.Terran_Vulture, UnitType.Terran_Goliath);
+		
+		int enemyUnitCount = 0;
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			enemyUnitCount = (int) (InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon, UnitType.Protoss_Dark_Templar, UnitType.Protoss_Archon) * 1.5);
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			enemyUnitCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling, UnitType.Zerg_Hydralisk, UnitType.Zerg_Mutalisk) / 2;
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			enemyUnitCount = InfoUtils.enemyNumUnits(UnitType.Terran_Marine); // MECHANIC NO COUNT
+		}
+		
+		boolean detectingOk = true;
+		
+		// 앞마당에 터렛이 있거나, 스캔이 한번의 스캔이 있어야 한다.
+		boolean invisibleEnemyExist = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Protoss_Citadel_of_Adun, UnitType.Zerg_Lurker);
+		if (invisibleEnemyExist) {
+			detectingOk = false;
+			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
+			for (Unit turret : turretList) {
+				RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+				if (regionType == RegionType.MY_FIRST_EXPANSION) {
+					detectingOk = true;
+					break;
+				}
 			}
-		} else {
-			if (defenseSecondChoke()) {
+			
+			if (!detectingOk) {
+				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Spell_Scanner_Sweep);
+				for (Unit scanner : scannerList) {
+					if (scanner.getEnergy() >= 50) {
+						detectingOk = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (detectingOk) {
+			int secondChokeBonus = 5;
+			int firstExpansionBonus = 2;
+			if (StrategyIdea.currentStrategy.defaultTimeMap.isDouble() || StrategyIdea.currentStrategy.defaultTimeMap.isMechanic()) {
+				secondChokeBonus = 0;
+				firstExpansionBonus = 0;
+			}
+			
+			// 병력이 쌓였다면 second choke에서 방어한다.
+			if (factoryUnitCount >= enemyUnitCount + secondChokeBonus) {
 				return InfoUtils.mySecondChoke().getCenter();
-			} else {
+			}
+			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
+			if (factoryUnitCount >= enemyUnitCount + firstExpansionBonus || firstExpansionOccupied()) {
 				return firstExpansionBackwardPosition();
 			}
 		}
+
+		if (entranceBlocked()) {
+			return entranceBlockedPosition();
+		} else {
+			// 마린이 일정이상 쌓였거나
+			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+			if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
+				return firstChokeDefensePosition();
+			} else {
+				/// 커맨드센터 수비 필요
+				return commandCenterInsidePosition();
+			}
+		}
+	}
+
+	private boolean entranceBlocked() {
+		return InfoUtils.enemyRace() == Race.Protoss;
 	}
 
 	/// 메인부대 위치 지점
@@ -97,6 +159,7 @@ public class PositionFinder {
 			if (enemyBase == null) {
 				return InfoUtils.mySecondChoke().getCenter();
 			}
+			
 			if (!enemyBaseDestroyed(enemyBase)) {
 				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
 					return enemyBase.getPosition();
@@ -106,8 +169,9 @@ public class PositionFinder {
 					// 안전한 위치까지 바로 전진하도록 한다.
 					return enemyBase.getPosition();
 				}
+			} else {
+				return letsfindRatPosition();
 			}
-			return letsfindRatPosition();
 
 		} else {
 			return getCampPosition();
@@ -130,23 +194,33 @@ public class PositionFinder {
 		return false;
 	}
 
-	/// 커맨드센터 수비 필요
-	private boolean defenseInside() {
-		// TODO 초반 저글링 공격 등 타이밍상 first choke에서 수비가 불가한 경우 true
-		// 수비가 가능해지는 시점에 false로 변경
-		return false;
+	private Position entranceBlockedPosition() {
+		return firstChokeDefensePosition();
 	}
 
 	/// 커맨드센터와 미네랄 사이의 방어지역
 	private Position commandCenterInsidePosition() {
-		return null;
-	}
-
-	/// 전진수비 여부
-	private boolean defenseSecondChoke() {
-		// TODO 1. 병력이 일정이상 쌓였을 때
-		// 2. 상대가 테란이면 좀더 빨리 포지션을 차지해야 한다.
-		return false;
+		int x = 0;
+		int y = 0;
+		int mineralCnt = 0;
+		
+		Position basePosition = InfoUtils.myBase().getPosition();
+		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()){
+			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(basePosition) < 320) {
+				x += mineral.getPosition().getX();
+				y += mineral.getPosition().getY();
+				mineralCnt++;
+			}
+		}
+		if (mineralCnt == 0) {
+			return basePosition;
+		}
+		int finalx = x / mineralCnt;
+		int finaly = y / mineralCnt;
+		finalx = (finalx + basePosition.getX()) / 2;
+		finaly = (finaly + basePosition.getY()) / 2;
+		
+		return new Position(finalx, finaly);
 	}
 
 	/// First Choke Point 방어지역
@@ -161,21 +235,26 @@ public class PositionFinder {
 		return p1FromMyBase < p2FromMyBase ? p1 : p2;
 	}
 
-	/// First Expansion에서 약간 물러난 위치
+	/// second choke보다 안쪽 포지션
 	private Position firstExpansionBackwardPosition() {
 		Chokepoint firstChoke = InfoUtils.myFirstChoke();
 		Chokepoint secondChoke = InfoUtils.mySecondChoke();
 		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
+		
+		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
+		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
+		return new Position(x, y);
 
-		double distanceFromFirstChoke = firstChoke.getDistance(secondChoke);
-		double distanceFromExpansion = firstExpansion.getDistance(secondChoke);
-		if (distanceFromFirstChoke < distanceFromExpansion) {
-			return firstChoke.getCenter();
-		} else {
-			int x = (firstChoke.getX() + firstExpansion.getX()) / 2;
-			int y = (firstChoke.getY() + firstExpansion.getY()) / 2;
-			return new Position(x, y);
-		}
+		//First Expansion에서 약간 물러난 위치 (prebot 1 - overwatch, circuit 맵에 맞지 않음)
+//		double distanceFromFirstChoke = firstChoke.getDistance(secondChoke);
+//		double distanceFromExpansion = firstExpansion.getDistance(secondChoke);
+//		if (distanceFromFirstChoke < distanceFromExpansion) {
+//			return firstChoke.getCenter();
+//		} else {
+//			int x = (firstChoke.getX() + firstExpansion.getX()) / 2;
+//			int y = (firstChoke.getY() + firstExpansion.getY()) / 2;
+//			return new Position(x, y);
+//		}
 	}
 
 	private boolean enemyBaseDestroyed(BaseLocation enemyBase) {

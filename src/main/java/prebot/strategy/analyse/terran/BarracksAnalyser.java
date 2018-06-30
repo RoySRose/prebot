@@ -28,8 +28,8 @@ public class BarracksAnalyser extends UnitAnalyser {
 			if (found.size() >= 2) { // 배럭 2개 이상
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int secondBuildFrame = buildStartFrameDefaultJustBefore(found.get(1));
-				int twoBarrackSecondBarrackFrame = EnemyStrategy.TERRAN_2BARRACKS.defaultTimeMap.timeOfIndex(UnitType.Terran_Barracks, 1, 20);
-				int bbsSecondBarrackFrame = EnemyStrategy.TERRAN_BBS.defaultTimeMap.timeOfIndex(UnitType.Terran_Barracks, 1, 20);
+				int twoBarrackSecondBarrackFrame = EnemyStrategy.TERRAN_2BARRACKS.defaultTimeMap.frameOfIndex(UnitType.Terran_Barracks, 1, 20);
+				int bbsSecondBarrackFrame = EnemyStrategy.TERRAN_BBS.defaultTimeMap.frameOfIndex(UnitType.Terran_Barracks, 1, 20);
 				
 				if (firstBuildFrame < bbsSecondBarrackFrame && secondBuildFrame < bbsSecondBarrackFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FASTEST_TWO);
@@ -41,7 +41,7 @@ public class BarracksAnalyser extends UnitAnalyser {
 			
 			} else if (found.size() == 1) { // 배럭 1개
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-				int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Barracks, 15);
+				int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.frame(UnitType.Terran_Barracks, 15);
 				if (firstBuildFrame < mechanicFirstBarrackFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FAST_ONE);
 				} else {
@@ -49,7 +49,7 @@ public class BarracksAnalyser extends UnitAnalyser {
 				}
 			}
 		} else {
-			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.time(UnitType.Terran_Barracks, 15);
+			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.defaultTimeMap.frame(UnitType.Terran_Barracks, 15);
 			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > mechanicFirstBarrackFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_NOT_FOUND);
