@@ -103,6 +103,7 @@ public final class BuildQueueProvider {
         buildableList.add(new BuilderGoliath              (new MetaType(UnitType.Terran_Goliath), factoryUnitSelector));
         buildableList.add(new BuilderVulture              (new MetaType(UnitType.Terran_Vulture), factoryUnitSelector));
         buildableList.add(new BuilderSiegeTank(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
+        buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith), starportUnitSelector));
         
         /*
         buildableList.add(new BuilderBattlecruiser        (new MetaType(UnitType.Terran_Battlecruiser),starportUnitSelector));
@@ -219,35 +220,50 @@ public final class BuildQueueProvider {
 
         //Deactivate
     	/*upgrade*/
-    	buildableList.remove(apolloReactor);
-    	buildableList.remove(caduceusReactor);
-    	buildableList.remove(charonBoosters);
-    	buildableList.remove(colossusReactor);
-    	buildableList.remove(ionThrusters);
-    	buildableList.remove(moebiusReactor);
-    	buildableList.remove(ocularImplants);
-    	buildableList.remove(terranInfantryArmor);
-    	buildableList.remove(terranInfantryWeapons);
-    	buildableList.remove(terranShipPlating);
-    	buildableList.remove(terranShipWeapons);
-    	buildableList.remove(terranVehiclePlating);
-    	buildableList.remove(terranVehicleWeapons);
-    	buildableList.remove(titanReactor);
-    	buildableList.remove(u238Shells);
-
-    	/*tech*/
-    	buildableList.remove(cloakingField);
-    	buildableList.remove(empShockwave);
-    	buildableList.remove(irradiate);
-    	buildableList.remove(lockdown);
-    	buildableList.remove(nuclearStrike);
-    	buildableList.remove(opticalFlare);
-    	buildableList.remove(personnelCloaking);
-    	buildableList.remove(restoration);
-    	buildableList.remove(spiderMines);
-    	buildableList.remove(stimPacks);
-    	buildableList.remove(tankSiegeMode);
-    	buildableList.remove(yamatoGun);
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1) {
+    		buildableList.remove(ionThrusters);
+    	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1) {
+    		buildableList.remove(charonBoosters);
+    	}
+    	if(Prebot.Broodwar.self().hasResearched(TechType.Spider_Mines)) {
+    		buildableList.remove(spiderMines);
+    	}
+    	if(Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) {
+    		buildableList.remove(tankSiegeMode);
+    	}
+    	
+    	
+    	
+//    	buildableList.remove(apolloReactor);
+//    	buildableList.remove(caduceusReactor);
+//    	
+//    	buildableList.remove(colossusReactor);
+//    	
+//    	buildableList.remove(moebiusReactor);
+//    	buildableList.remove(ocularImplants);
+//    	buildableList.remove(terranInfantryArmor);
+//    	buildableList.remove(terranInfantryWeapons);
+//    	buildableList.remove(terranShipPlating);
+//    	buildableList.remove(terranShipWeapons);
+//    	buildableList.remove(terranVehiclePlating);
+//    	buildableList.remove(terranVehicleWeapons);
+//    	buildableList.remove(titanReactor);
+//    	buildableList.remove(u238Shells);
+//
+//    	/*tech*/
+//    	buildableList.remove(cloakingField);
+//    	buildableList.remove(empShockwave);
+//    	buildableList.remove(irradiate);
+//    	buildableList.remove(lockdown);
+//    	buildableList.remove(nuclearStrike);
+//    	buildableList.remove(opticalFlare);
+//    	buildableList.remove(personnelCloaking);
+//    	buildableList.remove(restoration);
+//    	
+//    	buildableList.remove(stimPacks);
+//    	
+//    	buildableList.remove(yamatoGun);
     }
 
     public void process(){
@@ -267,63 +283,64 @@ public final class BuildQueueProvider {
     		InitialBuildProvider.Instance().updateInitialBuild();
     	}
     		
-    		//셀렉터들에 필요한 유닛카운트 미리 집계
-    		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
-    			BuildConditionChecker.Instance().executeSustainUnits();
-    		}
-    		
-    		if (Prebot.Broodwar.getFrameCount() < 10000) {
-    			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
-    				BuildConditionChecker.Instance().executeFly();
-    			}
-    		} else {
-    			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
-    				BuildConditionChecker.Instance().executeFly();
-    			}
-    		}
-    		
-    		
-    		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
-		        upgradeSelector.select();
-    		}
-	        //barrackUnitSelector.select();
-	        factoryUnitSelector.select();
-	        //starportUnitSelector.select();
-	        
-	        /*if(!sysout) {
-	        	
-	        	for(BuildableItem buildableItem: buildableList) {
-	        		FileUtils.appendTextToFile("log.txt", "\n BuildableItem || " + buildableItem.toString());
-	        	}
-	        	sysout = true;
-	        	
-	        }*/
-	
-	        for(BuildableItem buildableItem: buildableList) {
-	        	FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() before|| " + buildableItem.toString());
-        		buildableItem.process();
-        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() after|| " + buildableItem.toString());
-        	}
-	        
-	        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
-					|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
-				RespondToStrategy.Instance().update();
-				// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
-				// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		//셀렉터들에 필요한 유닛카운트 미리 집계
+		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
+			BuildConditionChecker.Instance().executeSustainUnits();
+		}
+		
+		if (Prebot.Broodwar.getFrameCount() < 10000) {
+			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
+				BuildConditionChecker.Instance().executeFly();
 			}
-	        if(respondSet) {
-			    researchSelector.select();
-			    upgradeSelector.select();
-			    //barrackUnitSelector.select();
-			    factoryUnitSelector.select();
-	        	for(BuildableItem buildableItem: buildableList) {
-		        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() || " + buildableItem.toString());
-	        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet before|| " + buildableItem.toString());
-	        		buildableItem.process();
-	        		FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet after|| " + buildableItem.toString());
-	        	}
-	        	respondSet = false;
-	        }
-    	//}
+		} else {
+			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
+				BuildConditionChecker.Instance().executeFly();
+			}
+		}
+		
+		
+		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
+	        upgradeSelector.select();
+		}
+        //barrackUnitSelector.select();
+        factoryUnitSelector.select();
+        //starportUnitSelector.select();
+        
+        /*if(!sysout) {
+        	
+        	for(BuildableItem buildableItem: buildableList) {
+        		FileUtils.appendTextToFile("log.txt", "\n BuildableItem || " + buildableItem.toString());
+        	}
+        	sysout = true;
+        	
+        }*/
+
+        for(BuildableItem buildableItem: buildableList) {
+        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() before|| " + buildableItem.toString());
+    		buildableItem.process();
+    		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() after|| " + buildableItem.toString());
+    	}
+        
+        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
+				|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
+			RespondToStrategy.Instance().update();
+			// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+			// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+		}
+        if(respondSet) {
+		    researchSelector.select();
+		    upgradeSelector.select();
+		    //barrackUnitSelector.select();
+		    factoryUnitSelector.select();
+        	for(BuildableItem buildableItem: buildableList) {
+	        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() || " + buildableItem.toString());
+        		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet before|| " + buildableItem.toString());
+        		buildableItem.process();
+        		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet after|| " + buildableItem.toString());
+        	}
+        	respondSet = false;
+        }
+        turnOffReseach();
+	//}
     }
 }

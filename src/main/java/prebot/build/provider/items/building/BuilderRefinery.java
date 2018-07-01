@@ -58,8 +58,11 @@ public class BuilderRefinery extends DefaultBuildableItem {
     			}
     		}
 	        if(BuildConditionChecker.Instance().buildGas) {
-	        	settilePosition(BuildConditionChecker.Instance().findGeyser);
-	        	return true;
+	        	if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery, null)
+    					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Refinery, null) == 0) {
+		        	settilePosition(BuildConditionChecker.Instance().findGeyser);
+		        	return true;
+	        	}
 	        }
 
     	}

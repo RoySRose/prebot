@@ -33,6 +33,7 @@ public class ResearchSelector implements Selector<MetaType>{
     	//metaType = new MetaType(UpgradeType.None);
    		//metaType = new MetaType(UpgradeType.None);
     	if(BuildQueueProvider.Instance().respondSet) {
+    		metaType = null;
     		//unitType = UnitType.None;
     	}else {
 	    	//if (Prebot.Broodwar.getFrameCount() % 43 == 0) {

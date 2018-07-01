@@ -5,6 +5,7 @@ import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
+import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 
 public class BuilderTankSiegeMode extends DefaultBuildableItem {
@@ -26,7 +27,7 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
     	//FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || buildCondition => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());
 	    	if(String.valueOf(researchSelector.getSelected()) != "null"){
 		    	if(researchSelector.getSelected().isTech()) {
-			    	if(researchSelector.getSelected().getTechType() == metaType.getTechType()) {
+			    	if(researchSelector.getSelected().getTechType() == metaType.getTechType() && Prebot.Broodwar.self().isResearching(researchSelector.getSelected().getTechType()) == false) {
 			    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
 			    	//if(researchSelector.getSelected().equals(metaType)) {
 			//        	FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());

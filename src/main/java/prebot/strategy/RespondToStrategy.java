@@ -15,6 +15,7 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
@@ -124,6 +125,10 @@ public class RespondToStrategy {
 	
 	public void update() {
 		BuildQueueProvider.Instance().respondSet = true;
+		/*if(BuildQueueProvider.Instance().respondSet) {
+			FileUtils.appendTextToFile("log.txt", "\n RespondToStrategy update respondSet");
+		}*/
+			
 		max_turret_to_mutal = 0;
 //		if(need_vessel==false && need_vessel_time!=0 && MyBotModule.Broodwar.getFrameCount() - need_vessel_time > 5000){
 //			need_vessel = true;

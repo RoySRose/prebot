@@ -6,7 +6,9 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.MapSpecificInformation.GameMap;
@@ -74,6 +76,7 @@ public class BlockingEntrance {
     }
 
     public void SetBlockingTilePosition() {
+//    	FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
 
         //starting position..... needed?
         for (Unit unit : Prebot.Broodwar.self().getUnits()) {
@@ -185,17 +188,13 @@ public class BlockingEntrance {
 
 //      avoid supply 설정
 //      System.out.println("before setTilesToAvoidSupply");
-//      ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+//        FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition end ==>> ");
         
-        
-        
-        
-
     }
 
-    public BlockingEntrance() {
+    public void setBlockingEntrance() {
 //    	기존 프리봇1 에서 입구 터렛 위치 추가
-    	
+//    	FileUtils.appendTextToFile("log.txt", "\n setBlockingEntrance start ==>> ");
     	
 //    	맵 : Over_wath
     	if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.OVERWATCH) {
@@ -381,7 +380,8 @@ public class BlockingEntrance {
         //...
 
 
-        SetBlockingTilePosition();
+//        SetBlockingTilePosition();
+//    	FileUtils.appendTextToFile("log.txt", "\n setBlockingEntrance end ==>> ");
     }
     
     

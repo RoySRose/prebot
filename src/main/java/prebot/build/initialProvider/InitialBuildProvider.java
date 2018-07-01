@@ -27,15 +27,18 @@ public class InitialBuildProvider {
 	
 	public void onStart() {
 //		System.out.println("InitialBuildProvider start");
+		
+		
    	 
-        BlockingEntrance blockingEntrance = new BlockingEntrance();
+        //BlockingEntrance blockingEntrance = new BlockingEntrance();
 
-        TilePosition firstSupplyPos = blockingEntrance.first_supple;
-        TilePosition barrackPos = blockingEntrance.barrack;
-        TilePosition secondSupplyPos = blockingEntrance.second_supple;
-        TilePosition factoryPos = blockingEntrance.factory;
-        TilePosition bunkerPos = blockingEntrance.bunker;
+        TilePosition firstSupplyPos = BlockingEntrance.Instance().first_supple;
+        TilePosition barrackPos = BlockingEntrance.Instance().barrack;
+        TilePosition secondSupplyPos = BlockingEntrance.Instance().second_supple;
+        TilePosition factoryPos = BlockingEntrance.Instance().factory;
+        TilePosition bunkerPos = BlockingEntrance.Instance().bunker;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
+        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
