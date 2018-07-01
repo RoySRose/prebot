@@ -32,7 +32,7 @@ public class AcademyAnalyser extends UnitAnalyser {
 		}
 		
 		int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-		int academyFrame = EnemyStrategy.TERRAN_BIONIC.defaultTimeMap.frame(UnitType.Terran_Academy, 30);
+		int academyFrame = EnemyStrategy.TERRAN_BIONIC.buildTimeMap.frame(UnitType.Terran_Academy, 30);
 		
 		if (academyFrame < buildFrame) {
 			ClueManager.Instance().addClueInfo(ClueInfo.ACADEMY_FAST);

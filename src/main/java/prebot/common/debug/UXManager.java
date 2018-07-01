@@ -56,6 +56,8 @@ import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.manage.AirForceManager;
+import prebot.strategy.manage.AirForceTeam;
 import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
@@ -154,6 +156,7 @@ public class UXManager {
 			drawEnemyAirDefenseRange();
 			drawManagerTimeSpent(500, 220);
 			drawDecision();
+			drawAirForceInformation();
 			
 		} else if (uxOption == 5) {
 			drawEnemyBaseToBaseTime();
@@ -1411,13 +1414,32 @@ public class UXManager {
 		for (UnitInfo eui : wraithKillerEuiList) {
 			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.Grey);
 		}
-		
+	}
+	
+	private void drawAirForceInformation() {
 		for (Unit unit : UnitUtils.getUnitList(UnitType.Terran_Wraith)) {
 			if (unit.isMoving()) {
 				Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
 				Prebot.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
 				Prebot.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
 			}
+		}
+		
+		// target position
+		List<Position> targetPositions = AirForceManager.Instance().getTargetPositions();
+		for (int i = 0; i < targetPositions.size(); i++) {
+			Prebot.Broodwar.drawTextMap(targetPositions.get(i), "position#" + i);
+		}
+		
+
+		// air force team
+		int y = 200;
+		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
+		for (AirForceTeam airForceUnit : airForceTeamSet) {
+			Prebot.Broodwar.drawTextMap(airForceUnit.leaderUnit.getPosition(), "unit#" + airForceUnit.leaderUnit.getID());
+			Position targetPosition = new Position(airForceUnit.getTargetPosition().getX(), airForceUnit.getTargetPosition().getY() - 10);
+			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*");
+			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceUnit.toString());
 		}
 	}
 	

@@ -34,9 +34,9 @@ public class ZerglingAnalyser extends UnitAnalyser {
 			return;
 		}
 
-		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
-		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
-		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.defaultTimeMap.frame(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
+		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
+		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
+		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
 		int buildToZerglingFrame = UnitType.Zerg_Spawning_Pool.buildTime() + UnitType.Zerg_Zergling.buildTime();
 		
 		RegionType foundRegionType = PositionUtils.positionToRegionType(found.get(0).getLastPosition());

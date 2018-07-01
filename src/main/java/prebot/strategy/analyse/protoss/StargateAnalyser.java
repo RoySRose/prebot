@@ -24,8 +24,8 @@ public class StargateAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int fastStargateFrame = EnemyStrategy.PROTOSS_STARGATE.defaultTimeMap.frame(UnitType.Protoss_Stargate, 30);
-			int doubleStargateFrame = EnemyStrategy.PROTOSS_DOUBLE_CARRIER.defaultTimeMap.frame(UnitType.Protoss_Stargate, 30);
+			int fastStargateFrame = EnemyStrategy.PROTOSS_STARGATE.buildTimeMap.frame(UnitType.Protoss_Stargate, 30);
+			int doubleStargateFrame = EnemyStrategy.PROTOSS_DOUBLE_CARRIER.buildTimeMap.frame(UnitType.Protoss_Stargate, 30);
 
 			if (buildFrame < fastStargateFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_ONEGATE_FAST);

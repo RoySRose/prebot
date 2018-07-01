@@ -31,9 +31,9 @@ public class LairAnalyser extends UnitAnalyser {
 			return;
 		}
 
-		int oneHatFrame = EnemyStrategy.ZERG_OVERPOOL_GAS.defaultTimeMap.frame(UnitType.Zerg_Lair, 30);
-		int twoHatFrame = EnemyStrategy.ZERG_2HAT_GAS.defaultTimeMap.frame(UnitType.Zerg_Lair, 30);
-		int threeHatFrame = EnemyStrategy.ZERG_3HAT.defaultTimeMap.frame(UnitType.Zerg_Lair, 30);
+		int oneHatFrame = EnemyStrategy.ZERG_OVERPOOL_GAS.buildTimeMap.frame(UnitType.Zerg_Lair, 30);
+		int twoHatFrame = EnemyStrategy.ZERG_2HAT_GAS.buildTimeMap.frame(UnitType.Zerg_Lair, 30);
+		int threeHatFrame = EnemyStrategy.ZERG_3HAT.buildTimeMap.frame(UnitType.Zerg_Lair, 30);
 		
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {

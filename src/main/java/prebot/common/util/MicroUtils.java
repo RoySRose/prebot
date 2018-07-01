@@ -39,10 +39,15 @@ public class MicroUtils {
 	private static final int AIR_DRIVING_PRE_EXPECT_SECS = 0;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
 
+	public static void airDriving(Unit wraith, Position leaderOrderPosition) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/// 레이쓰 전용
 	public static Position airDrivingPosition(Position startPosition, Position endPosition, int[] driveAngle) {
 		if (startPosition.getDistance(endPosition) <= WRAITH_MOVE_DISTANCE_12_FRAMES) {
-			return endPosition;
+			return endPosition; // 목표위치에 도착한 경우 짧게 찍는다.
 		}
 		
 		double radianToMovePosition = oppositeDirectionRadian(endPosition, startPosition);
@@ -52,6 +57,7 @@ public class MicroUtils {
 		double minimumDistance = CommonCode.DOUBLE_MAX;
 		double minimumDistanceRadian = 0.0d;
 		
+		// 목표지점까지의 최소거리를 찾는다.
 		for (int angle : driveAngle) {
 			moveRadian = rotate(radianToMovePosition, angle);
 			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_48_FRAMES);
@@ -69,10 +75,11 @@ public class MicroUtils {
 			}
 		}
 		
-		if (minimumDistance == CommonCode.DOUBLE_MAX) {
+		if (minimumDistance == CommonCode.DOUBLE_MAX) { // 위치를 찾지 못함
 			return null;
 		}
 		
+		// 목표지점까지의 세부각도를 찾는다.
 		double realMoveRadian = minimumDistanceRadian;
 		double adjustedRadian = 0.0d;
 		for (int angle : Angles.AIR_FORCE_DRIVE_DETAIL) {
@@ -274,8 +281,13 @@ public class MicroUtils {
 	}
 
 	/// 반대 방향의 각도(radian)
-	private static double oppositeDirectionRadian(Position myPosition, Position targetPosition) {
+	public static double oppositeDirectionRadian(Position myPosition, Position targetPosition) {
 		return Math.atan2(myPosition.getY() - targetPosition.getY(), myPosition.getX() - targetPosition.getX());
+	}
+	
+	/// 정방향 각도(radian)
+	public static double targetDirectionRadian(Position myPosition, Position targetPosition) {
+		return Math.atan2(targetPosition.getY() - myPosition.getY(), targetPosition.getX() - myPosition.getX());
 	}
 
 	private static Position lowestRiskPosition(Unit unit, FleeOption fOption, double standRadian, int moveDistance, int riskRadius) {

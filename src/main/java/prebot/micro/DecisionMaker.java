@@ -12,6 +12,7 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.AirForceTeam;
 
 public class DecisionMaker {
 	
@@ -95,6 +96,70 @@ public class DecisionMaker {
 			}
 		}
 		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
+	}
+
+	public Decision makeDecisionForAirForceDrivePosition(Unit myUnit, List<UnitInfo> euiList) {
+//		Decision.attackUnit(eui);
+//		Decision.fleeFromUnit(eui);
+		return Decision.attackPosition();
+	}
+	
+	
+	public Decision makeDecisionForAirForceMoving(AirForceTeam airForceTeam, List<UnitInfo> euiList) {
+		boolean allUnitCoolTimeReady = true;
+		for (Unit wraith : airForceTeam.memberList) {
+			if (wraith.getGroundWeaponCooldown() > 0) {
+				allUnitCoolTimeReady = false;
+				break;
+			}
+		}
+		
+		Decision decision = null;
+		if (allUnitCoolTimeReady) {
+			UnitInfo targetInfo = null;
+			int minimumLinearDistance = CommonCode.INT_MAX;
+			for (UnitInfo eui : euiList) {
+//				// 대공능력이 있는 적이 있다면 이동시 공격을 하지 않는다.
+//				// (만약 대공능력이 있는 적을 공격을 해야 한다면 이전 단계 판단에서 지정된다.)
+//				if (eui.getType().airWeapon() != WeaponType.None) {
+//					targetInfo = null;
+//					break;
+//				}
+				int distanceEnemyToLeader = airForceTeam.leaderUnit.getDistance(eui.getLastPosition());
+				if (distanceEnemyToLeader > UnitType.Terran_Wraith.groundWeapon().maxRange()) {
+					continue;
+				}
+				int distanceEnemyToTargetPosition = (int) eui.getLastPosition().getDistance(airForceTeam.getTargetPosition());
+				if (distanceEnemyToLeader + distanceEnemyToTargetPosition < minimumLinearDistance) {
+					targetInfo = eui;
+					minimumLinearDistance = distanceEnemyToLeader + distanceEnemyToTargetPosition;
+				}
+			}
+			if (targetInfo != null) {
+				decision  = Decision.attackUnit(targetInfo);
+			}
+		}
+		
+		if (decision == null) {
+			// air force team이 너무 분산되어 있는 경우 모으도록 한다.
+			int averageDistance = 0;
+			int memberSize = airForceTeam.memberList.size();
+			if (memberSize > 1) {
+				int sumOfDistance = 0;
+				for (Unit member : airForceTeam.memberList) {
+					if (member.getID() != airForceTeam.leaderUnit.getID()) {
+						sumOfDistance += member.getDistance(airForceTeam.leaderUnit);
+					}
+				}
+				averageDistance = sumOfDistance / (memberSize - 1);
+			}
+			if (averageDistance > 5) {
+				decision = Decision.unite();
+			} else {
+				decision = Decision.attackPosition();
+			}
+		}
 		return decision;
 	}
 

@@ -82,6 +82,7 @@ public class EnemyBuildTimer {
 			// updateStarportExpectTime();
 			// updateEngineeringExpectTime();
 			// updateTurretExpectTime();
+			// updateArmoryExpectTime();
 		}
 		
 		setImportantTime();
@@ -220,9 +221,9 @@ public class EnemyBuildTimer {
 	}
 	
 	private void updateByBuilding(UnitType buildingType, UnitType... nextBuildingTypes) {
-		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.frame(buildingType);
+		int buildFrameByStrategy = StrategyIdea.currentStrategy.buildTimeMap.frame(buildingType);
 		if (buildFrameByStrategy == CommonCode.UNKNOWN) {
-			buildFrameByStrategy = StrategyIdea.startStrategy.defaultTimeMap.frame(buildingType);
+			buildFrameByStrategy = StrategyIdea.startStrategy.buildTimeMap.frame(buildingType);
 		}
 		updateByBuilding(buildFrameByStrategy, buildingType, nextBuildingTypes);
 	}
@@ -311,11 +312,11 @@ public class EnemyBuildTimer {
 			}
 		}
 
-		int buildFrameByStrategy = StrategyIdea.currentStrategy.defaultTimeMap.frame(buildingType);
+		int buildFrameByStrategy = StrategyIdea.currentStrategy.buildTimeMap.frame(buildingType);
 		if (buildFrameByStrategy != CommonCode.UNKNOWN && buildFrameByStrategy < expectBuildTime) {
 			expectBuildTime = buildFrameByStrategy;
 		} else {
-			buildFrameByStrategy = StrategyIdea.startStrategy.defaultTimeMap.frame(buildingType);
+			buildFrameByStrategy = StrategyIdea.startStrategy.buildTimeMap.frame(buildingType);
 			if (buildFrameByStrategy != CommonCode.UNKNOWN && buildFrameByStrategy < expectBuildTime) {
 				expectBuildTime = buildFrameByStrategy;
 			}

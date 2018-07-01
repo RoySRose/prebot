@@ -1,6 +1,5 @@
 package prebot.strategy;
 
-import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;

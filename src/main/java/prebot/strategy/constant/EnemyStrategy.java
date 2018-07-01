@@ -249,7 +249,7 @@ public enum EnemyStrategy {
 		this.marineCount = strategy.marineCount;
 		this.addOnOption = strategy.addOnOption;
 		this.expansionOption = strategy.expansionOption;
-		this.defaultTimeMap = strategy.defaultTimeMap;
+		this.buildTimeMap = strategy.buildTimeMap;
 	}
 	
 	private EnemyStrategy(EnemyStrategy strategy, BuildTimeMap addTimeMap) {
@@ -258,7 +258,7 @@ public enum EnemyStrategy {
 		this.marineCount = strategy.marineCount;
 		this.addOnOption = strategy.addOnOption;
 		this.expansionOption = strategy.expansionOption;
-		this.defaultTimeMap = strategy.defaultTimeMap.putAll(addTimeMap);
+		this.buildTimeMap = strategy.buildTimeMap.putAll(addTimeMap);
 	}
 	
 	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade) {
@@ -267,7 +267,7 @@ public enum EnemyStrategy {
 		this.marineCount = MarineCount.FOUR_MARINE;
 		this.addOnOption = AddOnOption.VULTURE_FIRST;
 		this.expansionOption = ExpansionOption.TWO_FACTORY;
-		this.defaultTimeMap = new BuildTimeMap();
+		this.buildTimeMap = new BuildTimeMap();
 	}
 
 	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade, int marineCount, AddOnOption addOnOption, ExpansionOption expansionOption, BuildTimeMap defaultTimeMap) {
@@ -276,7 +276,7 @@ public enum EnemyStrategy {
 		this.marineCount = marineCount;
 		this.addOnOption = addOnOption;
 		this.expansionOption = expansionOption;
-		this.defaultTimeMap = defaultTimeMap;
+		this.buildTimeMap = defaultTimeMap;
 	}
 	
 	public FactoryRatio ratio;
@@ -284,7 +284,7 @@ public enum EnemyStrategy {
 	public int marineCount;
 	public AddOnOption addOnOption;
 	public ExpansionOption expansionOption;
-	public BuildTimeMap defaultTimeMap;
+	public BuildTimeMap buildTimeMap;
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder().append("[").append(name()).append("]").append("\n").append(ratio.toString()).append("\n");
@@ -298,7 +298,7 @@ public enum EnemyStrategy {
 			}
 		}
 		sb.append("\n").append("MARINE COUNT=").append(marineCount).append("\n").append(addOnOption).append("\n").append(expansionOption).append("");
-		sb.append("\n\n").append(defaultTimeMap);
+		sb.append("\n\n").append(buildTimeMap);
 		return sb.toString();
 	}
 }
