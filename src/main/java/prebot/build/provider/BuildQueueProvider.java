@@ -321,6 +321,7 @@ public final class BuildQueueProvider {
     		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() after|| " + buildableItem.toString());
     	}
         
+        /*respond strategy 대응*/
         if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
 				|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
 			RespondToStrategy.Instance().update();
@@ -333,10 +334,7 @@ public final class BuildQueueProvider {
 		    //barrackUnitSelector.select();
 		    factoryUnitSelector.select();
         	for(BuildableItem buildableItem: buildableList) {
-	        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() || " + buildableItem.toString());
-        		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet before|| " + buildableItem.toString());
         		buildableItem.process();
-        		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() respondSet after|| " + buildableItem.toString());
         	}
         	respondSet = false;
         }

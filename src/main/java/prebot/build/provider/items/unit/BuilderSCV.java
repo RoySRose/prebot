@@ -1,5 +1,7 @@
 package prebot.build.provider.items.unit;
 
+import java.util.List;
+
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -14,6 +16,7 @@ import prebot.build.provider.BuildConditionChecker;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -106,11 +109,10 @@ public class BuilderSCV extends DefaultBuildableItem {
 			if (Prebot.Broodwar.self().minerals() >= 50) {
 				int maxworkerCount = tot_mineral_self * 2 + 8 * Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 				int workerCount = Prebot.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType()); // workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
-				for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-					if (unit.getType().isResourceDepot()) {
-						if (unit.isTraining()) {
-							workerCount += unit.getTrainingQueue().size();
-						}
+//				List CommandCenter = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+				for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+					if (commandcenter.isTraining()) {
+						workerCount += commandcenter.getTrainingQueue().size();
 					}
 				}
 	
@@ -120,8 +122,8 @@ public class BuilderSCV extends DefaultBuildableItem {
 				}
 				// System.out.println("maxworkerCount: " + maxworkerCount);
 				if (workerCount < nomorescv && workerCount < maxworkerCount) {
-					for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-						if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
+					for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+						if (!commandcenter.isTraining()) {
 	
 							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
 							BuildOrderItem checkItem = null;

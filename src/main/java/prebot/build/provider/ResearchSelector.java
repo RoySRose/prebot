@@ -21,8 +21,8 @@ import prebot.build.provider.DefaultBuildableItem;
 public class ResearchSelector implements Selector<MetaType>{
 	BuildCondition buildCondition;
 	MetaType metaType;
-    MetaType techType;
-    MetaType upgradeType;
+//    MetaType techType;
+//    MetaType upgradeType;
     //BuildCondition buildCondition;
 
     public final MetaType getSelected(){

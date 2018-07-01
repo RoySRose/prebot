@@ -100,17 +100,9 @@ public class BuilderFactory extends DefaultBuildableItem {
     			}
 
     			if (CCcnt <= 1) {
-    				if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS) {
-    					maxFaccnt = 4;
-    				} else {
     					maxFaccnt = 3;
-    				}
     			} else if (CCcnt == 2) {
-    				if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS) {
     					maxFaccnt = 6;
-    				} else {
-    					maxFaccnt = 6;
-    				}
     			} else if (CCcnt >= 3) {
     				maxFaccnt = 9;
     			}
