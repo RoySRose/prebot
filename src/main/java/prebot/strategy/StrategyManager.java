@@ -1,5 +1,7 @@
 package prebot.strategy;
 
+import prebot.build.prebot1.BuildManager;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
@@ -66,6 +68,7 @@ public class StrategyManager extends GameManager {
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {
 		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
+		
 		AnalyzeStrategy.Instance().update();
 	}
 
@@ -98,11 +101,15 @@ public class StrategyManager extends GameManager {
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
 			AttackExpansionManager.Instance().executeCombat();
 		}
-		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
-			AttackExpansionManager.Instance().executeExpansion();
-		}
-
-		TempBuildSourceCode.Instance().update();
+//		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
+//			AttackExpansionManager.Instance().executeExpansion();
+//		}
+		
+		
+		
+		//건물 생성 연결중
+		BuildQueueProvider.Instance().process();
+		//TempBuildSourceCode.Instance().update();
 	}
 
 	

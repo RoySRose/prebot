@@ -13,6 +13,10 @@ public class StarportUnitSelector implements Selector<UnitType>{
     }
 
     public final void select(){
-        unitType = UnitType.Terran_Wraith;
+    	if(BuildQueueProvider.Instance().respondSet) {
+    		unitType = UnitType.None;
+    	}else {
+    		unitType = UnitType.None;
+    	}
     }
 }

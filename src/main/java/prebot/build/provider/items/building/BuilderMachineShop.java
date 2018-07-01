@@ -14,10 +14,15 @@ public class BuilderMachineShop extends DefaultBuildableItem {
     public final boolean buildCondition(){
     	
     	
-        System.out.println("MachineShop build condition check");
-        if(machine_shop_chk)        return true;
+//        System.out.println("MachineShop build condition check");
+        if(machine_shop_chk) {
+        	setBlocking(true);
+        	setHighPriority(true);
+        	machine_shop_chk = false;
+        	return true;
+        }
         
-        machine_shop_chk = false;
+        
         
         return false;
     }

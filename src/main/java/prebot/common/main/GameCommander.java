@@ -6,6 +6,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
@@ -39,6 +40,9 @@ public class GameCommander {
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
 		}
+		BlockingEntrance.Instance().setBlockingEntrance();
+		BlockingEntrance.Instance().SetBlockingTilePosition();
+		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
