@@ -32,6 +32,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
+import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
@@ -1305,17 +1306,18 @@ public class UXManager {
 	private void drawSquadInfoOnMap(int x, int y) {
 		// TODO Auto-generated method stub
 		/// ConstructionQueue 를 Screen 에 표시합니다
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Squad Name>");
+		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "<Squad Name>");
 		Prebot.Broodwar.drawTextScreen(x +110, y, UxColor.CHAR_WHITE + " <Unit Size>");
 		
+		y += 15;
 		for (Squad squad : CombatManager.Instance().squadData.getSquadMap().values()) {
 			Color squadColor = UxColor.SQUAD_COLOR.get(squad.getClass());
 			if (squadColor != null) {
-				Prebot.Broodwar.drawTextScreen(x, y + 10, "" + UxColor.COLOR_TO_CHARACTER.get(squadColor) + squad.getSquadName());
-				Prebot.Broodwar.drawTextScreen(x +120, y + 10, "" + squad.unitList.size());
+				Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.COLOR_TO_CHARACTER.get(squadColor) + squad.getSquadName());
+				Prebot.Broodwar.drawTextScreen(x +120, y, "" + squad.unitList.size());
 			} else {
-				Prebot.Broodwar.drawTextScreen(x, y + 10, "" + "*" + squad.getSquadName());
-				Prebot.Broodwar.drawTextScreen(x +120, y + 10, "" + squad.unitList.size());
+				Prebot.Broodwar.drawTextScreen(x, y, "" + "*" + squad.getSquadName());
+				Prebot.Broodwar.drawTextScreen(x +120, y, "" + squad.unitList.size());
 			}
 			y+=10;
 		}
@@ -1344,6 +1346,8 @@ public class UXManager {
 			}
 			Prebot.Broodwar.drawTextScreen(x + 103, currentY, ": " + drawColor + gameManager.getRecorded());
 		}
+
+		Prebot.Broodwar.drawTextScreen(x, currentY += 15, "* group size: " + LagObserver.groupsize());
 	}
 	
 	private void drawPathData(){

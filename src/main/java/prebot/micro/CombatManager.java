@@ -170,11 +170,16 @@ public class CombatManager extends GameManager {
 			}
 		}
 
+		// 새 게릴라 스퀴드
 		newGuerillaSquad(assignableVultures);
 
+		// 게릴라 임무해제
 		List<Squad> guerillaSquads = squadData.getSquadList(SquadInfo.GUERILLA_.squadName);
 		for (Squad squad : guerillaSquads) {
 			if (squad instanceof GuerillaSquad) {
+				for (Unit invalidUnit : squad.invalidUnitList()) {
+					squadData.excludeUnitFromSquad(invalidUnit);
+				}
 				if (removeGuerilla((GuerillaSquad) squad)) {
 					squadData.removeSquad(squad.getSquadName());
 				}

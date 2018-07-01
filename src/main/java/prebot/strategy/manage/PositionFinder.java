@@ -117,11 +117,14 @@ public class PositionFinder {
 		}
 		
 		if (detectingOk) {
-			int secondChokeBonus = 5;
-			int firstExpansionBonus = 2;
-			if (StrategyIdea.currentStrategy.defaultTimeMap.isDouble() || StrategyIdea.currentStrategy.defaultTimeMap.isMechanic()) {
+			int secondChokeBonus = 8;
+			int firstExpansionBonus = 3;
+			if (StrategyIdea.currentStrategy.defaultTimeMap.isDouble()) {
 				secondChokeBonus = 0;
 				firstExpansionBonus = 0;
+			} else if (StrategyIdea.currentStrategy.defaultTimeMap.isMechanic()) {
+				secondChokeBonus = 2;
+				firstExpansionBonus = 2;
 			}
 			
 			// 병력이 쌓였다면 second choke에서 방어한다.
@@ -134,22 +137,28 @@ public class PositionFinder {
 			}
 		}
 
-		if (entranceBlocked()) {
+		if (InfoUtils.enemyRace() == Race.Protoss && entranceBlocked()) {
 			return entranceBlockedPosition();
 		} else {
-			// 마린이 일정이상 쌓였거나
-			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
-			if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
+			if (InfoUtils.enemyRace() == Race.Terran) {
+				// 테란은 언덕 랜덤데미지를 활용해야 한다.
 				return firstChokeDefensePosition();
+				
 			} else {
-				/// 커맨드센터 수비 필요
-				return commandCenterInsidePosition();
+				// 마린이 일정이상 쌓였어야 한다.
+				int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+				if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
+					return firstChokeDefensePosition();
+				} else {
+					/// 커맨드센터 수비 필요
+					return commandCenterInsidePosition();
+				}
 			}
 		}
 	}
 
 	private boolean entranceBlocked() {
-		return InfoUtils.enemyRace() == Race.Protoss;
+		return true;
 	}
 
 	/// 메인부대 위치 지점

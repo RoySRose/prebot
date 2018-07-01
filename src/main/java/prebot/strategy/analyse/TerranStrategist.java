@@ -47,7 +47,7 @@ public class TerranStrategist extends Strategist {
 		} else if (hasInfo(ClueInfo.BARRACK_FAST_TWO)) {
 			return EnemyStrategy.TERRAN_2BARRACKS;
 			
-		} else if (hasInfo(ClueInfo.BARRACK_ONE)) {
+		} else if (hasAnyInfo(ClueInfo.BARRACK_ONE, ClueInfo.BARRACK_FAST_ONE)) {
 			if (hasAnyInfo(ClueInfo.REFINERY_FAST, ClueInfo.REFINERY_LATE)) {
 				return EnemyStrategy.TERRAN_MECHANIC; 
 			} else if (hasInfo(ClueInfo.NO_REFINERY)) {

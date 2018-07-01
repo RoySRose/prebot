@@ -15,16 +15,25 @@ import prebot.strategy.analyse.Strategist;
 import prebot.strategy.analyse.TerranStrategist;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.analyse.ZergStrategist;
+import prebot.strategy.analyse.protoss.AdunAnalyser;
 import prebot.strategy.analyse.protoss.AssimilatorAnalyser;
 import prebot.strategy.analyse.protoss.CannonAnalyser;
 import prebot.strategy.analyse.protoss.CoreAnalyser;
 import prebot.strategy.analyse.protoss.ForgeAnalyser;
 import prebot.strategy.analyse.protoss.GateAnalyser;
 import prebot.strategy.analyse.protoss.NexsusAnalyser;
+import prebot.strategy.analyse.protoss.ObservatoryAnalyser;
+import prebot.strategy.analyse.protoss.RoboticsAnalyser;
+import prebot.strategy.analyse.protoss.RoboticsSupportAnalyser;
+import prebot.strategy.analyse.protoss.StargateAnalyser;
+import prebot.strategy.analyse.protoss.TemplarArchAnalyser;
 import prebot.strategy.analyse.protoss.ZealotAnalyser;
+import prebot.strategy.analyse.terran.AcademyAnalyser;
 import prebot.strategy.analyse.terran.BarracksAnalyser;
 import prebot.strategy.analyse.terran.CommandCenterAnalyser;
+import prebot.strategy.analyse.terran.FactoryAnalyser;
 import prebot.strategy.analyse.terran.RefineryAnalyser;
+import prebot.strategy.analyse.terran.StarportAnalyser;
 import prebot.strategy.analyse.zerg.ExtractorAnalyser;
 import prebot.strategy.analyse.zerg.HatcheryAnalyser;
 import prebot.strategy.analyse.zerg.HydraDenAnalyser;
@@ -76,12 +85,18 @@ public class StrategyAnalyseManager {
 
 	public void setUp(Race race) {
 		if (race == Race.Protoss) {
-			analysers.add(new NexsusAnalyser());
-			analysers.add(new CoreAnalyser());
-			analysers.add(new GateAnalyser());
+			analysers.add(new AdunAnalyser());
 			analysers.add(new AssimilatorAnalyser());
-			analysers.add(new ForgeAnalyser());
 			analysers.add(new CannonAnalyser());
+			analysers.add(new CoreAnalyser());
+			analysers.add(new ForgeAnalyser());
+			analysers.add(new GateAnalyser());
+			analysers.add(new NexsusAnalyser());
+			analysers.add(new ObservatoryAnalyser());
+			analysers.add(new RoboticsAnalyser());
+			analysers.add(new RoboticsSupportAnalyser());
+			analysers.add(new StargateAnalyser());
+			analysers.add(new TemplarArchAnalyser());
 			analysers.add(new ZealotAnalyser());
 			
 			strategist = new ProtossStrategist();
@@ -99,9 +114,12 @@ public class StrategyAnalyseManager {
 			strategist = new ZergStrategist();
 			
 		} else if (race == Race.Terran) {
+			analysers.add(new AcademyAnalyser());
 			analysers.add(new BarracksAnalyser());
 			analysers.add(new CommandCenterAnalyser());
+			analysers.add(new FactoryAnalyser());
 			analysers.add(new RefineryAnalyser());
+			analysers.add(new StarportAnalyser());
 			
 			strategist = new TerranStrategist();
 		}

@@ -132,7 +132,7 @@ public class MicroUtils {
 	
 	public static void kiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
 		if (UnitUtils.unitInSight(targetInfo) == null) {
-			CommandUtils.move(rangedUnit, targetInfo.getLastPosition());
+			kitingInvisible(rangedUnit, targetInfo, kOption);
 		} else {
 			kiting(rangedUnit, targetInfo.getUnit(), kOption);
 		}
@@ -149,18 +149,8 @@ public class MicroUtils {
 		}
 		
 		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
-			if (targetUnit.isVisible()) {
-				CommandUtils.attackUnit(rangedUnit, targetUnit);
-			} else {
-				// TODO 테스트 필요
-				if (!rangedUnit.isInWeaponRange(targetUnit)) {
-					flee(rangedUnit, targetUnit.getPosition(), kOption.fOption);
-				} else {
-					CommandUtils.attackUnit(rangedUnit, targetUnit);
-				}
-			}
+			CommandUtils.attackUnit(rangedUnit, targetUnit);
 			
-			return;
 		} else {
 			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
 			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
@@ -168,6 +158,15 @@ public class MicroUtils {
 			} else {
 				flee(rangedUnit, targetUnit.getPosition(), kOption.fOption);
 			}
+		}
+	}
+	
+	public static void kitingInvisible(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
+		WeaponType weapon = getWeapon(rangedUnit.getType(), targetInfo.getType());
+		if (weapon == WeaponType.None || weapon.maxRange() < rangedUnit.getDistance(targetInfo.getLastPosition()) - 50) {
+			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
+		} else {
+			flee(rangedUnit, targetInfo.getLastPosition(), kOption.fOption);
 		}
 	}
 
