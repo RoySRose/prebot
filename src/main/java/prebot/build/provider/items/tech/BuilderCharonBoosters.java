@@ -6,6 +6,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
+import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 
 public class BuilderCharonBoosters extends DefaultBuildableItem {
@@ -28,7 +29,7 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
     	}else {
 	    	if(String.valueOf(researchSelector.getSelected()) != "null"){
 		    	if(researchSelector.getSelected().isUpgrade()) {
-			    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType()) {
+			    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType() && Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType()) == false) {
 			    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
 				    	//if(researchSelector.getSelected().equals(metaType)) {
 				        	//FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || researchSelector => " + researchSelector.getSelected().getUpgradeType() + " || metaType => " + metaType.getUpgradeType());

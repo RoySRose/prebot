@@ -333,6 +333,7 @@ public class BuildConditionChecker {
 		controltower = false;
 		CC = 0;
 		buildGas = false;
+		findGeyser = null;
 		
 		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 			if (unit == null)

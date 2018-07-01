@@ -169,11 +169,12 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 	//			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || now mineral : " + Prebot.Broodwar.self().minerals() + "now gas : " + Prebot.Broodwar.self().gas());
 	
 				if (selected.mineralPrice() <= Prebot.Broodwar.self().minerals() && selected.gasPrice() <= Prebot.Broodwar.self().gas() && Prebot.Broodwar.self().supplyUsed() <= 392) {
-	//				FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || resource enough");
+					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || resource enough");
+					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit ==> " + selected.toString());
 					//BuildManager.Instance().buildQueue.queueAsLowestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					unitType = selected;
 				}
-			}/*else {
+			}else {
 	//			현재 빌드큐에 팩토리 유닛이 들어가 있는데 벌쳐는 아닐경우, 자원이 가능하면 일단 벌쳐를 눌러준다.
 				if(currentinbuildqueuecnt_vulture < 1) {
 					
@@ -182,7 +183,7 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 						unitType = UnitType.Terran_Vulture;
 					}
 				}
-			}*/
+			}
     	}
     }
 }
