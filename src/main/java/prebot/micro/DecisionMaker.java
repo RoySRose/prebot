@@ -1,17 +1,23 @@
 package prebot.micro;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.UXManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Tank;
+import prebot.micro.predictor.WraithFightPredictor;
+import prebot.micro.targeting.TargetScoreCalculator;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
 
 public class DecisionMaker {
@@ -99,14 +105,93 @@ public class DecisionMaker {
 		return decision;
 	}
 
-	public Decision makeDecisionForAirForceDrivePosition(Unit myUnit, List<UnitInfo> euiList) {
-//		Decision.attackUnit(eui);
-//		Decision.fleeFromUnit(eui);
-		return Decision.attackPosition();
+	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, List<UnitInfo> euiList) {
+		List<UnitInfo> euiListAirDefenseBuilding = new ArrayList<>();
+		List<UnitInfo> euiListAirWeapon = new ArrayList<>();
+		List<UnitInfo> euiListFeed = new ArrayList<>();
+		for (UnitInfo eui : euiList) {
+			boolean isAirDefenseBuilding = false;
+			for (UnitType airDefenseUnitType : UnitUtils.enemyAirDefenseUnitType()) {
+				if (eui.getType() == airDefenseUnitType) {
+					isAirDefenseBuilding = true;
+					break;
+				}
+			}
+			if (isAirDefenseBuilding) {
+				euiListAirDefenseBuilding.add(eui);
+			} else if (eui.getType().airWeapon() != WeaponType.None) {
+				euiListAirWeapon.add(eui);
+			} else {
+				euiListFeed.add(eui);
+			}
+		}
+		
+		// air driving 오차로 상대 건물 공격범위안으로 들어왔을 경우
+		for (UnitInfo eui : euiListAirDefenseBuilding) {
+			if (UnitUtils.unitInSight(eui) != null && eui.getUnit().isInWeaponRange(airForceTeam.leaderUnit)) {
+				return Decision.attackPosition();
+			}
+		}
+
+		List<UnitInfo> euiListTarget = new ArrayList<>();
+		if (euiListAirWeapon.isEmpty()) {
+			euiListTarget = euiListFeed;
+			
+		} else {
+			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon);
+			if (fightPredict == SmallFightPredict.BACK) {
+				return Decision.fleeFromPosition();
+			}
+			euiListTarget = euiListAirWeapon;
+		}
+		
+		UnitInfo bestTargetInfo = null;
+		boolean bestTargetProtectedByBuilding = false;
+		int highestFeedScore = 0;
+		
+		boolean inWeaponRange = false;
+		boolean protectedByBuilding = false;
+		for (UnitInfo eui : euiListTarget) {
+			inWeaponRange = UnitUtils.unitInSight(eui) != null && airForceTeam.isInAirForceWeaponRange(eui.getUnit());
+			protectedByBuilding = protectedByBuilding(eui, euiListAirDefenseBuilding);
+			if (!inWeaponRange && protectedByBuilding) { // 건물에 의해 보호받는 빌딩은 제외. 공격범위내에 있으면 예외
+				continue;
+			}
+			
+			int score = targetScoreCalculator.calculate(airForceTeam.leaderUnit, eui);
+			if (score > highestFeedScore) {
+				bestTargetInfo = eui;
+				bestTargetProtectedByBuilding = protectedByBuilding;
+				highestFeedScore = score;
+			}
+		}
+		
+		if (bestTargetInfo != null) {
+			if (bestTargetProtectedByBuilding) {
+				return Decision.attackUnit(bestTargetInfo);
+			} else {
+				return Decision.kitingUnit(bestTargetInfo);
+			}
+			
+		} else if (euiListAirWeapon.isEmpty()) {
+			return Decision.attackPosition();
+		} else {
+			return Decision.fleeFromPosition();
+		}
+	}
+
+	private boolean protectedByBuilding(UnitInfo eui, List<UnitInfo> euiListAirDefenseBuilding) {
+		for (UnitInfo euiBuilding : euiListAirDefenseBuilding) {
+			int buildingWeaponRange = euiBuilding.getType().airWeapon().maxRange() + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+			double distanceWithBuilding = eui.getLastPosition().getDistance(euiBuilding.getLastPosition());
+			if (distanceWithBuilding < buildingWeaponRange) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
-	
-	public Decision makeDecisionForAirForceMoving(AirForceTeam airForceTeam, List<UnitInfo> euiList) {
+	public Decision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, List<UnitInfo> euiList, boolean movingAttack) {
 		boolean allUnitCoolTimeReady = true;
 		for (Unit wraith : airForceTeam.memberList) {
 			if (wraith.getGroundWeaponCooldown() > 0) {
@@ -120,17 +205,36 @@ public class DecisionMaker {
 			UnitInfo targetInfo = null;
 			int minimumLinearDistance = CommonCode.INT_MAX;
 			for (UnitInfo eui : euiList) {
+				Unit enemyUnit = UnitUtils.unitInSight(eui);
+				if (enemyUnit == null) {
+					continue;
+				}
+				
 //				// 대공능력이 있는 적이 있다면 이동시 공격을 하지 않는다.
 //				// (만약 대공능력이 있는 적을 공격을 해야 한다면 이전 단계 판단에서 지정된다.)
 //				if (eui.getType().airWeapon() != WeaponType.None) {
 //					targetInfo = null;
 //					break;
 //				}
-				int distanceEnemyToLeader = airForceTeam.leaderUnit.getDistance(eui.getLastPosition());
-				if (distanceEnemyToLeader > UnitType.Terran_Wraith.groundWeapon().maxRange()) {
+				
+				if (movingAttack) { // 이동시 진행각도에 있는 적만 공격하고 싶으세요?
+					// 약 45도 이상 벌어진 적은 이동하며 공격하지 않음 (3.14 = 90도, 0.78 = 45도)
+					double leaderTargetRadian = MicroUtils.targetDirectionRadian(airForceTeam.leaderUnit.getPosition(), airForceTeam.getTargetPosition());
+					double leaderEnemyRadian = MicroUtils.targetDirectionRadian(airForceTeam.leaderUnit.getPosition(), enemyUnit.getPosition());
+					if (Math.abs(leaderTargetRadian - leaderEnemyRadian) > 0.78) {
+//						System.out.println("wraith - targetposition : " + leaderTargetRadian);
+//						System.out.println("wraith - " + eui.getType() + " : " + leaderEnemyRadian);
+						continue;
+					}
+				}
+
+				// 공격범위 내에 있어야 한다.
+				if (!airForceTeam.isInAirForceWeaponRange(enemyUnit)) {
 					continue;
 				}
-				int distanceEnemyToTargetPosition = (int) eui.getLastPosition().getDistance(airForceTeam.getTargetPosition());
+				// 최소 진행각도의 적을 타게팅하기 위함
+				int distanceEnemyToLeader = enemyUnit.getDistance(airForceTeam.leaderUnit);
+				int distanceEnemyToTargetPosition = enemyUnit.getDistance(airForceTeam.getTargetPosition());
 				if (distanceEnemyToLeader + distanceEnemyToTargetPosition < minimumLinearDistance) {
 					targetInfo = eui;
 					minimumLinearDistance = distanceEnemyToLeader + distanceEnemyToTargetPosition;
@@ -141,6 +245,7 @@ public class DecisionMaker {
 			}
 		}
 		
+		// 공격할 적이 없을 경우 이동한다.
 		if (decision == null) {
 			// air force team이 너무 분산되어 있는 경우 모으도록 한다.
 			int averageDistance = 0;
@@ -160,6 +265,7 @@ public class DecisionMaker {
 				decision = Decision.attackPosition();
 			}
 		}
+		UXManager.Instance().addDecisionListForUx(airForceTeam.leaderUnit, decision);
 		return decision;
 	}
 
@@ -226,10 +332,13 @@ public class DecisionMaker {
 	// 접근하면 안되는 적이 있는지 판단 (성큰, 포톤캐논, 시즈탱크, 벙커)
 	private boolean isDangerousType(Unit myUnit, UnitType enemyUnitType, Unit enemyUnit) {
 		if (myUnit.isFlying()) {
-			return enemyUnitType == UnitType.Zerg_Spore_Colony
-					|| enemyUnitType == UnitType.Protoss_Photon_Cannon
-					|| enemyUnitType == UnitType.Terran_Bunker
-					|| enemyUnitType == UnitType.Terran_Missile_Turret;
+			UnitType[] enemyAirDefenseUnitType = UnitUtils.enemyAirDefenseUnitType();
+			for (UnitType airDefenseUnitType : enemyAirDefenseUnitType) {
+				if (enemyUnitType == airDefenseUnitType) {
+					return true;
+				}
+			}
+			return false;
 			// || (marine, goliath, dragoon, archon, hydra..) {
 
 		} else {

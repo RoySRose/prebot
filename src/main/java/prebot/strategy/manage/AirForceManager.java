@@ -21,26 +21,41 @@ import prebot.strategy.UnitInfo;
 
 public class AirForceManager {
 	
-	public enum StrikeLevel {
-		CRITICAL_SPOT, // 때리면 죽는 곳 공격 (엔지니어링베이, 아모리, 터렛 건설중인 SCV)
-		SORE_SPOT, // 때리면 아픈 곳 공격 (건설중인 SCV, 그냥 SCV, 탱크)
-		POSSIBLE_SPOT, // 때릴 수 있는 곳 공격 (벌처, 건물 등 잡히는 대로)
+	public static class StrikeLevel {
+		public static final int CRITICAL_SPOT = 3; // 때리면 죽는 곳 공격 (터렛건설중인 SCV, 아모리 건설중인 SCV, 엔지니어링베이 건설중인 SCV)
+		public static final int SORE_SPOT = 2; // 때리면 아픈 곳 공격 (커맨드센터건설중인 SCV, 팩토리 건설중인 SCV, 뭔가 건설중인 SCV, 체력이 적은 SCV, 가까운 SCV, 탱크)
+		public static final int POSSIBLE_SPOT = 1; // 때릴 수 있는 곳 공격 (벌처, 건물 등 잡히는 대로)
 	}
 
-	private static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 100;
-	public static final int TARGET_POSITIONS_SIZE = 4; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
+	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
+	public static final int AIR_FORCE_TARGET_POSITIONS_SIZE = 4; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
+	public static final int AIR_FORCE_SAFE_DISTANCE = 80; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리 
 	
 	private static AirForceManager instance = new AirForceManager();
-	private StrikeLevel strikeLevel = StrikeLevel.CRITICAL_SPOT;
 	private int airForceStartFrame = CommonCode.NONE;
 
 	/// static singleton 객체를 리턴합니다
 	public static AirForceManager Instance() {
 		return instance;
 	}
-
-	public StrikeLevel getStrikeLevel() {
+	
+	private int strikeLevel = StrikeLevel.CRITICAL_SPOT;
+	private boolean disabledAutoAdjustment = false;
+	
+	public int getStrikeLevel() {
 		return strikeLevel;
+	}
+
+	public void setStrikeLevel(int strikeLevel) {
+		this.strikeLevel = strikeLevel;
+	}
+
+	public boolean isDisabledAutoAdjustment() {
+		return disabledAutoAdjustment;
+	}
+
+	public void setDisabledAutoAdjustment(boolean disabledAutoAdjustment) {
+		this.disabledAutoAdjustment = disabledAutoAdjustment;
 	}
 
 	private BaseLocation firstBase = null; // 시작 공격 베이스
@@ -100,17 +115,17 @@ public class AirForceManager {
 			int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
 			int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
 
-			double vectorXSegment = vectorX / (TARGET_POSITIONS_SIZE - 1);
-			double vectorYSegment = vectorY / (TARGET_POSITIONS_SIZE - 1);
+			double vectorXSegment = vectorX / (AIR_FORCE_TARGET_POSITIONS_SIZE - 1);
+			double vectorYSegment = vectorY / (AIR_FORCE_TARGET_POSITIONS_SIZE - 1);
 
 			targetPositions.add(0, firstBase.getPosition());
-			for (int index = 1; index < TARGET_POSITIONS_SIZE - 1; index++) {
+			for (int index = 1; index < AIR_FORCE_TARGET_POSITIONS_SIZE - 1; index++) {
 				int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index));
 				int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index));
 
 				targetPositions.add(index, new Position(resultX, resultY));
 			}
-			targetPositions.add(TARGET_POSITIONS_SIZE - 1, secondBase.getPosition());
+			targetPositions.add(AIR_FORCE_TARGET_POSITIONS_SIZE - 1, secondBase.getPosition());
 		}
 	}
 
@@ -130,7 +145,11 @@ public class AirForceManager {
 	}
 
 	private void adjustStrikeLevel() {
-		if (StrikeLevel.CRITICAL_SPOT.equals(strikeLevel)) {
+		if (disabledAutoAdjustment) {
+			return;
+		}
+		
+		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
 			if (!StrategyIdea.currentStrategy.buildTimeMap.isMechanic()) { // 메카닉이 아님
 				strikeLevel = StrikeLevel.SORE_SPOT;
 				return;
@@ -153,7 +172,7 @@ public class AirForceManager {
 				return;
 			}
 			
-		} else if (StrikeLevel.SORE_SPOT.equals(strikeLevel)) {
+		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
 		}
 		

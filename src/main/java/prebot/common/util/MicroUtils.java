@@ -23,6 +23,7 @@ import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.constant.MicroConfig.Flee;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.AirForceManager;
 
 /**
  * 마이크로 컨트롤 유틸
@@ -64,7 +65,7 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 80, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
@@ -88,7 +89,7 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 80, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (enemyDefTowerList.isEmpty()) {
 				realMoveRadian = adjustedRadian;
 				break;

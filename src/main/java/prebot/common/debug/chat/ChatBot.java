@@ -5,6 +5,7 @@ import java.util.List;
 
 import prebot.common.debug.chat.impl.GameSpeedAdjuster;
 import prebot.common.debug.chat.impl.StrategeChanger;
+import prebot.common.debug.chat.impl.StrikeLevelAdjuster;
 import prebot.common.debug.chat.impl.UxOptionChanger;
 
 public class ChatBot {
@@ -18,15 +19,17 @@ public class ChatBot {
 	/*****************************************************************************
 	 * 설명
 	 * 
-	 * 1) 게임스피드 조절	: s + 숫자	ex) s0=매우빠름, s24=bot경기스피드, s42=fastest
-	 * 2) UX 타입 변경	: d + 숫자	ex) d1=?, d0=prebot1 display
-	 * 3) 전략 변경		: $ + 전략명	ex) $TERRAN INIT
+	 * 1) 게임스피드 조절			: s + 숫자	ex) s0=매우빠름, s24=bot경기스피드, s42=fastest
+	 * 2) UX 타입 변경			: d + 숫자	ex) d1=?, d0=prebot1 display
+	 * 3) 전략 변경				: $ + 전략명	ex) $TERRAN INIT
+	 * 4) 레이쓰 공격레벨 변경		: w + 숫자	ex) w1
 	 * 
 	 *****************************************************************************/
 	static {
 		chatExecuters.add(new GameSpeedAdjuster('s'));
 		chatExecuters.add(new UxOptionChanger('d'));
 		chatExecuters.add(new StrategeChanger('$'));
+		chatExecuters.add(new StrikeLevelAdjuster('w'));
 	}
 
 	/**

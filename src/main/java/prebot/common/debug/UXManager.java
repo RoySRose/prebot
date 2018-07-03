@@ -1417,6 +1417,7 @@ public class UXManager {
 	}
 	
 	private void drawAirForceInformation() {
+		// wraith moving
 		for (Unit unit : UnitUtils.getUnitList(UnitType.Terran_Wraith)) {
 			if (unit.isMoving()) {
 				Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
@@ -1431,16 +1432,17 @@ public class UXManager {
 			Prebot.Broodwar.drawTextMap(targetPositions.get(i), "position#" + i);
 		}
 		
-
 		// air force team
 		int y = 200;
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
 		for (AirForceTeam airForceUnit : airForceTeamSet) {
-			Prebot.Broodwar.drawTextMap(airForceUnit.leaderUnit.getPosition(), "unit#" + airForceUnit.leaderUnit.getID());
+			Position position = airForceUnit.leaderUnit.getPosition();
+			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, "unit#" + airForceUnit.leaderUnit.getID());
 			Position targetPosition = new Position(airForceUnit.getTargetPosition().getX(), airForceUnit.getTargetPosition().getY() - 10);
-			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*");
+			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceUnit.leaderUnit.getID());
 			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceUnit.toString());
 		}
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "strike level=" + AirForceManager.Instance().getStrikeLevel());
 	}
 	
 	private void drawEnemyBaseToBaseTime() {
