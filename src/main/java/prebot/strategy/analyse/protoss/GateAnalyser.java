@@ -28,7 +28,7 @@ public class GateAnalyser extends UnitAnalyser {
 			if (found.size() >= 2) { // 게이트 웨이 2개 이상
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int secondBuildFrame = buildStartFrameDefaultJustBefore(found.get(1));
-				int twoGateSecondGateFrame = EnemyStrategy.PROTOSS_2GATE.defaultTimeMap.frameOfIndex(UnitType.Protoss_Gateway, 1, 20);
+				int twoGateSecondGateFrame = EnemyStrategy.PROTOSS_2GATE.buildTimeMap.frameOfIndex(UnitType.Protoss_Gateway, 1, 20);
 				
 				if (firstBuildFrame < twoGateSecondGateFrame && secondBuildFrame < twoGateSecondGateFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.GATE_FAST_TWO);
@@ -38,7 +38,7 @@ public class GateAnalyser extends UnitAnalyser {
 			
 			} else if (found.size() == 1) { // 게이트 웨이 1개
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-				int twoGateFirstGateFrame = EnemyStrategy.PROTOSS_2GATE.defaultTimeMap.frame(UnitType.Protoss_Gateway, 15);
+				int twoGateFirstGateFrame = EnemyStrategy.PROTOSS_2GATE.buildTimeMap.frame(UnitType.Protoss_Gateway, 15);
 				if (firstBuildFrame < twoGateFirstGateFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.GATE_FAST_ONE);
 				} else {
@@ -46,7 +46,7 @@ public class GateAnalyser extends UnitAnalyser {
 				}
 			}
 		} else {
-			int twoGateFirstGateFrame = EnemyStrategy.PROTOSS_2GATE.defaultTimeMap.frame(UnitType.Protoss_Gateway, 20);
+			int twoGateFirstGateFrame = EnemyStrategy.PROTOSS_2GATE.buildTimeMap.frame(UnitType.Protoss_Gateway, 20);
 			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > twoGateFirstGateFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.GATE_NOT_FOUND);

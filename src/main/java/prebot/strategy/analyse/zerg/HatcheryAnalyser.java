@@ -25,9 +25,9 @@ public class HatcheryAnalyser extends UnitAnalyser {
 			return;
 		}
 		
-		int doubleFrame = EnemyStrategy.ZERG_2HAT_GAS.defaultTimeMap.frame(UnitType.Zerg_Hatchery, 10);
-		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.defaultTimeMap.frame(UnitType.Zerg_Hatchery, 10);
-		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.defaultTimeMap.frame(UnitType.Zerg_Hatchery, 10);
+		int doubleFrame = EnemyStrategy.ZERG_2HAT_GAS.buildTimeMap.frame(UnitType.Zerg_Hatchery, 10);
+		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.buildTimeMap.frame(UnitType.Zerg_Hatchery, 10);
+		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.buildTimeMap.frame(UnitType.Zerg_Hatchery, 10);
 		
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {

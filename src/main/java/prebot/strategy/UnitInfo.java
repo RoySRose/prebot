@@ -11,12 +11,12 @@ import prebot.common.main.Prebot;
 public class UnitInfo {
 
 	private int unitID;
+	private UnitType type;
 	private int lastHealth;
 	private int lastShields;
 	private Player player;
 	private Unit unit;
 	private Position lastPosition;
-	private UnitType type;
 	private boolean completed;
 	private int updateFrame;
 	private int remainingBuildTime;
@@ -24,11 +24,11 @@ public class UnitInfo {
 	public UnitInfo()
 	{
 		unitID = 0;
+		type = UnitType.None;
 		lastHealth = 0;
 		player = null;
 		unit = null;
 		lastPosition = Position.None;
-		type = UnitType.None;
 		completed = false;
 		updateFrame = 0;
 	}
@@ -123,8 +123,7 @@ public class UnitInfo {
 
 	@Override
 	public String toString() {
-		return "UnitInfo [unitID=" + unitID + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", type=" + type
-				+ ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
+		return "UnitInfo [unitID=" + unitID + ", type=" + type + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
 	}
 
 	

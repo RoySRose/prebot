@@ -14,15 +14,15 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
-import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.TargetScoreCalculators;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.control.Control;
+import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.TankPositionManager;
@@ -61,7 +61,7 @@ public class TankControl extends Control {
 	}
 
 	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
-		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forSiegeMode);
+		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
 			Decision decision = decisionMaker.makeDecisionForSiegeMode(siege, euiList);
@@ -85,7 +85,7 @@ public class TankControl extends Control {
 	}
 
 	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList) {
-		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forTankMode);
+		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 

@@ -15,12 +15,12 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
-import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.TargetScoreCalculators;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
@@ -39,7 +39,7 @@ public class MarineControl extends Control {
 		if (bunker != null) {
 			fleePosition = bunker.getPosition();
 		}
-		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forMarine);
+		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(fleePosition, true, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
 

@@ -24,7 +24,7 @@ public class AdunAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int fastAdunFrame = EnemyStrategy.PROTOSS_FAST_DARK.defaultTimeMap.frame(UnitType.Protoss_Citadel_of_Adun, 30);
+			int fastAdunFrame = EnemyStrategy.PROTOSS_FAST_DARK.buildTimeMap.frame(UnitType.Protoss_Citadel_of_Adun, 30);
 
 			if (buildFrame < fastAdunFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.ADUN_FAST);

@@ -22,7 +22,7 @@ public class CannonAnalyser extends UnitAnalyser {
 	}
 
 	private void fastCannon() {
-		int forgeDoulbeCannonFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.frame(UnitType.Protoss_Photon_Cannon, 15);
+		int forgeDoulbeCannonFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Photon_Cannon, 15);
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));

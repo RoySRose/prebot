@@ -25,7 +25,7 @@ public class ForgeAnalyser extends UnitAnalyser {
 		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-			int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.frame(UnitType.Protoss_Forge, 15);
+			int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Forge, 15);
 			if (buildFrame < forgeDoubleForgeFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FAST_IN_EXPANSION);
 			}
@@ -34,7 +34,7 @@ public class ForgeAnalyser extends UnitAnalyser {
 			found = found();
 			if (!found.isEmpty()) {
 				int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
-				int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.defaultTimeMap.frame(UnitType.Protoss_Forge, 15);
+				int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Forge, 15);
 				if (buildFrame < forgeDoubleForgeFrame) {
 					ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FAST_IN_BASE);
 				}

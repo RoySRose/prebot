@@ -212,17 +212,23 @@ public class UnitUtils {
 			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
-			int weoponrange = 0; // radius 안의 공격범위가 닿는 적까지 포함
-			if (enemyAirWeopon) {
-				if (eui.getType().airWeapon() != WeaponType.None) {
-					weoponrange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
-				}
+			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
+			
+			if (eui.getType() == UnitType.Terran_Bunker) {
+				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32;
 			} else {
-				if (eui.getType().groundWeapon() != WeaponType.None) {
-					weoponrange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon());
+				if (enemyAirWeopon) {
+					if (eui.getType().airWeapon() != WeaponType.None) {
+						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
+					}
+				} else {
+					if (eui.getType().groundWeapon() != WeaponType.None) {
+						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon());
+					}
 				}
 			}
-			if (eui.getLastPosition().getDistance(position) > radius + weoponrange) {
+			
+			if (eui.getLastPosition().getDistance(position) > radius + weaponRange) {
 				continue;
 			}
 			if (ignorableEnemyUnitInfo(eui)) {
@@ -347,7 +353,7 @@ public class UnitUtils {
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
-		return TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
+		return !eui.getType().isBuilding() && TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 	}
 	
 	/** 즉시 생산할 수 있는 상태인지 판단 */

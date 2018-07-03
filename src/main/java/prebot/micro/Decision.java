@@ -13,7 +13,8 @@ public class Decision {
 		HOLD("H"),
 		STOP("S"),
 		CHANGE_MODE("C"),
-		RIGHT_CLICK("R");
+		RIGHT_CLICK("R"),
+		UNITE("U");
 		
 		private DecisionType(String shortName) {
 			this.SHORTNAME = shortName;
@@ -68,6 +69,10 @@ public class Decision {
 	
 	public static Decision move() {
 		return new Decision(DecisionType.RIGHT_CLICK);
+	}
+	
+	public static Decision unite() {
+		return new Decision(DecisionType.UNITE);
 	}
 
 	@Override

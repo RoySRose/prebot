@@ -20,9 +20,9 @@ public class ExtractorAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE_GAS.defaultTimeMap.frame(UnitType.Zerg_Extractor, 10);
-		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL_GAS.defaultTimeMap.frame(UnitType.Zerg_Extractor, 50);
-		int doubleHatchFrame = EnemyStrategy.ZERG_2HAT_GAS.defaultTimeMap.frame(UnitType.Zerg_Extractor, 50);
+		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE_GAS.buildTimeMap.frame(UnitType.Zerg_Extractor, 10);
+		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL_GAS.buildTimeMap.frame(UnitType.Zerg_Extractor, 50);
+		int doubleHatchFrame = EnemyStrategy.ZERG_2HAT_GAS.buildTimeMap.frame(UnitType.Zerg_Extractor, 50);
 		
 		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {

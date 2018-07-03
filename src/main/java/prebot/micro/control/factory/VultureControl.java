@@ -9,13 +9,13 @@ import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
-import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.TargetScoreCalculators;
+import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
+import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
@@ -25,7 +25,7 @@ public class VultureControl extends Control {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		
-		DecisionMaker decisionMaker = new DecisionMaker(TargetScoreCalculators.forVulture);
+		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
