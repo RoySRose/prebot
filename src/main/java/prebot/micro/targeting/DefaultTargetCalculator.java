@@ -19,7 +19,7 @@ public class DefaultTargetCalculator extends TargetScoreCalculator {
 		UnitType enemyUnitType = eui.getType();
 		
 		Unit enemyUnit = UnitUtils.unitInSight(eui);
-		if (UnitUtils.isValidUnit(enemyUnit)) {
+		if (enemyUnit != null) {
 			enemyIsComplete = enemyUnit.isCompleted();
 			enemyPosition = enemyUnit.getPosition();
 			enemyUnitType = enemyUnit.getType();

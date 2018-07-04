@@ -180,7 +180,7 @@ public class WorkerManager extends GameManager {
 		double closestDistance = 1000000000;
 
 		for (Unit unit : workerData.getWorkers()) {
-			if (!UnitUtils.isValidUnit(unit) || workerData.getWorkerJob(unit) != workerJob || !unit.canMove()
+			if (!UnitUtils.isCompleteValidUnit(unit) || workerData.getWorkerJob(unit) != workerJob || !unit.canMove()
 					|| !unit.isMoving()) { // 가스통 안에 있는 일꾼, 또는 자원을 채취하기 직전인 일꾼을
 											// 사용하지 않기 위함
 				continue;

@@ -22,11 +22,12 @@ import prebot.strategy.UnitInfo;
 
 public class GoliathControl extends Control {
 
+	// TODO 수리중인 골리앗 카이팅 하지 않기
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {

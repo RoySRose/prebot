@@ -141,7 +141,7 @@ public class MarineControl extends Control {
 	private boolean unitIsInBunker(Unit marine, Unit bunker) {
 		List<Unit> loadedUnits = bunker.getLoadedUnits();
 		for (Unit loadedUnit : loadedUnits) {
-			if (UnitUtils.isValidUnit(loadedUnit) && loadedUnit.getID() == marine.getID()) {
+			if (UnitUtils.isCompleteValidUnit(loadedUnit) && loadedUnit.getID() == marine.getID()) {
 				return true;
 			}
 		}
