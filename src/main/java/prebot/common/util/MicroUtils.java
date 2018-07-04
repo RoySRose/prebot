@@ -171,7 +171,7 @@ public class MicroUtils {
 	
 	public static void kitingInvisible(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
 		WeaponType weapon = getWeapon(rangedUnit.getType(), targetInfo.getType());
-		if (weapon == WeaponType.None || weapon.maxRange() < rangedUnit.getDistance(targetInfo.getLastPosition()) - 50) {
+		if (weapon == WeaponType.None || rangedUnit.getDistance(targetInfo.getLastPosition()) > weapon.maxRange() + 50) {
 			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
 		} else {
 			flee(rangedUnit, targetInfo.getLastPosition(), kOption.fOption);

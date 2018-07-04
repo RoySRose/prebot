@@ -33,22 +33,14 @@ public class UnitUtils {
 	
 	/** 유효한 유닛인지 검사 */
 	public static boolean isValidUnit(Unit unit) {
-		return unit != null && unit.isCompleted() && unit.getHitPoints() > 0 && unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
+		// unit.getHitPoints() > 0 || !unit.isDetected() 조건 제외
+		return unit != null && unit.getType() != UnitType.Unknown && unit.exists() && unit.getPosition().isValid();
 	}
-
-	@Deprecated // TODO 삭제예정
-	public static boolean isValidUnit(Unit unit, boolean excludeIncomplete, boolean excludeUndetected) {
-		if (unit == null) {
-			return false;
-		}
-		if (excludeIncomplete && !unit.isCompleted()) {
-			return false;
-		}
-		if (excludeUndetected && !unit.isDetected()) {
-			return false;
-		}
-
-		return unit.exists() && unit.getType() != UnitType.Unknown && unit.getPosition().isValid();
+	
+	/** 유효한 유닛인지 검사 */
+	public static boolean isCompleteValidUnit(Unit unit) {
+		// unit.getHitPoints() > 0 || !unit.isDetected() 조건 제외
+		return isValidUnit(unit) && unit.isCompleted();
 	}
 
 	/** 시야에 있는 unitinfo이면 unit 정보 리턴 */
@@ -423,7 +415,7 @@ public class UnitUtils {
 		double closestDist = CommonCode.DOUBLE_MAX;
 
 		for (Unit unit : unitList) {
-			if (!UnitUtils.isValidUnit(unit) || !unitCondition.correspond(unit)) {
+			if (!UnitUtils.isCompleteValidUnit(unit) || !unitCondition.correspond(unit)) {
 				continue;
 			}
 			double dist = unit.getDistance(position);
@@ -472,20 +464,12 @@ public class UnitUtils {
 			return true;
 		}
 	}
+
 	
 	public static int myFactoryUnitSupplyCount() {
-		int totalSupplyCount = 0;
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-			if (!UnitUtils.isValidUnit(unit)) {
-				continue;
-			}
-			if (unit.getType() == UnitType.Terran_Vulture
-					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-					|| unit.getType() == UnitType.Terran_Goliath) {
-				totalSupplyCount++;
-			}
-		}
+		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
+				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
+		
 		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 

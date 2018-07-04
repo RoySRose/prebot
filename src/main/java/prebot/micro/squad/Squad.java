@@ -83,7 +83,7 @@ public abstract class Squad {
 	public List<Unit> invalidUnitList() {
 		List<Unit> invalidUnitList = new ArrayList<>();
 		for (Unit unit : unitList) {
-			if (!UnitUtils.isValidUnit(unit) || !want(unit)) {
+			if (!UnitUtils.isCompleteValidUnit(unit) || !want(unit)) {
 				invalidUnitList.add(unit);
 			}
 		}

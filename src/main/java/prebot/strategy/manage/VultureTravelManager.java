@@ -84,7 +84,7 @@ public class VultureTravelManager {
 		for (Integer vultureId : checkerSiteMap.keySet()) {
 			TravelSite travelSite = checkerSiteMap.get(vultureId);
 			// 유효하지 않은 벌처
-			if (!UnitUtils.isValidUnit(Prebot.Broodwar.getUnit(vultureId))) {
+			if (!UnitUtils.isCompleteValidUnit(Prebot.Broodwar.getUnit(vultureId))) {
 				invalidList.add(vultureId);
 			}
 			// 시야가 밝혀진 목적지
@@ -142,7 +142,7 @@ public class VultureTravelManager {
 		List<Integer> removeList = new ArrayList<>();
 		for (Integer checkerId : checkerRetiredTimeMap.keySet()) {
 			Unit checker = Prebot.Broodwar.getUnit(checkerId);
-			if (!UnitUtils.isValidUnit(checker)) {
+			if (!UnitUtils.isCompleteValidUnit(checker)) {
 				removeList.add(checkerId);
 			} else {
 				int retiredTime = checkerRetiredTimeMap.get(checkerId);

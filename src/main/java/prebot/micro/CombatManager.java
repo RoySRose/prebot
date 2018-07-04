@@ -102,7 +102,7 @@ public class CombatManager extends GameManager {
 		// 유효한 공격유닛 필터링(일꾼 포함)
 		List<Unit> combatUnitList = new ArrayList<>();
 		for (Unit myUnit : Prebot.Broodwar.self().getUnits()) {
-			if (!UnitUtils.isValidUnit(myUnit)) {
+			if (!UnitUtils.isCompleteValidUnit(myUnit)) {
 				continue;
 			}
 			combatUnitList.add(myUnit);

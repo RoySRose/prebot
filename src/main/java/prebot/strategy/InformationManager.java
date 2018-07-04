@@ -642,7 +642,7 @@ public class InformationManager extends GameManager {
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(selfPlayer).getUnitAndUnitInfoMap().get(it.next());
 				if (ui.getType().isBuilding()) {
-					if (UnitUtils.isValidUnit(ui.getUnit())
+					if (UnitUtils.isCompleteValidUnit(ui.getUnit())
 							&& ui.getUnit().isLifted()
 							&& (ui.getType() == UnitType.Terran_Barracks || ui.getType() == UnitType.Terran_Engineering_Bay)) {
 						continue;
@@ -1232,7 +1232,7 @@ public class InformationManager extends GameManager {
 					
 					// 띄워졌있는 배럭, 엔베는 차지한 영역으로 안쓴다. 왜냐면 우리는 이것들을 시야확보용으로 쓸 것이기 때문이다.
 					if (player == Prebot.Broodwar.self()
-							&& UnitUtils.isValidUnit(ui.getUnit())
+							&& UnitUtils.isCompleteValidUnit(ui.getUnit())
 							&& ui.getUnit().isLifted()
 							&& (ui.getType() == UnitType.Terran_Barracks || ui.getType() == UnitType.Terran_Engineering_Bay)) {
 						continue;
@@ -1779,7 +1779,7 @@ public class InformationManager extends GameManager {
 				firstScoutAlive = true;
 			}
 		} else {
-			if (firstScoutAlive && !UnitUtils.isValidUnit(firstScout)) {
+			if (firstScoutAlive && !UnitUtils.isCompleteValidUnit(firstScout)) {
 				firstScoutAlive = false;
 			}
 		}
@@ -1794,7 +1794,7 @@ public class InformationManager extends GameManager {
 				firstVultureAlive = true;
 			}
 		} else {
-			if (firstVultureAlive && !UnitUtils.isValidUnit(firstVulture)) {
+			if (firstVultureAlive && !UnitUtils.isCompleteValidUnit(firstVulture)) {
 				firstVultureAlive = false;
 			}
 		}

@@ -34,7 +34,7 @@ public class DecisionMaker {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		
-		Unit undetectedDarkTemplar = null;
+		Unit closeUndetectedEnemy = null;
 		Unit tooCloseTarget = null;
 		Unit tooFarTarget = null;
 		int closestTooFarTargetDistance = CommonCode.INT_MAX;
@@ -55,8 +55,8 @@ public class DecisionMaker {
 				}
 				continue;
 			}
-			if (isCloseUndetectedDarkTemplar(myUnit, eui)) {
-				undetectedDarkTemplar = enemyUnit;
+			if (isCloseUndetectedGroundUnit(myUnit, eui)) {
+				closeUndetectedEnemy = enemyUnit;
 				continue;
 			}
 			
@@ -89,7 +89,7 @@ public class DecisionMaker {
 				decision = Decision.attackUnit(bestTargetUnitInfo);
 			}
 		} else {
-			if (undetectedDarkTemplar != null || tooCloseTarget != null) {
+			if (closeUndetectedEnemy != null || tooCloseTarget != null) {
 				decision = Decision.change();
 			} else if (tooFarTarget != null) {
 				if (closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
@@ -276,7 +276,7 @@ public class DecisionMaker {
 			if (!MicroUtils.canAttack(myUnit, eui)) {
 				continue;
 			}
-			if (isCloseDangerousTarget(myUnit, eui) || isCloseUndetectedDarkTemplar(myUnit, eui)) {
+			if (isCloseDangerousTarget(myUnit, eui)) {
 				return Decision.fleeFromUnit(eui);
 			}
 			int score = targetScoreCalculator.calculate(myUnit, eui);
@@ -351,17 +351,22 @@ public class DecisionMaker {
 		}
 	}
 	
-	private boolean isCloseUndetectedDarkTemplar(Unit myUnit, UnitInfo eui) {
+	private boolean isCloseUndetectedGroundUnit(Unit myUnit, UnitInfo eui) {
 		if (myUnit.isFlying()) {
 			return false;
 		}
+
 		Unit enemyUnit = UnitUtils.unitInSight(eui);
 		if (enemyUnit == null || enemyUnit.isDetected()) {
 			return false;
 		}
-		if (enemyUnit.getType() == UnitType.Protoss_Dark_Templar) {
-			return myUnit.getDistance(enemyUnit.getPosition()) < 150;
+		
+		if (eui.getType() == UnitType.Protoss_Dark_Templar) {
+			return myUnit.getDistance(enemyUnit) < 150;
+		} else if (eui.getType() == UnitType.Zerg_Lurker) {
+			return enemyUnit.isInWeaponRange(myUnit);
+		} else {
+			return false;
 		}
-		return false;
 	}
 }

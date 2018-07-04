@@ -218,7 +218,7 @@ public class AirForceManager {
 		List<Integer> excludedWraithList = new ArrayList<>(); // 삭제된 레이쓰
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			if (UnitUtils.isValidUnit(wraith)) {
+			if (UnitUtils.isCompleteValidUnit(wraith)) {
 				AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
 				airForceTeam.memberList.add(wraith);
 			} else {
