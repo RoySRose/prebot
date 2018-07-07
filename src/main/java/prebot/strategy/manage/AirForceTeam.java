@@ -80,7 +80,7 @@ public class AirForceTeam {
 
 	public void changeTargetIndex() {
 		targetTryCount = 0;
-		int foundCount = AirForceManager.AIR_FORCE_TARGET_POSITIONS_SIZE;
+		int foundCount = AirForceManager.airForceTargetPositionSize;
 		while (foundCount > 0) {
 			currentTargetIndex = directionReservse ? currentTargetIndex - 1 : currentTargetIndex + 1;
 
@@ -88,8 +88,8 @@ public class AirForceTeam {
 				currentTargetIndex = 1;
 				directionReservse = false;
 
-			} else if (currentTargetIndex >= AirForceManager.AIR_FORCE_TARGET_POSITIONS_SIZE) {
-				currentTargetIndex = AirForceManager.AIR_FORCE_TARGET_POSITIONS_SIZE - 2;
+			} else if (currentTargetIndex >= AirForceManager.airForceTargetPositionSize) {
+				currentTargetIndex = AirForceManager.airForceTargetPositionSize - 2;
 				directionReservse = true;
 			}
 

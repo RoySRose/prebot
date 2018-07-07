@@ -345,7 +345,11 @@ public class UnitUtils {
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
-		return !eui.getType().isBuilding() && TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
+		return ignorableEnemyUnitInfo(eui, StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS);
+	}
+	
+	public static boolean ignorableEnemyUnitInfo(UnitInfo eui, int ignoreSeconds) {
+		return !eui.getType().isBuilding() && TimeUtils.elapsedSeconds(eui.getUpdateFrame()) >= ignoreSeconds;
 	}
 	
 	/** 즉시 생산할 수 있는 상태인지 판단 */
@@ -496,6 +500,27 @@ public class UnitUtils {
 			leader = UnitUtils.getClosestUnitToPosition(unitList, attackBase.getPosition(), UnitType.Terran_Goliath);
 		}
 		return leader;
+	}
+	
+	public static Position centerPositionOfUnit(List<Unit> unitList) {
+		int count = 0;
+		int x = 0;
+		int y = 0;
+		for (Unit unit : unitList) {
+			if (!UnitUtils.isValidUnit(unit)) {
+				continue;
+			}
+			
+			count++;
+			x += unit.getPosition().getX();
+			y += unit.getPosition().getY();
+		}
+		if (count > 0) {
+			return new Position(x / count, y / count);
+		} else {
+			return null;
+		}
+		
 	}
 	
 	public static UnitType[] enemyAirDefenseUnitType() {

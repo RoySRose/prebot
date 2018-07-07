@@ -1409,6 +1409,10 @@ public class UXManager {
 		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
 		for (UnitInfo eui : airDefenseEuiList) {
 			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
+			
+			if (eui.getType() == UnitType.Terran_Bunker) {
+				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32, Color.White);
+			}
 		}
 		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());
 		for (UnitInfo eui : wraithKillerEuiList) {
