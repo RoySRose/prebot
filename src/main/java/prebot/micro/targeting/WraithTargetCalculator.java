@@ -1,5 +1,8 @@
 package prebot.micro.targeting;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
@@ -10,6 +13,25 @@ import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceManager.StrikeLevel;
 
 public class WraithTargetCalculator extends TargetScoreCalculator {
+
+	private static final Map<UnitType, Integer> TYPE_SCORE = new HashMap<>();
+	static {
+		TYPE_SCORE.put(UnitType.Zerg_Spore_Colony, 100);
+		TYPE_SCORE.put(UnitType.Zerg_Hydralisk, 200);
+		TYPE_SCORE.put(UnitType.Zerg_Mutalisk, 300);
+		TYPE_SCORE.put(UnitType.Zerg_Devourer, 400);
+		TYPE_SCORE.put(UnitType.Zerg_Scourge, 500);
+		
+		TYPE_SCORE.put(UnitType.Terran_Bunker, 100);
+		TYPE_SCORE.put(UnitType.Terran_Missile_Turret, 200);
+		TYPE_SCORE.put(UnitType.Terran_Medic, 300);
+		TYPE_SCORE.put(UnitType.Terran_Marine, 400);
+		TYPE_SCORE.put(UnitType.Terran_Ghost, 500);
+		TYPE_SCORE.put(UnitType.Terran_Battlecruiser, 600);
+		TYPE_SCORE.put(UnitType.Terran_Goliath, 700);
+		TYPE_SCORE.put(UnitType.Terran_Wraith, 800);
+		TYPE_SCORE.put(UnitType.Terran_Valkyrie, 900);
+	}
 
 	@Override
 	public int calculate(Unit unit, UnitInfo eui) {
@@ -26,8 +48,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	}
 
 	private int caculateForEnemy(Unit unit, Unit enemyUnit) {
-		// TODO Auto-generated method stub
-		return 0;
+		return TYPE_SCORE.get(enemyUnit.getType());
 	}
 
 	private int caculateForFeed(Unit unit, Unit enemyUnit) {
@@ -78,6 +99,9 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 			return 23;
 		}
 		if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+			return 22;
+		}
+		if (enemyUnit.getType().isBuilding() && enemyUnit.getHitPoints() < 250) {
 			return 22;
 		}
 		return CommonCode.NONE;

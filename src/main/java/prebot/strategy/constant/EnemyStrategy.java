@@ -21,7 +21,7 @@ public enum EnemyStrategy {
 	
 	// PHASE1 : 시작 ~ 코어완료 OR 일정시간 경과
 	PROTOSS_INIT(1, 1, 0, UpgradeOrder.VM_TS_VS
-			, MarineCount.ONE_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
 			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
 	PROTOSS_1GATE_CORE(PROTOSS_INIT
@@ -81,15 +81,21 @@ public enum EnemyStrategy {
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
 	PROTOSS_HARDCORE_ZEALOT(1, 1, 0, UpgradeOrder.VM_VS_TS // camp=F_EXPANSION
-			, MarineCount.ONE_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
+			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()),
 	
-	PROTOSS_STARGATE(PROTOSS_ROBOTICS_REAVER), //
+	PROTOSS_STARGATE(1, 1, 0, UpgradeOrder.VM_VS_TS // camp=F_EXPANSION
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
+			, TimeMapForProtoss.PROTOSS_STARGATE()),
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
-	PROTOSS_DOUBLE_GROUND(PROTOSS_ROBOTICS_REAVER), //
+	PROTOSS_DOUBLE_GROUND(1, 1, 0, UpgradeOrder.VM_VS_TS // camp=F_EXPANSION
+			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
+			, TimeMapForProtoss.PROTOSS_DOUBLE_GROUND()),
 	
-	PROTOSS_DOUBLE_CARRIER(PROTOSS_ROBOTICS_REAVER), //
+	PROTOSS_DOUBLE_CARRIER(1, 1, 0, UpgradeOrder.VM_VS_TS // camp=F_EXPANSION
+			, MarineCount.ONE_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
+			, TimeMapForProtoss.PROTOSS_DOUBLE_CARRIER()),
 	
 
 	// PHASE3 - PHASE2 종료 ~
@@ -153,7 +159,7 @@ public enum EnemyStrategy {
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
 	
 	ZERG_NO_LAIR_LING(3, 1, 1, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
+			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
 	
 	ZERG_NO_LAIR_HYDRA(1, 2, 0, UpgradeOrder.VS_VM_GR_TS // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),

@@ -120,7 +120,9 @@ public class TimeMapForProtoss {
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Nexus, 4, 10)
 		.put(UnitType.Protoss_Stargate, 5, 40)
-		.put(UnitType.Protoss_Fleet_Beacon, 6, 30);
+		.put(UnitType.Protoss_Fleet_Beacon, 6, 30)
+		.put(UnitType.Protoss_Citadel_of_Adun, 9, 00)
+		.put(UnitType.Protoss_Templar_Archives, 9, 40);
 	}
 
 	public static BuildTimeMap PROTOSS_DOUBLE_GROUND() { // non-precise
@@ -133,7 +135,9 @@ public class TimeMapForProtoss {
 		return PROTOSS_DOUBLE()
 		.put(UnitType.Protoss_Citadel_of_Adun, 3, 50)
 		.put(UnitType.Protoss_Stargate, 5, 00)
-		.put(UnitType.Protoss_Fleet_Beacon, 5, 50);
+		.put(UnitType.Protoss_Fleet_Beacon, 5, 50)
+		.put(UnitType.Protoss_Citadel_of_Adun, 9, 00)
+		.put(UnitType.Protoss_Templar_Archives, 9, 40);
 	}
 	
 }

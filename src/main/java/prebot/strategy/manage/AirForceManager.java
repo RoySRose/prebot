@@ -28,8 +28,11 @@ public class AirForceManager {
 	}
 
 	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
-	public static final int AIR_FORCE_TARGET_POSITIONS_SIZE = 4; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
 	public static final int AIR_FORCE_SAFE_DISTANCE = 80; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리 
+	public static final int AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE = 1;
+	
+
+	public static int airForceTargetPositionSize = 0; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
 	
 	private static AirForceManager instance = new AirForceManager();
 	private int airForceStartFrame = CommonCode.NONE;
@@ -104,28 +107,49 @@ public class AirForceManager {
 			/// 첫번째 공격 base, 마지막 공격 base를 지정하고, 중간 포지션을 설정한다.
 			double airDistanceToBase = InfoUtils.myBase().getAirDistance(InfoUtils.enemyBase());
 			double airDistanceToExpansion = InfoUtils.myBase().getAirDistance(InfoUtils.enemyFirstExpansion());
+			
+			boolean expansionFirst = false;
 			if (airDistanceToBase < airDistanceToExpansion) {
-				firstBase = InfoUtils.enemyBase();
+				expansionFirst = false;
+				
+				firstBase = InfoUtils.enemyBase(); // 본진먼저
 				secondBase = InfoUtils.enemyFirstExpansion();
 			} else {
-				firstBase = InfoUtils.enemyFirstExpansion();
+				expansionFirst = true;
+				
+				firstBase = InfoUtils.enemyFirstExpansion(); // 앞마당먼저
 				secondBase = InfoUtils.enemyBase();
+			}
+			Position mineralPosition = null;
+			List<Unit> staticMinerals = InfoUtils.enemyFirstExpansion().getStaticMinerals();
+			if (staticMinerals != null) {
+				mineralPosition = UnitUtils.centerPositionOfUnit(staticMinerals);
 			}
 
 			int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
 			int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
 
-			double vectorXSegment = vectorX / (AIR_FORCE_TARGET_POSITIONS_SIZE - 1);
-			double vectorYSegment = vectorY / (AIR_FORCE_TARGET_POSITIONS_SIZE - 1);
+			double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
+			double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 
-			targetPositions.add(0, firstBase.getPosition());
-			for (int index = 1; index < AIR_FORCE_TARGET_POSITIONS_SIZE - 1; index++) {
-				int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index));
-				int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index));
-
-				targetPositions.add(index, new Position(resultX, resultY));
+			if (expansionFirst && mineralPosition != null) {
+				targetPositions.add(mineralPosition);
 			}
-			targetPositions.add(AIR_FORCE_TARGET_POSITIONS_SIZE - 1, secondBase.getPosition());
+			
+			targetPositions.add(firstBase.getPosition());
+			for (int index = 0; index < AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE; index++) {
+				int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
+				int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index + 1));
+
+				targetPositions.add(new Position(resultX, resultY));
+			}
+			targetPositions.add(secondBase.getPosition());
+			
+			if (!expansionFirst && mineralPosition != null) {
+				targetPositions.add(mineralPosition);
+			}
+			
+			AirForceManager.airForceTargetPositionSize = targetPositions.size();
 		}
 	}
 
