@@ -117,10 +117,10 @@ public class TankControl extends Control {
 				if (positionToSiege != null) {
 					int stayCnt = TankPositionManager.Instance().isSiegeStayCnt(tank);
 					
-					if(tank.getDistance(positionToSiege) <= 0  && TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
+					if(tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE  && TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
 						CommandUtils.siege(tank);
 						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
-					}else if(stayCnt > 50){
+					}else if(stayCnt > 100){
 						CommandUtils.siege(tank);
 						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
 					}else{

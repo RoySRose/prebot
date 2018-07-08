@@ -405,6 +405,15 @@ public class UnitUtils {
 			}
 		});
 	}
+	
+	public static Unit getClosestCombatWorkerToPosition(List<Unit> unitList, Position position) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return unit.getType().isWorker() && WorkerManager.Instance().isCombatWorker(unit);
+			}
+		});
+	}
 
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
 	private static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, UnitCondition unitCondition) {
@@ -419,7 +428,7 @@ public class UnitUtils {
 		double closestDist = CommonCode.DOUBLE_MAX;
 
 		for (Unit unit : unitList) {
-			if (!UnitUtils.isCompleteValidUnit(unit) || !unitCondition.correspond(unit)) {
+			if (!UnitUtils.isValidUnit(unit) || !unitCondition.correspond(unit)) {
 				continue;
 			}
 			double dist = unit.getDistance(position);
