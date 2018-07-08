@@ -103,7 +103,7 @@ public class AirForceControl extends Control {
 
 		} else if (decision.type == DecisionType.KITING_UNIT) {
 			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
-					(decision.eui.getType().airWeapon() != WeaponType.None || decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
+					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
 				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition);
 			} else {
 				airDrivingPosition = decision.eui.getLastPosition();
