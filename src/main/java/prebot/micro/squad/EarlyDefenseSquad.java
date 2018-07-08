@@ -87,7 +87,7 @@ public class EarlyDefenseSquad extends Squad {
 		/*유닛이 줄었을때 필요일꾼 만큼만 스쿼드 유지 나머지는 idle*/
 		while(unitList.size() > scvCountForDefense){
 			SquadData squadData = new SquadData();
-			Unit defenseScv = UnitUtils.getClosestCombatWorkerToPosition(unitList, closeEnemyUnit.getPosition());
+			Unit defenseScv = UnitUtils.getFarthestCombatWorkerToPosition(unitList, closeEnemyUnit.getPosition());
 			if (defenseScv == null) {
 				break;
 			}
@@ -122,7 +122,7 @@ public class EarlyDefenseSquad extends Squad {
 					scvCountForDefense += 2;
 				}  else if (enemy.getType() == UnitType.Terran_Marine) {
 					scvCountForDefense += 2;
-				} else if (enemy.getType().isBuilding() || enemy.isConstructing()) {
+				} else if (enemy.getType().isBuilding()) {
 					scvCountForDefense += 3;
 				} 
 			}
