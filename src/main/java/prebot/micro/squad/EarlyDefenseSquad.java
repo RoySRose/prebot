@@ -10,6 +10,7 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.SquadData;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
@@ -75,13 +76,24 @@ public class EarlyDefenseSquad extends Squad {
 		if (closeEnemyUnit == null) {
 			return marineList;
 		}
-		List<Unit> myUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, closeEnemyUnit.getPosition(), REACT_RADIUS); 
+		/*List<Unit> myUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, closeEnemyUnit.getPosition(), REACT_RADIUS); 
 		if (myUnitList.isEmpty()) {
 			return marineList;
-		}
+		}*/
 		
 		// 얼마나 SCV 동원이 필요한지 체크
 		double scvCountForDefense = scvCountForDefense(enemyInSightList);
+		
+		/*유닛이 줄었을때 필요일꾼 만큼만 스쿼드 유지 나머지는 idle*/
+		while(unitList.size() > scvCountForDefense){
+			SquadData squadData = new SquadData();
+			Unit defenseScv = UnitUtils.getClosestCombatWorkerToPosition(unitList, closeEnemyUnit.getPosition());
+			if (defenseScv == null) {
+				break;
+			}
+			squadData.excludeUnitFromSquad(defenseScv);
+			unitList.remove(defenseScv);
+		}
 		
 		List<Unit> recruitScvList = new ArrayList<>();
 		while (unitList.size() + marineList.size()+ recruitScvList.size()< scvCountForDefense) {
@@ -110,10 +122,26 @@ public class EarlyDefenseSquad extends Squad {
 					scvCountForDefense += 2;
 				}  else if (enemy.getType() == UnitType.Terran_Marine) {
 					scvCountForDefense += 2;
-				}
+				} else if (enemy.getType().isBuilding() || enemy.isConstructing()) {
+					scvCountForDefense += 3;
+				} 
 			}
 		}
 		return scvCountForDefense;
+	}
+	
+	@Override
+	public void findEnemies() {
+		euiList.clear();
+		List<UnitInfo> enemyUnitsInRegion = InfoUtils.euiListInMyRegion(InfoUtils.myBase().getRegion());
+		if (enemyUnitsInRegion.size() >= 1) {
+			for (UnitInfo enemy : enemyUnitsInRegion) {
+					euiList.add(enemy);
+			}
+		}
+		for (Unit unit : unitList) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.EARLY_DEFENSE.squadRadius);
+		}
 	}
 
 	@Override

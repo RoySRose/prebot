@@ -1,5 +1,6 @@
 package prebot.strategy.manage;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 import bwapi.Position;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -16,6 +18,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -23,19 +26,20 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.PositionReserveInfo;
+import prebot.micro.PositionSiegeInfo;
 import prebot.micro.constant.MicroConfig.FleeAngle;
 
 public class TankPositionManager {
 	
 	private static final int NARROW_WIDTH = 250;
-	private static final int NEAR_BUILDING_DISTANCE = 100;
-	private static final int NEAR_CHOKE_DISTANCE = 200;
+	private static final int NEAR_BUILDING_DISTANCE = 80;
+	private static final int NEAR_CHOKE_DISTANCE = 100;
 	
 	private static final int POSITION_EXPIRE_FRAME = 24 * 4;
 
 	private static final int SIEGE_MODE_MAX_COUNT_IN_RADIUS = 5;
 	private static final int SIEGE_ARRANGE_RADIUS = 80;
-	private static final int SIEGE_ARRANGE_DISTANCE_FROM_CENTER = 150;
+	private static final int SIEGE_ARRANGE_DISTANCE_FROM_CENTER = 130;
 	private static final int SIEGE_ARRANGE_DISTANCE_FROM_CENTER_ADJUST = 50;
 	
 	private static final int SIEGE_ARRANGE_DISTANCE_FROM_CENTER_TERRAN = 30;
@@ -47,7 +51,8 @@ public class TankPositionManager {
 		return instance;
 	}
 
-	private Map<Integer, PositionReserveInfo> siegeModeReservedMap = new HashMap<>(); // key : tank id
+	public Map<Integer, PositionReserveInfo> siegeModeReservedMap = new HashMap<>(); // key : tank id
+	public Map<Integer, PositionSiegeInfo> siegePositionMap = new HashMap<>(); // key : tank id
 
 	public void update() {
 		List<Integer> expiredList = new ArrayList<>();
@@ -106,6 +111,9 @@ public class TankPositionManager {
 				    	
 						if (siegeModeTanks.size() + reservedCount < seigeNumLimit) {
 							PositionReserveInfo reserveInfo = new PositionReserveInfo(tank.getID(), movePosition, TimeUtils.elapsedFrames());
+							if(siegeModeReservedMap.containsValue(reserveInfo)){
+								continue;
+							}
 							siegeModeReservedMap.put(tank.getID(), reserveInfo);
 							return movePosition;
 						}
@@ -151,33 +159,44 @@ public class TankPositionManager {
 
 	public boolean isProperPositionToSiege(Position position) {
 		Chokepoint nearestChoke = BWTA.getNearestChokepoint(position);
+		
 		if (nearestChoke.getWidth() < NARROW_WIDTH) {
 			if (nearestChoke.getCenter().getDistance(position) < NEAR_CHOKE_DISTANCE) {
 				return false;
 			}
 		}
 		
-		List<Unit> unitList = Prebot.Broodwar.getUnitsOnTile(position.toTilePosition());
+    	
+		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
+		if (position.getDistance(expansionBase.getPosition()) < NEAR_BUILDING_DISTANCE) {
+ 			return false;
+		}
+		
+		
+    	List<Unit> unitList = Prebot.Broodwar.getUnitsOnTile(position.getX(),position.getY());
     	for (Unit unit : unitList) {
     		if (unit.getType().isBuilding()) {
+    			return false;
+    		}else if(unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
     			return false;
     		}
     	}
     	
-		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
-		if (position.getDistance(expansionBase.getPosition()) < NEAR_BUILDING_DISTANCE) {
-			return false;
+    	return true;
+	}
+
+	public int isSiegeStayCnt(Unit siege) {
+		// TODO Auto-generated method stub
+		int cnt = 0;
+		if(siegePositionMap.get(siege.getID()) == null){
+			cnt = 1;
+		}else if(siege.getPosition().equals(siegePositionMap.get(siege.getID()).position)){
+			cnt = siegePositionMap.get(siege.getID()).postionCnt+1;
 		}
+		PositionSiegeInfo siegeInfo = new PositionSiegeInfo(siege.getID(), siege.getPosition(),cnt);
+		siegePositionMap.put(siege.getID(),siegeInfo);
 		
-		Position leftPosition = new Position(position.getX() - 30, position.getY());
-		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, leftPosition, NEAR_BUILDING_DISTANCE);
-    	for (Unit nearUnit : nearUnitList) {
-    		if (nearUnit.getType().isBuilding() && nearUnit.getType().canBuildAddon()) {
-				return false;
-    		}
-    	}
-		
-		return true;
+		return cnt;
 	}
 
 }
