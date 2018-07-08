@@ -162,12 +162,9 @@ public class TankPositionManager {
 		
 		if (nearestChoke.getWidth() < NARROW_WIDTH) {
 			if (nearestChoke.getCenter().getDistance(position) < NEAR_CHOKE_DISTANCE) {
-				System.out.println(nearestChoke.getCenter().getDistance(position));
 				return false;
 			}
 		}
-		
-    	
 		
     	
 		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
@@ -182,7 +179,6 @@ public class TankPositionManager {
     			return false;
     		}else if(unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
     			return false;
-    			
     		}
     	}
     	
