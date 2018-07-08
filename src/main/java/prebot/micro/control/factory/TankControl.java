@@ -61,6 +61,7 @@ public class TankControl extends Control {
 	}
 
 	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
+
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
@@ -77,6 +78,7 @@ public class TankControl extends Control {
 				if (siege.getDistance(StrategyIdea.mainPosition) > siegeModeSpreadRadius
 						|| !TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition())) {
 					CommandUtils.unsiege(siege);
+					TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
 				} else {
 					CommandUtils.holdPosition(siege);
 				}
@@ -113,10 +115,15 @@ public class TankControl extends Control {
 				}
 
 				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE
-							&& TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
+					int stayCnt = TankPositionManager.Instance().isSiegeStayCnt(tank);
+					
+					if(tank.getDistance(positionToSiege) <= 0  && TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
 						CommandUtils.siege(tank);
-					} else {
+						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
+					}else if(stayCnt > 50){
+						CommandUtils.siege(tank);
+						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
+					}else{
 						CommandUtils.attackMove(tank, positionToSiege);
 					}
 				} else {
@@ -130,7 +137,6 @@ public class TankControl extends Control {
 						CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
 					}
 				}
-
 			}
 		}
 	}
