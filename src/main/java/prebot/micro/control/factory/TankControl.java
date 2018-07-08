@@ -8,15 +8,19 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
+import prebot.micro.PositionReserveInfo;
+import prebot.micro.PositionSiegeInfo;
 import prebot.micro.TargetScoreCalculators;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -73,9 +77,9 @@ public class TankControl extends Control {
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
 				CommandUtils.unsiege(siege);
 			} else if (decision.type == DecisionType.ATTACK_POSITION) { // NO ENEMY
-				if (siege.getDistance(StrategyIdea.mainPosition) > siegeModeSpreadRadius
-						|| !TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition())) {
+				if (!TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition())){
 					CommandUtils.unsiege(siege);
+					TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
 				} else {
 					CommandUtils.holdPosition(siege);
 				}
@@ -111,16 +115,19 @@ public class TankControl extends Control {
 					positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(StrategyIdea.mainPosition, tank, siegeModeSpreadRadius);
 				}
 
+				
 				if (positionToSiege != null) {
-					if (tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE
-							&& TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
+					int stayCnt = TankPositionManager.Instance().isSiegeStayCnt(tank);
+					
+					if(tank.getDistance(positionToSiege) <= 0  && TankPositionManager.Instance().isProperPositionToSiege(positionToSiege)) {
 						CommandUtils.siege(tank);
-					} else {
-						if(tank.getPosition().equals(positionToSiege)){
-							CommandUtils.siege(tank);
-						}else{
-							tank.move(positionToSiege);
-						}
+						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
+					}else if(stayCnt > 50){
+						CommandUtils.siege(tank);
+						TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
+					}else{
+						CommandUtils.attackMove(tank, positionToSiege);
+						
 					}
 				} else {
 					if (arrived) {
@@ -133,8 +140,9 @@ public class TankControl extends Control {
 						CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
 					}
 				}
-
 			}
+			
+
 		}
 	}
 
