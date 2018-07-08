@@ -248,6 +248,10 @@ public class DecisionMaker {
 			UnitInfo targetInfo = null;
 			int minimumLinearDistance = CommonCode.INT_MAX;
 			for (UnitInfo eui : euiList) {
+				if (eui.getType() == UnitType.Zerg_Larva || eui.getType() == UnitType.Zerg_Egg || eui.getType() == UnitType.Zerg_Lurker_Egg) {
+					continue;
+				}
+				
 				Unit enemyUnit = UnitUtils.unitInSight(eui);
 				if (enemyUnit == null) {
 					continue;

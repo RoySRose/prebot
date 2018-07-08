@@ -3,10 +3,12 @@ package prebot.micro.targeting;
 import java.util.HashMap;
 import java.util.Map;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
@@ -65,16 +67,22 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 
 	// CRITICAL_SPOT = 3; // 때리면 죽는 곳 공격 (터렛건설중인 SCV, 아모리 건설중인 SCV, 엔지니어링베이 건설중인 SCV)
 	private int criticalHighestScore(Unit enemyUnit) {
-		if (enemyUnit.getType().isWorker()) {
-			if (enemyUnit.isConstructing()) {
-				UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
-				if (constructingBuilding == UnitType.Terran_Missile_Turret) {
-					return 30;
-				} else if (constructingBuilding == UnitType.Terran_Armory) {
-					return 29;
-				} else if (constructingBuilding == UnitType.Terran_Engineering_Bay) {
-					return 28;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (enemyUnit.getType().isWorker()) {
+				if (enemyUnit.isConstructing()) {
+					UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
+					if (constructingBuilding == UnitType.Terran_Missile_Turret) {
+						return 30;
+					} else if (constructingBuilding == UnitType.Terran_Armory) {
+						return 29;
+					} else if (constructingBuilding == UnitType.Terran_Engineering_Bay) {
+						return 28;
+					}
 				}
+			}
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (enemyUnit.getType() == UnitType.Zerg_Overlord) {
+				return 30;
 			}
 		}
 		return CommonCode.NONE;
@@ -82,38 +90,55 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 
 	// SORE_SPOT = 2; // 때리면 아픈 곳 공격 (커맨드센터건설중인 SCV, 팩토리 건설중인 SCV, 뭔가 건설중인 SCV, 체력이 적은 SCV, 가까운 SCV, 탱크)
 	private int soreHighestScore(Unit enemyUnit) {
-		if (enemyUnit.getType().isWorker()) {
-			if (enemyUnit.isConstructing()) {
-				UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
-				if (constructingBuilding == UnitType.Terran_Command_Center) {
-					return 27;
-				} else if (constructingBuilding == UnitType.Terran_Factory) {
-					return 26;
-				} else {
-					return 25;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (enemyUnit.getType().isWorker()) {
+				if (enemyUnit.isConstructing()) {
+					UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
+					if (constructingBuilding == UnitType.Terran_Command_Center) {
+						return 27;
+					} else if (constructingBuilding == UnitType.Terran_Factory) {
+						return 26;
+					} else {
+						return 25;
+					}
 				}
+				return 24;
 			}
-			return 24;
+			if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+				return 23;
+			}
+			if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+				return 22;
+			}
+			if (enemyUnit.getType().isBuilding() && enemyUnit.getHitPoints() < 250) {
+				return 22;
+			}
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (enemyUnit.getType().isWorker()) {
+				return 29;
+			}
 		}
-		if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-			return 23;
-		}
-		if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-			return 22;
-		}
-		if (enemyUnit.getType().isBuilding() && enemyUnit.getHitPoints() < 250) {
-			return 22;
-		}
+		
 		return CommonCode.NONE;
 	}
 
 	// POSSIBLE_SPOT = 1; // 때릴 수 있는 곳 공격 (벌처, 건물 등 잡히는 대로)
 	private int possibleHighestScore(Unit enemyUnit) {
-		if (enemyUnit.getType() == UnitType.Terran_Supply_Depot) {
-			return 21;
-		} else {
-			return 20;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (enemyUnit.getType() == UnitType.Terran_Supply_Depot) {
+				return 21;
+			}
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (enemyUnit.getType() == UnitType.Zerg_Lurker) {
+				return 28;
+			} else if (enemyUnit.getType() == UnitType.Zerg_Zergling) {
+				return 27;
+			} else if (enemyUnit.getType() == UnitType.Zerg_Larva || enemyUnit.getType() == UnitType.Zerg_Egg || enemyUnit.getType() == UnitType.Zerg_Lurker_Egg) {
+				return CommonCode.NONE;
+			}
 		}
+		
+		return 20;
 	}
 
 	// enemyUnit.isCloaked()
