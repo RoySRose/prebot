@@ -108,6 +108,7 @@ public class EnemyStrategyOptions {
 	public static class BuildTimeMap {
 		private boolean isDouble = false;
 		private boolean isMechanic = false;
+		private boolean isTwoGate = false;
 		
 		private Map<UnitType, List<Integer>> buildingTime = new HashMap<>();
 		private Map<TechType, Integer> techTime = new HashMap<>();
@@ -120,6 +121,19 @@ public class EnemyStrategyOptions {
 		public BuildTimeMap setMechanic() {
 			this.isMechanic = true;
 			return this;
+		}
+		public BuildTimeMap setTwoGate() {
+			this.isTwoGate = true;
+			return this;
+		}
+		public boolean isDouble() {
+			return isDouble;
+		}
+		public boolean isMechanic() {
+			return isMechanic;
+		}
+		public boolean isTwoGate() {
+			return isTwoGate;
 		}
 		public BuildTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
@@ -176,12 +190,6 @@ public class EnemyStrategyOptions {
 		}
 		public int frame(UpgradeType upgradeType, int margin) {
 			return frame(upgradeType) + margin * TimeUtils.SECOND;
-		}
-		public boolean isDouble() {
-			return isDouble;
-		}
-		public boolean isMechanic() {
-			return isMechanic;
 		}
 		@Override
 		public String toString() {

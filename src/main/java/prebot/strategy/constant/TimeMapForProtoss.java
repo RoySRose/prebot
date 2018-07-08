@@ -14,7 +14,7 @@ public class TimeMapForProtoss {
 	}
 	
 	public static BuildTimeMap PROTOSS_2GATE() {
-		return new BuildTimeMap()
+		return new BuildTimeMap().setTwoGate()
 		.put(UnitType.Protoss_Gateway, 1, 20)
 		.put(UnitType.Protoss_Gateway, 1, 45)
 		.put(UnitType.Protoss_Assimilator, 3, 00)
