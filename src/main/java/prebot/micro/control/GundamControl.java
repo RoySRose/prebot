@@ -3,8 +3,10 @@ package prebot.micro.control;
 import java.util.List;
 
 import bwapi.Unit;
+import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
@@ -13,11 +15,21 @@ public class GundamControl extends Control {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		for (Unit unit : unitList) {
+			Unit ataackWorkerScv = null;
 			if (skipControl(unit)) {
 				continue;
 			}
+			for(UnitInfo enemyWorker : euiList){
+				if(enemyWorker.getType().isWorker()){
+					ataackWorkerScv = UnitUtils.getClosestCombatWorkerToPosition(unitList, enemyWorker.getUnit().getPosition());
+					CommandUtils.attackUnit(ataackWorkerScv, enemyWorker.getUnit());
+				}
+			}
+			if(unit == ataackWorkerScv){
+				continue;
+			}
 			Unit target = getClosestEnemyUnitFromWorker(unit);
-
+			
 			if (target != null) {
 				CommandUtils.attackUnit(unit, target);
 			} else {

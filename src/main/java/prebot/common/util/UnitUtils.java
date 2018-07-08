@@ -405,9 +405,18 @@ public class UnitUtils {
 			}
 		});
 	}
-	
+
 	public static Unit getClosestCombatWorkerToPosition(List<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return unit.getType().isWorker() && WorkerManager.Instance().isCombatWorker(unit);
+			}
+		});
+	}
+	
+	public static Unit getFarthestCombatWorkerToPosition(List<Unit> unitList, Position position) {
+		return getFarthestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return unit.getType().isWorker() && WorkerManager.Instance().isCombatWorker(unit);
@@ -438,6 +447,31 @@ public class UnitUtils {
 			}
 		}
 		return closestUnit;
+	}
+	
+	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
+	private static Unit getFarthestUnitToPosition(List<Unit> unitList, Position position, UnitCondition unitCondition) {
+		if (unitList.size() == 0) {
+			return null;
+		}
+		if (!PositionUtils.isValidPosition(position)) {
+			return unitList.get(0);
+		}
+
+		Unit farthesetUnit = null;
+		double farthestDist = 0.0;
+
+		for (Unit unit : unitList) {
+			if (!UnitUtils.isValidUnit(unit) || !unitCondition.correspond(unit)) {
+				continue;
+			}
+			double dist = unit.getDistance(position);
+			if (farthesetUnit == null || dist > farthestDist) {
+				farthesetUnit = unit;
+				farthestDist = dist;
+			}
+		}
+		return farthesetUnit;
 	}
 
 	public static Map<UnitType, List<Unit>> makeUnitListMap(List<Unit> sourceUnitList) {
