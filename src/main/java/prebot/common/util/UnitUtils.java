@@ -327,9 +327,21 @@ public class UnitUtils {
 		return unitDiscovered(selfUnitDiscoveredMap, unitTypes);
 	}
 	
+	/// 유닛타입의 아군 유닛이 하나 생산되었는지 여부 (완성)
+	public static boolean myCompleteUnitDiscovered(UnitType... unitTypes) {
+		Map<UnitType, Boolean> selfUnitDiscoveredMap = UnitCache.getCurrentCache().getSelfCompleteUnitDiscoveredMap();
+		return unitDiscovered(selfUnitDiscoveredMap, unitTypes);
+	}
+	
 	/// 유닛타입의 적 유닛이 하나 생산되었는지 여부
 	public static boolean enemyUnitDiscovered(UnitType... unitTypes) {
 		Map<UnitType, Boolean> enemyUnitDiscoveredMap = UnitCache.getCurrentCache().getEnemyUnitDiscoveredMap();
+		return unitDiscovered(enemyUnitDiscoveredMap, unitTypes);
+	}
+	
+	/// 유닛타입의 적 유닛이 하나 생산되었는지 여부 (완성)
+	public static boolean enemyCompleteUnitDiscovered(UnitType... unitTypes) {
+		Map<UnitType, Boolean> enemyUnitDiscoveredMap = UnitCache.getCurrentCache().getEnemyCompleteUnitDiscoveredMap();
 		return unitDiscovered(enemyUnitDiscoveredMap, unitTypes);
 	}
 	

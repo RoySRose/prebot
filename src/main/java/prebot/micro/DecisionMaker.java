@@ -114,7 +114,7 @@ public class DecisionMaker {
 			if (UnitUtils.ignorableEnemyUnitInfo(eui, 3)) { // 레이쓰는 기억력이 안좋다.
 				continue;
 			}
-			
+
 			boolean isAirDefenseBuilding = false;
 			for (UnitType airDefenseUnitType : UnitUtils.enemyAirDefenseUnitType()) {
 				if (eui.getType() == airDefenseUnitType) {
@@ -130,7 +130,7 @@ public class DecisionMaker {
 				euiListFeed.add(eui);
 			}
 		}
-		
+
 		// air driving 오차로 상대 건물 공격범위안으로 들어왔을 경우
 		for (UnitInfo eui : euiListAirDefenseBuilding) {
 			Unit enemyUnit = UnitUtils.unitInSight(eui);
@@ -138,26 +138,25 @@ public class DecisionMaker {
 				if (enemyUnit.isInWeaponRange(airForceTeam.leaderUnit)) {
 					return Decision.attackPosition();
 				}
-				
+
 				// TODO 벙커 별도 처리가 필요한지 테스트
-//				if (enemyUnit.getType() == UnitType.Terran_Bunker) {
-//					int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32 + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
-//					if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
-//						System.out.println("##### avoid bunker");
-//						return Decision.attackPosition();
-//					}
-//				}
+				// if (enemyUnit.getType() == UnitType.Terran_Bunker) {
+				// int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32 + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+				// if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
+				// System.out.println("##### avoid bunker");
+				// return Decision.attackPosition();
+				// }
+				// }
 			}
 		}
 
-		List<UnitInfo> euiListTarget = new ArrayList<>();
-		boolean notInWeaponRange = false;
-		
+		UnitInfo bestTargetInfo = null;
+
 		if (!euiListAirWeapon.isEmpty()) {
 			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon);
 			if (fightPredict == SmallFightPredict.ATTACK) {
-				euiListTarget = euiListAirWeapon;
-				
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
+
 			} else if (fightPredict == SmallFightPredict.BACK) {
 				for (UnitInfo eui : euiListAirWeapon) {
 					Unit unitInSight = UnitUtils.unitInSight(eui);
@@ -174,17 +173,29 @@ public class DecisionMaker {
 						}
 					}
 				}
-				notInWeaponRange = true;
-				euiListTarget = euiListFeed;
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
+			}
+
+		} else {
+			bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
+		}
+
+		if (bestTargetInfo != null) {
+			boolean bestTargetProtectedByBuilding = protectedByBuilding(bestTargetInfo, euiListAirDefenseBuilding);
+			if (bestTargetProtectedByBuilding) {
+				return Decision.attackUnit(bestTargetInfo);
+			} else {
+				return Decision.kitingUnit(bestTargetInfo);
 			}
 		} else {
-			euiListTarget = euiListFeed;
+			return Decision.attackPosition();
 		}
-		
+	}
+	
+	private UnitInfo getBestTargetInfo(AirForceTeam airForceTeam, List<UnitInfo> euiListTarget, List<UnitInfo> euiListAirDefenseBuilding) {
 		UnitInfo bestTargetInfo = null;
-		boolean bestTargetProtectedByBuilding = false;
 		int highestFeedScore = 0;
-		
+
 		boolean inWeaponRange = false;
 		boolean protectedByBuilding = false;
 		for (UnitInfo eui : euiListTarget) {
@@ -193,34 +204,14 @@ public class DecisionMaker {
 			if (!inWeaponRange && protectedByBuilding) { // 건물에 의해 보호받는 빌딩은 제외. 공격범위내에 있으면 예외
 				continue;
 			}
-			
+
 			int score = targetScoreCalculator.calculate(airForceTeam.leaderUnit, eui);
 			if (score > highestFeedScore) {
 				bestTargetInfo = eui;
-				bestTargetProtectedByBuilding = protectedByBuilding;
 				highestFeedScore = score;
 			}
 		}
-		
-		if (bestTargetInfo != null) {
-			if (bestTargetProtectedByBuilding) {
-				return Decision.attackUnit(bestTargetInfo);
-			} else {
-				return Decision.kitingUnit(bestTargetInfo);
-			}
-		} else {
-			if (!notInWeaponRange) {
-				for (UnitInfo eui : euiListAirWeapon) {
-					Unit unitInSight = UnitUtils.unitInSight(eui);
-					if (unitInSight != null) {
-						if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
-							return Decision.fleeFromPosition();
-						}
-					}
-				}
-			}
-			return Decision.attackPosition();
-		}
+		return bestTargetInfo;
 	}
 
 	private boolean protectedByBuilding(UnitInfo eui, List<UnitInfo> euiListAirDefenseBuilding) {

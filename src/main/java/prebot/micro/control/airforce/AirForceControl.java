@@ -41,7 +41,7 @@ public class AirForceControl extends Control {
 			decision = Decision.fleeFromPosition();
 		}
 
-		// 결정상세(유닛공격, 전진시에만): 쿨타임 및 적유닛타입에 따른 공격, 뭉치기, 카이팅방향 결정
+		// 결정상세(유닛공격, 전진): 쿨타임 및 적유닛타입에 따른 공격, 뭉치기, 카이팅방향 결정
 		Decision decisionDetail = null;
 		if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, Arrays.asList(decision.eui), false);
@@ -95,40 +95,40 @@ public class AirForceControl extends Control {
 		Position airDrivingPosition = null;
 		if (decision.type == DecisionType.ATTACK_UNIT) {
 			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
-					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
-				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition);
+					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
+				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, true);
 			} else {
 				airDrivingPosition = airForceTeam.leaderUnit.getPosition();
 			}
 
 		} else if (decision.type == DecisionType.KITING_UNIT) {
 			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
-					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
-				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition);
+					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
+				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, true);
 			} else {
 				airDrivingPosition = decision.eui.getLastPosition();
 			}
 			
 		} else if (decision.type == DecisionType.ATTACK_POSITION) {
-			airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.getTargetPosition());
+			airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.getTargetPosition(), true);
 			if (airForceTeam.leaderUnit.getPosition().getDistance(airForceTeam.getTargetPosition()) < 100) {
 				airForceTeam.changeTargetIndex();
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_POSITION) {
 			// TODO region 밖일 경우 별도 처리 필요?
-			airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition);
+			airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, false);
 			airForceTeam.retreat();
 		}
 		airForceTeam.leaderOrderPosition = airDrivingPosition;
 	}
 
-	private Position airDrivingPosition(AirForceTeam airForceTeam, Position goalPosition) {
+	private Position airDrivingPosition(AirForceTeam airForceTeam, Position goalPosition, boolean avoidEnemyUnit) {
 		Position leaderPosition = airForceTeam.leaderUnit.getPosition();
-		Position airDrivingPosition = MicroUtils.airDrivingPosition(leaderPosition, goalPosition, airForceTeam.driveAngle);
+		Position airDrivingPosition = MicroUtils.airDrivingPosition(leaderPosition, goalPosition, airForceTeam.driveAngle, avoidEnemyUnit);
 		if (airDrivingPosition == null) {
 			airForceTeam.switchDriveAngle();
-			airDrivingPosition = MicroUtils.airDrivingPosition(leaderPosition, goalPosition, airForceTeam.driveAngle);
+			airDrivingPosition = MicroUtils.airDrivingPosition(leaderPosition, goalPosition, airForceTeam.driveAngle, avoidEnemyUnit);
 		}
 		if (airDrivingPosition == null) {
 			airDrivingPosition = goalPosition;

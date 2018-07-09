@@ -40,13 +40,8 @@ public class MicroUtils {
 	private static final int AIR_DRIVING_PRE_EXPECT_SECS = 0;
 	private static final Map<UnitType, Integer> RISK_RADIUS_MAP = new HashMap<>();
 
-	public static void airDriving(Unit wraith, Position leaderOrderPosition) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/// 레이쓰 전용
-	public static Position airDrivingPosition(Position startPosition, Position endPosition, int[] driveAngle) {
+	public static Position airDrivingPosition(Position startPosition, Position endPosition, int[] driveAngle, boolean avoidEnemyUnit) {
 		if (startPosition.getDistance(endPosition) <= WRAITH_MOVE_DISTANCE_12_FRAMES) {
 			return endPosition; // 목표위치에 도착한 경우 짧게 찍는다.
 		}
@@ -69,6 +64,13 @@ public class MicroUtils {
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
+			if (avoidEnemyUnit) {
+				List<UnitInfo> enemyAirWeaponList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.wraithKillerUnitType());
+				if (!enemyAirWeaponList.isEmpty()) {
+					continue;
+				}
+			}
+			
 			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
 			if (distance < minimumDistance) {
 				minimumDistance = distance;

@@ -60,7 +60,7 @@ public class WraithFightPredictor {
 	private static final Map<UnitType, Integer> WRAITH_TARGET = new HashMap<>();
 	
 	static {
-		WRAITH_TARGET.put(UnitType.Zerg_Hydralisk, 300);
+		WRAITH_TARGET.put(UnitType.Zerg_Hydralisk, 200);
 		WRAITH_TARGET.put(UnitType.Zerg_Mutalisk, 200);
 		WRAITH_TARGET.put(UnitType.Zerg_Scourge, 500);
 		WRAITH_TARGET.put(UnitType.Zerg_Devourer, 500);
