@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -35,7 +36,7 @@ public class AirForceManager {
 	public static int airForceTargetPositionSize = 0; // 최소값=3 (enemyBase, enemyExpansionBase, middlePosition1)
 	
 	private static AirForceManager instance = new AirForceManager();
-	private int airForceStartFrame = CommonCode.NONE;
+	private int strikeLevelStartFrame = CommonCode.NONE;
 
 	/// static singleton 객체를 리턴합니다
 	public static AirForceManager Instance() {
@@ -66,6 +67,7 @@ public class AirForceManager {
 
 	private List<Position> targetPositions = new ArrayList<>(); // 타깃포지션
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
+	private int totalAchievement = 0;
 	
 	public List<Position> getTargetPositions() {
 		return targetPositions;
@@ -81,8 +83,8 @@ public class AirForceManager {
 		if (enemyBase == null || enemyFirstExpansion == null) {
 			return;
 		}
-		if (airForceStartFrame == CommonCode.NONE) {
-			airForceStartFrame = TimeUtils.elapsedFrames();
+		if (strikeLevelStartFrame == CommonCode.NONE) {
+			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
 		setTargetPosition();
@@ -123,7 +125,12 @@ public class AirForceManager {
 			Position mineralPosition = null;
 			List<Unit> staticMinerals = InfoUtils.enemyFirstExpansion().getStaticMinerals();
 			if (staticMinerals != null) {
-				mineralPosition = UnitUtils.centerPositionOfUnit(staticMinerals);
+				Position mineralCenterPosition = UnitUtils.centerPositionOfUnit(staticMinerals);
+				Position firstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
+				
+				int vectorX = (int) ((mineralCenterPosition.getX() - firstExpansionPosition.getX()) / 3.0);
+				int vectorY = (int) ((mineralCenterPosition.getY() - firstExpansionPosition.getY()) / 3.0);
+				mineralPosition = new Position(mineralCenterPosition.getX() + vectorX, mineralCenterPosition.getY() + vectorY);
 			}
 
 			int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
@@ -173,31 +180,51 @@ public class AirForceManager {
 			return;
 		}
 		
+		boolean levelDown = false;
+		boolean levelUp = false;
+		if (totalAchievement > 0) {
+			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+		}
+		
 		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
-			if (!StrategyIdea.currentStrategy.buildTimeMap.isMechanic()) { // 메카닉이 아님
-				strikeLevel = StrikeLevel.SORE_SPOT;
-				return;
-			}
-			if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Goliath)) { // 골리앗 발견
-				strikeLevel = StrikeLevel.SORE_SPOT;
-				return;
-			}
-//			int armoryBuildFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Terran_Armory); // 아모리 완성
-//			if (TimeUtils.after(armoryBuildFrame + UnitType.Terran_Armory.buildTime())) {
-//				strikeLevel = StrikeLevel.SORE_SPOT;
-//				return;
-//			}
-			if (TimeUtils.elapsedFrames(airForceStartFrame) > 2 * TimeUtils.MINUTE) { // 레이쓰가 활동한지 일정시간 지남
-				strikeLevel = StrikeLevel.SORE_SPOT;
-				return;
-			}
-			if (true) {
-				strikeLevel = StrikeLevel.SORE_SPOT;
-				return;
+			if (InfoUtils.enemyRace() == Race.Terran) {
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 1 * TimeUtils.MINUTE) { // 레이쓰가 활동한지 일정시간 지남
+					levelDown = true;
+				} else if (!StrategyIdea.currentStrategy.buildTimeMap.isMechanic()) { // 메카닉이 아님
+					levelDown = true;
+				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Goliath, UnitType.Terran_Armory)) { // 골리앗 발견, 완성된 아모리 발견
+					levelDown = true;
+				}
+			} else if (InfoUtils.enemyRace() == Race.Zerg) {
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 1 * TimeUtils.MINUTE) { // 레이쓰가 활동한지 일정시간 지남
+					levelDown = true;
+				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 히드라 발견
+					levelDown = true;
+				}
+			} else if (InfoUtils.enemyRace() == Race.Protoss) {
+				levelDown = true;
 			}
 			
 		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
+			if (totalAchievement <= 50) {
+				levelDown = true;
+			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 20 * TimeUtils.SECOND) {
+				levelDown = true;
+			}
+			
+		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
+			if (totalAchievement >= 100) {
+				levelUp = true;
+			}
+		}
+		
+		if (levelDown) {
+			strikeLevel--;
+			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+		} else if (levelUp) {
+			strikeLevel++;
+			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
 	}
@@ -253,11 +280,16 @@ public class AirForceManager {
 			airForceTeamMap.remove(wraithId);
 		}
 		
-		// leader 교체
 		airForceTeamSet = new HashSet<>(airForceTeamMap.values());
+		totalAchievement = 0;
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
+			// leader 교체
 			Unit newLeader = UnitUtils.getClosestUnitToPosition(airForceTeam.memberList, airForceTeam.getTargetPosition());
 			airForceTeam.leaderUnit = newLeader;
+			
+			// achievement
+			int achievement = airForceTeam.achievement();
+			totalAchievement += achievement;
 		}
 	}
 

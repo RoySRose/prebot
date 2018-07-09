@@ -1,7 +1,9 @@
 package prebot.strategy.manage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Unit;
@@ -14,6 +16,7 @@ public class AirForceTeam {
 
 	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
 	private static final int RETREAT_TIME = 3 * TimeUtils.SECOND; // 타깃포지션별 재공격 시도 횟수
+	private static final int WRAITH_EFFECTIVE_FRAME_SIZE = 25 * TimeUtils.SECOND;
 
 	public Unit leaderUnit;
 	public List<Unit> memberList = new ArrayList<>();
@@ -23,6 +26,15 @@ public class AirForceTeam {
 	public boolean directionReservse;
 	public int[] driveAngle;
 	public Position leaderOrderPosition;
+
+	// for achievement
+	public int damaged = 0;
+	public int killed = 0;
+	
+	public Map<Integer, Integer> preKillCounts = new HashMap<>();
+	public Map<Integer, Integer> preHitPoints = new HashMap<>();
+	public int[] damagedMemory = new int[WRAITH_EFFECTIVE_FRAME_SIZE];
+	public int[] killedMemory = new int[WRAITH_EFFECTIVE_FRAME_SIZE];
 
 	public AirForceTeam(Unit leaderUnit) {
 		this.leaderUnit = leaderUnit; // leader wraith unit ID
@@ -34,8 +46,40 @@ public class AirForceTeam {
 		this.leaderOrderPosition = null;
 	}
 	
-	public void setMemberList(List<Unit> memberList) {
-		this.memberList = memberList;
+	public int achievement() {
+		int reducedHitPoints = 0;
+		int killCounts = 0;
+		for (Unit wraith : memberList) {
+			Integer preHitPoint = preHitPoints.get(wraith.getID());
+			Integer preKillCount = preKillCounts.get(wraith.getID());
+			if (preHitPoint == null) {
+				continue;
+			}
+			if (wraith.getHitPoints() < preHitPoint) {
+				int reduced = preHitPoint - wraith.getHitPoints();
+				reducedHitPoints += reduced;
+			}
+			if (wraith.getKillCount() > preKillCount) {
+				int killed = wraith.getKillCount() - preKillCount;
+				killCounts += killed;
+			}
+		}
+		
+		int index = TimeUtils.elapsedFrames() % WRAITH_EFFECTIVE_FRAME_SIZE;
+		damaged = damaged + reducedHitPoints - damagedMemory[index];
+		killed = killed + killCounts - killedMemory[index];
+		
+		damagedMemory[index] = reducedHitPoints;
+		killedMemory[index] = killCounts;
+		
+		preHitPoints.clear();
+		preKillCounts.clear();
+		for (Unit wraith : memberList) {
+			preHitPoints.put(wraith.getID(), wraith.getHitPoints());
+			preKillCounts.put(wraith.getID(), wraith.getKillCount());
+		}
+		
+		return killed * 100 - damaged;
 	}
 
 	public Position getTargetPosition() {
@@ -101,7 +145,7 @@ public class AirForceTeam {
 
 	@Override
 	public String toString() {
-		return "Team" + leaderUnit.getID() + " size=" + memberList.size();
+		return "Team" + leaderUnit.getID() + " size=" + memberList.size() + ", achieve=" + killed + "/" + damaged;
 	}
 
 }

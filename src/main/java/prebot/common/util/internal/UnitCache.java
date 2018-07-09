@@ -26,6 +26,7 @@ public class UnitCache {
 
 	// 아군 UnitType 발견 여부
 	private Map<UnitType, Boolean> selfUnitDiscoveredMap = new HashMap<>();
+	private Map<UnitType, Boolean> selfCompleteUnitDiscoveredMap = new HashMap<>();
 
 	// 아군 모든 UnitType 리스트
 	private List<Unit> selfAllUnitList = new ArrayList<>(); /// 아군 모든 유닛 리스트
@@ -41,7 +42,8 @@ public class UnitCache {
 	
 
 	// 적군  UnitType 발견 여부
-	private Map<UnitType, Boolean> enemyUnitDiscoveredMap  = new HashMap<>();
+	private Map<UnitType, Boolean> enemyUnitDiscoveredMap = new HashMap<>();
+	private Map<UnitType, Boolean> enemyCompleteUnitDiscoveredMap = new HashMap<>();
 
 	// 적군 모든 UnitType 리스트
 	private List<UnitInfo> enemyAllUnitInfoList = new ArrayList<>(); /// 적군 모든 유닛정보 리스트
@@ -59,6 +61,10 @@ public class UnitCache {
 		return selfUnitDiscoveredMap;
 	}
 	
+	public Map<UnitType, Boolean> getSelfCompleteUnitDiscoveredMap() {
+		return selfCompleteUnitDiscoveredMap;
+	}
+
 	public int allCount(UnitType unitType) {
 		if (unitType == UnitType.AllUnits) {
 			return selfAllUnitList.size();
@@ -139,6 +145,10 @@ public class UnitCache {
 		return enemyUnitDiscoveredMap;
 	}
 	
+	public Map<UnitType, Boolean> getEnemyCompleteUnitDiscoveredMap() {
+		return enemyCompleteUnitDiscoveredMap;
+	}
+
 	public int enemyAllCount(UnitType unitType) {
 		if (unitType == UnitType.AllUnits) {
 			return enemyAllUnitInfoList.size();
@@ -286,6 +296,13 @@ public class UnitCache {
 			if (discovered == null || discovered == Boolean.FALSE) {
 				selfUnitDiscoveredMap.put(unitType, Boolean.TRUE);
 			}
+
+			if (selfUnit.isCompleted()) {
+				Boolean discoveredComplete = selfCompleteUnitDiscoveredMap.get(unitType);
+				if (discoveredComplete == null || discoveredComplete == Boolean.FALSE) {
+					selfCompleteUnitDiscoveredMap.put(unitType, Boolean.TRUE);
+				}
+			}
 		}
 		
 		for (Unit enemyUnit : Prebot.Broodwar.enemy().getUnits()) {
@@ -296,6 +313,13 @@ public class UnitCache {
 			Boolean discovered = enemyUnitDiscoveredMap.get(unitType);
 			if (discovered == null || discovered == Boolean.FALSE) {
 				enemyUnitDiscoveredMap.put(unitType, Boolean.TRUE);
+			}
+
+			if (enemyUnit.isCompleted()) {
+				Boolean discoveredComplete = enemyCompleteUnitDiscoveredMap.get(unitType);
+				if (discoveredComplete == null || discoveredComplete == Boolean.FALSE) {
+					enemyCompleteUnitDiscoveredMap.put(unitType, Boolean.TRUE);
+				}
 			}
 		}
 	}

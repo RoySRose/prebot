@@ -1439,12 +1439,13 @@ public class UXManager {
 		// air force team
 		int y = 200;
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
-		for (AirForceTeam airForceUnit : airForceTeamSet) {
-			Position position = airForceUnit.leaderUnit.getPosition();
-			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, "unit#" + airForceUnit.leaderUnit.getID());
-			Position targetPosition = new Position(airForceUnit.getTargetPosition().getX(), airForceUnit.getTargetPosition().getY() - 10);
-			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceUnit.leaderUnit.getID());
-			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceUnit.toString());
+		for (AirForceTeam airForceTeam : airForceTeamSet) {
+			Position position = airForceTeam.leaderUnit.getPosition();
+			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, "leader#" + airForceTeam.leaderUnit.getID());
+			
+			Position targetPosition = new Position(airForceTeam.getTargetPosition().getX(), airForceTeam.getTargetPosition().getY() - 10);
+			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceTeam.leaderUnit.getID());
+			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceTeam.toString());
 		}
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "strike level=" + AirForceManager.Instance().getStrikeLevel());
 	}
