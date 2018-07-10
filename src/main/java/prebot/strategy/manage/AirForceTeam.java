@@ -24,8 +24,8 @@ public class AirForceTeam {
 	public int retreatFrame = 0;
 	public int targetTryCount = 0;
 	public boolean directionReservse;
-	public int[] driveAngle;
 	public Position leaderOrderPosition;
+	public int[] driveAngle;
 
 	// for achievement
 	public int damaged = 0;
@@ -42,8 +42,8 @@ public class AirForceTeam {
 		this.retreatFrame = 0;
 		this.targetTryCount = 0; // 공격 재시도 count
 		this.directionReservse = false; // 타깃포지션 변경 역방향 여부
-		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 		this.leaderOrderPosition = null;
+		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 	}
 	
 	public int achievement() {

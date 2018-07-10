@@ -3,8 +3,6 @@ package prebot.strategy.manage;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.TimeUtils;
-import prebot.strategy.action.impl.GasAdjustment8Barrack111;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
@@ -41,16 +39,16 @@ public class InitialAction {
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, UnitType.Terran_Supply_Depot.buildTime() - 10 * TimeUtils.SECOND));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 0));
 				assignedFirstScout = true;
 			}
-			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));
-			ActionManager.Instance().addAction(new GasAdjustment8Barrack111());
+//			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));
+//			ActionManager.Instance().addAction(new GasAdjustment2Star());
 			StrategyAnalyseManager.Instance().setUp(Race.Zerg);
 			terminated = true;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
-			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
+//			ActionManager.Instance().addAction(new GasAdjustment2Star());
 			if (!assignedFirstScout) {
 				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
 				assignedFirstScout = true;

@@ -15,7 +15,6 @@ import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
 import prebot.micro.control.Control;
 import prebot.micro.targeting.WraithTargetCalculator;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
@@ -75,7 +74,9 @@ public class AirForceControl extends Control {
 				}
 
 			} else if (decisionDetail.type == DecisionType.UNITE) {
+//				Position centerOfWraith = UnitUtils.centerPositionOfUnit(wraithList);
 				for (Unit wraith : wraithList) {
+//					wraith.rightClick(centerOfWraith);
 					wraith.rightClick(airForceTeam.leaderUnit.getPosition());
 				}
 			} else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.FLEE_FROM_POSITION) {
@@ -96,7 +97,7 @@ public class AirForceControl extends Control {
 		if (decision.type == DecisionType.ATTACK_UNIT) {
 			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
 					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
-				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, true);
+				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), true); // 가까운 base로 변경
 			} else {
 				airDrivingPosition = airForceTeam.leaderUnit.getPosition();
 			}
@@ -104,7 +105,7 @@ public class AirForceControl extends Control {
 		} else if (decision.type == DecisionType.KITING_UNIT) {
 			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
 					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
-				airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, true);
+				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), true); // 가까운 base로 변경
 			} else {
 				airDrivingPosition = decision.eui.getLastPosition();
 			}
@@ -116,8 +117,7 @@ public class AirForceControl extends Control {
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_POSITION) {
-			// TODO region 밖일 경우 별도 처리 필요?
-			airDrivingPosition = airDrivingPosition(airForceTeam, StrategyIdea.campPosition, false);
+			airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), false); // 가까운 base로 변경
 			airForceTeam.retreat();
 		}
 		airForceTeam.leaderOrderPosition = airDrivingPosition;
