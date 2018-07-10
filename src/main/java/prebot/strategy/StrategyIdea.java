@@ -21,6 +21,8 @@ public class StrategyIdea {
 	public static EnemyStrategy startStrategy = EnemyStrategy.UNKNOWN;
 	public static EnemyStrategy currentStrategy = EnemyStrategy.UNKNOWN;
 	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
+	
+	public static int wraithCount = 0;
 
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 
 	public static int bunkerNeedFrame = CommonCode.INT_MAX;
