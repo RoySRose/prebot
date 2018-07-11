@@ -12,8 +12,8 @@ import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 
 public class WraithFightPredictor {
 	
-	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> wraithList, List<UnitInfo> euiList) {
-		int wraithPower = powerOfAirForce(wraithList);
+	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> wraithList, List<UnitInfo> euiList, boolean cloakingBonus) {
+		int wraithPower = powerOfAirForce(wraithList, cloakingBonus);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 		
 		if (wraithPower > enemyPower) {
@@ -24,11 +24,15 @@ public class WraithFightPredictor {
 	}
 
 	// 벌처 한기 최대 점수 : 70점 (업그레이드시 100점)
-	public static int powerOfAirForce(List<Unit> wraithList) {
+	public static int powerOfAirForce(List<Unit> wraithList, boolean cloakingBonus) {
 		int totalPower = 0;
 		for (Unit wraith : wraithList) {
 			double hitPointRate = (double) wraith.getHitPoints() / UnitType.Terran_Wraith.maxHitPoints();
 			totalPower += POWER_WRAITH * hitPointRate;
+			
+			if (cloakingBonus) {
+				totalPower += POWER_CLOAKING;
+			}
 		}
 		return totalPower;
 	}
@@ -57,6 +61,7 @@ public class WraithFightPredictor {
 
 	
 	private static final int POWER_WRAITH = 100;
+	private static final int POWER_CLOAKING = 200;
 	private static final Map<UnitType, Integer> WRAITH_TARGET = new HashMap<>();
 	
 	static {

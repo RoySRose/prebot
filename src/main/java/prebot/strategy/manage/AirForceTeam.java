@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Position;
+import bwapi.TechType;
 import bwapi.Unit;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -15,7 +16,7 @@ import prebot.strategy.UnitInfo;
 public class AirForceTeam {
 
 	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
-	private static final int RETREAT_TIME = 3 * TimeUtils.SECOND; // 타깃포지션별 재공격 시도 횟수
+	private static final int RETREAT_TIME = 2 * TimeUtils.SECOND; // 타깃포지션별 재공격 시도 횟수
 	private static final int WRAITH_EFFECTIVE_FRAME_SIZE = 25 * TimeUtils.SECOND;
 
 	public Unit leaderUnit;
@@ -26,10 +27,11 @@ public class AirForceTeam {
 	public boolean directionReservse;
 	public Position leaderOrderPosition;
 	public int[] driveAngle;
+	public boolean cloakingMode;
 
 	// for achievement
-	public int damaged = 0;
-	public int killed = 0;
+	public int damagedEffectiveFrame = 0;
+	public int killedEffectiveFrame = 0;
 	
 	public Map<Integer, Integer> preKillCounts = new HashMap<>();
 	public Map<Integer, Integer> preHitPoints = new HashMap<>();
@@ -44,6 +46,7 @@ public class AirForceTeam {
 		this.directionReservse = false; // 타깃포지션 변경 역방향 여부
 		this.leaderOrderPosition = null;
 		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
+		this.cloakingMode = false;
 	}
 	
 	public int achievement() {
@@ -66,8 +69,8 @@ public class AirForceTeam {
 		}
 		
 		int index = TimeUtils.elapsedFrames() % WRAITH_EFFECTIVE_FRAME_SIZE;
-		damaged = damaged + reducedHitPoints - damagedMemory[index];
-		killed = killed + killCounts - killedMemory[index];
+		damagedEffectiveFrame = damagedEffectiveFrame + reducedHitPoints - damagedMemory[index];
+		killedEffectiveFrame = killedEffectiveFrame + killCounts - killedMemory[index];
 		
 		damagedMemory[index] = reducedHitPoints;
 		killedMemory[index] = killCounts;
@@ -79,7 +82,7 @@ public class AirForceTeam {
 			preKillCounts.put(wraith.getID(), wraith.getKillCount());
 		}
 		
-		return killed * 100 - damaged;
+		return killCounts * 100 - reducedHitPoints;
 	}
 
 	public Position getTargetPosition() {
@@ -142,10 +145,27 @@ public class AirForceTeam {
 			foundCount = !enemyDefTowerList.isEmpty() ? foundCount - 1 : 0;
 		}
 	}
+	
+	public void cloak() {
+		this.cloakingMode = true;
+	}
+	
+	public boolean cloakable() {
+		if (cloakingMode) {
+			return false;
+		}
+		
+		for (Unit wraith : memberList) {
+			if (wraith.getEnergy() < TechType.Cloaking_Field.energyCost() + 20) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public String toString() {
-		return "Team" + leaderUnit.getID() + " size=" + memberList.size() + ", achieve=" + killed + "/" + damaged;
+		return "Team" + leaderUnit.getID() + "(" + (cloakingMode ? "C":"U") + ") size=" + memberList.size() + ", achieve=" + killedEffectiveFrame + "/" + damagedEffectiveFrame;
 	}
 
 }
