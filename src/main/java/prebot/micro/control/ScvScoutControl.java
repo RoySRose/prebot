@@ -11,10 +11,12 @@ import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -39,7 +41,15 @@ public class ScvScoutControl extends Control {
 	// 상대방 MainBaseLocation 위치를 모르는 상황이면, StartLocation 들에 대해 아군의 MainBaseLocation에서 가까운 것부터 순서대로 정찰
 	// 상대방 MainBaseLocation 위치를 아는 상황이면, 해당 BaseLocation 이 있는 Region의 가장자리를 따라 계속 이동함 (정찰 유닛이 죽을때까지)
 	private void moveScoutUnit(Unit scoutScv) {
+		BaseLocation myBaseLocation = InfoUtils.myBase();
 		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
+		
+		//BaseLocation enemyFirstExpansionLocation = InfoUtils.enemyFirstExpansion();
+			
+		// 아군 지역에 적 건물이 잇을땐 패스(가스 러쉬시 우리 지역을 정찰 지역으로 보는경우가 있음.
+		if (enemyBaseLocation != null && enemyBaseLocation.getDistance(myBaseLocation.getPosition()) < 5 * UxConfig.TILE_SIZE)
+			enemyBaseLocation = null;
+		
 		if (enemyBaseLocation == null) {
 			BaseLocation scoutBaseLocation; 
 			if (StrategyIdea.enemyBaseExpected != null) {
@@ -48,9 +58,18 @@ public class ScvScoutControl extends Control {
 				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
 				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			}
-			CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
+			BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(scoutBaseLocation);
+			
+			if (!Prebot.Broodwar.isExplored(enemyFisrtExpansionPosition.getTilePosition())) {
+				CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
+			}else{
+				CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
+			}
 		} else {
-			if (!Prebot.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
+			BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(enemyBaseLocation);
+			if (!Prebot.Broodwar.isExplored(enemyFisrtExpansionPosition.getTilePosition())) {
+				CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
+			}else if (!Prebot.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
 				CommandUtils.move(scoutScv, enemyBaseLocation.getPosition());
 			} else {
 				Position currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(scoutScv);
@@ -148,5 +167,23 @@ public class ScvScoutControl extends Control {
 		}
 
 		return closestIndex;
+	}
+	
+	public BaseLocation getClosestFirstExpansionBase(BaseLocation scoutBaseLocation) {
+		double tempDistance;
+		double closestDistance = 1000000000;
+		BaseLocation expansionBase = scoutBaseLocation;
+		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations())
+		{
+			if (targetBaseLocation.getTilePosition().equals(scoutBaseLocation.getTilePosition())) continue;
+
+			tempDistance = PositionUtils.getGroundDistance(scoutBaseLocation.getPosition(), targetBaseLocation.getPosition());
+			if (tempDistance < closestDistance && tempDistance > 0) {
+				closestDistance = tempDistance;
+				expansionBase = targetBaseLocation;
+			}
+		}
+		return expansionBase;
+		
 	}
 }
