@@ -16,8 +16,10 @@ import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
@@ -30,7 +32,8 @@ public class AirForceManager {
 	}
 
 	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
-	public static final int AIR_FORCE_SAFE_DISTANCE = 80; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리 
+	public static final int AIR_FORCE_SAFE_DISTANCE = 80; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
+	public static final int AIR_FORCE_SAFE_DISTANCE2 = 150; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
 	public static final int AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE = 1;
 	
 
@@ -76,15 +79,23 @@ public class AirForceManager {
 	
 	private List<Position> targetPositions = new ArrayList<>(); // 타깃포지션
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
-	private int totalAchievement = 0;
+	private int achievementEffectiveFrame = 0;
 	private int accumulatedAchievement = 0;
-	
+
 	public List<Position> getTargetPositions() {
 		return targetPositions;
 	}
 	
 	public Map<Integer, AirForceTeam> getAirForceTeamMap() {
 		return airForceTeamMap;
+	}
+	
+	public int getAchievementEffectiveFrame() {
+		return achievementEffectiveFrame;
+	}
+
+	public int getAccumulatedAchievement() {
+		return accumulatedAchievement;
 	}
 
 	public void update() {
@@ -136,31 +147,14 @@ public class AirForceManager {
 				secondBase = InfoUtils.enemyBase();
 			}
 			
-//			List<Unit> staticMinerals = InfoUtils.enemyFirstExpansion().getStaticMinerals();
-//			if (staticMinerals != null) {
-//				Position mineralCenterPosition = UnitUtils.centerPositionOfUnit(staticMinerals);
-//				Position firstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
-//				
-//				int vectorX = (int) ((mineralCenterPosition.getX() - firstExpansionPosition.getX()) / 3.0);
-//				int vectorY = (int) ((mineralCenterPosition.getY() - firstExpansionPosition.getY()) / 3.0);
-//				mineralPosition = new Position(mineralCenterPosition.getX() + vectorX, mineralCenterPosition.getY() + vectorY);
-//			}
-			
-			Position enemyBasePosition = InfoUtils.enemyBase().getPosition();
-			Position enemyFirstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
-			int x = (int) ((enemyFirstExpansionPosition.getX() - enemyBasePosition.getX()) / 2.2);
-			int y = (int) ((enemyFirstExpansionPosition.getY() - enemyBasePosition.getY()) / 2.2);
-
-			Position mineralPosition = new Position(InfoUtils.enemyFirstExpansion().getX() + x, InfoUtils.enemyFirstExpansion().getY() + y);
-
 			int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
 			int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
 
 			double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 			double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 
-			if (expansionFirst && mineralPosition != null) {
-				targetPositions.add(mineralPosition);
+			if (expansionFirst) {
+				targetPositions.addAll(getMineralPositions());
 			}
 			
 			targetPositions.add(firstBase.getPosition());
@@ -172,8 +166,8 @@ public class AirForceManager {
 			}
 			targetPositions.add(secondBase.getPosition());
 			
-			if (!expansionFirst && mineralPosition != null) {
-				targetPositions.add(mineralPosition);
+			if (!expansionFirst) {
+				targetPositions.addAll(getMineralPositions());
 			}
 			
 			AirForceManager.airForceTargetPositionSize = targetPositions.size();
@@ -181,6 +175,24 @@ public class AirForceManager {
 //			this.setRetreatPosition();
 			this.setRetreatPositionForUseMapSetting();
 		}
+	}
+
+	private List<Position> getMineralPositions() {
+		Position enemyBasePosition = InfoUtils.enemyBase().getPosition();
+		Position enemyFirstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
+
+		List<Position> positions = new ArrayList<>();
+		double radian = MicroUtils.targetDirectionRadian(enemyBasePosition, enemyFirstExpansionPosition);
+		for (int angle : Angles.AIRFORCE_MINERAL_TARGET_ANGLE) {
+			double rotateAngle = MicroUtils.rotate(radian, angle);
+			Position mineralPosition = MicroUtils.getMovePosition(enemyFirstExpansionPosition, rotateAngle, 300);
+			if (mineralPosition.isValid()) {
+				positions.add(mineralPosition);
+			} else {
+				positions.add(mineralPosition.makeValid());
+			}
+		}
+		return positions;
 	}
 
 	private void setRetreatPosition() {
@@ -272,7 +284,7 @@ public class AirForceManager {
 		
 		boolean levelDown = false;
 		boolean levelUp = false;
-		if (totalAchievement > 0) {
+		if (achievementEffectiveFrame > 0) {
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
@@ -297,14 +309,14 @@ public class AirForceManager {
 			
 		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
-			if (totalAchievement <= -50) {
+			if (achievementEffectiveFrame <= -50) {
 				levelDown = true;
 			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 20 * TimeUtils.SECOND) {
 				levelDown = true;
 			}
 			
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
-			if (totalAchievement >= 100) {
+			if (achievementEffectiveFrame >= 100) {
 				levelUp = true;
 			}
 		}
@@ -350,10 +362,14 @@ public class AirForceManager {
 		}
 		
 		// 리더의 위치를 비교하여 합칠 그룹인지 체크한다.
-		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
+		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
+			boolean cloakingMode = airForceTeam.cloakingMode;
 			for (AirForceTeam compareForceUnit : airForceTeamSet) {
+				if (cloakingMode != compareForceUnit.cloakingMode) {
+					continue;
+				}
 				Unit airForceLeader = airForceTeam.leaderUnit;
 				Unit compareForceLeader = compareForceUnit.leaderUnit;
 				if (airForceLeader.getDistance(compareForceLeader) <= AIR_FORCE_TEAM_MERGE_DISTANCE) {
@@ -377,11 +393,16 @@ public class AirForceManager {
 			airForceTeam.memberList.clear();
 		}
 		List<Integer> excludedWraithList = new ArrayList<>(); // 삭제된 레이쓰
+		List<Integer> uncloakedWraithList = new ArrayList<>(); // 언클락 레이쓰
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			if (UnitUtils.isCompleteValidUnit(wraith)) {
 				AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
-				airForceTeam.memberList.add(wraith);
+				if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
+					uncloakedWraithList.add(wraithId);
+				} else {
+					airForceTeam.memberList.add(wraith);
+				}
 			} else {
 				excludedWraithList.add(wraithId);
 			}
@@ -389,9 +410,16 @@ public class AirForceManager {
 		for (Integer wraithId : excludedWraithList) {
 			airForceTeamMap.remove(wraithId);
 		}
+		for (Integer wraithId : uncloakedWraithList) {
+			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
+			airForceTeamMap.remove(wraithId);
+			AirForceTeam uncloackedForceTeam = new AirForceTeam(wraith);
+			uncloackedForceTeam.memberList.add(wraith);
+			airForceTeamMap.put(wraithId, uncloackedForceTeam);
+		}
 		
 		airForceTeamSet = new HashSet<>(airForceTeamMap.values());
-		totalAchievement = 0;
+		achievementEffectiveFrame = 0;
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
 			// leader 교체
 			Unit newLeader = UnitUtils.getClosestUnitToPosition(airForceTeam.memberList, airForceTeam.getTargetPosition());
@@ -399,7 +427,8 @@ public class AirForceManager {
 			
 			// achievement
 			int achievement = airForceTeam.achievement();
-			totalAchievement += achievement;
+			accumulatedAchievement += achievement;
+			achievementEffectiveFrame = achievementEffectiveFrame + airForceTeam.killedEffectiveFrame * 100 - airForceTeam.damagedEffectiveFrame;
 		}
 	}
 

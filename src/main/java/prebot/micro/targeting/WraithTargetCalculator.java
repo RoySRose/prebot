@@ -15,7 +15,17 @@ import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceManager.StrikeLevel;
 
 public class WraithTargetCalculator extends TargetScoreCalculator {
+	
+	public WraithTargetCalculator() {
+		this.strikeLevel = AirForceManager.Instance().getStrikeLevel();
+	}
 
+	public void setStrikeLevel(int strikeLevel) {
+		this.strikeLevel = strikeLevel;
+	}
+
+	private int strikeLevel;
+	
 	private static final Map<UnitType, Integer> TYPE_SCORE = new HashMap<>();
 	static {
 		TYPE_SCORE.put(UnitType.Zerg_Spore_Colony, 100);
@@ -54,7 +64,6 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	}
 
 	private int caculateForFeed(Unit unit, Unit enemyUnit) {
-		int strikeLevel = AirForceManager.Instance().getStrikeLevel();
 		int score = criticalHighestScore(enemyUnit);
 		if (score == CommonCode.NONE && strikeLevel < StrikeLevel.CRITICAL_SPOT) {
 			score = soreHighestScore(enemyUnit);
