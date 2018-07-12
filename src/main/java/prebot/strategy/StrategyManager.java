@@ -23,6 +23,7 @@ import prebot.strategy.manage.VultureTravelManager;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager extends GameManager {
 
+	
 	private static StrategyManager instance = new StrategyManager();
 
 	/// static singleton 객체를 리턴합니다
