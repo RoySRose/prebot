@@ -20,7 +20,10 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-    	int machine_shop_cnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop) + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Machine_Shop);
+    	
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+    		return false;
+    	}
 
         if(factoryUnitSelector.getSelected().equals(metaType.getUnitType())) {
 //        	FileUtils.appendTextToFile("log.txt", "\n BuilderSiegeTank || SiegeTank selected");
@@ -28,19 +31,10 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
 //        		setBlocking(true);
 //        		RespondToStrategy.Instance().once_tank = false;
 //        	}
-        	if(machine_shop_cnt > 0) {
-//        		FileUtils.appendTextToFile("log.txt", "\n BuilderSiegeTank || machine_shop_cnt > 0");
-        		return true;
-        	}
+       	
+        	return true;
         	
-        	return false;
-        	
-        }else{
-        	if(BuildQueueProvider.Instance().respondSet) {
-        		return false;
-        	}else {
-	            return false;
-	        }
         }
+	    return false;
     }
 }

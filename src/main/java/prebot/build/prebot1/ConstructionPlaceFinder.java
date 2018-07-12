@@ -28,8 +28,8 @@ public class ConstructionPlaceFinder {
 		NewMethod 		///< 예비
 	};
 	
-	public int maxSupplyCntX = 3;
-	public int maxSupplyCntY = 4;
+	public int maxSupplyCntX = 4;
+	public int maxSupplyCntY = 3;
 	
 	/// 건물 건설 예정 타일을 저장해놓기 위한 2차원 배열<br>
 	/// TilePosition 단위이기 때문에 보통 128*128 사이즈가 된다<br>
