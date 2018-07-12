@@ -27,7 +27,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
     	
     	if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) +
 			 ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) != 0) {
-			return true;
+			return false;
 		}
     	
 		
