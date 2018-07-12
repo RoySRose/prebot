@@ -109,13 +109,7 @@ public class StrategyManager extends GameManager {
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0) {
 			AttackExpansionManager.Instance().executeCombat();
 		}
-		// if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
-		// AttackExpansionManager.Instance().executeExpansion();
-		// }
 
-		// 건물 생성 연결중
-		// BuildQueueProvider.Instance().process();
-		TempBuildSourceCode.Instance().update();
 	}
 
 	
