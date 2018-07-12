@@ -1,8 +1,15 @@
 package prebot.strategy;
 
-import prebot.build.provider.BuildQueueProvider;
+import java.util.List;
+
+import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.BaseLocation;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
@@ -96,6 +103,7 @@ public class StrategyManager extends GameManager {
 		AirForceManager.Instance().update();
 		PositionFinder.Instance().update();
 		EnemyBaseFinder.Instance().update();
+		expansionOkay();
 		
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
 			AttackExpansionManager.Instance().executeCombat();
@@ -119,6 +127,8 @@ public class StrategyManager extends GameManager {
 				break;
 			}
 		}
+		StrategyIdea.EXOK = expansionOkay;
+	}
 		
 
 	
