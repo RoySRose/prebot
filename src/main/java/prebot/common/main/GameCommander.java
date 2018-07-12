@@ -10,6 +10,7 @@ import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.debug.chat.ChatBot;
@@ -65,10 +66,22 @@ public class GameCommander {
 
 		try {
 			logObserver.start();
-
+	
 			InformationManager.Instance().updateTimeCheck();
 			MapGrid.Instance().updateTimeCheck();
 			StrategyManager.Instance().updateTimeCheck();
+			
+			
+//			이니셜빌드가 끝나지 않았다면, 끝났는지 체크하고, 끝났다면 빌드 프로바이더
+			if(!InitialBuildProvider.Instance().InitialBuildFinished) {
+	    		InitialBuildProvider.Instance().updateInitialBuild();
+	    	}else {
+//	    		if (Prebot.Broodwar.getFrameCount() % 24 == 0){
+	    			BuildQueueProvider.Instance().updateTimeCheck();
+//	    		}
+	    	}
+
+			
 			
 			BuildManager.Instance().updateTimeCheck();
 			ConstructionManager.Instance().updateTimeCheck();

@@ -108,7 +108,7 @@ public class StrategyManager extends GameManager {
 		
 		//건물 생성 연결중
 //		BuildQueueProvider.Instance().process();
-		TempBuildSourceCode.Instance().update();
+//		TempBuildSourceCode.Instance().update();
 	}
 
 	

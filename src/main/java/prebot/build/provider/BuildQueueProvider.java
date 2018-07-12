@@ -14,14 +14,16 @@ import prebot.build.provider.items.tech.*;
 import prebot.build.provider.items.unit.*;
 import prebot.build.provider.items.upgrade.*;
 import prebot.common.MetaType;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.RespondToStrategy;
 import prebot.strategy.manage.AttackExpansionManager;
 
-public final class BuildQueueProvider {
+public class BuildQueueProvider extends GameManager {
 
+	//process 를 update 로 바꾸고 GameManager Extend
     private static BuildQueueProvider instance = new BuildQueueProvider();
     /// static singleton 객체를 리턴합니다
     public static BuildQueueProvider Instance() {
@@ -102,7 +104,7 @@ public final class BuildQueueProvider {
         
         buildableList.add(new BuilderGoliath              (new MetaType(UnitType.Terran_Goliath), factoryUnitSelector));
         buildableList.add(new BuilderVulture              (new MetaType(UnitType.Terran_Vulture), factoryUnitSelector));
-        buildableList.add(new BuilderSiegeTank(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
+        buildableList.add(new BuilderSiegeTank				(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
         buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith), starportUnitSelector));
         
         /*
@@ -266,42 +268,42 @@ public final class BuildQueueProvider {
 //    	buildableList.remove(yamatoGun);
     }
 
-    public void process(){
+    public void update(){
+    	turnOffReseach();
     	
-    	
-    	if (BuildConditionChecker.Instance().EXOK == false && Prebot.Broodwar.getFrameCount() % 2 == 0) {
+    	/*if (BuildConditionChecker.Instance().EXOK == false && Prebot.Broodwar.getFrameCount() % 2 == 0) {
     		BuildConditionChecker.Instance().executeFirstex();
-		}
+		}*/
     	
     	
-    	if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
+    	//if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
 	        researchSelector.select();
 	        //researchSelector2.select();
-		}
+		//}
     	
-    	if(!InitialBuildProvider.Instance().InitialBuildFinished) {
-    		InitialBuildProvider.Instance().updateInitialBuild();
-    	}
+//    	if(!InitialBuildProvider.Instance().InitialBuildFinished) {
+//    		InitialBuildProvider.Instance().updateInitialBuild();
+//    	}
     		
 		//셀렉터들에 필요한 유닛카운트 미리 집계
-		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
-			BuildConditionChecker.Instance().executeSustainUnits();
-		}
+//		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
+//			BuildConditionChecker.Instance().executeSustainUnits();
+//		}
 		
-		if (Prebot.Broodwar.getFrameCount() < 10000) {
-			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
-				BuildConditionChecker.Instance().executeFly();
-			}
-		} else {
-			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
-				BuildConditionChecker.Instance().executeFly();
-			}
-		}
+//		if (Prebot.Broodwar.getFrameCount() < 10000) {
+//			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
+//				BuildConditionChecker.Instance().executeFly();
+//			}
+//		} else {
+//			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
+//				BuildConditionChecker.Instance().executeFly();
+//			}
+//		}
 		
 		
-		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
+//		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
 	        upgradeSelector.select();
-		}
+//		}
         //barrackUnitSelector.select();
         factoryUnitSelector.select();
         //starportUnitSelector.select();
@@ -322,23 +324,25 @@ public final class BuildQueueProvider {
     	}
         
         /*respond strategy 대응*/
-        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
-				|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
-			RespondToStrategy.Instance().update();
-			// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
-			// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
-		}
-        if(respondSet) {
-		    researchSelector.select();
-		    upgradeSelector.select();
-		    //barrackUnitSelector.select();
-		    factoryUnitSelector.select();
-        	for(BuildableItem buildableItem: buildableList) {
-        		buildableItem.process();
-        	}
-        	respondSet = false;
-        }
-        turnOffReseach();
+//        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
+//				|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
+//			RespondToStrategy.Instance().update();
+//			// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
+//			// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
+//		}
+//        if(respondSet) {
+//		    researchSelector.select();
+//		    upgradeSelector.select();
+//		    //barrackUnitSelector.select();
+//		    factoryUnitSelector.select();
+//        	for(BuildableItem buildableItem: buildableList) {
+//        		buildableItem.process();
+//        	}
+//        	respondSet = false;
+//        }
+        
 	//}
     }
+
+	
 }

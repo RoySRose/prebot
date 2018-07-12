@@ -20,32 +20,28 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-    	if(BuildQueueProvider.Instance().respondSet) {
-    		return false;
-    	}else {
     	
 //    	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
 //    	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || buildCondition || metaType =>" + metaType.toString());
 
         //if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
-	    	if(String.valueOf(researchSelector.getSelected()) != "null"){
-		    	if(researchSelector.getSelected().isUpgrade()) {
-			    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType() && Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType()) == false) {
-			    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
-			    	//if(researchSelector.getSelected().equals(metaType)) {
-			//        	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || researchSelector => " + researchSelector.getSelected().getUpgradeType() + " || metaType => " + metaType.getUpgradeType());
-				        	if (researchSelector.currentResearched <= 2) {
-				//        		FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || block & high");
-				        		setBlocking(true);
-				        		setHighPriority(true);
-				        	}
-				            return true;
-			    		}
-			        }
-		    	}
+    	if(String.valueOf(researchSelector.getSelected()) != "null"){
+	    	if(researchSelector.getSelected().isUpgrade()) {
+		    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType()) {
+		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
+		    	//if(researchSelector.getSelected().equals(metaType)) {
+		//        	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || researchSelector => " + researchSelector.getSelected().getUpgradeType() + " || metaType => " + metaType.getUpgradeType());
+			        	if (researchSelector.currentResearched <= 2) {
+			//        		FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || block & high");
+			        		setBlocking(true);
+			        		setHighPriority(true);
+			        	}
+			        	System.out.println(" research return true ==> ion_thrusters");
+			            return true;
+		    		}
+		        }
 	    	}
     	}
-
     	return false;
     }
 }
