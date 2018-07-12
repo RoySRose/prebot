@@ -6,6 +6,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
@@ -96,32 +97,32 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 		return ret;
 	}
 	
-	public void setCombatUnitRatio() {
-		vultureratio = 0;
-		tankratio = 0;
-		goliathratio = 0;
-		wgt = 1;
-
-		// config setting 가지고 오기
-		if (StrategyManager.Instance().currentStrategyException == EnemyStrategyException.INIT) {
-			vultureratio = StrategyManager.Instance().currentStrategy.vultureRatio;
-			tankratio = StrategyManager.Instance().currentStrategy.tankRatio;
-			goliathratio = StrategyManager.Instance().currentStrategy.goliathRatio;
-			wgt = StrategyManager.Instance().currentStrategy.weight;
-		} else {
-			vultureratio = StrategyManager.Instance().currentStrategyException.vultureRatio;
-			tankratio = StrategyManager.Instance().currentStrategyException.tankRatio;
-			goliathratio = StrategyManager.Instance().currentStrategyException.goliathRatio;
-			wgt = StrategyManager.Instance().currentStrategyException.weight;
-
-			if (vultureratio == 0 && tankratio == 0 && goliathratio == 0) {
-				vultureratio = StrategyManager.Instance().currentStrategy.vultureRatio;
-				tankratio = StrategyManager.Instance().currentStrategy.tankRatio;
-				goliathratio = StrategyManager.Instance().currentStrategy.goliathRatio;
-				wgt = StrategyManager.Instance().currentStrategy.weight;
-			}
-		}
-	}
+//	public void setCombatUnitRatio() {
+//		vultureratio = 0;
+//		tankratio = 0;
+//		goliathratio = 0;
+//		wgt = 1;
+//
+//		// config setting 가지고 오기
+//		if (StrategyManager.Instance().currentStrategyException == EnemyStrategyException.INIT) {
+//			vultureratio = StrategyIdea.currentStrategy.ratio.vulture;
+//			tankratio = StrategyIdea.currentStrategy.ratio.tank;
+//			goliathratio = StrategyIdea.currentStrategy.ratio.goliath;
+//			wgt = 1;
+//		} else {
+//			vultureratio = StrategyManager.Instance().currentStrategyException.vultureRatio;
+//			tankratio = StrategyManager.Instance().currentStrategyException.tankRatio;
+//			goliathratio = StrategyManager.Instance().currentStrategyException.goliathRatio;
+//			wgt = StrategyManager.Instance().currentStrategyException.weight;
+//
+//			if (vultureratio == 0 && tankratio == 0 && goliathratio == 0) {
+//				vultureratio = StrategyManager.Instance().currentStrategy.vultureRatio;
+//				tankratio = StrategyManager.Instance().currentStrategy.tankRatio;
+//				goliathratio = StrategyManager.Instance().currentStrategy.goliathRatio;
+//				wgt = StrategyManager.Instance().currentStrategy.weight;
+//			}
+//		}
+//	}
 	
 	
 	
@@ -141,11 +142,16 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 
     public final void select(){
     	
-    	if(BuildQueueProvider.Instance().respondSet) {
-    		unitType = UnitType.None;
-    	}else {
-    	
-	    	setCombatUnitRatio();
+  
+//	    	setCombatUnitRatio();
+    		
+    		vultureratio = StrategyIdea.currentStrategy.ratio.vulture;
+			tankratio = StrategyIdea.currentStrategy.ratio.tank;
+			goliathratio = StrategyIdea.currentStrategy.ratio.goliath;
+			wgt = 1;
+			
+//			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || ratio  || vultureratio : " + vultureratio + " / tankratio : " + tankratio + " / goliathratio : " + goliathratio);
+    		
 	        unitType = UnitType.None;
 	    	//unitType = null;
 	    	
@@ -154,36 +160,44 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 			int tot_goliath = GetCurrentTot(UnitType.Terran_Goliath);
 	
 			UnitType selected = null;
-			int currentinbuildqueuecnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null)
-					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode, null)
-					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath, null);
+//			int currentinbuildqueuecnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null)
+//					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode, null)
+//					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath, null);
 			
-			int currentinbuildqueuecnt_vulture = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null);
+			int currentinbuildqueuecnt = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath);
+//			System.out.println("currentinbuildqueuecnt ==>> Vulture : " + BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture)
+//					+" / Tank : " + BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+//					+" / Goliath : " +BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Goliath));
+//			int currentinbuildqueuecnt_vulture = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture, null);
 	
 			
 	//		FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || currentinbuildqueuecnt || " + currentinbuildqueuecnt);
 	
 			if (currentinbuildqueuecnt == 0) {
 				selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
-	//			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || " + selected.toString());
+				
 	//			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || now mineral : " + Prebot.Broodwar.self().minerals() + "now gas : " + Prebot.Broodwar.self().gas());
 	
 				if (selected.mineralPrice() <= Prebot.Broodwar.self().minerals() && selected.gasPrice() <= Prebot.Broodwar.self().gas() && Prebot.Broodwar.self().supplyUsed() <= 392) {
-					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || resource enough");
-					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit ==> " + selected.toString());
+					/*FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || resource enough");
+					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit ==> " + selected.toString());*/
 					//BuildManager.Instance().buildQueue.queueAsLowestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+//					System.out.println("FactoryUnitSelector || selected unit || " + selected.toString());
+//					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || selected unit || " + selected.toString());
 					unitType = selected;
 				}
-			}else {
-	//			현재 빌드큐에 팩토리 유닛이 들어가 있는데 벌쳐는 아닐경우, 자원이 가능하면 일단 벌쳐를 눌러준다.
-				if(currentinbuildqueuecnt_vulture < 1) {
-					
-					if (UnitType.Terran_Vulture.mineralPrice() <= Prebot.Broodwar.self().minerals() &&Prebot.Broodwar.self().supplyUsed() <= 392) {
-	//					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || use odd resouce to vulture");
-						unitType = UnitType.Terran_Vulture;
-					}
-				}
 			}
-    	}
+//			else {
+//	//			현재 빌드큐에 팩토리 유닛이 들어가 있는데 벌쳐는 아닐경우, 자원이 가능하면 일단 벌쳐를 눌러준다.
+//				if(currentinbuildqueuecnt_vulture < 1) {
+//					
+//					if (UnitType.Terran_Vulture.mineralPrice() <= Prebot.Broodwar.self().minerals() &&Prebot.Broodwar.self().supplyUsed() <= 392) {
+//	//					FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || use odd resouce to vulture");
+//						unitType = UnitType.Terran_Vulture;
+//					}
+//				}
+//			}
     }
 }
