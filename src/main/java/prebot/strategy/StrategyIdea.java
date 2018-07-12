@@ -34,6 +34,8 @@ public class StrategyIdea {
 	public static int turretBuildStartFrame = CommonCode.INT_MAX;
 	public static int engineeringBayBuildStartFrame = CommonCode.INT_MAX;
 	public static List<RegionType> turretRegionType = new ArrayList<>();
+	
+	public static boolean EXOK = false; // 앞마당 커맨드가 제자리에 안착했는지 여부
 
 	// 적 전략 특이사항
 	public static boolean gasRushed = false;
