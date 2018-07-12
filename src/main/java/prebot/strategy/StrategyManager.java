@@ -1,8 +1,15 @@
 package prebot.strategy;
 
-import prebot.build.provider.BuildQueueProvider;
+import java.util.List;
+
+import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.BaseLocation;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
@@ -82,35 +89,47 @@ public class StrategyManager extends GameManager {
 	}
 
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
-	public void update() {
+		public void update() {
 
-		// 전략 파악
-		InitialAction.Instance().update();
-		StrategyAnalyseManager.Instance().update();
-		ActionManager.Instance().update();
-		DefenseTowerTimer.Instance().update();
-		
-		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
-		SpiderMineManger.Instance().update();
-		VultureTravelManager.Instance().update();
-		TankPositionManager.Instance().update();
-		AirForceManager.Instance().update();
-		PositionFinder.Instance().update();
-		EnemyBaseFinder.Instance().update();
-		
-		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
-			AttackExpansionManager.Instance().executeCombat();
+			// 전략 파악
+			InitialAction.Instance().update();
+			StrategyAnalyseManager.Instance().update();
+			ActionManager.Instance().update();
+			DefenseTowerTimer.Instance().update();
+			
+			AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
+			SpiderMineManger.Instance().update();
+			VultureTravelManager.Instance().update();
+			TankPositionManager.Instance().update();
+			AirForceManager.Instance().update();
+			PositionFinder.Instance().update();
+			EnemyBaseFinder.Instance().update();
+			expansionOkay();
+			
+			if (Prebot.Broodwar.getFrameCount() % 31 == 0){
+				AttackExpansionManager.Instance().executeCombat();
+			}
+
 		}
-//		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
-//			AttackExpansionManager.Instance().executeExpansion();
-//		}
+
 		
-		
-		
-		//건물 생성 연결중
-//		BuildQueueProvider.Instance().process();
-//		TempBuildSourceCode.Instance().update();
-	}
+		private void expansionOkay() {
+			boolean expansionOkay = false;
+			BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
+			List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+			for (Unit commandCenter : commandCenterList) {
+				if (commandCenter.isLifted()) {
+					continue;
+				}
+				
+				if(commandCenter.getTilePosition().getX() == myFirstExpansion.getTilePosition().getX()
+						&& commandCenter.getTilePosition().getY() == myFirstExpansion.getTilePosition().getY()) {
+					expansionOkay = true;
+					break;
+				}
+			}
+			StrategyIdea.EXOK = expansionOkay;
+		}
 
 	
 }
