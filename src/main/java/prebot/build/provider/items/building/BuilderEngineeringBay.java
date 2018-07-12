@@ -1,5 +1,7 @@
 package prebot.build.provider.items.building;
 
+import java.util.List;
+
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -11,12 +13,14 @@ import prebot.build.provider.BuildConditionChecker;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.RespondToStrategy;
+import prebot.strategy.StrategyIdea;
 
 public class BuilderEngineeringBay extends DefaultBuildableItem {
 
@@ -27,24 +31,28 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
     public final boolean buildCondition(){
 //        System.out.println("EngineeringBay build condition check");
     	
+    	if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0) {
+    		return false;
+    	}
     	
-    	if(BuildQueueProvider.Instance().respondSet) {
-    		
+    	
+    	if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) 
+				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) != 0){
+    		return false;
+    	}
+    	
+    	if(StrategyIdea.engineeringBayBuildStartFrame < Prebot.Broodwar.getFrameCount()) {
+    		return true;
+    	}
+    	
     		if (RespondToStrategy.Instance().max_turret_to_mutal != 0) {
-    			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Engineering_Bay)) {
-    				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) 
-    						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay,	null) == 0) {
 //    					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,
 //    							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-    					setBlocking(true);
-    					setHighPriority(true);
-						setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
-						return true;
-    				}
-    			} 
-    		}
-    		
-    	}else {
+					setBlocking(true);
+					setHighPriority(true);
+					setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
+					return true;
+			} 
     	
 	    	int cc = 0;
 	    	
@@ -59,33 +67,28 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
 	//			if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
 	//					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
 	//				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Engineering_Bay,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-	        		if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay) < 1
-	        				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0){
+	        		
 		        		setBlocking(true);
 						return true;
 	        		}
-				}
 	        	
 	        	if (Prebot.Broodwar.getFrameCount() > 17000) {
 	//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay, false);
 //	        		if(BuildConditionChecker.Instance().getQueueCount(UnitType.Terran_Engineering_Bay)) {
-	        		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay, null)
-							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
 	        			return true;
-	        		}
+
 				}
 	        	
-	        	for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+	        	List<Unit> CommandCenter = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+	        	
+	        	for (Unit unit : CommandCenter) {
 	        		if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) > 8) {
 	        			cc++;
 					}
 				}
 	        	
 	        	if(cc>=2) {
-	        		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Engineering_Bay, null)
-							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Engineering_Bay, null) == 0) {
-	        			return true;
-	        		}
+        			return true;
 				}
 			}
 	 
@@ -127,8 +130,6 @@ public class BuilderEngineeringBay extends DefaultBuildableItem {
 						return true;
 		        	}
 			}
-        
-    	}
         
         return false;
     }

@@ -26,6 +26,12 @@ public class VsTerran extends BaseBuild{
     	queueBuild(true, UnitType.Terran_Vulture);
     	queueBuild(true, UnitType.Terran_Starport);
     	queueBuild(true, UnitType.Terran_Starport);
+    	queueBuild(true, UnitType.Terran_SCV);
+    	queueBuild(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
+    	queueBuild(true, UnitType.Terran_SCV);
+    	queueBuild(true, UnitType.Terran_Wraith, UnitType.Terran_SCV);
+    	queueBuild(true, UnitType.Terran_SCV);
+    	queueBuild(false, UnitType.Terran_Machine_Shop);
     	
     	
         /*queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);

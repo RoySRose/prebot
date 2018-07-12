@@ -36,6 +36,7 @@ public class BlockingEntrance {
     public TilePosition barrack = TilePosition.None;
     public TilePosition factory = TilePosition.None;
     public TilePosition bunker = TilePosition.None;
+    public TilePosition supply_area = TilePosition.None;
     //public TilePosition entrance_turret = TilePosition.None;
 
     public static boolean entranceBlock = true;
@@ -66,8 +67,10 @@ public class BlockingEntrance {
     
     private static Location loc_t = null;
     
-    private static int fix_supplyX[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
-	private static int fix_supplyY[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};
+    private Map mapName = null;
+    
+    /*private static int fix_supplyX[] = null; //new int []{26, 54, 98, 104, 90, 52, 14, 20};
+	private static int fix_supplyY[] = null; //new int []{21, 25, 23,   63, 97, 96, 99, 56};*/
 
     private HashMap<Integer, TilePosition> postitionStorage = new HashMap<>();
 
@@ -90,9 +93,9 @@ public class BlockingEntrance {
 
 
         //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
-        Map map = Map.OVERWATCH;
+        mapName = Map.OVERWATCH;
         if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-            map = Map.CIRCUITBREAKER;
+        	mapName = Map.CIRCUITBREAKER;
         }
         //System.out.println("this map ==>> " + map.toString());
 
@@ -175,11 +178,13 @@ public class BlockingEntrance {
 //
 //        }
 
-        first_supple = postitionStorage.get(combine(map, loc, Building.FIRST_SUPPLY));
-        second_supple = postitionStorage.get(combine(map, loc, Building.SECOND_SUPPLY));
-        barrack = postitionStorage.get(combine(map, loc, Building.BARRACK));
-        factory = postitionStorage.get(combine(map, loc, Building.FACTORY));
-        bunker = postitionStorage.get(combine(map, loc, Building.BUNKER));
+        first_supple = postitionStorage.get(combine(mapName, loc, Building.FIRST_SUPPLY));
+        second_supple = postitionStorage.get(combine(mapName, loc, Building.SECOND_SUPPLY));
+        barrack = postitionStorage.get(combine(mapName, loc, Building.BARRACK));
+        factory = postitionStorage.get(combine(mapName, loc, Building.FACTORY));
+        bunker = postitionStorage.get(combine(mapName, loc, Building.BUNKER));
+        supply_area = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
+        
         //entrance_turret = postitionStorage.get(combine(map, loc, Building.ENTRANCE_TURRET));
         
         
@@ -200,10 +205,15 @@ public class BlockingEntrance {
     	if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.OVERWATCH) {
     		
     		
-			int[] fix_supplyXX = { 0, 115, 94, 0, 21 };
+			/*int[] fix_supplyXX = { 0, 115, 94, 0, 21 };
 			fix_supplyX = fix_supplyXX;
 			int[] fix_supplyYY = { 0, 28, 121, 95, 0 };
-			fix_supplyY = fix_supplyYY;
+			fix_supplyY = fix_supplyYY;*/
+			
+			postitionStorage.put(combine(Map.OVERWATCH, Location.One, Building.SUPPLY_AREA), new TilePosition(115, 25));
+	    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.SUPPLY_AREA), new TilePosition(94, 121));
+	    	postitionStorage.put(combine(Map.OVERWATCH, Location.Seven, Building.SUPPLY_AREA), new TilePosition(0, 95));
+	    	postitionStorage.put(combine(Map.OVERWATCH, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(21, 0));
     		
     		if (InformationManager.Instance().enemyRace == Race.Protoss
 					|| InformationManager.Instance().enemyRace == Race.Terran) {
@@ -213,16 +223,16 @@ public class BlockingEntrance {
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.One, Building.FACTORY)   		  , new TilePosition(115, 21));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.One, Building.BUNKER)   		  , new TilePosition(108, 16));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.One, Building.ENTRANCE_TURRET), new TilePosition(111, 14));
-		
-		
+
+		    	
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.FIRST_SUPPLY)  , new TilePosition(113, 107));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.BARRACK)   		 , new TilePosition(109, 107));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.SECOND_SUPPLY)   , new TilePosition(107, 105));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.FACTORY)   		 , new TilePosition(107, 115));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.BUNKER)   		   , new TilePosition(113, 109));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Five, Building.ENTRANCE_TURRET), new TilePosition(116, 108));
-		
-		
+
+		    	
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Seven, Building.FIRST_SUPPLY)  , new TilePosition(20, 110));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Seven, Building.BARRACK)   		  , new TilePosition(16, 112));
 		    	postitionStorage.put(combine(Map.OVERWATCH, Location.Seven, Building.SECOND_SUPPLY)   , new TilePosition(23, 110));
@@ -272,14 +282,21 @@ public class BlockingEntrance {
 
     			
     		}
+    		
+    		
     	}
     	
     	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
     		
-    		int[] fix_supplyXX = { 0, 101, 101, 15, 15 };
+    		/*int[] fix_supplyXX = { 0, 101, 101, 15, 15 };
 			fix_supplyX = fix_supplyXX;
 			int[] fix_supplyYY = { 0, 0, 121, 121, 0 };
-			fix_supplyY = fix_supplyYY;
+			fix_supplyY = fix_supplyYY;*/
+			
+			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SUPPLY_AREA), new TilePosition(101, 0));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SUPPLY_AREA), new TilePosition(101, 121));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(15, 121));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(15, 0));
     	
     	
 //    	맵 : CIRCUITBREAKER
@@ -409,16 +426,41 @@ public class BlockingEntrance {
 	
 	public final TilePosition getSupplyPosition(TilePosition tilepos)
 	{
+//			Map map = InformationManager.Instance().getMapSpecificInformation().getMap();
+//			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
 		
-			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
-			return supply_pos;
+		Location loc = Location.START;
+
+        if(tilepos.getX() < SMALL
+                && tilepos.getY() < SMALL){
+            loc = Location.Eleven;
+        }
+
+        if(BIG < tilepos.getX()
+                && tilepos.getY() < SMALL){
+            loc = Location.One;
+        }
+     
+        if(tilepos.getX() < SMALL
+                && tilepos.getY() > SMALL){
+            loc = Location.Seven;
+        }
+
+        if(BIG < tilepos.getX()
+                && tilepos.getY() > SMALL){
+            loc = Location.Five;
+        }
+        
+		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
+		return supply_pos;
 
 	}
 	
 	public final TilePosition getSupplyPosition()
 	{
-			TilePosition supply_pos= new TilePosition(fix_supplyX[loc_t.getValue()], fix_supplyY[loc_t.getValue()]);
-			return supply_pos;
+		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc_t, Building.SUPPLY_AREA));
+//		System.out.println(" supply_pos ==>>> ( " + supply_pos.getX() + " , " + supply_pos.getY() + " ) ");
+		return supply_pos;
 	}
 }
 
