@@ -1,5 +1,7 @@
 package prebot.build.provider.items.building;
 
+import java.util.List;
+
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
@@ -8,8 +10,10 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.common.util.UnitUtils;
 
 public class BuilderSupplyDepot extends DefaultBuildableItem {
 
@@ -76,6 +80,15 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
         boolean barrackflag = false;
         boolean factoryflag = false;
 
+        
+        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) > 0) {
+        	barrackflag = true;
+        }
+        
+        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0) {
+        	barrackflag = true;
+        }
+        
         if(factoryflag==false){
             for (Unit unit : Prebot.Broodwar.self().getUnits()) {
                 if (unit.getType() == UnitType.Terran_Factory  && unit.isCompleted()) {
@@ -87,21 +100,19 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
             }
         }
 
-        int Faccnt=0;
-        int CCcnt=0;
+        int Faccnt =0;
+        int CCcnt  = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
         int facFullOperating =0;
-        for (Unit unit : Prebot.Broodwar.self().getUnits())
+        
+        List<Unit> factory = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+        for (Unit unit : factory)
         {
-            if (unit == null) continue;
-            if (unit.getType().isResourceDepot() && unit.isCompleted()){
-                CCcnt++;
+
+            Faccnt ++;
+            if(unit.isTraining() == true){
+                facFullOperating++;
             }
-            if (unit.getType() == UnitType.Terran_Factory && unit.isCompleted()){
-                Faccnt ++;
-                if(unit.isTraining() == true){
-                    facFullOperating++;
-                }
-            }
+
         }
 
         if(CCcnt == 1){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨

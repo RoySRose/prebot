@@ -1,5 +1,7 @@
 package prebot.build.provider.items.building;
 
+import java.util.List;
+
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
@@ -9,8 +11,10 @@ import prebot.build.provider.BuildConditionChecker;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.common.util.UnitUtils;
 
 public class BuilderBarracks extends DefaultBuildableItem {
 
@@ -21,20 +25,29 @@ public class BuilderBarracks extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
-    	if(BuildQueueProvider.Instance().respondSet) {
-    		return false;
-    	}else {
+    	if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) +
+			 ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) != 0) {
+			return true;
+		}
     	
-    		if (InitialBuildProvider.Instance().InitialBuildFinished == true 
-    				&& 
-    				(BuildConditionChecker.Instance().barrackcnt == 0 
-    				|| (BuildConditionChecker.Instance().barrackcnt == 1 && BuildConditionChecker.Instance().barrackUnit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3))) {
-    			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) == 0
-    					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
-//    				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks, false);
-    				return true;
-    			}
-    		}
+		
+		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 0) {
+			
+			return true;
+
+//			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks) +
+//				 ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Barracks, null) == 0) {
+//				return true;
+//			}
+		}else if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 1) {
+			List<Unit> BarracksList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
+			
+			for(Unit unit : BarracksList) {
+				if(unit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3) {
+					return true;
+				}
+			}
+		}
 //	        //System.out.println("barracks build condition check");
 //	//    	배럭이 2개만들어질 경우가 있는지 확인은 필요. 현재 조건 1개를 전제로 함
 //	    	if (InitialBuildProvider.Instance().InitialBuildFinished) {
@@ -65,7 +78,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
 //	    			}
 //	    		}
 //			}
-    	}
+
     	return false;
     }
 

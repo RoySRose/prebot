@@ -32,11 +32,11 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
 			    	//if(researchSelector.getSelected().equals(metaType)) {
 			//        	FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());
 			        	
-				        	if (researchSelector.currentResearched <= 2) {
-				//        		FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || block & high");
-				        		setBlocking(true);
-				        		setHighPriority(true);
-				        	}
+//				        	if (researchSelector.currentResearched <= 2) {
+//				//        		FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || block & high");
+//				        		setBlocking(true);
+//				        		setHighPriority(true);
+//				        	}
 				            return true;
 			    		}
 			        }

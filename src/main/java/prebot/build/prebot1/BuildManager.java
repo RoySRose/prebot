@@ -18,9 +18,12 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.constant.BuildConfig;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.TempBuildSourceCode;
 
@@ -39,6 +42,8 @@ public class BuildManager extends GameManager {
 	public Boolean FirstExpansionLocationFull;
 	public Boolean SecondChokePointFull;
 	public Boolean FisrtSupplePointFull;
+	
+//	public boolean tank = false;
 	
 	/// static singleton 객체를 리턴합니다
 	public static BuildManager Instance() {
@@ -82,6 +87,17 @@ public class BuildManager extends GameManager {
 
 		// the current item to be used
 		BuildOrderItem currentItem = buildQueue.getHighestPriorityItem();
+		
+		//test용. 날릴것. hkk
+//		tank = false;
+//		if(currentItem.metaType.isUnit()) {
+//			if(currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+//				System.out.println("=================== Siege Tank of BuildManager ====== producer ==> " + currentItem.producerID);
+//				tank = true;
+//			}
+//		}
+		//여기까지 날릴것
+		
 
 		//System.out.println("current HighestPriorityItem is " + currentItem.metaType.getName());
 
@@ -98,10 +114,10 @@ public class BuildManager extends GameManager {
 			else {
 				seedPosition = getSeedPositionFromSeedLocationStrategy(currentItem.seedLocationStrategy);
 			}
-			
+
 			// this is the unit which can produce the currentItem
 			Unit producer = getProducer(currentItem.metaType, seedPosition, currentItem.producerID);
-					
+			
 			/*
 			 * if (currentItem.metaType.isUnit() &&
 			 * currentItem.metaType.getUnitType().isBuilding()) { if (producer
@@ -120,8 +136,19 @@ public class BuildManager extends GameManager {
 				// check to see if we can make it right now
 				// 지금 해당 유닛을 건설/생산 할 수 있는지에 대해 자원, 서플라이, 테크 트리, producer 만을 갖고
 				// 판단한다
+				//test용. 날릴것. hkk
+//				if(tank) {
+//					System.out.println("producer ==>  " + producer.getType() + " : " + producer.getID());
+//				}
+				
 				canMake = canMakeNow(producer, currentItem.metaType);
 
+				//test용. 날릴것. hkk
+//				if(tank) {
+//					System.out.println("canMake ===>>> " + canMake);
+//				}
+				
+				
 				/*
 				 * if (currentItem.metaType.isUnit() &&
 				 * currentItem.metaType.getUnitType().isBuilding() ) { std::cout
@@ -233,10 +260,18 @@ public class BuildManager extends GameManager {
 	public Unit getProducer(MetaType t, Position closestTo, int producerID) {
 		// get the type of unit that builds this
 		UnitType producerType = t.whatBuilds();
+		
+
 
 		// make a set of all candidate producers
 		List<Unit> candidateProducers = new ArrayList<Unit>();
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+//		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		List<Unit> selectPorducer = UnitUtils.getUnitList(UnitFindRange.COMPLETE);
+		for (Unit unit : selectPorducer) {
+			
+			//test용 날릴것. hkk
+//			if(tank) System.out.println("======== unit of selectPorducer ==>> " + unit.getType() +" : " + unit.getID());
+			
 			if (unit == null)
 				continue;
 
@@ -281,6 +316,15 @@ public class BuildManager extends GameManager {
 				Pair<UnitType, Integer> ReqPair = null;
 
 				Map<UnitType, Integer> requiredUnitsMap = t.getUnitType().requiredUnits();
+				
+				//test용 날릴것. hkk
+//				if(t.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+//				
+//					System.out.println(" requiredUnitsMap ==> " + requiredUnitsMap);
+//				}
+				
+				boolean able = true;
+				
 				if (requiredUnitsMap != null) {
 					Iterator<UnitType> it = requiredUnitsMap.keySet().iterator();
 
@@ -290,11 +334,15 @@ public class BuildManager extends GameManager {
 						UnitType requiredType = it.next();
 						if (requiredType.isAddon()) {
 							if (unit.getAddon() == null || (unit.getAddon().getType() != requiredType)) {
-								continue;
+//								if(tank) System.out.println("======== unit don't have addon & continue==>> " + unit.getType() +" : " + unit.getID());
+//								continue;
+								able = false;
 							}
 						}
 					}
 				}
+				
+				if(!able) continue;
 
 				// if the type is an addon
 				if (t.getUnitType().isAddon()) {
@@ -363,11 +411,24 @@ public class BuildManager extends GameManager {
 				}
 			}
 
+			//test 용 날릴것. hkk
+//			if(tank) System.out.println("add candidateProducers ==> " + unit.getType() + " : " + unit.getID());
 			// if we haven't cut it, add it to the set of candidates
 			candidateProducers.add(unit); // C++ :
 											// candidateProducers.insert(unit);
+			
 
 		}
+		
+		//test 용 날릴것 .hkk
+//		if(tank) {
+//			
+//			
+//			
+//			for(Unit unit_list : candidateProducers) {
+//				System.out.println("candidateProducers ==>> " + unit_list.getType() + " : " + unit_list.getID());
+//			}
+//		}
 
 		return getClosestUnitToPosition(candidateProducers, closestTo);
 	}
@@ -459,6 +520,11 @@ public class BuildManager extends GameManager {
 		}
 
 		boolean canMake = hasEnoughResources(t);
+		
+//		if(tank) {
+//			System.out.println("******** " + producer.getID() +" 's  canBuildAddon && isConstructing==>> " + producer.canBuildAddon() + " && " + producer.isConstructing());
+//			//System.out.println("producer.isConstructing(); ==>> " + producer.isConstructing());
+//		}
 
 		if (canMake) {
 			if (t.isUnit()) {
@@ -987,7 +1053,8 @@ public class BuildManager extends GameManager {
 						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								
-								if (TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
+								if(InitialBuildProvider.Instance().InitialBuildFinished) {
+//								if (TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
 									if(unit.canBuildAddon() == false){
 										continue;
 									}
