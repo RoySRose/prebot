@@ -1,15 +1,8 @@
 package prebot.strategy;
 
-import java.util.List;
-
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwta.BaseLocation;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.InfoUtils;
-import prebot.common.util.UnitUtils;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
@@ -50,7 +43,7 @@ public class StrategyManager extends GameManager {
 	public void setCurrentStrategyBasic(EnemyStrategy strategy) {
 		if (currentStrategy != strategy) {
 			lastStrategy = currentStrategy;
-			currentStrategy = strategy;
+			currentStrategy =  strategy;
 			TempBuildSourceCode.Instance().setCombatUnitRatio();
 		}
 	}
@@ -95,7 +88,7 @@ public class StrategyManager extends GameManager {
 		StrategyAnalyseManager.Instance().update();
 		ActionManager.Instance().update();
 		DefenseTowerTimer.Instance().update();
-
+		
 		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
@@ -104,9 +97,7 @@ public class StrategyManager extends GameManager {
 		PositionFinder.Instance().update();
 		EnemyBaseFinder.Instance().update();
 		
-		expansionOkay();
-
-		if (Prebot.Broodwar.getFrameCount() % 31 == 0) {
+		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
 			AttackExpansionManager.Instance().executeCombat();
 		}
 
@@ -129,7 +120,6 @@ public class StrategyManager extends GameManager {
 			}
 		}
 		
-		StrategyIdea.EXOK = expansionOkay;
-	}
 
+	
 }
