@@ -1437,7 +1437,7 @@ public class UXManager {
 		}
 		
 		// air force team
-		int y = 200;
+		int y = 150;
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
 			Position position = airForceTeam.leaderUnit.getPosition();
@@ -1448,6 +1448,9 @@ public class UXManager {
 			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceTeam.toString());
 		}
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "strike level=" + AirForceManager.Instance().getStrikeLevel());
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "total achievement=" + AirForceManager.Instance().getAchievementEffectiveFrame());
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "accumulated achievement=" + AirForceManager.Instance().getAccumulatedAchievement());
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "wraith count=" + StrategyIdea.wraithCount);
 	}
 	
 	private void drawEnemyBaseToBaseTime() {
