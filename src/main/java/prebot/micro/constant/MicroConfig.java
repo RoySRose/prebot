@@ -151,7 +151,7 @@ public class MicroConfig {
 		public static final double BACKOFF_DIST_RANGE_ENEMY = 180.0;
 		
 		public static final int TANK_SQUAD_SIZE = 2;
-		public static final int MAIN_SQUAD_COVERAGE = 150;
+		public static final int MAIN_SQUAD_COVERAGE = 200;
 		public static final int MAIN_SQUAD_COVERAGE2 = 250;
 		public static final int ARRIVE_DECISION_RANGE = 100;
 		

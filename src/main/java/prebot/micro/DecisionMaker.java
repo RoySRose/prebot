@@ -7,7 +7,6 @@ import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.UXManager;
 import prebot.common.main.Prebot;
@@ -133,7 +132,7 @@ public class DecisionMaker {
 			}
 			if (isAirDefenseBuilding) {
 				euiListAirDefenseBuilding.add(eui);
-			} else if (eui.getType().airWeapon() != WeaponType.None) {
+			} else if (MicroUtils.airEnemyType(eui.getType())) {
 				euiListAirWeapon.add(eui);
 			} else {
 				euiListFeed.add(eui);
@@ -151,18 +150,17 @@ public class DecisionMaker {
 		for (UnitInfo eui : euiListAirDefenseBuilding) {
 			Unit enemyUnit = UnitUtils.unitInSight(eui);
 			if (enemyUnit != null) {
-				if (enemyUnit.isInWeaponRange(airForceTeam.leaderUnit)) {
-					return Decision.fleeFromUnit(eui);
+				// 벙커 별도 처리
+				if (enemyUnit.getType() == UnitType.Terran_Bunker) {
+					int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+					if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
+						return Decision.fleeFromUnit(eui);
+					}
+				} else {
+					if (enemyUnit.isInWeaponRange(airForceTeam.leaderUnit)) {
+						return Decision.fleeFromUnit(eui);
+					}
 				}
-
-				// TODO 벙커 별도 처리가 필요한지 테스트
-				// if (enemyUnit.getType() == UnitType.Terran_Bunker) {
-				// int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32 + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
-				// if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
-				// System.out.println("##### avoid bunker");
-				// return Decision.attackPosition();
-				// }
-				// }
 			}
 		}
 
@@ -392,7 +390,7 @@ public class DecisionMaker {
 		int enemyWeaponRange = 0;
 
 		if (enemyUnitType == UnitType.Terran_Bunker) {
-			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32;
+			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;
 		} else {
 			if (!myUnit.isFlying()) {
 				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.airWeapon());
