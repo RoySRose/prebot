@@ -1411,7 +1411,7 @@ public class UXManager {
 			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
 			
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32, Color.White);
+				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64, Color.White);
 			}
 		}
 		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());

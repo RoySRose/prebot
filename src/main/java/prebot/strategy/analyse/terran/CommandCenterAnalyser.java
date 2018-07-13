@@ -49,9 +49,6 @@ public class CommandCenterAnalyser extends UnitAnalyser {
 				return;
 			}
 		}
-		
-		System.out.println(found.get(0).getLastPosition().toTilePosition());
-		System.out.println(enemyBase.getTilePosition());
 			
 		int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 		
