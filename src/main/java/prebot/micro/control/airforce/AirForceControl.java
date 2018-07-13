@@ -9,6 +9,7 @@ import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
@@ -122,8 +123,7 @@ public class AirForceControl extends Control {
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) {
-//			airDrivingPosition = airDrivingPosition(airForceTeam, TilePositionUtils.getCenterTilePosition().toPosition(), Angles.AIR_FORCE_DRIVE); // 가까운 base로 변경
-			airDrivingPosition = MicroUtils.airFleePosition(airForceTeam.leaderUnit.getPosition(), decision.eui.getLastPosition());
+			airDrivingPosition = airFeePosition(airForceTeam, decision.eui.getLastPosition(), airForceTeam.driveAngle);
 			airForceTeam.retreat();
 		}
 		airForceTeam.leaderOrderPosition = airDrivingPosition;
@@ -138,6 +138,15 @@ public class AirForceControl extends Control {
 		}
 		if (airDrivingPosition == null) {
 			airDrivingPosition = goalPosition;
+		}
+		return airDrivingPosition;
+	}
+
+	private Position airFeePosition(AirForceTeam airForceTeam, Position enemyPosition, int[] angle) {
+		Position leaderPosition = airForceTeam.leaderUnit.getPosition();
+		Position airDrivingPosition = MicroUtils.airFleePosition(leaderPosition, enemyPosition);
+		if (airDrivingPosition == null) {
+			airDrivingPosition = airDrivingPosition(airForceTeam, TilePositionUtils.getCenterTilePosition().toPosition(), angle);
 		}
 		return airDrivingPosition;
 	}

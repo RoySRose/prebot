@@ -6,9 +6,9 @@ import java.util.Map;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
@@ -51,8 +51,8 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 		if (unitInSight == null) {
 			return CommonCode.NONE;
 		}
-
-		if (unitInSight.getType().airWeapon() != WeaponType.None || unitInSight.getType() == UnitType.Protoss_Carrier) {
+		
+		if (MicroUtils.airEnemyType(unitInSight.getType())) {
 			return caculateForEnemy(unit, unitInSight);
 		} else {
 			return caculateForFeed(unit, unitInSight);
@@ -78,7 +78,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	private int criticalHighestScore(Unit enemyUnit) {
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			if (enemyUnit.getType().isWorker()) {
-				if (enemyUnit.isConstructing()) {
+				if (enemyUnit.isConstructing() && enemyUnit.getOrderTarget() != null) {
 					UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
 					if (constructingBuilding == UnitType.Terran_Missile_Turret) {
 						return 30;
@@ -101,7 +101,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	private int soreHighestScore(Unit enemyUnit) {
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			if (enemyUnit.getType().isWorker()) {
-				if (enemyUnit.isConstructing()) {
+				if (enemyUnit.isConstructing() && enemyUnit.getOrderTarget() != null) {
 					UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
 					if (constructingBuilding == UnitType.Terran_Command_Center) {
 						return 27;

@@ -144,6 +144,15 @@ public class MicroUtils {
 		return airDrivingPosition;
 	}
 	
+	public static boolean airEnemyType(UnitType unitType) {
+		return unitType.airWeapon() != WeaponType.None
+				|| unitType == UnitType.Terran_Medic
+				|| unitType == UnitType.Terran_Science_Vessel
+				|| unitType == UnitType.Zerg_Defiler
+				|| unitType == UnitType.Protoss_Carrier
+				|| unitType == UnitType.Protoss_High_Templar;
+	}
+	
 	private static double getDistanceAfterSeconds(Position startPosition, Position endPosition, int seconds) {
 		if (seconds == 0) {
 			return startPosition.getDistance(endPosition);
