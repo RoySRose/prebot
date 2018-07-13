@@ -207,7 +207,7 @@ public class UnitUtils {
 			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 32;
+				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;
 			} else {
 				if (enemyAirWeopon) {
 					if (eui.getType().airWeapon() != WeaponType.None) {

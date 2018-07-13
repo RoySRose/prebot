@@ -110,12 +110,11 @@ public class WatcherControl extends Control {
 				fightUnitList.add(unit);
 				continue;
 			}
-			
-			if (unit.getID() == leader.getID() || unit.getDistance(leader) <= REGROUP_UNIT_RADIUS) {
-				CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
-			} else {
-				CommandUtils.move(unit, leader.getPosition());
+			if (unit.getID() != leader.getID() && unit.getDistance(leader) > REGROUP_UNIT_RADIUS) {
+				fightUnitList.add(unit);
+				continue;
 			}
+			CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
 		}
 		
 		if (!fightUnitList.isEmpty()) {

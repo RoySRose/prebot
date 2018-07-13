@@ -129,52 +129,56 @@ public class AirForceManager {
 		}
 		
 		if (resetTargetPosition) {
-			firstBase = secondBase = null;
-			targetPositions.clear();
-
-			/// 첫번째 공격 base, 마지막 공격 base를 지정하고, 중간 포지션을 설정한다.
-			double airDistanceToBase = InfoUtils.myBase().getAirDistance(InfoUtils.enemyBase());
-			double airDistanceToExpansion = InfoUtils.myBase().getAirDistance(InfoUtils.enemyFirstExpansion());
-			
-			boolean expansionFirst = false;
-			if (airDistanceToBase < airDistanceToExpansion) {
-				expansionFirst = false; // 본진먼저
-				firstBase = InfoUtils.enemyBase();
-				secondBase = InfoUtils.enemyFirstExpansion();
-			} else {
-				expansionFirst = true; // 앞마당먼저
-				firstBase = InfoUtils.enemyFirstExpansion();
-				secondBase = InfoUtils.enemyBase();
-			}
-			
-			int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
-			int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
-
-			double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
-			double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
-
-			if (expansionFirst) {
-				targetPositions.addAll(getMineralPositions());
-			}
-			
-			targetPositions.add(firstBase.getPosition());
-			for (int index = 0; index < AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE; index++) {
-				int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
-				int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index + 1));
-
-				targetPositions.add(new Position(resultX, resultY));
-			}
-			targetPositions.add(secondBase.getPosition());
-			
-			if (!expansionFirst) {
-				targetPositions.addAll(getMineralPositions());
-			}
-			
-			AirForceManager.airForceTargetPositionSize = targetPositions.size();
-			
-//			this.setRetreatPosition();
-			this.setRetreatPositionForUseMapSetting();
+			resetTargetPosition();
 		}
+	}
+
+	private void resetTargetPosition() {
+		firstBase = secondBase = null;
+		targetPositions.clear();
+
+		/// 첫번째 공격 base, 마지막 공격 base를 지정하고, 중간 포지션을 설정한다.
+		double airDistanceToBase = InfoUtils.myBase().getAirDistance(InfoUtils.enemyBase());
+		double airDistanceToExpansion = InfoUtils.myBase().getAirDistance(InfoUtils.enemyFirstExpansion());
+		
+		boolean expansionFirst = false;
+		if (airDistanceToBase < airDistanceToExpansion) {
+			expansionFirst = false; // 본진먼저
+			firstBase = InfoUtils.enemyBase();
+			secondBase = InfoUtils.enemyFirstExpansion();
+		} else {
+			expansionFirst = true; // 앞마당먼저
+			firstBase = InfoUtils.enemyFirstExpansion();
+			secondBase = InfoUtils.enemyBase();
+		}
+		
+		int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
+		int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
+
+		double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
+		double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
+
+		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && expansionFirst) {
+			targetPositions.addAll(getMineralPositions());
+		}
+		
+		targetPositions.add(firstBase.getPosition());
+		for (int index = 0; index < AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE; index++) {
+			int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
+			int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index + 1));
+
+			targetPositions.add(new Position(resultX, resultY));
+		}
+		targetPositions.add(secondBase.getPosition());
+		
+		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
+			targetPositions.addAll(getMineralPositions());
+		}
+		
+		AirForceManager.airForceTargetPositionSize = targetPositions.size();
+		
+//		this.setRetreatPosition();
+		this.setRetreatPositionForUseMapSetting();
 	}
 
 	private List<Position> getMineralPositions() {
@@ -284,7 +288,7 @@ public class AirForceManager {
 		
 		boolean levelDown = false;
 		boolean levelUp = false;
-		if (achievementEffectiveFrame > 0) {
+		if (StrikeLevel.CRITICAL_SPOT > strikeLevel && achievementEffectiveFrame > 0) {
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
@@ -324,9 +328,11 @@ public class AirForceManager {
 		if (levelDown) {
 			strikeLevel--;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+			resetTargetPosition();
 		} else if (levelUp) {
 			strikeLevel++;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+			resetTargetPosition();
 		}
 	}
 
