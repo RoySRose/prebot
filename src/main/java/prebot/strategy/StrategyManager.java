@@ -7,12 +7,14 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
+import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
+import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
@@ -28,6 +30,7 @@ import prebot.strategy.manage.VultureTravelManager;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager extends GameManager {
 
+	
 	private static StrategyManager instance = new StrategyManager();
 
 	/// static singleton 객체를 리턴합니다
@@ -93,7 +96,7 @@ public class StrategyManager extends GameManager {
 		StrategyAnalyseManager.Instance().update();
 		ActionManager.Instance().update();
 		DefenseTowerTimer.Instance().update();
-
+		
 		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
@@ -101,11 +104,14 @@ public class StrategyManager extends GameManager {
 		AirForceManager.Instance().update();
 		PositionFinder.Instance().update();
 		EnemyBaseFinder.Instance().update();
-		
 		expansionOkay();
+		
+		if (Prebot.Broodwar.getFrameCount() % 31 == 0){
+			AttackExpansionManager.Instance().executeCombat();
+		}
 
 	}
-
+	
 	private void expansionOkay() {
 		boolean expansionOkay = false;
 		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
@@ -114,14 +120,15 @@ public class StrategyManager extends GameManager {
 			if (commandCenter.isLifted()) {
 				continue;
 			}
-				
+			
 			if(commandCenter.getTilePosition().getX() == myFirstExpansion.getTilePosition().getX()
 					&& commandCenter.getTilePosition().getY() == myFirstExpansion.getTilePosition().getY()) {
 				expansionOkay = true;
 				break;
 			}
 		}
+		
 		StrategyIdea.EXOK = expansionOkay;
 	}
-	
+
 }
