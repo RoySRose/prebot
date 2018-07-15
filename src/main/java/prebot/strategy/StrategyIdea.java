@@ -6,7 +6,6 @@ import java.util.List;
 import bwapi.Position;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
@@ -25,15 +24,17 @@ public class StrategyIdea {
 	public static int wraithCount = 0;
 
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 
-	public static int bunkerNeedFrame = CommonCode.INT_MAX;
-	public static int bunkerBuildStartFrame = CommonCode.INT_MAX;
-	public static RegionType bunkerRegionType = RegionType.MY_BASE;
+//	public static int bunkerNeedFrame = CommonCode.INT_MAX;
+//	public static int bunkerBuildStartFrame = CommonCode.INT_MAX;
+//	public static RegionType bunkerRegionType = RegionType.MY_BASE;
 
 	// 터렛이 필요한 frame (turretBuildStartFrame 이전에는 터렛을 짓지 않는다.)
 	public static int turretNeedFrame = CommonCode.INT_MAX;
 	public static int turretBuildStartFrame = CommonCode.INT_MAX;
 	public static int engineeringBayBuildStartFrame = CommonCode.INT_MAX;
-	public static List<RegionType> turretRegionType = new ArrayList<>();
+	public static int academyFrame = CommonCode.INT_MAX;
+	
+//	public static List<RegionType> turretRegionType = new ArrayList<>();
 	
 	public static boolean EXOK = false; // 앞마당 커맨드가 제자리에 안착했는지 여부
 
@@ -42,10 +43,12 @@ public class StrategyIdea {
 	public static boolean photonRushed = false;
 	
 	// [적군 위치에 따른 상태 파악]
-	// 빌드매니저: COMMING, IN_MY_REGION인 경우 벌처, 팩토리가 없는 경우 마린을 우선적으로 추가 생산한다. (마린 6기 이상이면 추가생산 없음, 벌처 2기 이상이면 추가생산 없음 - 적용 특이사항 예시) (initial이 끝나기 전)
+	// 빌드매니저: COMMING, IN_MY_REGION인 경우 벌처, 팩토리가 없는 경우 마린을 우선적으로 추가 생산한다.
+	// (마린 6기 이상이면 추가생산 없음, 벌처 2기 이상이면 추가생산 없음 - 적용 특이사항 예시) (initial이 끝나기 전)
 	// 컴뱃매니저: ?
 	public static EnemyUnitStatus enemyUnitStatus = EnemyUnitStatus.SLEEPING;
-	public static Position enemySquadPosition = null; // 적 유닛 포지션
+	public static Position enemyGroundSquadPosition = Position.Unknown;
+	public static Position enemyAirSquadPosition = Position.Unknown;
 	
 	// [아군 메인부대의 전투개시 여부]
 	// 컴뱃매니저: 시즈모드 변경시, watcher전투 판단시 
@@ -63,6 +66,7 @@ public class StrategyIdea {
 	public static Position mainPosition = null; // 메인스쿼드 목표 포지션
 	public static Position watcherPosition = null; // watcher 포지션
 	public static Position mainSquadCenter = null; // 메인스쿼드 유닛들의 센터 포지션
+	public static int mainSquadCoverRadius = 0; // 메인스쿼드가 차지한 지역
 
 	public static BaseLocation enemyBaseExpected = null; // 적base 예상 지점
 

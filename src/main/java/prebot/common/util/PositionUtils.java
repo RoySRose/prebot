@@ -119,6 +119,10 @@ public class PositionUtils {
 	
 	/** positionList 중 position에 가장 가까운 position 리턴 */
 	public static Position getClosestPositionToPosition(List<Position> positionList, Position position) {
+		return getClosestPositionToPosition(positionList, position, CommonCode.DOUBLE_MAX);
+	}
+	
+	public static Position getClosestPositionToPosition(List<Position> positionList, Position position, double limitDistance) {
 		if (positionList.size() == 0) {
 			return null;
 		}
@@ -127,7 +131,7 @@ public class PositionUtils {
 		}
 
 		Position closestPosition = null;
-		double closestDist = CommonCode.DOUBLE_MAX;
+		double closestDist = limitDistance;
 
 		for (Position p : positionList) {
 			double dist = p.getDistance(position);

@@ -7,9 +7,9 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
-import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
@@ -38,7 +38,7 @@ public class AirForceControl extends Control {
 		if (!airForceTeam.retreating()) {
 			decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList);
 		} else {
-			decision = Decision.fleeFromPosition();
+			decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
 		}
 
 		// 결정상세(유닛공격, 전진): 쿨타임 및 적유닛타입에 따른 공격, 뭉치기, 카이팅방향 결정
@@ -52,12 +52,10 @@ public class AirForceControl extends Control {
 		this.applyAirForceDecision(airForceTeam, decision, decisionDetail);
 
 		if (decisionDetail != null) {
+			// 공격 쿨타임
 			if (decisionDetail.type == DecisionType.ATTACK_UNIT) {
-				if (decision.type == DecisionType.ATTACK_POSITION) {
-					for (Unit wraith : wraithList) {
-						wraith.rightClick(decisionDetail.eui.getUnit());
-					}
-				} else if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
+				// ATTACK_UNIT, KITING_UNIT 동일
+				if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 					boolean unitInRange = false;
 					Unit unitInSight = UnitUtils.unitInSight(decision.eui);
 					if (unitInSight != null && airForceTeam.leaderUnit.isInWeaponRange(unitInSight)) {
@@ -73,14 +71,25 @@ public class AirForceControl extends Control {
 						}
 					}
 				}
+				// 지나가면서 한대씩 때리기
+				else if (decision.type == DecisionType.ATTACK_POSITION) {
+					for (Unit wraith : wraithList) {
+						wraith.rightClick(decisionDetail.eui.getUnit());
+					}
+				}
 
-			} else if (decisionDetail.type == DecisionType.UNITE) {
+			}
+			// 뭉치기
+			else if (decisionDetail.type == DecisionType.UNITE) {
 //				Position centerOfWraith = UnitUtils.centerPositionOfUnit(wraithList);
 				for (Unit wraith : wraithList) {
 //					wraith.rightClick(centerOfWraith);
 					wraith.rightClick(airForceTeam.leaderUnit.getPosition());
 				}
-			} else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.FLEE_FROM_POSITION) {
+				
+			}
+			// 전진 카이팅, 카이팅
+			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.FLEE_FROM_POSITION) {
 				for (Unit wraith : wraithList) {
 					wraith.rightClick(airForceTeam.leaderOrderPosition);
 				}
@@ -123,8 +132,9 @@ public class AirForceControl extends Control {
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) {
-			airDrivingPosition = airFeePosition(airForceTeam, decision.eui.getLastPosition(), airForceTeam.driveAngle);
-			airForceTeam.retreat();
+			airForceTeam.retreat(decision.eui);
+			airDrivingPosition = airFeePosition(airForceTeam, airForceTeam.driveAngle);
+//			airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), Angles.AIR_FORCE_FREE);
 		}
 		airForceTeam.leaderOrderPosition = airDrivingPosition;
 	}
@@ -142,12 +152,21 @@ public class AirForceControl extends Control {
 		return airDrivingPosition;
 	}
 
-	private Position airFeePosition(AirForceTeam airForceTeam, Position enemyPosition, int[] angle) {
+	private Position airFeePosition(AirForceTeam airForceTeam, int[] angle) {
 		Position leaderPosition = airForceTeam.leaderUnit.getPosition();
+		
+		Position enemyPosition;
+		Unit enemyUnit = Prebot.Broodwar.getUnit(airForceTeam.fleeEui.getUnitID());
+		if (enemyUnit != null) {
+			enemyPosition = enemyUnit.getPosition();
+		} else {
+			enemyPosition = airForceTeam.fleeEui.getLastPosition();
+		}
 		Position airDrivingPosition = MicroUtils.airFleePosition(leaderPosition, enemyPosition);
 		if (airDrivingPosition == null) {
-			airDrivingPosition = airDrivingPosition(airForceTeam, TilePositionUtils.getCenterTilePosition().toPosition(), angle);
+			airDrivingPosition = AirForceManager.Instance().getRetreatPosition();
 		}
+		airDrivingPosition = airDrivingPosition(airForceTeam, airDrivingPosition, angle);
 		return airDrivingPosition;
 	}
 }

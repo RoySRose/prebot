@@ -163,17 +163,17 @@ public class VultureTravelManager {
 		}
 
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
-
-		int mineNumPerPosition = vultureCount / 3 + 1;
-		int bonumNumPerPosition = (mineCount - 10) / 8;
-		if (bonumNumPerPosition > 0) {
-			mineNumPerPosition += bonumNumPerPosition;
-		}
+//		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
+		
+//		int bonusNumPerPosition = (mineCount - 10) / 8;
+//		if (bonusNumPerPosition > 0) {
+//			mineNumPerPosition += bonusNumPerPosition;
+//		}
 
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
 		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
-		StrategyIdea.checkerMaxNumber = Math.min(vultureCount / 4, Vulture.CHECKER_MAX_COUNT);
+		StrategyIdea.checkerMaxNumber = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
 	}
 
 	// 벌처스쿼드가 정찰할 base를 선택한다.

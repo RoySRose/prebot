@@ -8,7 +8,6 @@ import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.debug.UXManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
@@ -16,6 +15,7 @@ import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.predictor.WraithFightPredictor;
 import prebot.micro.targeting.TargetScoreCalculator;
 import prebot.micro.targeting.WraithTargetCalculator;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.AirForceManager;
@@ -87,24 +87,23 @@ public class DecisionMaker {
 		Decision decision;
 		if (bestTargetUnitInfo != null) {
 			if (targetInRangeButOutOfSight || highestScore <= 0) {
-				decision = Decision.stop();
+				decision = Decision.stop(myUnit);
 			} else {
-				decision = Decision.attackUnit(bestTargetUnitInfo);
+				decision = Decision.attackUnit(myUnit, bestTargetUnitInfo);
 			}
 		} else {
 			if (closeUndetectedEnemy != null || tooCloseTarget != null) {
-				decision = Decision.change();
+				decision = Decision.change(myUnit);
 			} else if (tooFarTarget != null) {
 				if (closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
-					decision = Decision.change();
+					decision = Decision.change(myUnit);
 				} else {
-					decision = Decision.hold();
+					decision = Decision.hold(myUnit);
 				}
 			} else {
-				decision = Decision.attackPosition();
+				decision = Decision.attackPosition(myUnit);
 			}
 		}
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 
@@ -154,11 +153,11 @@ public class DecisionMaker {
 				if (enemyUnit.getType() == UnitType.Terran_Bunker) {
 					int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
 					if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
-						return Decision.fleeFromUnit(eui);
+						return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 					}
 				} else {
 					if (enemyUnit.isInWeaponRange(airForceTeam.leaderUnit)) {
-						return Decision.fleeFromUnit(eui);
+						return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 					}
 				}
 			}
@@ -169,16 +168,17 @@ public class DecisionMaker {
 		if (!euiListAirWeapon.isEmpty()) {
 			boolean detectUnitExist = euiListDetector.isEmpty() && airForceTeam.damagedEffectiveFrame < 10;
 			boolean cloakingBonus = airForceTeam.cloakingMode && !detectUnitExist;
-			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus);
+			boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
+			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
 
 			if (fightPredict == SmallFightPredict.ATTACK) {
 				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 
 			} else if (fightPredict == SmallFightPredict.BACK) {
 				if (Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field) && euiListDetector.isEmpty() && !cloakingBonus && airForceTeam.cloakable()) {
-					SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true);
+					SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
 					if (cloakingFightPredict == SmallFightPredict.ATTACK) {
-						return Decision.change();
+						return Decision.change(airForceTeam.leaderUnit);
 					}
 				}
 				
@@ -186,13 +186,13 @@ public class DecisionMaker {
 					Unit unitInSight = UnitUtils.unitInSight(eui);
 					if (unitInSight != null) {
 						if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
-							return Decision.fleeFromUnit(eui);
+							return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 						} else {
 							// isInWeaponRange는 제외해도 괜찮다.
 							int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
 							int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
 							if (enemyUnitDistance < weaponMaxRange) {
-								return Decision.fleeFromUnit(eui);
+								return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 							}
 						}
 					}
@@ -207,12 +207,12 @@ public class DecisionMaker {
 		if (bestTargetInfo != null) {
 			boolean bestTargetProtectedByBuilding = protectedByBuilding(bestTargetInfo, euiListAirDefenseBuilding);
 			if (bestTargetProtectedByBuilding) {
-				return Decision.attackUnit(bestTargetInfo);
+				return Decision.attackUnit(airForceTeam.leaderUnit, bestTargetInfo);
 			} else {
-				return Decision.kitingUnit(bestTargetInfo);
+				return Decision.kitingUnit(airForceTeam.leaderUnit, bestTargetInfo);
 			}
 		} else {
-			return Decision.attackPosition();
+			return Decision.attackPosition(airForceTeam.leaderUnit);
 		}
 	}
 	
@@ -246,7 +246,7 @@ public class DecisionMaker {
 
 	private boolean protectedByBuilding(UnitInfo eui, List<UnitInfo> euiListAirDefenseBuilding) {
 		for (UnitInfo euiBuilding : euiListAirDefenseBuilding) {
-			int buildingWeaponRange = euiBuilding.getType().airWeapon().maxRange() + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+			int buildingWeaponRange = euiBuilding.getType().airWeapon().maxRange();// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
 			double distanceWithBuilding = eui.getLastPosition().getDistance(euiBuilding.getLastPosition());
 			if (distanceWithBuilding < buildingWeaponRange) {
 				return true;
@@ -264,7 +264,7 @@ public class DecisionMaker {
 			}
 		}
 		
-		Decision decision = null;
+		Decision decisionDetail = null;
 		if (allUnitCoolTimeReady) {
 			UnitInfo targetInfo = null;
 			int minimumLinearDistance = CommonCode.INT_MAX;
@@ -309,12 +309,12 @@ public class DecisionMaker {
 				}
 			}
 			if (targetInfo != null) {
-				decision  = Decision.attackUnit(targetInfo);
+				decisionDetail  = Decision.attackUnit(airForceTeam.leaderUnit, targetInfo);
 			}
 		}
 		
 		// 공격할 적이 없을 경우 이동한다.
-		if (decision == null) {
+		if (decisionDetail == null) {
 			// air force team이 너무 분산되어 있는 경우 모으도록 한다.
 			int averageDistance = 0;
 			int memberSize = airForceTeam.memberList.size();
@@ -328,28 +328,31 @@ public class DecisionMaker {
 				averageDistance = sumOfDistance / (memberSize - 1);
 			}
 			if (averageDistance > 5) {
-				decision = Decision.unite();
+				decisionDetail = Decision.unite(airForceTeam.leaderUnit);
 			} else {
 				if (allUnitCoolTimeReady) {
-					decision = Decision.attackPosition();
+					decisionDetail = Decision.attackPosition(airForceTeam.leaderUnit);
 				} else {
-					decision = Decision.fleeFromPosition();
+					decisionDetail = Decision.fleeFromPosition(airForceTeam.leaderUnit);
 				}
 			}
 		}
-		UXManager.Instance().addDecisionListForUx(airForceTeam.leaderUnit, decision);
-		return decision;
+		return decisionDetail;
 	}
 
 	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList) {
+		return makeDecision(myUnit, euiList, false);
+	}
+	
+	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList, boolean overwhelm) {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		for (UnitInfo eui : euiList) {
 			if (!MicroUtils.canAttack(myUnit, eui)) {
 				continue;
 			}
-			if (isCloseDangerousTarget(myUnit, eui)) {
-				return Decision.fleeFromUnit(eui);
+			if (!overwhelm && isCloseDangerousTarget(myUnit, eui)) {
+				return Decision.fleeFromUnit(myUnit, eui);
 			}
 			int score = targetScoreCalculator.calculate(myUnit, eui);
 			if (score > highestScore) {
@@ -360,11 +363,10 @@ public class DecisionMaker {
 
 		Decision decision;
 		if (bestTargetUnitInfo != null) {
-			decision = Decision.kitingUnit(bestTargetUnitInfo);
+			decision = Decision.kitingUnit(myUnit, bestTargetUnitInfo);
 		} else {
-			decision = Decision.attackPosition();
+			decision = Decision.attackPosition(myUnit);
 		}
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 
@@ -390,7 +392,7 @@ public class DecisionMaker {
 		int enemyWeaponRange = 0;
 
 		if (enemyUnitType == UnitType.Terran_Bunker) {
-			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;
+			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 		} else {
 			if (!myUnit.isFlying()) {
 				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.airWeapon());

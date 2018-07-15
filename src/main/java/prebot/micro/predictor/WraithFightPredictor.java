@@ -11,10 +11,38 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 
 public class WraithFightPredictor {
+
+	private static final int POWER_WRAITH = 100;
+	private static final int POWER_CLOAKING = 200;
+	private static final Map<UnitType, Integer> WRAITH_TARGET = new HashMap<>();
 	
-	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> wraithList, List<UnitInfo> euiList, boolean cloakingBonus) {
+	static {
+		WRAITH_TARGET.put(UnitType.Zerg_Mutalisk, 100);
+		WRAITH_TARGET.put(UnitType.Zerg_Hydralisk, 150);
+		WRAITH_TARGET.put(UnitType.Zerg_Scourge, 300);
+		WRAITH_TARGET.put(UnitType.Zerg_Devourer, 300);
+		WRAITH_TARGET.put(UnitType.Zerg_Spore_Colony, 1200);
+		
+		WRAITH_TARGET.put(UnitType.Terran_Marine, 80);
+		WRAITH_TARGET.put(UnitType.Terran_Medic, 200);
+		WRAITH_TARGET.put(UnitType.Terran_Ghost, 200);
+		WRAITH_TARGET.put(UnitType.Terran_Goliath, 500);
+		WRAITH_TARGET.put(UnitType.Terran_Wraith, 100);
+		WRAITH_TARGET.put(UnitType.Terran_Valkyrie, 400);
+		WRAITH_TARGET.put(UnitType.Terran_Battlecruiser, 500);
+		WRAITH_TARGET.put(UnitType.Terran_Bunker, 1000);
+		WRAITH_TARGET.put(UnitType.Terran_Missile_Turret, 800);
+	}
+	
+	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> wraithList, List<UnitInfo> euiList, boolean cloakingBonus, boolean mainSquadBonus) {
 		int wraithPower = powerOfAirForce(wraithList, cloakingBonus);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
+		
+//		System.out.println("wraithPower : " + wraithPower + " / " +  " enemyPower : " + enemyPower);
+		if (mainSquadBonus) {
+//			System.out.println("Bonus! 1000++");
+			wraithPower += 1000;
+		}
 		
 		if (wraithPower > enemyPower) {
 			return SmallFightPredict.ATTACK;
@@ -57,29 +85,6 @@ public class WraithFightPredictor {
 		} else {
 			return enemyPower;
 		}
-	}
-
-	
-	private static final int POWER_WRAITH = 100;
-	private static final int POWER_CLOAKING = 200;
-	private static final Map<UnitType, Integer> WRAITH_TARGET = new HashMap<>();
-	
-	static {
-		WRAITH_TARGET.put(UnitType.Zerg_Hydralisk, 150);
-		WRAITH_TARGET.put(UnitType.Zerg_Mutalisk, 150);
-		WRAITH_TARGET.put(UnitType.Zerg_Scourge, 500);
-		WRAITH_TARGET.put(UnitType.Zerg_Devourer, 500);
-		WRAITH_TARGET.put(UnitType.Zerg_Sunken_Colony, 1500);
-		
-		WRAITH_TARGET.put(UnitType.Terran_Marine, 100);
-		WRAITH_TARGET.put(UnitType.Terran_Medic, 200);
-		WRAITH_TARGET.put(UnitType.Terran_Ghost, 200);
-		WRAITH_TARGET.put(UnitType.Terran_Goliath, 600);
-		WRAITH_TARGET.put(UnitType.Terran_Wraith, 100);
-		WRAITH_TARGET.put(UnitType.Terran_Valkyrie, 400);
-		WRAITH_TARGET.put(UnitType.Terran_Battlecruiser, 600);
-		WRAITH_TARGET.put(UnitType.Terran_Bunker, 1500);
-		WRAITH_TARGET.put(UnitType.Terran_Missile_Turret, 1000);
 	}
 
 }
