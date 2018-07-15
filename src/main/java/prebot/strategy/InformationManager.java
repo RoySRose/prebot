@@ -1592,6 +1592,8 @@ public class InformationManager extends GameManager {
 			gameMap = GameMap.CIRCUITBREAKER;
 		} else if (mapName.matches(".*OVER.*")) {
 			gameMap = GameMap.OVERWATCH;
+		} else if (mapName.matches(".*SPIRIT.*")) {
+			gameMap = GameMap.FIGHTING_SPRIRITS;
 		}
 
 		List<BaseLocation> startingBase = new ArrayList<>();

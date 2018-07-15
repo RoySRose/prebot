@@ -81,8 +81,8 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
 	//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop, true);
 	//							break;
-							BuilderMachineShop.machine_shop_chk = true;
-							return false;
+//							BuilderMachineShop.machine_shop_chk = true;
+							return true;
 						}
 					}
 				}
