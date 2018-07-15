@@ -158,6 +158,9 @@ public class UXManager {
 		} else if (uxOption == 5) {
 			drawEnemyBaseToBaseTime();
 			
+		} else if (uxOption == 6) {
+			drawBigWatch();
+			drawManagerTimeSpent(500, 220);
 		}
 
 		drawUnitIdOnMap();
@@ -1345,7 +1348,8 @@ public class UXManager {
 		
 		int currentY = y;
 		for (GameManager gameManager : gameManagers) {
-			Prebot.Broodwar.drawTextScreen(x, currentY += 10, UxColor.CHAR_PURPLE + gameManager.getClass().getSimpleName());
+			currentY += 10;
+			Prebot.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_PURPLE + gameManager.getClass().getSimpleName());
 
 			char drawColor = UxColor.CHAR_WHITE;
 			if (gameManager.getRecorded() > 10L) {
@@ -1358,17 +1362,36 @@ public class UXManager {
 
 		Prebot.Broodwar.drawTextScreen(x, currentY += 15, "* group size: " + LagObserver.groupsize());
 	}
+
+	private void drawBigWatch() {
+		Map<String, Long> resultTimeMap = BigWatch.getResultTimeMap();
+		Map<String, Long> recordTimeMap = BigWatch.getRecordTimeMap();
+
+		int currentY = 0;
+		for (String tag : resultTimeMap.keySet()) {
+			Long resultTime = resultTimeMap.get(tag);
+			Long recordTime = recordTimeMap.get(tag);
+			
+			char drawColor = UxColor.CHAR_WHITE;
+			if (recordTime > 10L) {
+				drawColor = UxColor.CHAR_TEAL;
+			} else if (recordTime > 30L) {
+				drawColor = UxColor.CHAR_RED;
+			}
+			Prebot.Broodwar.drawTextScreen(10, currentY += 10, UxColor.CHAR_WHITE + tag + " : " + resultTime + " / " + drawColor + recordTime);
+		}
+	}
 	
 	private void drawPathData(){
 		for (Unit depot : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
 			List<Minerals> mineralsList = WorkerData.depotMineral.get(depot);
 			if (mineralsList == null) { // TODO
-				System.out.println("mineralsList is null.");
-				if (depot != null) {
-					System.out.println("depot=" + depot.getID());
-				} else {
-					System.out.println("depot is null");
-				}
+//				System.out.println("mineralsList is null.");
+//				if (depot != null) {
+//					System.out.println("depot=" + depot.getID() +  "" + depot.getPosition());
+//				} else {
+//					System.out.println("depot is null");
+//				}
 				return;
 			}
 			

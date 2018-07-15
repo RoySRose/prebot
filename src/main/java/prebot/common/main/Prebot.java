@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
 import prebot.common.constant.CommonConfig.Config;
+import prebot.common.debug.BigWatch;
 import prebot.common.debug.UXManager;
 
 public class Prebot extends DefaultBWListener {
@@ -79,6 +80,7 @@ public class Prebot extends DefaultBWListener {
 		// Pause 상태에서는 timeStartedAtFrame 를 계속 갱신해서, timeElapsedAtFrame 이 제대로
 		// 계산되도록 한다
 		try {
+			BigWatch.clear();
 			gameCommander.onFrame();
 		} catch (Exception e) {
 			Broodwar.printf("[Error Stack Trace]");

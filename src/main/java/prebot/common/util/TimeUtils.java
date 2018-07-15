@@ -106,8 +106,8 @@ public class TimeUtils {
 
 	/// 실행할 frame되어야 하는 frame이면 true
 	public static boolean executeRotation(int group, int rotationSize) {
-//		return (Prebot.Broodwar.getFrameCount() % rotationSize) == group;
-		return true;
+		return (Prebot.Broodwar.getFrameCount() % rotationSize) == group;
+//		return true;
 	}
 
 	/// unit이 실행할 rotation이면 true

@@ -98,7 +98,6 @@ public class CombatManager extends GameManager {
 	}
 
 	private void combatUnitArrangement() {
-
 		// 유효한 공격유닛 필터링(일꾼 포함)
 		List<Unit> combatUnitList = new ArrayList<>();
 		for (Unit myUnit : Prebot.Broodwar.self().getUnits()) {
@@ -122,6 +121,7 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateSquadDefault(SquadInfo squadInfo, List<Unit> combatUnitList) {
+//		BigWatch.start("CombatManager.updateSquadDefault." + squadInfo.squadName);
 		Squad squad = squadData.getSquad(squadInfo.squadName);
 
 		for (Unit invalidUnit : squad.invalidUnitList()) {
@@ -137,12 +137,15 @@ public class CombatManager extends GameManager {
 		for (Unit recuitUnit : recruitUnitList) {
 			squadData.assignUnitToSquad(recuitUnit, squad);
 		}
+//		BigWatch.record("CombatManager.updateSquadDefault." + squadInfo.squadName);
 	}
 
 	private void squadExecution() {
 		for (Squad squad : squadData.getSquadMap().values()) {
+//			BigWatch.start("CombatManager.squadExecution." + squad.getSquadName());
 			squad.findEnemies(); // 적 탐색
 			squad.execute(); // squad 유닛 명령 지시
+//			BigWatch.record("CombatManager.squadExecution." + squad.getSquadName());
 		}
 	}
 
