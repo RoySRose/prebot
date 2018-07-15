@@ -203,7 +203,7 @@ public class SpiderMineManger {
 	
 	private Position positionToMineOnlyGoodPosition(Unit vulture, int mineNumberPerPosition) {
 		Position positionToMine = null;
-		Position nearestGoodPosition = PositionUtils.getClosestPositionToPosition(goodPositions, vulture.getPosition());
+		Position nearestGoodPosition = PositionUtils.getClosestPositionToPosition(goodPositions, vulture.getPosition(), 200.0);
 		if (nearestGoodPosition != null) {
 			positionToMine = positionToMineNearPosition(vulture, nearestGoodPosition, mineNumberPerPosition);
 		}

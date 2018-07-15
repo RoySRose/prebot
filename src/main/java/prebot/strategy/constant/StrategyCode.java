@@ -11,7 +11,7 @@ public class StrategyCode {
 	}
 	
 	public static enum SmallFightPredict {
-		BACK, ATTACK
+		BACK, ATTACK, OVERWHELM
 	}
 	
 	public static enum EnemyUnitStatus {

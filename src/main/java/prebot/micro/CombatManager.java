@@ -176,46 +176,47 @@ public class CombatManager extends GameManager {
 		// 게릴라 임무해제
 		List<Squad> guerillaSquads = squadData.getSquadList(SquadInfo.GUERILLA_.squadName);
 		for (Squad squad : guerillaSquads) {
-			if (squad instanceof GuerillaSquad) {
-				for (Unit invalidUnit : squad.invalidUnitList()) {
-					squadData.excludeUnitFromSquad(invalidUnit);
-				}
-				if (removeGuerilla((GuerillaSquad) squad)) {
-					squadData.removeSquad(squad.getSquadName());
-				}
+			for (Unit invalidUnit : squad.invalidUnitList()) {
+				squadData.excludeUnitFromSquad(invalidUnit);
+			}
+			if (removeGuerilla((GuerillaSquad) squad)) {
+				squadData.removeSquad(squad.getSquadName());
 			}
 		}
 	}
 
 	private void newGuerillaSquad(List<Unit> assignableVultures) {
 		BaseLocation bestGuerillaSite = VultureTravelManager.Instance().getBestGuerillaSite(assignableVultures);
-		if (bestGuerillaSite != null) {
-			// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
-			int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
-			int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
+		if (bestGuerillaSite == null) {
+			return;
+		}
 
-			if (vulturePower > enemyPower) {
-				String squadName = SquadInfo.GUERILLA_.squadName + bestGuerillaSite.getPosition().toString();
-				Squad guerillaSquad = squadData.getSquad(squadName);
-				// 게릴라 스쿼드 생성(포지션 별)
-				if (guerillaSquad == null) {
-					guerillaSquad = new GuerillaSquad(bestGuerillaSite.getPosition());
-					squadData.addSquad(guerillaSquad);
+		// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+		int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
+		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
+		if (vulturePower < enemyPower) {
+			return;
+		}
+		
+		String squadName = SquadInfo.GUERILLA_.squadName + bestGuerillaSite.getPosition().toString();
+		Squad guerillaSquad = squadData.getSquad(squadName);
+		// 게릴라 스쿼드 생성(포지션 별)
+		if (guerillaSquad == null) {
+			guerillaSquad = new GuerillaSquad(bestGuerillaSite.getPosition());
+			squadData.addSquad(guerillaSquad);
+		}
+		// 게릴라 유닛이 남아있지 않다면 할당한다.
+		if (guerillaSquad.unitList.isEmpty()) {
+			for (Unit assignableVulture : assignableVultures) {
+				squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
+				int squadPower = VultureFightPredictor.powerOfWatchers(guerillaSquad.unitList);
+				if (squadPower > enemyPower + Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
+					break; // 충분한 파워
 				}
-				// 게릴라 유닛이 남아있지 않다면 할당한다.
-				if (guerillaSquad.unitList.isEmpty()) {
-					for (Unit assignableVulture : assignableVultures) {
-						squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
-						int squadPower = VultureFightPredictor.powerOfWatchers(guerillaSquad.unitList);
-						if (squadPower > enemyPower + Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
-							break; // 충분한 파워
-						}
-					}
-				}
-				VultureTravelManager.Instance().guerillaStart(squadName);
 			}
 		}
+		VultureTravelManager.Instance().guerillaStart(squadName);
 	}
 
 	private boolean removeGuerilla(GuerillaSquad squad) {

@@ -180,15 +180,33 @@ public class UnitUtils {
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForGround(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, euiList, position, radius, false, unitTypes);
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForAir(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(true, euiList, position, radius, true, unitTypes);
+	}
+	
+	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
+		List<UnitInfo> euiList = new ArrayList<>();
+		addEnemyUnitInfosInRadius(true, euiList, position, radius, false, unitTypes);
+		return euiList;
+	}
+	
+	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
+		List<UnitInfo> euiList = new ArrayList<>();
+		addEnemyUnitInfosInRadius(true, euiList, position, radius, true, unitTypes);
+		return euiList;
+	}
+	
+	public static List<UnitInfo> getUnitInfosInRadiusForAirComplete(Position position, int radius, UnitType... unitTypes) {
+		List<UnitInfo> euiList = new ArrayList<>();
+		addEnemyUnitInfosInRadius(false, euiList, position, radius, true, unitTypes);
+		return euiList;
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(Collection<UnitInfo> euiList, Position position, int radius, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyAirWeopon, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -204,10 +222,14 @@ public class UnitUtils {
 			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
+			if (!includeIncomplete && !eui.isCompleted()) {
+				continue;
+			}
+			
 			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;
+				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 			} else {
 				if (enemyAirWeopon) {
 					if (eui.getType().airWeapon() != WeaponType.None) {
@@ -228,18 +250,6 @@ public class UnitUtils {
 			}
 			euiList.add(eui);
 		}
-	}
-	
-	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(euiList, position, radius, false, unitTypes);
-		return euiList;
-	}
-	
-	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(euiList, position, radius, true, unitTypes);
-		return euiList;
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */

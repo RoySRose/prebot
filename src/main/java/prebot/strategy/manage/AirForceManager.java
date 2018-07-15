@@ -32,7 +32,7 @@ public class AirForceManager {
 	}
 
 	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
-	public static final int AIR_FORCE_SAFE_DISTANCE = 80; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
+	public static final int AIR_FORCE_SAFE_DISTANCE = 100; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
 	public static final int AIR_FORCE_SAFE_DISTANCE2 = 150; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
 	public static final int AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE = 1;
 	
@@ -99,19 +99,9 @@ public class AirForceManager {
 	}
 
 	public void update() {
-		BaseLocation enemyBase = InfoUtils.enemyBase();
-		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
-		if (enemyBase == null || enemyFirstExpansion == null) {
-			return;
-		}
 		if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
 			return;
 		}
-		
-		if (strikeLevelStartFrame == CommonCode.NONE) {
-			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-		}
-		
 		setTargetPosition();
 		changeAirForceTeamTargetPosition();
 		adjustStrikeLevel();
@@ -119,28 +109,66 @@ public class AirForceManager {
 	}
 
 	private void setTargetPosition() {
-		boolean resetTargetPosition = false;
-		if (firstBase == null || secondBase == null || targetPositions.isEmpty()) {
-			resetTargetPosition =  true;
-		} else {
-			boolean enemyBaseFirstCase = InfoUtils.enemyBase().equals(firstBase) && InfoUtils.enemyFirstExpansion().equals(secondBase);
-			boolean enemyExpansionFirstCase = InfoUtils.enemyFirstExpansion().equals(firstBase) && InfoUtils.enemyBase().equals(secondBase);
-			resetTargetPosition = !enemyBaseFirstCase && !enemyExpansionFirstCase;
+//		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown
+//				|| StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+//			setTargetPosition(true);
+//			return;
+//		}
+		
+		BaseLocation enemyBase = InfoUtils.enemyBase();
+		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
+		if (enemyBase == null || enemyFirstExpansion == null) {
+			setTargetPosition(true);
+			return;
 		}
 		
-		if (resetTargetPosition) {
-			resetTargetPosition();
+		// 초기화 필요
+		if (firstBase == null || secondBase == null || targetPositions.isEmpty()) {
+			setTargetPosition(false);
+			return;
+		}
+		
+		// base가 변경된 경우
+		boolean enemyBaseFirstCase = InfoUtils.enemyBase().equals(firstBase) && InfoUtils.enemyFirstExpansion().equals(secondBase);
+		boolean enemyExpansionFirstCase = InfoUtils.enemyFirstExpansion().equals(firstBase) && InfoUtils.enemyBase().equals(secondBase);
+		if (!enemyBaseFirstCase && !enemyExpansionFirstCase) {
+			setTargetPosition(false);
+			return;
 		}
 	}
 
-	private void resetTargetPosition() {
+	private void setTargetPosition(boolean defensivePosition) {
 		firstBase = secondBase = null;
 		targetPositions.clear();
 
+		if (defensivePosition) {
+			setDefensivePosition();
+			this.retreatPosition = StrategyIdea.campPosition;
+		} else {
+			setOffensivePosition();
+			setRetreatPositionForUseMapSetting();
+		}
+		
+		AirForceManager.airForceTargetPositionSize = targetPositions.size();
+//		this.setRetreatPosition();
+	}
+
+	private void setDefensivePosition() {
+		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown) {
+			targetPositions.add(StrategyIdea.enemyGroundSquadPosition);
+		}
+		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+			targetPositions.add(StrategyIdea.enemyAirSquadPosition);
+		}
+		targetPositions.add(StrategyIdea.mainSquadCenter);
+		targetPositions.add(StrategyIdea.mainPosition);
+	}
+
+	private void setOffensivePosition() {
 		/// 첫번째 공격 base, 마지막 공격 base를 지정하고, 중간 포지션을 설정한다.
 		double airDistanceToBase = InfoUtils.myBase().getAirDistance(InfoUtils.enemyBase());
 		double airDistanceToExpansion = InfoUtils.myBase().getAirDistance(InfoUtils.enemyFirstExpansion());
-		
+
 		boolean expansionFirst = false;
 		if (airDistanceToBase < airDistanceToExpansion) {
 			expansionFirst = false; // 본진먼저
@@ -151,7 +179,7 @@ public class AirForceManager {
 			firstBase = InfoUtils.enemyFirstExpansion();
 			secondBase = InfoUtils.enemyBase();
 		}
-		
+
 		int vectorX = secondBase.getPosition().getX() - firstBase.getPosition().getX();
 		int vectorY = secondBase.getPosition().getY() - firstBase.getPosition().getY();
 
@@ -161,7 +189,7 @@ public class AirForceManager {
 		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && expansionFirst) {
 			targetPositions.addAll(getMineralPositions());
 		}
-		
+
 		targetPositions.add(firstBase.getPosition());
 		for (int index = 0; index < AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE; index++) {
 			int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
@@ -170,15 +198,10 @@ public class AirForceManager {
 			targetPositions.add(new Position(resultX, resultY));
 		}
 		targetPositions.add(secondBase.getPosition());
-		
+
 		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
 			targetPositions.addAll(getMineralPositions());
 		}
-		
-		AirForceManager.airForceTargetPositionSize = targetPositions.size();
-		
-//		this.setRetreatPosition();
-		this.setRetreatPositionForUseMapSetting();
 	}
 
 	private List<Position> getMineralPositions() {
@@ -288,21 +311,22 @@ public class AirForceManager {
 		
 		boolean levelDown = false;
 		boolean levelUp = false;
-		if (StrikeLevel.CRITICAL_SPOT > strikeLevel && achievementEffectiveFrame > 0) {
+		if (strikeLevelStartFrame == CommonCode.NONE
+				|| StrikeLevel.SORE_SPOT >= strikeLevel && achievementEffectiveFrame > 0) {
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
 		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
 			if (InfoUtils.enemyRace() == Race.Terran) {
-				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 1 * TimeUtils.MINUTE) { // 레이쓰가 활동한지 일정시간 지남
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 45 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
 				} else if (!StrategyIdea.currentStrategy.buildTimeMap.isMechanic()) { // 메카닉이 아님
 					levelDown = true;
-				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Goliath, UnitType.Terran_Armory)) { // 골리앗 발견, 완성된 아모리 발견
+				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Goliath, UnitType.Terran_Armory)) { // 골리앗 발견, 완성된 아모리 발견
 					levelDown = true;
 				}
 			} else if (InfoUtils.enemyRace() == Race.Zerg) {
-				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 1 * TimeUtils.MINUTE) { // 레이쓰가 활동한지 일정시간 지남
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 45 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
 				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 히드라 발견
 					levelDown = true;
@@ -315,7 +339,7 @@ public class AirForceManager {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
 			if (achievementEffectiveFrame <= -50) {
 				levelDown = true;
-			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 20 * TimeUtils.SECOND) {
+			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 15 * TimeUtils.SECOND) {
 				levelDown = true;
 			}
 			
@@ -328,11 +352,11 @@ public class AirForceManager {
 		if (levelDown) {
 			strikeLevel--;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-			resetTargetPosition();
+			setTargetPosition();
 		} else if (levelUp) {
 			strikeLevel++;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-			resetTargetPosition();
+			setTargetPosition();
 		}
 	}
 

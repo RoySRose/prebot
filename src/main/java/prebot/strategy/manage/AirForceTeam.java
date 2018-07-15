@@ -26,6 +26,7 @@ public class AirForceTeam {
 	public int targetTryCount = 0;
 	public boolean directionReservse;
 	public Position leaderOrderPosition;
+	public UnitInfo fleeEui;
 	public int[] driveAngle;
 	public boolean cloakingMode;
 
@@ -45,6 +46,7 @@ public class AirForceTeam {
 		this.targetTryCount = 0; // 공격 재시도 count
 		this.directionReservse = false; // 타깃포지션 변경 역방향 여부
 		this.leaderOrderPosition = null;
+		this.fleeEui = null;
 		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 		this.cloakingMode = false;
 	}
@@ -90,6 +92,11 @@ public class AirForceTeam {
 		if (targetPositions.isEmpty()) {
 			return null;
 		}
+		
+		// AirForceManager의 targetPosition이 변경된 경우
+		if (currentTargetIndex >= AirForceManager.airForceTargetPositionSize) {
+			currentTargetIndex = 0;
+		}
 		return targetPositions.get(currentTargetIndex);
 	}
 
@@ -105,13 +112,14 @@ public class AirForceTeam {
 		return TimeUtils.elapsedFrames(retreatFrame) < RETREAT_TIME;
 	}
 	
-	public void retreat() {
+	public void retreat(UnitInfo eui) {
 		if (retreating()) {
 			return;
 		}
-		retreatFrame = TimeUtils.elapsedFrames();
-		targetTryCount++;
-		if (targetTryCount == MAX_TARGET_TRY_COUNT) {
+		this.fleeEui = eui;
+		this.retreatFrame = TimeUtils.elapsedFrames();
+		this.targetTryCount++;
+		if (this.targetTryCount == MAX_TARGET_TRY_COUNT) {
 			changeTargetIndex();
 		}
 	}

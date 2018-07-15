@@ -1,5 +1,7 @@
 package prebot.micro;
 
+import bwapi.Unit;
+import prebot.common.debug.UXManager;
 import prebot.strategy.UnitInfo;
 
 public class Decision {
@@ -24,55 +26,78 @@ public class Decision {
 	}
 
 	public DecisionType type;
+	public Unit myUnit;
 	public UnitInfo eui;
 	
-	private Decision(DecisionType type) {
+	private Decision(DecisionType type, Unit myUnit) {
 		this.type = type;
+		this.myUnit = myUnit;
 	}
 
-	private Decision(DecisionType type, UnitInfo eui) {
+	private Decision(DecisionType type, Unit myUnit, UnitInfo eui) {
+		this.type = type;
+		this.myUnit = myUnit;
 		this.eui = eui;
-		this.type = type;
 	}
 
-	public static Decision kitingUnit(UnitInfo eui) {
-		return new Decision(DecisionType.KITING_UNIT, eui);
+	public static Decision kitingUnit(Unit myUnit, UnitInfo eui) {
+		Decision decision = new Decision(DecisionType.KITING_UNIT, myUnit, eui);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 
-	public static Decision attackUnit(UnitInfo eui) {
-		return new Decision(DecisionType.ATTACK_UNIT, eui);
+	public static Decision attackUnit(Unit myUnit, UnitInfo eui) {
+		Decision decision = new Decision(DecisionType.ATTACK_UNIT, myUnit, eui);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision fleeFromUnit(UnitInfo eui) {
-		return new Decision(DecisionType.FLEE_FROM_UNIT, eui);
+	public static Decision fleeFromUnit(Unit myUnit, UnitInfo eui) {
+		Decision decision = new Decision(DecisionType.FLEE_FROM_UNIT, myUnit, eui);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision attackPosition() {
-		return new Decision(DecisionType.ATTACK_POSITION);
+	public static Decision attackPosition(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.ATTACK_POSITION, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision fleeFromPosition() {
-		return new Decision(DecisionType.FLEE_FROM_POSITION);
+	public static Decision fleeFromPosition(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.FLEE_FROM_POSITION, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision hold() {
-		return new Decision(DecisionType.HOLD);
+	public static Decision hold(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.HOLD, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision stop() {
-		return new Decision(DecisionType.STOP);
+	public static Decision stop(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.STOP, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision change() {
-		return new Decision(DecisionType.CHANGE_MODE);
+	public static Decision change(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.CHANGE_MODE, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision move() {
-		return new Decision(DecisionType.RIGHT_CLICK);
+	public static Decision move(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.RIGHT_CLICK, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 	
-	public static Decision unite() {
-		return new Decision(DecisionType.UNITE);
+	public static Decision unite(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.UNITE, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
 	}
 
 	@Override

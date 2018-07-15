@@ -333,13 +333,14 @@ public class InformationManager extends GameManager {
 	public void updateUnitsInfo() {
 		// update our units info
 		for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
+//			System.out.println(unit.getID() + ", " + unit.getType());
 			updateUnitInfo(unit);
 		}
 		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 			updateUnitInfo(unit);
 		}
 
-		updateEnemiesInMyRegion();
+		updateEnemiesLocation();
 		
 		// remove bad enemy units
 		if (unitData.get(enemyPlayer) != null) {
@@ -351,7 +352,7 @@ public class InformationManager extends GameManager {
 	}
 
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
-	private void updateEnemiesInMyRegion() {
+	private void updateEnemiesLocation() {
 		euiListInMyRegion.clear();
 		Set<Region> myRegionSet = occupiedRegions.get(selfPlayer);
 		for (Region region : myRegionSet) {
@@ -386,7 +387,7 @@ public class InformationManager extends GameManager {
 				enemyRace = unit.getType().getRace();
 			}
 			
-			if(unit.getPlayer() == selfPlayer && unit.getType() == UnitType.Terran_Vulture_Spider_Mine){
+			if (unit.getPlayer() == selfPlayer && unit.getType() == UnitType.Terran_Vulture_Spider_Mine) {
 				return;
 			}
 			
@@ -655,34 +656,6 @@ public class InformationManager extends GameManager {
 		}
 
 		updateChokePointAndExpansionLocation();
-	}
-	
-	// UnitUtils.getEnemyUnitInfoList 로 대체
-	@Deprecated
-	public List<UnitInfo> getEnemyUnits() {
-		return getEnemyUnits(null);
-	}
-
-	// UnitUtils.getEnemyUnitInfoList 로 대체
-	@Deprecated
-	public List<UnitInfo> getEnemyUnits(UnitType type) {
-		List<UnitInfo> units = new ArrayList<>();
-
-		Iterator<Integer> it = null;
-		it = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
-
-		while (it.hasNext()) {
-			final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
-			if (ui != null) {
-				if (type == null) {
-					units.add(ui);
-				} else if (type == ui.getType()) {
-					units.add(ui);
-				}
-			}
-		}
-
-		return units;
 	}
 	
 	public List<UnitInfo> getEnemyUnitsNear(Unit myunit, int radius, boolean ground, boolean air)
