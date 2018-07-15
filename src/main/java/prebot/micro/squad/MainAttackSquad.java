@@ -65,6 +65,10 @@ public class MainAttackSquad extends Squad {
 	}
 
 	private void updateInitiatedFlag() {
+		if (euiList.isEmpty()) {
+			StrategyIdea.initiated = false;
+		}
+		
 		for (UnitInfo eui : euiList) {
 			if (eui.getType() != UnitType.Terran_Vulture_Spider_Mine
 					&& eui.getType() != UnitType.Zerg_Larva
@@ -74,7 +78,6 @@ public class MainAttackSquad extends Squad {
 				StrategyIdea.initiated = true;
 			}
 		}
-		StrategyIdea.initiated = false;
 	}
 	
 	@Override

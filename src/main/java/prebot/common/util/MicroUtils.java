@@ -33,7 +33,7 @@ import prebot.strategy.manage.AirForceManager;
  */
 public class MicroUtils {
 
-	private static final int WRAITH_MOVE_DISTANCE_48_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 48); // 1.5초간 움직이는 거리
+	private static final int WRAITH_MOVE_DISTANCE_48_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 48); // 2.0초간 움직이는 거리
 	private static final int WRAITH_MOVE_DISTANCE_24_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 24); // 1.0초간 움직이는 거리
 	private static final int WRAITH_MOVE_DISTANCE_12_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 12); // 0.5초간 움직이는 거리
 	
@@ -44,7 +44,7 @@ public class MicroUtils {
 		double fleeRadian = oppositeDirectionRadian(startPosition, targetPosition);
 		int riskRadius = getRiskRadius(UnitType.Terran_Wraith);
 //		for (int moveDistance = WRAITH_MOVE_DISTANCE_48_FRAMES; moveDistance > 10; moveDistance = (int) (moveDistance * 0.7)) {
-		return airLowestRiskPosition(startPosition, Angles.WIDE, fleeRadian, WRAITH_MOVE_DISTANCE_48_FRAMES, riskRadius);
+		return airLowestRiskPosition(startPosition, Angles.AIR_FORCE_FREE, fleeRadian, WRAITH_MOVE_DISTANCE_48_FRAMES * 2, riskRadius);
 	}
 	
 	private static Position airLowestRiskPosition(Position startPosition, int[] angles, double standRadian, int moveDistance, int riskRadius) {
@@ -390,19 +390,19 @@ public class MicroUtils {
 			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
 				if (Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType) > 0) { // 적군이 공격할 수 있으면 위험하겠지
 					if (unit.getType().isBuilding()) { // 건물이 공격할 수 있으면 진짜 위험한거겠지
-						risk += 15;
+						risk += 20;
 					} else if (!unit.getType().isFlyer()) { // 날아다니지 않으면 길막까지 하니까
-						risk += 10;
+						risk += 15;
 					} else if (unit.getType().isWorker()) { // 일꾼은 그다지 위험하지 않다고 본다.
-						risk += 1;
+						risk += 2;
 					} else { // 날아다니면 길막은 하지 않으니까
 						risk += 5;
 					}
 				} else { // 적군이 공격할 수 없을 때
 					if (unit.getType().isBuilding()) {
-						risk += 1;
+						risk += 3;
 					} else if (!unit.getType().isFlyer()) {
-						risk += 1;
+						risk += 2;
 					} else {
 						risk += 1;
 					}

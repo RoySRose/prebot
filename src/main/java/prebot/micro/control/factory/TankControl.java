@@ -25,6 +25,7 @@ import prebot.micro.control.Control;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.TankPositionManager;
 
 public class TankControl extends Control {
@@ -40,7 +41,7 @@ public class TankControl extends Control {
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
-		this.siegeModeSpreadRadius = UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + (int) (Math.log(unitList.size()) * 11);
+		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
 		
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();
@@ -65,6 +66,8 @@ public class TankControl extends Control {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
+			SpiderMineManger.Instance().addRemoveMineNearTank(siege);
+			
 			Decision decision = decisionMaker.makeDecisionForSiegeMode(siege, euiList);
 			if (decision.type == DecisionType.ATTACK_UNIT) {
 				CommandUtils.attackUnit(siege, decision.eui.getUnit());

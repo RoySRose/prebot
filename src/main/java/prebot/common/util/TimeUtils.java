@@ -60,17 +60,6 @@ public class TimeUtils {
 	public static int framesToMinutes(int frame) {
 		return frame / MINUTE;
 	}
-	
-	/// 실행할 frame되어야 하는 frame이면 true
-	public static boolean executeRotation(int group, int rotationSize) {
-		return (Prebot.Broodwar.getFrameCount() % rotationSize) == group;
-	}
-
-	/// unit이 실행할 rotation이면 true
-	public static boolean executeUnitRotation(Unit unit, int rotationSize) {
-		int unitGroup = unit.getID() % rotationSize;
-		return executeRotation(unitGroup, rotationSize);
-	}
 
 	/// 유닛의 빌드시간
 	public static int buildSeconds(UnitType unitType) {
@@ -113,6 +102,18 @@ public class TimeUtils {
 		int minutes = framesToMinutes(frames);
 		int seconds = framesToSeconds(frames - minutes * MINUTE);
 		return minutes + "min " + seconds + "sec";
+	}
+
+	/// 실행할 frame되어야 하는 frame이면 true
+	public static boolean executeRotation(int group, int rotationSize) {
+//		return (Prebot.Broodwar.getFrameCount() % rotationSize) == group;
+		return true;
+	}
+
+	/// unit이 실행할 rotation이면 true
+	public static boolean executeUnitRotation(Unit unit, int rotationSize) {
+		int unitGroup = unit.getID() % rotationSize;
+		return executeRotation(unitGroup, rotationSize);
 	}
 	
 }

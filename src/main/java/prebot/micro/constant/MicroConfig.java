@@ -62,8 +62,9 @@ public class MicroConfig {
 		public static final int[] AIR_FORCE_DRIVE_DETAIL = { 0, -5, +5, -10, +10 -15, +15, -20, +20, -30, +30, -40, +40, -50, +50, -70, +70, -100, +100, -120, +120};
 		public static final int[] AIR_FORCE_DRIVE_LEFT = { 0, -5, -10, -15, -20, -25, -30, -35, -40, -45, -50, -55 - 60, -65, -70, -80, -90, -100, -110, -120, -130 };
 		public static final int[] AIR_FORCE_DRIVE_RIGHT = { 0, +5, +10, +15, +20, +25, +30, +35, +40, +45, +50, +55 + 60, +65, +70, +80, +90, +100, +110, +120, +130 };
+		public static final int[] AIR_FORCE_FREE = { 0, -20, +20, -40, +40, -60, +60, -80, +80, -100, +100, -120, +120, -140, +140, -160, +160, +180 };
 		public static final int[] AROUND_360 = { 0, 45, 90, 135, 180, 225, 270, 315 };
-		public static final int[] AIRFORCE_MINERAL_TARGET_ANGLE = { +60, +40, +20, 0, -20, -40, -60 };
+		public static final int[] AIRFORCE_MINERAL_TARGET_ANGLE = { +60, +30, 0, -30, -60 };
 	}
 
 	public static class Flee {
@@ -89,16 +90,16 @@ public class MicroConfig {
 
 	public static class Vulture {
 		public static final int GEURILLA_ENEMY_RADIUS = 400;
-		public static final int GEURILLA_EXTRA_ENEMY_POWER = 150;
+		public static final int GEURILLA_EXTRA_ENEMY_POWER = 200;
 		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 게릴라지역이 선정되고 일정시간이 지나야 다시 게릴라 지역으로 선정가능
 		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // GEURILLA_INTERVAL_FRAME 대기 없이 게릴라벌처를 할당가능한 숫자
 		public static final int CHECKER_IGNORE_FRAME = 30 * 24; // 10초
-		public static final int CHECKER_INTERVAL_FRAME = 30 * 24; // 30초
+		public static final int CHECKER_INTERVAL_FRAME = 20 * 24; // 30초
 		public static final int CHECKER_RETIRE_FRAME = 20 * 24; // 20초
 		
 		public static final int CHECKER_MAX_COUNT = 3;
 
-		public static final int IGNORE_MOVE_FRAME = 5 * 24; // 5초
+		public static final int IGNORE_MOVE_FRAME = 8 * 24; // 5초
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;

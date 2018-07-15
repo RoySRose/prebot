@@ -1,7 +1,6 @@
 package prebot.strategy.constant;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,58 +50,31 @@ public class EnemyStrategyOptions {
 	}
 
 	public static class UpgradeOrder {
-		// 시즈업
-		public static final List<MetaType> TS = Arrays.asList(new MetaType(TechType.Tank_Siege_Mode));
+		public static class FacUp {
+			public static final Object VM = TechType.Spider_Mines;
+			public static final Object VS = UpgradeType.Ion_Thrusters;
+			public static final Object TS = TechType.Tank_Siege_Mode;
+			public static final Object GR = UpgradeType.Charon_Boosters;
+		}
 		
-		// 마인업-시즈업-속도업
-		public static final List<MetaType> VM_TS_VS = Arrays.asList(new MetaType(TechType.Spider_Mines)
-				, new MetaType(TechType.Tank_Siege_Mode)
-				, new MetaType(UpgradeType.Ion_Thrusters));
+		private static Map<Object, MetaType> upgradeOrderMap = new HashMap<>();
+		static {
+			upgradeOrderMap.put(TechType.Spider_Mines, new MetaType(TechType.Spider_Mines));
+			upgradeOrderMap.put(UpgradeType.Ion_Thrusters, new MetaType(UpgradeType.Ion_Thrusters));
+			upgradeOrderMap.put(TechType.Tank_Siege_Mode, new MetaType(TechType.Tank_Siege_Mode));
+			upgradeOrderMap.put(UpgradeType.Charon_Boosters, new MetaType(UpgradeType.Charon_Boosters));
+		}
 		
-		// 시즈업-마인업-속도업
-		public static final List<MetaType> TS_VM_VS = Arrays.asList(new MetaType(TechType.Tank_Siege_Mode)
-				, new MetaType(TechType.Spider_Mines)
-				, new MetaType(UpgradeType.Ion_Thrusters));
-		
-		// 속도업-시즈업-마인업
-		public static final List<MetaType> VS_TS_VM = Arrays.asList(new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(TechType.Tank_Siege_Mode)
-				, new MetaType(TechType.Spider_Mines));
-
-		// 마인업-속도업-시즈업
-		public static final List<MetaType> VM_VS_TS = Arrays.asList(new MetaType(TechType.Spider_Mines)
-				, new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(TechType.Tank_Siege_Mode));
-		
-		// 마인업-시즈업-속도업-골리앗업
-		public static final List<MetaType> VM_TS_VS_GR = Arrays.asList(new MetaType(TechType.Spider_Mines)
-				, new MetaType(TechType.Tank_Siege_Mode)
-				, new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(UpgradeType.Charon_Boosters));
-		
-		// 마인업-골리앗업-속도업-시즈업
-		public static final List<MetaType> VM_GR_VS_TS = Arrays.asList(new MetaType(TechType.Spider_Mines)
-				, new MetaType(UpgradeType.Charon_Boosters)
-				, new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(TechType.Tank_Siege_Mode));
-		
-		// 시즈업-마인업-속도업-골리앗업
-		public static final List<MetaType> TS_VM_VS_GR = Arrays.asList(new MetaType(TechType.Tank_Siege_Mode)
-				, new MetaType(TechType.Spider_Mines)
-				, new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(UpgradeType.Charon_Boosters));
-		
-		// 속도업-마인업-골리앗업-시즈업
-		public static final List<MetaType> VS_VM_GR_TS = Arrays.asList(new MetaType(UpgradeType.Ion_Thrusters)
-				, new MetaType(TechType.Spider_Mines)
-				, new MetaType(UpgradeType.Charon_Boosters)
-				, new MetaType(TechType.Tank_Siege_Mode));
-		
-		// 마인업-골리앗업-시즈업-속도업
-		public static final List<MetaType> VM_GR_TS_VS = Arrays.asList(new MetaType(TechType.Spider_Mines),
-				new MetaType(UpgradeType.Charon_Boosters),
-				new MetaType(TechType.Tank_Siege_Mode),
-				new MetaType(UpgradeType.Ion_Thrusters));
+		public static List<MetaType> get(Object... upgrades) {
+			List<MetaType> upgradeOrderList = new ArrayList<>();
+			for (Object upgrade : upgrades) {
+				MetaType metaType = upgradeOrderMap.get(upgrade);
+				if (metaType != null) {
+					upgradeOrderList.add(metaType);
+				}
+			}
+			return upgradeOrderList;
+		}
 	}
 	
 	public static class BuildTimeMap {

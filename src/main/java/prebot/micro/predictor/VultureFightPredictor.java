@@ -19,6 +19,60 @@ import prebot.strategy.constant.StrategyCode.SmallFightPredict;
  *  */
 public class VultureFightPredictor {
 	
+	private static final int VULTURE_POWER = 30;
+	private static final int BONUS_ION_THRUSTERS = 15;
+	
+	private static final int BONUS_ZERGLING_SPEED = 5;
+	private static final int BONUS_HYDRA_SPEED = 10;
+	private static final int BONUS_HYDRA_RANGE = 10;
+	private static final int BONUS_LURKER_BURROWED = 300;
+	
+	private static final int BONUS_ZEALOT_SPEED = 10;
+	private static final int BONUS_DRAGOON_RANGE = 30;
+	
+	private static final int BONUS_MARINE_STIM = 10;
+	private static final int BONUS_MARINE_RANGE = 20;
+	
+	private static final Map<UnitType, Integer> VULTURE_TARGET = new HashMap<>();
+	
+	static {
+		VULTURE_TARGET.put(UnitType.Zerg_Larva, 0);
+		VULTURE_TARGET.put(UnitType.Zerg_Egg, 0);
+		VULTURE_TARGET.put(UnitType.Zerg_Lurker_Egg, 0);
+		VULTURE_TARGET.put(UnitType.Zerg_Drone, 1);
+		VULTURE_TARGET.put(UnitType.Zerg_Broodling, 10);
+		VULTURE_TARGET.put(UnitType.Zerg_Lurker, 10);
+		VULTURE_TARGET.put(UnitType.Zerg_Zergling, 15);
+		VULTURE_TARGET.put(UnitType.Zerg_Infested_Terran, 15);
+		VULTURE_TARGET.put(UnitType.Zerg_Hydralisk, 70); // hitpoint 점수 사용 *
+		VULTURE_TARGET.put(UnitType.Zerg_Ultralisk, 100);
+		VULTURE_TARGET.put(UnitType.Zerg_Defiler, 100);
+		VULTURE_TARGET.put(UnitType.Zerg_Mutalisk, 300);
+		VULTURE_TARGET.put(UnitType.Zerg_Guardian, 400);
+		VULTURE_TARGET.put(UnitType.Zerg_Sunken_Colony, 800);
+		
+		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, 0); // 하템 암살해야됨
+		VULTURE_TARGET.put(UnitType.Protoss_Dark_Archon, 0);
+		VULTURE_TARGET.put(UnitType.Protoss_Probe, 1);
+		VULTURE_TARGET.put(UnitType.Protoss_Zealot, 20);
+		VULTURE_TARGET.put(UnitType.Protoss_Archon, 50);
+		VULTURE_TARGET.put(UnitType.Protoss_Dark_Templar, 100);
+		VULTURE_TARGET.put(UnitType.Protoss_Dragoon, 120); // hitpoint 점수 사용 *
+		VULTURE_TARGET.put(UnitType.Protoss_Scout, 300);
+		VULTURE_TARGET.put(UnitType.Protoss_Carrier, 400);
+		VULTURE_TARGET.put(UnitType.Protoss_Reaver, 400);
+		VULTURE_TARGET.put(UnitType.Protoss_Photon_Cannon, 600);
+		
+		VULTURE_TARGET.put(UnitType.Terran_Marine, 30);
+		VULTURE_TARGET.put(UnitType.Terran_Medic, 30);
+		VULTURE_TARGET.put(UnitType.Terran_Firebat, 30);
+		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Tank_Mode, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Siege_Mode, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Vulture, 100);
+		VULTURE_TARGET.put(UnitType.Terran_Goliath, 400);
+		VULTURE_TARGET.put(UnitType.Terran_Bunker, 600);
+	}
+	
 	/** 벌처의 후퇴*/
 //	public static WatcherCombatPredictResult predict(List<Unit> vultureList, List<Unit> enemyUnitList) {
 //		int vulturePower = powerOfWatchers(vultureList);
@@ -29,8 +83,11 @@ public class VultureFightPredictor {
 	public static SmallFightPredict watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
+//		System.out.println("vulturePower : " + vulturePower + " / " +  " enemyPower : " + enemyPower);
 		
-		if (vulturePower > enemyPower) {
+		if (vulturePower > enemyPower * 1.5) {
+			return SmallFightPredict.OVERWHELM;
+		} else if (vulturePower > enemyPower) {
 			return SmallFightPredict.ATTACK;
 		} else {
 			return SmallFightPredict.BACK;
@@ -136,60 +193,6 @@ public class VultureFightPredictor {
 		}
 		
 		return enemyPower;
-	}
-	
-	private static final int VULTURE_POWER = 30;
-	private static final int BONUS_ION_THRUSTERS = 15;
-	
-	private static final int BONUS_ZERGLING_SPEED = 5;
-	private static final int BONUS_HYDRA_SPEED = 10;
-	private static final int BONUS_HYDRA_RANGE = 10;
-	private static final int BONUS_LURKER_BURROWED = 300;
-	
-	private static final int BONUS_ZEALOT_SPEED = 10;
-	private static final int BONUS_DRAGOON_RANGE = 30;
-	
-	private static final int BONUS_MARINE_STIM = 10;
-	private static final int BONUS_MARINE_RANGE = 20;
-	
-	private static final Map<UnitType, Integer> VULTURE_TARGET = new HashMap<>();
-	
-	static {
-		VULTURE_TARGET.put(UnitType.Zerg_Larva, 0);
-		VULTURE_TARGET.put(UnitType.Zerg_Egg, 0);
-		VULTURE_TARGET.put(UnitType.Zerg_Lurker_Egg, 0);
-		VULTURE_TARGET.put(UnitType.Zerg_Drone, 1);
-		VULTURE_TARGET.put(UnitType.Zerg_Broodling, 10);
-		VULTURE_TARGET.put(UnitType.Zerg_Lurker, 10);
-		VULTURE_TARGET.put(UnitType.Zerg_Zergling, 15);
-		VULTURE_TARGET.put(UnitType.Zerg_Infested_Terran, 15);
-		VULTURE_TARGET.put(UnitType.Zerg_Hydralisk, 70); // hitpoint 점수 사용 *
-		VULTURE_TARGET.put(UnitType.Zerg_Ultralisk, 100);
-		VULTURE_TARGET.put(UnitType.Zerg_Defiler, 100);
-		VULTURE_TARGET.put(UnitType.Zerg_Mutalisk, 300);
-		VULTURE_TARGET.put(UnitType.Zerg_Guardian, 400);
-		VULTURE_TARGET.put(UnitType.Zerg_Sunken_Colony, 800);
-		
-		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, 0); // 하템 암살해야됨
-		VULTURE_TARGET.put(UnitType.Protoss_Dark_Archon, 0);
-		VULTURE_TARGET.put(UnitType.Protoss_Probe, 1);
-		VULTURE_TARGET.put(UnitType.Protoss_Zealot, 20);
-		VULTURE_TARGET.put(UnitType.Protoss_Archon, 50);
-		VULTURE_TARGET.put(UnitType.Protoss_Dark_Templar, 100);
-		VULTURE_TARGET.put(UnitType.Protoss_Dragoon, 120); // hitpoint 점수 사용 *
-		VULTURE_TARGET.put(UnitType.Protoss_Scout, 300);
-		VULTURE_TARGET.put(UnitType.Protoss_Carrier, 400);
-		VULTURE_TARGET.put(UnitType.Protoss_Reaver, 400);
-		VULTURE_TARGET.put(UnitType.Protoss_Photon_Cannon, 600);
-		
-		VULTURE_TARGET.put(UnitType.Terran_Marine, 30);
-		VULTURE_TARGET.put(UnitType.Terran_Medic, 30);
-		VULTURE_TARGET.put(UnitType.Terran_Firebat, 30);
-		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Tank_Mode, 400);
-		VULTURE_TARGET.put(UnitType.Terran_Siege_Tank_Siege_Mode, 400);
-		VULTURE_TARGET.put(UnitType.Terran_Vulture, 100);
-		VULTURE_TARGET.put(UnitType.Terran_Goliath, 400);
-		VULTURE_TARGET.put(UnitType.Terran_Bunker, 400);
 	}
 
 }

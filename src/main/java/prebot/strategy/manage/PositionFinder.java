@@ -7,16 +7,19 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
@@ -33,6 +36,10 @@ import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
  * 
  */
 public class PositionFinder {
+	
+	private static final int POSITION_EFFECTIVE_FRAME_SIZE = 20 * TimeUtils.SECOND;
+	private Position[] enemyGroundEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
+	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 
 	private static PositionFinder instance = new PositionFinder();
 
@@ -44,35 +51,100 @@ public class PositionFinder {
 		StrategyIdea.campPosition = getCampPosition();
 		StrategyIdea.mainPosition = getMainPosition();
 
-		StrategyIdea.mainSquadCenter = getMainSquadCenter();
-		StrategyIdea.watcherPosition = getWatcherPosition(); // TODO 변경필요
+		updateMainSquadCenter();
+		updateEnemyUnitPosition();
+	}
 
-		// 분리 필요
-		BaseLocation myBase = InfoUtils.myBase();
-		Region myRegion = BWTA.getRegion(myBase.getPosition());
+	private void updateEnemyUnitPosition() {
+		int sumOfAirX = 0;
+		int sumOfAirY = 0;
+		int airCount = 0;
+		
+		int sumOfGroundX = 0;
+		int sumOfGroundY = 0;
+		int groundCount = 0;
+
+		Position myFirstExpansionPosition = InfoUtils.myFirstExpansion().getPosition();
+		List<UnitInfo> enemyUnitInfoList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		for (UnitInfo eui : enemyUnitInfoList) {
+			if (eui.getType().isWorker() || eui.getType().isBuilding()) {
+				continue;
+			}
+			if (eui.getType().groundWeapon() == WeaponType.None && eui.getType().airWeapon() == WeaponType.None) {
+				continue;
+			}
+			if (eui.getType() == UnitType.Terran_Vulture_Spider_Mine) {
+				continue;
+			}
+			if (UnitUtils.ignorableEnemyUnitInfo(eui)) {
+				continue;
+			}
+			
+//			Region region = BWTA.getRegion(eui.getLastPosition());
+//			if (PositionUtils.getGroundDistance(myFirstExpansionPosition, region.getCenter()) > 80) {
+			
+			double distance = myFirstExpansionPosition.getDistance(eui.getLastPosition());
+			if (distance > 1000) {
+//				System.out.println(eui.getType().toString() + " is too far -> " + myFirstExpansionPosition.getDistance(eui.getLastPosition()));
+				continue;
+			}
+//			System.out.println(eui.getType().toString() + " is effective pos -> " + distance);
+			if (eui.getType().isFlyer()) {
+				sumOfAirX += eui.getLastPosition().getX();
+				sumOfAirY += eui.getLastPosition().getY();
+				airCount++;				
+			} else {
+				sumOfGroundX += eui.getLastPosition().getX();
+				sumOfGroundY += eui.getLastPosition().getY();
+				groundCount++;
+			}
+		}
+		Position enemyGroundPosition;
+		Position enemyAirPosition;
+		if (groundCount > 0) {
+			enemyGroundPosition = new Position(sumOfGroundX / groundCount, sumOfGroundY / groundCount);
+		} else {
+			enemyGroundPosition = Position.Unknown;
+		}
+		if (airCount > 0) {
+			enemyAirPosition = new Position(sumOfAirX / airCount, sumOfAirY / airCount);
+		} else {
+			enemyAirPosition = Position.Unknown;
+		}
+		enemyGroundEffectivePostions[TimeUtils.elapsedFrames() % POSITION_EFFECTIVE_FRAME_SIZE] = enemyGroundPosition;
+		enemyAirEffectivePostions[TimeUtils.elapsedFrames() % POSITION_EFFECTIVE_FRAME_SIZE] = enemyAirPosition;
+		
+		StrategyIdea.enemyGroundSquadPosition = enemyGroundPosition;
+		StrategyIdea.enemyAirSquadPosition = enemyAirPosition;
+		
+		
+		// 적 상태
+		EnemyUnitStatus enemyStatus;
+		Region myRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		List<UnitInfo> euiList = InfoUtils.euiListInMyRegion(myRegion);
-		if (euiList.isEmpty()) {
-			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.SLEEPING;
+		if (!euiList.isEmpty()) {
+			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
 		} else {
-			StrategyIdea.enemyUnitStatus = EnemyUnitStatus.IN_MY_REGION;
+			if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown
+					|| StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+				enemyStatus = EnemyUnitStatus.COMMING;	
+			} else {
+				enemyStatus = EnemyUnitStatus.SLEEPING;
+			}
 		}
+		StrategyIdea.enemyUnitStatus = enemyStatus;
 	}
 
-	private Position getMainSquadCenter() {
+	private void updateMainSquadCenter() {
 		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
-		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
-		if (UnitUtils.isCompleteValidUnit(leader)) {
-			return leader.getPosition();
+//		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
+		Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList);
+		if (centerPosition != null) {
+			StrategyIdea.mainSquadCenter = centerPosition;
+			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
 		} else {
-			return getMainPosition();
-		}
-	}
-
-	private Position getWatcherPosition() {
-		if (InfoUtils.enemyBase() != null) {
-			return InfoUtils.enemyBase().getPosition();
-		} else {
-			return InfoUtils.mySecondChoke().getCenter();
+			StrategyIdea.mainSquadCenter = getMainPosition();
+			StrategyIdea.mainSquadCoverRadius = 250;
 		}
 	}
 
@@ -90,33 +162,33 @@ public class PositionFinder {
 			enemyUnitCount = InfoUtils.enemyNumUnits(UnitType.Terran_Marine); // MECHANIC NO COUNT
 		}
 		
-		boolean detectingOk = true;
+		boolean firstExpansionDetectingOk = true;
 		
 		// 앞마당에 터렛이 있거나, 스캔이 한번의 스캔이 있어야 한다.
 		boolean invisibleEnemyExist = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Protoss_Citadel_of_Adun, UnitType.Zerg_Lurker);
 		if (invisibleEnemyExist) {
-			detectingOk = false;
+			firstExpansionDetectingOk = false;
 			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 			for (Unit turret : turretList) {
 				RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
 				if (regionType == RegionType.MY_FIRST_EXPANSION) {
-					detectingOk = true;
+					firstExpansionDetectingOk = true;
 					break;
 				}
 			}
 			
-			if (!detectingOk) {
+			if (!firstExpansionDetectingOk) {
 				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Spell_Scanner_Sweep);
 				for (Unit scanner : scannerList) {
 					if (scanner.getEnergy() >= 50) {
-						detectingOk = true;
+						firstExpansionDetectingOk = true;
 						break;
 					}
 				}
 			}
 		}
 		
-		if (detectingOk) {
+		if (firstExpansionDetectingOk) {
 			int secondChokeBonus = 8;
 			int firstExpansionBonus = 3;
 			if (StrategyIdea.currentStrategy.buildTimeMap.isDouble()) {
@@ -137,22 +209,26 @@ public class PositionFinder {
 			}
 		}
 
-		if (InfoUtils.enemyRace() == Race.Protoss && entranceBlocked()) {
-			return entranceBlockedPosition();
-		} else {
-			if (InfoUtils.enemyRace() == Race.Terran) {
-				// 테란은 언덕 랜덤데미지를 활용해야 한다.
-				return firstChokeDefensePosition();
-				
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			if (entranceBlocked()) {
+				return entranceBlockedPosition();
 			} else {
-				// 마린이 일정이상 쌓였어야 한다.
-				int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
-				if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
-					return firstChokeDefensePosition();
-				} else {
-					/// 커맨드센터 수비 필요
-					return commandCenterInsidePosition();
-				}
+				return firstChokeDefensePosition();
+			}
+			
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+//			if (entranceBlocked()) { }
+			// 테란은 언덕 랜덤데미지를 활용해야 한다.
+			return firstChokeDefensePosition();
+			
+		} else { //if (InfoUtils.enemyRace() == Race.Zerg) {
+			// 마린이 일정이상 쌓였어야 한다.
+			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+			if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
+				return firstChokeDefensePosition();
+			} else {
+				/// 커맨드센터 수비 필요
+				return commandCenterInsidePosition();
 			}
 		}
 	}
@@ -187,11 +263,6 @@ public class PositionFinder {
 		}
 	}
 
-	private Position getEnemyCampPosition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/// 첫번째 확장기지를 차지하였는지 여부
 	private boolean firstExpansionOccupied() {
 		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
@@ -204,6 +275,7 @@ public class PositionFinder {
 	}
 
 	private Position entranceBlockedPosition() {
+		// TODO 입막 수비위치
 		return firstChokeDefensePosition();
 	}
 
