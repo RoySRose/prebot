@@ -93,10 +93,14 @@ public class BlockingEntrance {
 
 
         //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
-        mapName = Map.OVERWATCH;
-        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-        	mapName = Map.CIRCUITBREAKER;
-        }
+//        mapName = Map.OVERWATCH;
+//        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+//        	mapName = Map.CIRCUITBREAKER;
+//        }
+        mapName = Map.CIRCUITBREAKER;
+        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPRIRITS) {
+        	mapName = Map.FIGHTING_SPRIRITS;
+        } 
         //System.out.println("this map ==>> " + map.toString());
 
         Location loc = Location.START;
@@ -294,9 +298,9 @@ public class BlockingEntrance {
 			fix_supplyY = fix_supplyYY;*/
 			
 			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SUPPLY_AREA), new TilePosition(101, 0));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SUPPLY_AREA), new TilePosition(101, 121));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(15, 121));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(15, 0));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SUPPLY_AREA), new TilePosition(101, 119));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(18, 119));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(18, 0));
     	
     	
 //    	맵 : CIRCUITBREAKER
@@ -368,6 +372,86 @@ public class BlockingEntrance {
 
     			
     		}
+    	}
+    	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPRIRITS) {
+    		
+    		System.out.println("맵 ==>> 투혼");
+    		
+    		
+    		postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.SUPPLY_AREA), new TilePosition(119, 23));
+	    	postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.SUPPLY_AREA), new TilePosition(103, 119));
+	    	postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.SUPPLY_AREA), new TilePosition(0, 98));
+	    	postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(19, 11));
+	    	
+	    	
+//        	맵 : 투혼
+        		if (InformationManager.Instance().enemyRace == Race.Protoss
+    					|| InformationManager.Instance().enemyRace == Race.Terran) {
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.FIRST_SUPPLY)     , new TilePosition(100	,7));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.BARRACK)   		   , new TilePosition(102	,9));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.SECOND_SUPPLY)    , new TilePosition(97	,5));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.FACTORY)   		   , new TilePosition(110	,9));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.BUNKER)   		     , new TilePosition(100	,5));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.ENTRANCE_TURRET)  , new TilePosition(103	,7));
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.FIRST_SUPPLY)    , new TilePosition(118	,100));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.BARRACK)   		   , new TilePosition(114	,101));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.SECOND_SUPPLY)   , new TilePosition(120	,98 ));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.FACTORY)   		   , new TilePosition(115	,109));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.BUNKER)   		   , new TilePosition(118	,102));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.ENTRANCE_TURRET) , new TilePosition(121	,100));
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.FIRST_SUPPLY)   , new TilePosition(25	,120));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.BARRACK)   		 , new TilePosition(21	,118));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.SECOND_SUPPLY)  , new TilePosition(28	,121));  
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.FACTORY)   		 , new TilePosition(14	,115));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.BUNKER)   		   , new TilePosition(25	,122));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.ENTRANCE_TURRET), new TilePosition(23	,122));
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.FIRST_SUPPLY)   , new TilePosition(7	,26  ));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.BARRACK)   		  , new TilePosition(4	,28  ));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.SECOND_SUPPLY)  , new TilePosition(10	,26));  
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.FACTORY)   		  , new TilePosition(13	,11));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.BUNKER)   		  , new TilePosition(7	,24  ));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.ENTRANCE_TURRET), new TilePosition(10	,24));
+
+    		    	
+        		}else {
+        			
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.FIRST_SUPPLY)     , new TilePosition(114	,2));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.BARRACK)   		   , new TilePosition(111	,4));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.SECOND_SUPPLY)    , new TilePosition(114	,8));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.FACTORY)   		   , new TilePosition(110	,9));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.BUNKER)   		     , new TilePosition(115	,4));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.ENTRANCE_TURRET), null);
+
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.FIRST_SUPPLY)    , new TilePosition(114	,112));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.BARRACK)   		   , new TilePosition(111	,114));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.SECOND_SUPPLY)   , new TilePosition(114	,118));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.FACTORY)   		   , new TilePosition(115	,109));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.BUNKER)   		   , new TilePosition(115	,114));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Five, Building.ENTRANCE_TURRET), null);
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.FIRST_SUPPLY)   , new TilePosition(8	  ,122));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.BARRACK)   		 , new TilePosition(11	,120));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.SECOND_SUPPLY)  , new TilePosition(0	  ,122));  
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.FACTORY)   		 , new TilePosition(14	,115));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.BUNKER)   		   , new TilePosition(8	  ,120));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Seven, Building.ENTRANCE_TURRET), null);
+
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.FIRST_SUPPLY)   , new TilePosition(6	,13));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.BARRACK)   		  , new TilePosition(9	,11));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.SECOND_SUPPLY)  , new TilePosition(0	,12));  
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.FACTORY)   		  , new TilePosition(13	,11));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.BUNKER)   		  , new TilePosition(6	,11));
+        			postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.Eleven, Building.ENTRANCE_TURRET), null);
+
+
+
+        			
+        		}
+    		
     	}
 
 

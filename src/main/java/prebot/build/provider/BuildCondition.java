@@ -9,7 +9,7 @@ public class BuildCondition {
 
     public boolean blocking=false;
     public boolean highPriority=false;
-    public BuildOrderItem.SeedPositionStrategy seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
+    public BuildOrderItem.SeedPositionStrategy seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
     public TilePosition tilePosition = TilePosition.None;
 	/*public static boolean blocking=false;
     public static boolean highPriority=false;
