@@ -22,6 +22,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
@@ -69,6 +70,7 @@ public class InformationManager extends GameManager {
 	private boolean photonRushed;
 //	private int MainBaseSuppleLimit;
 	private Unit FirstCC;
+	private boolean blockingEnterance;
 	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -142,6 +144,7 @@ public class InformationManager extends GameManager {
 		gasRushed = false;
 		checkGasRush = true;
 		photonRushed = false;
+		blockingEnterance = false;
 //		MainBaseSuppleLimit =0;
 		
 		for (Unit unit : Prebot.Broodwar.self().getUnits()){
@@ -224,6 +227,7 @@ public class InformationManager extends GameManager {
 		if(Prebot.Broodwar.getFrameCount() % 8 == 0) {
 			updateUnitsInfo();
 			updateCurrentStatusInfo();
+			updateBlockingEnterance();
 		}
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (Prebot.Broodwar.getFrameCount() % 31 == 0) {
@@ -1350,6 +1354,9 @@ public class InformationManager extends GameManager {
 		return enemyFirstGas;
 	}
 	
+	public boolean isBlockingEnterance() {
+		return blockingEnterance;
+	}
 	
 //	public int getMainBaseSuppleLimit() {
 //		return MainBaseSuppleLimit;
@@ -1799,5 +1806,36 @@ public class InformationManager extends GameManager {
 		}
 		return baseToBaseFrame;
 		// 대략적인 firstExpansion <-> myExpansion 사이에 unitType이 이동하는데 걸리는 시간 리턴 (단위 frame)
+	}
+	
+	public void updateBlockingEnterance() {
+		// update our units info
+		boolean firstBarrack = false;
+		boolean firstSupple = false;
+		boolean secondSupple = false;
+		
+		TilePosition firstBarracks		= BlockingEntrance.Instance().barrack;
+		TilePosition firstSupplePos		= BlockingEntrance.Instance().first_supple;
+		TilePosition secondSupplePos	= BlockingEntrance.Instance().second_supple;
+		
+		for (Unit supple : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Supply_Depot)) {
+			if(supple.getTilePosition().equals(firstSupplePos)){
+				firstSupple = true;
+			}else if(supple.getTilePosition().equals(secondSupplePos)){
+				secondSupple = true;
+			}
+		}
+		
+		for (Unit barrack : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Barracks)) {
+			if(barrack.getTilePosition().equals(firstBarracks) && !barrack.isLifted()){
+				firstBarrack = true;
+			}
+		}
+		
+		if(firstBarrack && firstSupple && secondSupple){
+			blockingEnterance = true;
+		}else{
+			blockingEnterance = false;
+		}
 	}
 }

@@ -226,6 +226,48 @@ public class MicroUtils {
 		}
 	}
 
+	
+	public static void BlockingKiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption, Position safePosition) {
+		if (UnitUtils.unitInSight(targetInfo) == null) {
+			BlockingKitingInvisible(rangedUnit, targetInfo, kOption, safePosition);
+		} else {
+			Blockingkiting(rangedUnit, targetInfo.getUnit(), kOption, safePosition);
+		}
+	}
+	
+	public static void BlockingKitingInvisible(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption, Position safePosition) {
+		WeaponType weapon = getWeapon(rangedUnit.getType(), targetInfo.getType());
+		if (weapon == WeaponType.None || rangedUnit.getDistance(targetInfo.getLastPosition()) > weapon.maxRange() + 50) {
+			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
+		} else {
+			flee(rangedUnit, safePosition, kOption.fOption);
+		}
+	}
+	
+	
+	public static void Blockingkiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption, Position safePosition) {
+		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
+			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
+			kOption.fOption.united = false;
+			kOption.fOption.angles = Angles.WIDE;
+		} else if (groundUnitFreeKiting(rangedUnit)) {
+			kOption.fOption.united = false;
+			kOption.fOption.angles = Angles.WIDE;
+		}
+		
+		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
+			CommandUtils.attackUnit(rangedUnit, targetUnit);
+		} else {
+			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
+			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
+				CommandUtils.attackMove(rangedUnit, targetUnit.getPosition());
+			} else {
+				CommandUtils.move(rangedUnit,safePosition);
+			}
+		}
+	}
+	
+	
 	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, CoolTimeAttack cooltimeAttack) {
 
 		// attackUnit, target 각각의 지상/공중 무기를 선택
