@@ -43,6 +43,7 @@ import prebot.strategy.analyse.zerg.SpawningPoolAnalyser;
 import prebot.strategy.analyse.zerg.SpireAnalyser;
 import prebot.strategy.analyse.zerg.ZerglingAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public class StrategyAnalyseManager {
 	
@@ -79,7 +80,29 @@ public class StrategyAnalyseManager {
 //				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
 				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
 				StrategyIdea.currentStrategy = strategyToApply;
+				this.applyDetailValue(strategyToApply);
 			}
+		}
+	}
+
+	private void applyDetailValue(EnemyStrategy currentStrategy) {
+		StrategyIdea.factoryRatio = currentStrategy.factoryRatio;
+		StrategyIdea.upgrade = currentStrategy.upgrade;
+		StrategyIdea.marineCount = currentStrategy.marineCount;
+		
+		if (currentStrategy.addOnOption != null) {
+			StrategyIdea.addOnOption = currentStrategy.addOnOption;
+		}
+		if (currentStrategy.expansionOption != null) {
+			StrategyIdea.expansionOption = currentStrategy.expansionOption;
+			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+				StrategyIdea.wraithCount = 4; // default wraith count
+			} else {
+				StrategyIdea.wraithCount = 0;
+			}
+		}
+		if (currentStrategy.buildTimeMap != null) {
+			StrategyIdea.buildTimeMap = currentStrategy.buildTimeMap;
 		}
 	}
 

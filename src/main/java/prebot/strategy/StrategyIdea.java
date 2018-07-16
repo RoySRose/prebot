@@ -5,9 +5,14 @@ import java.util.List;
 
 import bwapi.Position;
 import bwta.BaseLocation;
+import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
 
 public class StrategyIdea {
@@ -20,6 +25,13 @@ public class StrategyIdea {
 	public static EnemyStrategy startStrategy = EnemyStrategy.UNKNOWN;
 	public static EnemyStrategy currentStrategy = EnemyStrategy.UNKNOWN;
 	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
+	
+	public static FactoryRatio factoryRatio;
+	public static List<MetaType> upgrade;
+	public static int marineCount;
+	public static AddOnOption addOnOption;
+	public static ExpansionOption expansionOption;
+	public static BuildTimeMap buildTimeMap;
 	
 	public static int wraithCount = 0;
 

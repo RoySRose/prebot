@@ -117,8 +117,7 @@ public class ResearchSelector implements Selector<MetaType>{
 		
 		if(canResearch == true) {
 		
-			List<MetaType> upgradeOrder = StrategyIdea.currentStrategy.upgrade;
-			
+			List<MetaType> upgradeOrder = StrategyIdea.upgrade;
 			
 			
 			for(MetaType e : upgradeOrder) {
