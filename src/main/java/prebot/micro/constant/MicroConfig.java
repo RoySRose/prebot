@@ -15,7 +15,7 @@ import prebot.strategy.InformationManager;
 public class MicroConfig {
 
 	public static enum MainSquadMode {
-		DEFENSE(0.1, false),
+		DEFENSE(0.0, false),
 		NORMAL(0.8, false),
 		ATTCK(0.2, true),
 		SPEED_ATTCK(0.0, true),

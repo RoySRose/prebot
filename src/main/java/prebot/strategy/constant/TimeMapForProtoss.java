@@ -45,7 +45,7 @@ public class TimeMapForProtoss {
 	}
 	
 	public static BuildTimeMap PROTOSS_FORGE_DOUBLE() {
-		return new BuildTimeMap().setDouble()
+		return new BuildTimeMap().setDouble().setAttackQuickly()
 		.put(UnitType.Protoss_Forge, 1, 40)
 		.put(UnitType.Protoss_Photon_Cannon, 2, 15)
 		.put(UnitType.Protoss_Nexus, 2, 30)
@@ -116,7 +116,7 @@ public class TimeMapForProtoss {
 //	}
 
 	public static BuildTimeMap PROTOSS_STARGATE() { // non-precise
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setAttackQuickly()
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Nexus, 4, 10)
 		.put(UnitType.Protoss_Stargate, 5, 40)
@@ -132,7 +132,7 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_DOUBLE_CARRIER() { // non-precise
-		return PROTOSS_DOUBLE()
+		return PROTOSS_DOUBLE().setAttackQuickly()
 		.put(UnitType.Protoss_Citadel_of_Adun, 3, 50)
 		.put(UnitType.Protoss_Stargate, 5, 00)
 		.put(UnitType.Protoss_Fleet_Beacon, 5, 50)

@@ -81,6 +81,7 @@ public class EnemyStrategyOptions {
 		private boolean isDouble = false;
 		private boolean isMechanic = false;
 		private boolean isTwoGate = false;
+		private boolean attackQuickly = false;
 		
 		private Map<UnitType, List<Integer>> buildingTime = new HashMap<>();
 		private Map<TechType, Integer> techTime = new HashMap<>();
@@ -98,6 +99,10 @@ public class EnemyStrategyOptions {
 			this.isTwoGate = true;
 			return this;
 		}
+		public BuildTimeMap setAttackQuickly() {
+			this.attackQuickly = true;
+			return this;
+		}
 		public boolean isDouble() {
 			return isDouble;
 		}
@@ -106,6 +111,9 @@ public class EnemyStrategyOptions {
 		}
 		public boolean isTwoGate() {
 			return isTwoGate;
+		}
+		public boolean isAttackQuickly() {
+			return attackQuickly;
 		}
 		public BuildTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);

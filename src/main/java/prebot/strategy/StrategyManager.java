@@ -7,14 +7,14 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
-import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
@@ -105,7 +105,23 @@ public class StrategyManager extends GameManager {
 		EnemyBaseFinder.Instance().update();
 		
 		expansionOkay();
+		temporaryAttackTimer();
+	}
 
+	/// 테스트용 임시 공격 타이밍
+	private void temporaryAttackTimer() {
+		if (!StrategyIdea.mainSquadMode.isAttackMode) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.isAttackQuickly()) {
+				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
+			} else if (TimeUtils.after(9 * TimeUtils.MINUTE)) {
+				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+			}
+			
+		} else {
+			if (TimeUtils.after(11 * TimeUtils.MINUTE)) {
+				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
+			}
+		}
 	}
 
 	private void expansionOkay() {
