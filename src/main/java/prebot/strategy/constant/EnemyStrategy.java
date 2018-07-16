@@ -25,8 +25,7 @@ public enum EnemyStrategy {
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
 			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
-	PROTOSS_1GATE_CORE(PROTOSS_INIT
-			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
+	PROTOSS_1GATE_CORE(PROTOSS_INIT),
 	
 	PROTOSS_2GATE(5, 1, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
@@ -186,8 +185,7 @@ public enum EnemyStrategy {
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_MECHANIC()),
 	
-	TERRAN_MECHANIC(TERRAN_INIT
-			, TimeMapForTerran.TERRAN_MECHANIC()),
+	TERRAN_MECHANIC(TERRAN_INIT),
 	
 	TERRAN_2BARRACKS(2, 1, 0, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
@@ -251,34 +249,16 @@ public enum EnemyStrategy {
 	UNKNOWN(ZERG_INIT);
 	
 	private EnemyStrategy(EnemyStrategy strategy) {
-		this.ratio = strategy.ratio;
+		this.factoryRatio = strategy.factoryRatio;
 		this.upgrade = strategy.upgrade;
 		this.marineCount = strategy.marineCount;
 		this.addOnOption = strategy.addOnOption;
 		this.expansionOption = strategy.expansionOption;
 		this.buildTimeMap = strategy.buildTimeMap;
 	}
-	
-	private EnemyStrategy(EnemyStrategy strategy, BuildTimeMap addTimeMap) {
-		this.ratio = strategy.ratio;
-		this.upgrade = strategy.upgrade;
-		this.marineCount = strategy.marineCount;
-		this.addOnOption = strategy.addOnOption;
-		this.expansionOption = strategy.expansionOption;
-		this.buildTimeMap = strategy.buildTimeMap.putAll(addTimeMap);
-	}
-	
-	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade) {
-		this.ratio = FactoryRatio.ratio(vulture, tank, goliath);
-		this.upgrade = upgrade;
-		this.marineCount = MarineCount.FOUR_MARINE;
-		this.addOnOption = AddOnOption.VULTURE_FIRST;
-		this.expansionOption = ExpansionOption.TWO_FACTORY;
-		this.buildTimeMap = new BuildTimeMap();
-	}
 
 	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade, int marineCount, AddOnOption addOnOption, ExpansionOption expansionOption, BuildTimeMap defaultTimeMap) {
-		this.ratio = FactoryRatio.ratio(vulture, tank, goliath);
+		this.factoryRatio = FactoryRatio.ratio(vulture, tank, goliath);
 		this.upgrade = upgrade;
 		this.marineCount = marineCount;
 		this.addOnOption = addOnOption;
@@ -286,7 +266,16 @@ public enum EnemyStrategy {
 		this.buildTimeMap = defaultTimeMap;
 	}
 	
-	public FactoryRatio ratio;
+	private EnemyStrategy(int vulture, int tank, int goliath, List<MetaType> upgrade) {
+		this.factoryRatio = FactoryRatio.ratio(vulture, tank, goliath);
+		this.upgrade = upgrade;
+		this.marineCount = 0;
+		this.addOnOption = null;
+		this.expansionOption = null;
+		this.buildTimeMap = new BuildTimeMap();
+	}
+	
+	public FactoryRatio factoryRatio;
 	public List<MetaType> upgrade;
 	public int marineCount;
 	public AddOnOption addOnOption;
@@ -294,7 +283,7 @@ public enum EnemyStrategy {
 	public BuildTimeMap buildTimeMap;
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder().append("[").append(name()).append("]").append("\n").append(ratio.toString()).append("\n");
+		StringBuilder sb = new StringBuilder().append("[").append(name()).append("]").append("\n").append(factoryRatio.toString()).append("\n");
 		for (MetaType metaType : upgrade) {
 			if (metaType.isUnit()) {
 				sb.append(metaType.getUnitType()).append(" / ");

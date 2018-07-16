@@ -18,7 +18,6 @@ public class MicroConfig {
 		DEFENSE(0.1, false),
 		NORMAL(0.8, false),
 		ATTCK(0.2, true),
-		FD_PRESS(0.0, true),
 		SPEED_ATTCK(0.0, true),
 		NO_MERCY(0.8, true);
 

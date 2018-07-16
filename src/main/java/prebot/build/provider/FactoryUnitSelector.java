@@ -145,9 +145,9 @@ public class FactoryUnitSelector implements Selector<UnitType>{
   
 //	    	setCombatUnitRatio();
     		
-    		vultureratio = StrategyIdea.currentStrategy.ratio.vulture;
-			tankratio = StrategyIdea.currentStrategy.ratio.tank;
-			goliathratio = StrategyIdea.currentStrategy.ratio.goliath;
+    		vultureratio = StrategyIdea.factoryRatio.vulture;
+			tankratio = StrategyIdea.factoryRatio.tank;
+			goliathratio = StrategyIdea.factoryRatio.goliath;
 			wgt = 1;
 			
 //			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || ratio  || vultureratio : " + vultureratio + " / tankratio : " + tankratio + " / goliathratio : " + goliathratio);

@@ -75,7 +75,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 //    		
 //    		if(InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 113 == 0) {
     	executeFirstex();
-    	if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+    	if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
     		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
     			return false;
     		}

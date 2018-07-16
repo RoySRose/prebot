@@ -33,6 +33,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
+import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonConfig.UxConfig;
@@ -1421,12 +1422,26 @@ public class UXManager {
 	}
 
 	private void drawStrategySample() {
+		String upgradeString = "";
+		for (MetaType metaType : StrategyIdea.upgrade) {
+			upgradeString += metaType.getName() + " > ";
+		}
+		
+		int y = 10;
 		Race enemyRace = InfoUtils.enemyRace();
 		EnemyStrategy strategy = StrategyIdea.currentStrategy;
-		Prebot.Broodwar.drawTextScreen(20, 25, "" + UxColor.CHAR_YELLOW + strategy.toString());
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "[" + strategy.name() + "]");
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "FAC RATIO : " + StrategyIdea.factoryRatio);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "UPGRADE   : " + upgradeString);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MARINE CNT : " + StrategyIdea.marineCount);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "ADDON     : " + StrategyIdea.addOnOption);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "EXPANSION : " + StrategyIdea.expansionOption);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "WRAITH CNT : " + StrategyIdea.wraithCount);
+		Prebot.Broodwar.drawTextScreen(20, y += 20, UxColor.CHAR_YELLOW + "" + strategy.buildTimeMap);
+		
 		Prebot.Broodwar.drawTextScreen(20, 260, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
 
-		int y = 10;
+		y = 10;
 		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
 			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
 				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());

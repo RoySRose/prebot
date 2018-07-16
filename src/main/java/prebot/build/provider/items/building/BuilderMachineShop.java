@@ -68,7 +68,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 					int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
 //					setCombatUnitRatio();
 //					UnitType selected = FactoryUnitSelector.chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
-					UnitType selected = FactoryUnitSelector.chooseunit(StrategyIdea.currentStrategy.ratio.vulture, StrategyIdea.currentStrategy.ratio.tank, StrategyIdea.currentStrategy.ratio.goliath, 1, tot_vulture, tot_tank, tot_goliath);
+					UnitType selected = FactoryUnitSelector.chooseunit(StrategyIdea.factoryRatio.vulture, StrategyIdea.factoryRatio.tank, StrategyIdea.factoryRatio.goliath, 1, tot_vulture, tot_tank, tot_goliath);
 	
 					if (selected == UnitType.Terran_Siege_Tank_Tank_Mode) {
 						addition = 0;

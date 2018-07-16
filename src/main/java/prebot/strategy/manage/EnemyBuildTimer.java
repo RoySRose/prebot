@@ -76,10 +76,10 @@ public class EnemyBuildTimer {
 			}
 			
 			// 프로토스 전은 안전하게 10초나 땡겨서 시간을 준다.
-			StrategyIdea.turretNeedFrame -= 10 * TimeUtils.SECOND;
-			StrategyIdea.turretBuildStartFrame -= 10 * TimeUtils.SECOND;
-			StrategyIdea.engineeringBayBuildStartFrame -= 10 * TimeUtils.SECOND;
-			StrategyIdea.academyFrame -= 5 * TimeUtils.SECOND;
+			StrategyIdea.turretNeedFrame -= 15 * TimeUtils.SECOND;
+			StrategyIdea.turretBuildStartFrame -= 15 * TimeUtils.SECOND;
+			StrategyIdea.engineeringBayBuildStartFrame -= 15 * TimeUtils.SECOND;
+			StrategyIdea.academyFrame -= 10 * TimeUtils.SECOND;
 			
 		} else if (enemyRace == Race.Zerg) {
 			int spireFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Spire);

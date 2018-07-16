@@ -10,9 +10,7 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
-import prebot.micro.control.MarineControl;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
 import prebot.strategy.StrategyIdea;
@@ -20,7 +18,6 @@ import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
 	
-	private MarineControl marineControl = new MarineControl();
 	private TankControl tankControl = new TankControl();
 	private GoliathControl goliathControl = new GoliathControl();
 	
@@ -30,13 +27,6 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
-		if (StrategyIdea.mainSquadMode == MainSquadMode.FD_PRESS
-				|| StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
-			if (unit.getType() == UnitType.Terran_Marine) {
-				return true;
-			}
-		}
-		
 		return unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
 				|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 				|| unit.getType() == UnitType.Terran_Goliath;
@@ -52,8 +42,6 @@ public class MainAttackSquad extends Squad {
 		updateInitiatedFlag();
 		
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
-		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
-		marineControl.control(marineList, euiList);
 		
 		List<Unit> tankList = new ArrayList<>();
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));

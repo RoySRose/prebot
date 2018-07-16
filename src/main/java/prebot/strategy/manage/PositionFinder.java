@@ -191,10 +191,10 @@ public class PositionFinder {
 		if (firstExpansionDetectingOk) {
 			int secondChokeBonus = 8;
 			int firstExpansionBonus = 3;
-			if (StrategyIdea.currentStrategy.buildTimeMap.isDouble()) {
+			if (StrategyIdea.buildTimeMap.isDouble()) {
 				secondChokeBonus = 0;
 				firstExpansionBonus = 0;
-			} else if (StrategyIdea.currentStrategy.buildTimeMap.isMechanic()) {
+			} else if (StrategyIdea.buildTimeMap.isMechanic()) {
 				secondChokeBonus = 2;
 				firstExpansionBonus = 2;
 			}
