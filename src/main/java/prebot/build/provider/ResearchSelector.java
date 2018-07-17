@@ -106,7 +106,7 @@ public class ResearchSelector implements Selector<MetaType>{
 		
 //		비어있는 머신샵이 최소 큐에 들어있는 개발건 보다 많아야 선택
 		if(canMachineShopCnt != 0 && QueueResearch < canMachineShopCnt) {
-			System.out.println("QueueResearch : " + QueueResearch + " / canMachineShopCnt : " + canMachineShopCnt);
+//			System.out.println("QueueResearch : " + QueueResearch + " / canMachineShopCnt : " + canMachineShopCnt);
 			canResearch = true;
 		}
 		

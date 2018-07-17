@@ -23,6 +23,7 @@ import prebot.strategy.RespondToStrategy;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TempBuildSourceCode;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.AttackExpansionManager;
@@ -105,7 +106,23 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     
     
     public boolean executeExpansion() {
-
+    	if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+    		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
+    			return false;
+    		}
+    	}
+    	
+    	if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
+    		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 1) {
+    			return false;
+    		}
+    	}
+    	
+    	if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
+    		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 2) {
+    			return false;
+    		}
+    	}
 		
 
 		int MaxCCcount = 4;

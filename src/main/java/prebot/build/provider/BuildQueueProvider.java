@@ -77,20 +77,21 @@ public class BuildQueueProvider extends GameManager {
     
     //BuildCountChecker buildCountChecker;
     ResearchSelector researchSelector;
-    //ResearchSelector2 researchSelector2;
+
+    
     UpgradeSelector upgradeSelector;
     BarrackUnitSelector barrackUnitSelector;
     FactoryUnitSelector factoryUnitSelector;
-    StarportUnitSelector starportUnitSelector;
+//    StarportUnitSelector starportUnitSelector;
 
     public BuildQueueProvider(){
 
-        researchSelector = new ResearchSelector();
+    	researchSelector = new ResearchSelector();
         //researchSelector2 = new ResearchSelector2();
         upgradeSelector = new UpgradeSelector();
         barrackUnitSelector = new BarrackUnitSelector();
         factoryUnitSelector = new FactoryUnitSelector();
-        starportUnitSelector = new StarportUnitSelector();
+//        starportUnitSelector = new StarportUnitSelector();
 
         //Unit
         //
@@ -105,7 +106,7 @@ public class BuildQueueProvider extends GameManager {
         buildableList.add(new BuilderGoliath              (new MetaType(UnitType.Terran_Goliath), factoryUnitSelector));
         buildableList.add(new BuilderVulture              (new MetaType(UnitType.Terran_Vulture), factoryUnitSelector));
         buildableList.add(new BuilderSiegeTank				(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
-        buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith), starportUnitSelector));
+        buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith)));
         
         /*
         buildableList.add(new BuilderBattlecruiser        (new MetaType(UnitType.Terran_Battlecruiser),starportUnitSelector));
@@ -145,8 +146,10 @@ public class BuildQueueProvider extends GameManager {
         /*upgrade(tech)*/
         ionThrusters               = new BuilderIonThrusters         (new MetaType(UpgradeType.Ion_Thrusters  ), researchSelector);
         charonBoosters             = new BuilderCharonBoosters       (new MetaType(UpgradeType.Charon_Boosters  ), researchSelector);
+        apolloReactor              = new BuilderApolloReactor        (new MetaType(UpgradeType.Apollo_Reactor  ));
+        
         /*
-        apolloReactor              = new BuilderApolloReactor        (new MetaType(UpgradeType.Apollo_Reactor  ), upgradeSelector);
+        
         caduceusReactor            = new BuilderCaduceusReactor      (new MetaType(UpgradeType.Caduceus_Reactor  ), upgradeSelector);
         charonBoosters             = new BuilderCharonBoosters       (new MetaType(UpgradeType.Charon_Boosters  ), upgradeSelector);
         colossusReactor            = new BuilderColossusReactor      (new MetaType(UpgradeType.Colossus_Reactor  ), upgradeSelector);
@@ -234,114 +237,18 @@ public class BuildQueueProvider extends GameManager {
     	if(Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) {
     		buildableList.remove(tankSiegeMode);
     	}
-    	
-    	
-    	
-//    	buildableList.remove(apolloReactor);
-//    	buildableList.remove(caduceusReactor);
-//    	
-//    	buildableList.remove(colossusReactor);
-//    	
-//    	buildableList.remove(moebiusReactor);
-//    	buildableList.remove(ocularImplants);
-//    	buildableList.remove(terranInfantryArmor);
-//    	buildableList.remove(terranInfantryWeapons);
-//    	buildableList.remove(terranShipPlating);
-//    	buildableList.remove(terranShipWeapons);
-//    	buildableList.remove(terranVehiclePlating);
-//    	buildableList.remove(terranVehicleWeapons);
-//    	buildableList.remove(titanReactor);
-//    	buildableList.remove(u238Shells);
-//
-//    	/*tech*/
-//    	buildableList.remove(cloakingField);
-//    	buildableList.remove(empShockwave);
-//    	buildableList.remove(irradiate);
-//    	buildableList.remove(lockdown);
-//    	buildableList.remove(nuclearStrike);
-//    	buildableList.remove(opticalFlare);
-//    	buildableList.remove(personnelCloaking);
-//    	buildableList.remove(restoration);
-//    	
-//    	buildableList.remove(stimPacks);
-//    	
-//    	buildableList.remove(yamatoGun);
+
     }
 
     public void update(){
     	turnOffReseach();
-    	
-    	/*if (BuildConditionChecker.Instance().EXOK == false && Prebot.Broodwar.getFrameCount() % 2 == 0) {
-    		BuildConditionChecker.Instance().executeFirstex();
-		}*/
-    	
-    	
-    	//if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
-	        researchSelector.select();
-	        //researchSelector2.select();
-		//}
-    	
-//    	if(!InitialBuildProvider.Instance().InitialBuildFinished) {
-//    		InitialBuildProvider.Instance().updateInitialBuild();
-//    	}
-    		
-		//셀렉터들에 필요한 유닛카운트 미리 집계
-//		if (Prebot.Broodwar.getFrameCount() % 239 == 0) {
-//			BuildConditionChecker.Instance().executeSustainUnits();
-//		}
-		
-//		if (Prebot.Broodwar.getFrameCount() < 10000) {
-//			if (Prebot.Broodwar.getFrameCount() % 29 == 0) {
-//				BuildConditionChecker.Instance().executeFly();
-//			}
-//		} else {
-//			if (Prebot.Broodwar.getFrameCount() % 281 == 0) {
-//				BuildConditionChecker.Instance().executeFly();
-//			}
-//		}
-		
-		
-//		if (InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 53 == 0) {
-	        upgradeSelector.select();
-//		}
-        //barrackUnitSelector.select();
+    	researchSelector.select();
+        upgradeSelector.select();
         factoryUnitSelector.select();
-        //starportUnitSelector.select();
-        
-        /*if(!sysout) {
-        	
-        	for(BuildableItem buildableItem: buildableList) {
-        		FileUtils.appendTextToFile("log.txt", "\n BuildableItem || " + buildableItem.toString());
-        	}
-        	sysout = true;
-        	
-        }*/
-
         for(BuildableItem buildableItem: buildableList) {
-        	//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() before|| " + buildableItem.toString());
     		buildableItem.process();
-    		//FileUtils.appendTextToFile("log.txt", "\n buildableItem.process() after|| " + buildableItem.toString());
     	}
         
-        /*respond strategy 대응*/
-//        if ((Prebot.Broodwar.getFrameCount() < 13000 && Prebot.Broodwar.getFrameCount() % 5 == 0)
-//				|| (Prebot.Broodwar.getFrameCount() >= 13000 && Prebot.Broodwar.getFrameCount() % 23 == 0)) { // Analyze 와 동일하게
-//			RespondToStrategy.Instance().update();
-//			// RespondToStrategyOld.Instance().update();// 다른 유닛 생성에 비해 제일 마지막에 돌아야 한다. highqueue 이용하면 제일 앞에 있을 것이므로
-//			// AnalyzeStrategy.Instance().AnalyzeEnemyStrategy();
-//		}
-//        if(respondSet) {
-//		    researchSelector.select();
-//		    upgradeSelector.select();
-//		    //barrackUnitSelector.select();
-//		    factoryUnitSelector.select();
-//        	for(BuildableItem buildableItem: buildableList) {
-//        		buildableItem.process();
-//        	}
-//        	respondSet = false;
-//        }
-        
-	//}
     }
 
 	

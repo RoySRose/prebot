@@ -14,24 +14,29 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
 
 public class BuilderWraith extends DefaultBuildableItem {
 
 	StarportUnitSelector starportUnitSelector;
 
-    public BuilderWraith(MetaType metaType, StarportUnitSelector starportUnitSelector){
+    public BuilderWraith(MetaType metaType){
         super(metaType);
-        this.starportUnitSelector = starportUnitSelector;
+//        this.starportUnitSelector = starportUnitSelector;
     }
 
     public final boolean buildCondition(){
+    	
+    	int maxWraithCnt = StrategyIdea.wraithCount;
+    	
+    	maxWraithCnt = 10;
     	
     	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
     		return false;
     	}
 
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) < 11) {
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) <= maxWraithCnt) {
     		if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
     		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
     			return true;

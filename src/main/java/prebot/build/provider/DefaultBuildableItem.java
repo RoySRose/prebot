@@ -43,7 +43,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     	this.buildCondition.seedPositionStrategy = seedPositionStrategy;
     }
 
-    public final void settilePosition(TilePosition tilePosition) {
+    public final void setTilePosition(TilePosition tilePosition) {
     	this.buildCondition.tilePosition = tilePosition;
     }
 
@@ -53,7 +53,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public DefaultBuildableItem(MetaType metaType) {
-        buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, TilePosition.None);
+        buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.NoLocation, TilePosition.None);
         this.metaType = metaType;
         //setProducerOfUnit();
         if(metaType.isUnit() && (!metaType.getUnitType().isBuilding() || metaType.getUnitType().isAddon())) {
@@ -102,34 +102,36 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     		buildCondition.tilePosition = TilePosition.None;
     		//FileUtils.appendTextToFile("log.txt", "\nafter input buildCondition.tilePosition ==>>> None ==> " + buildCondition.tilePosition.getLength());
     	}*/
-    	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue()==>>> " + metaType.getName());
+    	
         if(buildCondition.highPriority){
         	
         	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue() OF buildCondition.highPriority TRUE==>>> " + metaType.getName());
             //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
         	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
         		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
+//        		FileUtils.appendTextToFile("log.txt", "\n test log highPriority" + metaType.getUnitType() + " :: SeedPositionStrategy != SeedPositionStrategy.NoLocation ");
                 //BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType.getUnitType(), buildCondition.seedPositionStrategy, buildCondition.blocking);
         		BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
             //}else if(!buildCondition.tilePosition == TilePosition.None){
             }else if(buildCondition.tilePosition != TilePosition.None){
-            	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
+//            	FileUtils.appendTextToFile("log.txt", "\n test log highPriority" + metaType.getUnitType() + " :: tilePosition != TilePosition.None ");
                 BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
             }else{
                 BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.blocking);
                 //FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! " + metaType.getUnitType());
                 //FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! " + buildCondition.blocking);
-                BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.blocking);
             }
         }else {
         	//FileUtils.appendTextToFile("log.txt", "\n test log setBuildQueue() OF buildCondition.highPriority FALSE==>>> " + metaType.getName());
             //if(!buildCondition.seedPositionStrategy.equals(BuildOrderItem.SeedPositionStrategy.NoLocation)){
         	if(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation){
         		//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation ");
+//        		FileUtils.appendTextToFile("log.txt", "\n test log lowPriority" + metaType.getUnitType() + " :: SeedPositionStrategy != SeedPositionStrategy.NoLocation ");
                 BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
             //}else if(!buildCondition.tilePosition.equals(TilePosition.None)){
             }else if(buildCondition.tilePosition != TilePosition.None){
             	//FileUtils.appendTextToFile("log.txt", "\n test log buildCondition.tilePosition != TilePosition.None ");
+//            	FileUtils.appendTextToFile("log.txt", "\n test log lowPriority" + metaType.getUnitType() + " :: tilePosition != TilePosition.None ");
                 BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
             }else{
             	//FileUtils.appendTextToFile("log.txt", "\n test log ELSE!!!!!!!!!!!!!!!!!! ");
@@ -184,7 +186,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     private final void setDefaultConditions(){
         this.buildCondition.blocking = false;
         this.buildCondition.highPriority = false;
-        this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+        this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
         this.buildCondition.tilePosition = TilePosition.None;
     }
 
