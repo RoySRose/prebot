@@ -10,6 +10,7 @@ import bwapi.TilePosition;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.MetaType;
+import prebot.common.util.FileUtils;
 
 /// 빌드 오더 목록 자료구조 class
 public class BuildOrderQueue {
@@ -178,9 +179,19 @@ public class BuildOrderQueue {
 			final MetaType item = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType;
 			TilePosition itemPosition = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation;
 			Point seedPositionPoint = null;
+//			FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> item => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType.getUnitType());
+//			FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> seedTile => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation);
 			if(queryTilePosition != null)
 			{
+//				20180716. hkk debug
+//				System.out.println("(BuildOrderItem)tempArr[queue.size() - 1 - i]"+((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType.getUnitType());
+//				System.out.println("queryTilePosition.getX(), queryTilePosition.getY() == > " + queryTilePosition.getX() +" / "+ queryTilePosition.getY());
 				seedPositionPoint = new Point(queryTilePosition.getX(), queryTilePosition.getY());
+				
+//				20180716. hkk debug				
+//				System.out.println("(int)seedPositionPoint.getX(), (int)seedPositionPoint.getY() == > " + (int)seedPositionPoint.getX() + " / " + (int)seedPositionPoint.getY());
+//				System.out.println("itemPosition == > " + (int)itemPosition.getX() + " / " + (int)itemPosition.getY());
+				
 			}
 
 			if (queryType.isUnit() && item.isUnit()) {

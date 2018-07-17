@@ -15,6 +15,7 @@ import bwta.Chokepoint;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.PositionUtils;
 import prebot.strategy.InformationManager;
 
@@ -256,6 +257,14 @@ public class ConstructionPlaceFinder {
 //			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
 		else if (buildingType == UnitType.Terran_Missile_Turret) {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
+//			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
+//			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
+			FileUtils.appendTextToFile("log.txt","\n desiredPosition : " + desiredPosition + " / entrance_turret : " + BlockingEntrance.Instance().entrance_turret);
+			FileUtils.appendTextToFile("log.txt","\\n desiredPosition : (" + desiredPosition.getX() +" , "+desiredPosition.getY()+")");
+			FileUtils.appendTextToFile("log.txt","\\n entrance_turret : (" + BlockingEntrance.Instance().entrance_turret.getX() +" , "+BlockingEntrance.Instance().entrance_turret.getY()+")");
+			if(desiredPosition == BlockingEntrance.Instance().entrance_turret) {
+				buildingGapSpace = 0; 
+			}
 		}else if (buildingType == UnitType.Terran_Bunker) {
 			buildingGapSpace = 0;
 		}
