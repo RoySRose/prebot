@@ -9,13 +9,13 @@ import java.util.List;
 public class EngineeringBayControl extends BuildingFlyControl {
 
     public EngineeringBayControl() {
-        super(true, false);
+        super(true, false, null);
     }
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+  
         processFly(unitList, euiList);
-		// TODO Auto-generated method stub
 	}
 
     @Override

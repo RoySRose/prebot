@@ -18,12 +18,12 @@ import java.util.List;
 public class ScienceFacilityControl extends BuildingFlyControl {
 
     public ScienceFacilityControl() {
-        super(false, false);
+        super(false, false, null);
     }
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		// TODO Auto-generated method stub
+
         processFly(unitList, euiList);
 	}
 
