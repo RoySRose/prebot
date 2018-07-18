@@ -70,7 +70,7 @@ public class TempBuildSourceCode {
 		// BUILD MANAGER : 다른 위치에 커맨드를 짓는다.(하드코딩 또는 FIRST CHOKE 뒤쪽 등 처리방법 고민필요)
 		// COMBAT MANAGER : STRATEGY MANAGER에서 멀티지역이 안전해졌다고 판단이 들어오면 커맨드 센터를 띄워서 이동시킨다.
 		if (EXOK == false && Prebot.Broodwar.getFrameCount() % 2 == 0) {
-			executeFirstex();
+			//executeFirstex();
 		}
 
 		if (Prebot.Broodwar.getFrameCount() % 43 == 0) {
