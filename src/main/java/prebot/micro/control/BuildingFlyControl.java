@@ -1,15 +1,26 @@
 package prebot.micro.control;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.Chokepoint;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
+import prebot.common.main.MyBotModule;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
+import prebot.micro.control.factory.GoliathControl;
+import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BuildingFlyControl extends Control{
@@ -20,10 +31,17 @@ public abstract class BuildingFlyControl extends Control{
     boolean flyAlways;
     boolean isGateway;
 
-    public BuildingFlyControl(boolean flyAlways, boolean isGateway) {
+    public BuildingFlyControl(boolean flyAlways, boolean isGateway, TilePosition tilePosition) {
         this.flyAlways = flyAlways;
         this.isGateway = isGateway;
-        this.landPosition = TilePosition.None;
+        if(isGateway){
+            if(tilePosition == null){
+                System.out.println("TilePosition must not be null");
+            }
+            this.landPosition = tilePosition;
+        }else {
+            this.landPosition = TilePosition.None;
+        }
         this.flyPosition = Position.None;
     }
 
@@ -45,9 +63,6 @@ public abstract class BuildingFlyControl extends Control{
     }
     public void setFlyPosition(Position flyPosition) {
         this.flyPosition = flyPosition;
-    }
-    public Position getFlyPosition() {
-        return this.flyPosition;
     }
 
 
@@ -110,4 +125,5 @@ public abstract class BuildingFlyControl extends Control{
         }
         return false;
     }
+
 }

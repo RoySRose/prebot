@@ -3,6 +3,7 @@ package prebot.micro.control.building;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
@@ -13,18 +14,19 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import sun.jvm.hotspot.opto.Block;
 
 import java.util.List;
 
 public class BarracksControl extends BuildingFlyControl {
 
     public BarracksControl() {
-        super(false, true);
+        super(false, true, BlockingEntrance.Instance().barrack);
     }
 
     @Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		// TODO Auto-generated method stub
+        //setFlyPosition(getFlyPosition0(unitList));
         processFly(unitList, euiList);
 	}
 
