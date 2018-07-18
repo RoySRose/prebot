@@ -1,12 +1,19 @@
 package prebot.micro.control.building;
 
-import java.util.List;
-
-import bwapi.Position;
+import bwapi.Race;
+import bwapi.TechType;
 import bwapi.Unit;
+import prebot.build.initialProvider.buildSets.VsProtoss;
+import prebot.build.initialProvider.buildSets.VsTerran;
+import prebot.build.initialProvider.buildSets.VsZerg;
+import prebot.common.MetaType;
+import prebot.micro.constant.MicroConfig;
+import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
-import prebot.micro.control.Control;
+import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
+
+import java.util.List;
 
 public class ScienceFacilityControl extends BuildingFlyControl {
 
@@ -17,11 +24,17 @@ public class ScienceFacilityControl extends BuildingFlyControl {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
-        executeFly(unitList, euiList);
+        processFly(unitList, euiList);
 	}
 
     @Override
     public void checkFlyCondition() {
-
+        if (InformationManager.Instance().enemyRace == Race.Zerg) {
+            if (MicroConfig.Upgrade.hasResearched(TechType.Irradiate)) {
+                setBuildingFly(BuildingFly.UP);
+            }
+        } else {
+            setBuildingFly(BuildingFly.UP);
+        }
     }
 }
