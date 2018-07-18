@@ -1,5 +1,7 @@
 package prebot.micro.control.building;
 
+import java.util.List;
+
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -14,9 +16,6 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import sun.jvm.hotspot.opto.Block;
-
-import java.util.List;
 
 public class BarracksControl extends BuildingFlyControl {
 
