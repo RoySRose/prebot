@@ -1,7 +1,5 @@
 package prebot.micro.control.building;
 
-import java.util.List;
-
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -11,27 +9,30 @@ import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
-import prebot.micro.control.Control;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+
+import java.util.List;
 
 public class CommandCenterControl extends BuildingFlyControl {
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
-        executeFly(unitList, euiList);
+        processFly(unitList, euiList);
 	}
 
     @Override
     public void checkFlyCondition() {
 
-        if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
+        if (Prebot.getBroodwar().self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 
             Unit checkCC = getSecondCommandCenter();
-            BaseLocation correctLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 
             if (checkCC != null) {
+                BaseLocation correctLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
+
                 if (checkCC.isLifted() == false) {
                     if (checkCC.getTilePosition().getX() != correctLocation.getTilePosition().getX() || checkCC.getTilePosition().getY() != correctLocation.getTilePosition().getY()) {
                         setBuildingFly(BuildingFly.UP);
@@ -40,15 +41,11 @@ public class CommandCenterControl extends BuildingFlyControl {
                     setLandPosition(new TilePosition(correctLocation.getTilePosition().getX(), correctLocation.getTilePosition().getY()));
                     setBuildingFly(BuildingFly.DOWN);
                 }
-                if (checkCC.isLifted() == false && checkCC.getTilePosition().getX() == correctLocation.getTilePosition().getX()
-                        && checkCC.getTilePosition().getY() == correctLocation.getTilePosition().getY()) {
-                    EXOK = true;
-                }
             }
         }
     }
 
-    private final Unit getSecondCommandCenter(){
+    public Unit getSecondCommandCenter(){
 
         for (Unit commandCenter : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
             if (commandCenter.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() && commandCenter.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
@@ -57,6 +54,7 @@ public class CommandCenterControl extends BuildingFlyControl {
                 return commandCenter;
             }
         }
+        return null;
     }
 
 }
