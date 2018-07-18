@@ -82,7 +82,7 @@ public enum EnemyStrategy {
 	
 	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()),
+			, TimeMapForProtoss.PROTOSS_HARDCORE_ZEALOT()),
 	
 	PROTOSS_STARGATE(1, 3, 1, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY

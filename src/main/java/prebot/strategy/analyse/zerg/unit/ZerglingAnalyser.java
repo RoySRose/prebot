@@ -1,4 +1,4 @@
-package prebot.strategy.analyse.zerg;
+package prebot.strategy.analyse.zerg.unit;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
+import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ZerglingAnalyser extends UnitAnalyser {
 
@@ -21,19 +22,18 @@ public class ZerglingAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		fastPoolByZergling();
-	}
-
-	private void fastPoolByZergling() {
-		if (ClueManager.Instance().containsClueType(ClueType.POOL_ASSUME)) {
-			return;
-		}
-		
 		List<UnitInfo> found = found();
 		if (found.isEmpty()) {
 			return;
 		}
+		fastPoolByZergling(found);
+		fastZerglingCount(found);
+	}
 
+	private void fastPoolByZergling(List<UnitInfo> found) {
+		if (ClueManager.Instance().containsClueType(ClueType.POOL_ASSUME)) {
+			return;
+		}
 		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
 		int nineDroneFrame = EnemyStrategy.ZERG_9DRONE.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
 		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
@@ -62,4 +62,31 @@ public class ZerglingAnalyser extends UnitAnalyser {
 		}
 	}
 
+	private void fastZerglingCount(List<UnitInfo> found) {
+		if (found.isEmpty()) {
+			return;
+		}
+		
+		int poolExpectFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Spawning_Pool);
+		int fastZerglingFrame = poolExpectFrame + UnitType.Zerg_Spawning_Pool.buildTime() + UnitType.Zerg_Zergling.buildTime() + 5 * TimeUtils.SECOND;
+		int secondFastZerglingFrame = fastZerglingFrame + UnitType.Zerg_Zergling.buildTime() + 5 * TimeUtils.SECOND;
+		int thirdFastZerglingFrame = secondFastZerglingFrame + UnitType.Zerg_Overlord.buildTime() + UnitType.Zerg_Zergling.buildTime() + 5 * TimeUtils.SECOND;
+
+		if (found.size() >= 10) {
+			int lastUnitFoundFrame = lastUnitFoundFrame(found, 10);
+			if (lastUnitFoundFrame < thirdFastZerglingFrame) {
+				ClueManager.Instance().addClueInfo(ClueInfo.FAST_OVERTEN_ZERGLING);
+			}
+		} else if (found.size() >= 8) {
+			int lastUnitFoundFrame = lastUnitFoundFrame(found, 8);
+			if (lastUnitFoundFrame < secondFastZerglingFrame) {
+				ClueManager.Instance().addClueInfo(ClueInfo.FAST_EIGHT_ZERGLING);
+			}
+		} else if (found.size() >= 6) {
+			int lastUnitFoundFrame = lastUnitFoundFrame(found, 6);
+			if (lastUnitFoundFrame < fastZerglingFrame) {
+				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SIX_ZERGLING);
+			}
+		}
+	}
 }

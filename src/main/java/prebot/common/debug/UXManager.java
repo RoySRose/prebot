@@ -61,6 +61,7 @@ import prebot.strategy.manage.AirForceTeam;
 import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
+import prebot.strategy.manage.StrategyAnalyseManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
@@ -144,7 +145,7 @@ public class UXManager {
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
 			//미네랄PATH
 		} else if (uxOption == 2) {
-			drawStrategySample();
+			drawStrategy();
 			
 		} else if (uxOption == 3) {
 			drawEnemyBuildTimer();
@@ -208,8 +209,8 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "turret Need  Frame : " + TimeUtils.framesToTimeString(StrategyIdea.turretNeedFrame));
 		y += 15;
 		
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "academy Need Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "comsat Need Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame));
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "academy Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame));
+		Prebot.Broodwar.drawTextScreen(20, y += 15, "comsat Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame + UnitType.Terran_Academy.buildTime()));
 		y += 15;
 		
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "darkTemplarInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().darkTemplarInMyBaseFrame));
@@ -1421,7 +1422,7 @@ public class UXManager {
 		
 	}
 
-	private void drawStrategySample() {
+	private void drawStrategy() {
 		String upgradeString = "";
 		for (MetaType metaType : StrategyIdea.upgrade) {
 			upgradeString += metaType.getName() + " > ";
@@ -1430,7 +1431,9 @@ public class UXManager {
 		int y = 10;
 		Race enemyRace = InfoUtils.enemyRace();
 		EnemyStrategy strategy = StrategyIdea.currentStrategy;
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "[" + strategy.name() + "]");
+		int phase = StrategyAnalyseManager.Instance().getPhase();
+		
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "[" + strategy.name() + " ...(phase "+ phase + ")]");
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "FAC RATIO : " + StrategyIdea.factoryRatio);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "UPGRADE   : " + upgradeString);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MARINE CNT : " + StrategyIdea.marineCount);

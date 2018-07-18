@@ -2,8 +2,10 @@ package prebot.strategy.analyse.zerg;
 
 import java.util.List;
 
+import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
@@ -58,7 +60,9 @@ public class LairAnalyser extends UnitAnalyser {
 		
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
-			if (found.get(0).isCompleted()) {
+			UnitInfo lairInfo = found.get(0);
+			Unit lairInSight = UnitUtils.unitInSight(lairInfo);
+			if (lairInSight != null && lairInSight.isCompleted()) {
 				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_COMPLETE);
 			} else {
 				int updateFrame = found.get(0).getUpdateFrame();

@@ -3,6 +3,7 @@ package prebot.strategy.manage;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
@@ -39,7 +40,7 @@ public class InitialAction {
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 0));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 5 * TimeUtils.SECOND));
 				assignedFirstScout = true;
 			}
 //			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));

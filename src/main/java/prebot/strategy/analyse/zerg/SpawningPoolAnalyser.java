@@ -52,7 +52,7 @@ public class SpawningPoolAnalyser extends UnitAnalyser {
 		} else {
 			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > doubleFrame) { // 더블 타이밍 지남
-				ClueManager.Instance().addClueInfo(ClueInfo.NO_POOL);
+				ClueManager.Instance().addClueInfo(ClueInfo.LATE_POOL);
 			}
 		}
 	}

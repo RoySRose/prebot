@@ -31,6 +31,8 @@ public class StargateAnalyser extends UnitAnalyser {
 				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_ONEGATE_FAST);
 			} else if (buildFrame < doubleStargateFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_DOUBLE_FAST);
+			} else {
+				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_FOUND);
 			}
 		}
 	}
