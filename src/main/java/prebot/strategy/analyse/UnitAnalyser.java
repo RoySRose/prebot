@@ -131,5 +131,19 @@ public abstract class UnitAnalyser {
 	protected int baseToBaseFrame(UnitType unitType) {
 		return InformationManager.Instance().baseToBaseFrame(unitType);
 	}
+	
+	protected int lastUnitFoundFrame(List<UnitInfo> euiList, int lastCount) {
+		if (euiList.size() < lastCount) {
+			lastCount = euiList.size();
+		}
+		int maxFrame = 0;
+		for (int i = 0; i < lastCount; i++) {
+			UnitInfo unitInfo = euiList.get(i);
+			if (unitInfo.getUpdateFrame() > maxFrame) {
+				maxFrame = unitInfo.getUpdateFrame();
+			}
+		}
+		return maxFrame;
+	}
 
 }

@@ -1,42 +1,20 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ZergStrategist extends Strategist {
 	
+	public ZergStrategist() {
+		super(UnitType.Zerg_Lair);
+	}
+	
 	@Override
-	public EnemyStrategy strategyToApply() {
-		if (phase01()) {
-			return StrategyIdea.startStrategy = strategyPhase01();
-		} else if (phase02()) {
-			return strategyPhase02();
-		} else {
-			return strategyPhase03();
-		}
-	}
-
-	private boolean phase01() {
-		if (TimeUtils.before(TimeUtils.timeToFrames(4, 0))) {
-			int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
-			return buildTimeExpect == CommonCode.UNKNOWN || TimeUtils.before(buildTimeExpect);
-		}
-		return false;
-	}
-
-	private boolean phase02() {
-		return TimeUtils.before(10 * TimeUtils.MINUTE); // TODO 조정
-	}
-
-	private EnemyStrategy strategyPhase01() {
+	protected EnemyStrategy strategyPhase01() {
 		if (hasInfo(ClueInfo.DOUBLE_HATCH_12HAT)) {
 			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR) && !hasInfo(ClueInfo.LAIR_2HAT_FAST)) {
 				return EnemyStrategy.ZERG_3HAT;
@@ -64,7 +42,7 @@ public class ZergStrategist extends Strategist {
 				return EnemyStrategy.ZERG_OVERPOOL;
 			}
 			
-		} else if (hasAnyInfo(ClueInfo.POOL_2HAT, ClueInfo.NO_POOL)) {
+		} else if (hasAnyInfo(ClueInfo.POOL_2HAT, ClueInfo.LATE_POOL)) {
 			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR)) {
 				return EnemyStrategy.ZERG_3HAT;
 			} else {
@@ -83,17 +61,19 @@ public class ZergStrategist extends Strategist {
 		return EnemyStrategy.ZERG_INIT;
 	}
 	
-	private EnemyStrategy strategyPhase02() {
-		
-		// TODO unit에 의한 판단 최상위
-		
+	@Override
+	protected EnemyStrategy strategyPhase02() {
 		if (hasAnyInfo(ClueInfo.LAIR_INCOMPLETE, ClueInfo.LAIR_COMPLETE)) {
-			if (hasAllType(ClueType.SPIRE, ClueType.HYDRADEN)) {
+			boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
+			boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
+			boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
+			
+			if (spireTech && hydraTech) {
 				return EnemyStrategy.ZERG_LAIR_MIXED;
-			} else if (hasType(ClueType.SPIRE)) {
-				return EnemyStrategy.ZERG_FAST_MUTAL;
-			} else if (hasType(ClueType.HYDRADEN)) {
+			} else if (lurkerFound || hydraTech) {
 				return EnemyStrategy.ZERG_FAST_LURKER;
+			} else if (spireTech) {
+				return EnemyStrategy.ZERG_FAST_MUTAL;
 			} else {
 				return EnemyStrategy.ZERG_FAST_MUTAL;
 			}
@@ -116,8 +96,9 @@ public class ZergStrategist extends Strategist {
 			}
 		}
 	}
-
-	private EnemyStrategy strategyPhase03() {
+	
+	@Override
+	protected EnemyStrategy strategyPhase03() {
 //		int hatchCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Hatchery);
 //		int lairCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Lair);
 //		int hiveCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Hive);

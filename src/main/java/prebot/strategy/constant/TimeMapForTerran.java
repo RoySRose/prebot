@@ -16,14 +16,14 @@ public class TimeMapForTerran {
 	}
 	
 	public static BuildTimeMap TERRAN_BBS() {
-		return new BuildTimeMap()
+		return new BuildTimeMap().setBionic()
 		.put(UnitType.Terran_Barracks, 1, 00)
 		.put(UnitType.Terran_Barracks, 1, 25)
 		.put(UnitType.Terran_Supply_Depot, 1, 45);
 	}
 	
 	public static BuildTimeMap TERRAN_2BARRACKS() {
-		return new BuildTimeMap()
+		return new BuildTimeMap().setBionic()
 		.put(UnitType.Terran_Supply_Depot, 0, 55)
 		.put(UnitType.Terran_Barracks, 1, 30)
 		.put(UnitType.Terran_Barracks, 2, 0)
@@ -86,13 +86,13 @@ public class TimeMapForTerran {
 	}
 	
 	public static BuildTimeMap TERRAN_BIONIC() {
-		return TERRAN_2BARRACKS()
+		return TERRAN_2BARRACKS().setBionic()
 		  .put(UnitType.Terran_Academy, 3, 0)
 		  .put(TechType.Stim_Packs, 3, 50);
 	}
 	
 	public static BuildTimeMap TERRAN_2BARRACKS_1FAC() {
-		return TERRAN_2BARRACKS()
+		return TERRAN_2BARRACKS().setBionic()
 		  .put(UnitType.Terran_Factory, 3, 35);
 	}
 	

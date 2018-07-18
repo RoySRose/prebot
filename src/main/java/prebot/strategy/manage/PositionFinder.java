@@ -25,6 +25,7 @@ import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.squad.Squad;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
@@ -137,14 +138,14 @@ public class PositionFinder {
 
 	private void updateMainSquadCenter() {
 		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
-//		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
-		Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList);
-		if (centerPosition != null) {
-			StrategyIdea.mainSquadCenter = centerPosition;
+		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
+		if (leader != null) {
+			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
 			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
+			StrategyIdea.mainSquadCenter = centerPosition;
 		} else {
-			StrategyIdea.mainSquadCenter = getMainPosition();
 			StrategyIdea.mainSquadCoverRadius = 250;
+			StrategyIdea.mainSquadCenter = getMainPosition();
 		}
 	}
 
@@ -189,8 +190,8 @@ public class PositionFinder {
 		}
 		
 		if (firstExpansionDetectingOk) {
-			int secondChokeBonus = 8;
-			int firstExpansionBonus = 3;
+			int secondChokeBonus = 15;
+			int firstExpansionBonus = 5;
 			if (StrategyIdea.buildTimeMap.isDouble()) {
 				secondChokeBonus = 0;
 				firstExpansionBonus = 0;
@@ -210,7 +211,7 @@ public class PositionFinder {
 		}
 
 		if (InfoUtils.enemyRace() == Race.Protoss) {
-			if (entranceBlocked()) {
+			if (InformationManager.Instance().isBlockingEnterance()) {
 				return entranceBlockedPosition();
 			} else {
 				return firstChokeDefensePosition();

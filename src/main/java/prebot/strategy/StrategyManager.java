@@ -118,7 +118,7 @@ public class StrategyManager extends GameManager {
 			}
 			
 		} else {
-			if (TimeUtils.after(11 * TimeUtils.MINUTE)) {
+			if (TimeUtils.after(13 * TimeUtils.MINUTE)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
 			}
 		}

@@ -21,7 +21,6 @@ public class CommandCenterAnalyser extends UnitAnalyser {
 	@Override
 	public void analyse() {
 		fastDoubleCommand();
-		
 	}
 
 	private void fastDoubleCommand() {

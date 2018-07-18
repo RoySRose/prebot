@@ -86,12 +86,15 @@ public class EnemyBuildTimer {
 			if (spireFrame != CommonCode.UNKNOWN) {
 				mutaliskInMyBaseFrame = spireFrame + UnitType.Zerg_Spire.buildTime() + UnitType.Zerg_Mutalisk.buildTime() + InformationManager.Instance().baseToBaseFrame(UnitType.Zerg_Mutalisk);
 			}
-			
 			int hydradenFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Hydralisk_Den);
 			int lairFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
 			if (hydradenFrame != CommonCode.UNKNOWN && lairFrame != CommonCode.UNKNOWN) {
 				lurkerInMyBaseFrame = Math.max(hydradenFrame, lairFrame) + TechType.Lurker_Aspect.researchTime() + UnitType.Zerg_Lurker.buildTime() + InformationManager.Instance().baseToBaseFrame(UnitType.Zerg_Lurker);
 			}
+			
+//			System.out.println("spireFrame : " + TimeUtils.framesToTimeString(spireFrame));
+//			System.out.println("hydradenFrame : " + TimeUtils.framesToTimeString(hydradenFrame));
+//			System.out.println("lairFrame : " + TimeUtils.framesToTimeString(lairFrame));
 
 			boolean muteTime = mutaliskInMyBaseFrame != CommonCode.UNKNOWN && (lurkerInMyBaseFrame == CommonCode.UNKNOWN || mutaliskInMyBaseFrame < lurkerInMyBaseFrame);
 			boolean lurkTime = lurkerInMyBaseFrame != CommonCode.UNKNOWN && (mutaliskInMyBaseFrame == CommonCode.UNKNOWN || lurkerInMyBaseFrame < mutaliskInMyBaseFrame);
@@ -148,6 +151,7 @@ public class EnemyBuildTimer {
 			updateObservatoryExpectTime();
 
 		} else if (enemyRace == Race.Zerg) {
+			updateSpawningPoolExpectTime();
 			updateLairExpectTime();
 			updateHydradenExpectTime();
 			updateSpireExpectTime();
@@ -206,6 +210,11 @@ public class EnemyBuildTimer {
 		updateByBuilding(UnitType.Protoss_Observatory);
 		updateByFlagUnit(UnitType.Protoss_Observatory, UnitType.Protoss_Observer);
 	}
+	
+	private void updateSpawningPoolExpectTime() {
+		updateByBuilding(UnitType.Zerg_Spawning_Pool, UnitType.Zerg_Lair);
+		updateByFlagUnit(UnitType.Zerg_Spawning_Pool, UnitType.Zerg_Zergling);
+	}
 
 	private void updateLairExpectTime() {
 		updateByBuilding(UnitType.Zerg_Lair, UnitType.Zerg_Spire);
@@ -239,6 +248,7 @@ public class EnemyBuildTimer {
 		if (isCertainBuildTime(buildingType)) {
 			return;
 		}
+		
 		List<UnitInfo> buildingInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, buildingType);
 		if (!buildingInfos.isEmpty()) {
 			if (buildingInfos.get(0).isCompleted()) {
@@ -255,14 +265,16 @@ public class EnemyBuildTimer {
 
 			} else {
 				// 미완성 건물 발견. 에너지로 빌드시간 추측 가능
+				boolean ignoreMinimum = true;
 				int expectBuildFrame = TimeUtils.buildStartFrames(buildingInfos.get(0).getUnit());
 				if (expectBuildFrame == CommonCode.UNKNOWN) {
+					ignoreMinimum = false;
 					expectBuildFrame = buildFrameByStrategy;
 				}
 				if (expectBuildFrame == CommonCode.UNKNOWN) {
 					System.out.println("################ ERROR - updateDefaultExpectTime" + buildFrameByStrategy + " / " + buildingType);
 				}
-				updateBuildTimeExpect(buildingType, expectBuildFrame);
+				updateBuildTimeExpect(buildingType, expectBuildFrame, ignoreMinimum);
 				addCertainBuildTime(buildingType);
 				for (UnitType nextBuildingType : nextBuildingTypes) {
 					updateBuildTimeMinimum(nextBuildingType, expectBuildFrame + buildingType.buildTime());
@@ -275,6 +287,7 @@ public class EnemyBuildTimer {
 				int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 				int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
 				int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+				
 				if (baseLastCheckFrame > buildFrameByStrategy && gasLastCheckFrame > buildFrameByStrategy && expansionLastCheckFrame > buildFrameByStrategy) {
 					int minimumFrame = baseLastCheckFrame < gasLastCheckFrame ? baseLastCheckFrame : gasLastCheckFrame;
 					minimumFrame = minimumFrame < expansionLastCheckFrame ? minimumFrame : expansionLastCheckFrame;
@@ -341,10 +354,17 @@ public class EnemyBuildTimer {
 
 	/// 빌드 예상시간 업데이트
 	private void updateBuildTimeExpect(UnitType buildingType, int frame) {
+		updateBuildTimeExpect(buildingType, frame, false);
+	}
+	
+	private void updateBuildTimeExpect(UnitType buildingType, int frame, boolean ignoreMinimum) {
 		if (frame == CommonCode.UNKNOWN) {
 			return;
 		}
-		Integer buildTimeMinimum = buildTimeMinimumMap.get(buildingType);
+		Integer buildTimeMinimum = null;
+		if (!ignoreMinimum) {
+			buildTimeMinimum = buildTimeMinimumMap.get(buildingType);
+		}
 		if (buildTimeMinimum != null && frame < buildTimeMinimum) {
 			buildTimeExpectMap.put(buildingType, buildTimeMinimum);
 		} else {

@@ -1,42 +1,21 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ProtossStrategist extends Strategist {
+	
+	public ProtossStrategist() {
+		super(UnitType.Protoss_Cybernetics_Core);
+	}
 
 	@Override
-	public EnemyStrategy strategyToApply() {
-		if (phase01()) {
-			return StrategyIdea.startStrategy = strategyPhase01();
-		} else if (phase02()) {
-			return strategyPhase02();
-		} else {
-			return strategyPhase03();
-		}
-	}
-
-	private boolean phase01() {
-		if (TimeUtils.before(TimeUtils.timeToFrames(4, 0))) {
-			int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Cybernetics_Core);
-			return buildTimeExpect == CommonCode.UNKNOWN || TimeUtils.before(buildTimeExpect);
-		}
-		return false;
-	}
-
-	private boolean phase02() {
-		return TimeUtils.before(10 * TimeUtils.MINUTE); // TODO 조정
-	}
-
-	private EnemyStrategy strategyPhase01() {
+	protected EnemyStrategy strategyPhase01() {
 		if (hasType(ClueType.FAST_NEXSUS)) {
 			if (hasInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
 				return EnemyStrategy.PROTOSS_DOUBLE;
@@ -85,27 +64,46 @@ public class ProtossStrategist extends Strategist {
 		
 		return EnemyStrategy.PROTOSS_INIT;
 	}
-
-	private EnemyStrategy strategyPhase02() {
-		if (hasAnyInfo(ClueInfo.TEMPLAR_ARCH_FAST, ClueInfo.ADUN_FAST)) {
-			if (hasInfo(ClueInfo.ROBO_FAST)) {
+	
+	@Override
+	protected EnemyStrategy strategyPhase02() {
+		if (hasAnyInfo(ClueInfo.TEMPLAR_ARCH_FAST, ClueInfo.ADUN_FAST, ClueInfo.FAST_DARK)) {
+			if (hasAnyInfo(ClueInfo.ROBO_FAST, ClueInfo.FAST_SHUTTLE)) {
 				return EnemyStrategy.PROTOSS_DARK_DROP;
 			} else {
 				return EnemyStrategy.PROTOSS_FAST_DARK;
 			}
 		}
 		
-		if (hasAnyInfo(ClueInfo.ROBO_FAST)) {
-			if (hasInfo(ClueInfo.ROBO_SUPPORT_FAST)) {
+		if (hasAnyInfo(ClueInfo.ROBO_FAST, ClueInfo.FAST_SHUTTLE)) {
+			if (hasAnyInfo(ClueInfo.ROBO_SUPPORT_FAST, ClueInfo.FAST_REAVER)) {
 				return EnemyStrategy.PROTOSS_ROBOTICS_REAVER;
-			} else if (hasInfo(ClueInfo.OBSERVER_FAST)) {
+			} else if (hasAnyInfo(ClueInfo.OBSERVERTORY_FAST, ClueInfo.FAST_OBSERVER)) {
 				return EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON;
 			} else {
 				return EnemyStrategy.PROTOSS_DARK_DROP;
 			}
 		}
 		
-		if (hasAnyInfo(ClueInfo.STARGATE_ONEGATE_FAST)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.isDouble()) {
+			if (hasInfo(ClueInfo.FAST_FLEET_BEACON)) {
+				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
+			} else if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
+				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
+			} else {
+				return EnemyStrategy.PROTOSS_DOUBLE_GROUND;
+			}
+		}
+		
+		if (StrategyIdea.startStrategy.buildTimeMap.isTwoGate()) {
+			if (hasType(ClueType.FAST_CORE)) {
+				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+			} else {
+				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
+			}
+		}
+		
+		if (hasAnyInfo(ClueInfo.STARGATE_ONEGATE_FAST, ClueInfo.FAST_FLEET_BEACON)) {
 			return EnemyStrategy.PROTOSS_STARGATE;
 		}
 		
@@ -113,30 +111,27 @@ public class ProtossStrategist extends Strategist {
 			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 		}
 		
-		// if 더블인가
-		if (StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_DOUBLE
-				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_FORGE_DOUBLE
-				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_GATE_DOUBLE) {
-			if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
-				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
+		if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
+			if (hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
+				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
+			} else if (hasType(ClueType.FAST_CORE)) {
+				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+			} else if (hasAnyInfo(ClueInfo.GATE_FAST_TWO, ClueInfo.GATE_TWO)) {
+				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
 			} else {
 				return EnemyStrategy.PROTOSS_DOUBLE_GROUND;
 			}
 		}
 		
-		if (StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_2GATE
-				|| StrategyIdea.startStrategy == EnemyStrategy.PROTOSS_2GATE_CENTER) {
-			if (hasType(ClueType.FAST_CORE)) {
-				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
-			} else if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
-				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
-			}
+		if (hasInfo(ClueInfo.FAST_THREE_ZEALOT)) {
+			return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;	
 		}
 		
 		return EnemyStrategy.PROTOSS_FAST_DARK;
 	}
-
-	private EnemyStrategy strategyPhase03() {
+	
+	@Override
+	protected EnemyStrategy strategyPhase03() {
 		int zealotCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot);
 		int dragoonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dragoon);
 		int darkCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dark_Templar);

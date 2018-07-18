@@ -534,11 +534,15 @@ public class UnitUtils {
 		}
 	}
 
-	
 	public static int myFactoryUnitSupplyCount() {
 		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
 				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 		
+		return totalSupplyCount * 4; // 인구수 기준이므로
+	}
+	
+	public static int myWraithUnitSupplyCount() {
+		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
 		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 
@@ -567,12 +571,15 @@ public class UnitUtils {
 		return leader;
 	}
 	
-	public static Position centerPositionOfUnit(List<Unit> unitList) {
+	public static Position centerPositionOfUnit(List<Unit> unitList, Position leaderPosition, int limitDistance) {
 		int count = 0;
 		int x = 0;
 		int y = 0;
 		for (Unit unit : unitList) {
 			if (!UnitUtils.isValidUnit(unit)) {
+				continue;
+			}
+			if (unit.getDistance(leaderPosition) > limitDistance) {
 				continue;
 			}
 			

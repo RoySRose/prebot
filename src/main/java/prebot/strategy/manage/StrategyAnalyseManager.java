@@ -6,6 +6,7 @@ import java.util.List;
 import bwapi.Race;
 import bwapi.TilePosition;
 import prebot.common.constant.CommonCode;
+import prebot.common.debug.UxColor;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -19,6 +20,7 @@ import prebot.strategy.analyse.protoss.AdunAnalyser;
 import prebot.strategy.analyse.protoss.AssimilatorAnalyser;
 import prebot.strategy.analyse.protoss.CannonAnalyser;
 import prebot.strategy.analyse.protoss.CoreAnalyser;
+import prebot.strategy.analyse.protoss.FleetBeaconAnalyser;
 import prebot.strategy.analyse.protoss.ForgeAnalyser;
 import prebot.strategy.analyse.protoss.GateAnalyser;
 import prebot.strategy.analyse.protoss.NexsusAnalyser;
@@ -27,13 +29,26 @@ import prebot.strategy.analyse.protoss.RoboticsAnalyser;
 import prebot.strategy.analyse.protoss.RoboticsSupportAnalyser;
 import prebot.strategy.analyse.protoss.StargateAnalyser;
 import prebot.strategy.analyse.protoss.TemplarArchAnalyser;
-import prebot.strategy.analyse.protoss.ZealotAnalyser;
+import prebot.strategy.analyse.protoss.unit.DarkTemplarAnalyser;
+import prebot.strategy.analyse.protoss.unit.DragoonAnalyser;
+import prebot.strategy.analyse.protoss.unit.ObserverAnalyser;
+import prebot.strategy.analyse.protoss.unit.ReaverAnalyser;
+import prebot.strategy.analyse.protoss.unit.ShuttleAnalyser;
+import prebot.strategy.analyse.protoss.unit.ZealotAnalyser;
 import prebot.strategy.analyse.terran.AcademyAnalyser;
 import prebot.strategy.analyse.terran.BarracksAnalyser;
 import prebot.strategy.analyse.terran.CommandCenterAnalyser;
 import prebot.strategy.analyse.terran.FactoryAnalyser;
 import prebot.strategy.analyse.terran.RefineryAnalyser;
 import prebot.strategy.analyse.terran.StarportAnalyser;
+import prebot.strategy.analyse.terran.unit.DropshipAnalyser;
+import prebot.strategy.analyse.terran.unit.FirebatAnalyser;
+import prebot.strategy.analyse.terran.unit.GoliathAnalyser;
+import prebot.strategy.analyse.terran.unit.MarineAnalyser;
+import prebot.strategy.analyse.terran.unit.MedicAnalyser;
+import prebot.strategy.analyse.terran.unit.TankAnalyser;
+import prebot.strategy.analyse.terran.unit.VultureAnalyser;
+import prebot.strategy.analyse.terran.unit.WraithAnalyser;
 import prebot.strategy.analyse.zerg.ExtractorAnalyser;
 import prebot.strategy.analyse.zerg.HatcheryAnalyser;
 import prebot.strategy.analyse.zerg.HydraDenAnalyser;
@@ -41,7 +56,10 @@ import prebot.strategy.analyse.zerg.LairAnalyser;
 import prebot.strategy.analyse.zerg.OverloadAnalyser;
 import prebot.strategy.analyse.zerg.SpawningPoolAnalyser;
 import prebot.strategy.analyse.zerg.SpireAnalyser;
-import prebot.strategy.analyse.zerg.ZerglingAnalyser;
+import prebot.strategy.analyse.zerg.unit.HydraliskAnalyser;
+import prebot.strategy.analyse.zerg.unit.LurkerAnalyser;
+import prebot.strategy.analyse.zerg.unit.MutaliskAnalyser;
+import prebot.strategy.analyse.zerg.unit.ZerglingAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
@@ -63,6 +81,14 @@ public class StrategyAnalyseManager {
 	public int lastCheckFrameBase = 0;
 	public int lastCheckFrameGas = 0;
 	public int lastCheckFrameFirstExpansion = 0;
+
+	public int getPhase() {
+		if (strategist != null) {
+			return strategist.getPhase();
+		} else {
+			return CommonCode.UNKNOWN;
+		}
+	}
 	
 	public void update() {
 		updateVisitFrame();
@@ -77,7 +103,7 @@ public class StrategyAnalyseManager {
 			EnemyStrategy strategyToApply = strategist.strategyToApply();
 			
 			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
-//				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
 				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
 				StrategyIdea.currentStrategy = strategyToApply;
 				this.applyDetailValue(strategyToApply);
@@ -120,7 +146,14 @@ public class StrategyAnalyseManager {
 			analysers.add(new RoboticsSupportAnalyser());
 			analysers.add(new StargateAnalyser());
 			analysers.add(new TemplarArchAnalyser());
+			analysers.add(new FleetBeaconAnalyser());
+			
 			analysers.add(new ZealotAnalyser());
+			analysers.add(new DragoonAnalyser());
+			analysers.add(new DarkTemplarAnalyser());
+			analysers.add(new ShuttleAnalyser());
+			analysers.add(new ReaverAnalyser());
+			analysers.add(new ObserverAnalyser());
 			
 			strategist = new ProtossStrategist();
 			
@@ -132,7 +165,11 @@ public class StrategyAnalyseManager {
 			analysers.add(new OverloadAnalyser());
 			analysers.add(new SpawningPoolAnalyser());
 			analysers.add(new SpireAnalyser());
+
 			analysers.add(new ZerglingAnalyser());
+			analysers.add(new HydraliskAnalyser());
+			analysers.add(new LurkerAnalyser());
+			analysers.add(new MutaliskAnalyser());
 			
 			strategist = new ZergStrategist();
 			
@@ -143,6 +180,15 @@ public class StrategyAnalyseManager {
 			analysers.add(new FactoryAnalyser());
 			analysers.add(new RefineryAnalyser());
 			analysers.add(new StarportAnalyser());
+
+			analysers.add(new MarineAnalyser());
+			analysers.add(new MedicAnalyser());
+			analysers.add(new FirebatAnalyser());
+			analysers.add(new VultureAnalyser());
+			analysers.add(new TankAnalyser());
+			analysers.add(new GoliathAnalyser());
+			analysers.add(new WraithAnalyser());
+			analysers.add(new DropshipAnalyser());
 			
 			strategist = new TerranStrategist();
 		}
@@ -159,12 +205,15 @@ public class StrategyAnalyseManager {
 		TilePosition enemyFirstExpansionTile = InfoUtils.enemyFirstExpansion().getTilePosition();
 		
 		if (Prebot.Broodwar.isVisible(enemyBaseTile)) {
+//			System.out.println("base explored");
 			lastCheckFrameBase = TimeUtils.elapsedFrames();
 		}
 		if (Prebot.Broodwar.isVisible(enemyGasTile)) {
+//			System.out.println("gas explored");
 			lastCheckFrameGas = TimeUtils.elapsedFrames();
 		}
 		if (Prebot.Broodwar.isVisible(enemyFirstExpansionTile)) {
+//			System.out.println("expansion explored");
 			lastCheckFrameFirstExpansion = TimeUtils.elapsedFrames();
 		}
 	}
