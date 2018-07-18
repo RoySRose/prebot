@@ -46,17 +46,21 @@ public abstract class BuildingFlyControl extends Control{
     public void setFlyPosition(Position flyPosition) {
         this.flyPosition = flyPosition;
     }
+    public Position getFlyPosition() {
+        return this.flyPosition;
+    }
 
 
-    public void executeFly(List<Unit> unitList, List<UnitInfo> euiList){
-        if(flyAlways){
-            this.buildingFly = BuildingFly.UP;
-            return;
-        }
+    public final void processFly(List<Unit> unitList, List<UnitInfo> euiList){
 
         setDefaultBuildingFly(unitList);
         checkFlyCondition();
 
+        executeFly(unitList, euiList);
+
+    }
+
+    public void executeFly(List<Unit> unitList, List<UnitInfo> euiList){
         for(Unit units : unitList){
 
             if(!units.isFlying() && getBuildingFly() == BuildingFly.UP){
@@ -75,15 +79,19 @@ public abstract class BuildingFlyControl extends Control{
 
     public abstract void checkFlyCondition();
 
-    private final void setDefaultBuildingFly(List<Unit> unitList) {
-        if(isGateway) {
-            if (checkEnemyNearBy(unitList) || marinInBuildManager()) {
-                buildingFly = BuildingFly.DOWN;
+    public final void setDefaultBuildingFly(List<Unit> unitList) {
+        if(flyAlways){
+            this.buildingFly = BuildingFly.UP;
+        }else {
+            if (isGateway) {
+                if (checkEnemyNearBy(unitList) || marinInBuildManager()) {
+                    buildingFly = BuildingFly.DOWN;
+                } else {
+                    buildingFly = BuildingFly.UP;
+                }
             } else {
-                buildingFly = BuildingFly.UP;
+                buildingFly = BuildingFly.DOWN;
             }
-        }else{
-            buildingFly = BuildingFly.DOWN;
         }
     }
 
