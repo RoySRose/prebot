@@ -26,7 +26,7 @@ public class CommandCenterControl extends BuildingFlyControl {
     @Override
     public void checkFlyCondition() {
 
-        if (Prebot.getBroodwar().self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
+        if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 
             Unit checkCC = getSecondCommandCenter();
 
