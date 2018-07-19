@@ -19,20 +19,21 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.control.Control;
 import prebot.strategy.AnalyzeStrategy;
 import prebot.strategy.InformationManager;
-import prebot.strategy.RespondToStrategy;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class ComsatControl extends Control {
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		// 상대 클록 유닛
-		for (UnitInfo unitInfo : euiList) {
-			Unit unit = unitInfo.getUnit();
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing)
-					&& unit.getPosition().isValid() && unit.isFlying() == false) {
+		for (UnitInfo eui : euiList) {
+			Unit unit = eui.getUnit();
+			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() == false) {
 				if (InformationManager.Instance().enemyRace == Race.Protoss) {
-					if (unit.isFlying() && RespondToStrategy.Instance().enemy_arbiter == false) {
+					if (unit.isFlying() && UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
 						continue;
 					}
 				}
@@ -54,8 +55,7 @@ public class ComsatControl extends Control {
 						}
 					}
 					if (neareasetvessel != null) {
-						List<Unit> nearallies = UnitUtils.getUnitsInRadius(PlayerRange.ALL,
-								neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
+						List<Unit> nearallies = UnitUtils.getUnitsInRadius(PlayerRange.ALL, neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
 						if (nearallies != null && nearallies.size() > 2) {
 							break;// 베슬이 올것으로 예상됨
 						}
@@ -125,11 +125,16 @@ public class ComsatControl extends Control {
 
 		Unit comsat = null;
 
+		int energy = 50;		
+		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+			energy = 150;
+		}
+
 		// 저그전 특이사항
 		if (InformationManager.Instance().enemyRace == Race.Zerg) {
 
-			int energy = 50;
-			if (RespondToStrategy.Instance().enemy_lurker == true) {
+			if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER
+					|| UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg)) {
 				energy = 150;
 			}
 
@@ -174,10 +179,7 @@ public class ComsatControl extends Control {
 			}
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) { // 폴토전
 																				// 특이사항
-
-			int energy = 50;
-			if (RespondToStrategy.Instance().enemy_dark_templar == true
-					|| RespondToStrategy.Instance().enemy_arbiter == true) {
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Templar_Archives)) {
 				energy = 150;
 			}
 
@@ -234,11 +236,9 @@ public class ComsatControl extends Control {
 				}
 
 			}
-		} else if (InformationManager.Instance().enemyRace == Race.Terran) {// 테란
-																			// 특이사항
-
-			int energy = 50;
-			if (RespondToStrategy.Instance().enemy_wraith == true) {
+		} else if (InformationManager.Instance().enemyRace == Race.Terran) {// 테란  특이사항
+			
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Starport, UnitType.Terran_Control_Tower)) {
 				energy = 150;
 			}
 

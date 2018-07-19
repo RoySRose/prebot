@@ -6,6 +6,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class TerranStrategist extends Strategist {
 	
@@ -100,7 +101,7 @@ public class TerranStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.isDouble()) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 			if (hasInfo(ClueInfo.FACTORY_TWO)) {
 				return EnemyStrategy.TERRAN_DOUBLE_MECHANIC;
 				
@@ -128,7 +129,7 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_1FAC_1STAR;
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.isBionic()) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.BIONIC)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		

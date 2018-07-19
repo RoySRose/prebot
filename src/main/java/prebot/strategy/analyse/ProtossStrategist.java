@@ -7,6 +7,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class ProtossStrategist extends Strategist {
 	
@@ -85,7 +86,7 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.isDouble()) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 			if (hasInfo(ClueInfo.FAST_FLEET_BEACON)) {
 				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
 			} else if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
@@ -95,7 +96,7 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.isTwoGate()) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
 			if (hasType(ClueType.FAST_CORE)) {
 				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 			} else {

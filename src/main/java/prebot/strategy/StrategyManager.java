@@ -11,6 +11,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
@@ -111,7 +112,7 @@ public class StrategyManager extends GameManager {
 	/// 테스트용 임시 공격 타이밍
 	private void temporaryAttackTimer() {
 		if (!StrategyIdea.mainSquadMode.isAttackMode) {
-			if (StrategyIdea.currentStrategy.buildTimeMap.isAttackQuickly()) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
 			} else if (TimeUtils.after(9 * TimeUtils.MINUTE)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;

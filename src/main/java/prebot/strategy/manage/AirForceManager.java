@@ -22,6 +22,7 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AirForceManager {
 	
@@ -320,7 +321,7 @@ public class AirForceManager {
 			if (InfoUtils.enemyRace() == Race.Terran) {
 				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 45 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
-				} else if (!StrategyIdea.buildTimeMap.isMechanic()) { // 메카닉이 아님
+				} else if (!StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) { // 메카닉이 아님
 					levelDown = true;
 				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Goliath, UnitType.Terran_Armory)) { // 골리앗 발견, 완성된 아모리 발견
 					levelDown = true;

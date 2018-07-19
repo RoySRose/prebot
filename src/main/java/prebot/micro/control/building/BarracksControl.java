@@ -16,6 +16,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class BarracksControl extends BuildingFlyControl {
 
@@ -34,7 +35,7 @@ public class BarracksControl extends BuildingFlyControl {
 
         if(getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
 
-            if((StrategyIdea.currentStrategy.buildTimeMap.isTwoGate())
+            if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
                     && UnitUtils.getUnitCount(UnitType.Terran_Vulture) >= 3 ){
                 setBuildingFly(BuildingFly.UP);
             }else if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {

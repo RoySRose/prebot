@@ -25,9 +25,9 @@ import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.squad.Squad;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
 
 /**
@@ -192,10 +192,10 @@ public class PositionFinder {
 		if (firstExpansionDetectingOk) {
 			int secondChokeBonus = 15;
 			int firstExpansionBonus = 5;
-			if (StrategyIdea.buildTimeMap.isDouble()) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 				secondChokeBonus = 0;
 				firstExpansionBonus = 0;
-			} else if (StrategyIdea.buildTimeMap.isMechanic()) {
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) {
 				secondChokeBonus = 2;
 				firstExpansionBonus = 2;
 			}
@@ -211,11 +211,9 @@ public class PositionFinder {
 		}
 
 		if (InfoUtils.enemyRace() == Race.Protoss) {
-			if (InformationManager.Instance().isBlockingEnterance()) {
-				return entranceBlockedPosition();
-			} else {
-				return firstChokeDefensePosition();
-			}
+//			if (InformationManager.Instance().isBlockingEnterance()) {
+//			}
+			return firstChokeDefensePosition();
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
 //			if (entranceBlocked()) { }
@@ -232,10 +230,6 @@ public class PositionFinder {
 				return commandCenterInsidePosition();
 			}
 		}
-	}
-
-	private boolean entranceBlocked() {
-		return true;
 	}
 
 	/// 메인부대 위치 지점
@@ -273,11 +267,6 @@ public class PositionFinder {
 			}
 		}
 		return false;
-	}
-
-	private Position entranceBlockedPosition() {
-		// TODO 입막 수비위치
-		return firstChokeDefensePosition();
 	}
 
 	/// 커맨드센터와 미네랄 사이의 방어지역

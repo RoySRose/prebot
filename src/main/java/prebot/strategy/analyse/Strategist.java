@@ -9,6 +9,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -54,10 +55,9 @@ public abstract class Strategist {
 	}
 
 	private boolean phase02End() {
-		if (StrategyIdea.currentStrategy.buildTimeMap.isAttackQuickly()) {
-			
-		} else if (StrategyIdea.currentStrategy.buildTimeMap.isDefenseSafely()) {
-			
+		//TODO 빠른공격시에는 후퇴시 종료, 안전방어시에는  방어성공시 종료
+		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_SAFELY)) {
 		}
 		
 		if (TimeUtils.after(10 * TimeUtils.MINUTE)) {

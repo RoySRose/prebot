@@ -3,18 +3,19 @@ package prebot.strategy.constant;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class TimeMapForProtoss {
 	
 	public static BuildTimeMap PROTOSS_1GATE_CORE() {
-		return new BuildTimeMap()
+		return new BuildTimeMap().setFeature(Feature.DETECT_IMPORTANT)
 		.put(UnitType.Protoss_Gateway, 1, 20)
 		.put(UnitType.Protoss_Assimilator, 1, 30)
 		.put(UnitType.Protoss_Cybernetics_Core, 2, 00);
 	}
 	
 	public static BuildTimeMap PROTOSS_2GATE() {
-		return new BuildTimeMap().setTwoGate()
+		return new BuildTimeMap().setFeature(Feature.TWOGATE)
 		.put(UnitType.Protoss_Gateway, 1, 20)
 		.put(UnitType.Protoss_Gateway, 1, 45)
 		.put(UnitType.Protoss_Assimilator, 3, 00)
@@ -22,7 +23,7 @@ public class TimeMapForProtoss {
 	}
 	
 	public static BuildTimeMap PROTOSS_DOUBLE() {
-		return new BuildTimeMap().setDouble()
+		return new BuildTimeMap().setFeature(Feature.DOUBLE)
 		.put(UnitType.Protoss_Nexus, 1, 55)
 		.put(UnitType.Protoss_Gateway, 2, 5)
 		.put(UnitType.Protoss_Assimilator, 2, 20)
@@ -38,14 +39,14 @@ public class TimeMapForProtoss {
 	}
 	
 	public static BuildTimeMap PROTOSS_FORGE_CANNON_RUSH() {
-		return new BuildTimeMap().setDouble()
+		return new BuildTimeMap().setFeature(Feature.DOUBLE)
 		.put(UnitType.Protoss_Forge, 1, 40)
 		.put(UnitType.Protoss_Photon_Cannon, 2, 15)
 		.put(UnitType.Protoss_Cybernetics_Core, 4, 20);
 	}
 	
 	public static BuildTimeMap PROTOSS_FORGE_DOUBLE() {
-		return new BuildTimeMap().setDouble().setAttackQuickly()
+		return new BuildTimeMap().setFeature(Feature.DOUBLE, Feature.QUICK_ATTACK)
 		.put(UnitType.Protoss_Forge, 1, 40)
 		.put(UnitType.Protoss_Photon_Cannon, 2, 15)
 		.put(UnitType.Protoss_Nexus, 2, 30)
@@ -53,7 +54,7 @@ public class TimeMapForProtoss {
 	}
 	
 	public static BuildTimeMap PROTOSS_GATE_DOUBLE() {
-		return new BuildTimeMap().setDouble()
+		return new BuildTimeMap().setFeature(Feature.DOUBLE)
 		.put(UnitType.Protoss_Forge, 1, 40)
 		.put(UnitType.Protoss_Gateway, 2, 15)
 		.put(UnitType.Protoss_Nexus, 2, 30)
@@ -61,19 +62,19 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_FAST_DARK() {
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
 		.put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
 		.put(UnitType.Protoss_Templar_Archives, 3, 20);
 	}
 
 	public static BuildTimeMap PROTOSS_DARK_DROP() {
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
 		.put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
 		.put(UnitType.Protoss_Templar_Archives, 3, 20);
 	}
 
 	public static BuildTimeMap PROTOSS_FAST_DRAGOON() {
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Citadel_of_Adun, 3, 00)
 		.put(UnitType.Protoss_Templar_Archives, 3, 40);
@@ -86,7 +87,7 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_POWER_DRAGOON() { // non-precise
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Gateway, 3, 30)
 		.put(UnitType.Protoss_Citadel_of_Adun, 3, 50)
@@ -122,7 +123,7 @@ public class TimeMapForProtoss {
 //	}
 
 	public static BuildTimeMap PROTOSS_STARGATE() { // non-precise
-		return PROTOSS_1GATE_CORE().setAttackQuickly()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.QUICK_ATTACK)
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Nexus, 4, 10)
 		.put(UnitType.Protoss_Stargate, 5, 40)
@@ -138,7 +139,7 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_DOUBLE_CARRIER() { // non-precise
-		return PROTOSS_DOUBLE().setAttackQuickly()
+		return PROTOSS_DOUBLE().setFeature(Feature.QUICK_ATTACK)
 		.put(UnitType.Protoss_Citadel_of_Adun, 3, 50)
 		.put(UnitType.Protoss_Stargate, 5, 00)
 		.put(UnitType.Protoss_Fleet_Beacon, 5, 50)
