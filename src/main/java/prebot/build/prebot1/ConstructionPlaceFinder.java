@@ -245,6 +245,10 @@ public class ConstructionPlaceFinder {
 			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
 				buildingGapSpace=0;
 			}
+//			20180719. hkk. 저그전에 대비해서 첫서플과 두번째 서플은 건물들을 붙여지어야 함
+			if(desiredPosition == BlockingEntrance.Instance().first_supple || desiredPosition == BlockingEntrance.Instance().second_supple) {
+				buildingGapSpace = 0;
+			}
 			if(MethodFix == true){
 				buildingGapSpace=1;
 			}
@@ -259,16 +263,19 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
 //			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
 //			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
-			FileUtils.appendTextToFile("log.txt","\n desiredPosition : " + desiredPosition + " / entrance_turret : " + BlockingEntrance.Instance().entrance_turret);
-			FileUtils.appendTextToFile("log.txt","\\n desiredPosition : (" + desiredPosition.getX() +" , "+desiredPosition.getY()+")");
-			FileUtils.appendTextToFile("log.txt","\\n entrance_turret : (" + BlockingEntrance.Instance().entrance_turret.getX() +" , "+BlockingEntrance.Instance().entrance_turret.getY()+")");
-			if(desiredPosition == BlockingEntrance.Instance().entrance_turret) {
-				buildingGapSpace = 0; 
+			if(BlockingEntrance.Instance().entrance_turret != TilePosition.None) {
+				FileUtils.appendTextToFile("log.txt","\n desiredPosition : " + desiredPosition + " / entrance_turret : " + BlockingEntrance.Instance().entrance_turret);
+				FileUtils.appendTextToFile("log.txt","\\n desiredPosition : (" + desiredPosition.getX() +" , "+desiredPosition.getY()+")");
+				FileUtils.appendTextToFile("log.txt","\\n entrance_turret : (" + BlockingEntrance.Instance().entrance_turret.getX() +" , "+BlockingEntrance.Instance().entrance_turret.getY()+")");
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret) {
+					FileUtils.appendTextToFile("log.txt","\\n entrance_turret : buildingGapSpace : " + buildingGapSpace);
+					buildingGapSpace = 0; 
+				}
 			}
 		}else if (buildingType == UnitType.Terran_Bunker) {
 			buildingGapSpace = 0;
 		}
-
+		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
 			while (buildingGapSpace >= 0) {
 
@@ -604,7 +611,10 @@ public class ConstructionPlaceFinder {
 					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
-					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret) {
+//					20180719. hkk. 저그전 대비 배럭과 서플 가스 주변에 붙여짓기 필요
+					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false
+							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
+							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot ) {
 						if (isTilesToAvoid(x, y)) {
 							return false;
 						}

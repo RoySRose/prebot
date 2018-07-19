@@ -21,6 +21,10 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
+    		return false;
+    	}
+    	
     	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
     		return false;
     	}

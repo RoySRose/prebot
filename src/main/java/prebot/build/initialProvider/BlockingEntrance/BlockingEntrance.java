@@ -304,7 +304,7 @@ public class BlockingEntrance {
     	}
     	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPRIRITS) {
     		
-    		System.out.println("맵 ==>> 투혼");
+//    		System.out.println("맵 ==>> 투혼");
     		
     		
     		postitionStorage.put(combine(Map.FIGHTING_SPRIRITS, Location.One, Building.SUPPLY_AREA), new TilePosition(118, 23));

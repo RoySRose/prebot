@@ -32,6 +32,9 @@ public class BuilderComsatStation extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
         //System.out.println("ComsatStation build condition check");
+    	
+    	
+    	
     	if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0) {
     		return false;
     	}
@@ -43,12 +46,13 @@ public class BuilderComsatStation extends DefaultBuildableItem {
         
 //    	executeFirstex();
     	
-    	if(StrategyIdea.academyFrame > Prebot.Broodwar.getFrameCount()) {
-    		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) > 0) {
-	    		setBlocking(true);
-	    		setHighPriority(true);
-	    		return true;
-    		}
+    	if(StrategyIdea.academyFrame < Prebot.Broodwar.getFrameCount()) {
+//    		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) > 0) {
+//	    		setBlocking(true);
+//	    		setHighPriority(true);
+//	    		return true;
+//    		}
+    		return false;
     	}
         
     

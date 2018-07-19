@@ -90,7 +90,7 @@ public class BuildQueueProvider extends GameManager {
     	researchSelector = new ResearchSelector();
         //researchSelector2 = new ResearchSelector2();
         upgradeSelector = new UpgradeSelector();
-        barrackUnitSelector = new BarrackUnitSelector();
+//        barrackUnitSelector = new BarrackUnitSelector();
         factoryUnitSelector = new FactoryUnitSelector();
 //        starportUnitSelector = new StarportUnitSelector();
 
@@ -101,13 +101,13 @@ public class BuildQueueProvider extends GameManager {
         /*
         buildableList.add(new BuilderFirebat              (new MetaType(UnitType.Terran_Firebat), barrackUnitSelector));
         buildableList.add(new BuilderGhost                (new MetaType(UnitType.Terran_Ghost), barrackUnitSelector));
-        buildableList.add(new BuilderMarine               (new MetaType(UnitType.Terran_Marine), barrackUnitSelector));
         buildableList.add(new BuilderMedic                (new MetaType(UnitType.Terran_Medic), barrackUnitSelector));*/
         
         buildableList.add(new BuilderGoliath              (new MetaType(UnitType.Terran_Goliath), factoryUnitSelector));
         buildableList.add(new BuilderVulture              (new MetaType(UnitType.Terran_Vulture), factoryUnitSelector));
         buildableList.add(new BuilderSiegeTank				(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
         buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith)));
+        buildableList.add(new BuilderMarine               (new MetaType(UnitType.Terran_Marine)));
         
         /*
         buildableList.add(new BuilderBattlecruiser        (new MetaType(UnitType.Terran_Battlecruiser),starportUnitSelector));
