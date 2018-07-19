@@ -52,7 +52,8 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 //			if(expanchcker == false){
 				BaseLocation enemyMainbase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 				
-				if(enemyMainbase != null && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1 && UnitUtils.myFactoryUnitSupplyCount() >= 25){
+				if(enemyMainbase != null && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) ==1 
+						&& (UnitUtils.myFactoryUnitSupplyCount() >= 25 || UnitUtils.myWraithUnitSupplyCount() >= 25)){
 					
 					
 					BaseLocation enemyFEbase = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
@@ -61,7 +62,9 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 					for(BaseLocation check : enemybases){
 						if(enemyFEbase.equals(check)){
 //							expanchcker = true;
-							return false;
+							setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+							setBlocking(true);
+							return true;
 							
 						}
 					}
@@ -70,9 +73,10 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 //					expanchcker = true;
 					return false;
 				}
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-				return true;
+//				setBlocking(true);
+//				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+//				return true;
+				return false;
 //			}
 			
 		}else if(InformationManager.Instance().enemyRace == Race.Protoss) {

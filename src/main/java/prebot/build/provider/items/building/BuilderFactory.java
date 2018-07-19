@@ -72,6 +72,20 @@ public class BuilderFactory extends DefaultBuildableItem {
 //	        
 //    		
 //    		if(InitialBuildProvider.Instance().InitialBuildFinished && Prebot.Broodwar.getFrameCount() % 113 == 0) {
+    	
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0){
+    		return false;
+    	}
+    	
+//    	배럭이 있고, 가스는 100 이상인데 팩토리가 없을경우. 첫팩은 무조건 있어야 하므로
+    	if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) == 0
+    			&& Prebot.Broodwar.self().gas() > 100) {
+    		if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory) 
+    				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) != 0){
+    			return true;
+    		}
+    	}
+    	
     	if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
     		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
     			return false;

@@ -40,7 +40,8 @@ public class InitialAction {
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 5 * TimeUtils.SECOND));
+				//ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 5 * TimeUtils.SECOND));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 5));
 				assignedFirstScout = true;
 			}
 //			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));

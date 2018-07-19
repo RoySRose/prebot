@@ -23,8 +23,9 @@ public class VsZerg extends BaseBuild{
     	queueBuild(true, UnitType.Terran_Barracks, barrackPos);
     	queueBuild(true, UnitType.Terran_Refinery);
     	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-    	queueBuild(true, UnitType.Terran_Factory, factoryPos);
     	queueBuild(true, UnitType.Terran_Marine);
+    	queueBuild(true, UnitType.Terran_Bunker, bunkerPos);
+    	queueBuild(true, UnitType.Terran_Factory, factoryPos);
     	queueBuild(true, UnitType.Terran_Supply_Depot, secondSupplyPos);
     	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
     	queueBuild(true, UnitType.Terran_Vulture);

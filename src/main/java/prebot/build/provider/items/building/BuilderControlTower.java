@@ -35,17 +35,26 @@ public class BuilderControlTower extends DefaultBuildableItem {
     	}
     	
     	
-//    	레이스 4기 생산후 건설
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) >= 4) {
-    		return true;
+    	
+//    	레이스 4기 생산후 건설 or 사이언스 퍼실리티 있으면 건설 
+    	if(
+    		(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) >= 4)
+    		|| Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
+    		List<Unit> starport = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+    		for(Unit unit : starport) {
+    			if(unit.canBuildAddon()) {
+    				return true;
+    			}
+    		}
+//    		return false;
     	}
     	
     	
 //    	사이언스 퍼실리티 있으면 건설
-    	if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
-    		return true;
-    	}
-    	
+//    	if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
+//    		return true;
+//    	}
+//    	
 //    	int CC = 0;
 //    	
 //    	List<Unit> CommandCenter = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
