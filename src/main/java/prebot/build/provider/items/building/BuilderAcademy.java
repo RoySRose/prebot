@@ -37,32 +37,12 @@ public class BuilderAcademy extends DefaultBuildableItem {
     		return false;
     	}
     	
-    	if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
+    	if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) +
+				 ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) != 0) {
     		return false;
     	}
     	
-//    	executeFirstex();
-    
-//    	전략적 판단에 대한 부분은 리더에게 오더 받는다. 변경예정
-//		if (RespondToStrategy.Instance().enemy_dark_templar 
-//    		|| RespondToStrategy.Instance().enemy_wraith 
-//    		|| RespondToStrategy.Instance().enemy_lurker 
-//    		|| RespondToStrategy.Instance().enemy_arbiter 
-//    		|| RespondToStrategy.Instance().prepareDark) {
-//        	
-//        
-//    		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) < 1
-//    				
-//    				//allUnitCount 에서 지어지고 있는 건물도 셀텐데 해당 조건 없어도 되지 않나
-//    			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
-//				setBlocking(true);
-//				setHighPriority(true);
-//				return true;
-//			}
-//		}
-    	
-    	if(StrategyIdea.academyFrame > Prebot.Broodwar.getFrameCount()) {
+    	if(StrategyIdea.academyFrame < Prebot.Broodwar.getFrameCount()) {
     		setBlocking(true);
     		setHighPriority(true);
     		return true;
@@ -87,8 +67,7 @@ public class BuilderAcademy extends DefaultBuildableItem {
 		}
 		
     	if (myCommand >= 2) {
-    		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0 && BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Academy) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Academy, null) == 0) {
+    		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Academy) == 0) {
 				return true;
 			}
 		}
