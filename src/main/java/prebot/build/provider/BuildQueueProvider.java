@@ -13,7 +13,6 @@ import prebot.build.provider.items.building.*;
 import prebot.build.provider.items.tech.*;
 import prebot.build.provider.items.unit.*;
 import prebot.build.provider.items.upgrade.*;
-import prebot.build.provider.items.upgrade.BuilderApolloReactor;
 import prebot.common.MetaType;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -81,7 +80,7 @@ public class BuildQueueProvider extends GameManager {
 
     
     UpgradeSelector upgradeSelector;
-    BarrackUnitSelector barrackUnitSelector;
+//    BarrackUnitSelector barrackUnitSelector;
     FactoryUnitSelector factoryUnitSelector;
 //    StarportUnitSelector starportUnitSelector;
 
@@ -152,9 +151,7 @@ public class BuildQueueProvider extends GameManager {
         /*
         
         caduceusReactor            = new BuilderCaduceusReactor      (new MetaType(UpgradeType.Caduceus_Reactor  ), upgradeSelector);
-        charonBoosters             = new BuilderCharonBoosters       (new MetaType(UpgradeType.Charon_Boosters  ), upgradeSelector);
         colossusReactor            = new BuilderColossusReactor      (new MetaType(UpgradeType.Colossus_Reactor  ), upgradeSelector);
-        ionThrusters               = new BuilderIonThrusters         (new MetaType(UpgradeType.Ion_Thrusters  ), upgradeSelector);
         moebiusReactor             = new BuilderMoebiusReactor       (new MetaType(UpgradeType.Moebius_Reactor  ), upgradeSelector);
         ocularImplants             = new BuilderOcularImplants       (new MetaType(UpgradeType.Ocular_Implants  ), upgradeSelector);
         terranInfantryArmor        = new BuilderTerranInfantryArmor  (new MetaType(UpgradeType.Terran_Infantry_Armor  ), upgradeSelector);
@@ -177,9 +174,7 @@ public class BuildQueueProvider extends GameManager {
         opticalFlare               = new BuilderOpticalFlare         (new MetaType(TechType.Optical_Flare    ), researchSelector2);
         personnelCloaking          = new BuilderPersonnelCloaking    (new MetaType(TechType.Personnel_Cloaking    ), researchSelector2);
         restoration                = new BuilderRestoration          (new MetaType(TechType.Restoration    ), researchSelector2);
-        spiderMines                = new BuilderSpiderMines          (new MetaType(TechType.Spider_Mines    ), researchSelector2);
         stimPacks                  = new BuilderStimPacks            (new MetaType(TechType.Stim_Packs    ), researchSelector2);
-        tankSiegeMode              = new BuilderTankSiegeMode        (new MetaType(TechType.Tank_Siege_Mode    ), researchSelector2);
         yamatoGun                  = new BuilderYamatoGun            (new MetaType(TechType.Yamato_Gun    ), researchSelector2);*/
 
 
