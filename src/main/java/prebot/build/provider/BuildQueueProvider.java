@@ -13,6 +13,7 @@ import prebot.build.provider.items.building.*;
 import prebot.build.provider.items.tech.*;
 import prebot.build.provider.items.unit.*;
 import prebot.build.provider.items.upgrade.*;
+import prebot.build.provider.items.upgrade.BuilderApolloReactor;
 import prebot.common.MetaType;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
