@@ -168,8 +168,8 @@ public class BuildQueueProvider extends GameManager {
         /*Research(tech)*/
         spiderMines                = new BuilderSpiderMines          (new MetaType(TechType.Spider_Mines    ), researchSelector);
         tankSiegeMode              = new BuilderTankSiegeMode        (new MetaType(TechType.Tank_Siege_Mode    ), researchSelector);
-        /*cloakingField              = new BuilderCloakingField        (new MetaType(TechType.Cloaking_Field    ), researchSelector2);
-        empShockwave               = new BuilderEMPShockwave         (new MetaType(TechType.EMP_Shockwave    ), researchSelector2);
+        cloakingField              = new BuilderCloakingField        (new MetaType(TechType.Cloaking_Field    ));
+        /*empShockwave               = new BuilderEMPShockwave         (new MetaType(TechType.EMP_Shockwave    ), researchSelector2);
         irradiate                  = new BuilderIrradiate            (new MetaType(TechType.Irradiate    ), researchSelector2);
         lockdown                   = new BuilderLockdown             (new MetaType(TechType.Lockdown    ), researchSelector2);
         nuclearStrike              = new BuilderNuclearStrike        (new MetaType(TechType.Nuclear_Strike    ), researchSelector2);
@@ -187,11 +187,9 @@ public class BuildQueueProvider extends GameManager {
         /*upgrade*/
         buildableList.add(charonBoosters);
         buildableList.add(ionThrusters);
-        /*buildableList.add(apolloReactor);
-        buildableList.add(caduceusReactor);
-        buildableList.add(charonBoosters);
+        buildableList.add(apolloReactor);
+        /*buildableList.add(caduceusReactor);
         buildableList.add(colossusReactor);
-        buildableList.add(ionThrusters);
         buildableList.add(moebiusReactor);
         buildableList.add(ocularImplants);
         buildableList.add(terranInfantryArmor);
@@ -206,17 +204,15 @@ public class BuildQueueProvider extends GameManager {
         /*tech*/
         buildableList.add(spiderMines);
         buildableList.add(tankSiegeMode);
-        /*buildableList.add(cloakingField);
-        buildableList.add(empShockwave);
+        buildableList.add(cloakingField);
+        /*buildableList.add(empShockwave);
         buildableList.add(irradiate);
         buildableList.add(lockdown);
         buildableList.add(nuclearStrike);
         buildableList.add(opticalFlare);
         buildableList.add(personnelCloaking);
         buildableList.add(restoration);
-        buildableList.add(spiderMines);
         buildableList.add(stimPacks);
-        buildableList.add(tankSiegeMode);
         buildableList.add(yamatoGun);*/
 
     }
@@ -231,11 +227,17 @@ public class BuildQueueProvider extends GameManager {
     	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1) {
     		buildableList.remove(charonBoosters);
     	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1) {
+    		buildableList.remove(apolloReactor);
+    	}
     	if(Prebot.Broodwar.self().hasResearched(TechType.Spider_Mines)) {
     		buildableList.remove(spiderMines);
     	}
     	if(Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) {
     		buildableList.remove(tankSiegeMode);
+    	}
+    	if(Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
+    		buildableList.remove(cloakingField);
     	}
 
     }
