@@ -179,34 +179,38 @@ public class UnitUtils {
 		}
 	}
 	
+	public static void addEnemyUnitInfosInRadiusForEarlyDefense(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, false, unitTypes);
+	}
+	
 	public static void addEnemyUnitInfosInRadiusForGround(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, unitTypes);
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForAir(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, unitTypes);
 	}
 	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, unitTypes);
 		return euiList;
 	}
 	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, unitTypes);
 		return euiList;
 	}
 	
 	public static List<UnitInfo> getUnitInfosInRadiusForAirComplete(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(false, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(false, true, euiList, position, radius, true, unitTypes);
 		return euiList;
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyAirWeopon, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -223,6 +227,9 @@ public class UnitUtils {
 				continue;
 			}
 			if (!includeIncomplete && !eui.isCompleted()) {
+				continue;
+			}
+			if (onlyCombatUnit && !MicroUtils.combatEnemyType(eui.getType())) {
 				continue;
 			}
 			

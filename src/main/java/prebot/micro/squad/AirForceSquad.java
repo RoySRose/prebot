@@ -45,12 +45,12 @@ public class AirForceSquad extends Squad {
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행한다.
 		for (Unit leaderWraith : leaderUnits) {
 			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(leaderWraith.getID());
-			List<UnitInfo> euiList = findEnemies(airForceTeam.memberList);
+			List<UnitInfo> euiList = findEnemiesForTeam(airForceTeam.memberList);
 			airForceControl.control(airForceTeam.memberList, euiList);
 		}
 	}
 
-	public List<UnitInfo> findEnemies(List<Unit> unitList) {
+	public List<UnitInfo> findEnemiesForTeam(List<Unit> unitList) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		for (Unit unit : unitList) {
 			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);

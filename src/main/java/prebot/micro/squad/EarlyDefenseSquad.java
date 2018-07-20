@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -14,8 +13,8 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
-import prebot.micro.WorkerManager;
 import prebot.micro.WorkerData.WorkerJob;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
@@ -167,7 +166,7 @@ public class EarlyDefenseSquad extends Squad {
 			}
 		}
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.EARLY_DEFENSE.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForEarlyDefense(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.EARLY_DEFENSE.squadRadius);
 		}
 	}
 

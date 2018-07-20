@@ -39,7 +39,7 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public void execute() {
-		updateInitiatedFlag();
+		this.updateInitiatedFlag();
 		
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		

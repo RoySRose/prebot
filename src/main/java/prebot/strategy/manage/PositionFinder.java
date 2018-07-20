@@ -2,7 +2,6 @@ package prebot.strategy.manage;
 
 import java.util.List;
 
-import bwapi.Pair;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
@@ -18,6 +17,7 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -350,14 +350,16 @@ public class PositionFinder {
 
 	/// First Choke Point 방어지역
 	private Position firstChokeDefensePosition() {
-		Pair<Position, Position> pairPosition = InfoUtils.myFirstChoke().getSides();
-		Position p1 = new Position(pairPosition.first.getX(), pairPosition.second.getY());
-		Position p2 = new Position(pairPosition.second.getX(), pairPosition.first.getY());
+		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
 
-		BaseLocation myBase = InfoUtils.myBase();
-		double p1FromMyBase = p1.getApproxDistance(myBase.getPosition());
-		double p2FromMyBase = p2.getApproxDistance(myBase.getPosition());
-		return p1FromMyBase < p2FromMyBase ? p1 : p2;
+		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 200);
+		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
+			return firstChokeDefensePosition;
+		} else {
+			return firstChokePosition;
+		}
 	}
 
 	/// second choke보다 안쪽 포지션

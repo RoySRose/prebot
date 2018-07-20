@@ -208,43 +208,37 @@ public class SpiderMineManger {
 			return null;
 		}
 		
-		Position position = positionToMineOnlyGoodPosition(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
-		if (position != null) {
-//			System.out.println("goood position -> " + vulture.getID());
-			mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
+		if (MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
+			Position position = positionToMineOnlyGoodPosition(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
+			if (position != null) {
+				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
+			}
+			return position;
+		} else {
+			boolean vultureInMyOccupied = false;
+			Region vultureRegion = BWTA.getRegion(vulture.getPosition());
+			for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
+				if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
+					vultureInMyOccupied = true;
+					break;
+				}
+			}
+			
+			int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
+			if (vultureInMyOccupied) {
+				if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
+					return null;
+				} else {
+					mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
+				}
+			}
+			
+			Position position = positionToMineNearPosition(vulture, vulture.getPosition(), mineNumberPerPosition);
+			if (position != null) {
+				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
+			}
 			return position;
 		}
-		if (MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
-//			System.out.println("only good?? -> " + vulture.getID());
-			return null;
-		}
-		
-		boolean vultureInMyOccupied = false;
-		Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-//		System.out.println("not my occupied?? -> " + vulture.getID());
-		for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
-			if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
-				vultureInMyOccupied = true;
-				break;
-			}
-		}
-		
-		int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
-		if (vultureInMyOccupied) {
-			if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
-				return null;
-			} else {
-				mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
-			}
-		}
-		
-		position = positionToMineNearPosition(vulture, vulture.getPosition(), mineNumberPerPosition);
-		if (position != null) {
-//			System.out.println("mine position -> " + vulture.getID());
-			mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
-		}
-//		System.out.println("no??? -> " + vulture.getID());
-		return position;
 	}
 	
 	private Position positionToMineOnlyGoodPosition(Unit vulture, int mineNumberPerPosition) {

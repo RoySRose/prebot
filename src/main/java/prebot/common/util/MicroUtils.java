@@ -144,6 +144,18 @@ public class MicroUtils {
 		return airDrivingPosition;
 	}
 	
+	public static boolean combatEnemyType(UnitType unitType) {
+		if (unitType.isBuilding()) {
+			if (unitType.canAttack() || unitType == UnitType.Terran_Bunker || unitType == UnitType.Zerg_Creep_Colony) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	
 	public static boolean airEnemyType(UnitType unitType) {
 		return unitType.airWeapon() != WeaponType.None
 				|| unitType == UnitType.Terran_Medic
