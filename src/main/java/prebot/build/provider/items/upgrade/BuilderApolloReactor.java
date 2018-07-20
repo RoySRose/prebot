@@ -1,4 +1,4 @@
-package prebot.build.provider.items.tech;
+package prebot.build.provider.items.upgrade;
 
 import bwapi.TechType;
 import bwapi.UpgradeType;
