@@ -6,6 +6,7 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.building.BarracksControl;
@@ -62,7 +63,7 @@ public class BuildingSquad extends Squad {
 		scienceFacilityControl.control(scienceFacilityList, scienceFacilityEuiList);
 		
 		List<Unit> combatList = unitListMap.getOrDefault(UnitType.Terran_Comsat_Station, new ArrayList<Unit>());
-		List<UnitInfo> comsatEuiList = findEnemies(combatList);
+		List<UnitInfo> comsatEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE);
 		comsatControl.control(combatList, comsatEuiList);
 	}
 	

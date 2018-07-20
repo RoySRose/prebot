@@ -203,8 +203,9 @@ public class MicroUtils {
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		}
-		
-		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
+
+		boolean timeToAttack = timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack);
+		if (timeToAttack) {
 			CommandUtils.attackUnit(rangedUnit, targetUnit);
 			
 		} else {
@@ -294,9 +295,22 @@ public class MicroUtils {
 				: (targetUnit.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
 		double distanceToAttack = rangedUnit.getDistance(targetUnit) - Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
 		int catchTime = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
+		if (!targetUnit.isDetected()) {
+			catchTime -= TimeUtils.SECOND;
+		} else {
+			if (targetUnit.getType() == UnitType.Protoss_Dark_Templar) { // 다크를 죽여버린다.
+				cooltimeAttack = CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE;
+			}
+		}
 		
 		// 상대가 때리기 위해 거리를 좁히거나 벌려야 하는 경우(coolTime <= catchTime)
 		if (cooltime <= catchTime + Prebot.Broodwar.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
+//			System.out.println("#################################");
+//			System.out.println("vulture id " + rangedUnit.getID() + ": " + cooltime + " <= " + catchTime + " + " + Prebot.Broodwar.getLatency() * 2);
+//			System.out.println("distanceToAttack = " + distanceToAttack);
+//			System.out.println("getDistance = " + rangedUnit.getDistance(targetUnit));
+//			System.out.println("weaponMaxRange = " + Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon));
+//			System.out.println("#################################");
 			return true;
 		}
 		
@@ -594,11 +608,11 @@ public class MicroUtils {
 		return weaponType != WeaponType.None;
 	}
 
-	private static WeaponType getWeapon(Unit attacker, Unit target) {
+	public static WeaponType getWeapon(Unit attacker, Unit target) {
 		return target.isFlying() ? attacker.getType().airWeapon() : attacker.getType().groundWeapon();
 	}
 
-	private static WeaponType getWeapon(UnitType attacker, UnitType target) {
+	public static WeaponType getWeapon(UnitType attacker, UnitType target) {
 		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
 	}
 

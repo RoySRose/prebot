@@ -114,12 +114,12 @@ public class StrategyManager extends GameManager {
 		if (!StrategyIdea.mainSquadMode.isAttackMode) {
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
-			} else if (TimeUtils.after(9 * TimeUtils.MINUTE)) {
+			} else if (TimeUtils.after(15 * TimeUtils.MINUTE)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
 			}
 			
 		} else {
-			if (TimeUtils.after(13 * TimeUtils.MINUTE)) {
+			if (TimeUtils.after(18 * TimeUtils.MINUTE)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
 			}
 		}

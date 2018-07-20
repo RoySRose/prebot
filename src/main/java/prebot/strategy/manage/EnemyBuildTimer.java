@@ -1,5 +1,6 @@
 package prebot.strategy.manage;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +18,7 @@ import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class EnemyBuildTimer {
@@ -25,6 +27,18 @@ public class EnemyBuildTimer {
 	public Map<UnitType, Integer> buildTimeExpectMap = new HashMap<>();
 	public Map<UnitType, Integer> buildTimeMinimumMap = new HashMap<>();
 	public Set<UnitType> buildTimeCertain = new HashSet<>();
+	
+	private Map<UnitType, List<UnitType>> nextBuildingMap = new HashMap<>();
+	
+	public EnemyBuildTimer() {
+		nextBuildingMap.put(UnitType.Protoss_Cybernetics_Core, Arrays.asList(UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Robotics_Facility));//, UnitType.Protoss_Stargate));
+		nextBuildingMap.put(UnitType.Protoss_Citadel_of_Adun, Arrays.asList(UnitType.Protoss_Templar_Archives));
+		nextBuildingMap.put(UnitType.Protoss_Robotics_Facility, Arrays.asList(UnitType.Protoss_Robotics_Support_Bay, UnitType.Protoss_Observatory));
+//		nextBuildingMap.put(UnitType.Protoss_Stargate, Arrays.asList(UnitType.Protoss_Fleet_Beacon));
+		
+		nextBuildingMap.put(UnitType.Zerg_Spawning_Pool, Arrays.asList(UnitType.Zerg_Lair, UnitType.Zerg_Hydralisk_Den));
+		nextBuildingMap.put(UnitType.Zerg_Lair, Arrays.asList(UnitType.Zerg_Spire));
+	}
 
 	public int darkTemplarInMyBaseFrame = CommonCode.UNKNOWN;
 	public int reaverInMyBaseFrame = CommonCode.UNKNOWN;
@@ -168,7 +182,7 @@ public class EnemyBuildTimer {
 	}
 
 	private void updateFactoryExpectTime() {
-		updateByBuilding(UnitType.Terran_Factory, UnitType.Terran_Starport);
+		updateByBuilding(UnitType.Terran_Factory);
 		updateByFlagUnit(UnitType.Terran_Starport, UnitType.Terran_Vulture);
 	}
 
@@ -178,12 +192,12 @@ public class EnemyBuildTimer {
 	}
 
 	private void updateCoreExpectTime() {
-		updateByBuilding(UnitType.Protoss_Cybernetics_Core, UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Robotics_Facility);
+		updateByBuilding(UnitType.Protoss_Cybernetics_Core);
 		updateByFlagUnit(UnitType.Protoss_Cybernetics_Core, UnitType.Protoss_Dragoon);
 	}
 
 	private void updateAdunExpectTime() {
-		updateByBuilding(UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Templar_Archives);
+		updateByBuilding(UnitType.Protoss_Citadel_of_Adun);
 		updateByFlagUnit(UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Dark_Templar);
 		updateByFlagUnit(UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_High_Templar);
 	}
@@ -195,7 +209,7 @@ public class EnemyBuildTimer {
 	}
 
 	private void updateRoboticsExpectTime() {
-		updateByBuilding(UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Robotics_Support_Bay, UnitType.Protoss_Observatory);
+		updateByBuilding(UnitType.Protoss_Robotics_Facility);
 		updateByFlagUnit(UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Shuttle);
 		updateByFlagUnit(UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Reaver);
 		updateByFlagUnit(UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Observer);
@@ -212,12 +226,12 @@ public class EnemyBuildTimer {
 	}
 	
 	private void updateSpawningPoolExpectTime() {
-		updateByBuilding(UnitType.Zerg_Spawning_Pool, UnitType.Zerg_Lair);
+		updateByBuilding(UnitType.Zerg_Spawning_Pool);
 		updateByFlagUnit(UnitType.Zerg_Spawning_Pool, UnitType.Zerg_Zergling);
 	}
 
 	private void updateLairExpectTime() {
-		updateByBuilding(UnitType.Zerg_Lair, UnitType.Zerg_Spire);
+		updateByBuilding(UnitType.Zerg_Lair);
 		updateByFlagUnit(UnitType.Zerg_Lair, UnitType.Zerg_Lurker);
 		updateByFlagUnit(UnitType.Zerg_Lair, UnitType.Zerg_Mutalisk);
 	}
@@ -235,16 +249,16 @@ public class EnemyBuildTimer {
 	}
 	
 	/// 건물에 따른 시간 예측 (또는 확정)
-	private void updateByBuilding(UnitType buildingType, UnitType... nextBuildingTypes) {
+	private void updateByBuilding(UnitType buildingType) {
 		int buildFrameByStrategy = StrategyIdea.currentStrategy.buildTimeMap.frame(buildingType);
 		if (buildFrameByStrategy == CommonCode.UNKNOWN) {
 			buildFrameByStrategy = StrategyIdea.startStrategy.buildTimeMap.frame(buildingType);
 		}
-		updateByBuilding(buildFrameByStrategy, buildingType, nextBuildingTypes);
+		updateByBuilding(buildFrameByStrategy, buildingType);
 	}
 	
 	/// 건물에 따른 시간 확정. 연계건물(nextBuilding)에 대한 최소시간 설정
-	private void updateByBuilding(int buildFrameByStrategy, UnitType buildingType, UnitType... nextBuildingTypes) {
+	private void updateByBuilding(int buildFrameByStrategy, UnitType buildingType) {
 		if (isCertainBuildTime(buildingType)) {
 			return;
 		}
@@ -258,10 +272,7 @@ public class EnemyBuildTimer {
 					expectBuildFrame = buildFrameByStrategy;
 				}
 				updateBuildTimeExpect(buildingType, expectBuildFrame);
-				addCertainBuildTime(buildingType);
-				for (UnitType nextBuildingType : nextBuildingTypes) {
-					updateBuildTimeMinimum(nextBuildingType, expectBuildFrame + buildingType.buildTime());
-				}
+				addCertainBuildTime(buildingType, expectBuildFrame);
 
 			} else {
 				// 미완성 건물 발견. 에너지로 빌드시간 추측 가능
@@ -275,24 +286,25 @@ public class EnemyBuildTimer {
 					System.out.println("################ ERROR - updateDefaultExpectTime" + buildFrameByStrategy + " / " + buildingType);
 				}
 				updateBuildTimeExpect(buildingType, expectBuildFrame, ignoreMinimum);
-				addCertainBuildTime(buildingType);
-				for (UnitType nextBuildingType : nextBuildingTypes) {
-					updateBuildTimeMinimum(nextBuildingType, expectBuildFrame + buildingType.buildTime());
-				}
+				addCertainBuildTime(buildingType, expectBuildFrame);
 			}
 
 		} else {
 			// 미발견. 전략별 시간 선택. 전략별 시간 이후 적 본진, 앞마당, 가스가 모두 정찰 되었다면 최후 정찰시간을 이후로 최소값을 증가시킨다.
 			if (buildFrameByStrategy != CommonCode.UNKNOWN) {
-				int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
+
 				int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
-				int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
-				
-				if (baseLastCheckFrame > buildFrameByStrategy && gasLastCheckFrame > buildFrameByStrategy && expansionLastCheckFrame > buildFrameByStrategy) {
-					int minimumFrame = baseLastCheckFrame < gasLastCheckFrame ? baseLastCheckFrame : gasLastCheckFrame;
-					minimumFrame = minimumFrame < expansionLastCheckFrame ? minimumFrame : expansionLastCheckFrame;
-					updateBuildTimeMinimum(buildingType, minimumFrame);
+				if (!avoidRashExpectation(buildingType)) {
+					int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
+					int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+					
+					if (baseLastCheckFrame > buildFrameByStrategy && gasLastCheckFrame > buildFrameByStrategy && expansionLastCheckFrame > buildFrameByStrategy) {
+						int minimumFrame = baseLastCheckFrame < gasLastCheckFrame ? baseLastCheckFrame : gasLastCheckFrame;
+						minimumFrame = minimumFrame < expansionLastCheckFrame ? minimumFrame : expansionLastCheckFrame;
+						updateBuildTimeMinimum(buildingType, minimumFrame);
+					}
 				}
+				
 				// 가스가 없으면 모든 가스가 필요한 건물의 최소 빌드타임을 대충 올려놓는다.
 				if (buildingType.gasPrice() > 0 && InfoUtils.enemyBaseGas() != null) {
 					if (InfoUtils.enemyNumUnits(UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor, UnitType.Terran_Refinery) == 0) {
@@ -302,6 +314,19 @@ public class EnemyBuildTimer {
 				updateBuildTimeExpect(buildingType, buildFrameByStrategy);
 			}
 		}
+	}
+
+	/// 특정 주요건물에 대해 섣부른 판단을 하지 않는다.(적베이스, 앞마당, 가스를 모두 정찰해도 최소시간을 업데이트하지 않는다.)
+	/// - 적 전략이 패스트 다크라고 판단되면 숨김아둔, 템플러아카이브가 있을 수 있다.
+	/// - 적 전략이 뮤탈전략이라고 판단되면 앞마당 크립 구섞탱이에 스파이어가 건설될 수 있다.
+	private boolean avoidRashExpectation(UnitType buildingType) {
+		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
+			return buildingType == UnitType.Protoss_Citadel_of_Adun || buildingType == UnitType.Protoss_Templar_Archives;
+			
+		} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
+			return buildingType == UnitType.Zerg_Spire;
+		}
+		return false;
 	}
 
 	/// 유닛에 따른 시간 확정
@@ -344,7 +369,7 @@ public class EnemyBuildTimer {
 			}
 		}
 		updateBuildTimeExpect(buildingType, expectBuildTime);
-		addCertainBuildTime(buildingType);
+		addCertainBuildTime(buildingType, expectBuildTime);
 	}
 
 	/// 빌드시간 확정되었는지 여부
@@ -384,7 +409,14 @@ public class EnemyBuildTimer {
 	}
 
 	/// 빌드시간 확정
-	private void addCertainBuildTime(UnitType buildingType) {
+	private void addCertainBuildTime(UnitType buildingType, int expectBuildFrame) {
 		buildTimeCertain.add(buildingType);
+
+		List<UnitType> nextBuildingTypes = nextBuildingMap.get(buildingType);
+		if (nextBuildingTypes != null) {
+			for (UnitType nextBuildingType : nextBuildingTypes) {
+				updateBuildTimeMinimum(nextBuildingType, expectBuildFrame + buildingType.buildTime());
+			}
+		}
 	}
 }

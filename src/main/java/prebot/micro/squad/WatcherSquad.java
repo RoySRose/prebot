@@ -2,11 +2,8 @@ package prebot.micro.squad;
 
 import java.util.List;
 
-import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.util.InfoUtils;
-import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -53,8 +50,6 @@ public class WatcherSquad extends Squad {
 			return;
 		}
 
-		updateWatcherPosition();
-		
 		Unit regroupLeader = null;
 		if (StrategyIdea.initiated) {
 			smallFightPredict = SmallFightPredict.ATTACK;
@@ -78,20 +73,6 @@ public class WatcherSquad extends Squad {
 		vultureWatcher.setRegroupLeader(regroupLeader);
 		
 		vultureWatcher.control(unitList, euiList);
-	}
-
-	private void updateWatcherPosition() {
-		Position watcherPosition;
-		if (PositionUtils.isValidGroundPosition(StrategyIdea.enemyGroundSquadPosition)) {
-			watcherPosition = StrategyIdea.enemyGroundSquadPosition;
-			
-		} else if (InfoUtils.enemyBase() != null) {
-			// if (otherWatcherPosition != null) {watcherPosition = otherWatcherPosition;} else {}
-			watcherPosition = InfoUtils.enemyBase().getPosition();
-		} else {
-			watcherPosition = InfoUtils.mySecondChoke().getCenter();
-		}
-		StrategyIdea.watcherPosition = watcherPosition;
 	}
 
 //	private Position getOtherWatcherPosition(Position regroupPosition) {

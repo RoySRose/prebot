@@ -7,11 +7,8 @@ import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
-import bwta.Region;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
@@ -29,7 +26,6 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.SpiderMineManger;
-import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 /// MainSquad <-> 적 기지 or 주력병력 주둔지 이동하여 마인 매설 
 public class WatcherControl extends Control {
@@ -59,7 +55,9 @@ public class WatcherControl extends Control {
 		
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
-		KitingOption kOptionMainBattle = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
+		
+		FleeOption fOptionMainBattle = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.WIDE);
+		KitingOption kOptionMainBattle = new KitingOption(fOptionMainBattle, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 		
 		List<Unit> otherMechanics = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 		
@@ -142,14 +140,9 @@ public class WatcherControl extends Control {
 	}
 	
 	private boolean spiderMineOrderIssue(Unit vulture) {
-		Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-		if (vultureRegion == BWTA.getRegion(InfoUtils.myBase().getPosition())) {
-			return false;
-		}
-		
 		Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
 		if (positionToMine == null) {
-			positionToMine = SpiderMineManger.Instance().reserveSpiderMine(vulture, MinePositionLevel.NOT_MY_OCCUPIED);
+			positionToMine = SpiderMineManger.Instance().reserveSpiderMine(vulture, StrategyIdea.watcherMinePositionLevel);
 		}
 		if (positionToMine != null) {
 			CommandUtils.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);

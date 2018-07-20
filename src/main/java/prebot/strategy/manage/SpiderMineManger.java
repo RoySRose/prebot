@@ -16,6 +16,7 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -28,11 +29,13 @@ import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class SpiderMineManger {
 	
 	private static final int RESV_EXPIRE_FRAME = 24 * 3;
 	private static final int MINE_REMOVE_TANK_DIST = 150;
+	private static final int MAX_MINE_COUNT = 250;
 //	private static final int MINE_BETWEEN_DIST = 50;
 	
 	public enum MinePositionLevel {
@@ -40,11 +43,11 @@ public class SpiderMineManger {
 		 NOT_MY_OCCUPIED,
 		 ONLY_GOOD_POSITION
 	}
+
+	private static final List<Position> GOOD_POSITIONS = new ArrayList<>(); // 마인 심기 좋은 지역
 	
 	private Map<Integer, PositionReserveInfo> mineRemoveMap = new HashMap<>(); // key : spider mine id
 	private Map<Integer, PositionReserveInfo> mineReservedMap = new HashMap<>(); // key : vulture id
-	private List<Position> goodPositions = new ArrayList<>(); // 마인 심기 좋은 지역
-	private List<BaseLocation> myExpansions = new ArrayList<>();
 
 	private static SpiderMineManger instance = new SpiderMineManger();
 	
@@ -72,22 +75,22 @@ public class SpiderMineManger {
 		
 		if (!otherBases.isEmpty() && myReadyToAttackPos != null && mySecondChoke != null
 				&& enemyReadyToAttackPos != null && enemyFirstExpansion != null && enemySecondChoke != null) {
-			myExpansions = this.getMyExpansionBaseLocation();
+			List<BaseLocation> myExpansions = this.getMyExpansionBaseLocation();
 			
 			// 3rd 멀티지역
 			for (BaseLocation base : otherBases) {
 				if (!myExpansions.contains(base)) {
-					goodPositions.add(base.getPosition());
+					GOOD_POSITIONS.add(base.getPosition());
 				}
 			}
 			
 			// 공격준비지역
-			goodPositions.add(myReadyToAttackPos);
-			goodPositions.add(mySecondChoke.getCenter());
+//			GOOD_POSITIONS.add(myReadyToAttackPos);
+//			GOOD_POSITIONS.add(mySecondChoke.getCenter());
 			
-			goodPositions.add(enemyReadyToAttackPos);
-			goodPositions.add(enemySecondChoke.getCenter());
-			goodPositions.add(enemyFirstExpansion.getPosition());
+			GOOD_POSITIONS.add(enemyReadyToAttackPos);
+			GOOD_POSITIONS.add(enemySecondChoke.getCenter());
+			GOOD_POSITIONS.add(enemyFirstExpansion.getPosition());
 			
 			return true;
 		}
@@ -102,6 +105,33 @@ public class SpiderMineManger {
 		
 		updateMineReservedMap(); // 만료 매설 만료시간 관리
 		updateMineRemoveMap(); // 만료 제거 만료시간 관리
+		updateVulturePolicy(); // 벌처 정책 관리
+	}
+
+	private void updateVulturePolicy() {
+		if (!initialized) {
+			return;
+		}
+
+		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+
+		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
+		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+			mineNumPerPosition += 2;
+		} else if (mineCount > MAX_MINE_COUNT) {
+			mineNumPerPosition = 1;
+		}
+
+		MinePositionLevel mLevel = MinePositionLevel.NOT_MY_OCCUPIED;
+		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)
+				|| StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+			mLevel = MinePositionLevel.ANYWHERE;
+		}
+		StrategyIdea.watcherMinePositionLevel = mLevel;
+		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
+		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
+		StrategyIdea.checkerMaxNumber = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
 	}
 
 	private void updateMineReservedMap() {
@@ -180,30 +210,46 @@ public class SpiderMineManger {
 		
 		Position position = positionToMineOnlyGoodPosition(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
 		if (position != null) {
+//			System.out.println("goood position -> " + vulture.getID());
 			mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
 			return position;
 		}
 		if (MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
+//			System.out.println("only good?? -> " + vulture.getID());
 			return null;
 		}
-		if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
-			Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-			for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
-				if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
-					return null;
-				}
+		
+		boolean vultureInMyOccupied = false;
+		Region vultureRegion = BWTA.getRegion(vulture.getPosition());
+//		System.out.println("not my occupied?? -> " + vulture.getID());
+		for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
+			if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
+				vultureInMyOccupied = true;
+				break;
 			}
 		}
-		position = positionToMineNearPosition(vulture, vulture.getPosition(), StrategyIdea.spiderMineNumberPerPosition);
+		
+		int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
+		if (vultureInMyOccupied) {
+			if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
+				return null;
+			} else {
+				mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
+			}
+		}
+		
+		position = positionToMineNearPosition(vulture, vulture.getPosition(), mineNumberPerPosition);
 		if (position != null) {
+//			System.out.println("mine position -> " + vulture.getID());
 			mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
 		}
+//		System.out.println("no??? -> " + vulture.getID());
 		return position;
 	}
 	
 	private Position positionToMineOnlyGoodPosition(Unit vulture, int mineNumberPerPosition) {
 		Position positionToMine = null;
-		Position nearestGoodPosition = PositionUtils.getClosestPositionToPosition(goodPositions, vulture.getPosition(), 200.0);
+		Position nearestGoodPosition = PositionUtils.getClosestPositionToPosition(GOOD_POSITIONS, vulture.getPosition(), 200.0);
 		if (nearestGoodPosition != null) {
 			positionToMine = positionToMineNearPosition(vulture, nearestGoodPosition, mineNumberPerPosition);
 		}
