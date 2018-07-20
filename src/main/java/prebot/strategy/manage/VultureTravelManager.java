@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
-import bwapi.UnitType;
 import bwta.BaseLocation;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -17,10 +15,10 @@ import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 
+// 벌처 이동지 관리 - 벌처 정찰 max, 마인수 등의 정책도 함께 관리한다.
 public class VultureTravelManager {
 
 	private static VultureTravelManager instance = new VultureTravelManager();
@@ -46,7 +44,6 @@ public class VultureTravelManager {
 		updateCheckerJob();
 		updateGuerillaIgnoreTime();
 		refreshRetiredCheckers();
-		updateVulturePolicy();
 	}
 
 	private void initializeTravelSite() {
@@ -155,25 +152,6 @@ public class VultureTravelManager {
 		for (Integer checkerId : removeList) {
 			checkerRetiredTimeMap.remove(checkerId);
 		}
-	}
-
-	private void updateVulturePolicy() {
-		if (!initialized) {
-			return;
-		}
-
-		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-//		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
-		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
-		
-//		int bonusNumPerPosition = (mineCount - 10) / 8;
-//		if (bonusNumPerPosition > 0) {
-//			mineNumPerPosition += bonusNumPerPosition;
-//		}
-
-		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
-		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
-		StrategyIdea.checkerMaxNumber = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
 	}
 
 	// 벌처스쿼드가 정찰할 base를 선택한다.

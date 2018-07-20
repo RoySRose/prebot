@@ -349,6 +349,18 @@ public class UnitUtils {
 		return unitDiscovered(enemyUnitDiscoveredMap, unitTypes);
 	}
 	
+	public static boolean invisibleEnemyDiscovered() {
+		Race enemyRace = InfoUtils.enemyRace();
+		if (enemyRace == Race.Protoss) {
+			return enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);	
+		} else if (enemyRace == Race.Terran) {
+			return enemyUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Starport, UnitType.Terran_Control_Tower, UnitType.Terran_Ghost);
+		} else if (enemyRace == Race.Zerg) {
+			return enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg);
+		}
+		return false;
+	}
+	
 	/// 유닛타입의 적 유닛이 하나 생산되었는지 여부 (완성)
 	public static boolean enemyCompleteUnitDiscovered(UnitType... unitTypes) {
 		Map<UnitType, Boolean> enemyUnitDiscoveredMap = UnitCache.getCurrentCache().getEnemyCompleteUnitDiscoveredMap();
@@ -414,6 +426,15 @@ public class UnitUtils {
 					}
 				}
 				return false;
+			}
+		});
+	}
+	
+	public static Unit getClosestUnitToPositionNotStunned(List<Unit> unitList, Position position) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return !unit.isStasised() && !unit.isLockedDown();
 			}
 		});
 	}

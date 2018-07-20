@@ -152,10 +152,11 @@ public class UXManager {
 			
 		} else if (uxOption == 4) {
 			drawSquadInfoOnMap(20, 30);
-			drawEnemyAirDefenseRange();
 			drawManagerTimeSpent(500, 220);
 			drawDecision();
+			drawEnemyAirDefenseRange();
 			drawAirForceInformation();
+			drawVulturePolicy();
 			
 		} else if (uxOption == 5) {
 			drawEnemyBaseToBaseTime();
@@ -1498,6 +1499,15 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "total achievement=" + AirForceManager.Instance().getAchievementEffectiveFrame());
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "accumulated achievement=" + AirForceManager.Instance().getAccumulatedAchievement());
 		Prebot.Broodwar.drawTextScreen(20, y += 15, "wraith count=" + StrategyIdea.wraithCount);
+	}
+
+	private void drawVulturePolicy() {
+		int y = 10;
+		Prebot.Broodwar.drawTextScreen(400, y += 15, "[vulture policy]");
+		Prebot.Broodwar.drawTextScreen(400, y += 15, "checkerMaxNumber=" + StrategyIdea.checkerMaxNumber);
+		Prebot.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerPosition=" + StrategyIdea.spiderMineNumberPerPosition);
+		Prebot.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerGoodPosition=" + StrategyIdea.spiderMineNumberPerGoodPosition);
+		Prebot.Broodwar.drawTextScreen(400, y += 15, "watcherMinePositionLevel=" + StrategyIdea.watcherMinePositionLevel);
 	}
 	
 	private void drawEnemyBaseToBaseTime() {

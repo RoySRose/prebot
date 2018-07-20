@@ -88,7 +88,7 @@ public class MicroConfig {
 	public static final int RANDOM_MOVE_DISTANCE = 90;
 
 	public static class Vulture {
-		public static final int GEURILLA_ENEMY_RADIUS = 400;
+		public static final int GEURILLA_ENEMY_RADIUS = 300;
 		public static final int GEURILLA_EXTRA_ENEMY_POWER = 200;
 		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 게릴라지역이 선정되고 일정시간이 지나야 다시 게릴라 지역으로 선정가능
 		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // GEURILLA_INTERVAL_FRAME 대기 없이 게릴라벌처를 할당가능한 숫자

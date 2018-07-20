@@ -11,12 +11,20 @@ public class TimeUtils {
 	public static final int SECOND = 24;
 	public static final int MINUTE = 24 * 60;
 	
-	/// 지나간 프레임이면 true
+	/// 이전 프레임이면 true
+	public static boolean beforeTime(int minutes, int seconds) {
+		return before(timeToFrames(minutes, seconds));
+	}
+	
 	public static boolean before(int frame) {
 		return Prebot.Broodwar.getFrameCount() < frame;
 	}
 	
 	/// 지나간 프레임이면 true
+	public static boolean afterTime(int minutes, int seconds) {
+		return after(timeToFrames(minutes, seconds));
+	}
+	
 	public static boolean after(int frame) {
 		return Prebot.Broodwar.getFrameCount() > frame;
 	}

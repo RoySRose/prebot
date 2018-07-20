@@ -57,7 +57,7 @@ public abstract class Strategist {
 	private boolean phase02End() {
 		//TODO 빠른공격시에는 후퇴시 종료, 안전방어시에는  방어성공시 종료
 		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
-		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_SAFELY)) {
+		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
 		}
 		
 		if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
