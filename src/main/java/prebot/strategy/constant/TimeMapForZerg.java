@@ -2,6 +2,7 @@ package prebot.strategy.constant;
 
 import bwapi.UnitType;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class TimeMapForZerg {
 	
@@ -77,6 +78,22 @@ public class TimeMapForZerg {
 		.put(UnitType.Zerg_Hatchery, 2, 50)
 		.put(UnitType.Zerg_Extractor, 3, 0)
 		.put(UnitType.Zerg_Lair, 3, 50);
+	}
+	
+	public static BuildTimeMap ZERG_FAST_MUTAL() {
+		return new BuildTimeMap();
+	}
+	public static BuildTimeMap ZERG_FAST_LURKER() {
+		return new BuildTimeMap().setFeature(Feature.DEFENSE_FRONT, Feature.DETECT_IMPORTANT);
+	}
+	public static BuildTimeMap ZERG_NO_LAIR_LING() {
+		return new BuildTimeMap();
+	}
+	public static BuildTimeMap ZERG_NO_LAIR_HYDRA() {
+		return new BuildTimeMap().setFeature(Feature.DEFENSE_FRONT);
+	}
+	public static BuildTimeMap ZERG_LAIR_MIXED() {
+		return new BuildTimeMap();
 	}
 	
 }

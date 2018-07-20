@@ -153,19 +153,19 @@ public enum EnemyStrategy {
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
 	ZERG_FAST_MUTAL(1, 0, 1, UpgradeOrder.get(FacUp.VS, FacUp.VM) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, new BuildTimeMap()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, TimeMapForZerg.ZERG_FAST_MUTAL()),
 	
 	ZERG_FAST_LURKER(2, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_FAST_LURKER()),
 	
 	ZERG_NO_LAIR_LING(3, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
-			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
+			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_LING()),
 	
 	ZERG_NO_LAIR_HYDRA(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, new BuildTimeMap()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
 	
 	ZERG_LAIR_MIXED(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, new BuildTimeMap()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, TimeMapForZerg.ZERG_LAIR_MIXED()),
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
 	
 	// PHASE3 : PHASE2 종료 ~

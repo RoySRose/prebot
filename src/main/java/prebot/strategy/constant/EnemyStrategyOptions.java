@@ -81,7 +81,7 @@ public class EnemyStrategyOptions {
 	
 	public static class BuildTimeMap {
 		public enum Feature {
-			DOUBLE, MECHANIC, BIONIC, TWOGATE, QUICK_ATTACK, DEFENSE_SAFELY, DETECT_IMPORTANT
+			DOUBLE, MECHANIC, BIONIC, TWOGATE, QUICK_ATTACK, DEFENSE_FRONT, DEFENSE_DROP, DETECT_IMPORTANT
 		}
 		
 		private Set<Feature> features = new HashSet<>();
@@ -160,6 +160,8 @@ public class EnemyStrategyOptions {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
+			sb.append("Feature: ").append(features).append("\n");
+			
 			for (UnitType unitType : buildingTime.keySet()) {
 				List<Integer> times = buildingTime.get(unitType);
 				List<String> timeStrings = new ArrayList<>();
@@ -177,7 +179,7 @@ public class EnemyStrategyOptions {
 				sb.append(upgradeType).append(TimeUtils.framesToTimeString(time)).append("\n");
 			}
 			
-			return "[DefaultTimeMap]\n" + sb.toString();
+			return sb.toString();
 		}
 	}
 }

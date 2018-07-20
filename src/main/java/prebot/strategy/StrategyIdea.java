@@ -14,6 +14,7 @@ import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
+import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 public class StrategyIdea {
 	
@@ -85,6 +86,7 @@ public class StrategyIdea {
 	public static int checkerMaxNumber = 0; // 정찰벌처 최대수
 	public static int spiderMineNumberPerPosition = 1; // 
 	public static int spiderMineNumberPerGoodPosition = 1;
+	public static MinePositionLevel watcherMinePositionLevel = MinePositionLevel.NOT_MY_OCCUPIED;
 	
 	// [전략에 따른 가스조절]
 	public static boolean gasAdjustment = false;

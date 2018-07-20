@@ -4,331 +4,185 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Order;
-import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.WeaponType;
 import bwta.BaseLocation;
 import prebot.common.MapGrid;
+import prebot.common.MapGrid.GridCell;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.Control;
-import prebot.strategy.AnalyzeStrategy;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class ComsatControl extends Control {
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+		
 		// 상대 클록 유닛
-		for (UnitInfo eui : euiList) {
-			Unit unit = eui.getUnit();
-			if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() == false) {
-				if (InformationManager.Instance().enemyRace == Race.Protoss) {
-					if (unit.isFlying() && UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
-						continue;
+		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
+		if (PositionUtils.isValidPosition(scanPosition)) {
+			if (!MapGrid.Instance().scanIsActiveAt(scanPosition)) {
+				Unit comsatMaxEnergy = null;
+				int maxEnergy = 49;
+				for (Unit comsat : unitList) {
+					if (comsat.getEnergy() > maxEnergy && comsat.canUseTech(TechType.Scanner_Sweep, scanPosition)) {
+						maxEnergy = comsat.getEnergy();
+						comsatMaxEnergy = comsat;
 					}
 				}
-				// 주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로
-				// 넘어간다
-				List<Unit> nearvessel = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-						UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
-				if (nearvessel != null) {
-					Unit neareasetvessel = null;
-					int closestDistToVessel = 100000;
-					for (Unit vessel : nearvessel) {
-						if (vessel.isStasised() || vessel.isLockedDown()) {
-							continue;
-						}
-						int tempdist = unit.getDistance(vessel);
-						if (tempdist < closestDistToVessel) {
-							neareasetvessel = vessel;
-							closestDistToVessel = tempdist;
-						}
-					}
-					if (neareasetvessel != null) {
-						List<Unit> nearallies = UnitUtils.getUnitsInRadius(PlayerRange.ALL, neareasetvessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
-						if (nearallies != null && nearallies.size() > 2) {
-							break;// 베슬이 올것으로 예상됨
-						}
-					}
-				}
-
-				if (InformationManager.Instance().enemyRace == Race.Protoss) {
-					List<Unit> myUnits = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Vulture.groundWeapon().maxRange() + 2, UnitType.Terran_Vulture);
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Goliath.groundWeapon().maxRange() + 2, UnitType.Terran_Goliath));
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + 2,
-							UnitType.Terran_Siege_Tank_Siege_Mode));
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange() + 2,
-							UnitType.Terran_Siege_Tank_Tank_Mode));
-					int faccnt = 0;
-					for (Unit facunit : myUnits) {
-						if (facunit.getType() == UnitType.Terran_Vulture || facunit.getType() == UnitType.Terran_Goliath
-								|| facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-								|| facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-							faccnt++;
-						}
-					}
-					if (faccnt > 2) {
-						smartScan(unit.getPosition(), unitList);
-						return;
-					}
-				} else if (InformationManager.Instance().enemyRace == Race.Terran) {
-					List<Unit> myUnits = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Wraith.sightRange(), UnitType.Terran_Goliath);
-					if (myUnits.size() > 1) {
-						smartScan(unit.getPosition(), unitList);
-						return;
-					}
-				} else {
-					List<Unit> myUnits = UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Vulture.groundWeapon().maxRange() + 2, UnitType.Terran_Vulture);
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Goliath.groundWeapon().maxRange() + 2, UnitType.Terran_Goliath));
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + 2,
-							UnitType.Terran_Siege_Tank_Siege_Mode));
-					myUnits.addAll(UnitUtils.getUnitsInRadius(PlayerRange.SELF, unit.getPosition(),
-							UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange() + 2,
-							UnitType.Terran_Siege_Tank_Tank_Mode));
-
-					int faccnt = 0;
-					for (Unit facunit : myUnits) {
-						if (facunit.getType() == UnitType.Terran_Vulture
-								|| facunit.getType() == UnitType.Terran_Goliath) {
-							faccnt++;
-						}
-						if (facunit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-								|| facunit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-							faccnt = 10;
-						}
-					}
-					if (faccnt > 4) {
-						smartScan(unit.getPosition(), unitList);
-						return;
-					}
+				if (comsatMaxEnergy != null) {
+					MapGrid.Instance().scanAtPosition(scanPosition);
+					comsatMaxEnergy.useTech(TechType.Scanner_Sweep, scanPosition);
 				}
 			}
+			return;
 		}
 
-		Unit comsat = null;
-
-		int energy = 50;		
-		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
-			energy = 150;
+		Unit comsatToUse = null;
+		int usableEnergy = 50;		
+		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+			usableEnergy = 150;
 		}
-
-		// 저그전 특이사항
-		if (InformationManager.Instance().enemyRace == Race.Zerg) {
-
-			if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER
-					|| UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg)) {
-				energy = 150;
+		for (Unit comsatStation : unitList) {
+			if (comsatStation.getEnergy() > usableEnergy) {
+				comsatToUse = comsatStation;
+				usableEnergy = comsatStation.getEnergy();
 			}
-
-			for (Unit unit : unitList) {
-				if (unit.getType() == UnitType.Terran_Comsat_Station && unit.getEnergy() > energy) {
-					comsat = unit;
-				}
-			}
-			if (comsat != null) {
-
-				Player enemyPlayer = Prebot.Broodwar.enemy();
-				// find place
-				List<TilePosition> scanArea = new ArrayList<TilePosition>();
-
-				if (InformationManager.Instance().getMainBaseLocation(enemyPlayer) != null) {
-					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
-				}
-				if (InformationManager.Instance().getFirstExpansionLocation(enemyPlayer) != null) {
-					scanArea.add(
-							InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
-				}
-
-				TilePosition target = null;
-				int scantime = 1000000;
-				if (scanArea.size() > 0) {
-					for (TilePosition scans : scanArea) {
-						if (Prebot.Broodwar.isVisible(scans)) {
-							continue;
-						}
-						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
-						if (scantime > tempscantime) {
-							target = scans;
-							scantime = tempscantime;
-						}
-					}
-				}
-				if (target != null) {
-					MapGrid.Instance().scanAtPosition(target.toPosition());
-					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
-				}
-
-			}
-		} else if (InformationManager.Instance().enemyRace == Race.Protoss) { // 폴토전
-																				// 특이사항
-			if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Templar_Archives)) {
-				energy = 150;
-			}
-
-			for (Unit unit : unitList) {
-				if (unit.getType() == UnitType.Terran_Comsat_Station && unit.getEnergy() > energy) {
-					comsat = unit;
-				}
-			}
-			if (comsat != null) {
-
-				Player enemyPlayer = Prebot.Broodwar.enemy();
-				// find place
-				List<TilePosition> scanArea = new ArrayList<TilePosition>();
-
-				if (InformationManager.Instance().getMainBaseLocation(enemyPlayer) != null) {
-					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
-				}
-				if (InformationManager.Instance().getFirstExpansionLocation(enemyPlayer) != null) {
-					scanArea.add(
-							InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
-				}
-				if (InformationManager.Instance().getMainBaseLocation(enemyPlayer) != null) {
-					scanArea.add(
-							InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
-				}
-				if (InformationManager.Instance().getFirstExpansionLocation(enemyPlayer) != null) {
-					scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter()
-							.toTilePosition());
-				}
-				if (Prebot.Broodwar.getFrameCount() > 20000) {
-					if (InformationManager.Instance().getIslandBaseLocations() != null) {
-						for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
-							scanArea.add(islands.getTilePosition());
-						}
-					}
-				}
-				TilePosition target = null;
-				int scantime = 1000000;
-				if (scanArea.size() > 0) {
-					for (TilePosition scans : scanArea) {
-						if (Prebot.Broodwar.isVisible(scans)) {
-							continue;
-						}
-						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
-						if (scantime > tempscantime) {
-							target = scans;
-							scantime = tempscantime;
-						}
-					}
-				}
-				if (target != null) {
-					MapGrid.Instance().scanAtPosition(target.toPosition());
-					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
-				}
-
-			}
-		} else if (InformationManager.Instance().enemyRace == Race.Terran) {// 테란  특이사항
+		}
+		if (comsatToUse != null) {
+			Position scanPositionForObservation = getScanPositionForObservation();
 			
-			if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Starport, UnitType.Terran_Control_Tower)) {
-				energy = 150;
+			if (PositionUtils.isValidPosition(scanPositionForObservation)) {
+				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
+				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
 			}
+		}
+		
+	}
 
-			for (Unit unit : unitList) {
-				if (unit.getType() == UnitType.Terran_Comsat_Station && unit.getEnergy() > energy) {
-					comsat = unit;
+	/// 클로킹 유닛용 스캔 포지션
+	private Position scanPositionForInvisibleEnemy(List<UnitInfo> euiList) {
+		for (UnitInfo eui : euiList) {
+			Unit enemyUnit = eui.getUnit();
+			if (!UnitUtils.isValidUnit(enemyUnit) || !enemyUnit.isVisible()) {
+				continue;
+			}
+			if (enemyUnit.isDetected() && enemyUnit.getOrder() != Order.Burrowing) {
+				continue;
+			}
+			
+			// 주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로 넘어간다
+			List<Unit> nearVessel = UnitUtils.getUnitsInRadius(PlayerRange.SELF, enemyUnit.getPosition(), UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
+			if (nearVessel != null) {
+				Unit neareasetVessel = UnitUtils.getClosestUnitToPositionNotStunned(nearVessel, enemyUnit.getPosition());
+				if (neareasetVessel != null) {
+					List<Unit> nearAllies = UnitUtils.getUnitsInRadius(PlayerRange.SELF, neareasetVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
+					if (nearAllies != null && nearAllies.size() > 2) {
+						continue;// 베슬이 올것으로 예상됨
+					}
 				}
 			}
-			if (comsat != null) {
+			
+			List<Unit> myAttackUnits = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
+					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith);
+			
+			Race enemyRace = InfoUtils.enemyRace();
+			int myAttackUnitInWeaponRangeCount = 0;
+			for (Unit myAttackUnit : myAttackUnits) {
+				WeaponType weaponType = MicroUtils.getWeapon(myAttackUnit, enemyUnit);
+				if (weaponType == WeaponType.None) {
+					continue;
+				}
 
-				Player enemyPlayer = Prebot.Broodwar.enemy();
-				// find place
-				List<TilePosition> scanArea = new ArrayList<TilePosition>();
+				int weaponMaxRange = Prebot.Broodwar.self().weaponMaxRange(weaponType);
+				int weaponRangeMargin = 15; // 쉽게 스캔을 사용해 공격할 수 있도록 두는 여유값(조절필요)
 
-				if (InformationManager.Instance().getMainBaseLocation(enemyPlayer) != null) {
-					scanArea.add(InformationManager.Instance().getMainBaseLocation(enemyPlayer).getTilePosition());
-				}
-				if (InformationManager.Instance().getFirstExpansionLocation(enemyPlayer) != null) {
-					scanArea.add(
-							InformationManager.Instance().getFirstExpansionLocation(enemyPlayer).getTilePosition());
-				}
-				if (InformationManager.Instance().getMainBaseLocation(enemyPlayer) != null) {
-					scanArea.add(
-							InformationManager.Instance().getFirstChokePoint(enemyPlayer).getCenter().toTilePosition());
-				}
-				if (InformationManager.Instance().getFirstExpansionLocation(enemyPlayer) != null) {
-					scanArea.add(InformationManager.Instance().getSecondChokePoint(enemyPlayer).getCenter()
-							.toTilePosition());
-				}
-				if (Prebot.Broodwar.getFrameCount() > 20000) {
-					if (InformationManager.Instance().getIslandBaseLocations() != null) {
-						for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
-							scanArea.add(islands.getTilePosition());
+				int enemyUnitDistance = myAttackUnit.getDistance(enemyUnit);
+				if (enemyUnitDistance < weaponMaxRange + weaponRangeMargin) {
+					myAttackUnitInWeaponRangeCount++;
+
+					if (enemyRace == Race.Protoss) {
+						if (myAttackUnitInWeaponRangeCount >= 3) {
+							return enemyUnit.getPosition();
+						}
+					} else if (enemyRace == Race.Protoss) {
+						if (myAttackUnitInWeaponRangeCount >= 2) {
+							return enemyUnit.getPosition();
+						}
+					} else if (enemyRace == Race.Zerg) {
+						if (myAttackUnitInWeaponRangeCount >= 5 || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+							return enemyUnit.getPosition();
 						}
 					}
 				}
-				TilePosition target = null;
-				int scantime = 1000000;
-				if (scanArea.size() > 0) {
-					for (TilePosition scans : scanArea) {
-						if (Prebot.Broodwar.isVisible(scans)) {
-							continue;
-						}
-						int tempscantime = MapGrid.Instance().getCell(scans.toPosition()).getTimeLastScan();
-						if (scantime > tempscantime) {
-							target = scans;
-							scantime = tempscantime;
-						}
-					}
-				}
-				if (target != null) {
-					MapGrid.Instance().scanAtPosition(target.toPosition());
-					comsat.useTech(TechType.Scanner_Sweep, target.toPosition());
+			}
+		}
+		return null;
+	}
+
+	/// 정찰용 스캔 포지션
+	private Position getScanPositionForObservation() {
+		// find place
+		List<TilePosition> scanTilePositionCandidate = new ArrayList<TilePosition>();
+		if (InfoUtils.enemyBase() != null) {
+			scanTilePositionCandidate.add(InfoUtils.enemyBase().getTilePosition());
+			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
+				scanTilePositionCandidate.add(InfoUtils.enemyFirstChoke().getCenter().toTilePosition());
+			}
+		}
+		if (InfoUtils.enemyFirstExpansion() != null) {
+			scanTilePositionCandidate.add(InfoUtils.enemyFirstExpansion().getTilePosition());
+			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
+				scanTilePositionCandidate.add(InfoUtils.enemySecondChoke().getCenter().toTilePosition());
+			}
+		}
+		
+		if (TimeUtils.afterTime(14, 0)) {
+			if (InformationManager.Instance().getIslandBaseLocations() != null) {
+				for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
+					scanTilePositionCandidate.add(islands.getTilePosition());
 				}
 			}
 		}
-		AnalyzeStrategy.Instance().update();
 
-	}
-
-	public static boolean smartScan(Position targetPosition, List<Unit> unitList) {
-		// if (targetPosition.isValid()) {
-		// MyBotModule.Broodwar.sendText("SmartScan : bad position");
-		// return false;
-		// }
-		if (MapGrid.Instance().scanIsActiveAt(targetPosition)) {
-			// MyBotModule.Broodwar.sendText("SmartScan : last scan still on");
-			return false;
-		}
-
-		// Choose the comsat with the highest energy.
-		// If we're not terran, we're unlikely to have any comsats....
-		int maxEnergy = 49; // anything greater is enough energy for a scan
-		Unit comsat = null;
-		for (Unit unit : unitList) {
-			if (unit.getType() == UnitType.Terran_Comsat_Station && unit.getEnergy() > maxEnergy
-					&& unit.canUseTech(TechType.Scanner_Sweep, targetPosition)) {
-				maxEnergy = unit.getEnergy();
-				comsat = unit;
+		Position oldestCheckPosition = null;
+		int oldestLastCheckTime = CommonCode.INT_MAX;
+		for (TilePosition scanTilePosition : scanTilePositionCandidate) {
+			if (Prebot.Broodwar.isVisible(scanTilePosition)) {
+				continue;
+			}
+			Position scanPosotion = scanTilePosition.toPosition();
+			GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+			if (cell == null) {
+				continue;
+			}
+			
+			int lastScanTime = TimeUtils.elapsedFrames(cell.getTimeLastScan());
+			int lastVisitTime = TimeUtils.elapsedFrames(cell.getTimeLastVisited());
+			int lastCheckTime = Math.min(lastScanTime, lastVisitTime);
+			
+			if (lastCheckTime < oldestLastCheckTime) {
+				oldestCheckPosition = scanPosotion;
+				oldestLastCheckTime = lastCheckTime;
 			}
 		}
-
-		if (comsat != null) {
-			MapGrid.Instance().scanAtPosition(targetPosition);
-			return comsat.useTech(TechType.Scanner_Sweep, targetPosition);
-		}
-
-		return false;
+		return oldestCheckPosition;
 	}
-
-
-
+	
 }

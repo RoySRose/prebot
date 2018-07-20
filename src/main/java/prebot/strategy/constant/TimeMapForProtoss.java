@@ -62,13 +62,13 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_FAST_DARK() {
-		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DEFENSE_FRONT, Feature.DETECT_IMPORTANT)
 		.put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
 		.put(UnitType.Protoss_Templar_Archives, 3, 20);
 	}
 
 	public static BuildTimeMap PROTOSS_DARK_DROP() {
-		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DEFENSE_DROP, Feature.DETECT_IMPORTANT)
 		.put(UnitType.Protoss_Citadel_of_Adun, 2, 40)
 		.put(UnitType.Protoss_Templar_Archives, 3, 20);
 	}
@@ -95,7 +95,7 @@ public class TimeMapForProtoss {
 	}
 
 	public static BuildTimeMap PROTOSS_ROBOTICS_REAVER() { // non-precise
-		return PROTOSS_1GATE_CORE()
+		return PROTOSS_1GATE_CORE().setFeature(Feature.DEFENSE_DROP)
 		.put(UpgradeType.Singularity_Charge, 2, 50)
 		.put(UnitType.Protoss_Robotics_Facility, 3, 40)
 		.put(UnitType.Protoss_Gateway, 4, 0)

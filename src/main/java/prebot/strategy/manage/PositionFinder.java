@@ -54,6 +54,150 @@ public class PositionFinder {
 
 		updateMainSquadCenter();
 		updateEnemyUnitPosition();
+		updateWatcherPosition();
+	}
+
+	/// 주둔지
+	private Position getCampPosition() {
+		int factorySupplyCount = UnitUtils.myFactoryUnitSupplyCount();
+		
+		int enemyGroundUnitSupplyCount = 0;
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			int zealotSupply = InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot) * UnitType.Protoss_Zealot.supplyRequired();
+			int dragoonSupply = InfoUtils.enemyNumUnits(UnitType.Protoss_Dragoon) * UnitType.Protoss_Dragoon.supplyRequired();
+			int darkSupply = InfoUtils.enemyNumUnits(UnitType.Protoss_Dark_Templar) * UnitType.Protoss_Dark_Templar.supplyRequired();
+			int archonSupply = InfoUtils.enemyNumUnits(UnitType.Protoss_Archon) * UnitType.Protoss_Archon.supplyRequired();
+			int reaverSupply = InfoUtils.enemyNumUnits(UnitType.Protoss_Reaver) * UnitType.Protoss_Reaver.supplyRequired();
+			enemyGroundUnitSupplyCount = zealotSupply + dragoonSupply + darkSupply + archonSupply + reaverSupply;
+			
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			int zerglingSupply = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling) * UnitType.Zerg_Zergling.supplyRequired();
+			int hydraSupply = InfoUtils.enemyNumUnits(UnitType.Zerg_Hydralisk) * UnitType.Zerg_Hydralisk.supplyRequired();
+			int lurkerSupply = InfoUtils.enemyNumUnits(UnitType.Zerg_Lurker) * UnitType.Zerg_Lurker.supplyRequired();
+			int ultraSupply = InfoUtils.enemyNumUnits(UnitType.Zerg_Ultralisk) * UnitType.Zerg_Ultralisk.supplyRequired();
+			enemyGroundUnitSupplyCount = zerglingSupply + hydraSupply + lurkerSupply + ultraSupply;
+			
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			// MECHANIC NO COUNT
+			int marineSupply = InfoUtils.enemyNumUnits(UnitType.Terran_Marine) * UnitType.Terran_Marine.supplyRequired();
+			int medicSupply = InfoUtils.enemyNumUnits(UnitType.Terran_Medic) * UnitType.Terran_Medic.supplyRequired();
+			enemyGroundUnitSupplyCount = marineSupply + medicSupply;
+		}
+		
+		// 딕텍팅이 괜찮은 경우
+		// 적 클로킹유닛이 없거나 / 앞마당에 터렛이 있거나 / 1회이상 컴셋 사용 가능
+		boolean firstExpansionDetectingOk = true;
+		if (UnitUtils.invisibleEnemyDiscovered()) {
+			firstExpansionDetectingOk = false;
+			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
+			for (Unit turret : turretList) {
+				RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+				if (regionType == RegionType.MY_FIRST_EXPANSION) {
+					firstExpansionDetectingOk = true;
+					break;
+				}
+			}
+			if (!firstExpansionDetectingOk) {
+				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Spell_Scanner_Sweep);
+				for (Unit scanner : scannerList) {
+					if (scanner.getEnergy() >= 50) {
+						firstExpansionDetectingOk = true;
+						break;
+					}
+				}
+			}
+		}
+
+//		System.out.println("facto : " + factorySupplyCount);
+//		System.out.println("enemy : " + enemyGroundUnitSupplyCount);
+//		System.out.println("########################################################");
+		
+		// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
+		if (firstExpansionDetectingOk) {
+			int SECOND_CHOKE_MARGIN = 15 * 4; // TODO 추후 상수로 변경
+			int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
+				SECOND_CHOKE_MARGIN = 3 * 4;
+				FIRST_EXPANSION_MARGIN = 1 * 4;
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC) || firstExpansionOccupied()) {
+				SECOND_CHOKE_MARGIN = 10 * 4;
+				FIRST_EXPANSION_MARGIN = 5 * 4;
+			}
+			
+			// 병력이 쌓였다면 second choke에서 방어한다.
+			if (factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
+				return InfoUtils.mySecondChoke().getCenter();
+			}
+			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
+			if (factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
+				return firstExpansionBackwardPosition();
+			}
+		}
+		
+		
+		return firstChokeDefensePosition();
+
+//		if (InfoUtils.enemyRace() == Race.Protoss) {
+////			if (InformationManager.Instance().isBlockingEnterance()) {
+////			}
+//			return firstChokeDefensePosition();
+//			
+//		} else if (InfoUtils.enemyRace() == Race.Terran) {
+////			if (entranceBlocked()) { }
+//			// 테란은 언덕 랜덤데미지를 활용해야 한다.
+//			return firstChokeDefensePosition();
+//			
+//		} else { //if (InfoUtils.enemyRace() == Race.Zerg) {
+//			return firstChokeDefensePosition();
+//			
+//			// 마린이 일정이상 쌓였어야 한다.
+////			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+////			if (factorySupplyCount + marineCount > Math.max(enemyUnitCount, 3)) {
+////				return firstChokeDefensePosition();
+////			} else {
+////				/// 커맨드센터 수비 필요
+////				return commandCenterInsidePosition();
+////			}
+//		}
+	}
+
+	/// 메인부대 위치 지점
+	private Position getMainPosition() {
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			BaseLocation enemyBase = InfoUtils.enemyBase();
+			if (enemyBase == null) {
+				return InfoUtils.mySecondChoke().getCenter();
+			}
+			
+			if (!enemyBaseDestroyed(enemyBase)) {
+				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
+					return enemyBase.getPosition();
+				} else {
+					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
+					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
+					// 안전한 위치까지 바로 전진하도록 한다.
+					return enemyBase.getPosition();
+				}
+			} else {
+				return letsfindRatPosition();
+			}
+
+		} else {
+			return getCampPosition();
+		}
+	}
+
+	private void updateMainSquadCenter() {
+		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
+		if (leader != null) {
+			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
+			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
+			StrategyIdea.mainSquadCenter = centerPosition;
+		} else {
+			StrategyIdea.mainSquadCoverRadius = 250;
+			StrategyIdea.mainSquadCenter = getMainPosition();
+		}
 	}
 
 	private void updateEnemyUnitPosition() {
@@ -123,139 +267,49 @@ public class PositionFinder {
 		EnemyUnitStatus enemyStatus;
 		Region myRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		List<UnitInfo> euiList = InfoUtils.euiListInMyRegion(myRegion);
-		if (!euiList.isEmpty()) {
-			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
-		} else {
+		
+		if (euiList.isEmpty()) {
 			if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown
 					|| StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
 				enemyStatus = EnemyUnitStatus.COMMING;	
 			} else {
 				enemyStatus = EnemyUnitStatus.SLEEPING;
 			}
+		} else {
+			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
 		}
 		StrategyIdea.enemyUnitStatus = enemyStatus;
+//		System.out.println(enemyStatus);
 	}
-
-	private void updateMainSquadCenter() {
-		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
-		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
-		if (leader != null) {
-			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
-			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
-			StrategyIdea.mainSquadCenter = centerPosition;
-		} else {
-			StrategyIdea.mainSquadCoverRadius = 250;
-			StrategyIdea.mainSquadCenter = getMainPosition();
-		}
-	}
-
-	/// 주둔지
-	private Position getCampPosition() {
-		int factoryUnitCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode,
-				UnitType.Terran_Siege_Tank_Siege_Mode , UnitType.Terran_Vulture, UnitType.Terran_Goliath);
+	
+	private void updateWatcherPosition() {
+		Position watcherPosition = null;
 		
-		int enemyUnitCount = 0;
-		if (InfoUtils.enemyRace() == Race.Protoss) {
-			enemyUnitCount = (int) (InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon, UnitType.Protoss_Dark_Templar, UnitType.Protoss_Archon) * 1.5);
-		} else if (InfoUtils.enemyRace() == Race.Zerg) {
-			enemyUnitCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling, UnitType.Zerg_Hydralisk, UnitType.Zerg_Mutalisk) / 2;
-		} else if (InfoUtils.enemyRace() == Race.Terran) {
-			enemyUnitCount = InfoUtils.enemyNumUnits(UnitType.Terran_Marine); // MECHANIC NO COUNT
-		}
-		
-		boolean firstExpansionDetectingOk = true;
-		
-		// 앞마당에 터렛이 있거나, 스캔이 한번의 스캔이 있어야 한다.
-		boolean invisibleEnemyExist = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Protoss_Citadel_of_Adun, UnitType.Zerg_Lurker);
-		if (invisibleEnemyExist) {
-			firstExpansionDetectingOk = false;
-			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
-			for (Unit turret : turretList) {
-				RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
-				if (regionType == RegionType.MY_FIRST_EXPANSION) {
-					firstExpansionDetectingOk = true;
-					break;
-				}
-			}
+		// watcher 특수 포지션
+		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
+			watcherPosition = InfoUtils.myBase().getPosition(); // 드롭인 경우 본진
 			
-			if (!firstExpansionDetectingOk) {
-				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Spell_Scanner_Sweep);
-				for (Unit scanner : scannerList) {
-					if (scanner.getEnergy() >= 50) {
-						firstExpansionDetectingOk = true;
-						break;
-					}
-				}
+		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+			
+			// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
+			if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
+				watcherPosition = InfoUtils.mySecondChoke().getCenter();
 			}
 		}
 		
-		if (firstExpansionDetectingOk) {
-			int secondChokeBonus = 15;
-			int firstExpansionBonus = 5;
-			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-				secondChokeBonus = 0;
-				firstExpansionBonus = 0;
-			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) {
-				secondChokeBonus = 2;
-				firstExpansionBonus = 2;
-			}
-			
-			// 병력이 쌓였다면 second choke에서 방어한다.
-			if (factoryUnitCount >= enemyUnitCount + secondChokeBonus) {
-				return InfoUtils.mySecondChoke().getCenter();
-			}
-			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-			if (factoryUnitCount >= enemyUnitCount + firstExpansionBonus || firstExpansionOccupied()) {
-				return firstExpansionBackwardPosition();
-			}
-		}
-
-		if (InfoUtils.enemyRace() == Race.Protoss) {
-//			if (InformationManager.Instance().isBlockingEnterance()) {
-//			}
-			return firstChokeDefensePosition();
-			
-		} else if (InfoUtils.enemyRace() == Race.Terran) {
-//			if (entranceBlocked()) { }
-			// 테란은 언덕 랜덤데미지를 활용해야 한다.
-			return firstChokeDefensePosition();
-			
-		} else { //if (InfoUtils.enemyRace() == Race.Zerg) {
-			// 마린이 일정이상 쌓였어야 한다.
-			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
-			if (factoryUnitCount + marineCount > Math.max(enemyUnitCount, 3)) {
-				return firstChokeDefensePosition();
+		// watcher 기본 포지션
+		if (watcherPosition == null) {
+			if (PositionUtils.isValidGroundPosition(StrategyIdea.enemyGroundSquadPosition)) {
+				watcherPosition = StrategyIdea.enemyGroundSquadPosition;
+			} else if (InfoUtils.enemyBase() != null) {
+				watcherPosition = InfoUtils.enemyBase().getPosition();
+				// if (otherWatcherPosition != null) {watcherPosition = otherWatcherPosition;} else {}
 			} else {
-				/// 커맨드센터 수비 필요
-				return commandCenterInsidePosition();
+				watcherPosition = InfoUtils.mySecondChoke().getCenter();
 			}
 		}
-	}
-
-	/// 메인부대 위치 지점
-	private Position getMainPosition() {
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			BaseLocation enemyBase = InfoUtils.enemyBase();
-			if (enemyBase == null) {
-				return InfoUtils.mySecondChoke().getCenter();
-			}
-			
-			if (!enemyBaseDestroyed(enemyBase)) {
-				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
-					return enemyBase.getPosition();
-				} else {
-					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
-					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
-					// 안전한 위치까지 바로 전진하도록 한다.
-					return enemyBase.getPosition();
-				}
-			} else {
-				return letsfindRatPosition();
-			}
-
-		} else {
-			return getCampPosition();
-		}
+		
+		StrategyIdea.watcherPosition = watcherPosition;
 	}
 
 	/// 첫번째 확장기지를 차지하였는지 여부
