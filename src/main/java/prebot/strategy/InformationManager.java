@@ -227,7 +227,7 @@ public class InformationManager extends GameManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
-		
+		updateFirstBarrack();
 		if(Prebot.Broodwar.getFrameCount() % 8 == 0) {
 			updateUnitsInfo();
 			updateCurrentStatusInfo();
@@ -272,7 +272,7 @@ public class InformationManager extends GameManager {
 
 		updateFirstScout();
 		updateFirstVulture();
-		updateFirstBarrack();
+		
 		
 		if(checkGasRush == true){
 			
