@@ -35,16 +35,12 @@ public class BarracksControl extends BuildingFlyControl {
 
         if(getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
 
+        	
             if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
                     && UnitUtils.getUnitCount(UnitType.Terran_Vulture) >= 3 ){
                 setBuildingFly(BuildingFly.UP);
             }else if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
-                BaseLocation firstExpansion = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-                if(StrategyIdea.campPosition == firstExpansion.getPosition()){
-                    setBuildingFly(BuildingFly.UP);
-                }
-                BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
-                CommonCode.RegionType regionType = PositionUtils.positionToRegionType(myFirstExpansion.getPosition());
+            	CommonCode.RegionType regionType = PositionUtils.positionToRegionType(StrategyIdea.campPosition);
                 if (regionType != CommonCode.RegionType.MY_BASE) {
                     setBuildingFly(BuildingFly.UP);
                 }
