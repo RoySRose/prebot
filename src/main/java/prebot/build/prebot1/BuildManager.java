@@ -121,13 +121,13 @@ public class BuildManager extends GameManager {
 
 			// Temporary Barrack lift
 			if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Marine){
-				System.out.println("marine checked");
+				//System.out.println("marine checked");
 				if (InformationManager.Instance().firstBarrack == null) {
-                    System.out.println("marin out");
+                    //System.out.println("marin out");
                 	break;
                 }
                 if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
-                    System.out.println("marin wait");
+                    //System.out.println("marin wait");
                 	break;
                 }
             }

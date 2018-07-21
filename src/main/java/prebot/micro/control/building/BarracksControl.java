@@ -27,7 +27,6 @@ public class BarracksControl extends BuildingFlyControl {
     @Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
         //setFlyPosition(getFlyPosition0(unitList));
-    	System.out.println("inside barrack");
         processFly(unitList, euiList);
 	}
 
@@ -51,6 +50,6 @@ public class BarracksControl extends BuildingFlyControl {
                 }
             }
         }
-        System.out.println("change fly: " + getBuildingFly());
+        //System.out.println("change fly: " + getBuildingFly());
     }
 }
