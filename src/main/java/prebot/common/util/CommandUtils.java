@@ -2,6 +2,7 @@ package prebot.common.util;
 
 import bwapi.Position;
 import bwapi.TechType;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
@@ -20,13 +21,25 @@ public class CommandUtils {
 		}
 	}
 
-	public static void move(Unit unit, Position targetPosition) {
-		if (validCommand(unit, targetPosition, UnitCommandType.Move, true, true)) {
-			unit.move(targetPosition);
-		}
-	}
+    public static void move(Unit unit, Position targetPosition) {
+        if (validCommand(unit, targetPosition, UnitCommandType.Move, true, true)) {
+            unit.move(targetPosition);
+        }
+    }
 
-	public static void rightClick(Unit unit, Unit target) {
+    public static void land(Unit unit, TilePosition targetPosition) {
+        if (validCommand(unit, targetPosition, UnitCommandType.Land, true, true)) {
+            unit.land(targetPosition);
+        }
+    }
+
+    public static void lift(Unit unit) {
+        if (unit.canLift() && validCommand(unit, UnitCommandType.Lift)) {
+            unit.lift();
+        }
+    }
+
+    public static void rightClick(Unit unit, Unit target) {
 		if (validCommand(unit, target, UnitCommandType.Right_Click_Unit, false, true)) {
 			unit.rightClick(target);
 		}
@@ -152,4 +165,31 @@ public class CommandUtils {
 		
 		return true;
 	}
+
+    private static boolean validCommand(Unit unit, TilePosition tilePosition, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean issueIfNotMoving) {
+        if (!UnitUtils.isValidUnit(unit)) {
+            return false;
+        }
+        if (!PositionUtils.isValidTilePosition(tilePosition)) {
+            return false;
+        }
+        if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+            return false;
+        }
+        if (notIssueOnAttackFrame && unit.isAttackFrame()) {
+            return false;
+        }
+
+        if (issueIfNotMoving && !unit.isMoving()) {
+            return true;
+        }
+        UnitCommand currentCommand = unit.getLastCommand();
+        if (currentCommand.getUnitCommandType() == commandType) {
+            if (currentCommand.getTargetPosition().equals(tilePosition)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

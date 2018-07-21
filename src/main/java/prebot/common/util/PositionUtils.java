@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Pair;
 import bwapi.Position;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
@@ -23,6 +24,11 @@ public class PositionUtils {
 	public static boolean isValidPosition(Position position) {
 		return position != Position.None && position != Position.Invalid && position != Position.Unknown && position.isValid();
 	}
+
+    /// 유효한 tileposition이면 true
+    public static boolean isValidTilePosition(TilePosition tilePosition) {
+        return tilePosition != TilePosition.None && tilePosition != TilePosition.Invalid && tilePosition != TilePosition.Unknown && tilePosition.isValid();
+    }
 
 	/// 유효한 지상 position이면 true
 	public static boolean isValidGroundPosition(Position position) {
