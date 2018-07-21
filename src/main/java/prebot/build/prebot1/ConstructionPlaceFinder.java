@@ -1126,11 +1126,11 @@ public class ConstructionPlaceFinder {
 	}
 	public void setTilesToAvoidSupply() {
 		
-		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
+//		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
 			
-			System.out.println("setTilesToAvoidSupply map is not UNKNOWN");
+//			System.out.println("setTilesToAvoidSupply map is not UNKNOWN");
 		
 			int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
 			int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
