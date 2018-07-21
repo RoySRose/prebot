@@ -562,6 +562,15 @@ public class UnitUtils {
 		}
 	}
 
+	public static int myUnitSupplyCount(UnitType... unitTypes) {
+		int totalCount = 0;
+		for (UnitType unitType : unitTypes) {
+			int unitCount = UnitUtils.getUnitCount(unitType);
+			totalCount += unitCount * unitType.supplyRequired();
+		}
+		return totalCount;
+	}
+	
 	public static int myFactoryUnitSupplyCount() {
 		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
 				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);

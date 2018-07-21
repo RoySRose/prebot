@@ -59,6 +59,7 @@ public class PositionFinder {
 
 	/// 주둔지
 	private Position getCampPosition() {
+		int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		int factorySupplyCount = UnitUtils.myFactoryUnitSupplyCount();
 		
 		int enemyGroundUnitSupplyCount = 0;
@@ -108,28 +109,29 @@ public class PositionFinder {
 			}
 		}
 
-//		System.out.println("facto : " + factorySupplyCount);
-//		System.out.println("enemy : " + enemyGroundUnitSupplyCount);
-//		System.out.println("########################################################");
+		System.out.println("facto : " + factorySupplyCount);
+		System.out.println("enemy : " + enemyGroundUnitSupplyCount);
+		System.out.println("########################################################");
 		
 		// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 		if (firstExpansionDetectingOk) {
-			int SECOND_CHOKE_MARGIN = 18 * 4; // TODO 추후 상수로 변경
-			int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
+			int SECOND_CHOKE_MARGIN = 20 * 4; // TODO 추후 상수로 변경
+			int FIRST_EXPANSION_MARGIN = 15 * 4; // TODO 추후 상수로 변경
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 				SECOND_CHOKE_MARGIN = 3 * 4;
 				FIRST_EXPANSION_MARGIN = 1 * 4;
-			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC) || firstExpansionOccupied()) {
-				SECOND_CHOKE_MARGIN = 10 * 4;
-				FIRST_EXPANSION_MARGIN = 5 * 4;
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) {
+				SECOND_CHOKE_MARGIN = 8 * 4;
+				FIRST_EXPANSION_MARGIN = 4 * 4;
 			}
-			
 			// 병력이 쌓였다면 second choke에서 방어한다.
-			if (factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
+			if (myTankSupplyCount >= 10 * 4
+					|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
 				return InfoUtils.mySecondChoke().getCenter();
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-			if (factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
+			if (myTankSupplyCount >= 5 * 4
+					|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 				return firstExpansionBackwardPosition();
 			}
 		}
@@ -354,7 +356,7 @@ public class PositionFinder {
 		Position myBasePosition = InfoUtils.myBase().getPosition();
 		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
 
-		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 200);
+		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 220);
 		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
 			return firstChokeDefensePosition;
 		} else {

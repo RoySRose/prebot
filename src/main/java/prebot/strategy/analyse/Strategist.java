@@ -9,7 +9,8 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions.Mission;
+import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -55,21 +56,31 @@ public abstract class Strategist {
 	}
 
 	private boolean phase02End() {
-		//TODO 빠른공격시에는 후퇴시 종료, 안전방어시에는  방어성공시 종료
-		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
-		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
-		}
-		
 		if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
+			System.out.println("TIME COMPLETE");
 			return true;
 		}
+
+		// default mission;
 		if (UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
 			return false;
 		}
-		if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
-			return false;
+		if (!StrategyIdea.currentStrategy.missionTypeList.isEmpty()) {
+			for (MissionType missionType : StrategyIdea.currentStrategy.missionTypeList) {
+				if (!Mission.complete(missionType)) {
+					return false;
+				}
+			}
+			System.out.println("MISSION COMPLETE");
+			return true;
+			
+		} else {
+			if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
+				return false;
+			}
+			System.out.println("DEFAULT MISSION COMPLETE");
+			return true;
 		}
-		return true;
 	}
 
 	public boolean hasInfo(ClueInfo info) {

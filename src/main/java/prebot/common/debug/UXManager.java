@@ -1441,6 +1441,7 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "ADDON     : " + StrategyIdea.addOnOption);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "EXPANSION : " + StrategyIdea.expansionOption);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "WRAITH CNT : " + StrategyIdea.wraithCount);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MISSION    : " + strategy.missionTypeList);
 		Prebot.Broodwar.drawTextScreen(20, y += 20, UxColor.CHAR_YELLOW + "" + strategy.buildTimeMap);
 		
 		Prebot.Broodwar.drawTextScreen(20, 260, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());

@@ -7,12 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import bwapi.Position;
 import bwapi.TechType;
+import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
 
 public class EnemyStrategyOptions {
 	
@@ -76,6 +83,62 @@ public class EnemyStrategyOptions {
 				}
 			}
 			return upgradeOrderList;
+		}
+	}
+	
+	public static class Mission {
+		public static enum MissionType {
+			NO_ENEMY, NO_AIR_ENEMY, DETECT_OK, VULTURE, TANK, GOLIATH, RETREAT
+		}	
+		
+		public static List<MissionType> missions(MissionType... missions) {
+			List<MissionType> missionList = new ArrayList<>();
+			for (MissionType mission : missions) {
+				missionList.add(mission);
+			}
+			return missionList;
+		}
+		
+		public static boolean complete(MissionType mission) {
+			switch (mission) {
+			case NO_ENEMY:
+				return StrategyIdea.enemyGroundSquadPosition != Position.Unknown;
+			case NO_AIR_ENEMY:
+				return StrategyIdea.enemyAirSquadPosition != Position.Unknown;
+			case DETECT_OK:
+				boolean comsatReady = false;
+				List<Unit> comsatList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+				int totalComsatEnergy = 0;
+				for (Unit comsat : comsatList) {
+					totalComsatEnergy += comsat.getEnergy();
+					if (totalComsatEnergy > 99) {
+						comsatReady = true;
+						break;
+					}
+				}
+				boolean baseTurretOk = false;
+				boolean expansionTurretOk = false;
+				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
+				for (Unit turret : turretList) {
+					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_BASE) {
+						baseTurretOk = true;
+					}
+					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+						expansionTurretOk = true;
+					}
+				}
+				return comsatReady && baseTurretOk && expansionTurretOk;
+				
+			case VULTURE:
+				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 5;
+			case TANK:
+				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
+			case GOLIATH:
+				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
+			case RETREAT:
+				return !StrategyIdea.mainSquadMode.isAttackMode;
+			}
+			return true;
 		}
 	}
 	

@@ -44,26 +44,25 @@ public class WatcherControl extends Control {
 	
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		Position fleePosition = null;
+		Position fleePosition = StrategyIdea.mainSquadCenter;
+		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
 			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
 			Unit closeTurret = UnitUtils.getClosestUnitToPosition(turretList, StrategyIdea.mainSquadCenter);
 			if (closeTurret != null) {
 				fleePosition = closeTurret.getPosition();
+				coverRadius = 50;
 			}
-		}
-		if (fleePosition == null) {
-			fleePosition = StrategyIdea.mainSquadCenter;
 		}
 		
 		if (regroupLeader != null) {
-			regroup(unitList, euiList, fleePosition);
+			regroup(unitList, euiList, fleePosition, coverRadius);
 		} else {
-			fight(unitList, euiList, fleePosition);	
+			fight(unitList, euiList, fleePosition, coverRadius);	
 		}
 	}
 
-	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition) {
+	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition, int coverRadius) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
@@ -92,7 +91,7 @@ public class WatcherControl extends Control {
 					if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
 						CommandUtils.holdPosition(unit);
 					} else {
-						if (unit.getDistance(fleePosition) < StrategyIdea.mainSquadCoverRadius) {
+						if (unit.getDistance(fleePosition) < coverRadius) {
 							if (otherMechanics.size() >= 10) {
 								MicroUtils.kiting(unit, decision.eui, kOptionMainBattle);
 							} else if (otherMechanics.size() >= 3) {
@@ -126,7 +125,7 @@ public class WatcherControl extends Control {
 	}
 
 	/// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
-	private void regroup(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition) {
+	private void regroup(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition, int coverRadius) {
 		int regroupRadius = Math.min(UnitType.Terran_Vulture.sightRange() + unitList.size() * 80, 1000);
 //		System.out.println("regroupRadius : " + regroupRadius);
 		
@@ -135,7 +134,7 @@ public class WatcherControl extends Control {
 			if (skipControl(unit)) {
 				continue;
 			}
-			if (unit.getDistance(fleePosition) < StrategyIdea.mainSquadCoverRadius) {
+			if (unit.getDistance(fleePosition) < coverRadius) {
 				fightUnitList.add(unit);
 				continue;
 			}
@@ -147,7 +146,7 @@ public class WatcherControl extends Control {
 		}
 		
 		if (!fightUnitList.isEmpty()) {
-			fight(fightUnitList, euiList, fleePosition);
+			fight(fightUnitList, euiList, fleePosition, coverRadius);
 		}
 		
 	}
