@@ -15,7 +15,13 @@ public abstract class Control {
 			control(unitList, euiList);
 		}
 	}
-	
+
+	public void controlIfUnitMoreThanTwo(List<Unit> unitList, List<UnitInfo> euiList) {
+		if (unitList.size() > 1) {
+			control(unitList, euiList);
+		}
+	}
+		
 	public abstract void control(List<Unit> unitList, List<UnitInfo> euiList);
 	
 	protected boolean skipControl(Unit unit) {
