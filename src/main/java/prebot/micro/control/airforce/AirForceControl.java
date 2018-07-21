@@ -32,16 +32,15 @@ public class AirForceControl extends Control {
 		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(wraithList.get(0).getID());
 		DecisionMaker decisionMaker = new DecisionMaker(new WraithTargetCalculator());
 
-		// 결정: 유닛공격(방어기지 안 또는 바깥쪽의 적), 전진, 후퇴
-		// * 유닛공격 - 제압가능한 공격유닛 공격 OR SCV, 탱크 등 학살
+		// 결정: 도망(유닛), 공격(유닛), 카이팅(유닛), 클로킹, 이동
 		Decision decision = null;
 		if (!airForceTeam.retreating()) {
-			decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList);
+			decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList, AirForceManager.Instance().getStrikeLevel());
 		} else {
 			decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
 		}
 
-		// 결정상세(유닛공격, 전진): 쿨타임 및 적유닛타입에 따른 공격, 뭉치기, 카이팅방향 결정
+		// 결정상세(공격, 카이팅, 이동): 공격, 뭉치기, 카이팅
 		Decision decisionDetail = null;
 		if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, Arrays.asList(decision.eui), false);
@@ -49,6 +48,7 @@ public class AirForceControl extends Control {
 			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, euiList, true);
 		}
 
+		System.out.println("decision: " + decision + " / " + decisionDetail);
 		this.applyAirForceDecision(airForceTeam, decision, decisionDetail);
 
 		if (decisionDetail != null) {
@@ -110,17 +110,17 @@ public class AirForceControl extends Control {
 	private void applyAirForceDecision(AirForceTeam airForceTeam, Decision decision, Decision decisionDetail) {
 		Position airDrivingPosition = null;
 		if (decision.type == DecisionType.ATTACK_UNIT) {
-			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
-					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
-				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // 가까운 base로 변경
+			if (decisionDetail.type == DecisionType.KITING_UNIT &&
+					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
+				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // kiting
 			} else {
 				airDrivingPosition = airForceTeam.leaderUnit.getPosition();
 			}
 
 		} else if (decision.type == DecisionType.KITING_UNIT) {
-			if (decisionDetail.type == DecisionType.FLEE_FROM_POSITION &&
-					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) { // kiting
-				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // 가까운 base로 변경
+			if (decisionDetail.type == DecisionType.KITING_UNIT &&
+					(decision.eui.getType().airWeapon() != WeaponType.None && decision.eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange())) {
+				airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // kiting
 			} else {
 				airDrivingPosition = decision.eui.getLastPosition();
 			}
@@ -134,7 +134,6 @@ public class AirForceControl extends Control {
 		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 			airForceTeam.retreat(decision.eui);
 			airDrivingPosition = airFeePosition(airForceTeam, airForceTeam.driveAngle);
-//			airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), Angles.AIR_FORCE_FREE);
 		}
 		airForceTeam.leaderOrderPosition = airDrivingPosition;
 	}

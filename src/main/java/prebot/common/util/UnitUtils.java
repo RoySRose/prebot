@@ -232,6 +232,9 @@ public class UnitUtils {
 			if (onlyCombatUnit && !MicroUtils.combatEnemyType(eui.getType())) {
 				continue;
 			}
+			if (ignorableEnemyUnitInfo(eui)) {
+				continue;
+			}
 			
 			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			
@@ -250,9 +253,6 @@ public class UnitUtils {
 			}
 			
 			if (eui.getLastPosition().getDistance(position) > radius + weaponRange) {
-				continue;
-			}
-			if (ignorableEnemyUnitInfo(eui)) {
 				continue;
 			}
 			euiList.add(eui);

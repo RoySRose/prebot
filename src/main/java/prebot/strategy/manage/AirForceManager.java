@@ -22,6 +22,7 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AirForceManager {
@@ -30,6 +31,7 @@ public class AirForceManager {
 		public static final int CRITICAL_SPOT = 3; // 때리면 죽는 곳 공격 (터렛건설중인 SCV, 아모리 건설중인 SCV, 엔지니어링베이 건설중인 SCV)
 		public static final int SORE_SPOT = 2; // 때리면 아픈 곳 공격 (커맨드센터건설중인 SCV, 팩토리 건설중인 SCV, 뭔가 건설중인 SCV, 체력이 적은 SCV, 가까운 SCV, 탱크)
 		public static final int POSSIBLE_SPOT = 1; // 때릴 수 있는 곳 공격 (벌처, 건물 등 잡히는 대로)
+		public static final int DEFENSE_MODE = 0;
 	}
 
 	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
@@ -82,6 +84,7 @@ public class AirForceManager {
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
 	private int achievementEffectiveFrame = 0;
 	private int accumulatedAchievement = 0;
+	private boolean airForceDefenseMode = false;
 
 	public List<Position> getTargetPositions() {
 		return targetPositions;
@@ -110,11 +113,11 @@ public class AirForceManager {
 	}
 
 	private void setTargetPosition() {
-//		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown
-//				|| StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
-//			setTargetPosition(true);
-//			return;
-//		}
+		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown
+				|| StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
+			setTargetPosition(true);
+			return;
+		}
 		
 		BaseLocation enemyBase = InfoUtils.enemyBase();
 		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
@@ -143,9 +146,12 @@ public class AirForceManager {
 		targetPositions.clear();
 
 		if (defensivePosition) {
+			airForceDefenseMode = true;
 			setDefensivePosition();
-			this.retreatPosition = StrategyIdea.campPosition;
+			this.retreatPosition = StrategyIdea.campPosition;	
+			
 		} else {
+			airForceDefenseMode = false;
 			setOffensivePosition();
 			setRetreatPositionForUseMapSetting();
 		}
@@ -155,14 +161,14 @@ public class AirForceManager {
 	}
 
 	private void setDefensivePosition() {
-		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown) {
-			targetPositions.add(StrategyIdea.enemyGroundSquadPosition);
-		}
-		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
-			targetPositions.add(StrategyIdea.enemyAirSquadPosition);
-		}
+//		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+//			targetPositions.add(StrategyIdea.enemyAirSquadPosition);
+//		}
+//		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown) {
+//			targetPositions.add(StrategyIdea.enemyGroundSquadPosition);
+//		}
 		targetPositions.add(StrategyIdea.mainSquadCenter);
-		targetPositions.add(StrategyIdea.mainPosition);
+//		targetPositions.add(StrategyIdea.mainPosition);
 	}
 
 	private void setOffensivePosition() {
@@ -306,6 +312,12 @@ public class AirForceManager {
 	}
 
 	private void adjustStrikeLevel() {
+		if (airForceDefenseMode) {
+			strikeLevel = StrikeLevel.DEFENSE_MODE;
+			return;
+		}
+		
+		// TODO 디버깅용 코드 추후 삭제 필요
 		if (disabledAutoAdjustment) {
 			return;
 		}
@@ -348,6 +360,8 @@ public class AirForceManager {
 			if (achievementEffectiveFrame >= 100) {
 				levelUp = true;
 			}
+		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
+			levelUp = true;
 		}
 		
 		if (levelDown) {

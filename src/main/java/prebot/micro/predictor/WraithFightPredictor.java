@@ -13,7 +13,7 @@ import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 public class WraithFightPredictor {
 
 	private static final int POWER_WRAITH = 100;
-	private static final int POWER_CLOAKING = 200;
+	private static final int POWER_CLOAKING = 300;
 	private static final Map<UnitType, Integer> WRAITH_TARGET = new HashMap<>();
 	
 	static {

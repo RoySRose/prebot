@@ -18,6 +18,7 @@ import prebot.micro.targeting.WraithTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyConfig;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceManager.StrikeLevel;
 import prebot.strategy.manage.AirForceTeam;
@@ -107,10 +108,10 @@ public class DecisionMaker {
 		return decision;
 	}
 
-	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, List<UnitInfo> euiList) {
+	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, List<UnitInfo> euiList, int strikeLevel) {
 		int wraithMemorySeconds = 3;
-		if (AirForceManager.Instance().getStrikeLevel() < StrikeLevel.SORE_SPOT) {
-			wraithMemorySeconds = 15;
+		if (strikeLevel < StrikeLevel.SORE_SPOT) {
+			wraithMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}
 		
 		List<UnitInfo> euiListAirDefenseBuilding = new ArrayList<>();
@@ -309,7 +310,7 @@ public class DecisionMaker {
 				}
 			}
 			if (targetInfo != null) {
-				decisionDetail  = Decision.attackUnit(airForceTeam.leaderUnit, targetInfo);
+				decisionDetail = Decision.attackUnit(airForceTeam.leaderUnit, targetInfo); // 유닛 공격
 			}
 		}
 		
@@ -328,12 +329,12 @@ public class DecisionMaker {
 				averageDistance = sumOfDistance / (memberSize - 1);
 			}
 			if (averageDistance > 5) {
-				decisionDetail = Decision.unite(airForceTeam.leaderUnit);
+				decisionDetail = Decision.unite(airForceTeam.leaderUnit); // 뭉치기
 			} else {
 				if (allUnitCoolTimeReady) {
-					decisionDetail = Decision.attackPosition(airForceTeam.leaderUnit);
+					decisionDetail = Decision.attackPosition(airForceTeam.leaderUnit); // 이동
 				} else {
-					decisionDetail = Decision.fleeFromPosition(airForceTeam.leaderUnit);
+					decisionDetail = Decision.kitingUnit(airForceTeam.leaderUnit, null); // 카이팅 eui 정보는 decision에 저장된게 있다.
 				}
 			}
 		}

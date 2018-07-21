@@ -134,6 +134,11 @@ public class AirForceTeam {
 	}
 
 	public void changeTargetIndex() {
+		if (AirForceManager.airForceTargetPositionSize <= 1) {
+			currentTargetIndex = 0;
+			return;
+		}
+		
 		targetTryCount = 0;
 		int foundCount = AirForceManager.airForceTargetPositionSize;
 		while (foundCount > 0) {

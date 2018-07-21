@@ -69,9 +69,9 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_1FAC_1STAR;
 		}
 		
-		if (hasInfo(ClueInfo.FAST_THREE_WRAITH)) {
+		if (hasAnyInfo(ClueInfo.FAST_THREE_WRAITH, ClueInfo.FAST_TWO_WRAITH)) {
 			return EnemyStrategy.TERRAN_2STAR;
-		} else if (hasAnyInfo(ClueInfo.FAST_TWO_WRAITH, ClueInfo.FAST_ONE_WRAITH)) {
+		} else if (hasAnyInfo(ClueInfo.FAST_ONE_WRAITH)) {
 			if (hasInfo(ClueInfo.STARPORT_TWO)) {
 				return EnemyStrategy.TERRAN_2STAR;
 			} else {
