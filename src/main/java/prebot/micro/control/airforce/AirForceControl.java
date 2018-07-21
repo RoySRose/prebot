@@ -48,7 +48,7 @@ public class AirForceControl extends Control {
 			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, euiList, true);
 		}
 
-		System.out.println("decision: " + decision + " / " + decisionDetail);
+//		System.out.println("decision: " + decision + " / " + decisionDetail);
 		this.applyAirForceDecision(airForceTeam, decision, decisionDetail);
 
 		if (decisionDetail != null) {
