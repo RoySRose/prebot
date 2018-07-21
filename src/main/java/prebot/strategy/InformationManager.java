@@ -71,7 +71,9 @@ public class InformationManager extends GameManager {
 //	private int MainBaseSuppleLimit;
 	private Unit FirstCC;
 	private boolean blockingEnterance;
-	
+    public int barrackStart;
+    public Unit firstBarrack;
+
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
 	/// 건물 여부를 기준으로 파악하기 때문에 부적절하게 판단할수도 있습니다 
@@ -145,6 +147,8 @@ public class InformationManager extends GameManager {
 		checkGasRush = true;
 		photonRushed = false;
 		blockingEnterance = false;
+        barrackStart = -1;
+        firstBarrack = null;
 //		MainBaseSuppleLimit =0;
 		
 		for (Unit unit : Prebot.Broodwar.self().getUnits()){
@@ -268,6 +272,7 @@ public class InformationManager extends GameManager {
 
 		updateFirstScout();
 		updateFirstVulture();
+		updateFirstBarrack();
 		
 		if(checkGasRush == true){
 			
@@ -1781,7 +1786,16 @@ public class InformationManager extends GameManager {
 			}
 		}
 	}
-	
+
+    private void updateFirstBarrack() {
+        if (barrackStart == -1) {
+            List<Unit> barrack = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
+            if (!barrack.isEmpty() ) {
+                barrackStart = Prebot.Broodwar.getFrameCount();
+                firstBarrack = barrack.get(0);
+            }
+        }
+    }
 	
 	public int baseToBaseFrame(UnitType unitType) {
 		
