@@ -31,6 +31,7 @@ public class BuilderMarine extends DefaultBuildableItem {
         super(metaType);
     }
     
+    public boolean liftChecker = false;
 
     public final boolean buildCondition(){
     	
@@ -38,6 +39,16 @@ public class BuilderMarine extends DefaultBuildableItem {
     		return false;
     	}
     	
+    	List<Unit> barracks = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
+		for(Unit unit : barracks) {
+			if(!unit.isLifted()) {
+				liftChecker = true;
+			}
+		}
+
+    	if(liftChecker) {
+    		return false;
+    	}
 //    	liftChecker = false;
     	
     	

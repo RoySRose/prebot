@@ -93,12 +93,13 @@ public class BlockingEntrance {
 
 
 
-        //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
-
+      //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
         mapName = Map.CIRCUITBREAKER;
         if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPRIRITS) {
         	mapName = Map.FIGHTING_SPRIRITS;
-        } 
+        }else {
+        	mapName = Map.UNKNOWN;
+        }
         //System.out.println("this map ==>> " + map.toString());
 
         Location loc = Location.START;
@@ -107,17 +108,35 @@ public class BlockingEntrance {
                 && starting.getY() < SMALL){
             loc = Location.Eleven;
         }
-
+        if(SMALL < starting.getX()  && starting.getX() < BIG
+                && starting.getY() < SMALL){
+            loc = Location.Twelve;
+        }
         if(BIG < starting.getX()
                 && starting.getY() < SMALL){
             loc = Location.One;
         }
-
+        if(starting.getX() < SMALL
+                && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Nine;
+        }
+        //center
+        if(SMALL < starting.getX()  && starting.getX() < BIG
+                 && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Twelve;
+        }
+        if(BIG < starting.getX()
+                && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Three;
+        }
         if(starting.getX() < SMALL
                 && starting.getY() > SMALL){
             loc = Location.Seven;
         }
-
+       if(SMALL < starting.getX()  && starting.getX() < BIG
+                && starting.getY() > SMALL){
+            loc = Location.Six;
+        }
         if(BIG < starting.getX()
                 && starting.getY() > SMALL){
             loc = Location.Five;
@@ -380,6 +399,45 @@ public class BlockingEntrance {
 
     			
     		}
+    		
+    	}else {
+    		
+    		System.out.println("맵 ==>> UNKNOWN");
+    		
+    		
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.SUPPLY_AREA), TilePosition.None);         
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.SUPPLY_AREA), TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.SUPPLY_AREA), TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.SUPPLY_AREA), TilePosition.None);
+
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.FIRST_SUPPLY)     , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.BARRACK)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.SECOND_SUPPLY)    , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.FACTORY)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.BUNKER)   		     , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.ENTRANCE_TURRET), TilePosition.None);
+
+
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.FIRST_SUPPLY)    , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.BARRACK)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.SECOND_SUPPLY)   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.FACTORY)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.BUNKER)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Five, Building.ENTRANCE_TURRET), TilePosition.None);
+
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.FIRST_SUPPLY)   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.BARRACK)   		 , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.SECOND_SUPPLY)  , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.FACTORY)   		 , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.BUNKER)   		   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Seven, Building.ENTRANCE_TURRET), TilePosition.None);
+
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.FIRST_SUPPLY)   , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.BARRACK)   		  , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.SECOND_SUPPLY)  , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.FACTORY)   		  , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.BUNKER)   		  , TilePosition.None);
+    		postitionStorage.put(combine(Map.UNKNOWN, Location.Eleven, Building.ENTRANCE_TURRET), TilePosition.None);
     		
     	}
 
