@@ -94,9 +94,11 @@ public class BlockingEntrance {
 
 
       //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
-        mapName = Map.CIRCUITBREAKER;
+//        mapName = Map.CIRCUITBREAKER;
         if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPRIRITS) {
         	mapName = Map.FIGHTING_SPRIRITS;
+        }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+        	mapName = Map.CIRCUITBREAKER;
         }else {
         	mapName = Map.UNKNOWN;
         }
@@ -151,6 +153,8 @@ public class BlockingEntrance {
         supply_area = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
         
         loc_t = loc;
+        
+        System.out.println("this location ==>>>>  " + loc);
         
     }
 
@@ -446,25 +450,64 @@ public class BlockingEntrance {
 	public final TilePosition getSupplyPosition(TilePosition tilepos)
 	{
 		
+//		Location loc = Location.START;
+//
+//        if(tilepos.getX() < SMALL
+//                && tilepos.getY() < SMALL){
+//            loc = Location.Eleven;
+//        }
+//
+//        if(BIG < tilepos.getX()
+//                && tilepos.getY() < SMALL){
+//            loc = Location.One;
+//        }
+//     
+//        if(tilepos.getX() < SMALL
+//                && tilepos.getY() > SMALL){
+//            loc = Location.Seven;
+//        }
+//
+//        if(BIG < tilepos.getX()
+//                && tilepos.getY() > SMALL){
+//            loc = Location.Five;
+//        }
 		Location loc = Location.START;
 
-        if(tilepos.getX() < SMALL
-                && tilepos.getY() < SMALL){
+        if(starting.getX() < SMALL
+                && starting.getY() < SMALL){
             loc = Location.Eleven;
         }
-
-        if(BIG < tilepos.getX()
-                && tilepos.getY() < SMALL){
+        if(SMALL < starting.getX()  && starting.getX() < BIG
+                && starting.getY() < SMALL){
+            loc = Location.Twelve;
+        }
+        if(BIG < starting.getX()
+                && starting.getY() < SMALL){
             loc = Location.One;
         }
-     
-        if(tilepos.getX() < SMALL
-                && tilepos.getY() > SMALL){
+        if(starting.getX() < SMALL
+                && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Nine;
+        }
+        //center
+        if(SMALL < starting.getX()  && starting.getX() < BIG
+                 && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Twelve;
+        }
+        if(BIG < starting.getX()
+                && SMALL < starting.getY()  && starting.getY() < BIG){
+            loc = Location.Three;
+        }
+        if(starting.getX() < SMALL
+                && starting.getY() > SMALL){
             loc = Location.Seven;
         }
-
-        if(BIG < tilepos.getX()
-                && tilepos.getY() > SMALL){
+       if(SMALL < starting.getX()  && starting.getX() < BIG
+                && starting.getY() > SMALL){
+            loc = Location.Six;
+        }
+        if(BIG < starting.getX()
+                && starting.getY() > SMALL){
             loc = Location.Five;
         }
         
@@ -475,8 +518,13 @@ public class BlockingEntrance {
 	
 	public final TilePosition getSupplyPosition()
 	{
+		System.out.println("getSupplyPosition start");
+		System.out.println("getSupplyPosition mapName :: " + mapName);
+		System.out.println("getSupplyPosition loc_t :: " + loc_t);
+		System.out.println("getSupplyPosition SUPPLY_AREA :: " + Building.SUPPLY_AREA);
+		
 		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc_t, Building.SUPPLY_AREA));
-//		System.out.println(" supply_pos ==>>> ( " + supply_pos.getX() + " , " + supply_pos.getY() + " ) ");
+		System.out.println(" supply_pos end==>>> ( " + supply_pos.getX() + " , " + supply_pos.getY() + " ) ");
 		return supply_pos;
 	}
 }
