@@ -11,6 +11,8 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.MyBotModule;
+import prebot.common.main.Prebot;
+import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
@@ -76,17 +78,17 @@ public abstract class BuildingFlyControl extends Control{
     }
 
     public void executeFly(List<Unit> unitList, List<UnitInfo> euiList){
-        for(Unit units : unitList){
+        for(Unit unit : unitList){
 
-            if(!units.isFlying() && getBuildingFly() == BuildingFly.UP){
-                units.lift();
-            }else if(units.isFlying() && getBuildingFly() == BuildingFly.DOWN){
+            if(!unit.isFlying() && getBuildingFly() == BuildingFly.UP){
+                CommandUtils.lift(unit);
+            }else if(unit.isFlying() && getBuildingFly() == BuildingFly.DOWN){
                 if(landPosition != TilePosition.None) {
-                    units.land(landPosition);
+                    CommandUtils.land(unit, landPosition);
                 }
-            }else if(units.isFlying() && getBuildingFly() == BuildingFly.UP){
+            }else if(unit.isFlying() && getBuildingFly() == BuildingFly.UP){
                 if(flyPosition != Position.None) {
-                    units.move(flyPosition);
+                    CommandUtils.move(unit, flyPosition);
                 }
             }
         }
@@ -95,14 +97,19 @@ public abstract class BuildingFlyControl extends Control{
     public abstract void checkFlyCondition();
 
     public final void setDefaultBuildingFly(List<Unit> unitList) {
+
         if(flyAlways){
             this.buildingFly = BuildingFly.UP;
         }else {
             if (isGateway) {
-                if (checkEnemyNearBy(unitList) || marinInBuildManager()) {
+                if (Prebot.Broodwar.self().getRace() == Race.Zerg) {
                     buildingFly = BuildingFly.DOWN;
-                } else {
-                    buildingFly = BuildingFly.UP;
+                }else{
+                    if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
+                        buildingFly = BuildingFly.UP;
+                    } else {
+                        buildingFly = BuildingFly.DOWN;
+                    }
                 }
             } else {
                 buildingFly = BuildingFly.DOWN;
