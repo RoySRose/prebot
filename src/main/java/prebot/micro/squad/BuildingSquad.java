@@ -48,23 +48,23 @@ public class BuildingSquad extends Squad {
 		
 		List<Unit> barracksList = unitListMap.getOrDefault(UnitType.Terran_Barracks, new ArrayList<Unit>());
 		List<UnitInfo> barracksEuiList = findEnemies(barracksList);
-		barracksControl.control(barracksList, barracksEuiList);
+		barracksControl.controlIfUnitExist(barracksList, barracksEuiList);
 		
 		List<Unit> engineeringBayList = unitListMap.getOrDefault(UnitType.Terran_Engineering_Bay, new ArrayList<Unit>());
 		List<UnitInfo> engineeringBayEuiList = findEnemies(engineeringBayList);
-		engineeringBayControl.control(engineeringBayList, engineeringBayEuiList);
+		engineeringBayControl.controlIfUnitExist(engineeringBayList, engineeringBayEuiList);
 		
 		List<Unit> commandCenterList = unitListMap.getOrDefault(UnitType.Terran_Command_Center, new ArrayList<Unit>());
 		List<UnitInfo> commandCenterEuiList = findEnemies(commandCenterList);
-		commandCenterControl.control(commandCenterList, commandCenterEuiList);
+		commandCenterControl.controlIfUnitMoreThanTwo(commandCenterList, commandCenterEuiList);
 		
 		List<Unit> scienceFacilityList = unitListMap.getOrDefault(UnitType.Terran_Science_Facility, new ArrayList<Unit>());
 		List<UnitInfo> scienceFacilityEuiList = findEnemies(scienceFacilityList);
-		scienceFacilityControl.control(scienceFacilityList, scienceFacilityEuiList);
+		scienceFacilityControl.controlIfUnitExist(scienceFacilityList, scienceFacilityEuiList);
 		
 		List<Unit> combatList = unitListMap.getOrDefault(UnitType.Terran_Comsat_Station, new ArrayList<Unit>());
 		List<UnitInfo> comsatEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE);
-		comsatControl.control(combatList, comsatEuiList);
+		comsatControl.controlIfUnitExist(combatList, comsatEuiList);
 	}
 	
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {
