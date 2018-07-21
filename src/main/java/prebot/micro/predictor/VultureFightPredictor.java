@@ -26,6 +26,7 @@ public class VultureFightPredictor {
 	private static final int BONUS_HYDRA_SPEED = 10;
 	private static final int BONUS_HYDRA_RANGE = 10;
 	private static final int BONUS_LURKER_BURROWED = 300;
+	private static final int BONUS_DARK_UNDETECTED = 500;
 	
 	private static final int BONUS_ZEALOT_SPEED = 10;
 	private static final int BONUS_DRAGOON_RANGE = 30;
@@ -178,6 +179,10 @@ public class VultureFightPredictor {
 					enemyPower += BONUS_DRAGOON_RANGE;
 				}
 				enemyPower += hitPointsAndShields; // 80 + 100
+			} else if (unitType == UnitType.Protoss_Dark_Templar) {
+				if (enemyUnit != null && !enemyUnit.isDetected()) {
+					enemyPower += BONUS_DARK_UNDETECTED;
+				}
 			}
 			
 		} else if (InformationManager.Instance().enemyRace == Race.Terran) {

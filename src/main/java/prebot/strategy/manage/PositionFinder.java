@@ -114,7 +114,7 @@ public class PositionFinder {
 		
 		// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 		if (firstExpansionDetectingOk) {
-			int SECOND_CHOKE_MARGIN = 15 * 4; // TODO 추후 상수로 변경
+			int SECOND_CHOKE_MARGIN = 18 * 4; // TODO 추후 상수로 변경
 			int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 				SECOND_CHOKE_MARGIN = 3 * 4;

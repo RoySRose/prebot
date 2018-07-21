@@ -24,6 +24,7 @@ import prebot.micro.control.Control;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.SpiderMineManger;
 
@@ -43,20 +44,32 @@ public class WatcherControl extends Control {
 	
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+		Position fleePosition = null;
+		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
+			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
+			Unit closeTurret = UnitUtils.getClosestUnitToPosition(turretList, StrategyIdea.mainSquadCenter);
+			if (closeTurret != null) {
+				fleePosition = closeTurret.getPosition();
+			}
+		}
+		if (fleePosition == null) {
+			fleePosition = StrategyIdea.mainSquadCenter;
+		}
+		
 		if (regroupLeader != null) {
-			regroup(unitList, euiList);
+			regroup(unitList, euiList, fleePosition);
 		} else {
-			fight(unitList, euiList);	
+			fight(unitList, euiList, fleePosition);	
 		}
 	}
 
-	private void fight(List<Unit> unitList, List<UnitInfo> euiList) {
+	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-		
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
+
+		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
-		FleeOption fOptionMainBattle = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.WIDE);
+		FleeOption fOptionMainBattle = new FleeOption(fleePosition, true, Angles.WIDE);
 		KitingOption kOptionMainBattle = new KitingOption(fOptionMainBattle, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 		
 		List<Unit> otherMechanics = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
@@ -79,7 +92,7 @@ public class WatcherControl extends Control {
 					if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
 						CommandUtils.holdPosition(unit);
 					} else {
-						if (unit.getDistance(StrategyIdea.mainSquadCenter) < StrategyIdea.mainSquadCoverRadius) {
+						if (unit.getDistance(fleePosition) < StrategyIdea.mainSquadCoverRadius) {
 							if (otherMechanics.size() >= 10) {
 								MicroUtils.kiting(unit, decision.eui, kOptionMainBattle);
 							} else if (otherMechanics.size() >= 3) {
@@ -113,7 +126,7 @@ public class WatcherControl extends Control {
 	}
 
 	/// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
-	private void regroup(List<Unit> unitList, List<UnitInfo> euiList) {
+	private void regroup(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition) {
 		int regroupRadius = Math.min(UnitType.Terran_Vulture.sightRange() + unitList.size() * 80, 1000);
 //		System.out.println("regroupRadius : " + regroupRadius);
 		
@@ -122,7 +135,7 @@ public class WatcherControl extends Control {
 			if (skipControl(unit)) {
 				continue;
 			}
-			if (unit.getDistance(StrategyIdea.mainSquadCenter) < StrategyIdea.mainSquadCoverRadius) {
+			if (unit.getDistance(fleePosition) < StrategyIdea.mainSquadCoverRadius) {
 				fightUnitList.add(unit);
 				continue;
 			}
@@ -130,11 +143,11 @@ public class WatcherControl extends Control {
 				fightUnitList.add(unit);
 				continue;
 			}
-			CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
+			CommandUtils.move(unit, fleePosition);
 		}
 		
 		if (!fightUnitList.isEmpty()) {
-			fight(fightUnitList, euiList);
+			fight(fightUnitList, euiList, fleePosition);
 		}
 		
 	}
