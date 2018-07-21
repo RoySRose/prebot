@@ -18,6 +18,8 @@ import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.PositionUtils;
 import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation;
+import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {
@@ -1124,14 +1126,21 @@ public class ConstructionPlaceFinder {
 	}
 	public void setTilesToAvoidSupply() {
 		
-		int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
-		int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
+		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
 		
-		for(int x = 0; x < 9 ; x++){
-			for(int y = 0; y < 8 ; y++){
-				TilePosition t = new TilePosition(supply_x+x,supply_y+y);
-				tilesToAvoidSupply.add(t);
-				//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
+			
+			System.out.println("setTilesToAvoidSupply map is not UNKNOWN");
+		
+			int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
+			int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
+			
+			for(int x = 0; x < 9 ; x++){
+				for(int y = 0; y < 8 ; y++){
+					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+					tilesToAvoidSupply.add(t);
+					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+				}
 			}
 		}
 	}

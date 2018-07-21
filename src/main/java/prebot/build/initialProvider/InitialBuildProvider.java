@@ -26,7 +26,7 @@ public class InitialBuildProvider {
 	public boolean InitialBuildFinished = false;
 	
 	public void onStart() {
-//		System.out.println("InitialBuildProvider start");
+		System.out.println("InitialBuildProvider onStart start");
 		
 		
    	 
@@ -38,7 +38,7 @@ public class InitialBuildProvider {
         TilePosition factoryPos = BlockingEntrance.Instance().factory;
         TilePosition bunkerPos = BlockingEntrance.Instance().bunker;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
-        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
+//        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
@@ -47,6 +47,8 @@ public class InitialBuildProvider {
 		} else {
 			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
 		}
+		
+		System.out.println("InitialBuildProvider onStart end");
 	}
 
     public void updateInitialBuild(){
