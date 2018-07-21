@@ -122,7 +122,7 @@ public class PositionFinder {
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 				SECOND_CHOKE_MARGIN = 3 * 4;
 				FIRST_EXPANSION_MARGIN = 1 * 4;
-			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) {
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC) || firstExpansionOccupied()) {
 				SECOND_CHOKE_MARGIN = 8 * 4;
 				FIRST_EXPANSION_MARGIN = 4 * 4;
 			}

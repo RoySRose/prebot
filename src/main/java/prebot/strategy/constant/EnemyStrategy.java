@@ -227,7 +227,7 @@ public enum EnemyStrategy {
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()),
 	
-	TERRAN_2FAC(1, 1, 0, UpgradeOrder.get(FacUp.TS)
+	TERRAN_2FAC(0, 2, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2FAC()),
 	
@@ -235,7 +235,7 @@ public enum EnemyStrategy {
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_1FAC_1STAR()),
 	
-	TERRAN_2STAR(1, 1, 0, UpgradeOrder.get(FacUp.TS)
+	TERRAN_2STAR(0, 0, 1, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2STAR()),
 	

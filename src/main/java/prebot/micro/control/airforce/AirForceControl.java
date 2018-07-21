@@ -89,7 +89,7 @@ public class AirForceControl extends Control {
 				
 			}
 			// 전진 카이팅, 카이팅
-			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.FLEE_FROM_POSITION) {
+			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
 				for (Unit wraith : wraithList) {
 					wraith.rightClick(airForceTeam.leaderOrderPosition);
 				}
