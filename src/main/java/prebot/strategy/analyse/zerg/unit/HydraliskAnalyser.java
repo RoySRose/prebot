@@ -30,12 +30,20 @@ public class HydraliskAnalyser extends UnitAnalyser {
 				return;
 			}
 			
-			if (found.size() >= 3) {
+			if (found.size() >= 5) {
+				int lastUnitFoundFrame = lastUnitFoundFrame(found, 3);
+				int fiveHydraliskInMyRegionFrame = hydradenExpect + UnitType.Zerg_Hydralisk_Den.buildTime()
+					+ UnitType.Zerg_Hydralisk.buildTime() * 5 + baseToBaseFrame(UnitType.Zerg_Hydralisk) + 30 * TimeUtils.SECOND;
+				if (lastUnitFoundFrame < fiveHydraliskInMyRegionFrame) {
+					ClueManager.Instance().addClueInfo(ClueInfo.FIVE_MANY_HYDRA);
+				}
+				
+			} else if (found.size() >= 3) {
 				int lastUnitFoundFrame = lastUnitFoundFrame(found, 3);
 				int threeHydraliskInMyRegionFrame = hydradenExpect + UnitType.Zerg_Hydralisk_Den.buildTime()
 					+ UnitType.Zerg_Hydralisk.buildTime() + baseToBaseFrame(UnitType.Zerg_Hydralisk) + 30 * TimeUtils.SECOND;
 				if (lastUnitFoundFrame < threeHydraliskInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_MANY_HYDRA);
+					ClueManager.Instance().addClueInfo(ClueInfo.THREE_MANY_HYDRA);
 				}
 			} else {
 				int lastUnitFoundFrame = lastUnitFoundFrame(found, found.size());

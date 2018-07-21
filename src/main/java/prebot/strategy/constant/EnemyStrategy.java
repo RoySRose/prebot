@@ -169,6 +169,9 @@ public enum EnemyStrategy {
 	ZERG_FAST_LURKER(2, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_FAST_LURKER()),
 	
+	ZERG_HYDRA_WAVE(1, 1, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
+	
 	ZERG_NO_LAIR_LING(3, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_LING()),
 	

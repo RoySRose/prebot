@@ -55,10 +55,15 @@ public class ComsatControl extends Control {
 		}
 
 		Unit comsatToUse = null;
-		int usableEnergy = 50;		
+		int usableEnergy = 50;
 		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
 			usableEnergy = 150;
+		} else if (TimeUtils.afterTime(10, 0)) {
+			usableEnergy = 120;
+		} else if (TimeUtils.afterTime(7, 0)) {
+			usableEnergy = 90;
 		}
+		
 		for (Unit comsatStation : unitList) {
 			if (comsatStation.getEnergy() > usableEnergy) {
 				comsatToUse = comsatStation;

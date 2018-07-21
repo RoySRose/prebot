@@ -66,12 +66,17 @@ public class ZergStrategist extends Strategist {
 		if (hasAnyInfo(ClueInfo.LAIR_INCOMPLETE, ClueInfo.LAIR_COMPLETE)) {
 			boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
 			boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
-			boolean hydraMany = hasInfo(ClueInfo.FAST_MANY_HYDRA);
+			boolean hydraThreeMany = hasInfo(ClueInfo.THREE_MANY_HYDRA);
+			boolean hydraFiveMany = hasInfo(ClueInfo.FIVE_MANY_HYDRA);
 			boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
 			
-			if (spireTech && hydraTech && hydraMany) {
+			if (spireTech && hydraTech) {
 				return EnemyStrategy.ZERG_LAIR_MIXED;
-			} else if (lurkerFound || hydraTech) {
+			} else if (lurkerFound) {
+				return EnemyStrategy.ZERG_FAST_LURKER;
+			} else if (hydraThreeMany || hydraFiveMany) {
+				return EnemyStrategy.ZERG_HYDRA_WAVE;
+			} else if (hydraTech) {
 				return EnemyStrategy.ZERG_FAST_LURKER;
 			} else if (spireTech) {
 				return EnemyStrategy.ZERG_FAST_MUTAL;
