@@ -35,10 +35,10 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
 //    	frame으로 처리되어 있는 이유. initial이 끝난 후로 하면 되지 않나?
 //    	일단 기존 조건대로 처리. 셀렉터는 이니셜 빌드 이후에 도므로 아래 조건의 필요 유무 판단
     	
-    	if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
+    	/*if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
     		
     		return false;
-    	}
+    	}*/
 
         if (Prebot.Broodwar.self().supplyTotal() >= 400) {
             return false;
@@ -79,6 +79,10 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
         int supplyMargin = 4;
         boolean barrackflag = false;
         boolean factoryflag = false;
+        boolean starportflag = false;
+//        int barrackMargin = 4;
+//        int facMargin = 2;
+//        int satrportMargin = 2;
 
         
         if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) > 0) {
@@ -86,10 +90,14 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
         }
         
         if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0) {
-        	barrackflag = true;
+        	factoryflag = true;
         }
         
-        if(factoryflag==false){
+        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
+        	starportflag = true;
+        }
+        
+        /*if(factoryflag==false){
             for (Unit unit : Prebot.Broodwar.self().getUnits()) {
                 if (unit.getType() == UnitType.Terran_Factory  && unit.isCompleted()) {
                     factoryflag = true;
@@ -98,11 +106,16 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
                     barrackflag = true;
                 }
             }
-        }
+        }*/
 
         int Faccnt =0;
+        int Starportcnt =0;
         int CCcnt  = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
         int facFullOperating =0;
+        int starportOperating =0;
+        
+//        Factory 와 Starport 에서 유닛이 생산되는중인지 체크.
+//        기본적으로 유닛생산 건물수 만큼의 여유분이 있어야 하고, 현재 생산되고 있는 유닛만큼 여유분이 더 있어야 한다.
         
         List<Unit> factory = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
         for (Unit unit : factory)
@@ -114,12 +127,32 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
             }
 
         }
+        
+        List<Unit> starport = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+        for (Unit unit : starport)
+        {
+
+        	Starportcnt ++;
+            if(unit.isTraining() == true){
+            	starportOperating++;
+            }
+
+        }
 
         if(CCcnt == 1){//TODO 이거 현재는 faccnt cccnt 기준 안 먹는다. 기준 다시 잡아야됨
-            if(factoryflag==false && barrackflag==true){
-                supplyMargin = 5;
-            }else if(factoryflag==true){
-                supplyMargin = 6+4*Faccnt+facFullOperating*2;
+        	supplyMargin = 4;
+            if(barrackflag==true){
+                supplyMargin++;
+            }
+            if(factoryflag==true){
+                supplyMargin = supplyMargin+2+(4*Faccnt)+(facFullOperating*2);
+            }
+            if(starportflag==true){
+            	if(factoryflag==false) {
+            		supplyMargin = supplyMargin+2+(4*Starportcnt)+(starportOperating*2);
+            	}else {
+            		supplyMargin = supplyMargin+(4*Starportcnt)+(starportOperating*2);
+            	}
             }
         }else{ //if((MyBotModule.Broodwar.getFrameCount()>=6000 && MyBotModule.Broodwar.getFrameCount()<10000) || (Faccnt > 3 && CCcnt == 2)){
             supplyMargin = 11+4*Faccnt+facFullOperating*2;
