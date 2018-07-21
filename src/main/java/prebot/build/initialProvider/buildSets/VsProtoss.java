@@ -1,12 +1,9 @@
 package prebot.build.initialProvider.buildSets;
 
 
-import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.UnitType;
-import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
-import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 
@@ -29,7 +26,7 @@ public class VsProtoss extends BaseBuild{
 	        queueBuild(true, UnitType.Terran_Marine);
 	        queueBuild(true, UnitType.Terran_Supply_Depot, secondSupplyPos);
 	        queueBuild(true, UnitType.Terran_Factory, factoryPos);
-	        queueBuild(true, UnitType.Terran_Factory, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
+	        queueBuild(true, UnitType.Terran_Factory);
 	        queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 	        queueBuild(true, UnitType.Terran_Vulture);
 	        queueBuild(true, UnitType.Terran_Machine_Shop);

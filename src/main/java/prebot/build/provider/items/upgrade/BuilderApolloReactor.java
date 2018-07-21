@@ -21,6 +21,10 @@ public class BuilderApolloReactor extends DefaultBuildableItem {
   public final boolean buildCondition(){
   	boolean ApolloReactor = false;
   	
+  	if(BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Apollo_Reactor) == 0) {
+  		return false;
+  	}
+  	
   	ApolloReactor = (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1 ? true : false)
 				|| (Prebot.Broodwar.self().isUpgrading(UpgradeType.Apollo_Reactor) ? true : false);
   	
@@ -37,9 +41,7 @@ public class BuilderApolloReactor extends DefaultBuildableItem {
 		WraithCloacking = (Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) || (Prebot.Broodwar.self().isResearching(TechType.Cloaking_Field));
 		
   	if(WraithCloacking) {
-  		if(BuildManager.Instance().buildQueue.getItemCount(TechType.Cloaking_Field) == 0) {
-  			return true;
-  		}
+		return true;
   	}
 
       return false;
