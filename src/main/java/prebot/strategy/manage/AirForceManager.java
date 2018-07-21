@@ -340,7 +340,7 @@ public class AirForceManager {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
 			if (achievementEffectiveFrame <= -50) {
 				levelDown = true;
-			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 15 * TimeUtils.SECOND) {
+			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 8 * TimeUtils.SECOND) {
 				levelDown = true;
 			}
 			

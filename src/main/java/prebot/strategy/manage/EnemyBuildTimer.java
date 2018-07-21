@@ -116,7 +116,10 @@ public class EnemyBuildTimer {
 				StrategyIdea.turretBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
 				StrategyIdea.engineeringBayBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 			}
-			StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
+			
+			if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
+				StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
+			}
 			
 		} else {
 			int starportFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Terran_Starport);

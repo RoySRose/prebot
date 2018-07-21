@@ -1,5 +1,6 @@
 package prebot.strategy.manage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
@@ -11,6 +12,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
@@ -109,9 +111,9 @@ public class PositionFinder {
 			}
 		}
 
-		System.out.println("facto : " + factorySupplyCount);
-		System.out.println("enemy : " + enemyGroundUnitSupplyCount);
-		System.out.println("########################################################");
+//		System.out.println("facto : " + factorySupplyCount);
+//		System.out.println("enemy : " + enemyGroundUnitSupplyCount);
+//		System.out.println("########################################################");
 		
 		// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 		if (firstExpansionDetectingOk) {
@@ -212,8 +214,13 @@ public class PositionFinder {
 		int groundCount = 0;
 
 		Position myFirstExpansionPosition = InfoUtils.myFirstExpansion().getPosition();
-		List<UnitInfo> enemyUnitInfoList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
-		for (UnitInfo eui : enemyUnitInfoList) {
+
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		List<UnitInfo> closeEuiList = new ArrayList<>();
+
+		double closestDistance = CommonCode.DOUBLE_MAX;
+		UnitInfo closestEui = null;
+		for (UnitInfo eui : euiList) {
 			if (eui.getType().isWorker() || eui.getType().isBuilding()) {
 				continue;
 			}
@@ -227,22 +234,31 @@ public class PositionFinder {
 				continue;
 			}
 			
-//			Region region = BWTA.getRegion(eui.getLastPosition());
-//			if (PositionUtils.getGroundDistance(myFirstExpansionPosition, region.getCenter()) > 80) {
-			
 			double distance = myFirstExpansionPosition.getDistance(eui.getLastPosition());
 			if (distance > 1000) {
-//				System.out.println(eui.getType().toString() + " is too far -> " + myFirstExpansionPosition.getDistance(eui.getLastPosition()));
 				continue;
 			}
-//			System.out.println(eui.getType().toString() + " is effective pos -> " + distance);
+			if (distance < closestDistance) {
+				closestEui = eui;
+				closestDistance = distance;
+			}
+			closeEuiList.add(eui);
+		}
+		
+		for (UnitInfo eui : closeEuiList) {
+			Position euiPosition = eui.getLastPosition();
+			Position closestEuiPosition = closestEui.getLastPosition();
+			if (euiPosition.getDistance(closestEuiPosition) > 400) {
+				continue;
+			}
+			
 			if (eui.getType().isFlyer()) {
-				sumOfAirX += eui.getLastPosition().getX();
-				sumOfAirY += eui.getLastPosition().getY();
+				sumOfAirX += euiPosition.getX();
+				sumOfAirY += euiPosition.getY();
 				airCount++;				
 			} else {
-				sumOfGroundX += eui.getLastPosition().getX();
-				sumOfGroundY += eui.getLastPosition().getY();
+				sumOfGroundX += euiPosition.getX();
+				sumOfGroundY += euiPosition.getY();
 				groundCount++;
 			}
 		}
@@ -267,10 +283,9 @@ public class PositionFinder {
 		
 		// 적 상태
 		EnemyUnitStatus enemyStatus;
-		Region myRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
-		List<UnitInfo> euiList = InfoUtils.euiListInMyRegion(myRegion);
 		
-		if (euiList.isEmpty()) {
+		Region myRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+		if (InfoUtils.euiListInMyRegion(myRegion).isEmpty()) {
 			if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown
 					|| StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
 				enemyStatus = EnemyUnitStatus.COMMING;	
