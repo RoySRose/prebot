@@ -69,7 +69,7 @@ public class InitialBuildProvider {
         
         if(InitialBuildFinished == false) {
         	
-        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
+//        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
         	
         	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
         	

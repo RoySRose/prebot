@@ -21,7 +21,7 @@ public class BuilderApolloReactor extends DefaultBuildableItem {
   public final boolean buildCondition(){
   	boolean ApolloReactor = false;
   	
-  	if(BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Apollo_Reactor) == 0) {
+  	if(BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Apollo_Reactor) != 0) {
   		return false;
   	}
   	
