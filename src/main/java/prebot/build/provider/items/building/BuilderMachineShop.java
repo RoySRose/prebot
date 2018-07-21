@@ -11,6 +11,7 @@ import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
@@ -22,83 +23,57 @@ public class BuilderMachineShop extends DefaultBuildableItem {
         super(metaType);
     }
     
-    /*private int vultureratio = 0;
-    private int tankratio = 0;
-    private int goliathratio = 0;
-    private int wgt = 1;*/
-
     public final boolean buildCondition(){
-    	
-    	
-    	
-		int FaccntForMachineShop = 0;
-		int MachineShopcnt = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop);
+		if (Prebot.Broodwar.self().minerals() < 50 || Prebot.Broodwar.self().gas() < 50) {
+			return false;
+		}
+		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null);
+		if (buildQueueCount > 0) {
+			return false;
+		}
+		int constructionCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null);
+		if (constructionCount > 0) {
+			return false;
+		}
 		
-		List<Unit> factory = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+		int factoryCountForMachineShop = 0;
+		int machineShopCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop);
+		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
-		for (Unit unit : factory) {
-//			if (unit == null)
-//				continue;
-//			if (unit.getType().isResourceDepot() && unit.isCompleted()) {
-//				CCcnt++;
-//			}
+		for (Unit factory : factories) {
+			factoryCountForMachineShop++;
+			if (TilePositionUtils.addOnBuildable(factory.getTilePosition())) {
+				factoryCountForMachineShop--;
+			}
+		}
 
-//			Faccnt++;
-			FaccntForMachineShop++;
-			if (BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX() + 4, unit.getTilePosition().getY() + 1) == false
-					|| BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX() + 5, unit.getTilePosition().getY() + 1) == false
-					|| BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX() + 4, unit.getTilePosition().getY() + 2) == false
-					|| BuildManager.Instance().isBuildableTile(unit.getTilePosition().getX() + 5, unit.getTilePosition().getY() + 2) == false) {
-				FaccntForMachineShop--;
+		int vultureCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
+		int tankCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+				+ Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int goliathCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
+		
+		for (Unit factory : factories) {
+			if (factory.getAddon() != null || !factory.canBuildAddon()) {
+				continue;
 			}
-		}
-		
-		
-    	
-//    if (MachineShopcnt < FaccntForMachineShop) {
-		for (Unit unit : factory) {
-	//			if (unit == null)
-	//				continue;
-			if (unit.getAddon() == null && unit.canBuildAddon()) {
-				int addition = 3;
-				if (Prebot.Broodwar.self().gas() > 300) {
-	
-					int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
-					int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
-					int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
-//					setCombatUnitRatio();
-//					UnitType selected = FactoryUnitSelector.chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
-					UnitType selected = FactoryUnitSelector.chooseunit(StrategyIdea.factoryRatio.vulture, StrategyIdea.factoryRatio.tank, StrategyIdea.factoryRatio.goliath, 1, tot_vulture, tot_tank, tot_goliath);
-	
-					if (selected == UnitType.Terran_Siege_Tank_Tank_Mode) {
-						addition = 0;
-					}
-				}
-	
-				if (MachineShopcnt + addition < FaccntForMachineShop) {
-					if (Prebot.Broodwar.self().minerals() > 50 && Prebot.Broodwar.self().gas() > 50) {
-						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null) == 0
-								&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) {
-	//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop, true);
-	//							break;
-//							BuilderMachineShop.machine_shop_chk = true;
-							return true;
-						}
-					}
+			
+			int addition = 3;
+			if (Prebot.Broodwar.self().gas() > 300) {
+				UnitType selected = FactoryUnitSelector.chooseunit(
+						StrategyIdea.factoryRatio.vulture, StrategyIdea.factoryRatio.tank, StrategyIdea.factoryRatio.goliath, 1,
+						vultureCount, tankCount, goliathCount);
+
+				if (selected == UnitType.Terran_Siege_Tank_Tank_Mode) {
+					addition = 0;
 				}
 			}
+
+			if (machineShopCount + addition < factoryCountForMachineShop) {
+				return true;
+			}
 		}
-        
-        
         
         return false;
     }
-    
-    private int GetCurrentTotBlocked(UnitType checkunit) {
-		int cnt = Prebot.Broodwar.self().allUnitCount(checkunit);
-
-		return cnt;
-	}
-   
 
 }

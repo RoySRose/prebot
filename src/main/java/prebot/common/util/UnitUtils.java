@@ -17,6 +17,7 @@ import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
+import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
@@ -71,6 +72,19 @@ public class UnitUtils {
 			unitSet.addAll(getUnitList(unitFindRange, unitType));
 		}
 		return new ArrayList<>(unitSet);
+	}
+	
+	/** 실제보유, 컨스트럭션큐, 빌드큐 포함 존재 여부 */
+	public static boolean hasUnitOrWillBe(UnitType... unitTypes) {
+		if (getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes) > 0) {
+			return true;
+		}
+		for (UnitType unitType : unitTypes) {
+			if (BuildManager.Instance().buildQueue.getItemCount(unitType) > 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType unitType) {
