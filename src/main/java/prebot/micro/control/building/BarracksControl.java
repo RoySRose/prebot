@@ -27,6 +27,7 @@ public class BarracksControl extends BuildingFlyControl {
     @Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
         //setFlyPosition(getFlyPosition0(unitList));
+    	System.out.println("inside barrack");
         processFly(unitList, euiList);
 	}
 
@@ -34,7 +35,6 @@ public class BarracksControl extends BuildingFlyControl {
     public void checkFlyCondition() {
 
         if(getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
-
         	
             if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
                     && UnitUtils.getUnitCount(UnitType.Terran_Vulture) >= 3 ){
@@ -51,5 +51,6 @@ public class BarracksControl extends BuildingFlyControl {
                 }
             }
         }
+        System.out.println("change fly: " + getBuildingFly());
     }
 }

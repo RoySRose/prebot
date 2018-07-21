@@ -232,6 +232,7 @@ public class InformationManager extends GameManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+		System.out.println("Frame: " +Prebot.Broodwar.getFrameCount());
 		updateFirstBarrack();
 		if(Prebot.Broodwar.getFrameCount() % 8 == 0) {
 			updateUnitsInfo();
@@ -1797,10 +1798,12 @@ public class InformationManager extends GameManager {
 	}
 
     private void updateFirstBarrack() {
+    	
         if (barrackStart == -1) {
             List<Unit> barrack = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
             if (!barrack.isEmpty() ) {
                 barrackStart = Prebot.Broodwar.getFrameCount();
+                System.out.println("setting barrack: " + barrackStart);
                 firstBarrack = barrack.get(0);
             }
         }
