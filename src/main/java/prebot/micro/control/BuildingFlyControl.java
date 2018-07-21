@@ -83,10 +83,10 @@ public abstract class BuildingFlyControl extends Control{
             if(!unit.isFlying() && getBuildingFly() == BuildingFly.UP){
                 CommandUtils.lift(unit);
             }else if(unit.isFlying() && getBuildingFly() == BuildingFly.DOWN){
-            	System.out.print("inside excute to down: " + landPosition);
+            	//System.out.print("inside excute to down: " + landPosition);
                 if(landPosition != TilePosition.None) {
                     CommandUtils.land(unit, landPosition);
-                    System.out.println("send land command");
+                    //System.out.println("send land command");
                 }
             }else if(unit.isFlying() && getBuildingFly() == BuildingFly.UP){
                 if(flyPosition != Position.None) {
@@ -109,7 +109,7 @@ public abstract class BuildingFlyControl extends Control{
                 }else{
                     if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
                         buildingFly = BuildingFly.UP;
-                        System.out.println("wait!");
+                        //System.out.println("wait!");
                     } else {
                         buildingFly = BuildingFly.DOWN;
                         
@@ -119,7 +119,7 @@ public abstract class BuildingFlyControl extends Control{
                 buildingFly = BuildingFly.DOWN;
             }
         }
-        System.out.println("default: " + getBuildingFly());
+        //System.out.println("default: " + getBuildingFly());
     }
 
     private final boolean checkEnemyNearBy(List<Unit> unitList){
