@@ -1,60 +1,91 @@
 package prebot.micro.control;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import bwapi.Position;
 import bwapi.Unit;
-import bwapi.UnitType;
-import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.UnitCondition;
+import prebot.micro.WorkerManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class GundamControl extends Control {
-
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
-		for (Unit unit : unitList) {
-			Unit ataackWorkerScv = null;
-			if (skipControl(unit)) {
-				continue;
+		
+		List<UnitInfo> enemyWorkers = new ArrayList<>();
+		//List<UnitInfo> enemyBuildings = new ArrayList<>();
+		List<UnitInfo> enemyUnit = new ArrayList<>();
+		for (UnitInfo eui : euiList) {
+			if (eui.getType().isWorker()) {
+				enemyWorkers.add(eui);
+			} /*else if (eui.getType().isBuilding()) {
+				enemyBuildings.add(eui);
+			} */else {
+				enemyUnit.add(eui);
 			}
-			for(UnitInfo enemyWorker : euiList){
-				if(enemyWorker.getType().isWorker()){
-					ataackWorkerScv = UnitUtils.getClosestCombatWorkerToPosition(unitList, enemyWorker.getUnit().getPosition());
-					CommandUtils.attackUnit(ataackWorkerScv, enemyWorker.getUnit());
+		}
+		
+		Map<Integer, UnitInfo> scvTargetMap = new HashMap<>();
+		Set<Integer> assignedEnemeyIds = new HashSet<>();
+		
+		for (UnitInfo euiWorker : enemyWorkers) {
+				Unit combatScv = UnitUtils.getClosestUnitToPositionNotInSet(unitList, euiWorker.getLastPosition(), assignedEnemeyIds);
+				if(combatScv == null){
+					continue;
+				}else if(scvTargetMap.get(combatScv.getID()) != null){
+					continue;
 				}
-			}
-			if(unit == ataackWorkerScv){
+				//assignedEnemeyIds.add(euiWorker.getUnitID());
+				assignedEnemeyIds.add(combatScv.getID());
+				scvTargetMap.put(combatScv.getID(), euiWorker);
+				CommandUtils.attackUnit(combatScv, euiWorker.getUnit());
+		}
+		
+		
+		for (Unit worker : unitList) {
+			if (skipControl(worker)) {
 				continue;
 			}
-			Unit target = getClosestEnemyUnitFromWorker(unit);
+			UnitInfo eui = scvTargetMap.get(worker.getID());
 			
-			if (target != null) {
-				CommandUtils.attackUnit(unit, target);
+			if (eui != null) {
+				CommandUtils.attackUnit(worker, eui.getUnit());
 			} else {
-				CommandUtils.attackMove(unit, StrategyIdea.campPosition);
+				UnitInfo enemyUnitInfo = getClosestEnemyUnitFromWorker(enemyUnit, worker);
+				//Unit unitInSight = UnitUtils.unitInSight(closeBuildingInfo);
+				if (enemyUnitInfo != null) {
+					CommandUtils.attackUnit(worker, enemyUnitInfo.getUnit());
+				} else {
+					CommandUtils.attackMove(worker, StrategyIdea.campPosition);
+				}
 			}
 		}
 	}
 
 	/// 해당 일꾼 유닛으로부터 가장 가까운 적군 유닛을 리턴합니다
-	private Unit getClosestEnemyUnitFromWorker(Unit worker) {
+	private UnitInfo getClosestEnemyUnitFromWorker(List<UnitInfo> euiBuildingList, Unit worker) {
 		if (worker == null)
 			return null;
 
-		Unit closestUnit = null;
+		UnitInfo closestEui = null;
 		double closestDist = 10000;
+		for (UnitInfo euiBuilding : euiBuildingList) {
+			double dist = worker.getDistance(euiBuilding.getLastPosition());
 
-		for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
-			double dist = unit.getDistance(worker);
-
-			if ((dist < 400) && (closestUnit == null || (dist < closestDist))) {
-				closestUnit = unit;
+			if (dist < 700 && (closestEui == null || (dist < closestDist))) {
+				closestEui = euiBuilding;
 				closestDist = dist;
 			}
 		}
 
-		return closestUnit;
+		return closestEui;
 	}
 }

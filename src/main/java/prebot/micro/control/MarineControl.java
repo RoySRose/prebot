@@ -56,13 +56,10 @@ public class MarineControl extends Control {
 				if (skipControl(marine)) {
 					continue;
 				}
-				TilePosition firstSupplePos = BlockingEntrance.Instance().first_supple;
-				Position safePosition = firstSupplePos.toPosition();
-				for (Unit supple : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Supply_Depot)) {
-					if(supple.getTilePosition().equals(firstSupplePos)){
-						safePosition = marineEarlyDefensePosition(marine,supple);
-					}
-				}
+				
+				Position safePosition = InformationManager.Instance().isSafePosition();
+				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
+				
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
@@ -87,9 +84,6 @@ public class MarineControl extends Control {
 					}
 				}
 			}
-			
-			
-			
 		} else {
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
@@ -119,9 +113,6 @@ public class MarineControl extends Control {
 		Unit bunkerInRegion = null;
 		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
 			List<Unit> loadedUnits = bunker.getLoadedUnits();
-			if (loadedUnits != null && loadedUnits.size() > 4) {
-				continue;
-			}
 			Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
 			if (bunkerRegion == campRegion) {
 				bunkerInRegion = bunker;
@@ -172,21 +163,5 @@ public class MarineControl extends Control {
 		return false;
 	}
 	
-	private static Position marineEarlyDefensePosition(Unit marine, Unit supple) {
-		Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
-
-		int reverseX = supple.getPosition().getX() - firstCheokePoint.getX(); // 타겟과 반대로 가는 x양
-		int reverseY = supple.getPosition().getY() - firstCheokePoint.getY(); // 타겟과 반대로 가는 y양
-	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
-	    
-		Position safePosition = null;
-
-		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
-		int moveCalcSize = (int) (UnitType.Terran_Marine.topSpeed() * 15);
-		Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
-		Position movePosition = new Position(supple.getPosition().getX() + fleeVector.getX(), supple.getPosition().getY() + fleeVector.getY()); // 회피지점
-
-		return movePosition;
-	}
 
 }

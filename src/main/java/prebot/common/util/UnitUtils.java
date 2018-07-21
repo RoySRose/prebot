@@ -465,6 +465,15 @@ public class UnitUtils {
 		});
 	}
 	
+	public static Unit getClosestUnitToPositionNotInSet(List<Unit> unitList, Position position, Set<Integer> unitIds) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				return !unitIds.contains(unit.getID());
+			}
+		});
+	}
+	
 	public static Unit getFarthestCombatWorkerToPosition(List<Unit> unitList, Position position) {
 		return getFarthestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override

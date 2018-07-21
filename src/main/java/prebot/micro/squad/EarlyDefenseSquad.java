@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -13,8 +14,8 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
-import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.WorkerManager;
+import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
@@ -60,7 +61,6 @@ public class EarlyDefenseSquad extends Squad {
 				scvList.add(unit);
 			}
 		}
-		
 		if (StrategyIdea.enemyUnitStatus == EnemyUnitStatus.IN_MY_REGION && !InformationManager.Instance().isBlockingEnterance()) {
 			return defenseForScvAndMarine(marineList, scvList, euiList);
 		} else {
@@ -82,14 +82,9 @@ public class EarlyDefenseSquad extends Squad {
 		if (closeEnemyUnit == null) {
 			return marineList;
 		}
-		List<Unit> myUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, closeEnemyUnit.getPosition(), REACT_RADIUS); 
-		if (myUnitList.isEmpty() && !marineList.isEmpty()) {
-			return marineList;
-		}
 		
 		// 얼마나 SCV 동원이 필요한지 체크
 		double scvCountForDefense = scvCountForDefense(enemyInSightList);
-		
 		/*유닛이 줄었을때 필요일꾼 만큼만 스쿼드 유지 나머지는 idle*/
 		while(marineList.size() + unitList.size() > scvCountForDefense){
 			SquadData squadData = new SquadData();
@@ -100,6 +95,14 @@ public class EarlyDefenseSquad extends Squad {
 			squadData.excludeUnitFromSquad(defenseScv);
 			unitList.remove(defenseScv);
 		}
+				
+		//List<Unit> myUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, closeEnemyUnit.getPosition(), REACT_RADIUS); 
+		//if (myUnitList.isEmpty() && !marineList.isEmpty()) {
+		if(!marineList.isEmpty()){
+			return marineList;
+		}
+		
+		
 		
 		List<Unit> recruitScvList = new ArrayList<>();
 		while (unitList.size() + marineList.size()+ recruitScvList.size()< scvCountForDefense) {

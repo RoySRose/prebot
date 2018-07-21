@@ -74,6 +74,9 @@ public class InformationManager extends GameManager {
     public int barrackStart;
     public Unit firstBarrack;
 
+	//입막시 방어 안전 위치
+	private Position safePosition;
+	
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
 	/// 건물 여부를 기준으로 파악하기 때문에 부적절하게 판단할수도 있습니다 
@@ -149,6 +152,8 @@ public class InformationManager extends GameManager {
 		blockingEnterance = false;
         barrackStart = -1;
         firstBarrack = null;
+
+        safePosition	= null;
 //		MainBaseSuppleLimit =0;
 		
 		for (Unit unit : Prebot.Broodwar.self().getUnits()){
@@ -1363,6 +1368,10 @@ public class InformationManager extends GameManager {
 		return blockingEnterance;
 	}
 	
+	public Position isSafePosition() {
+		return safePosition;
+	}
+	
 //	public int getMainBaseSuppleLimit() {
 //		return MainBaseSuppleLimit;
 //	}
@@ -1822,7 +1831,17 @@ public class InformationManager extends GameManager {
 		// 대략적인 firstExpansion <-> myExpansion 사이에 unitType이 이동하는데 걸리는 시간 리턴 (단위 frame)
 	}
 	
-	public void updateBlockingEnterance() {
+	private void updateBlockingEnterance() {
+		//터렛지어지면 더이상 체크 안함
+		if(UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret)){
+			return;
+		}
+		//저그는 입막 안하므로 체크 안함
+		if(Prebot.Broodwar.self().getRace() == Race.Zerg){
+			System.out.println("저그");
+			blockingEnterance = false;
+			return;
+		}
 		// update our units info
 		boolean firstBarrack = false;
 		boolean firstSupple = false;
@@ -1838,6 +1857,9 @@ public class InformationManager extends GameManager {
 			}else if(supple.getTilePosition().equals(secondSupplePos)){
 				secondSupple = true;
 			}
+			if(safePosition == null){
+				earlyDefenseSafePosition(UnitType.Terran_Marine,supple);
+			}
 		}
 		
 		for (Unit barrack : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Barracks)) {
@@ -1851,5 +1873,22 @@ public class InformationManager extends GameManager {
 		}else{
 			blockingEnterance = false;
 		}
+	}
+	
+	/*입막시 마린 안전 방어 지역 (다른 유닛 필요시 사용)*/
+	public void earlyDefenseSafePosition(UnitType unitType, Unit supple) {
+		Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
+
+		int reverseX = supple.getPosition().getX() - firstCheokePoint.getX(); // 타겟과 반대로 가는 x양
+		int reverseY = supple.getPosition().getY() - firstCheokePoint.getY(); // 타겟과 반대로 가는 y양
+	    final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
+	    
+		
+
+		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
+		int moveCalcSize = (int) (unitType.topSpeed() * 20);
+		Position fleeVector = new Position((int)(moveCalcSize * Math.cos(fleeRadianAdjust)), (int)(moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
+		safePosition = new Position(supple.getPosition().getX() + fleeVector.getX(), supple.getPosition().getY() + fleeVector.getY()); // 회피지점
+
 	}
 }

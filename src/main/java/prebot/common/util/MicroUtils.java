@@ -219,9 +219,12 @@ public class MicroUtils {
 		boolean timeToAttack = timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack);
 		if (timeToAttack) {
 			CommandUtils.attackUnit(rangedUnit, targetUnit);
-			
 		} else {
 			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
+			//마린은 저글링 러쉬떄 안전을 위해 거리 조금 늘림
+			if(approachKitingDistance != CommonCode.NONE && rangedUnit.getType() ==  UnitType.Terran_Marine){
+				approachKitingDistance += 5;
+			}
 			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
 				CommandUtils.attackMove(rangedUnit, targetUnit.getPosition());
 			} else {
@@ -253,30 +256,22 @@ public class MicroUtils {
 		if (weapon == WeaponType.None || rangedUnit.getDistance(targetInfo.getLastPosition()) > weapon.maxRange() + 50) {
 			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
 		} else {
-			flee(rangedUnit, safePosition, kOption.fOption);
+			//flee(rangedUnit, safePosition, kOption.fOption);
+			CommandUtils.move(rangedUnit,safePosition);
 		}
 	}
 	
 	
 	public static void Blockingkiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption, Position safePosition) {
-		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
+		//if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
 			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
-		} else if (groundUnitFreeKiting(rangedUnit)) {
-			kOption.fOption.united = false;
-			kOption.fOption.angles = Angles.WIDE;
-		}
-		
+		//} 		
 		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
 			CommandUtils.attackUnit(rangedUnit, targetUnit);
 		} else {
-			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
-			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
-				CommandUtils.attackMove(rangedUnit, targetUnit.getPosition());
-			} else {
-				CommandUtils.move(rangedUnit,safePosition);
-			}
+			CommandUtils.move(rangedUnit,safePosition);
 		}
 	}
 	

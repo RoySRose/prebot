@@ -10,6 +10,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
@@ -26,6 +27,7 @@ public class ScvScoutControl extends Control {
 
 	private Map<Integer, BaseLocation> scoutBaseMap = new HashMap<>();
 	private Map<Integer, Integer> scoutVertexIndexMap = new HashMap<>();
+	private boolean scoutFirstExpansionFlag = false;
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
@@ -50,6 +52,7 @@ public class ScvScoutControl extends Control {
 		if (enemyBaseLocation != null && enemyBaseLocation.getDistance(myBaseLocation.getPosition()) < 5 * UxConfig.TILE_SIZE)
 			enemyBaseLocation = null;
 		
+		
 		if (enemyBaseLocation == null) {
 			BaseLocation scoutBaseLocation; 
 			if (StrategyIdea.enemyBaseExpected != null) {
@@ -58,13 +61,52 @@ public class ScvScoutControl extends Control {
 				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
 				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			}
-			BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(scoutBaseLocation);
-			
-			if (!Prebot.Broodwar.isExplored(enemyFisrtExpansionPosition.getTilePosition())) {
-				CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
+			CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
+		} else {
+			if (!Prebot.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
+				CommandUtils.move(scoutScv, enemyBaseLocation.getPosition());
+			} else {
+				Position currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(scoutScv);
+				if(Prebot.Broodwar.getFrameCount() % 2000 == 0){
+					scoutFirstExpansionFlag = true;
+				}
+				if(scoutFirstExpansionFlag){
+					if(canMoveFirstExpansion(scoutScv,enemyBaseLocation)){
+						BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(enemyBaseLocation);
+						if (!Prebot.Broodwar.isVisible(enemyFisrtExpansionPosition.getTilePosition())) {
+							CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
+						}else{
+							CommandUtils.move(scoutScv, currentScoutTargetPosition);
+							scoutFirstExpansionFlag = false;
+						}
+					}else{
+						CommandUtils.move(scoutScv, currentScoutTargetPosition);
+					}
+				}else{
+					CommandUtils.move(scoutScv, currentScoutTargetPosition);
+				}
+				// WorkerManager.Instance().setIdleWorker(scoutScv);
+			}
+		}
+		/*if (enemyBaseLocation == null) {
+			BaseLocation scoutBaseLocation; 
+			if (StrategyIdea.enemyBaseExpected != null) {
+				scoutBaseLocation = StrategyIdea.enemyBaseExpected;
+			} else {
+				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
+				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
+			}
+			if(scoutBaseLocation != null){
+				BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(scoutBaseLocation);
+				if (!Prebot.Broodwar.isExplored(enemyFisrtExpansionPosition.getTilePosition())) {
+					CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
+				}else{
+					CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
+				}
 			}else{
 				CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
 			}
+			
 		} else {
 			BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(enemyBaseLocation);
 			if (!Prebot.Broodwar.isExplored(enemyFisrtExpansionPosition.getTilePosition())) {
@@ -76,7 +118,17 @@ public class ScvScoutControl extends Control {
 				CommandUtils.move(scoutScv, currentScoutTargetPosition);
 				// WorkerManager.Instance().setIdleWorker(scoutScv);
 			}
+		}*/
+	}
+
+	private boolean canMoveFirstExpansion(Unit scoutScv, BaseLocation enemyBaseLocation) {
+		// TODO Auto-generated method stub
+		Chokepoint nearestChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		if (nearestChoke.getCenter().getDistance(scoutScv) < 200 && !scoutScv.isUnderAttack()) {
+			return true;
 		}
+		
+		return false;
 	}
 
 	/** 정찰되지 않은 SCV근처에 있는 base (정찰 scv가 2기 이상인 경우 겹치지 않도록 한다.) */
