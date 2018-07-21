@@ -186,7 +186,9 @@ public class CommandUtils {
         UnitCommand currentCommand = unit.getLastCommand();
         if (currentCommand.getUnitCommandType() == commandType) {
             if (currentCommand.getTargetPosition().equals(tilePosition)) {
-                return false;
+            	if (unit.getLastCommandFrame() + 10 >= Prebot.Broodwar.getFrameCount()) {
+                    return false;
+                }
             }
         }
 
