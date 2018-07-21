@@ -28,14 +28,14 @@ public class CommandUtils {
     }
 
     public static void land(Unit unit, TilePosition targetPosition) {
-        if (validCommand(unit, targetPosition, UnitCommandType.Land, true, true)) {
+        if (validCommand(unit, targetPosition, UnitCommandType.Land, true, false)) {
             unit.land(targetPosition);
         }
     }
 
     public static void lift(Unit unit) {
         if (unit.canLift() && validCommand(unit, UnitCommandType.Lift)) {
-            unit.lift();
+        	unit.lift();
         }
     }
 
@@ -167,7 +167,10 @@ public class CommandUtils {
 	}
 
     private static boolean validCommand(Unit unit, TilePosition tilePosition, UnitCommandType commandType, boolean notIssueOnAttackFrame, boolean issueIfNotMoving) {
-        if (!UnitUtils.isValidUnit(unit)) {
+    	
+    	
+    	
+    	if (!UnitUtils.isValidUnit(unit)) {
             return false;
         }
         if (!PositionUtils.isValidTilePosition(tilePosition)) {
@@ -183,13 +186,11 @@ public class CommandUtils {
         if (issueIfNotMoving && !unit.isMoving()) {
             return true;
         }
-        UnitCommand currentCommand = unit.getLastCommand();
-        if (currentCommand.getUnitCommandType() == commandType) {
-            if (currentCommand.getTargetPosition().equals(tilePosition)) {
-            	if (unit.getLastCommandFrame() + 10 >= Prebot.Broodwar.getFrameCount()) {
+        UnitCommand lastCommand = unit.getLastCommand();
+        if (lastCommand.getUnitCommandType() == commandType) {
+            	if (unit.getLastCommandFrame() + 1 >= Prebot.Broodwar.getFrameCount()) {    
                     return false;
                 }
-            }
         }
 
         return true;
