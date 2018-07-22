@@ -3,12 +3,8 @@ package prebot.build.provider;
 
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.StrategyManager;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 
 public class FactoryUnitSelector implements Selector<UnitType>{
 
@@ -148,7 +144,7 @@ public class FactoryUnitSelector implements Selector<UnitType>{
     		vultureratio = StrategyIdea.factoryRatio.vulture;
 			tankratio = StrategyIdea.factoryRatio.tank;
 			goliathratio = StrategyIdea.factoryRatio.goliath;
-			wgt = 1;
+			wgt = StrategyIdea.factoryRatio.weight;
 			
 //			FileUtils.appendTextToFile("log.txt", "\n FactoryUnitSelector || ratio  || vultureratio : " + vultureratio + " / tankratio : " + tankratio + " / goliathratio : " + goliathratio);
     		

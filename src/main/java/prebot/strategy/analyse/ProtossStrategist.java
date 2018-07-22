@@ -91,7 +91,7 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE) || hasType(ClueType.FAST_NEXSUS)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE) || hasAnyInfo(ClueInfo.NEXSUS_FAST_DOUBLE, ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
 			if (hasInfo(ClueInfo.FAST_FLEET_BEACON)) {
 				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
 			} else if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
@@ -119,9 +119,13 @@ public class ProtossStrategist extends Strategist {
 			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 		}
 		
-		if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
+		if (hasAnyInfo(ClueInfo.NO_ASSIMILATOR, ClueInfo.ASSIMILATOR_LATE)) {
 			if (hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
-				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
+				if (hasInfo(ClueInfo.ASSIMILATOR_LATE)) {
+					return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+				} else if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
+					return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
+				}
 			} else if (hasType(ClueType.FAST_CORE)) {
 				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 			} else if (hasAnyInfo(ClueInfo.GATE_FAST_TWO, ClueInfo.GATE_TWO)) {

@@ -60,7 +60,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			int addition = 3;
 			if (Prebot.Broodwar.self().gas() > 300) {
 				UnitType selected = FactoryUnitSelector.chooseunit(
-						StrategyIdea.factoryRatio.vulture, StrategyIdea.factoryRatio.tank, StrategyIdea.factoryRatio.goliath, 1,
+						StrategyIdea.factoryRatio.vulture, StrategyIdea.factoryRatio.tank, StrategyIdea.factoryRatio.goliath, StrategyIdea.factoryRatio.weight,
 						vultureCount, tankCount, goliathCount);
 
 				if (selected == UnitType.Terran_Siege_Tank_Tank_Mode) {

@@ -24,21 +24,29 @@ import prebot.strategy.StrategyIdea;
 public class EnemyStrategyOptions {
 	
 	public static class FactoryRatio {
+		public static class Weight {
+			public static final int VULTURE = 1;
+			public static final int TANK = 2;
+			public static final int GOLIATH = 3;
+		}
+		
 		public int vulture;
 		public int tank;
 		public int goliath;
+		public int weight;
 		
-		private FactoryRatio(int vulture, int tank, int goliath) {
+		private FactoryRatio(int vulture, int tank, int goliath, int weight) {
 			this.vulture = vulture;
 			this.tank = tank;
 			this.goliath = goliath;
+			this.weight = weight;
 		}
-		public static FactoryRatio ratio(int vulture, int tank, int goliath) {
-			return new FactoryRatio(vulture, tank, goliath);
+		public static FactoryRatio ratio(int vulture, int tank, int goliath, int weight) {
+			return new FactoryRatio(vulture, tank, goliath, weight);
 		}
 		@Override
 		public String toString() {
-			return "UNIT RATIO : vulture=" + vulture + ", tank=" + tank + ", goliath=" + goliath;
+			return "UNIT RATIO : vulture=" + vulture + ", tank=" + tank + ", goliath=" + goliath + ", weight=" + weight;
 		}
 	}
 	
