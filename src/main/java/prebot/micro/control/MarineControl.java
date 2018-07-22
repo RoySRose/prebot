@@ -59,7 +59,6 @@ public class MarineControl extends Control {
 				
 				Position safePosition = InformationManager.Instance().isSafePosition();
 				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
-				
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
@@ -70,12 +69,12 @@ public class MarineControl extends Control {
 						MicroUtils.kiting(marine, decision.eui, kOption);
 					}
 				} else {
-					if (marine.getDistance(StrategyIdea.campPosition) < 30) { // TODO 추후 변경
-						if(InformationManager.Instance().isBlockingEnterance()){
+					if(InformationManager.Instance().isBlockingEnterance()){
 						//if (MicroUtils.timeToRandomMove(marine)) {
-							CommandUtils.attackMove(marine, safePosition);
+							CommandUtils.attackMove(marine, StrategyIdea.campPosition);
 						//}
-						}else if (MicroUtils.timeToRandomMove(marine)) {
+					}else if (marine.getDistance(StrategyIdea.campPosition) < 30) { // TODO 추후 변경
+						if (MicroUtils.timeToRandomMove(marine)) {
 							Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 20);
 							CommandUtils.attackMove(marine, randomPosition);
 						}

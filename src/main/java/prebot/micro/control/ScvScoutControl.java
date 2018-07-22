@@ -124,7 +124,7 @@ public class ScvScoutControl extends Control {
 	private boolean canMoveFirstExpansion(Unit scoutScv, BaseLocation enemyBaseLocation) {
 		// TODO Auto-generated method stub
 		Chokepoint nearestChoke = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-		if (nearestChoke.getCenter().getDistance(scoutScv) < 200 && !scoutScv.isUnderAttack()) {
+		if (nearestChoke.getCenter().getDistance(scoutScv) < 300 && !scoutScv.isUnderAttack()) {
 			return true;
 		}
 		
