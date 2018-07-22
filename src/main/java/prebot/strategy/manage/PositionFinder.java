@@ -137,9 +137,19 @@ public class PositionFinder {
 				return firstExpansionBackwardPosition();
 			}
 		}
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			// 마린이 일정이상 쌓였어야 한다.
+			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+			if (factorySupplyCount + marineCount > Math.max(enemyGroundUnitSupplyCount, 3)) {
+				return firstChokeDefensePosition();
+			} else {
+				/// 커맨드센터 수비 필요
+				return commandCenterInsidePosition();
+			}
+		}else{
+			return firstChokeDefensePosition();
+		}
 		
-		
-		return firstChokeDefensePosition();
 
 //		if (InfoUtils.enemyRace() == Race.Protoss) {
 ////			if (InformationManager.Instance().isBlockingEnterance()) {

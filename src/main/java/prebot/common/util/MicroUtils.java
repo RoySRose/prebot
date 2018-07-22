@@ -222,9 +222,9 @@ public class MicroUtils {
 		} else {
 			int approachKitingDistance = forwardKitingTargetDistance(rangedUnit, targetUnit);
 			//마린은 저글링 러쉬떄 안전을 위해 거리 조금 늘림
-			if(approachKitingDistance != CommonCode.NONE && rangedUnit.getType() ==  UnitType.Terran_Marine){
+			/*if(approachKitingDistance != CommonCode.NONE && rangedUnit.getType() ==  UnitType.Terran_Marine){
 				approachKitingDistance += 5;
-			}
+			}*/
 			if (approachKitingDistance != CommonCode.NONE && rangedUnit.getDistance(targetUnit) >= approachKitingDistance) {
 				CommandUtils.attackMove(rangedUnit, targetUnit.getPosition());
 			} else {
