@@ -19,7 +19,12 @@ public class ProtossStrategist extends Strategist {
 	protected EnemyStrategy strategyPhase01() {
 		if (hasType(ClueType.FAST_NEXSUS)) {
 			if (hasInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
-				return EnemyStrategy.PROTOSS_DOUBLE;
+				if (hasAnyType(ClueType.FAST_FORGE, ClueType.FAST_CANNON)) {
+					return EnemyStrategy.PROTOSS_FORGE_DOUBLE;
+				} else {
+					return EnemyStrategy.PROTOSS_DOUBLE;
+				}
+				
 			} else if (hasInfo(ClueInfo.NEXSUS_FAST_DOUBLE)) {
 				if (hasAnyType(ClueType.FAST_FORGE, ClueType.FAST_CANNON)) {
 					return EnemyStrategy.PROTOSS_FORGE_DOUBLE;
@@ -86,10 +91,12 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE) || hasType(ClueType.FAST_NEXSUS)) {
 			if (hasInfo(ClueInfo.FAST_FLEET_BEACON)) {
 				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
 			} else if (hasAnyInfo(ClueInfo.STARGATE_DOUBLE_FAST)) {
+				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
+			} else if (hasAnyType(ClueType.FAST_FORGE, ClueType.FAST_CANNON)) {
 				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
 			} else {
 				return EnemyStrategy.PROTOSS_DOUBLE_GROUND;
@@ -126,6 +133,10 @@ public class ProtossStrategist extends Strategist {
 		
 		if (hasInfo(ClueInfo.FAST_THREE_ZEALOT)) {
 			return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;	
+		}
+		
+		if (hasAnyInfo(ClueInfo.GATE_FAST_TWO)) {
+			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 		}
 		
 		return EnemyStrategy.PROTOSS_FAST_DARK;

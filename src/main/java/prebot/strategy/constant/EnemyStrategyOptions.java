@@ -88,7 +88,10 @@ public class EnemyStrategyOptions {
 	
 	public static class Mission {
 		public static enum MissionType {
-			NO_ENEMY, NO_AIR_ENEMY, DETECT_OK, VULTURE, TANK, GOLIATH, RETREAT
+			EXPANSION, RETREAT
+			, NO_ENEMY, NO_AIR_ENEMY
+			, COMSAT_OK, TURRET_OK
+			, VULTURE, TANK, GOLIATH
 		}	
 		
 		public static List<MissionType> missions(MissionType... missions) {
@@ -100,12 +103,32 @@ public class EnemyStrategyOptions {
 		}
 		
 		public static boolean complete(MissionType mission) {
+			
 			switch (mission) {
-			case NO_ENEMY:
-				return StrategyIdea.enemyGroundSquadPosition != Position.Unknown;
-			case NO_AIR_ENEMY:
-				return StrategyIdea.enemyAirSquadPosition != Position.Unknown;
-			case DETECT_OK:
+			case EXPANSION: // 앞마당
+				boolean baseCommandCentertOk = false;
+				boolean expansionCommandCenterOk = false;
+				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+				for (Unit commandCenter : commandCenterList) {
+					if (commandCenter.isLifted()) {
+						continue;
+					}
+					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_BASE) {
+						baseCommandCentertOk = true;
+					}
+					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+						expansionCommandCenterOk = true;
+					}
+				}
+				return baseCommandCentertOk && expansionCommandCenterOk;
+			
+			case NO_ENEMY: // 지상 적 없음
+				return StrategyIdea.enemyGroundSquadPosition == Position.Unknown;
+				
+			case NO_AIR_ENEMY: // 공중 적 없음
+				return StrategyIdea.enemyAirSquadPosition == Position.Unknown;
+				
+			case COMSAT_OK: // 컴셋에너지보유
 				boolean comsatReady = false;
 				List<Unit> comsatList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 				int totalComsatEnergy = 0;
@@ -116,6 +139,9 @@ public class EnemyStrategyOptions {
 						break;
 					}
 				}
+				return comsatReady;
+			
+			case TURRET_OK: // 베이스터렛OK, 앞마당 터렛OK
 				boolean baseTurretOk = false;
 				boolean expansionTurretOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
@@ -127,17 +153,22 @@ public class EnemyStrategyOptions {
 						expansionTurretOk = true;
 					}
 				}
-				return comsatReady && baseTurretOk && expansionTurretOk;
+				return baseTurretOk && expansionTurretOk;
 				
-			case VULTURE:
+			case VULTURE: // 충분한 벌처
 				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 5;
-			case TANK:
+				
+			case TANK: // 충분한 탱크
 				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
-			case GOLIATH:
+				
+			case GOLIATH: // 충분한 골리앗
 				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
-			case RETREAT:
+				
+			case RETREAT: // 공격모드 해제
 				return !StrategyIdea.mainSquadMode.isAttackMode;
+				
 			}
+			
 			return true;
 		}
 	}

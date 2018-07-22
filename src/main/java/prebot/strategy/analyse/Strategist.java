@@ -57,14 +57,15 @@ public abstract class Strategist {
 
 	private boolean phase02End() {
 		if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
-			System.out.println("TIME COMPLETE");
+			System.out.println("TIME IS UP");
 			return true;
 		}
 
-		// default mission;
+		// default mission
 		if (UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
 			return false;
 		}
+		
 		if (!StrategyIdea.currentStrategy.missionTypeList.isEmpty()) {
 			for (MissionType missionType : StrategyIdea.currentStrategy.missionTypeList) {
 				if (!Mission.complete(missionType)) {
@@ -75,11 +76,13 @@ public abstract class Strategist {
 			return true;
 			
 		} else {
+			
 			if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
 				return false;
 			}
 			System.out.println("DEFAULT MISSION COMPLETE");
 			return true;
+			
 		}
 	}
 

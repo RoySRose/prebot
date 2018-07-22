@@ -60,13 +60,13 @@ public enum EnemyStrategy {
 	PROTOSS_FAST_DRAGOON(1, 2, 0, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_EXPANSION
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
 			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.VULTURE, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
 	
 	PROTOSS_FAST_DARK(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_FAST_DARK()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.DETECT_OK, MissionType.VULTURE, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.VULTURE, MissionType.TANK)),
 	// + WATCHER : 마인매설(+본진, 앞마당), attack=S_CHOKE
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 벌처 일정량 이상 보유.
@@ -74,24 +74,24 @@ public enum EnemyStrategy {
 	PROTOSS_DARK_DROP(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_DARK_DROP()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	
 	PROTOSS_ROBOTICS_REAVER(5, 5, 2, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_ROBOTICS_REAVER()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	
 	PROTOSS_ROBOTICS_OB_DRAGOON(5, 5, 2, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
 			, TimeMapForProtoss.PROTOSS_ROBOTICS_OB_DRAGOON()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
 	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_HARDCORE_ZEALOT()
-			, Mission.missions(MissionType.NO_ENEMY, MissionType.VULTURE)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),
 	
 	PROTOSS_STARGATE(1, 3, 1, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
@@ -101,7 +101,8 @@ public enum EnemyStrategy {
 	
 	PROTOSS_DOUBLE_GROUND(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
-			, TimeMapForProtoss.PROTOSS_DOUBLE_GROUND()),
+			, TimeMapForProtoss.PROTOSS_DOUBLE_GROUND()
+			, Mission.missions(MissionType.EXPANSION)),
 	
 	PROTOSS_DOUBLE_CARRIER(1, 2, 0, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
@@ -164,22 +165,34 @@ public enum EnemyStrategy {
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
 	ZERG_FAST_MUTAL(1, 0, 1, UpgradeOrder.get(FacUp.VS, FacUp.VM) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, TimeMapForZerg.ZERG_FAST_MUTAL()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForZerg.ZERG_FAST_MUTAL()
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
 	
 	ZERG_FAST_LURKER(2, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_FAST_LURKER()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_FAST_LURKER()
+			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.TANK)),
 	
 	ZERG_HYDRA_WAVE(1, 1, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
+			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
 	ZERG_NO_LAIR_LING(3, 1, 1, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
-			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_LING()),
+			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_NO_LAIR_LING()
+			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE)),
 	
 	ZERG_NO_LAIR_HYDRA(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
+			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
 	ZERG_LAIR_MIXED(1, 2, 0, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT, TimeMapForZerg.ZERG_LAIR_MIXED()),
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
+			, TimeMapForZerg.ZERG_LAIR_MIXED()
+			, Mission.missions(MissionType.EXPANSION, MissionType.TANK, MissionType.TURRET_OK)),
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 일정량 이상 보유.
 	
 	// PHASE3 : PHASE2 종료 ~
@@ -220,39 +233,47 @@ public enum EnemyStrategy {
 	// PHASE2 : PHASE1 종료 ~ ?
 	TERRAN_1FAC_DOUBLE(1, 1, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_1FAC_DOUBLE()),
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE()
+			, Mission.missions(MissionType.EXPANSION)),
 	
 	TERRAN_1FAC_DOUBLE_1STAR(1, 1, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_1STAR()),
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_1STAR()
+			, Mission.missions(MissionType.EXPANSION)),
 	
 	TERRAN_1FAC_DOUBLE_ARMORY(1, 1, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()),
+			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()
+			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
 	TERRAN_2FAC(0, 2, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_2FAC()),
+			, TimeMapForTerran.TERRAN_2FAC()
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),
 	
 	TERRAN_1FAC_1STAR(1, 1, 0, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_1FAC_1STAR()),
+			, TimeMapForTerran.TERRAN_1FAC_1STAR()
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK)),
 	
 	TERRAN_2STAR(0, 0, 1, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
-			, TimeMapForTerran.TERRAN_2STAR()),
+			, TimeMapForTerran.TERRAN_2STAR()
+			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
 	
 	TERRAN_BIONIC(2, 1, 0, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, TimeMapForTerran.TERRAN_BIONIC()),
+			, TimeMapForTerran.TERRAN_BIONIC()
+			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE, MissionType.TANK)),
 	
 	TERRAN_2BARRACKS_1FAC(1, 1, 0, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
-			, TimeMapForTerran.TERRAN_2BARRACKS_1FAC()),
+			, TimeMapForTerran.TERRAN_2BARRACKS_1FAC()
+			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE, MissionType.TANK)),
 	
-	TERRAN_DOUBLE_BIONIC(TERRAN_2STAR), //
+	TERRAN_DOUBLE_BIONIC(TERRAN_BIONIC), //
 	
-	TERRAN_DOUBLE_MECHANIC(TERRAN_2STAR), //
+	TERRAN_DOUBLE_MECHANIC(TERRAN_1FAC_DOUBLE), //
 
 	// PHASE3 : PHASE2 종료 ~
 	TERRAN_MECHANIC_VULTURE_TANK(0, 8, 1, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)),

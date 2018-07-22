@@ -90,7 +90,7 @@ public class PositionFinder {
 		// 딕텍팅이 괜찮은 경우
 		// 적 클로킹유닛이 없거나 / 앞마당에 터렛이 있거나 / 1회이상 컴셋 사용 가능
 		boolean firstExpansionDetectingOk = true;
-		if (UnitUtils.invisibleEnemyDiscovered()) {
+		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Zerg_Lurker, UnitType.Zerg_Egg)) {
 			firstExpansionDetectingOk = false;
 			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 			for (Unit turret : turretList) {
@@ -101,7 +101,7 @@ public class PositionFinder {
 				}
 			}
 			if (!firstExpansionDetectingOk) {
-				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Spell_Scanner_Sweep);
+				List<Unit> scannerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 				for (Unit scanner : scannerList) {
 					if (scanner.getEnergy() >= 50) {
 						firstExpansionDetectingOk = true;
@@ -210,7 +210,7 @@ public class PositionFinder {
 			StrategyIdea.mainSquadCenter = centerPosition;
 		} else {
 			StrategyIdea.mainSquadCoverRadius = 250;
-			StrategyIdea.mainSquadCenter = getMainPosition();
+			StrategyIdea.mainSquadCenter = StrategyIdea.campPosition;
 		}
 	}
 
