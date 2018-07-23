@@ -141,11 +141,11 @@ public class CombatManager extends GameManager {
 	}
 
 	private void squadExecution() {
+//		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
+//		mainSquad.findEnemiesAndExecuteSquad();
+		
 		for (Squad squad : squadData.getSquadMap().values()) {
-//			BigWatch.start("CombatManager.squadExecution." + squad.getSquadName());
-			squad.findEnemies(); // 적 탐색
-			squad.execute(); // squad 유닛 명령 지시
-//			BigWatch.record("CombatManager.squadExecution." + squad.getSquadName());
+			squad.findEnemiesAndExecuteSquad(); // squad 유닛 명령 지시
 		}
 	}
 

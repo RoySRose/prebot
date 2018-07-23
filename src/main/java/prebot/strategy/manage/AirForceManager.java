@@ -102,6 +102,10 @@ public class AirForceManager {
 		return accumulatedAchievement;
 	}
 
+	public boolean isAirForceDefenseMode() {
+		return airForceDefenseMode;
+	}
+
 	public void update() {
 		if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
 			return;
@@ -113,6 +117,7 @@ public class AirForceManager {
 	}
 
 	private void setTargetPosition() {
+		// TODO 미션...
 		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown
 				|| StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
 			setTargetPosition(true);

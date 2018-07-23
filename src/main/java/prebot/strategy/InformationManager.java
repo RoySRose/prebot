@@ -1612,10 +1612,10 @@ public class InformationManager extends GameManager {
 		String mapName = Prebot.Broodwar.mapFileName().toUpperCase();
 		if (mapName.matches(".*CIRCUIT.*")) {
 			gameMap = GameMap.CIRCUITBREAKER;
-		} else if (mapName.matches(".*OVER.*")) {
-			gameMap = GameMap.OVERWATCH;
 		} else if (mapName.matches(".*SPIRIT.*")) {
 			gameMap = GameMap.FIGHTING_SPRIRITS;
+		} else {
+			gameMap = GameMap.UNKNOWN;
 		}
 
 		List<BaseLocation> startingBase = new ArrayList<>();

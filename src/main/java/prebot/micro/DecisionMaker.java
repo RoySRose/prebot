@@ -170,8 +170,12 @@ public class DecisionMaker {
 			boolean detectUnitExist = euiListDetector.isEmpty() && airForceTeam.damagedEffectiveFrame < 10;
 			boolean cloakingBonus = airForceTeam.cloakingMode && !detectUnitExist;
 			boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
-			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
 
+			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
+			if (AirForceManager.Instance().isAirForceDefenseMode()) {
+				fightPredict = SmallFightPredict.ATTACK;
+			}
+			
 			if (fightPredict == SmallFightPredict.ATTACK) {
 				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 
@@ -265,7 +269,6 @@ public class DecisionMaker {
 			}
 		}
 		
-		Decision decisionDetail = null;
 		if (allUnitCoolTimeReady) {
 			UnitInfo targetInfo = null;
 			int minimumLinearDistance = CommonCode.INT_MAX;
@@ -310,35 +313,32 @@ public class DecisionMaker {
 				}
 			}
 			if (targetInfo != null) {
-				decisionDetail = Decision.attackUnit(airForceTeam.leaderUnit, targetInfo); // 유닛 공격
+				return Decision.attackUnit(airForceTeam.leaderUnit, targetInfo); // 유닛 공격
 			}
 		}
 		
 		// 공격할 적이 없을 경우 이동한다.
-		if (decisionDetail == null) {
-			// air force team이 너무 분산되어 있는 경우 모으도록 한다.
-			int averageDistance = 0;
-			int memberSize = airForceTeam.memberList.size();
-			if (memberSize > 1) {
-				int sumOfDistance = 0;
-				for (Unit member : airForceTeam.memberList) {
-					if (member.getID() != airForceTeam.leaderUnit.getID()) {
-						sumOfDistance += member.getDistance(airForceTeam.leaderUnit);
-					}
+		// air force team이 너무 분산되어 있는 경우 모으도록 한다.
+		int averageDistance = 0;
+		int memberSize = airForceTeam.memberList.size();
+		if (memberSize > 1) {
+			int sumOfDistance = 0;
+			for (Unit member : airForceTeam.memberList) {
+				if (member.getID() != airForceTeam.leaderUnit.getID()) {
+					sumOfDistance += member.getDistance(airForceTeam.leaderUnit);
 				}
-				averageDistance = sumOfDistance / (memberSize - 1);
 			}
-			if (averageDistance > 5) {
-				decisionDetail = Decision.unite(airForceTeam.leaderUnit); // 뭉치기
+			averageDistance = sumOfDistance / (memberSize - 1);
+		}
+		if (averageDistance > 5) {
+			return Decision.unite(airForceTeam.leaderUnit); // 뭉치기
+		} else {
+			if (allUnitCoolTimeReady) {
+				return Decision.attackPosition(airForceTeam.leaderUnit); // 이동
 			} else {
-				if (allUnitCoolTimeReady) {
-					decisionDetail = Decision.attackPosition(airForceTeam.leaderUnit); // 이동
-				} else {
-					decisionDetail = Decision.kitingUnit(airForceTeam.leaderUnit, null); // 카이팅 eui 정보는 decision에 저장된게 있다.
-				}
+				return Decision.kitingUnit(airForceTeam.leaderUnit, null); // 카이팅 eui 정보는 decision에 저장된게 있다.
 			}
 		}
-		return decisionDetail;
 	}
 
 	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList) {
@@ -395,7 +395,7 @@ public class DecisionMaker {
 		if (enemyUnitType == UnitType.Terran_Bunker) {
 			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 		} else {
-			if (!myUnit.isFlying()) {
+			if (myUnit.isFlying()) {
 				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.airWeapon());
 			} else {
 				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());

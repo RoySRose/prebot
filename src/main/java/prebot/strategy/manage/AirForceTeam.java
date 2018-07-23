@@ -109,6 +109,9 @@ public class AirForceTeam {
 	}
 
 	public boolean retreating() {
+		if (AirForceManager.Instance().isAirForceDefenseMode()) {
+			return false;
+		}
 		return TimeUtils.elapsedFrames(retreatFrame) < RETREAT_TIME;
 	}
 	
@@ -134,8 +137,7 @@ public class AirForceTeam {
 	}
 
 	public void changeTargetIndex() {
-		if (AirForceManager.airForceTargetPositionSize <= 1) {
-			currentTargetIndex = 0;
+		if (AirForceManager.Instance().isAirForceDefenseMode()) {
 			return;
 		}
 		

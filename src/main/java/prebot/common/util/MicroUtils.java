@@ -44,7 +44,7 @@ public class MicroUtils {
 		double fleeRadian = oppositeDirectionRadian(startPosition, targetPosition);
 		int riskRadius = getRiskRadius(UnitType.Terran_Wraith);
 //		for (int moveDistance = WRAITH_MOVE_DISTANCE_48_FRAMES; moveDistance > 10; moveDistance = (int) (moveDistance * 0.7)) {
-		return airLowestRiskPosition(startPosition, Angles.AIR_FORCE_FREE, fleeRadian, WRAITH_MOVE_DISTANCE_48_FRAMES * 2, riskRadius);
+		return airLowestRiskPosition(startPosition, Angles.AIR_FORCE_FREE, fleeRadian, WRAITH_MOVE_DISTANCE_24_FRAMES * 2, riskRadius);
 	}
 	
 	private static Position airLowestRiskPosition(Position startPosition, int[] angles, double standRadian, int moveDistance, int riskRadius) {
@@ -62,7 +62,7 @@ public class MicroUtils {
 				continue;
 			}
 			
-			riskOfCandiPosition = riskOfPosition(UnitType.Terran_Wraith, candiPosition, riskRadius, true);
+			riskOfCandiPosition = airRiskOfPosition(UnitType.Terran_Wraith, candiPosition, riskRadius);
 			if (riskOfCandiPosition < minimumRisk) {
 				bestPosition = candiPosition;
 				minimumRisk = riskOfCandiPosition;
@@ -163,6 +163,31 @@ public class MicroUtils {
 				|| unitType == UnitType.Zerg_Defiler
 				|| unitType == UnitType.Protoss_Carrier
 				|| unitType == UnitType.Protoss_High_Templar;
+	}
+	
+	private static int airRiskOfPosition(UnitType myUnitType, Position movePosition, int radius) {
+		int risk = 0;
+		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(PlayerRange.ALL, movePosition, radius);
+		for (Unit unit : unitsInRadius) {
+			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
+				int damage = Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType);
+				if (damage > 0) {
+					if (unit.getType().isBuilding()) {
+						risk += 30;
+					} else {
+						risk = 10;
+					}
+				}
+				
+			} else if (unit.getPlayer() == Prebot.Broodwar.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
+				if (unit.getType() == UnitType.Terran_Missile_Turret) {
+					risk += 20;
+				} else {
+					risk += 5;
+				}
+			}
+		}
+		return risk;
 	}
 	
 	private static double getDistanceAfterSeconds(Position startPosition, Position endPosition, int seconds) {

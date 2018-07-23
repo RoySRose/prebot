@@ -194,37 +194,41 @@ public class UnitUtils {
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForEarlyDefense(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, false, unitTypes);
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForGround(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, false, unitTypes);
 	}
 	
 	public static void addEnemyUnitInfosInRadiusForAir(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, true, unitTypes);
+	}
+	
+	public static void addEnemyUnitInfosInRadius(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, true, unitTypes);
 	}
 	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, false, unitTypes);
 		return euiList;
 	}
 	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, true, unitTypes);
 		return euiList;
 	}
 	
 	public static List<UnitInfo> getUnitInfosInRadiusForAirComplete(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(false, true, euiList, position, radius, true, unitTypes);
+		addEnemyUnitInfosInRadius(false, true, euiList, position, radius, false, true, unitTypes);
 		return euiList;
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -259,9 +263,10 @@ public class UnitUtils {
 					if (eui.getType().airWeapon() != WeaponType.None) {
 						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 					}
-				} else {
+				}
+				if (enemyGroundWeopon) {
 					if (eui.getType().groundWeapon() != WeaponType.None) {
-						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon());
+						weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
 					}
 				}
 			}

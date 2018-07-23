@@ -6,11 +6,17 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.constant.CommonCode;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.strategy.UnitInfo;
 
 public abstract class Squad {
+	private int squadExecutedFrame;
+	
+	public boolean squadExecuted() {
+		return squadExecutedFrame == TimeUtils.elapsedFrames();
+	}
 
 	private String squadName;
 	private int priority;
@@ -77,6 +83,16 @@ public abstract class Squad {
 	public abstract List<Unit> recruit(List<Unit> assignableUnitList);
 
 	/// squad 실행
+	public void findEnemiesAndExecuteSquad() {
+		if (squadExecutedFrame == TimeUtils.elapsedFrames()) {
+//			System.out.println("ALREADY EXECUTED SQUAD - " + squadName);
+			return;
+		}
+		findEnemies();
+		execute();
+		squadExecutedFrame = TimeUtils.elapsedFrames();
+	}
+	
 	public abstract void execute();
 
 	/// 유효하지 않은 유닛(죽은 유닛 등)을 리턴
@@ -91,7 +107,7 @@ public abstract class Squad {
 	}
 
 	/// 적 탐색
-	public void findEnemies() {
+	protected void findEnemies() {
 		euiList.clear();
 		for (Unit unit : unitList) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);

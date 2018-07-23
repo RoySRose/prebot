@@ -84,7 +84,7 @@ public class VultureFightPredictor {
 	public static SmallFightPredict watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
-//		System.out.println("vulturePower : " + vulturePower + " / " +  " enemyPower : " + enemyPower);
+//		System.out.println("vulturePower : " + vulturePower + " / " +  " enemyPower : " + enemyPower + "(" + euiList.size() + ")");
 		
 		if (vulturePower > enemyPower * 1.5) {
 			return SmallFightPredict.OVERWHELM;

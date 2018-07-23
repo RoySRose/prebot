@@ -30,20 +30,20 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	private static final Map<UnitType, Integer> TYPE_SCORE = new HashMap<>();
 	static {
 		TYPE_SCORE.put(UnitType.Zerg_Spore_Colony, 100);
-		TYPE_SCORE.put(UnitType.Zerg_Hydralisk, 200);
-		TYPE_SCORE.put(UnitType.Zerg_Mutalisk, 200);
-		TYPE_SCORE.put(UnitType.Zerg_Devourer, 200);
-		TYPE_SCORE.put(UnitType.Zerg_Scourge, 350);
+		TYPE_SCORE.put(UnitType.Zerg_Hydralisk, 300);
+		TYPE_SCORE.put(UnitType.Zerg_Mutalisk, 300);
+		TYPE_SCORE.put(UnitType.Zerg_Devourer, 300);
+		TYPE_SCORE.put(UnitType.Zerg_Scourge, 300);
 		
 		TYPE_SCORE.put(UnitType.Terran_Bunker, 100);
-		TYPE_SCORE.put(UnitType.Terran_Missile_Turret, 200);
+		TYPE_SCORE.put(UnitType.Terran_Missile_Turret, 100);
 		TYPE_SCORE.put(UnitType.Terran_Medic, 300);
-		TYPE_SCORE.put(UnitType.Terran_Marine, 400);
-		TYPE_SCORE.put(UnitType.Terran_Ghost, 400);
-		TYPE_SCORE.put(UnitType.Terran_Battlecruiser, 400);
-		TYPE_SCORE.put(UnitType.Terran_Goliath, 400);
-		TYPE_SCORE.put(UnitType.Terran_Wraith, 450);
-		TYPE_SCORE.put(UnitType.Terran_Valkyrie, 450);
+		TYPE_SCORE.put(UnitType.Terran_Marine, 300);
+		TYPE_SCORE.put(UnitType.Terran_Ghost, 300);
+		TYPE_SCORE.put(UnitType.Terran_Battlecruiser, 300);
+		TYPE_SCORE.put(UnitType.Terran_Goliath, 300);
+		TYPE_SCORE.put(UnitType.Terran_Wraith, 300);
+		TYPE_SCORE.put(UnitType.Terran_Valkyrie, 300);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 		if (targetScore == null) {
 			targetScore = 100;
 		}
-		int distanceScore = getDistanceScore(unit, enemyUnit.getPosition()) * 10; // 레이쓰 전투는 거리를 중요시한다.
+		int distanceScore = getDistanceScore(unit, enemyUnit.getPosition()) * 20; // 레이쓰 전투는 거리를 중요시한다.
 		int hitpointScore = getHitPointScore(enemyUnit);
 		
 		return targetScore + distanceScore + hitpointScore;
@@ -177,7 +177,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	private int getHitPointScore(Unit enemyUnit) {
 		int hitPointScore = 50;
 		double hitPointPercent = (double) enemyUnit.getHitPoints() / enemyUnit.getType().maxHitPoints();
-		return (int) (hitPointScore * hitPointPercent);
+		return hitPointScore - (int) (hitPointScore * hitPointPercent);
 	}
 
 	// enemyUnit.isCloaked()
