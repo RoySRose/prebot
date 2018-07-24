@@ -14,15 +14,17 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.predictor.WraithFightPredictor;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AirForceManager {
@@ -101,8 +103,17 @@ public class AirForceManager {
 	public int getAccumulatedAchievement() {
 		return accumulatedAchievement;
 	}
+	
+	public void setAirForceDefenseMode(boolean airForceDefenseMode) {
+		this.airForceDefenseMode = airForceDefenseMode;
+	}
 
 	public boolean isAirForceDefenseMode() {
+		// 적 공격 수비 또는 적 베이스를 발견못한 경우 임시 defenseMode이다.
+		// 이 때의 targetPosition.size는 1이다.
+		if (targetPositions.size() <= 1) {
+			return true;
+		}
 		return airForceDefenseMode;
 	}
 
@@ -110,59 +121,87 @@ public class AirForceManager {
 		if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
 			return;
 		}
+		
+		defenseModeChange();
 		setTargetPosition();
 		changeAirForceTeamTargetPosition();
 		adjustStrikeLevel();
 		adjustWraithCount();
 	}
 
+	private void defenseModeChange() {
+		List<Unit> wraithList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
+		List<UnitInfo> airEuiList = new ArrayList<>();
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			airEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitType.Zerg_Mutalisk, UnitType.Zerg_Scourge, UnitType.Zerg_Devourer);
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			airEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Valkyrie);
+		} else if (InfoUtils.enemyRace() == Race.Protoss) {
+			airEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitType.Protoss_Scout, UnitType.Protoss_Corsair);
+		}
+		
+		int powerOfAirForce = WraithFightPredictor.powerOfAirForce(wraithList, false);
+		int powerOfEnemies = WraithFightPredictor.powerOfEnemies(airEuiList);
+		
+		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
+			powerOfEnemies += 250;
+		}
+//		System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
+		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
+			airForceDefenseMode = false;
+		} else {
+			airForceDefenseMode = true;
+		}
+	}
+
 	private void setTargetPosition() {
-		// TODO 미션...
-		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown
-				|| StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
-			setTargetPosition(true);
+		boolean defenseMode = airForceDefenseMode;
+		if (!defenseMode) {
+			if (firstBase == null || secondBase == null || targetPositions.isEmpty()) {
+				BaseLocation enemyBase = InfoUtils.enemyBase();
+				BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
+				if (enemyBase == null || enemyFirstExpansion == null) {
+					defenseMode = true;
+				}
+			}
+				
+			if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+				defenseMode = true;
+			}
+		}
+		
+		if (defenseMode) {
+			setDefensePositions();
 			return;
 		}
 		
-		BaseLocation enemyBase = InfoUtils.enemyBase();
-		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
-		if (enemyBase == null || enemyFirstExpansion == null) {
-			setTargetPosition(true);
-			return;
-		}
-		
-		// 초기화 필요
-		if (firstBase == null || secondBase == null || targetPositions.isEmpty()) {
-			setTargetPosition(false);
-			return;
-		}
-		
+
 		// base가 변경된 경우
 		boolean enemyBaseFirstCase = InfoUtils.enemyBase().equals(firstBase) && InfoUtils.enemyFirstExpansion().equals(secondBase);
 		boolean enemyExpansionFirstCase = InfoUtils.enemyFirstExpansion().equals(firstBase) && InfoUtils.enemyBase().equals(secondBase);
 		if (!enemyBaseFirstCase && !enemyExpansionFirstCase) {
-			setTargetPosition(false);
-			return;
-		}
+			setOffensePositions();
+//			this.setRetreatPosition();
+		}	
 	}
 
-	private void setTargetPosition(boolean defensivePosition) {
+	private void setDefensePositions() {
 		firstBase = secondBase = null;
 		targetPositions.clear();
-
-		if (defensivePosition) {
-			airForceDefenseMode = true;
-			setDefensivePosition();
-			this.retreatPosition = StrategyIdea.campPosition;	
-			
-		} else {
-			airForceDefenseMode = false;
-			setOffensivePosition();
-			setRetreatPositionForUseMapSetting();
-		}
 		
+		setDefensivePosition();
+		this.retreatPosition = StrategyIdea.campPosition;
 		AirForceManager.airForceTargetPositionSize = targetPositions.size();
 //		this.setRetreatPosition();
+	}
+
+	private void setOffensePositions() {
+		firstBase = secondBase = null;
+		targetPositions.clear();
+		
+		setOffensivePosition();
+		setRetreatPositionForUseMapSetting();
+		AirForceManager.airForceTargetPositionSize = targetPositions.size();
 	}
 
 	private void setDefensivePosition() {
@@ -317,7 +356,7 @@ public class AirForceManager {
 	}
 
 	private void adjustStrikeLevel() {
-		if (airForceDefenseMode) {
+		if (isAirForceDefenseMode()) {
 			strikeLevel = StrikeLevel.DEFENSE_MODE;
 			return;
 		}
@@ -372,11 +411,11 @@ public class AirForceManager {
 		if (levelDown) {
 			strikeLevel--;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-			setTargetPosition();
+			setOffensePositions();
 		} else if (levelUp) {
 			strikeLevel++;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-			setTargetPosition();
+			setOffensePositions();
 		}
 	}
 
@@ -415,9 +454,15 @@ public class AirForceManager {
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
 		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
+			if (airForceTeam.needRepairTeam) {
+				continue;
+			}
 			boolean cloakingMode = airForceTeam.cloakingMode;
 			for (AirForceTeam compareForceUnit : airForceTeamSet) {
-				if (cloakingMode != compareForceUnit.cloakingMode) {
+				if (compareForceUnit.needRepairTeam) {
+					continue;
+				}
+				if (cloakingMode != compareForceUnit.cloakingMode) { // 클로킹상태가 다른 레이쓰부대는 합쳐질 수 없다.
 					continue;
 				}
 				Unit airForceLeader = airForceTeam.leaderUnit;
@@ -442,30 +487,49 @@ public class AirForceManager {
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
 			airForceTeam.memberList.clear();
 		}
-		List<Integer> excludedWraithList = new ArrayList<>(); // 삭제된 레이쓰
 		List<Integer> uncloakedWraithList = new ArrayList<>(); // 언클락 레이쓰
+		List<Integer> needRepairWraithList = new ArrayList<>(); // 치료가 필요한 레이쓰
+		List<Integer> excludedWraithList = new ArrayList<>(); // 삭제된 레이쓰
+		
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			if (UnitUtils.isCompleteValidUnit(wraith)) {
-				AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
-				if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
-					uncloakedWraithList.add(wraithId);
+				if (wraith.getHitPoints() > 25) { // repair hit points
+					AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
+					if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
+						uncloakedWraithList.add(wraithId);
+					} else {
+						airForceTeam.memberList.add(wraith);
+					}
 				} else {
-					airForceTeam.memberList.add(wraith);
+					needRepairWraithList.add(wraithId);
 				}
+				
 			} else {
 				excludedWraithList.add(wraithId);
 			}
 		}
-		for (Integer wraithId : excludedWraithList) {
-			airForceTeamMap.remove(wraithId);
-		}
 		for (Integer wraithId : uncloakedWraithList) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			airForceTeamMap.remove(wraithId);
+		
 			AirForceTeam uncloackedForceTeam = new AirForceTeam(wraith);
 			uncloackedForceTeam.memberList.add(wraith);
 			airForceTeamMap.put(wraithId, uncloackedForceTeam);
+		}
+		
+		for (Integer wraithId : needRepairWraithList) {
+			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
+			airForceTeamMap.remove(wraithId);
+			
+			AirForceTeam needRepairTeam = new AirForceTeam(wraith);
+			needRepairTeam.needRepairTeam = true;
+			needRepairTeam.memberList.add(wraith);
+			airForceTeamMap.put(wraithId, needRepairTeam);
+		}
+		
+		for (Integer wraithId : excludedWraithList) {
+			airForceTeamMap.remove(wraithId);
 		}
 		
 		airForceTeamSet = new HashSet<>(airForceTeamMap.values());
@@ -474,6 +538,20 @@ public class AirForceManager {
 			// leader 교체
 			Unit newLeader = UnitUtils.getClosestUnitToPosition(airForceTeam.memberList, airForceTeam.getTargetPosition());
 			airForceTeam.leaderUnit = newLeader;
+			
+			// repair 완료처리
+			if (airForceTeam.needRepairTeam) {
+				boolean repairComplete = true;
+				for (Unit wraith : airForceTeam.memberList) {
+					if (wraith.getHitPoints() < 115) { // repair complete hit points
+						repairComplete = false;
+						break;
+					}
+				}
+				if (repairComplete) {
+					airForceTeam.needRepairTeam = false;
+				}
+			}
 			
 			// achievement
 			int achievement = airForceTeam.achievement();

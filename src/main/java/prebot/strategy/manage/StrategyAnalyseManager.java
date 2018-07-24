@@ -7,6 +7,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.UxColor;
+import prebot.common.debug.chat.impl.StrategyChanger;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -99,6 +100,10 @@ public class StrategyAnalyseManager {
 			analyser.analyse();
 		}
 
+		if (StrategyChanger.stopStrategiestForDebugging) {
+			return;
+		}
+		
 		if (strategist != null) {
 			EnemyStrategy strategyToApply = strategist.strategyToApply();
 			

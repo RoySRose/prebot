@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prebot.common.debug.chat.impl.GameSpeedAdjuster;
-import prebot.common.debug.chat.impl.StrategeChanger;
+import prebot.common.debug.chat.impl.StrategyChanger;
 import prebot.common.debug.chat.impl.StrikeLevelAdjuster;
 import prebot.common.debug.chat.impl.UxOptionChanger;
 
@@ -28,7 +28,7 @@ public class ChatBot {
 	static {
 		chatExecuters.add(new GameSpeedAdjuster('s'));
 		chatExecuters.add(new UxOptionChanger('d'));
-		chatExecuters.add(new StrategeChanger('$'));
+		chatExecuters.add(new StrategyChanger('$'));
 		chatExecuters.add(new StrikeLevelAdjuster('w'));
 	}
 

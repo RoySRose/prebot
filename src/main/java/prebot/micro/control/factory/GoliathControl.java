@@ -33,6 +33,10 @@ public class GoliathControl extends Control {
 			if (skipControl(unit)) {
 				continue;
 			}
+//			if (unit.isBeingHealed()) {
+//				CommandUtils.holdPosition(unit);
+//				continue;
+//			}
 			
 			Decision decision = decisionMaker.makeDecision(unit, euiList);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {

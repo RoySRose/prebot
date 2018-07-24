@@ -7,8 +7,11 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
-public class StrategeChanger extends ChatExecuter {
-	public StrategeChanger(char type) {
+public class StrategyChanger extends ChatExecuter {
+	
+	public static boolean stopStrategiestForDebugging = false;
+	
+	public StrategyChanger(char type) {
 		super(type);
 	}
 
@@ -21,9 +24,11 @@ public class StrategeChanger extends ChatExecuter {
 			if (enemyStrategy.name().toUpperCase().equals(inputStrategyName)) {
 				StrategyIdea.currentStrategy = enemyStrategy;
 				applyDetailValue(enemyStrategy);
+				stopStrategiestForDebugging = true;
 				return;
 			}
 		}
+		stopStrategiestForDebugging = false;
 	}
 
 	// StrategyAnalyseManager에서 copy

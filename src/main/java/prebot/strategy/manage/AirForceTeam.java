@@ -8,6 +8,7 @@ import java.util.Map;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
+import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -16,7 +17,7 @@ import prebot.strategy.UnitInfo;
 public class AirForceTeam {
 
 	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
-	private static final int RETREAT_TIME = 2 * TimeUtils.SECOND; // 타깃포지션별 재공격 시도 횟수
+	private static final int RETREAT_TIME = 2 * TimeUtils.SECOND; // 후퇴시간
 	private static final int WRAITH_EFFECTIVE_FRAME_SIZE = 25 * TimeUtils.SECOND;
 
 	public Unit leaderUnit;
@@ -29,6 +30,7 @@ public class AirForceTeam {
 	public UnitInfo fleeEui;
 	public int[] driveAngle;
 	public boolean cloakingMode;
+	public boolean needRepairTeam;
 
 	// for achievement
 	public int damagedEffectiveFrame = 0;
@@ -49,6 +51,7 @@ public class AirForceTeam {
 		this.fleeEui = null;
 		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 		this.cloakingMode = false;
+		this.needRepairTeam = false;
 	}
 	
 	public int achievement() {
@@ -165,7 +168,14 @@ public class AirForceTeam {
 		this.cloakingMode = true;
 	}
 	
+	public void decloak() {
+		this.cloakingMode = false;
+	}
+	
 	public boolean cloakable() {
+		if (!Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
+			return false;
+		}
 		if (cloakingMode) {
 			return false;
 		}
@@ -176,6 +186,10 @@ public class AirForceTeam {
 			}
 		}
 		return true;
+	}
+	
+	public boolean uncloakable() {
+		return cloakingMode;
 	}
 
 	@Override

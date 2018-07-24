@@ -647,5 +647,16 @@ public class MicroUtils {
 	public static WeaponType getWeapon(UnitType attacker, UnitType target) {
 		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
 	}
+	
+	public static boolean isInWeaponRange(Unit myUnit, UnitInfo eui) {
+		Unit enemy = UnitUtils.unitInSight(eui);
+		if (enemy != null) {
+			return myUnit.isInWeaponRange(enemy);
+		} else {
+			int enemyUnitDistance = myUnit.getDistance(eui.getLastPosition());
+			int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
+			return enemyUnitDistance <= weaponMaxRange;
+		}
+	}
 
 }

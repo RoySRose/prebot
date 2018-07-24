@@ -234,16 +234,15 @@ public class InformationManager extends GameManager {
 	public void update() {
 		//System.out.println("Frame: " +Prebot.Broodwar.getFrameCount());
 		updateFirstBarrack();
-		if(Prebot.Broodwar.getFrameCount() % 8 == 0) {
-			updateUnitsInfo();
-			updateCurrentStatusInfo();
-			updateBlockingEnterance();
-		}
+		
+		updateUnitsInfo();
+		updateCurrentStatusInfo();
+		updateBlockingEnterance();
+
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (Prebot.Broodwar.getFrameCount() % 31 == 0) {
-			updateBaseLocationInfo();
-//			setEveryMultiInfo();
-		}
+		updateBaseLocationInfo();
+		// setEveryMultiInfo();
+		
 		UnitCache.getCurrentCache().updateCache();
 
 		if (enemyFirstGas == null) {

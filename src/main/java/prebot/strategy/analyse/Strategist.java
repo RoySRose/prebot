@@ -48,7 +48,7 @@ public abstract class Strategist {
 	}
 
 	private boolean phase01End() {
-		if (TimeUtils.after(TimeUtils.timeToFrames(4, 0))) {
+		if (TimeUtils.after(TimeUtils.timeToFrames(4, 30))) {
 			return true;
 		}
 		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(phase01keyUnitType);

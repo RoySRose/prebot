@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bwapi.Position;
-import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
@@ -167,45 +166,56 @@ public class DecisionMaker {
 		UnitInfo bestTargetInfo = null;
 
 		if (!euiListAirWeapon.isEmpty()) {
-			boolean detectUnitExist = euiListDetector.isEmpty() && airForceTeam.damagedEffectiveFrame < 10;
-			boolean cloakingBonus = airForceTeam.cloakingMode && !detectUnitExist;
-			boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
-
-			SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
 			if (AirForceManager.Instance().isAirForceDefenseMode()) {
-				fightPredict = SmallFightPredict.ATTACK;
-			}
-			
-			if (fightPredict == SmallFightPredict.ATTACK) {
-				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
-
-			} else if (fightPredict == SmallFightPredict.BACK) {
-				if (Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field) && euiListDetector.isEmpty() && !cloakingBonus && airForceTeam.cloakable()) {
-					SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
-					if (cloakingFightPredict == SmallFightPredict.ATTACK) {
-						return Decision.change(airForceTeam.leaderUnit);
-					}
+				if (airForceTeam.cloakable()) {
+					return Decision.change(airForceTeam.leaderUnit);
 				}
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 				
-				for (UnitInfo eui : euiListAirWeapon) {
-					Unit unitInSight = UnitUtils.unitInSight(eui);
-					if (unitInSight != null) {
-						if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
-							return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
-						} else {
-							// isInWeaponRange는 제외해도 괜찮다.
-							int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
-							int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
-							if (enemyUnitDistance < weaponMaxRange) {
+			} else {
+				boolean detectUnitExist = !euiListDetector.isEmpty() || airForceTeam.damagedEffectiveFrame > 10; // 10 hitpoints reduced
+				boolean cloakingBonus = airForceTeam.cloakingMode && !detectUnitExist;
+				boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
+//				System.out.println("cloakingBonus : " + cloakingBonus);
+				
+				SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
+				
+				if (fightPredict == SmallFightPredict.ATTACK) {
+					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
+
+				} else {
+					if (euiListDetector.isEmpty() && !cloakingBonus && airForceTeam.cloakable()) {
+						SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
+						if (cloakingFightPredict == SmallFightPredict.ATTACK) {
+							return Decision.change(airForceTeam.leaderUnit);
+						}
+					}
+					
+					for (UnitInfo eui : euiListAirWeapon) {
+						Unit unitInSight = UnitUtils.unitInSight(eui);
+						if (unitInSight != null) {
+							if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
 								return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+							} else {
+								// isInWeaponRange는 제외해도 괜찮다.
+								int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
+								int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
+								if (enemyUnitDistance < weaponMaxRange) {
+									return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+								}
 							}
 						}
 					}
+					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding, StrikeLevel.SORE_SPOT);
 				}
-				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding, StrikeLevel.SORE_SPOT);
 			}
-
+			
 		} else {
+			if (AirForceManager.Instance().isAirForceDefenseMode()) {
+				if (airForceTeam.uncloakable()) {
+					return Decision.change(airForceTeam.leaderUnit);
+				}
+			}
 			bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
 		}
 

@@ -43,6 +43,8 @@ public class PositionFinder {
 	private static final int POSITION_EFFECTIVE_FRAME_SIZE = 20 * TimeUtils.SECOND;
 	private Position[] enemyGroundEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
+	
+	private Position commandCenterInsidePosition = null;
 
 	private static PositionFinder instance = new PositionFinder();
 
@@ -352,6 +354,10 @@ public class PositionFinder {
 
 	/// 커맨드센터와 미네랄 사이의 방어지역
 	private Position commandCenterInsidePosition() {
+		if (this.commandCenterInsidePosition != null) {
+			return commandCenterInsidePosition;
+		}
+		
 		int x = 0;
 		int y = 0;
 		int mineralCnt = 0;
@@ -372,7 +378,7 @@ public class PositionFinder {
 		finalx = (finalx + basePosition.getX()) / 2;
 		finaly = (finaly + basePosition.getY()) / 2;
 		
-		return new Position(finalx, finaly);
+		return commandCenterInsidePosition = new Position(finalx, finaly);
 	}
 
 	/// First Choke Point 방어지역

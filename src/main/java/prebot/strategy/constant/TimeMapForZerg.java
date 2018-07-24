@@ -87,10 +87,10 @@ public class TimeMapForZerg {
 		return new BuildTimeMap().setFeature(Feature.DEFENSE_FRONT, Feature.DETECT_IMPORTANT);
 	}
 	public static BuildTimeMap ZERG_NO_LAIR_LING() {
-		return new BuildTimeMap();
+		return new BuildTimeMap().setFeature(Feature.NO_LAIR);
 	}
 	public static BuildTimeMap ZERG_NO_LAIR_HYDRA() {
-		return new BuildTimeMap().setFeature(Feature.DEFENSE_FRONT);
+		return new BuildTimeMap().setFeature(Feature.NO_LAIR, Feature.DEFENSE_FRONT);
 	}
 	public static BuildTimeMap ZERG_LAIR_MIXED() {
 		return new BuildTimeMap();

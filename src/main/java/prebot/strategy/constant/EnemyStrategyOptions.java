@@ -183,7 +183,8 @@ public class EnemyStrategyOptions {
 	
 	public static class BuildTimeMap {
 		public enum Feature {
-			DOUBLE, MECHANIC, BIONIC, TWOGATE, QUICK_ATTACK, DEFENSE_FRONT, DEFENSE_DROP, DETECT_IMPORTANT
+			DOUBLE, QUICK_ATTACK, DEFENSE_FRONT, DEFENSE_DROP, DETECT_IMPORTANT,
+			TWOGATE, MECHANIC, BIONIC, NO_LAIR
 		}
 		
 		private Set<Feature> features = new HashSet<>();

@@ -137,6 +137,10 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
+		if (hasAnyInfo(ClueInfo.BARRACK_FASTEST_TWO, ClueInfo.BARRACK_FAST_TWO)) {
+			return EnemyStrategy.TERRAN_BIONIC;
+		}
+		
 		return EnemyStrategy.TERRAN_2FAC;
 	}
 

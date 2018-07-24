@@ -201,8 +201,8 @@ public enum EnemyStrategy {
 	ZERG_GROUND2(1, 5, 2, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
 	ZERG_GROUND1(1, 5, 3, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
 	ZERG_MIXED(1, 5, 5, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
-	ZERG_AIR1(1, 2, 6, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
-	ZERG_AIR2(1, 1, 10, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
+	ZERG_AIR1(1, 2, 6, Weight.GOLIATH, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
+	ZERG_AIR2(1, 1, 10, Weight.GOLIATH, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
 
 	// [테란전 기본전략 : 2스타포트 클로킹 레이쓰]
 	// : 1팩 -> 마린2기 -> 1벌처 (SCV죽이고) -> 2스타 -> 1스타애드온 클로킹개발 -> 레이스 몇개에서 출발할지는 TBD -> 팩토리애드온 -> 커맨드 -> 탱크

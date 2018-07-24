@@ -19,6 +19,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class EnemyBuildTimer {
@@ -76,13 +77,9 @@ public class EnemyBuildTimer {
 
 			if (darktemplarTime) {
 				StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame - 10 * TimeUtils.SECOND;
-				StrategyIdea.turretBuildStartFrame = StrategyIdea.turretNeedFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
-				StrategyIdea.engineeringBayBuildStartFrame = StrategyIdea.turretBuildStartFrame - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 				
 			} else if (reaverTime) {
 				StrategyIdea.turretNeedFrame = reaverInMyBaseFrame - 10 * TimeUtils.SECOND;
-				StrategyIdea.turretBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
-				StrategyIdea.engineeringBayBuildStartFrame = reaverInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 			}
 			
 			if (darkTemplarInMyBaseFrame != CommonCode.UNKNOWN) {
@@ -109,16 +106,18 @@ public class EnemyBuildTimer {
 
 			if (muteTime) {
 				StrategyIdea.turretNeedFrame = mutaliskInMyBaseFrame - 10 * TimeUtils.SECOND;
-				StrategyIdea.turretBuildStartFrame = mutaliskInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
-				StrategyIdea.engineeringBayBuildStartFrame = mutaliskInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 			} else if (lurkTime) {
 				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 10 * TimeUtils.SECOND;
-				StrategyIdea.turretBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
-				StrategyIdea.engineeringBayBuildStartFrame = lurkerInMyBaseFrame - UnitType.Terran_Missile_Turret.buildTime() - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 			}
 			
 			if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
 				StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
+				
+				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+					StrategyIdea.academyFrame += 4 * TimeUtils.MINUTE;
+				} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
+					StrategyIdea.academyFrame += 2 * TimeUtils.MINUTE;
+				}
 			}
 			
 		} else {
@@ -126,8 +125,16 @@ public class EnemyBuildTimer {
 			if (starportFrame != CommonCode.UNKNOWN) {
 				cloakingWraithFrame = starportFrame + UnitType.Terran_Starport.buildTime() + UnitType.Terran_Control_Tower.buildTime() + TechType.Cloaking_Field.researchTime();
 				StrategyIdea.academyFrame = cloakingWraithFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
+				
+				if (StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
+					StrategyIdea.turretNeedFrame = cloakingWraithFrame;
+				}
 			}
-		}
+			// TODO 테란전 터렛
+		} 
+		
+		StrategyIdea.turretBuildStartFrame = StrategyIdea.turretNeedFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
+		StrategyIdea.engineeringBayBuildStartFrame = StrategyIdea.turretBuildStartFrame - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
 		
 	}
 
