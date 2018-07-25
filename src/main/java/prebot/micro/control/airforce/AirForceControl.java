@@ -21,6 +21,7 @@ import prebot.micro.targeting.WraithTargetCalculator;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
+import prebot.strategy.manage.PositionFinder;
 
 public class AirForceControl extends Control {
 
@@ -136,9 +137,15 @@ public class AirForceControl extends Control {
 		if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 			if (wraithKitingType(decision.eui)) {
 				if (decisionDetail.type == DecisionType.KITING_UNIT) { // 카이팅 후퇴
-					// airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // kiting flee
-					Position airFleePosition = airFeePosition(airForceTeam, decision.eui);
-					airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+					if (AirForceManager.Instance().isAirForceDefenseMode()) {
+						Position airFleePosition = PositionFinder.Instance().basefirstChokeMiddlePosition();
+						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+						
+					} else {
+						// airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // kiting flee
+						Position airFleePosition = airFeePosition(airForceTeam, decision.eui);
+						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+					}
 					
 				} else {
 					if (decision.type == DecisionType.ATTACK_UNIT) { // 제자리 공격
@@ -172,7 +179,7 @@ public class AirForceControl extends Control {
 			
 		} else if (decision.type == DecisionType.ATTACK_POSITION) {
 			if (airForceTeam.needRepairTeam) {
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 				Unit repairCenter = UnitUtils.getClosestUnitToPosition(commandCenterList, airForceTeam.leaderUnit.getPosition());
 				airDrivingPosition = airDrivingPosition(airForceTeam, repairCenter.getPosition(), airForceTeam.driveAngle);
 				
@@ -236,6 +243,6 @@ public class AirForceControl extends Control {
 	}
 
 	private boolean wraithKitingType(UnitInfo eui) {
-		return eui.getType().airWeapon() != WeaponType.None; // && eui.getType().airWeapon().maxRange() <= UnitType.Terran_Wraith.groundWeapon().maxRange();
+		return eui.getType().airWeapon() != WeaponType.None && eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange();
 	}
 }

@@ -45,7 +45,8 @@ public class PositionFinder {
 	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	
 	private Position commandCenterInsidePosition = null;
-
+	private Position basefirstChokeMiddlePosition = null;
+	
 	private static PositionFinder instance = new PositionFinder();
 
 	public static PositionFinder Instance() {
@@ -353,7 +354,7 @@ public class PositionFinder {
 	}
 
 	/// 커맨드센터와 미네랄 사이의 방어지역
-	private Position commandCenterInsidePosition() {
+	public Position commandCenterInsidePosition() {
 		if (this.commandCenterInsidePosition != null) {
 			return commandCenterInsidePosition;
 		}
@@ -381,6 +382,17 @@ public class PositionFinder {
 		return commandCenterInsidePosition = new Position(finalx, finaly);
 	}
 
+	public Position basefirstChokeMiddlePosition() {
+		if (this.basefirstChokeMiddlePosition != null) {
+			return basefirstChokeMiddlePosition;
+		}
+		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
+
+		return basefirstChokeMiddlePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 500);
+	}
+	
 	/// First Choke Point 방어지역
 	private Position firstChokeDefensePosition() {
 		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();

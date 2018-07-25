@@ -129,6 +129,27 @@ public class InfoUtils {
 		return InformationManager.Instance().getEuiListInMyRegion(myRegion);
 	}
 	
+	public static List<UnitInfo> euiListInBase() {
+		return InformationManager.Instance().getEuiListInBaseRegion();
+	}
+
+	public static List<UnitInfo> euiListInExpansion() {
+		return InformationManager.Instance().getEuiListInExpansionRegion();
+	}
+	
+	public static List<UnitInfo> euiListInThirdRegion() {
+		return InformationManager.Instance().getEuiListInThirdRegion();
+	}
+	
+	public static Region myThirdRegion() {
+		return InformationManager.Instance().getThirdRegion(Prebot.Broodwar.self());
+	}
+	
+	public static Region enemyThirdRegion() {
+		return InformationManager.Instance().getThirdRegion(Prebot.Broodwar.enemy());
+	}
+	
+	
 	public static int squadUnitSize(SquadInfo squadInfo) {
 		Squad squad = CombatManager.Instance().squadData.getSquad(squadInfo.squadName);
 		if (squad != null && squad.unitList != null) {

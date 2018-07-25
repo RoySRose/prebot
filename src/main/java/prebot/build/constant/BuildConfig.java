@@ -9,7 +9,7 @@ public class BuildConfig {
 	public static final int MAX_WORKER_COUNT = 65;
 	
 	/// MapGrid 에서 한 개 GridCell 의 size
-	public static final int MAP_GRID_SIZE = 32;
+	public static final int MAP_GRID_SIZE = 256;
 	
 	/// StarCraft 및 BWAPI 에서 1 Tile = 32 * 32 Point (Pixel) 입니다<br>
 	/// Position 은 Point (Pixel) 단위이고, TilePosition 은 Tile 단위입니다 

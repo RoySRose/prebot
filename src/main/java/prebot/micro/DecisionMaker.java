@@ -179,6 +179,7 @@ public class DecisionMaker {
 //				System.out.println("cloakingBonus : " + cloakingBonus);
 				
 				SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
+//				System.out.println("fightPredict = " + fightPredict);
 				
 				if (fightPredict == SmallFightPredict.ATTACK) {
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
@@ -242,7 +243,14 @@ public class DecisionMaker {
 		boolean inWeaponRange = false;
 		boolean protectedByBuilding = false;
 		for (UnitInfo eui : euiListTarget) {
-			inWeaponRange = UnitUtils.unitInSight(eui) != null && airForceTeam.isInAirForceWeaponRange(eui.getUnit());
+			Unit enemyInSight = UnitUtils.unitInSight(eui);
+			if (enemyInSight != null) {
+				if (!enemyInSight.isDetected()) {
+					continue;
+				}
+				inWeaponRange = airForceTeam.isInAirForceWeaponRange(enemyInSight);
+			}
+			
 			protectedByBuilding = protectedByBuilding(eui, euiListAirDefenseBuilding);
 			if (!inWeaponRange && protectedByBuilding) { // 건물에 의해 보호받는 빌딩은 제외. 공격범위내에 있으면 예외
 				continue;

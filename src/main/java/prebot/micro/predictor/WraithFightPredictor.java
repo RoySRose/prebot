@@ -6,6 +6,7 @@ import java.util.Map;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
@@ -41,6 +42,7 @@ public class WraithFightPredictor {
 //			System.out.println("Bonus! 1000++");
 		}
 		int enemyPower = powerOfEnemies(euiList);
+//		System.out.println(wraithPower + "(" + wraithList.size() + ")" + " / " + enemyPower + "(" + euiList.size() + ")");
 		
 		if (wraithPower > enemyPower) {
 			return SmallFightPredict.ATTACK;
@@ -78,8 +80,19 @@ public class WraithFightPredictor {
 		}
 		Unit unitInSight = UnitUtils.unitInSight(eui);
 		if (unitInSight != null) {
-			double hitPointRate = (double) unitInSight.getHitPoints() / eui.getType().maxHitPoints();
-			return (int) (enemyPower * hitPointRate);
+			double hitPointRate;
+			if (unitInSight.isCloaked()) {
+				if (MicroUtils.totalComsatCount() <= 0) {
+					hitPointRate = 5.0;
+				} else {
+					hitPointRate = 1.0;
+				}
+			} else {
+				hitPointRate = (double) unitInSight.getHitPoints() / eui.getType().maxHitPoints();
+			}
+			int power = (int) (enemyPower * hitPointRate);
+//			System.out.println(power);
+			return power;
 		} else {
 			return enemyPower;
 		}

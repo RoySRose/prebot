@@ -104,15 +104,18 @@ public class StrategyAnalyseManager {
 			return;
 		}
 		
+		EnemyStrategy strategyToApply;
 		if (strategist != null) {
-			EnemyStrategy strategyToApply = strategist.strategyToApply();
+			strategyToApply = strategist.strategyToApply();
+		} else {
+			strategyToApply = EnemyStrategy.ZERG_INIT;
+		}
 			
-			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
-				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
-				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
-				StrategyIdea.currentStrategy = strategyToApply;
-				this.applyDetailValue(strategyToApply);
-			}
+		if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
+			Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+			StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
+			StrategyIdea.currentStrategy = strategyToApply;
+			this.applyDetailValue(strategyToApply);
 		}
 	}
 

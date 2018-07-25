@@ -113,16 +113,16 @@ public class TerranStrategist extends Strategist {
 			}
 		}
 		
-		if (hasInfo(ClueInfo.FACTORY_FAST_ONE)) {
-			return EnemyStrategy.TERRAN_1FAC_DOUBLE;
+		if (hasInfo(ClueInfo.STARPORT_TWO)) {
+			return EnemyStrategy.TERRAN_2STAR;
 		}
 		
 		if (hasInfo(ClueInfo.ACADEMY_FAST)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasInfo(ClueInfo.STARPORT_TWO)) {
-			return EnemyStrategy.TERRAN_2STAR;
+		if (hasInfo(ClueInfo.FACTORY_FAST_ONE)) {
+			return EnemyStrategy.TERRAN_1FAC_DOUBLE;
 		}
 		
 		if (hasInfo(ClueInfo.STARPORT_ONE)) {
@@ -133,7 +133,7 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasInfo(ClueInfo.FACTORY_NOT_FOUND)) {
+		if (hasInfo(ClueInfo.FACTORY_NOT_FOUND)) { // *
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		

@@ -494,7 +494,7 @@ public class AirForceManager {
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			if (UnitUtils.isCompleteValidUnit(wraith)) {
-				if (wraith.getHitPoints() > 25) { // repair hit points
+				if (wraith.getHitPoints() > 30) { // repair hit points
 					AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
 					if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
 						uncloakedWraithList.add(wraithId);

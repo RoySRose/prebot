@@ -31,6 +31,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.MapTools;
@@ -97,10 +98,12 @@ public class InformationManager extends GameManager {
 	private Map<Player, Chokepoint> firstChokePoint = new HashMap<Player, Chokepoint>();
 	/// 해당 Player의 mainBaseLocation 에서 가장 가까운 BaseLocation
 	private Map<Player, BaseLocation> firstExpansionLocation = new HashMap<Player, BaseLocation>();
+	private Map<Player, Region> thirdRegion = new HashMap<Player, Region>();
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
 	private Map<Player, Chokepoint> thirdChokePointDonotUse = new HashMap<Player, Chokepoint>();
+	
 	
 	public Position tighteningPoint = null;
 	
@@ -122,6 +125,9 @@ public class InformationManager extends GameManager {
 	
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
 	private Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
+	private List<UnitInfo> euiListInBaseRegion = new ArrayList<>();
+	private List<UnitInfo> euiListInExpansionRegion = new ArrayList<>();
+	private List<UnitInfo> euiListInThirdRegion = new ArrayList<>();
 
 	public Map<UnitType, Integer> baseToBaseUnit = new HashMap<UnitType, Integer>();
 	
@@ -195,6 +201,8 @@ public class InformationManager extends GameManager {
 		firstChokePoint.put(enemyPlayer, null);
 		firstExpansionLocation.put(selfPlayer, null);
 		firstExpansionLocation.put(enemyPlayer, null);
+		thirdRegion.put(selfPlayer, null);
+		thirdRegion.put(enemyPlayer, null);
 		secondChokePoint.put(selfPlayer, null);
 		secondChokePoint.put(enemyPlayer, null);
 		thirdChokePointDonotUse.put(selfPlayer, null);
@@ -368,13 +376,24 @@ public class InformationManager extends GameManager {
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
 	private void updateEnemiesLocation() {
 		euiListInMyRegion.clear();
+		euiListInBaseRegion.clear();
+		euiListInExpansionRegion.clear();
+		euiListInThirdRegion.clear();
+		
 		Set<Region> myRegionSet = occupiedRegions.get(selfPlayer);
 		for (Region region : myRegionSet) {
 			euiListInMyRegion.put(region, new ArrayList<UnitInfo>());
 		}
 		
+		Region myBaseRegion = BWTA.getRegion(mainBaseLocations.get(selfPlayer).getPosition());
+		Region myExpansionRegion = BWTA.getRegion(firstExpansionLocation.get(selfPlayer).getPosition());
+		Region myThirdRegion = BWTA.getRegion(thirdRegion.get(selfPlayer).getCenter());
+		
 		Map<Integer, UnitInfo> unitAndUnitInfoMap = unitData.get(enemyPlayer).getUnitAndUnitInfoMap();
 		for (UnitInfo eui : unitAndUnitInfoMap.values()) {
+			if (UnitUtils.ignorableEnemyUnitInfo(eui)) {
+				continue;
+			}
 			if (!PositionUtils.isValidPosition(eui.getLastPosition())) {
 //				Prebot.Broodwar.printf("updateEnemiesInMyRegion. invalid eui=" + eui); //TODO 테스트 코드 추후 삭제
 //				System.out.println("updateEnemiesInMyRegion. invalid eui=" + eui);
@@ -382,11 +401,23 @@ public class InformationManager extends GameManager {
 			}
 			
 			Region region = BWTA.getRegion(eui.getLastPosition());
+			if (region == null) {
+				continue;
+			}
+			
 			if (myRegionSet.contains(region)) {
 				List<UnitInfo> euiList = euiListInMyRegion.get(region);
 				euiList.add(eui);
 	            euiListInMyRegion.put(region, euiList);
 	        }
+			
+			if (region.equals(myBaseRegion)) {
+				euiListInBaseRegion.add(eui);
+			} else if (region.equals(myExpansionRegion)) {
+				euiListInExpansionRegion.add(eui);
+			} else if (region.equals(myThirdRegion)) {
+				euiListInThirdRegion.add(eui);
+			}
 		}
 	}
 
@@ -1021,6 +1052,10 @@ public class InformationManager extends GameManager {
 						closestDistance = tempDistance;
 						thirdChokePointDonotUse.put(selfPlayer, secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer, chokepoint);
+						
+						double radian = MicroUtils.targetDirectionRadian(firstExpansionLocation.get(selfPlayer).getPosition(), secondChokePoint.get(selfPlayer).getCenter());
+						Region myThirdRegion = BWTA.getRegion(MicroUtils.getMovePosition(secondChokePoint.get(selfPlayer).getCenter(), radian, 100));
+						thirdRegion.put(selfPlayer, myThirdRegion);
 					}
 				}
 				this.updateOtherExpansionLocation(sourceBaseLocation);
@@ -1059,6 +1094,10 @@ public class InformationManager extends GameManager {
 						closestDistance = tempDistance;
 						thirdChokePointDonotUse.put(enemyPlayer, secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer, chokepoint);
+						
+						double radian = MicroUtils.targetDirectionRadian(firstExpansionLocation.get(enemyPlayer).getPosition(), secondChokePoint.get(enemyPlayer).getCenter());
+						Region enemyThirdRegion = BWTA.getRegion(MicroUtils.getMovePosition(secondChokePoint.get(enemyPlayer).getCenter(), radian, 100));
+						thirdRegion.put(enemyPlayer, enemyThirdRegion);
 					}
 				}
 					
@@ -1322,6 +1361,10 @@ public class InformationManager extends GameManager {
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	public Chokepoint getSecondChokePoint(Player player) {
 		return secondChokePoint.get(player);
+	}
+
+	public Region getThirdRegion(Player player) {
+		return thirdRegion.get(player);
 	}
 
 	/// 해당 Player (아군 or 적군) 의 Main BaseLocation과 First Expansion을 제외한 BaseLocation을 가까운 순으로 정렬하여 리턴합니다		 
@@ -1765,6 +1808,18 @@ public class InformationManager extends GameManager {
 
 	public List<UnitInfo> getEuiListInMyRegion(Region region) {
 		return euiListInMyRegion.get(region);
+	}
+
+	public List<UnitInfo> getEuiListInBaseRegion() {
+		return euiListInBaseRegion;
+	}
+
+	public List<UnitInfo> getEuiListInExpansionRegion() {
+		return euiListInExpansionRegion;
+	}
+
+	public List<UnitInfo> getEuiListInThirdRegion() {
+		return euiListInThirdRegion;
 	}
 
 	private void updateFirstScout() {

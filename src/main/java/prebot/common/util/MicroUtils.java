@@ -13,6 +13,7 @@ import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -657,6 +658,17 @@ public class MicroUtils {
 			int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 			return enemyUnitDistance <= weaponMaxRange;
 		}
+	}
+	
+	public static int totalComsatCount() {
+		int count = 0;
+		List<Unit> comsatList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		for (Unit comsat : comsatList) {
+			if (comsat.getEnergy() >= 50) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 }

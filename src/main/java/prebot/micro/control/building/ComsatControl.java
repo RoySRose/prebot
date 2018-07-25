@@ -18,6 +18,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -27,45 +28,55 @@ import prebot.micro.control.Control;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.StrategyConfig;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class ComsatControl extends Control {
 
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+//		if (TimeUtils.executeRotation(0, 24)) {
+//			return;
+//		}
 		
 		// 상대 클록 유닛
 		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
 		if (PositionUtils.isValidPosition(scanPosition)) {
 			if (!MapGrid.Instance().scanIsActiveAt(scanPosition)) {
 				Unit comsatMaxEnergy = null;
-				int maxEnergy = 49;
+				int maxEnergy = 50;
 				for (Unit comsat : unitList) {
-					if (comsat.getEnergy() > maxEnergy && comsat.canUseTech(TechType.Scanner_Sweep, scanPosition)) {
+					if (comsat.getEnergy() >= maxEnergy && comsat.canUseTech(TechType.Scanner_Sweep, scanPosition)) {
 						maxEnergy = comsat.getEnergy();
 						comsatMaxEnergy = comsat;
 					}
 				}
 				if (comsatMaxEnergy != null) {
+					GridCell cell = MapGrid.Instance().getCell(scanPosition);
+					int timeLastScan = cell.getTimeLastScan() + StrategyConfig.SCAN_DURATION;
+					
+					System.out.println("timeLastScan : " + cell.getCenter() + " / " + scanPosition + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
+					System.out.println("frames : " + TimeUtils.elapsedFrames());
+					
 					MapGrid.Instance().scanAtPosition(scanPosition);
-					comsatMaxEnergy.useTech(TechType.Scanner_Sweep, scanPosition);
+					CommandUtils.useTechPosition(comsatMaxEnergy, TechType.Scanner_Sweep, scanPosition);
+					return;
 				}
 			}
-			return;
 		}
 
 		Unit comsatToUse = null;
-		int usableEnergy = 50;
+		int usableEnergy = 75;
 		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
-			usableEnergy = 150;
+			usableEnergy = 180;
 		} else if (TimeUtils.afterTime(10, 0)) {
-			usableEnergy = 120;
+			usableEnergy = 130;
 		} else if (TimeUtils.afterTime(7, 0)) {
 			usableEnergy = 90;
 		}
 		
 		for (Unit comsatStation : unitList) {
-			if (comsatStation.getEnergy() > usableEnergy) {
+			if (comsatStation.getEnergy() >= usableEnergy) {
 				comsatToUse = comsatStation;
 				usableEnergy = comsatStation.getEnergy();
 			}
@@ -75,7 +86,7 @@ public class ComsatControl extends Control {
 			
 			if (PositionUtils.isValidPosition(scanPositionForObservation)) {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
-				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
+				CommandUtils.useTechPosition(comsatToUse, TechType.Scanner_Sweep, scanPositionForObservation);
 			}
 		}
 		
@@ -126,7 +137,7 @@ public class ComsatControl extends Control {
 						if (myAttackUnitInWeaponRangeCount >= 3) {
 							return enemyUnit.getPosition();
 						}
-					} else if (enemyRace == Race.Protoss) {
+					} else if (enemyRace == Race.Terran) {
 						if (myAttackUnitInWeaponRangeCount >= 2) {
 							return enemyUnit.getPosition();
 						}

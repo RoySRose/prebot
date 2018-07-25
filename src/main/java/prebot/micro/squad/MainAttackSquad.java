@@ -8,6 +8,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -82,6 +83,7 @@ public class MainAttackSquad extends Squad {
 			for (Unit building : myBuildings) {
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 			}
+			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 	}
 }
