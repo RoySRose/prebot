@@ -13,6 +13,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandCenterControl extends BuildingFlyControl {
@@ -20,7 +21,12 @@ public class CommandCenterControl extends BuildingFlyControl {
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
-        processFly(unitList, euiList);
+        if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2
+                && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) == 2) {
+            List<Unit> unitTempList = new ArrayList<>();
+            unitTempList.add(getSecondCommandCenter());
+            processFly(unitTempList, euiList);
+        }
 	}
 
     @Override
