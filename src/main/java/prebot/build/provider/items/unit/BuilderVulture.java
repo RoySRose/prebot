@@ -11,6 +11,8 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 
 public class BuilderVulture extends DefaultBuildableItem {
 
@@ -23,6 +25,11 @@ public class BuilderVulture extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	//FileUtils.appendTextToFile("log.txt", "\n BuilderVulture ==>>> " + metaType.getName());
+    	
+    	if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.IMMEDIATELY && !UnitUtils.myUnitDiscovered(UnitType.Terran_Machine_Shop)){
+			return false;
+		}
+    	
 
         if(factoryUnitSelector.getSelected().equals(metaType.getUnitType())) {
             return true;

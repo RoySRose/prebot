@@ -11,6 +11,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.build.initialProvider.buildSets.AdaptNewStrategy;
 import prebot.build.initialProvider.buildSets.VsProtoss;
 import prebot.build.initialProvider.buildSets.VsTerran;
 import prebot.build.initialProvider.buildSets.VsZerg;
@@ -37,11 +38,14 @@ public class InitialBuildProvider {
 		return instance;
 	}
 	
+	private boolean adaptStrategy = false;
+	
 	public int nowMarine = 0;
 	
 	public int orderMarine  = 0;
 	
 	public ExpansionOption nowStrategy, bfStrategy;
+	public EnemyStrategy dbgNowStg, dbgBfStg;
 
 	public boolean InitialBuildFinished = false;
 	
@@ -56,6 +60,8 @@ public class InitialBuildProvider {
 		
 		nowStrategy = null;
 		bfStrategy = null;
+		dbgNowStg = null;
+		dbgBfStg = null;
    	 
 //		StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT
         //BlockingEntrance blockingEntrance = new BlockingEntrance();
@@ -73,7 +79,7 @@ public class InitialBuildProvider {
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
 		} else {
-			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, ExpansionOption.TWO_STARPORT);
+			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
 		}
 		
 		System.out.println("InitialBuildProvider onStart end");
@@ -83,41 +89,59 @@ public class InitialBuildProvider {
         if(BuildManager.Instance().buildQueue.isEmpty()){
         	
             InitialBuildFinished = true;
-//            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
+            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
+        }
+        
+        if(InitialBuildFinished == true && adaptStrategy == false) {
+        	nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+        	if(nowStrategy != ExpansionOption.ONE_FACTORY) {
+        		FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild adapt new strategy ==>> " + nowStrategy);
+        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
+        		InitialBuildFinished = false;
+        		adaptStrategy = true;
+        	}
         }
         
         if(InitialBuildFinished == false) {
         	
-        	if(bfStrategy == null)	{
-        		bfStrategy = StrategyIdea.currentStrategy.expansionOption;
-        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + bfStrategy.toString());
-        	}
-    		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
-    		
-//    		최초 전략과 현재 전략이 다르면 빌드오더 날리고 새로 심기
-    		if(bfStrategy != nowStrategy) {
-    			FileUtils.appendTextToFile("log.txt", "\n strategy is diffrent ::  nowStrategy : " + StrategyIdea.currentStrategy.toString());
-    			FileUtils.appendTextToFile("log.txt", "\n bfStrategy : " + bfStrategy.toString() + " & nowStrategy : " + nowStrategy.toString());
-    			deleteFromQueueAll();
-    			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
-    			
-    			List<Unit> unitList = Prebot.Broodwar.self().getUnits();
-				
-				Collections.sort(unitList, new Comparator<Unit>() {
-					@Override
-					public int compare(Unit p1, Unit p2) {
-						return p1.getType().toString().compareTo(p2.getType().toString());
-					}
-				});
-				UnitType nowUnit = UnitType.None;
-    			for(Unit unit : unitList) {
-    				if(nowUnit != unit.getType()) {
-    					nowUnit = unit.getType();
-    					deleteFromQueueCnt(nowUnit, UnitUtils.getUnitCount(nowUnit));
-    				}
-    			}
-    			bfStrategy = nowStrategy;
-    		}
+//        	if(bfStrategy == null)	{
+//        		bfStrategy = StrategyIdea.currentStrategy.expansionOption;
+////        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + bfStrategy.toString());
+//        		dbgBfStg = StrategyIdea.currentStrategy;
+////        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + dbgBfStg.toString());
+//        	}
+//    		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+//    		dbgNowStg = StrategyIdea.currentStrategy;
+//    		
+////    		최초 전략과 현재 전략이 다르면 빌드오더 날리고 새로 심기
+//    		if(bfStrategy != nowStrategy) {
+//    			FileUtils.appendTextToFile("log.txt", "\n strategy is diffrent ::  nowStrategy : " + dbgNowStg.toString() + " & dbgBfStg : " + dbgNowStg.toString());
+////    			FileUtils.appendTextToFile("log.txt", "\n bfStrategy : " + bfStrategy.toString() + " & nowStrategy : " + nowStrategy.toString());
+//    			BuildManager.Instance().getBuildQueue().clearAll();
+////    			deleteFromQueueAll();
+//    			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
+////    			debugingFromQueue("before");
+//    			
+//    			List<Unit> unitList = Prebot.Broodwar.self().getUnits();
+//				
+//				Collections.sort(unitList, new Comparator<Unit>() {
+//					@Override
+//					public int compare(Unit p1, Unit p2) {
+//						return p1.getType().toString().compareTo(p2.getType().toString());
+//					}
+//				});
+//				UnitType nowUnit = UnitType.None;
+//    			for(Unit unit : unitList) {
+//    				if(nowUnit != unit.getType()) {
+//    					nowUnit = unit.getType();
+//    					deleteFromQueueCnt(nowUnit
+//    							,ConstructionManager.Instance().getConstructionQueueItemCount(nowUnit, null) 
+//    							+Prebot.Broodwar.self().completedUnitCount(nowUnit));
+//    				}
+//    			}
+//    			bfStrategy = nowStrategy;
+////    			debugingFromQueue("after");
+//    		}
         	
 //        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
         	
@@ -153,6 +177,30 @@ public class InitialBuildProvider {
 
 
     }
+    
+    public void debugingFromQueue(String setStr){
+        BuildOrderItem dbgCheckItem= null;
+        BuildOrderQueue dbgTempbuildQueue = BuildManager.Instance().getBuildQueue();
+
+        int cnt =0;
+        FileUtils.appendTextToFile("log.txt", "\n "+ setStr + " debugingFromQueue start =============================");
+        if (!dbgTempbuildQueue.isEmpty()) {
+        	dbgCheckItem= dbgTempbuildQueue.getHighestPriorityItem();
+            while(true){
+                if(dbgTempbuildQueue.canGetNextItem() == true){
+                	dbgTempbuildQueue.canGetNextItem();
+                }else{
+                    break;
+                }
+                dbgTempbuildQueue.PointToNextItem();
+                dbgCheckItem = dbgTempbuildQueue.getItem();
+                cnt ++;
+                FileUtils.appendTextToFile("log.txt", "\n debugingFromQueue ::  unitType : " + cnt + " :: " + dbgCheckItem.metaType.getUnitType());
+                //tempbuildQueue.removeCurrentItem();
+            }
+        }
+        FileUtils.appendTextToFile("log.txt", "\n " + setStr + " debugingFromQueue end =============================");
+    }
 
     public int deleteFromQueue(UnitType unitType){
         BuildOrderItem checkItem= null;
@@ -174,6 +222,7 @@ public class InitialBuildProvider {
                 if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
                     cnt++;
                     tempbuildQueue.removeCurrentItem();
+                    
                 }
             }
         }
@@ -183,56 +232,82 @@ public class InitialBuildProvider {
     public void deleteFromQueueCnt(UnitType unitType, int chkCnt){
         BuildOrderItem checkItem= null;
         BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+//        BuildOrderQueue tempbuildQueue = BuildManager.Instance().buildQueue;
 
-        FileUtils.appendTextToFile("log.txt", "\n 새 빌드오더에서 삭제할 유닛  ::  unitType : " + unitType.toString() + " & chkCnt : " + chkCnt);
+        
         int cnt =0;
+        
+        if(unitType == UnitType.Terran_SCV) {
+        	chkCnt = chkCnt-4;
+        }
+        FileUtils.appendTextToFile("log.txt", "\n delete of new build order ::  unitType : " + unitType.toString() + " & chkCnt : " + chkCnt);
 
         if (!tempbuildQueue.isEmpty()) {
-            checkItem= tempbuildQueue.getHighestPriorityItem();
+//            checkItem= tempbuildQueue.getHighestPriorityItem();
             while(true){
+            	System.out.println("unitType :: " + unitType + " while true");
                 if(tempbuildQueue.canGetNextItem() == true){
                     tempbuildQueue.canGetNextItem();
                 }else{
                     break;
                 }
-                tempbuildQueue.PointToNextItem();
-                checkItem = tempbuildQueue.getItem();
+                checkItem= tempbuildQueue.getHighestPriorityItem();
+//                tempbuildQueue.PointToNextItem();
+//                checkItem = tempbuildQueue.getItem();
 
                 if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
-                    cnt++;
+                    FileUtils.appendTextToFile("log.txt", "\n delete unit ::  unitType : " + checkItem.metaType.getUnitType() + " to " + cnt);
                     tempbuildQueue.removeCurrentItem();
-                    if(cnt >= chkCnt) break;
+                    cnt++;
+//                    debugingFromQueue(" deleteFromQueueCnt "+ cnt + " :: " + unitType.toString());
+//                    if(cnt >= chkCnt) break;
+                }else {
+                	cnt = cnt + deleteFromQueueNext(tempbuildQueue, unitType);
                 }
+                if(cnt >= chkCnt) return;
             }
         }
 //        return cnt;
     }
     
+    public int deleteFromQueueNext(BuildOrderQueue tempQueue, UnitType unit){
+    	if(tempQueue.canGetNextItem() == true){
+	    	tempQueue.PointToNextItem();
+	    	FileUtils.appendTextToFile("log.txt", "\n deleteFromQueueNext ::  queue unitType : " + tempQueue.getItem().metaType.getUnitType() + " &&  deleteUnit ::" + unit);
+	    	if( tempQueue.getItem().metaType.getUnitType() == unit) {
+	    		tempQueue.removeCurrentItem();
+	    		return 1;
+	    	}else {
+	    		deleteFromQueueNext(tempQueue, unit);
+	    	}
+	    	return 0;
+    	}
+    	return 0;
+    }
+    
     
     public void deleteFromQueueAll(){
-        BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-
-//        int cnt =0;
-
-        if (!tempbuildQueue.isEmpty()) {
-            while(true){
-                if(tempbuildQueue.canGetNextItem() == true){
-                    tempbuildQueue.canGetNextItem();
-                }else{
-                    break;
-                }
-                tempbuildQueue.PointToNextItem();
-                tempbuildQueue.removeCurrentItem();
-//                cnt++;
-//                checkItem = tempbuildQueue.getItem();
+    	BuildManager.Instance().buildQueue = new BuildOrderQueue();
+//    	FileUtils.appendTextToFile("log.txt", "\n deleteFromQueueAll");
+//    	BuildOrderItem checkItem= null;
+//        BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
 //
-//                if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
-//                    cnt++;
-//                    tempbuildQueue.removeCurrentItem();
-//                }
-            }
-        }
-//        return cnt;
+//        if (!tempbuildQueue.isEmpty()) {
+//            checkItem= tempbuildQueue.getHighestPriorityItem();
+//            while(true){
+//	            if(tempbuildQueue.canGetNextItem() == true){
+//	                tempbuildQueue.canGetNextItem();
+//	            }else{
+//	                break;
+//	            }
+//	            tempbuildQueue.PointToNextItem();
+//	            checkItem = tempbuildQueue.getItem();
+//	            if(checkItem.metaType.isUnit()){
+//	            	FileUtils.appendTextToFile("log.txt", "\n tempbuildQueue.removeCurrentItem() => " + checkItem.metaType.getUnitType());
+//	                tempbuildQueue.removeCurrentItem();
+//	            }
+//            }
+//        }
     }
     
     
