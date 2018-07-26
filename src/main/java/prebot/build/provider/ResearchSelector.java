@@ -132,7 +132,7 @@ public class ResearchSelector implements Selector<MetaType>{
 							) {
 						continue;
 					}else {
-						System.out.println("upgradeOrder selected ==> " + metaType.getUpgradeType());
+//						System.out.println("upgradeOrder selected ==> " + metaType.getUpgradeType());
 						metaType = e;
 						break;
 					}
@@ -145,7 +145,7 @@ public class ResearchSelector implements Selector<MetaType>{
 						continue;
 					}else {
 						metaType = e;
-						System.out.println("techOrder selected ==> " + metaType.getTechType());
+//						System.out.println("techOrder selected ==> " + metaType.getTechType());
 						break;
 					}
 				}

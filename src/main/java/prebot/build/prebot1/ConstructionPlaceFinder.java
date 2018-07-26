@@ -265,12 +265,9 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
 //			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
 //			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
-			if(BlockingEntrance.Instance().entrance_turret != TilePosition.None) {
-				FileUtils.appendTextToFile("log.txt","\n desiredPosition : " + desiredPosition + " / entrance_turret : " + BlockingEntrance.Instance().entrance_turret);
-				FileUtils.appendTextToFile("log.txt","\\n desiredPosition : (" + desiredPosition.getX() +" , "+desiredPosition.getY()+")");
-				FileUtils.appendTextToFile("log.txt","\\n entrance_turret : (" + BlockingEntrance.Instance().entrance_turret.getX() +" , "+BlockingEntrance.Instance().entrance_turret.getY()+")");
-				if(desiredPosition == BlockingEntrance.Instance().entrance_turret) {
-					FileUtils.appendTextToFile("log.txt","\\n entrance_turret : buildingGapSpace : " + buildingGapSpace);
+			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
+//					FileUtils.appendTextToFile("log.txt","\\n entrance_turret : buildingGapSpace : " + buildingGapSpace);
 					buildingGapSpace = 0; 
 				}
 			}

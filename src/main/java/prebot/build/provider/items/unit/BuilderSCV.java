@@ -1,20 +1,13 @@
 package prebot.build.provider.items.unit;
 
-import java.util.List;
-
 import bwapi.Race;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
-import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
-import prebot.build.prebot1.ConstructionManager;
-import prebot.build.provider.BuildCondition;
-import prebot.build.provider.BuildConditionChecker;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
@@ -23,7 +16,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
-import prebot.strategy.RespondToStrategy;
+import prebot.strategy.StrategyIdea;
 
 public class BuilderSCV extends DefaultBuildableItem {
 
@@ -31,7 +24,7 @@ public class BuilderSCV extends DefaultBuildableItem {
         super(metaType);
     }
     
-    public boolean EXOK = false;
+//    public boolean EXOK = false;
 
     public final boolean buildCondition(){
     	
@@ -42,12 +35,12 @@ public class BuilderSCV extends DefaultBuildableItem {
 				return false;
 			}
     	
-    		executeFirstex();
+//    		executeFirstex();
 //	    	if(!InitialBuildProvider.Instance().InitialBuildFinished) {
 //	    		return false;
 //	    	}
 	    	
-	    	if (!EXOK) {
+	    	if (!StrategyIdea.EXOK) {
 				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 					Unit checkCC = null;
 					for (Unit unit : Prebot.Broodwar.self().getUnits()) {
@@ -187,38 +180,5 @@ public class BuilderSCV extends DefaultBuildableItem {
 
         return false;
     }
-    
-    public void executeFirstex() {
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
-			Unit checkCC = null;
-			BaseLocation temp = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-
-				if (unit.getType() != UnitType.Terran_Command_Center) {
-					continue;
-				}
-				if (unit.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() && unit.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
-					continue;
-				} else {
-					checkCC = unit;
-					break;
-				}
-			}
-			if (checkCC != null) {
-				if (checkCC.isLifted() == false) {
-					if (checkCC.getTilePosition().getX() != temp.getTilePosition().getX() || checkCC.getTilePosition().getY() != temp.getTilePosition().getY()) {
-						checkCC.lift();
-					}
-				} else {
-					checkCC.land(new TilePosition(temp.getTilePosition().getX(), temp.getTilePosition().getY()));
-				}
-				if (checkCC.isLifted() == false && checkCC.getTilePosition().getX() == temp.getTilePosition().getX()
-						&& checkCC.getTilePosition().getY() == temp.getTilePosition().getY()) {
-					EXOK = true;
-				}
-			}
-		}
-	}
-
 
 }

@@ -1,14 +1,9 @@
 package prebot.build.provider.items.tech;
 
-import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
-import prebot.build.provider.BuildConditionChecker;
-import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 
 public class BuilderIonThrusters extends DefaultBuildableItem {
 
