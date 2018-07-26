@@ -39,7 +39,7 @@ public class BuilderFactory extends DefaultBuildableItem {
     	}
     	
 		if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-			List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Factory);
+			List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
 			if (commandCenterList.size() < 2) {
 				return false;
 			}

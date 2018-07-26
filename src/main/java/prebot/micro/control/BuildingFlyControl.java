@@ -104,7 +104,7 @@ public abstract class BuildingFlyControl extends Control{
             this.buildingFly = BuildingFly.UP;
         }else {
             if (isGateway) {
-                if (InformationManager.Instance().enemyRace == Race.Zerg) {
+                if (Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
                     buildingFly = BuildingFly.DOWN;
                 }else{
                     if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {

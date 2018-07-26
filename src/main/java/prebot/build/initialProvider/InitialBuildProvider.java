@@ -1,6 +1,9 @@
 package prebot.build.initialProvider;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import bwapi.Race;
@@ -23,6 +26,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
 public class InitialBuildProvider {
@@ -36,21 +40,31 @@ public class InitialBuildProvider {
 	public int nowMarine = 0;
 	
 	public int orderMarine  = 0;
+	
+	public ExpansionOption nowStrategy, bfStrategy;
 
 	public boolean InitialBuildFinished = false;
+	
+	public TilePosition firstSupplyPos = TilePosition.None;
+	public TilePosition barrackPos = TilePosition.None;
+	public TilePosition secondSupplyPos = TilePosition.None;
+	public TilePosition factoryPos = TilePosition.None;
+	public TilePosition bunkerPos = TilePosition.None; 
 	
 	public void onStart() {
 		System.out.println("InitialBuildProvider onStart start");
 		
-		
+		nowStrategy = null;
+		bfStrategy = null;
    	 
+//		StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT
         //BlockingEntrance blockingEntrance = new BlockingEntrance();
 
-        TilePosition firstSupplyPos = BlockingEntrance.Instance().first_supple;
-        TilePosition barrackPos = BlockingEntrance.Instance().barrack;
-        TilePosition secondSupplyPos = BlockingEntrance.Instance().second_supple;
-        TilePosition factoryPos = BlockingEntrance.Instance().factory;
-        TilePosition bunkerPos = BlockingEntrance.Instance().bunker;
+        firstSupplyPos = BlockingEntrance.Instance().first_supple;
+        barrackPos = BlockingEntrance.Instance().barrack;
+        secondSupplyPos = BlockingEntrance.Instance().second_supple;
+        factoryPos = BlockingEntrance.Instance().factory;
+        bunkerPos = BlockingEntrance.Instance().bunker;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 //        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
 
@@ -59,7 +73,7 @@ public class InitialBuildProvider {
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
 			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
 		} else {
-			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, ExpansionOption.TWO_STARPORT);
 		}
 		
 		System.out.println("InitialBuildProvider onStart end");
@@ -73,6 +87,37 @@ public class InitialBuildProvider {
         }
         
         if(InitialBuildFinished == false) {
+        	
+        	if(bfStrategy == null)	{
+        		bfStrategy = StrategyIdea.currentStrategy.expansionOption;
+        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + bfStrategy.toString());
+        	}
+    		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+    		
+//    		최초 전략과 현재 전략이 다르면 빌드오더 날리고 새로 심기
+    		if(bfStrategy != nowStrategy) {
+    			FileUtils.appendTextToFile("log.txt", "\n strategy is diffrent ::  nowStrategy : " + StrategyIdea.currentStrategy.toString());
+    			FileUtils.appendTextToFile("log.txt", "\n bfStrategy : " + bfStrategy.toString() + " & nowStrategy : " + nowStrategy.toString());
+    			deleteFromQueueAll();
+    			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
+    			
+    			List<Unit> unitList = Prebot.Broodwar.self().getUnits();
+				
+				Collections.sort(unitList, new Comparator<Unit>() {
+					@Override
+					public int compare(Unit p1, Unit p2) {
+						return p1.getType().toString().compareTo(p2.getType().toString());
+					}
+				});
+				UnitType nowUnit = UnitType.None;
+    			for(Unit unit : unitList) {
+    				if(nowUnit != unit.getType()) {
+    					nowUnit = unit.getType();
+    					deleteFromQueueCnt(nowUnit, UnitUtils.getUnitCount(nowUnit));
+    				}
+    			}
+    			bfStrategy = nowStrategy;
+    		}
         	
 //        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
         	
@@ -133,6 +178,61 @@ public class InitialBuildProvider {
             }
         }
         return cnt;
+    }
+    
+    public void deleteFromQueueCnt(UnitType unitType, int chkCnt){
+        BuildOrderItem checkItem= null;
+        BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+
+        FileUtils.appendTextToFile("log.txt", "\n 새 빌드오더에서 삭제할 유닛  ::  unitType : " + unitType.toString() + " & chkCnt : " + chkCnt);
+        int cnt =0;
+
+        if (!tempbuildQueue.isEmpty()) {
+            checkItem= tempbuildQueue.getHighestPriorityItem();
+            while(true){
+                if(tempbuildQueue.canGetNextItem() == true){
+                    tempbuildQueue.canGetNextItem();
+                }else{
+                    break;
+                }
+                tempbuildQueue.PointToNextItem();
+                checkItem = tempbuildQueue.getItem();
+
+                if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
+                    cnt++;
+                    tempbuildQueue.removeCurrentItem();
+                    if(cnt >= chkCnt) break;
+                }
+            }
+        }
+//        return cnt;
+    }
+    
+    
+    public void deleteFromQueueAll(){
+        BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
+
+//        int cnt =0;
+
+        if (!tempbuildQueue.isEmpty()) {
+            while(true){
+                if(tempbuildQueue.canGetNextItem() == true){
+                    tempbuildQueue.canGetNextItem();
+                }else{
+                    break;
+                }
+                tempbuildQueue.PointToNextItem();
+                tempbuildQueue.removeCurrentItem();
+//                cnt++;
+//                checkItem = tempbuildQueue.getItem();
+//
+//                if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
+//                    cnt++;
+//                    tempbuildQueue.removeCurrentItem();
+//                }
+            }
+        }
+//        return cnt;
     }
     
     

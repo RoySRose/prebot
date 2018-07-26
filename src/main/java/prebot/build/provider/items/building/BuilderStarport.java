@@ -46,7 +46,10 @@ public class BuilderStarport extends DefaultBuildableItem {
 		}
 		
 		// TODO 필요한 정보 추가
-		boolean needVessel = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);
-		return (needVessel && activatedCommandCount >= 2) || activatedCommandCount >= 3;
+		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+			boolean needVessel = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);
+			return (needVessel && activatedCommandCount >= 2) || activatedCommandCount >= 3;
+		}
+		return false;
 	}
 }
