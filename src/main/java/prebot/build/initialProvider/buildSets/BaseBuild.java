@@ -26,9 +26,9 @@ public class BaseBuild {
 
     public void queueBuild(boolean blocking, UnitType type, TilePosition tilePosition) {
         BuildOrderQueue bq = BuildManager.Instance().buildQueue;
-        System.out.println("tilePosition ==> " + tilePosition);
+//        System.out.println("tilePosition ==> " + tilePosition);
         if(tilePosition == TilePosition.None) {
-        	System.out.println("tilePosition is None");
+//        	System.out.println("tilePosition is None");
         	bq.queueAsLowestPriority(type, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, blocking);
         }
         bq.queueAsLowestPriority(type, tilePosition, blocking);
