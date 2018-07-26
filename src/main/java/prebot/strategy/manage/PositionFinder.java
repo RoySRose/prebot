@@ -121,13 +121,13 @@ public class PositionFinder {
 		// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 		if (firstExpansionDetectingOk) {
 			int SECOND_CHOKE_MARGIN = 20 * 4; // TODO 추후 상수로 변경
-			int FIRST_EXPANSION_MARGIN = 15 * 4; // TODO 추후 상수로 변경
+			int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 				SECOND_CHOKE_MARGIN = 3 * 4;
 				FIRST_EXPANSION_MARGIN = 1 * 4;
 			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC) || firstExpansionOccupied()) {
-				SECOND_CHOKE_MARGIN = 8 * 4;
-				FIRST_EXPANSION_MARGIN = 4 * 4;
+				SECOND_CHOKE_MARGIN = 6 * 4;
+				FIRST_EXPANSION_MARGIN = 3 * 4;
 			}
 			// 병력이 쌓였다면 second choke에서 방어한다.
 			if (myTankSupplyCount >= 10 * 4
@@ -135,7 +135,7 @@ public class PositionFinder {
 				return InfoUtils.mySecondChoke().getCenter();
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-			if (myTankSupplyCount >= 5 * 4
+			if (myTankSupplyCount >= 4 * 4
 					|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 				return firstExpansionBackwardPosition();
 			}
@@ -392,20 +392,6 @@ public class PositionFinder {
 
 		return basefirstChokeMiddlePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 500);
 	}
-	
-	/// First Choke Point 방어지역
-	private Position firstChokeDefensePosition() {
-		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
-		Position myBasePosition = InfoUtils.myBase().getPosition();
-		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
-
-		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 220);
-		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
-			return firstChokeDefensePosition;
-		} else {
-			return firstChokePosition;
-		}
-	}
 
 	/// second choke보다 안쪽 포지션
 	private Position firstExpansionBackwardPosition() {
@@ -427,6 +413,20 @@ public class PositionFinder {
 //			int y = (firstChoke.getY() + firstExpansion.getY()) / 2;
 //			return new Position(x, y);
 //		}
+	}
+	
+	/// First Choke Point 방어지역
+	private Position firstChokeDefensePosition() {
+		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
+
+		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 220);
+		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
+			return firstChokeDefensePosition;
+		} else {
+			return firstChokePosition;
+		}
 	}
 
 	private boolean enemyBaseDestroyed(BaseLocation enemyBase) {

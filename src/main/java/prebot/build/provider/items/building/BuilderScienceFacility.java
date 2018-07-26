@@ -21,9 +21,10 @@ public class BuilderScienceFacility extends DefaultBuildableItem {
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) > 0) {
+		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Science_Facility)) {
 			return false;
 		}
+		
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 6) {
 			return true;
 		}
