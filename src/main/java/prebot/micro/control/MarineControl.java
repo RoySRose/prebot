@@ -1,5 +1,6 @@
 package prebot.micro.control;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.midi.Synthesizer;
@@ -8,12 +9,18 @@ import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.WeaponType;
 import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
@@ -32,7 +39,8 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class MarineControl extends Control {
-
+	private static final int NEAR_BASE_DISTANCE = 200;
+	
 	@Override
 	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
@@ -82,6 +90,10 @@ public class MarineControl extends Control {
 						CommandUtils.attackMove(marine, StrategyIdea.campPosition);
 					}
 				}
+				
+				if(!isInsidePositionToBase(marine.getPosition())){
+					MicroUtils.flee(marine, safePosition, fOption);
+				}
 			}
 		} else {
 			for (Unit marine : unitList) {
@@ -90,18 +102,34 @@ public class MarineControl extends Control {
 				}
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.KITING_UNIT) {
-					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
-					if (enemyInSight != null) {
-						if(enemyInSight.isInWeaponRange(marine) || marine.isInWeaponRange(enemyInSight)) {
+					//Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
+					List<Unit> enemyInSightList = new ArrayList<>();
+					for (UnitInfo eui : euiList) {
+						Unit enemy = UnitUtils.unitInSight(eui);
+						if (enemy != null) {
+							enemyInSightList.add(enemy);
+						}
+					}
+					Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
+					if (closeEnemyUnit != null) {
+						if(closeEnemyUnit.isInWeaponRange(marine) || marine.isInWeaponRange(closeEnemyUnit) || closeEnemyUnit.isInWeaponRange(bunker) || bunker.isInWeaponRange(closeEnemyUnit)) {
 							intoTheBunker(bunker, marine);
 						} else {
-							outOfTheBunker(marine, bunker, decision.eui, kOption);
+							if(bunker.getLoadedUnits().size() > (unitList.size() / 2) ){
+								outOfTheBunker(marine, bunker, decision.eui, kOption);
+							}else {
+								MicroUtils.kiting(marine, decision.eui, kOption);
+							}
 						}
 					} else {
 						intoTheBunker(bunker, marine);
 					}
 
 				} else {
+					intoTheBunker(bunker, marine);
+				}
+				
+				if(!isInsidePositionToBase(marine.getPosition())){
 					intoTheBunker(bunker, marine);
 				}
 			}
@@ -162,5 +190,13 @@ public class MarineControl extends Control {
 		return false;
 	}
 	
-
+	public boolean isInsidePositionToBase(Position position) {
+		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
+		System.out.println("position.getDistance(expansionBase.getPosition() : " + position.getDistance(expansionBase.getPosition()));
+		if (position.getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
+ 			return false;
+		}
+    	return true;
+	}
+	
 }

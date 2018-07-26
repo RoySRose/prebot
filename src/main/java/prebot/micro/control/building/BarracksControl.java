@@ -7,6 +7,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
@@ -36,7 +37,7 @@ public class BarracksControl extends BuildingFlyControl {
         if(getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
         	
             if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
-                    && UnitUtils.getUnitCount(UnitType.Terran_Vulture) >= 3 ){
+                    && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3 ){
                 setBuildingFly(BuildingFly.UP);
             }else if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
             	CommonCode.RegionType regionType = PositionUtils.positionToRegionType(StrategyIdea.campPosition);
@@ -45,7 +46,7 @@ public class BarracksControl extends BuildingFlyControl {
                 }
 
             }else{
-                if(UnitUtils.getUnitCount(UnitType.Terran_Vulture) >= 1){
+                if( UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1){
                     setBuildingFly(BuildingFly.UP);
                 }
             }

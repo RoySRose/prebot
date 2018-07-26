@@ -224,6 +224,9 @@ public class MicroUtils {
 		fleeUnit.rightClick(getFleePosition(fleeUnit, targetPosition, fOption));
 	}
 	
+	public static void fleeScout(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
+		fleeUnit.rightClick(getFleeScoutPosition(fleeUnit, targetPosition, fOption));
+	}
 	public static void kiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
 		if (UnitUtils.unitInSight(targetInfo) == null) {
 			kitingInvisible(rangedUnit, targetInfo, kOption);
@@ -401,6 +404,21 @@ public class MicroUtils {
 		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
 	}
 	
+	private static Position getFleeScoutPosition(Unit fleeUnit, Position targetPosition, FleeOption fOption) {
+		double fleeRadian = targetDirectionRadian(fleeUnit.getPosition(), targetPosition) + 90.0;
+		Position fleePosition = Position.None;
+		int moveDistanceOneSec = moveDistancePerFrame(fleeUnit, TimeUtils.SECOND); // 1초간 움직이는 거리
+		int riskRadius = getRiskRadius(fleeUnit.getType());
+		
+		for (int moveDistance = moveDistanceOneSec; moveDistanceOneSec > 10; moveDistanceOneSec = (int) (moveDistanceOneSec * 0.7)) {
+			fleePosition = lowestRiskPosition(fleeUnit, fOption, fleeRadian, moveDistance, riskRadius);
+			if (fleePosition != Position.None) {
+				break;
+			}
+		}
+		return PositionUtils.isValidPosition(fleePosition) ? fleePosition : fOption.goalPosition;
+	}
+	
 	private static int getRiskRadius(UnitType unitType) {
 		if (RISK_RADIUS_MAP.isEmpty()) {
 			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, Flee.RISK_RADIUS_VULTURE);
@@ -408,6 +426,7 @@ public class MicroUtils {
 			RISK_RADIUS_MAP.put(UnitType.Terran_Goliath, Flee.RISK_RADIUS_GOLIATH);
 			RISK_RADIUS_MAP.put(UnitType.Terran_Wraith, Flee.RISK_RADIUS_WRAITH);
 			RISK_RADIUS_MAP.put(UnitType.Terran_Science_Vessel, Flee.RISK_RADIUS_VESSEL);
+			RISK_RADIUS_MAP.put(UnitType.Terran_SCV, Flee.RISK_RADIUS_DEFAULT);
 		}
 		
 		Integer riskRadius = RISK_RADIUS_MAP.get(unitType);
