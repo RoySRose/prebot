@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -17,8 +18,15 @@ import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
+import prebot.micro.Decision;
+import prebot.micro.DecisionMaker;
+import prebot.micro.FleeOption;
+import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -35,14 +43,14 @@ public class ScvScoutControl extends Control {
 			if (skipControl(unit)) {
 				continue;
 			}
-			moveScoutUnit(unit);
+			moveScoutUnit(unit,euiList);
 		}
 	}
 
 	/// 정찰 유닛을 이동시킵니다
 	// 상대방 MainBaseLocation 위치를 모르는 상황이면, StartLocation 들에 대해 아군의 MainBaseLocation에서 가까운 것부터 순서대로 정찰
 	// 상대방 MainBaseLocation 위치를 아는 상황이면, 해당 BaseLocation 이 있는 Region의 가장자리를 따라 계속 이동함 (정찰 유닛이 죽을때까지)
-	private void moveScoutUnit(Unit scoutScv) {
+	private void moveScoutUnit(Unit scoutScv,List<UnitInfo> euiList) {
 		BaseLocation myBaseLocation = InfoUtils.myBase();
 		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
 		
@@ -61,6 +69,17 @@ public class ScvScoutControl extends Control {
 				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
 				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			}
+			for (UnitInfo eui : euiList) {
+				if (isCloseDangerousTarget(scoutScv, eui)) {
+					FleeOption fOption = new FleeOption(scoutBaseLocation.getPoint(), false, Angles.WIDE);
+					MicroUtils.fleeScout(scoutScv, eui.getLastPosition(), fOption);
+					return;
+				}else{
+					CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
+					return;
+				}
+			}
+			
 			CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
 		} else {
 			if (!Prebot.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
@@ -237,5 +256,29 @@ public class ScvScoutControl extends Control {
 		}
 		return expansionBase;
 		
+	}
+	
+	private boolean isCloseDangerousTarget(Unit myUnit, UnitInfo eui) {
+		boolean enemyIsComplete = eui.isCompleted();
+		Position enemyPosition = eui.getLastPosition();
+		UnitType enemyUnitType = eui.getType();
+		
+		Unit enemyUnit = UnitUtils.unitInSight(eui);
+		if (UnitUtils.isValidUnit(enemyUnit)) {
+			enemyIsComplete = enemyUnit.isCompleted();
+			enemyPosition = enemyUnit.getPosition();
+			enemyUnitType = enemyUnit.getType();
+		}
+
+		// 접근하면 안되는 거리인지 있는지 판단
+		int distanceToNearEnemy = myUnit.getDistance(enemyPosition);
+		int enemyWeaponRange = 0;
+
+		if (enemyUnitType == UnitType.Terran_Bunker) {
+			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
+		} else {
+			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
+		}
+		return distanceToNearEnemy <= enemyWeaponRange + 64;
 	}
 }

@@ -55,7 +55,7 @@ public class EarlyDefenseSquad extends Squad {
 		List<Unit> scvList = new ArrayList<>();
 		
 		for (Unit unit : assignableUnitList) {
-			if (unit.getType() == UnitType.Terran_Marine) {
+			if (unit.getType() == UnitType.Terran_Marine && unit.isCompleted()) {
 				marineList.add(unit);
 			} else if (unit.getType() == UnitType.Terran_SCV && WorkerManager.Instance().getWorkerData().getWorkerJob(unit) != WorkerJob.Scout) {
 				scvList.add(unit);
