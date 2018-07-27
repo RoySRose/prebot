@@ -30,20 +30,6 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			return false;
 		}
 		
-		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
-		
-		if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
-			FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
-			if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
-				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
-				for (Unit factory : factories) {
-					if (factory.getAddon() != null || !factory.canBuildAddon()) {
-						continue;
-					}
-				}
-			}
-		}
-		
 		
 		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null);
 		if (buildQueueCount > 0) {
@@ -54,16 +40,41 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			return false;
 		}
 		
+		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+		
+		
+		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+		
+			if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
+				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
+				if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
+					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
+					for (Unit factory : factories) {
+						if (factory.getAddon() != null || !factory.canBuildAddon()) {
+							continue;
+						}
+						return true;
+					}
+				}
+			}else {
+				return true;
+			}
+		}
+			
+			
+		
 		int factoryCountForMachineShop = 0;
 		int machineShopCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop);
 		
 		
 		for (Unit factory : factories) {
 			factoryCountForMachineShop++;
-			if (TilePositionUtils.addOnBuildable(factory.getTilePosition())) {
+			if (!TilePositionUtils.addOnBuildable(factory.getTilePosition())) {
 				factoryCountForMachineShop--;
 			}
 		}
+		
+		
 
 //		int vultureCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
 //		int tankCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
@@ -92,10 +103,24 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 				}
 			}
 
+//			4fac
+//			1 mac +0
+//			3 여유
 			if (machineShopCount + addition < factoryCountForMachineShop) {
 				return true;
 			}
 		}
+		
+//		4개 이상부터는 절반 머신샵 유지
+//		if(factories.size() >= 4 && factories.size()/2 >machineShopCount) {
+//			for (Unit factory : factories) {
+//				if (factory.getAddon() != null || !factory.canBuildAddon()) {
+//					continue;
+//				}
+//				return true;
+//			}
+//			
+//		}
         
         return false;
     }

@@ -14,11 +14,9 @@ import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
  */
 public class GasAdjustmentMechanic extends Action {
 
-	private boolean gasAjustmentFinshed = false;
-
 	@Override
 	public boolean exitCondition() {
-		if (gasAjustmentFinshed || TimeUtils.afterTime(5, 0)) {
+		if (TimeUtils.elapsedSeconds() > 210 || UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) >= 2) {
 			StrategyIdea.gasAdjustment = false;
 			StrategyIdea.gasAdjustmentWorkerCount = 0;
 			return true;
@@ -30,27 +28,25 @@ public class GasAdjustmentMechanic extends Action {
 	@Override
 	public void action() {
 		StrategyIdea.gasAdjustment = true;
-
-		int adjustGasWorkerCount = 0;
 		int workerCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_SCV);
-		if (workerCount > 8) {
-			adjustGasWorkerCount = 3;
-			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Factory)) {
-				if (Prebot.Broodwar.self().gas() >= 92) {
-					adjustGasWorkerCount = 1;
+		if (workerCount < 8) {
+			StrategyIdea.gasAdjustmentWorkerCount = 0;
+		} else {
+			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
+				if (UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) > 0 || Prebot.Broodwar.self().gas() >= 100) {
+					StrategyIdea.gasAdjustmentWorkerCount = 1;
+				} else {
+					StrategyIdea.gasAdjustmentWorkerCount = 3;
 				}
 			} else {
-				if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
-					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
-						adjustGasWorkerCount = 1;
-					} else {
-						gasAjustmentFinshed = true;
-					}
-				} else {
-					gasAjustmentFinshed = true;
+				if(!UnitUtils.myUnitDiscovered(UnitType.Terran_Factory) && (Prebot.Broodwar.self().gas() >= 100 || Prebot.Broodwar.self().gas() > Prebot.Broodwar.self().minerals())) {
+					StrategyIdea.gasAdjustmentWorkerCount = 1;
+				}else {
+					StrategyIdea.gasAdjustmentWorkerCount = 3;
 				}
+//				StrategyIdea.gasAdjustment = false;
+//				StrategyIdea.gasAdjustmentWorkerCount = 0;
 			}
 		}
-		StrategyIdea.gasAdjustmentWorkerCount = adjustGasWorkerCount;
 	}
 }
