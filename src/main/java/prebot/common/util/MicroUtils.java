@@ -1,8 +1,11 @@
 package prebot.common.util;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.DamageType;
 import bwapi.Position;
@@ -688,6 +691,37 @@ public class MicroUtils {
 			}
 		}
 		return count;
+	}
+	
+	public static boolean exposedByEnemy(Unit myUnit, Collection<UnitInfo> enemiesInfo) {
+		for (UnitInfo ei : enemiesInfo) {
+			if (myUnit.getDistance(ei.getLastPosition()) <= ei.getType().sightRange()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static Set<UnitInfo> filterFlyingTargetInfos(Collection<UnitInfo> targetInfos) {
+		Set<UnitInfo> newTargetInfos = new HashSet<>();
+		for (UnitInfo targetInfo : targetInfos) {
+			Unit target = UnitUtils.unitInSight(targetInfo);
+
+			if (target != null) {
+				if (!UnitUtils.isCompleteValidUnit(target)) {
+					continue;
+				}
+				if (target.isFlying()) {
+					newTargetInfos.add(targetInfo);
+				}
+			} else {
+				UnitType enemyUnitType = targetInfo.getType();
+				if (enemyUnitType.isFlyer()) {
+					newTargetInfos.add(targetInfo);
+				}
+			}
+		}
+		return newTargetInfos;
 	}
 
 }

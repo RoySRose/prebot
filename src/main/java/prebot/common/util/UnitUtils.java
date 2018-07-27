@@ -411,7 +411,13 @@ public class UnitUtils {
 	
 	/** 시야에서 사라진지 N초가 경과하여 무시할 수 있다고 판단되면 true 리턴 */
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
-		return ignorableEnemyUnitInfo(eui, StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS);
+		int ignoreSeconds;
+		if (eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_SIEGE_TANK_SECONDS;
+		} else {
+			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
+		}
+		return ignorableEnemyUnitInfo(eui, ignoreSeconds);
 	}
 	
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui, int ignoreSeconds) {

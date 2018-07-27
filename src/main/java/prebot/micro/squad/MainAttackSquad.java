@@ -6,30 +6,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.UnitCondition;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
 
 	private Set<UnitInfo> euisNearUnit = new HashSet<>();
-	private Set<UnitInfo> euisNearBuilding = new HashSet<>();
+	private Set<UnitInfo> euisNearBaseRegion = new HashSet<>();
 	
-	public Set<UnitInfo> getEuiListNearUnit() {
+	public Set<UnitInfo> getEuisNearUnit() {
 		return euisNearUnit;
 	}
 
-	public Set<UnitInfo> getEuiListNearBuilding() {
-		return euisNearBuilding;
+	public Set<UnitInfo> getEuisNearBaseRegion() {
+		return euisNearBaseRegion;
 	}
 
 	private TankControl tankControl = new TankControl();
@@ -52,16 +53,22 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public void execute() {
-		this.updateInitiatedFlag();
 		
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
-		
 		List<Unit> tankList = new ArrayList<>();
+		List<Unit> goliathList = new ArrayList<>();
+		
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Siege_Mode, new ArrayList<Unit>()));
-		tankControl.control(tankList, euiList);
+		goliathList.addAll(unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>()));
+
+		this.updateInitiatedFlag();
+		int saveUnitLevel = this.saveUnitLevel(tankList, goliathList);
 		
-		List<Unit> goliathList = unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>());
+		tankControl.setSaveUnitLevel(saveUnitLevel);
+		goliathControl.setSaveUnitLevel(saveUnitLevel);
+		
+		tankControl.control(tankList, euiList);
 		goliathControl.control(goliathList, euiList);
 	}
 
@@ -81,28 +88,74 @@ public class MainAttackSquad extends Squad {
 		}
 	}
 	
+	private int saveUnitLevel(List<Unit> tankList, List<Unit> goliathList) {
+		List<UnitInfo> closeTankEnemies = new ArrayList<>();
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			List<UnitInfo> nearTankEnemies = new ArrayList<>();
+			for (Unit tank : tankList) {
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(nearTankEnemies, tank.getPosition(), 200);
+			}
+			for (UnitInfo enemyInfo : nearTankEnemies) {
+				Unit enemy = UnitUtils.unitInSight(enemyInfo);
+				if (enemy != null) {
+					if (!UnitUtils.isCompleteValidUnit(enemy)) {
+						continue;
+					}
+				}
+				
+				if (enemyInfo.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || enemyInfo.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+					closeTankEnemies.add(enemyInfo);
+				}
+			}
+		}
+		
+		// 탱크 vs 탱크 전투 판단여부
+		int saveUnitLevel = 1;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (closeTankEnemies.size() * 3 <= tankList.size()) {
+				// System.out.println("go ahead");
+				saveUnitLevel = 1; // 거리재기 전진
+			} else {
+				// System.out.println("keep in line");
+				saveUnitLevel = 2; // 안전거리 유지
+			}
+		}
+
+		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) { // strategy manager 판단
+			saveUnitLevel = 0;
+		} else if (InformationManager.Instance().enemyRace != Race.Terran) { // combat manager 자체 판단
+			if (Prebot.Broodwar.self().supplyUsed() >= 360) { // || pushLine) {
+				saveUnitLevel = 0;
+			}
+		}
+		return saveUnitLevel;
+	}
+	
 	@Override
 	public void findEnemies() {
 		euisNearUnit.clear();
+		euisNearBaseRegion.clear();
+		
 		for (Unit unit : unitList) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearUnit, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 		}
+
+		euisNearBaseRegion.addAll(InfoUtils.euiListInBase());
+		euisNearBaseRegion.addAll(InfoUtils.euiListInExpansion());
+		euisNearBaseRegion.addAll(InfoUtils.euiListInThirdRegion());
 		
-		euisNearBuilding.clear();
-		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
-			@Override public boolean correspond(Unit unit) {
-				return unit.getType().isBuilding() && !unit.isFlying();
-			}
-		});
-		for (Unit building : myBuildings) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
-		}
-		
+//		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
+//			@Override public boolean correspond(Unit unit) {
+//				return unit.getType().isBuilding() && !unit.isFlying();
+//			}
+//		});
+//		for (Unit building : myBuildings) {
+//			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+//		}
+
+		euiList = euisNearBaseRegion;
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			euiList = euisNearUnit;
-		} else {
-			euiList = euisNearBuilding;
-			euiList.addAll(InfoUtils.euiListInThirdRegion());
+			euiList.addAll(euisNearUnit);
 		}
 	}
 	

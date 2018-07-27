@@ -52,7 +52,7 @@ public abstract class Strategist {
 			return true;
 		}
 		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(phase01keyUnitType);
-		return buildTimeExpect != CommonCode.UNKNOWN && TimeUtils.after(buildTimeExpect);
+		return buildTimeExpect != CommonCode.UNKNOWN && TimeUtils.after(buildTimeExpect + phase01keyUnitType.buildTime());
 	}
 
 	private boolean phase02End() {

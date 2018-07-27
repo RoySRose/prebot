@@ -2,6 +2,7 @@ package prebot.common.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -129,16 +130,16 @@ public class InfoUtils {
 		return InformationManager.Instance().getEuiListInMyRegion(myRegion);
 	}
 	
-	public static List<UnitInfo> euiListInBase() {
-		return InformationManager.Instance().getEuiListInBaseRegion();
+	public static Set<UnitInfo> euiListInBase() {
+		return InformationManager.Instance().getEuisInBaseRegion();
 	}
 
-	public static List<UnitInfo> euiListInExpansion() {
-		return InformationManager.Instance().getEuiListInExpansionRegion();
+	public static Set<UnitInfo> euiListInExpansion() {
+		return InformationManager.Instance().getEuisInExpansionRegion();
 	}
 	
-	public static List<UnitInfo> euiListInThirdRegion() {
-		return InformationManager.Instance().getEuiListInThirdRegion();
+	public static Set<UnitInfo> euiListInThirdRegion() {
+		return InformationManager.Instance().getEuisInThirdRegion();
 	}
 	
 	public static Region myThirdRegion() {

@@ -121,10 +121,10 @@ public class EnemyStrategyOptions {
 					if (commandCenter.isLifted()) {
 						continue;
 					}
-					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_BASE) {
+					RegionType regionType = PositionUtils.positionToRegionType(commandCenter.getPosition());
+					if (regionType == RegionType.MY_BASE) {
 						baseCommandCentertOk = true;
-					}
-					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+					} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
 						expansionCommandCenterOk = true;
 					}
 				}
@@ -154,10 +154,10 @@ public class EnemyStrategyOptions {
 				boolean expansionTurretOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
-					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_BASE) {
+					RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+					if (regionType == RegionType.MY_BASE) {
 						baseTurretOk = true;
-					}
-					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+					} else if (regionType == RegionType.MY_FIRST_EXPANSION || regionType == RegionType.MY_THIRD_REGION) {
 						expansionTurretOk = true;
 					}
 				}

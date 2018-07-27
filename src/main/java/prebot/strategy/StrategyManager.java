@@ -2,6 +2,7 @@ package prebot.strategy;
 
 import java.util.List;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -114,8 +115,22 @@ public class StrategyManager extends GameManager {
 		if (!StrategyIdea.mainSquadMode.isAttackMode) {
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
-			} else if (TimeUtils.after(15 * TimeUtils.MINUTE)) {
-				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+				
+			} else {
+				if (InfoUtils.enemyRace() == Race.Terran) {
+					if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) >= 4) {
+						StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+						
+						if (!AirForceManager.Instance().isAirForceDefenseMode()) {
+							AirForceManager.Instance().setAirForceDefenseMode(true);
+						}
+					}
+				} else {
+					if (TimeUtils.after(15 * TimeUtils.MINUTE)) {
+						StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+					}
+				}
+				
 			}
 			
 		} else {

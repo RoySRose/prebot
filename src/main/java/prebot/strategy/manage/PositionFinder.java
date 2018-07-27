@@ -123,11 +123,11 @@ public class PositionFinder {
 			int SECOND_CHOKE_MARGIN = 20 * 4; // TODO 추후 상수로 변경
 			int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-				SECOND_CHOKE_MARGIN = 3 * 4;
-				FIRST_EXPANSION_MARGIN = 1 * 4;
-			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC) || firstExpansionOccupied()) {
-				SECOND_CHOKE_MARGIN = 6 * 4;
-				FIRST_EXPANSION_MARGIN = 3 * 4;
+				SECOND_CHOKE_MARGIN = 2 * 4;
+				FIRST_EXPANSION_MARGIN = 0;
+			} else if (InfoUtils.enemyRace() == Race.Terran || firstExpansionOccupied()) {
+				SECOND_CHOKE_MARGIN = 4 * 4;
+				FIRST_EXPANSION_MARGIN = 2 * 4;
 			}
 			// 병력이 쌓였다면 second choke에서 방어한다.
 			if (myTankSupplyCount >= 10 * 4
@@ -246,9 +246,8 @@ public class PositionFinder {
 			if (UnitUtils.ignorableEnemyUnitInfo(eui)) {
 				continue;
 			}
-			
 			double distance = myFirstExpansionPosition.getDistance(eui.getLastPosition());
-			if (distance > 1000) {
+			if (distance > 1200) {
 				continue;
 			}
 			if (distance < closestDistance) {

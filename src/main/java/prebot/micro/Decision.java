@@ -16,7 +16,8 @@ public class Decision {
 		STOP("S"),
 		CHANGE_MODE("C"),
 		RIGHT_CLICK("R"),
-		UNITE("U");
+		UNITE("U"),
+		DO_NOTHING("N");
 		
 		private DecisionType(String shortName) {
 			this.SHORTNAME = shortName;
@@ -96,6 +97,12 @@ public class Decision {
 	
 	public static Decision unite(Unit myUnit) {
 		Decision decision = new Decision(DecisionType.UNITE, myUnit);
+		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+		return decision;
+	}
+	
+	public static Decision doNothing(Unit myUnit) {
+		Decision decision = new Decision(DecisionType.DO_NOTHING, myUnit);
 		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}

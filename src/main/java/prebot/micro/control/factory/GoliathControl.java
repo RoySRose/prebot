@@ -9,23 +9,28 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMaker;
+import prebot.micro.DecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
-import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class GoliathControl extends Control {
+	
+	private int saveUnitLevel;
+
+	public void setSaveUnitLevel(int saveUnitLevel) {
+		this.saveUnitLevel = saveUnitLevel;
+	}
 
 	// TODO 수리중인 골리앗 카이팅 하지 않기
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
+//		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 
@@ -38,7 +43,7 @@ public class GoliathControl extends Control {
 //				continue;
 //			}
 			
-			Decision decision = decisionMaker.makeDecision(unit, euiList);
+			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 
