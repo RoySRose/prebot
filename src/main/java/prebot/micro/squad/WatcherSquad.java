@@ -32,11 +32,12 @@ public class WatcherSquad extends Squad {
 	
 	public WatcherSquad() {
 		super(SquadInfo.WATCHER);
+		setUnitType(UnitType.Terran_Vulture);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Vulture;
+		return true;
 	}
 
 	@Override

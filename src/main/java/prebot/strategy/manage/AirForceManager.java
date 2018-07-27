@@ -1,6 +1,7 @@
 package prebot.strategy.manage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -470,9 +471,9 @@ public class AirForceManager {
 	}
 
 	/// update air force team
-	public void updateAirForceTeam(List<Unit> wraithList) {
+	public void updateAirForceTeam(Collection<Unit> wraiths) {
 		/// new team
-		for (Unit wraith : wraithList) {
+		for (Unit wraith : wraiths) {
 			AirForceTeam teamOfWraith = airForTeamOfWraith(wraith.getID());
 			if (teamOfWraith == null) {
 				airForceTeamMap.put(wraith.getID(), new AirForceTeam(wraith));
@@ -503,7 +504,7 @@ public class AirForceManager {
 		}
 
 		// 합쳐지는 팀 레이쓰의 airForceTeamMap을 재설정한다.
-		for (Unit wraith : wraithList) {
+		for (Unit wraith : wraiths) {
 			Integer fromForceUnitLeaderId = airForceTeamMap.get(wraith.getID()).leaderUnit.getID();
 			Integer toForceUnitLeaderId = airForceTeamMergeMap.get(fromForceUnitLeaderId);
 			if (toForceUnitLeaderId != null) {

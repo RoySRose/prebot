@@ -1,6 +1,7 @@
 package prebot.micro.control;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,8 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
-import prebot.micro.Decision;
-import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.constant.MicroConfig.Angles;
-import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -38,7 +36,7 @@ public class ScvScoutControl extends Control {
 	private boolean scoutFirstExpansionFlag = false;
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
 				continue;
@@ -50,7 +48,7 @@ public class ScvScoutControl extends Control {
 	/// 정찰 유닛을 이동시킵니다
 	// 상대방 MainBaseLocation 위치를 모르는 상황이면, StartLocation 들에 대해 아군의 MainBaseLocation에서 가까운 것부터 순서대로 정찰
 	// 상대방 MainBaseLocation 위치를 아는 상황이면, 해당 BaseLocation 이 있는 Region의 가장자리를 따라 계속 이동함 (정찰 유닛이 죽을때까지)
-	private void moveScoutUnit(Unit scoutScv,List<UnitInfo> euiList) {
+	private void moveScoutUnit(Unit scoutScv, Collection<UnitInfo> euiList) {
 		BaseLocation myBaseLocation = InfoUtils.myBase();
 		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
 		

@@ -1,6 +1,6 @@
 package prebot.micro.control.factory;
 
-import java.util.List;
+import java.util.Collection;
 
 import bwapi.Position;
 import bwapi.Unit;
@@ -24,7 +24,7 @@ public class GoliathControl extends Control {
 
 	// TODO 수리중인 골리앗 카이팅 하지 않기
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);

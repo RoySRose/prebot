@@ -2,6 +2,7 @@ package prebot.common.debug;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -1375,8 +1376,11 @@ public class UXManager {
 		Map<String, Long> resultTimeMap = BigWatch.getResultTimeMap();
 		Map<String, Long> recordTimeMap = BigWatch.getRecordTimeMap();
 
+		List<String> tags = new ArrayList<>(resultTimeMap.keySet());
+		Collections.sort(tags);
+		
 		int currentY = 0;
-		for (String tag : resultTimeMap.keySet()) {
+		for (String tag : tags) {
 			Long resultTime = resultTimeMap.get(tag);
 			Long recordTime = recordTimeMap.get(tag);
 			

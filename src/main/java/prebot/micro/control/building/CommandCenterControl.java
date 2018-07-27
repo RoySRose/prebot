@@ -1,5 +1,9 @@
 package prebot.micro.control.building;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -10,16 +14,12 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommandCenterControl extends BuildingFlyControl {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
         if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2
                 && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) == 2) {

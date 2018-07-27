@@ -1,6 +1,7 @@
 package prebot.micro;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
@@ -33,7 +34,7 @@ public class DecisionMaker {
 		this.targetScoreCalculator = targetScoreCalculator;
 	}
 
-	public Decision makeDecisionForSiegeMode(Unit myUnit, List<UnitInfo> euiList) {
+	public Decision makeDecisionForSiegeMode(Unit myUnit, Collection<UnitInfo> euiList) {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		
@@ -107,7 +108,7 @@ public class DecisionMaker {
 		return decision;
 	}
 
-	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, List<UnitInfo> euiList, int strikeLevel) {
+	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, int strikeLevel) {
 		int wraithMemorySeconds = 3;
 		if (strikeLevel < StrikeLevel.SORE_SPOT) {
 			wraithMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
@@ -282,7 +283,7 @@ public class DecisionMaker {
 		return false;
 	}
 	
-	public Decision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, List<UnitInfo> euiList, boolean movingAttack) {
+	public Decision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, boolean movingAttack) {
 		boolean allUnitCoolTimeReady = true;
 		for (Unit wraith : airForceTeam.memberList) {
 			if (wraith.getGroundWeaponCooldown() > 0) {
@@ -363,11 +364,11 @@ public class DecisionMaker {
 		}
 	}
 
-	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList) {
+	public Decision makeDecision(Unit myUnit, Collection<UnitInfo> euiList) {
 		return makeDecision(myUnit, euiList, false);
 	}
 	
-	public Decision makeDecision(Unit myUnit, List<UnitInfo> euiList, boolean overwhelm) {
+	public Decision makeDecision(Unit myUnit, Collection<UnitInfo> euiList, boolean overwhelm) {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		for (UnitInfo eui : euiList) {

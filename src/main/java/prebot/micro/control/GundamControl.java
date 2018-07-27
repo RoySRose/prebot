@@ -1,24 +1,23 @@
 package prebot.micro.control;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import bwapi.Position;
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.micro.WorkerManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class GundamControl extends Control {
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		
 		List<UnitInfo> enemyWorkers = new ArrayList<>();
 		//List<UnitInfo> enemyBuildings = new ArrayList<>();

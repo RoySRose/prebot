@@ -1,8 +1,10 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -19,15 +21,15 @@ import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
 
-	private List<UnitInfo> euiListNearUnit = new ArrayList<>();
-	private List<UnitInfo> euiListNearBuilding = new ArrayList<>();
+	private Set<UnitInfo> euisNearUnit = new HashSet<>();
+	private Set<UnitInfo> euisNearBuilding = new HashSet<>();
 	
-	public List<UnitInfo> getEuiListNearUnit() {
-		return euiListNearUnit;
+	public Set<UnitInfo> getEuiListNearUnit() {
+		return euisNearUnit;
 	}
 
-	public List<UnitInfo> getEuiListNearBuilding() {
-		return euiListNearBuilding;
+	public Set<UnitInfo> getEuiListNearBuilding() {
+		return euisNearBuilding;
 	}
 
 	private TankControl tankControl = new TankControl();
@@ -35,13 +37,12 @@ public class MainAttackSquad extends Squad {
 	
 	public MainAttackSquad() {
 		super(SquadInfo.MAIN_ATTACK);
+		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-				|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-				|| unit.getType() == UnitType.Terran_Goliath;
+		return true;
 	}
 
 	@Override
@@ -82,25 +83,25 @@ public class MainAttackSquad extends Squad {
 	
 	@Override
 	public void findEnemies() {
-		euiListNearUnit.clear();
+		euisNearUnit.clear();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiListNearUnit, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearUnit, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 		}
 		
-		euiListNearBuilding.clear();
+		euisNearBuilding.clear();
 		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
 			@Override public boolean correspond(Unit unit) {
 				return unit.getType().isBuilding() && !unit.isFlying();
 			}
 		});
 		for (Unit building : myBuildings) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiListNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 		}
 		
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			euiList = euiListNearUnit;
+			euiList = euisNearUnit;
 		} else {
-			euiList = euiListNearBuilding;
+			euiList = euisNearBuilding;
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 	}

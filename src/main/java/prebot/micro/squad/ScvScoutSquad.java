@@ -18,11 +18,12 @@ public class ScvScoutSquad extends Squad {
 
 	public ScvScoutSquad() {
 		super(SquadInfo.SCV_SCOUT);
+		setUnitType(UnitType.Terran_SCV);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_SCV;
+		return true;
 	}
 
 	@Override

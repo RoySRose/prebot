@@ -8,6 +8,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
@@ -107,6 +108,7 @@ public class CombatManager extends GameManager {
 			combatUnitList.add(myUnit);
 		}
 
+		BigWatch.start("arrangement");
 		updateSquadDefault(SquadInfo.EARLY_DEFENSE, combatUnitList);
 		updateSquadDefault(SquadInfo.MAIN_ATTACK, combatUnitList);
 		updateSquadDefault(SquadInfo.WATCHER, combatUnitList);
@@ -118,6 +120,7 @@ public class CombatManager extends GameManager {
 
 		updateDefenseSquad(combatUnitList);
 		updateGuerillaSquad(combatUnitList);
+		BigWatch.record("arrangement");
 	}
 
 	private void updateSquadDefault(SquadInfo squadInfo, List<Unit> combatUnitList) {
@@ -127,8 +130,11 @@ public class CombatManager extends GameManager {
 		for (Unit invalidUnit : squad.invalidUnitList()) {
 			squadData.excludeUnitFromSquad(invalidUnit);
 		}
+		
+		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, squad.getUnitTypes());
+		
 		List<Unit> assignableUnitList = new ArrayList<>();
-		for (Unit unit : combatUnitList) {
+		for (Unit unit : squadTypeUnitList) {
 			if (squad.want(unit) && squadData.canAssignUnitToSquad(unit, squad)) {
 				assignableUnitList.add(unit);
 			}
@@ -141,12 +147,14 @@ public class CombatManager extends GameManager {
 	}
 
 	private void squadExecution() {
+		BigWatch.start("execution");
 		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
 		mainSquad.findEnemiesAndExecuteSquad();
 		
 		for (Squad squad : squadData.getSquadMap().values()) {
 			squad.findEnemiesAndExecuteSquad(); // squad 유닛 명령 지시
 		}
+		BigWatch.record("execution");
 	}
 
 	private void updateDefenseSquad(List<Unit> combatUnitList) {
@@ -160,7 +168,8 @@ public class CombatManager extends GameManager {
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();
-		for (Unit unit : combatUnitList) {
+		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+		for (Unit unit : squadTypeUnitList) {
 			if (unit.getType() != UnitType.Terran_Vulture) {
 				continue;
 			}

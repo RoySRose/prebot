@@ -33,11 +33,12 @@ public class ScoutDefenseSquad extends Squad {
 
 	public ScoutDefenseSquad() {
 		super(SquadInfo.IDLE);
+		setUnitType(UnitType.Terran_SCV);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_SCV && unit.getHitPoints() > 16;
+		return unit.getHitPoints() > 16;
 	}
 
 	@Override

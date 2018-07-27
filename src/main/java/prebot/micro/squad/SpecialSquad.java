@@ -19,12 +19,12 @@ public class SpecialSquad extends Squad {
 
 	public SpecialSquad() {
 		super(SquadInfo.SPECIAL);
+		setUnitType(UnitType.Terran_Science_Vessel, UnitType.Terran_Dropship);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Dropship
-				|| unit.getType() == UnitType.Terran_Science_Vessel;
+		return true;
 	}
 
 	@Override

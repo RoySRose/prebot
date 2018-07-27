@@ -1,10 +1,10 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -14,8 +14,8 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
-import prebot.micro.WorkerManager;
 import prebot.micro.WorkerData.WorkerJob;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
@@ -33,20 +33,18 @@ public class EarlyDefenseSquad extends Squad {
 
 	public EarlyDefenseSquad() {
 		super(SquadInfo.EARLY_DEFENSE);
+		setUnitType(UnitType.Terran_Marine, UnitType.Terran_SCV);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		if (unit.getType() == UnitType.Terran_Marine) {
-			return true;
-		}
 		if (unit.getType() == UnitType.Terran_SCV) {
 			List<Unit> enemyUnitsInRegion = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.ENEMY);
 			if (!enemyUnitsInRegion.isEmpty()) {
 				return unit.getHitPoints() > 16;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class EarlyDefenseSquad extends Squad {
 		}
 	}
 
-	private List<Unit> defenseForScvAndMarine(List<Unit> marineList, List<Unit> scvList, List<UnitInfo> euiList) {
+	private List<Unit> defenseForScvAndMarine(List<Unit> marineList, List<Unit> scvList, Collection<UnitInfo> euiList) {
 		// TODO 포톤캐넌, 파일런, 벙커 등 전략 대응. 반응거리(REACT_RADIUS) 더 길게 처리. 건물 당 SCV 몇기를 동원할지 등 처리
 		List<Unit> enemyInSightList = new ArrayList<>();
 		for (UnitInfo eui : euiList) {

@@ -1,7 +1,7 @@
 package prebot.micro.control.airforce;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import bwapi.Position;
 import bwapi.Unit;
@@ -25,13 +25,13 @@ import prebot.strategy.manage.PositionFinder;
 public class AirForceControl extends Control {
 
 	@Override
-	public void control(List<Unit> wraithList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> wraithList, Collection<UnitInfo> euiList) {
 		if (wraithList.isEmpty()) {
 			return;
 		}
 
 		// 팀 단위로 wraithList가 세팅되어야 한다.
-		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(wraithList.get(0).getID());
+		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(wraithList.iterator().next().getID());
 		DecisionMaker decisionMaker = new DecisionMaker(new WraithTargetCalculator());
 
 		// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)

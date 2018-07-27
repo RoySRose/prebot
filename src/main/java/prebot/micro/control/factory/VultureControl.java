@@ -1,6 +1,6 @@
 package prebot.micro.control.factory;
 
-import java.util.List;
+import java.util.Collection;
 
 import bwapi.Position;
 import bwapi.TechType;
@@ -23,8 +23,8 @@ import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.SpiderMineManger;
-import prebot.strategy.manage.VultureTravelManager;
 import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
+import prebot.strategy.manage.VultureTravelManager;
 
 public class VultureControl extends Control {
 	
@@ -35,7 +35,7 @@ public class VultureControl extends Control {
 	}
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);

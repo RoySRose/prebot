@@ -1,7 +1,7 @@
 package prebot.micro.predictor;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
@@ -35,7 +35,7 @@ public class WraithFightPredictor {
 		WRAITH_TARGET.put(UnitType.Terran_Missile_Turret, 800);
 	}
 	
-	public static SmallFightPredict airForcePredictByUnitInfo(List<Unit> wraithList, List<UnitInfo> euiList, boolean cloakingBonus, boolean mainSquadBonus) {
+	public static SmallFightPredict airForcePredictByUnitInfo(Collection<Unit> wraithList, Collection<UnitInfo> euiList, boolean cloakingBonus, boolean mainSquadBonus) {
 		int wraithPower = powerOfAirForce(wraithList, cloakingBonus);
 		if (mainSquadBonus) {
 			wraithPower += 1000;
@@ -52,7 +52,7 @@ public class WraithFightPredictor {
 	}
 
 	// 레이쓰 한기 최대 점수 : 100점
-	public static int powerOfAirForce(List<Unit> wraithList, boolean cloakingBonus) {
+	public static int powerOfAirForce(Collection<Unit> wraithList, boolean cloakingBonus) {
 		int totalPower = 0;
 		for (Unit wraith : wraithList) {
 			double hitPointRate = (double) wraith.getHitPoints() / UnitType.Terran_Wraith.maxHitPoints();
@@ -65,7 +65,7 @@ public class WraithFightPredictor {
 		return totalPower;
 	}
 
-	public static int powerOfEnemies(List<UnitInfo> euiList) {
+	public static int powerOfEnemies(Collection<UnitInfo> euiList) {
 		int enemyPower = 0;
 		for (UnitInfo eui : euiList) {
 			enemyPower += powerOfUnit(eui);

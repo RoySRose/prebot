@@ -13,6 +13,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
+import prebot.common.debug.BigWatch;
 import prebot.common.debug.chat.ChatBot;
 import prebot.common.util.PlayerUtil;
 import prebot.common.util.UnitUtils;
@@ -65,6 +66,7 @@ public class GameCommander {
 		}
 
 		try {
+			BigWatch.start("... GAME COMMANDER ...");
 			logObserver.start();
 	
 			InformationManager.Instance().updateTimeCheck();
@@ -85,6 +87,7 @@ public class GameCommander {
 			CombatManager.Instance().updateTimeCheck();
 			
 			logObserver.observe();
+			BigWatch.record("... GAME COMMANDER ...");
 
 		} catch (Exception e) {
 			e.printStackTrace();

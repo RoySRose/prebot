@@ -1,11 +1,13 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import bwapi.Position;
 import bwapi.Unit;
-import prebot.common.constant.CommonCode;
+import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -21,9 +23,10 @@ public abstract class Squad {
 	private String squadName;
 	private int priority;
 	private int squadRadius;
+	protected UnitType[] unitTypes;
 
-	public List<Unit> unitList = new ArrayList<>();
-	public List<UnitInfo> euiList = new ArrayList<>();
+	public Set<Unit> unitList = new HashSet<>();
+	public Set<UnitInfo> euiList = new HashSet<>();
 	// public Position goalPosition = Position.None;
 
 	// private List<Unit> unitOldBies = new ArrayList<>();
@@ -40,6 +43,14 @@ public abstract class Squad {
 		this.priority = squadInfo.priority;
 		this.squadRadius = squadInfo.squadRadius;
 	}
+	
+	public void setUnitType(UnitType... unitTypes) {
+		this.unitTypes = unitTypes;
+	}
+
+	public UnitType[] getUnitTypes() {
+		return unitTypes;
+	}
 
 	public String getSquadName() {
 		return squadName;
@@ -54,24 +65,11 @@ public abstract class Squad {
 	}
 
 	public void removeUnit(Unit unit) {
-		// remove(Object), contains(Object)가 정상동작하는가? unitList.remove(unit); 등 추후 변경가능
-		int idx = getIndexOfUnitList(unit);
-		if (idx != CommonCode.INDEX_NOT_FOUND) {
-			unitList.remove(idx);
-		}
+		unitList.remove(unit);
 	}
 
 	public boolean hasUnit(Unit unit) {
-		return getIndexOfUnitList(unit) != CommonCode.INDEX_NOT_FOUND;
-	}
-
-	private int getIndexOfUnitList(Unit unit) {
-		for (int idx = 0; idx < unitList.size(); idx++) {
-			if (unitList.get(idx).getID() == unit.getID()) {
-				return idx;
-			}
-		}
-		return CommonCode.INDEX_NOT_FOUND;
+		return unitList.contains(unit);
 	}
 
 	public void update() {

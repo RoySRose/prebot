@@ -234,7 +234,7 @@ public class UnitUtils {
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euiList, Position position, int radius, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euis, Position position, int radius, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -243,7 +243,7 @@ public class UnitUtils {
 		}
 		
 		for (UnitInfo eui : values) {
-			if (euiList.contains(eui)) {
+			if (euis.contains(eui)) {
 				continue;
 			}
 			//TODO unitinfo에 쓰레기 값 들어가는 오류 있음 information manager 확인필요 (아래는 임시 조치)
@@ -280,7 +280,7 @@ public class UnitUtils {
 			if (eui.getLastPosition().getDistance(position) > radius + weaponRange) {
 				continue;
 			}
-			euiList.add(eui);
+			euis.add(eui);
 		}
 	}
 	
@@ -438,7 +438,7 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 가장 가까운 유닛 리턴 */
-	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position) {
+	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -448,7 +448,7 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 가장 가까운 유닛타입 유닛 리턴 */
-	public static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, final UnitType... unitTypes) {
+	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, final UnitType... unitTypes) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -462,7 +462,7 @@ public class UnitUtils {
 		});
 	}
 	
-	public static Unit getClosestUnitToPositionNotStunned(List<Unit> unitList, Position position) {
+	public static Unit getClosestUnitToPositionNotStunned(Collection<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -472,7 +472,7 @@ public class UnitUtils {
 	}
 	
 	/** unitList 중 position에 가장 가까운 미네랄 일꾼 리턴 */
-	public static Unit getClosestMineralWorkerToPosition(List<Unit> unitList, Position position) {
+	public static Unit getClosestMineralWorkerToPosition(Collection<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -481,7 +481,7 @@ public class UnitUtils {
 		});
 	}
 
-	public static Unit getClosestCombatWorkerToPosition(List<Unit> unitList, Position position) {
+	public static Unit getClosestCombatWorkerToPosition(Collection<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -490,7 +490,7 @@ public class UnitUtils {
 		});
 	}
 	
-	public static Unit getClosestUnitToPositionNotInSet(List<Unit> unitList, Position position, Set<Integer> unitIds) {
+	public static Unit getClosestUnitToPositionNotInSet(Collection<Unit> unitList, Position position, Set<Integer> unitIds) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -499,7 +499,7 @@ public class UnitUtils {
 		});
 	}
 	
-	public static Unit getFarthestCombatWorkerToPosition(List<Unit> unitList, Position position) {
+	public static Unit getFarthestCombatWorkerToPosition(Collection<Unit> unitList, Position position) {
 		return getFarthestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -509,12 +509,12 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
-	private static Unit getClosestUnitToPosition(List<Unit> unitList, Position position, UnitCondition unitCondition) {
+	private static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
 		if (unitList.size() == 0) {
 			return null;
 		}
 		if (!PositionUtils.isValidPosition(position)) {
-			return unitList.get(0);
+			return unitList.iterator().next();
 		}
 
 		Unit closestUnit = null;
@@ -534,12 +534,12 @@ public class UnitUtils {
 	}
 	
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
-	private static Unit getFarthestUnitToPosition(List<Unit> unitList, Position position, UnitCondition unitCondition) {
+	private static Unit getFarthestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
 		if (unitList.size() == 0) {
 			return null;
 		}
 		if (!PositionUtils.isValidPosition(position)) {
-			return unitList.get(0);
+			return unitList.iterator().next();
 		}
 
 		Unit farthesetUnit = null;
@@ -558,7 +558,7 @@ public class UnitUtils {
 		return farthesetUnit;
 	}
 
-	public static Map<UnitType, List<Unit>> makeUnitListMap(List<Unit> sourceUnitList) {
+	public static Map<UnitType, List<Unit>> makeUnitListMap(Collection<Unit> sourceUnitList) {
 		Map<UnitType, List<Unit>> unitListMap = new HashMap<>();
 		for (Unit unit : sourceUnitList) {
 			List<Unit> unitList = unitListMap.get(unit.getType());
@@ -617,7 +617,7 @@ public class UnitUtils {
 		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 
-	public static Unit leaderOfUnit(List<Unit> unitList) {
+	public static Unit leaderOfUnit(Collection<Unit> unitList) {
 		if (unitList.isEmpty()) {
 			return null;
 		}
@@ -642,7 +642,7 @@ public class UnitUtils {
 		return leader;
 	}
 	
-	public static Position centerPositionOfUnit(List<Unit> unitList, Position leaderPosition, int limitDistance) {
+	public static Position centerPositionOfUnit(Collection<Unit> unitList, Position leaderPosition, int limitDistance) {
 		int count = 0;
 		int x = 0;
 		int y = 0;

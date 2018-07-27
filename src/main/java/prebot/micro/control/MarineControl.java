@@ -1,24 +1,17 @@
 package prebot.micro.control;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import javax.sound.midi.Synthesizer;
-
 import bwapi.Position;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
-import bwta.Chokepoint;
 import bwta.Region;
-import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -31,7 +24,6 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
@@ -42,7 +34,7 @@ public class MarineControl extends Control {
 	private static final int NEAR_BASE_DISTANCE = 200;
 	
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = getCompleteBunker(campRegion);
 		if (bunker == null) {
@@ -192,7 +184,7 @@ public class MarineControl extends Control {
 	
 	public boolean isInsidePositionToBase(Position position) {
 		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
-		System.out.println("position.getDistance(expansionBase.getPosition() : " + position.getDistance(expansionBase.getPosition()));
+//		System.out.println("position.getDistance(expansionBase.getPosition() : " + position.getDistance(expansionBase.getPosition()));
 		if (position.getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
  			return false;
 		}

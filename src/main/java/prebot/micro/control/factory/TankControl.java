@@ -1,6 +1,7 @@
 package prebot.micro.control.factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
@@ -38,7 +39,7 @@ public class TankControl extends Control {
 	private int siegeModeSpreadRadius;
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
@@ -61,7 +62,7 @@ public class TankControl extends Control {
 		executeTankMode(tankModeList, euiList);
 	}
 
-	private void executeSiegeMode(List<Unit> siegeModeList, List<UnitInfo> euiList) {
+	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList) {
 
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
@@ -89,7 +90,7 @@ public class TankControl extends Control {
 		}
 	}
 
-	private void executeTankMode(List<Unit> tankModeList, List<UnitInfo> euiList) {
+	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);

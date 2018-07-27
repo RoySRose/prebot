@@ -1,6 +1,7 @@
 package prebot.micro.control.factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
@@ -43,7 +44,7 @@ public class WatcherControl extends Control {
 	}
 	
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		Position fleePosition = StrategyIdea.mainSquadCenter;
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
@@ -62,7 +63,7 @@ public class WatcherControl extends Control {
 		}
 	}
 
-	private void fight(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition, int coverRadius) {
+	private void fight(Collection<Unit> unitList, Collection<UnitInfo> euiList, Position fleePosition, int coverRadius) {
 		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
@@ -125,7 +126,7 @@ public class WatcherControl extends Control {
 	}
 
 	/// 전방에 있는 벌처는 후퇴, 후속 벌처는 전진하여 squad유닛을 정비한다.
-	private void regroup(List<Unit> unitList, List<UnitInfo> euiList, Position fleePosition, int coverRadius) {
+	private void regroup(Collection<Unit> unitList, Collection<UnitInfo> euiList, Position fleePosition, int coverRadius) {
 		int regroupRadius = Math.min(UnitType.Terran_Vulture.sightRange() + unitList.size() * 80, 1000);
 //		System.out.println("regroupRadius : " + regroupRadius);
 		

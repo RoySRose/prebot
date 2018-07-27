@@ -1,5 +1,6 @@
 package prebot.micro.predictor;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class VultureFightPredictor {
 //		return getResult(vulturePower, enemyPower);
 //	}
 	
-	public static SmallFightPredict watcherPredictByUnitInfo(List<Unit> vultures, List<UnitInfo> euiList) {
+	public static SmallFightPredict watcherPredictByUnitInfo(Collection<Unit> vultures, Collection<UnitInfo> euiList) {
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 //		System.out.println("vulturePower : " + vulturePower + " / " +  " enemyPower : " + enemyPower + "(" + euiList.size() + ")");
@@ -96,7 +97,7 @@ public class VultureFightPredictor {
 	}
 
 	// 벌처 한기 최대 점수 : 70점 (업그레이드시 100점)
-	public static int powerOfWatchers(List<Unit> vultureList) {
+	public static int powerOfWatchers(Collection<Unit> vultureList) {
 		int totalPower = 0;
 		for (Unit vulture : vultureList) {
 			totalPower += VULTURE_POWER;
@@ -123,7 +124,7 @@ public class VultureFightPredictor {
 		return enemyTotalPower;
 	}
 	
-	public static int powerOfEnemiesByUnitInfo(List<UnitInfo> euiList) {
+	public static int powerOfEnemiesByUnitInfo(Collection<UnitInfo> euiList) {
 		int enemyTotalPower = 0;
 		for (UnitInfo eui : euiList) {
 			UnitType unitType = UnitType.Unknown;

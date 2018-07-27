@@ -21,11 +21,12 @@ public class GuerillaSquad extends Squad {
 	public GuerillaSquad(Position position) {
 		super(SquadInfo.GUERILLA_, position);
 		this.targetPosition = position;
+		setUnitType(UnitType.Terran_Vulture);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Vulture;
+		return true;
 	}
 
 	@Override

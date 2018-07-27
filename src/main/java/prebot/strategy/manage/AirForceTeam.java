@@ -1,9 +1,10 @@
 package prebot.strategy.manage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.Position;
 import bwapi.TechType;
@@ -21,7 +22,7 @@ public class AirForceTeam {
 	private static final int WRAITH_EFFECTIVE_FRAME_SIZE = 25 * TimeUtils.SECOND;
 
 	public Unit leaderUnit;
-	public List<Unit> memberList = new ArrayList<>();
+	public Set<Unit> memberList = new HashSet<>();
 	public int currentTargetIndex = 0;
 	public int retreatFrame = 0;
 	public int targetTryCount = 0;

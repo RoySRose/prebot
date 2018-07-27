@@ -1,6 +1,7 @@
 package prebot.micro.control.building;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Order;
@@ -28,13 +29,13 @@ import prebot.micro.control.Control;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyConfig;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.StrategyConfig;
 
 public class ComsatControl extends Control {
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 //		if (TimeUtils.executeRotation(0, 24)) {
 //			return;
 //		}
@@ -55,7 +56,7 @@ public class ComsatControl extends Control {
 					GridCell cell = MapGrid.Instance().getCell(scanPosition);
 					int timeLastScan = cell.getTimeLastScan() + StrategyConfig.SCAN_DURATION;
 					
-					System.out.println("timeLastScan : " + cell.getCenter() + " / " + scanPosition + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
+					System.out.println("timeLastScan : " + scanPosition + " / " + cell.getCenter() + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
 					System.out.println("frames : " + TimeUtils.elapsedFrames());
 					
 					MapGrid.Instance().scanAtPosition(scanPosition);
@@ -93,7 +94,7 @@ public class ComsatControl extends Control {
 	}
 
 	/// 클로킹 유닛용 스캔 포지션
-	private Position scanPositionForInvisibleEnemy(List<UnitInfo> euiList) {
+	private Position scanPositionForInvisibleEnemy(Collection<UnitInfo> euiList) {
 		for (UnitInfo eui : euiList) {
 			Unit enemyUnit = eui.getUnit();
 			if (!UnitUtils.isValidUnit(enemyUnit) || !enemyUnit.isVisible()) {

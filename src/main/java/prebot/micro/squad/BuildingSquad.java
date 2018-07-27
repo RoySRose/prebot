@@ -26,15 +26,16 @@ public class BuildingSquad extends Squad {
 
 	public BuildingSquad() {
 		super(SquadInfo.BUILDING);
+		setUnitType(UnitType.Terran_Barracks
+				, UnitType.Terran_Engineering_Bay
+				, UnitType.Terran_Command_Center
+				, UnitType.Terran_Science_Facility
+				, UnitType.Terran_Comsat_Station);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Barracks
-				|| unit.getType() == UnitType.Terran_Engineering_Bay
-				|| unit.getType() == UnitType.Terran_Command_Center
-				|| unit.getType() == UnitType.Terran_Science_Facility
-				|| unit.getType() == UnitType.Terran_Comsat_Station;
+		return true;
 	}
 
 	@Override

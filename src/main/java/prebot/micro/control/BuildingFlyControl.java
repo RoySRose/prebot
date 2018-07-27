@@ -1,29 +1,20 @@
 package prebot.micro.control;
 
+import java.util.Collection;
+import java.util.List;
+
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.Chokepoint;
 import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
-import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.MyBotModule;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.CombatManager;
-import prebot.micro.control.factory.GoliathControl;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class BuildingFlyControl extends Control{
 
@@ -68,7 +59,7 @@ public abstract class BuildingFlyControl extends Control{
     }
 
 
-    public final void processFly(List<Unit> unitList, List<UnitInfo> euiList){
+    public final void processFly(Collection<Unit> unitList, Collection<UnitInfo> euiList){
 
         setDefaultBuildingFly(unitList);
         checkFlyCondition();
@@ -77,7 +68,7 @@ public abstract class BuildingFlyControl extends Control{
 
     }
 
-    public void executeFly(List<Unit> unitList, List<UnitInfo> euiList){
+    public void executeFly(Collection<Unit> unitList, Collection<UnitInfo> euiList){
         for(Unit unit : unitList){
 
             if(!unit.isFlying() && getBuildingFly() == BuildingFly.UP){
@@ -98,7 +89,7 @@ public abstract class BuildingFlyControl extends Control{
 
     public abstract void checkFlyCondition();
 
-    public final void setDefaultBuildingFly(List<Unit> unitList) {
+    public final void setDefaultBuildingFly(Collection<Unit> unitList) {
 
         if(flyAlways){
             this.buildingFly = BuildingFly.UP;

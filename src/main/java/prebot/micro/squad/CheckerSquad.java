@@ -19,12 +19,12 @@ public class CheckerSquad extends Squad {
 
 	public CheckerSquad() {
 		super(SquadInfo.CHECKER);
+		setUnitType(UnitType.Terran_Vulture);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Vulture
-				&& !VultureTravelManager.Instance().checkerRetired(unit.getID());
+		return !VultureTravelManager.Instance().checkerRetired(unit.getID());
 	}
 
 	/// checker squad는 매 frame 1회 용감한 checker부대원을 모집한다.

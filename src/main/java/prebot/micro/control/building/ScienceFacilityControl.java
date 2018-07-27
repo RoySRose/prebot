@@ -1,19 +1,15 @@
 package prebot.micro.control.building;
 
+import java.util.Collection;
+
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
-import prebot.build.initialProvider.buildSets.VsProtoss;
-import prebot.build.initialProvider.buildSets.VsTerran;
-import prebot.build.initialProvider.buildSets.VsZerg;
-import prebot.common.MetaType;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
-
-import java.util.List;
 
 public class ScienceFacilityControl extends BuildingFlyControl {
 
@@ -22,7 +18,7 @@ public class ScienceFacilityControl extends BuildingFlyControl {
     }
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 
         processFly(unitList, euiList);
 	}

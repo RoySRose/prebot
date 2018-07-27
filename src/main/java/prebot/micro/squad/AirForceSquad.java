@@ -1,7 +1,10 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -19,11 +22,12 @@ public class AirForceSquad extends Squad {
 
 	public AirForceSquad() {
 		super(SquadInfo.AIR_FORCE);
+		setUnitType(UnitType.Terran_Wraith);
 	}
 
 	@Override
 	public boolean want(Unit unit) {
-		return unit.getType() == UnitType.Terran_Wraith;
+		return true;
 	}
 
 	@Override
@@ -46,13 +50,13 @@ public class AirForceSquad extends Squad {
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행한다.
 		for (Unit leaderWraith : leaderUnits) {
 			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(leaderWraith.getID());
-			List<UnitInfo> euiList = findEnemiesForTeam(airForceTeam.memberList);
-			airForceControl.control(airForceTeam.memberList, euiList);
+			Set<UnitInfo> euis = findEnemiesForTeam(airForceTeam.memberList);
+			airForceControl.control(airForceTeam.memberList, euis);
 		}
 	}
 
-	public List<UnitInfo> findEnemiesForTeam(List<Unit> unitList) {
-		List<UnitInfo> euiList = new ArrayList<>();
+	public Set<UnitInfo> findEnemiesForTeam(Collection<Unit> unitList) {
+		Set<UnitInfo> euis = new HashSet<>();
 		
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
 //			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
@@ -65,26 +69,26 @@ public class AirForceSquad extends Squad {
 //				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
 //			}
 			
-			List<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
+			Set<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
 			if (mainSquadEnemies != null) {
-				euiList = mainSquadEnemies;
+				euis = mainSquadEnemies;
 				
 			} else { // not happen logic
 				for (Unit unit : unitList) {
-					UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+					UnitUtils.addEnemyUnitInfosInRadiusForAir(euis, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
 				}
 			}
 			
 		} else {
 			for (Unit unit : unitList) {
-				UnitUtils.addEnemyUnitInfosInRadius(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadius(euis, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
 			}
 		}
 		
-		return euiList;
+		return euis;
 	}
 	
-	private List<UnitInfo> getMainSquadEnemies() {
+	private Set<UnitInfo> getMainSquadEnemies() {
 		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
 		if (mainSquad.squadExecuted()) {
 //			mainSquad.getEuiListNearUnit();

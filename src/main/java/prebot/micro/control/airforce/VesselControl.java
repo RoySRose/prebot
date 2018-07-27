@@ -1,5 +1,6 @@
 package prebot.micro.control.airforce;
 
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Order;
@@ -27,7 +28,7 @@ public class VesselControl extends Control {
 	private final static int VESSEL_SIGHT = UnitType.Terran_Science_Vessel.sightRange();
 
 	@Override
-	public void control(List<Unit> unitList, List<UnitInfo> euiList) {
+	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
 
