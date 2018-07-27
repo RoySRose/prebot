@@ -141,9 +141,12 @@ public class PositionFinder {
 			}
 		}
 		if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (factorySupplyCount > 4 * 1) {
+				return firstChokeDefensePosition();
+			}
 			// 마린이 일정이상 쌓였어야 한다.
 			int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
-			if (factorySupplyCount + marineCount > Math.max(enemyGroundUnitSupplyCount, 3)) {
+			if (marineCount > Math.max(enemyGroundUnitSupplyCount, 3)) {
 				return firstChokeDefensePosition();
 			} else {
 				/// 커맨드센터 수비 필요

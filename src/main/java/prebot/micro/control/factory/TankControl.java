@@ -129,8 +129,8 @@ public class TankControl extends Control {
 
 			} else if (decision.type == DecisionType.KITING_UNIT) {
 				if (MicroUtils.isRemovableEnemySpiderMine(tank, decision.eui)) {
-//					CommandUtils.holdPosition(tank);
-					tank.holdPosition();
+					MicroUtils.holdControlToRemoveMine(tank, decision.eui.getLastPosition(), fOption);
+					
 				} else {
 					if (shouldSiege(tank, decision.eui)) {
 						CommandUtils.siege(tank);

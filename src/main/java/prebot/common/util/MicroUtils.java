@@ -238,6 +238,14 @@ public class MicroUtils {
 		}
 	}
 	
+	public static void holdControlToRemoveMine(Unit rangedUnit, Position minePosition, FleeOption fOption) {
+		if (rangedUnit.getGroundWeaponCooldown() <= 10) {
+			rangedUnit.holdPosition();
+		} else {
+			MicroUtils.flee(rangedUnit, minePosition, fOption);
+		}
+	}
+	
 	public static void kiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption) {
 		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
 			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
@@ -604,7 +612,7 @@ public class MicroUtils {
 			return false;
 		}
 		
-		return target.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isAttackFrame() && unit.isInWeaponRange(target);
+		return target.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(target);
 	}
 	
 	// (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다.

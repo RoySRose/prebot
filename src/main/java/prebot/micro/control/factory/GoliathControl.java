@@ -48,7 +48,11 @@ public class GoliathControl extends Control {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 
 			} else if (decision.type == DecisionType.KITING_UNIT) {
-				MicroUtils.kiting(unit, decision.eui, kOption);
+				if (MicroUtils.isRemovableEnemySpiderMine(unit, decision.eui)) {
+					MicroUtils.holdControlToRemoveMine(unit, decision.eui.getLastPosition(), fOption);
+				} else {
+					MicroUtils.kiting(unit, decision.eui, kOption);
+				}
 
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
 				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainPosition)) {

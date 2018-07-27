@@ -64,9 +64,10 @@ public class MainAttackSquad extends Squad {
 
 		this.updateInitiatedFlag();
 		int saveUnitLevel = this.saveUnitLevel(tankList, goliathList);
+		int goliathSaveUnitLevel = Math.min(saveUnitLevel, 1);
 		
 		tankControl.setSaveUnitLevel(saveUnitLevel);
-		goliathControl.setSaveUnitLevel(saveUnitLevel);
+		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 		
 		tankControl.control(tankList, euiList);
 		goliathControl.control(goliathList, euiList);

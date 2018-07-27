@@ -201,7 +201,7 @@ public class UXManager {
 		if (StrategyIdea.initiated) {
 			color = UxColor.CHAR_RED;
 		}
-		Prebot.Broodwar.drawTextScreen(170, 353, color + TimeUtils.framesToTimeString(TimeUtils.elapsedFrames()) + "(" + TimeUtils.elapsedFrames() + ")");
+		Prebot.Broodwar.drawTextScreen(170, 353, color + StrategyIdea.mainSquadMode.toString() + ": " + TimeUtils.framesToTimeString(TimeUtils.elapsedFrames()) + "(" + TimeUtils.elapsedFrames() + ")");
 	}
 	
 	private void drawEnemyBuildTimer() {
