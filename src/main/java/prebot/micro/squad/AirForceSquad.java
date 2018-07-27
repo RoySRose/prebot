@@ -5,10 +5,8 @@ import java.util.List;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.UnitCondition;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.AirForceControl;
 import prebot.strategy.UnitInfo;
@@ -57,25 +55,25 @@ public class AirForceSquad extends Squad {
 		List<UnitInfo> euiList = new ArrayList<>();
 		
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
-			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
-				@Override public boolean correspond(Unit unit) {
-					return unit.getType().isBuilding() && !unit.isFlying();
-				}
-			});
-			euiList.clear();
-			for (Unit building : myBuildings) {
-				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
-			}
-			
-//			List<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
-//			if (mainSquadEnemies != null) {
-//				euiList = mainSquadEnemies;
-//				
-//			} else { // not happen logic
-//				for (Unit unit : unitList) {
-//					UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+//			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
+//				@Override public boolean correspond(Unit unit) {
+//					return unit.getType().isBuilding() && !unit.isFlying();
 //				}
+//			});
+//			euiList.clear();
+//			for (Unit building : myBuildings) {
+//				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
 //			}
+			
+			List<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
+			if (mainSquadEnemies != null) {
+				euiList = mainSquadEnemies;
+				
+			} else { // not happen logic
+				for (Unit unit : unitList) {
+					UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+				}
+			}
 			
 		} else {
 			for (Unit unit : unitList) {
@@ -86,15 +84,16 @@ public class AirForceSquad extends Squad {
 		return euiList;
 	}
 	
-//	private List<UnitInfo> getMainSquadEnemies() {
-//		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
-//		if (mainSquad.squadExecuted()) {
-//			return mainSquad.euiList;
-//		} else {
-//			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
-//			return null;
-//		}
-//	}
+	private List<UnitInfo> getMainSquadEnemies() {
+		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		if (mainSquad.squadExecuted()) {
+//			mainSquad.getEuiListNearUnit();
+			return mainSquad.getEuiListNearBuilding();
+		} else {
+			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
+			return null;
+		}
+	}
 
 	@Override
 	public void findEnemies() {

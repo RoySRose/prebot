@@ -4,7 +4,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -16,13 +15,13 @@ import prebot.strategy.action.Action;
 public class ScvScoutAfterBuild extends Action {
 
 	private final UnitType buildingType;
-	private final int remainingSeconds;
+	private final int remainingFrames;
 
 	private boolean assigned = false;
 
-	public ScvScoutAfterBuild(UnitType buildingType, int remainingSeconds) {
+	public ScvScoutAfterBuild(UnitType buildingType, int remainingFrames) {
 		this.buildingType = buildingType;
-		this.remainingSeconds = remainingSeconds;
+		this.remainingFrames = remainingFrames;
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class ScvScoutAfterBuild extends Action {
 			return;
 		}
 		for (Unit building : UnitUtils.getUnitList(UnitFindRange.ALL, buildingType)) {
-			if (building.getType() == buildingType && TimeUtils.framesToSeconds(building.getRemainingBuildTime()) <= remainingSeconds) {
+			if (building.getType() == buildingType && building.getRemainingBuildTime() <= remainingFrames) {
 				assigned = true;
 				break;
 			}

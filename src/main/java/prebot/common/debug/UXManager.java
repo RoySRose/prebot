@@ -2,6 +2,7 @@ package prebot.common.debug;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1492,9 +1493,23 @@ public class UXManager {
 		// air force team
 		int y = 150;
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
-		for (AirForceTeam airForceTeam : airForceTeamSet) {
+		List<AirForceTeam> airForceList = new ArrayList<>(airForceTeamSet);
+		airForceList.sort(new Comparator<AirForceTeam>() {
+			@Override
+			public int compare(AirForceTeam a1, AirForceTeam a2) {
+				int memberGap = a1.memberList.size() - a2.memberList.size();
+				int idGap = a1.leaderUnit.getID() - a2.leaderUnit.getID();
+				return memberGap * 100 + idGap;
+			}
+		});
+		
+		for (AirForceTeam airForceTeam : airForceList) {
+			char color = UxColor.CHAR_WHITE;
+			if (airForceTeam.repairCenter != null) {
+				color = UxColor.CHAR_RED;
+			}
 			Position position = airForceTeam.leaderUnit.getPosition();
-			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, "leader#" + airForceTeam.leaderUnit.getID());
+			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, color + "leader#" + airForceTeam.leaderUnit.getID());
 			
 			Position targetPosition = new Position(airForceTeam.getTargetPosition().getX(), airForceTeam.getTargetPosition().getY() - 10);
 			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceTeam.leaderUnit.getID());

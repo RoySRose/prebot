@@ -140,11 +140,10 @@ public class WorkerManager extends GameManager {
 	}
 
 	/**
-	 * 기본 가스일꾼 조절 : 최소 미네랄일꾼 7기 기준 [가스통 1개] 일꾼 00-07기 : 가스일꾼 0기 일꾼 08-09기 : 가스일꾼
-	 * 1기 일꾼 10-11기 : 가스일꾼 2기 일꾼 12-00기 : 가스일꾼 3기
+	 * 기본 가스일꾼 조절 : 최소 미네랄일꾼 7기 기준
 	 * 
-	 * [가스통 x2 기준] 일꾼 00-09기, 가스일꾼 0기 일꾼 10-13기, 가스일꾼 1기 일꾼 14-17기, 가스일꾼 2기 일꾼
-	 * 18-00기, 가스일꾼 3기
+	 * [가스통 1개] 일꾼 00-09기 -> 가스일꾼 0기 / 일꾼 10-12기 -> 가스일꾼 1기 / 일꾼 13-15기 -> 가스일꾼 2기 / 일꾼 16-00기 -> 가스일꾼 3기
+	 * [가스통 2개] 일꾼 00-12기 -> 가스일꾼 0기 / 일꾼 13-18기 -> 가스일꾼 1기 / 일꾼 19-24기 -> 가스일꾼 2기 / 일꾼 25-00기 -> 가스일꾼 3기
 	 */
 	private int getAdjustedWorkersPerRefinery() {
 		if (StrategyIdea.gasAdjustment) {
@@ -153,14 +152,23 @@ public class WorkerManager extends GameManager {
 
 		} else {
 			int workerCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_SCV).size();
-			if (workerCount <= 7) {
+			if (workerCount >= 30) {
+				return 3;
+			} else if (workerCount <= 7) {
 				return 0;
 
 			} else {
 				int refineryCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Refinery).size();
-				int workersPerRefinery = (int) (workerCount - 7 + 1) / (refineryCount * 2);
+				int workersPerRefinery = (int) (workerCount - 7) / (refineryCount * 3);
 
 				if (workersPerRefinery > MicroConfig.WORKERS_PER_REFINERY) {
+					if (Prebot.Broodwar.self().minerals() <= 200) {
+						if (Prebot.Broodwar.self().gas() >= 350) {
+							return 2;
+						} else if (Prebot.Broodwar.self().gas() >= 500) {
+							return 1;
+						}
+					}
 					return MicroConfig.WORKERS_PER_REFINERY;
 				} else {
 					return workersPerRefinery;

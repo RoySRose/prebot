@@ -28,6 +28,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
@@ -240,18 +241,33 @@ public class InformationManager extends GameManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+		
+		BigWatch.start("a");
 		//System.out.println("Frame: " +Prebot.Broodwar.getFrameCount());
 		updateFirstBarrack();
+		BigWatch.record("a");
 		
+		BigWatch.start("b");
 		updateUnitsInfo();
+		BigWatch.record("b");
+		
+		BigWatch.start("c");
 		updateCurrentStatusInfo();
+		BigWatch.record("c");
+		
+		BigWatch.start("d");
 		updateBlockingEnterance();
+		BigWatch.record("d");
 
+		BigWatch.start("e");
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		updateBaseLocationInfo();
 		// setEveryMultiInfo();
+		BigWatch.record("e");
 		
+		BigWatch.start("f");
 		UnitCache.getCurrentCache().updateCache();
+		BigWatch.record("f");
 
 		if (enemyFirstGas == null) {
 			enemyFirstGas = WorkerManager.Instance().getWorkerData().getGasNearDepot(getMainBaseLocation(enemyPlayer));

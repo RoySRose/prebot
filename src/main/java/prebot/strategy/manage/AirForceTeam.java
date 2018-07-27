@@ -30,7 +30,7 @@ public class AirForceTeam {
 	public UnitInfo fleeEui;
 	public int[] driveAngle;
 	public boolean cloakingMode;
-	public boolean needRepairTeam;
+	public Unit repairCenter;
 
 	// for achievement
 	public int damagedEffectiveFrame = 0;
@@ -51,7 +51,7 @@ public class AirForceTeam {
 		this.fleeEui = null;
 		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
 		this.cloakingMode = false;
-		this.needRepairTeam = false;
+		this.repairCenter = null;
 	}
 	
 	public int achievement() {

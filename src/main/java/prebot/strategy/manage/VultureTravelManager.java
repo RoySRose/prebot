@@ -6,15 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Unit;
+import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.main.Prebot;
+import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 
@@ -159,7 +163,27 @@ public class VultureTravelManager {
 	// 2. 방문한지 가장 오래된 location이 복수개이면, 가까운 곳부터 간다.
 	// (currentBase에서 가장 가까운 곳, checker unit id만 입력받은 경우 적 앞마당에서 가장 가까운 곳)
 	public BaseLocation getCheckerTravelSite(Integer checkerId) {
-		return getCheckerTravelSite(checkerId, InfoUtils.enemyFirstExpansion());
+		if (!initialized) {
+			return null;
+		}
+
+		TravelSite site = checkerSiteMap.get(checkerId);
+		if (site != null) {
+			return site.baseLocation;
+		}
+		
+		BaseLocation currentBase = null;
+		if (InfoUtils.mapInformation().getMap() == GameMap.CIRCUITBREAKER) {
+			currentBase = BaseLocationUtils.getClosestBaseToPosition(BWTA.getStartLocations(), InfoUtils.enemyBase().getPosition(), new BaseCondition() {
+				@Override public boolean correspond(BaseLocation base) {
+					return !base.equals(InfoUtils.enemyBase()) && !base.equals(InfoUtils.myBase());
+				}
+			});
+		} else {
+			currentBase = InfoUtils.enemyFirstExpansion();
+		}
+		
+		return getCheckerTravelSite(checkerId, currentBase);
 	}
 
 	public BaseLocation getCheckerTravelSite(Integer checkerId, BaseLocation currentBase) {
@@ -221,7 +245,7 @@ public class VultureTravelManager {
 				continue;
 			}
 
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) { // 적군이 존재하지 않음
 				continue;
 			}

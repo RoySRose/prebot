@@ -162,6 +162,10 @@ public class DecisionMaker {
 				}
 			}
 		}
+		
+		if (airForceTeam.repairCenter != null) {
+			return Decision.attackPosition(airForceTeam.leaderUnit);
+		}
 
 		UnitInfo bestTargetInfo = null;
 

@@ -141,8 +141,8 @@ public class CombatManager extends GameManager {
 	}
 
 	private void squadExecution() {
-//		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
-//		mainSquad.findEnemiesAndExecuteSquad();
+		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
+		mainSquad.findEnemiesAndExecuteSquad();
 		
 		for (Squad squad : squadData.getSquadMap().values()) {
 			squad.findEnemiesAndExecuteSquad(); // squad 유닛 명령 지시
@@ -195,7 +195,7 @@ public class CombatManager extends GameManager {
 		}
 
 		// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+		List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 		int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
 		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
 		if (vulturePower < enemyPower) {
@@ -229,7 +229,7 @@ public class CombatManager extends GameManager {
 
 		// 게릴라 지역에 적군이 없다.
 		if (Prebot.Broodwar.isVisible(squad.getTargetPosition().toTilePosition())) {
-			List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) {
 				return true;
 			}

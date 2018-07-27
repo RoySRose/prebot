@@ -109,12 +109,15 @@ public class EnemyBuildTimer {
 			} else if (lurkTime) {
 				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 10 * TimeUtils.SECOND;
 			}
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+				StrategyIdea.turretNeedFrame += 3 * TimeUtils.MINUTE;
+			}
 			
 			if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
 				StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
 				
 				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
-					StrategyIdea.academyFrame += 4 * TimeUtils.MINUTE;
+					StrategyIdea.academyFrame += 3 * TimeUtils.MINUTE;
 				} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
 					StrategyIdea.academyFrame += 2 * TimeUtils.MINUTE;
 				}

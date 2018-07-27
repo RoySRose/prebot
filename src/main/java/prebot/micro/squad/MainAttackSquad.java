@@ -18,7 +18,18 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
+
+	private List<UnitInfo> euiListNearUnit = new ArrayList<>();
+	private List<UnitInfo> euiListNearBuilding = new ArrayList<>();
 	
+	public List<UnitInfo> getEuiListNearUnit() {
+		return euiListNearUnit;
+	}
+
+	public List<UnitInfo> getEuiListNearBuilding() {
+		return euiListNearBuilding;
+	}
+
 	private TankControl tankControl = new TankControl();
 	private GoliathControl goliathControl = new GoliathControl();
 	
@@ -71,19 +82,27 @@ public class MainAttackSquad extends Squad {
 	
 	@Override
 	public void findEnemies() {
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			super.findEnemies();
-		} else {
-			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
-				@Override public boolean correspond(Unit unit) {
-					return unit.getType().isBuilding() && !unit.isFlying();
-				}
-			});
-			euiList.clear();
-			for (Unit building : myBuildings) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+		euiListNearUnit.clear();
+		for (Unit unit : unitList) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiListNearUnit, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+		}
+		
+		euiListNearBuilding.clear();
+		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
+			@Override public boolean correspond(Unit unit) {
+				return unit.getType().isBuilding() && !unit.isFlying();
 			}
+		});
+		for (Unit building : myBuildings) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiListNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+		}
+		
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			euiList = euiListNearUnit;
+		} else {
+			euiList = euiListNearBuilding;
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 	}
+	
 }

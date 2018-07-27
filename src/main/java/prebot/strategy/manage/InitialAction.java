@@ -3,6 +3,7 @@ package prebot.strategy.manage;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
@@ -31,27 +32,25 @@ public class InitialAction {
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, UnitType.Terran_Barracks.buildTime()));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, UnitType.Terran_Barracks.buildTime())); // 배럭짓고 출발
 				assignedFirstScout = true;
 			}
 			StrategyAnalyseManager.Instance().setUp(Race.Protoss);
 			terminated = true;
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
-				//ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Bunker, 5 * TimeUtils.SECOND));
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Refinery, 10));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, UnitType.Terran_Barracks.buildTime() - 10 * TimeUtils.SECOND)); // 배럭짓고 10초후 출발
 				assignedFirstScout = true;
 			}
-//			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, 0));
-//			ActionManager.Instance().addAction(new GasAdjustment2Star());
 			StrategyAnalyseManager.Instance().setUp(Race.Zerg);
 			terminated = true;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
-//			ActionManager.Instance().addAction(new GasAdjustment2Star());
+			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0)); // 서플 완성후 출발
 				assignedFirstScout = true;
 			}
 			StrategyAnalyseManager.Instance().setUp(Race.Terran);
@@ -59,7 +58,7 @@ public class InitialAction {
 			
 		} else {
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0)); // 서플 완성후 출발
 				assignedFirstScout = true;
 			}
 		}

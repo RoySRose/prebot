@@ -19,6 +19,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -253,6 +254,34 @@ public class AirForceManager {
 		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
 			targetPositions.addAll(getMineralPositions());
 		}
+		
+		List<BaseLocation> occupiedBases = InfoUtils.enemyOccupiedBases();
+		for (BaseLocation base : occupiedBases) {
+			if (base.equals(InfoUtils.enemyBase())
+					|| base.equals(InfoUtils.enemyFirstExpansion())) {
+				continue;
+			}
+			
+			targetPositions.add(base.getPosition());
+			
+			Position positionUp = new Position(base.getPosition().getX(), base.getPosition().getY() - 400);
+			Position positionDown = new Position(base.getPosition().getX(), base.getPosition().getY() + 400);
+			Position positionLeft = new Position(base.getPosition().getX() - 400, base.getPosition().getY());
+			Position positionRight = new Position(base.getPosition().getX() + 400, base.getPosition().getY());
+			
+			if (PositionUtils.isValidPosition(positionUp)) {
+				targetPositions.add(positionUp);
+			}
+			if (PositionUtils.isValidPosition(positionDown)) {
+				targetPositions.add(positionDown);
+			}
+			if (PositionUtils.isValidPosition(positionLeft)) {
+				targetPositions.add(positionLeft);
+			}
+			if (PositionUtils.isValidPosition(positionRight)) {
+				targetPositions.add(positionRight);
+			}
+		}
 	}
 
 	private List<Position> getMineralPositions() {
@@ -401,7 +430,7 @@ public class AirForceManager {
 			}
 			
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
-			if (achievementEffectiveFrame >= 100) {
+			if (achievementEffectiveFrame >= 150) {
 				levelUp = true;
 			}
 		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
@@ -454,12 +483,12 @@ public class AirForceManager {
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
 		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
-			if (airForceTeam.needRepairTeam) {
+			if (airForceTeam.repairCenter != null) {
 				continue;
 			}
 			boolean cloakingMode = airForceTeam.cloakingMode;
 			for (AirForceTeam compareForceUnit : airForceTeamSet) {
-				if (compareForceUnit.needRepairTeam) {
+				if (compareForceUnit.repairCenter != null) {
 					continue;
 				}
 				if (cloakingMode != compareForceUnit.cloakingMode) { // 클로킹상태가 다른 레이쓰부대는 합쳐질 수 없다.
@@ -520,12 +549,17 @@ public class AirForceManager {
 		
 		for (Integer wraithId : needRepairWraithList) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			airForceTeamMap.remove(wraithId);
+			List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+			Unit repairCenter = UnitUtils.getClosestUnitToPosition(commandCenterList, wraith.getPosition());
 			
-			AirForceTeam needRepairTeam = new AirForceTeam(wraith);
-			needRepairTeam.needRepairTeam = true;
-			needRepairTeam.memberList.add(wraith);
-			airForceTeamMap.put(wraithId, needRepairTeam);
+			if (repairCenter != null) {
+				airForceTeamMap.remove(wraithId);
+				
+				AirForceTeam needRepairTeam = new AirForceTeam(wraith);
+				needRepairTeam.memberList.add(wraith);
+				needRepairTeam.repairCenter = repairCenter;
+				airForceTeamMap.put(wraithId, needRepairTeam);
+			}
 		}
 		
 		for (Integer wraithId : excludedWraithList) {
@@ -540,7 +574,7 @@ public class AirForceManager {
 			airForceTeam.leaderUnit = newLeader;
 			
 			// repair 완료처리
-			if (airForceTeam.needRepairTeam) {
+			if (airForceTeam.repairCenter != null) {
 				boolean repairComplete = true;
 				for (Unit wraith : airForceTeam.memberList) {
 					if (wraith.getHitPoints() < 115) { // repair complete hit points
@@ -549,7 +583,7 @@ public class AirForceManager {
 					}
 				}
 				if (repairComplete) {
-					airForceTeam.needRepairTeam = false;
+					airForceTeam.repairCenter = null;
 				}
 			}
 			

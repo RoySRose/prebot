@@ -215,6 +215,12 @@ public class UnitUtils {
 		return euiList;
 	}
 	
+	public static List<UnitInfo> getAllEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
+		List<UnitInfo> euiList = new ArrayList<>();
+		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, false, unitTypes);
+		return euiList;
+	}
+	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, true, unitTypes);

@@ -7,7 +7,6 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
@@ -60,22 +59,30 @@ public class AirForceControl extends Control {
 				// ATTACK_UNIT, KITING_UNIT 동일
 				if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 					int attackType = 0; // 0:move, 1:attack, 2:hold
-					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
-					if (enemyInSight != null && airForceTeam.leaderUnit.isInWeaponRange(enemyInSight)) {
-						if (!MicroUtils.killedByNShot(airForceTeam.leaderUnit, enemyInSight, wraithList.size() / 2)) {
-							attackType = 1;
-						} else {
-							attackType = 2;
-						}
-					}
+//					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
+//					if (enemyInSight != null && airForceTeam.leaderUnit.isInWeaponRange(enemyInSight)) {
+//						if (!MicroUtils.killedByNShot(airForceTeam.leaderUnit, enemyInSight, wraithList.size() / 2)) {
+//							attackType = 1;
+//						} else {
+//							attackType = 2;
+//						}
+//					}
+					attackType = 1; // TODO 홀드컨 중지(레이쓰가 흩어지는 현상)
 
+					boolean holdControlToggleSwitchOn = false;
 					for (Unit wraith : wraithList) {
 						if (attackType == 0) {
 							wraith.rightClick(airForceTeam.leaderOrderPosition);
 						} else if (attackType == 1) {
-							CommandUtils.attackUnit(wraith, decisionDetail.eui.getUnit());							
+							CommandUtils.attackUnit(wraith, decisionDetail.eui.getUnit());
 						} else {
-							CommandUtils.holdPosition(wraith);
+							if (holdControlToggleSwitchOn) {
+								CommandUtils.holdPosition(wraith);
+								holdControlToggleSwitchOn = false;
+							} else {
+								CommandUtils.attackUnit(wraith, decisionDetail.eui.getUnit());
+								holdControlToggleSwitchOn = true;
+							}
 						}
 					}
 				}
@@ -98,9 +105,9 @@ public class AirForceControl extends Control {
 			}
 			// 전진 카이팅, 카이팅
 			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
-				if (airForceTeam.needRepairTeam && MicroUtils.arrivedToPosition(airForceTeam.leaderUnit, airForceTeam.leaderOrderPosition)) {
+				if (airForceTeam.repairCenter != null && MicroUtils.arrivedToPosition(airForceTeam.leaderUnit, airForceTeam.repairCenter.getPosition())) {
 					for (Unit wraith : wraithList) {
-						CommandUtils.holdPosition(wraith);
+						CommandUtils.holdPosition(wraith); // 수리 대기상태에서 홀딩
 					}
 				} else {
 					for (Unit wraith : wraithList) {
@@ -178,10 +185,8 @@ public class AirForceControl extends Control {
 			}
 			
 		} else if (decision.type == DecisionType.ATTACK_POSITION) {
-			if (airForceTeam.needRepairTeam) {
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
-				Unit repairCenter = UnitUtils.getClosestUnitToPosition(commandCenterList, airForceTeam.leaderUnit.getPosition());
-				airDrivingPosition = airDrivingPosition(airForceTeam, repairCenter.getPosition(), airForceTeam.driveAngle);
+			if (airForceTeam.repairCenter != null) {
+				airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.repairCenter.getPosition(), airForceTeam.driveAngle);
 				
 			} else {
 				airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.getTargetPosition(), airForceTeam.driveAngle);
