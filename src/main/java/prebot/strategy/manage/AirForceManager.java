@@ -167,7 +167,7 @@ public class AirForceManager {
 				}
 			}
 				
-			if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+			if (StrategyIdea.nearAirEnemyPosition != Position.Unknown) {
 				defenseMode = true;
 			}
 		}

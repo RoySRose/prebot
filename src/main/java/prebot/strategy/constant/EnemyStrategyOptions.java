@@ -131,10 +131,10 @@ public class EnemyStrategyOptions {
 				return baseCommandCentertOk && expansionCommandCenterOk;
 			
 			case NO_ENEMY: // 지상 적 없음
-				return StrategyIdea.enemyGroundSquadPosition == Position.Unknown;
+				return StrategyIdea.nearGroundEnemyPosition == Position.Unknown;
 				
 			case NO_AIR_ENEMY: // 공중 적 없음
-				return StrategyIdea.enemyAirSquadPosition == Position.Unknown;
+				return StrategyIdea.nearAirEnemyPosition == Position.Unknown;
 				
 			case COMSAT_OK: // 컴셋에너지보유
 				boolean comsatReady = false;

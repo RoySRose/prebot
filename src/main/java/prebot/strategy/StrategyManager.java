@@ -118,11 +118,13 @@ public class StrategyManager extends GameManager {
 				
 			} else {
 				if (InfoUtils.enemyRace() == Race.Terran) {
-					if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) >= 4) {
-						StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
-						
-						if (!AirForceManager.Instance().isAirForceDefenseMode()) {
-							AirForceManager.Instance().setAirForceDefenseMode(true);
+					if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
+						if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) >= 4) {
+							StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+							
+							if (!AirForceManager.Instance().isAirForceDefenseMode()) {
+								AirForceManager.Instance().setAirForceDefenseMode(true);
+							}
 						}
 					}
 				} else {

@@ -91,10 +91,7 @@ public class AirForceSquad extends Squad {
 	private Set<UnitInfo> getMainSquadEnemies() {
 		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
 		if (mainSquad.squadExecuted()) {
-			Set<UnitInfo> euisMainSquad = new HashSet<>();
-			euisMainSquad.addAll(mainSquad.getEuisNearUnit());
-			euisMainSquad.addAll(mainSquad.getEuisNearBaseRegion());
-			return euisMainSquad;
+			return mainSquad.euiList;
 		} else {
 			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
 			return null;

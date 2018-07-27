@@ -1,10 +1,8 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import bwapi.Race;
 import bwapi.Unit;
@@ -22,16 +20,16 @@ import prebot.strategy.UnitInfo;
 
 public class MainAttackSquad extends Squad {
 
-	private Set<UnitInfo> euisNearUnit = new HashSet<>();
-	private Set<UnitInfo> euisNearBaseRegion = new HashSet<>();
-	
-	public Set<UnitInfo> getEuisNearUnit() {
-		return euisNearUnit;
-	}
-
-	public Set<UnitInfo> getEuisNearBaseRegion() {
-		return euisNearBaseRegion;
-	}
+//	private Set<UnitInfo> euisNearUnit = new HashSet<>();
+//	private Set<UnitInfo> euisNearBaseRegion = new HashSet<>();
+//	
+//	public Set<UnitInfo> getEuisNearUnit() {
+//		return euisNearUnit;
+//	}
+//
+//	public Set<UnitInfo> getEuisNearBaseRegion() {
+//		return euisNearBaseRegion;
+//	}
 
 	private TankControl tankControl = new TankControl();
 	private GoliathControl goliathControl = new GoliathControl();
@@ -134,16 +132,18 @@ public class MainAttackSquad extends Squad {
 	
 	@Override
 	public void findEnemies() {
-		euisNearUnit.clear();
-		euisNearBaseRegion.clear();
+		euiList.clear();
+		euiList.addAll(InfoUtils.euiListInBase());
+		euiList.addAll(InfoUtils.euiListInExpansion());
+		euiList.addAll(InfoUtils.euiListInThirdRegion());
 		
-		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearUnit, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			for (Unit unit : unitList) {
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+			}
+		} else {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 		}
-
-		euisNearBaseRegion.addAll(InfoUtils.euiListInBase());
-		euisNearBaseRegion.addAll(InfoUtils.euiListInExpansion());
-		euisNearBaseRegion.addAll(InfoUtils.euiListInThirdRegion());
 		
 //		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
 //			@Override public boolean correspond(Unit unit) {
@@ -153,11 +153,6 @@ public class MainAttackSquad extends Squad {
 //		for (Unit building : myBuildings) {
 //			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
 //		}
-
-		euiList = euisNearBaseRegion;
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			euiList.addAll(euisNearUnit);
-		}
 	}
 	
 }

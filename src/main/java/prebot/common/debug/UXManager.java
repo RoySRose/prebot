@@ -1541,8 +1541,8 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainPosition : " + StrategyIdea.mainPosition);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "watcherPosition : " + StrategyIdea.watcherPosition);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainSquadCenter : " + StrategyIdea.mainSquadCenter);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyGroundSquadPosition : " + StrategyIdea.enemyGroundSquadPosition);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.enemyAirSquadPosition);
+		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyGroundSquadPosition : " + StrategyIdea.nearGroundEnemyPosition);
+		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.nearAirEnemyPosition);
 		
 		y += 10;
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + InfoUtils.enemyBase().getPosition());
@@ -1571,11 +1571,17 @@ public class UXManager {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.mainSquadCenter, "mainSqCntr");
 			Prebot.Broodwar.drawCircleMap(StrategyIdea.mainSquadCenter.getX(), StrategyIdea.mainSquadCenter.getY(), StrategyIdea.mainSquadCoverRadius, Color.Cyan);
 		}
-		if (StrategyIdea.enemyGroundSquadPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.enemyGroundSquadPosition, "enemySq(Ground)");
+		if (StrategyIdea.nearGroundEnemyPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.nearGroundEnemyPosition, "nearEnemySq(Ground)");
 		}
-		if (StrategyIdea.enemyAirSquadPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.enemyAirSquadPosition, "enemySq(Air)");
+		if (StrategyIdea.nearAirEnemyPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.nearAirEnemyPosition, "nearEnemySq(Air)");
+		}
+		if (InfoUtils.myReadyToPosition() != null) {
+			Prebot.Broodwar.drawTextMap(InfoUtils.myReadyToPosition(), "myReadyTo");
+		}
+		if (InfoUtils.enemyReadyToPosition() != null) {
+			Prebot.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
 		}
 	}
 
