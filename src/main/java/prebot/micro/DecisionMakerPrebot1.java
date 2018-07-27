@@ -263,7 +263,7 @@ public class DecisionMakerPrebot1 {
 			} else if (existTooCloseTarget) {
 				return Decision.change(mechanicUnit);
 			} else if (existTooFarTarget) {
-				if (mechanicUnit.getDistance(StrategyIdea.mainPosition) < Tank.SIEGE_MODE_MAX_RANGE + 200) {
+				if (mechanicUnit.getDistance(StrategyIdea.mainPosition) < Tank.SIEGE_MODE_MAX_RANGE + 50) {
 					return Decision.doNothing(mechanicUnit);
 				}
 				for (Unit tank : tanks) { // target이 가까운 동료 시즈포격에서 자유롭지 못하다면 상태유지
