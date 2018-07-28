@@ -60,8 +60,9 @@ public class StrategyIdea {
 	// (마린 6기 이상이면 추가생산 없음, 벌처 2기 이상이면 추가생산 없음 - 적용 특이사항 예시) (initial이 끝나기 전)
 	// 컴뱃매니저: ?
 	public static EnemyUnitStatus enemyUnitStatus = EnemyUnitStatus.SLEEPING;
-	public static Position enemyGroundSquadPosition = Position.Unknown;
-	public static Position enemyAirSquadPosition = Position.Unknown;
+	public static Position totalEnemyCneterPosition = Position.Unknown;
+	public static Position nearGroundEnemyPosition = Position.Unknown;
+	public static Position nearAirEnemyPosition = Position.Unknown;
 	
 	// [아군 메인부대의 전투개시 여부]
 	// 컴뱃매니저: 시즈모드 변경시, watcher전투 판단시 

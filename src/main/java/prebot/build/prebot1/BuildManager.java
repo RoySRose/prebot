@@ -23,6 +23,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 
@@ -214,6 +215,12 @@ public class BuildManager extends GameManager {
 							if (desiredPosition != TilePosition.None) {
 								// Send the construction task to the
 								// construction manager
+								if(t.getUnitType() == UnitType.Terran_Starport) {
+									FileUtils.appendTextToFile("log.txt", "\n Terran_Starport to Construction from Build :: desiredPosition ::" + desiredPosition);
+								}
+								if(t.getUnitType() == UnitType.Terran_Factory) {
+									FileUtils.appendTextToFile("log.txt", "\n Terran_Factory to Construction from Build :: desiredPosition ::" + desiredPosition);
+								}
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep
@@ -221,7 +228,7 @@ public class BuildManager extends GameManager {
 								// 없는 경우인데,
 								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음
 								// frame 에 건물 지을 공간을 다시 탐색하도록 한다.
-								System.out.print("There is no place to construct " + currentItem.metaType.getUnitType()+ " strategy " + currentItem.seedLocationStrategy);
+								System.out.print("\nThere is no place to construct :: " + currentItem.metaType.getUnitType()+ " :: strategy :: " + currentItem.seedLocationStrategy);
 								if (currentItem.seedLocation != null)
 									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
 								if (desiredPosition != null)
@@ -619,6 +626,7 @@ public class BuildManager extends GameManager {
 			
 		case LastBuilingPoint:
 			seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+			FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition case LastBuilingPoint return ==>> " + seedPositionStrategy.toString());
 			break;
 			
 		default:

@@ -2,6 +2,7 @@ package prebot.common.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -59,6 +60,14 @@ public class InfoUtils {
 	
 	public static BaseLocation enemyFirstExpansion() {
 		return InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.enemy());
+	}
+
+	public static Position myReadyToPosition() {
+		return InformationManager.Instance().getReadyToAttackPosition(Prebot.Broodwar.self());
+	}
+
+	public static Position enemyReadyToPosition() {
+		return InformationManager.Instance().getReadyToAttackPosition(Prebot.Broodwar.enemy());
 	}
 	
 	public static List<BaseLocation> myOtherExpansionsSorted() {
@@ -129,16 +138,16 @@ public class InfoUtils {
 		return InformationManager.Instance().getEuiListInMyRegion(myRegion);
 	}
 	
-	public static List<UnitInfo> euiListInBase() {
-		return InformationManager.Instance().getEuiListInBaseRegion();
+	public static Set<UnitInfo> euiListInBase() {
+		return InformationManager.Instance().getEuisInBaseRegion();
 	}
 
-	public static List<UnitInfo> euiListInExpansion() {
-		return InformationManager.Instance().getEuiListInExpansionRegion();
+	public static Set<UnitInfo> euiListInExpansion() {
+		return InformationManager.Instance().getEuisInExpansionRegion();
 	}
 	
-	public static List<UnitInfo> euiListInThirdRegion() {
-		return InformationManager.Instance().getEuiListInThirdRegion();
+	public static Set<UnitInfo> euiListInThirdRegion() {
+		return InformationManager.Instance().getEuisInThirdRegion();
 	}
 	
 	public static Region myThirdRegion() {

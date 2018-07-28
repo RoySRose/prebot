@@ -28,12 +28,12 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.MapTools;
 import prebot.common.util.internal.UnitCache;
@@ -105,6 +105,7 @@ public class InformationManager extends GameManager {
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
 	private Map<Player, Chokepoint> thirdChokePointDonotUse = new HashMap<Player, Chokepoint>();
 	
+	private List<Chokepoint> middleChokeList = new ArrayList<>();
 	
 	public Position tighteningPoint = null;
 	
@@ -126,9 +127,9 @@ public class InformationManager extends GameManager {
 	
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
 	private Map<Region, List<UnitInfo>> euiListInMyRegion = new HashMap<>();
-	private List<UnitInfo> euiListInBaseRegion = new ArrayList<>();
-	private List<UnitInfo> euiListInExpansionRegion = new ArrayList<>();
-	private List<UnitInfo> euiListInThirdRegion = new ArrayList<>();
+	private Set<UnitInfo> euisInBaseRegion = new HashSet<>();
+	private Set<UnitInfo> euisInExpansionRegion = new HashSet<>();
+	private Set<UnitInfo> euisInThirdRegion = new HashSet<>();
 
 	public Map<UnitType, Integer> baseToBaseUnit = new HashMap<UnitType, Integer>();
 	
@@ -242,32 +243,18 @@ public class InformationManager extends GameManager {
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
 		
-		BigWatch.start("a");
 		//System.out.println("Frame: " +Prebot.Broodwar.getFrameCount());
 		updateFirstBarrack();
-		BigWatch.record("a");
 		
-		BigWatch.start("b");
 		updateUnitsInfo();
-		BigWatch.record("b");
-		
-		BigWatch.start("c");
 		updateCurrentStatusInfo();
-		BigWatch.record("c");
 		
-		BigWatch.start("d");
 		updateBlockingEnterance();
-		BigWatch.record("d");
-
-		BigWatch.start("e");
+		
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		updateBaseLocationInfo();
 		// setEveryMultiInfo();
-		BigWatch.record("e");
-		
-		BigWatch.start("f");
 		UnitCache.getCurrentCache().updateCache();
-		BigWatch.record("f");
 
 		if (enemyFirstGas == null) {
 			enemyFirstGas = WorkerManager.Instance().getWorkerData().getGasNearDepot(getMainBaseLocation(enemyPlayer));
@@ -392,9 +379,9 @@ public class InformationManager extends GameManager {
 	/// occupiedRegions에 존재하는 시야 상의 적 Unit 정보
 	private void updateEnemiesLocation() {
 		euiListInMyRegion.clear();
-		euiListInBaseRegion.clear();
-		euiListInExpansionRegion.clear();
-		euiListInThirdRegion.clear();
+		euisInBaseRegion.clear();
+		euisInExpansionRegion.clear();
+		euisInThirdRegion.clear();
 		
 		Set<Region> myRegionSet = occupiedRegions.get(selfPlayer);
 		for (Region region : myRegionSet) {
@@ -428,11 +415,11 @@ public class InformationManager extends GameManager {
 	        }
 			
 			if (region.equals(myBaseRegion)) {
-				euiListInBaseRegion.add(eui);
+				euisInBaseRegion.add(eui);
 			} else if (region.equals(myExpansionRegion)) {
-				euiListInExpansionRegion.add(eui);
+				euisInExpansionRegion.add(eui);
 			} else if (region.equals(myThirdRegion)) {
-				euiListInThirdRegion.add(eui);
+				euisInThirdRegion.add(eui);
 			}
 		}
 	}
@@ -1199,16 +1186,29 @@ public class InformationManager extends GameManager {
 	
 	public void updateReadyToAttackPosition() {
 		try {
-			Chokepoint secChokeSelf = secondChokePoint.get(selfPlayer);
-			Chokepoint secChokeEnemy = secondChokePoint.get(enemyPlayer);
-			Position selfReadyToPos = getNextChokepoint(secChokeSelf, enemyPlayer).getCenter();
-			Position enemyReadyToPos = getNextChokepoint(secChokeEnemy, selfPlayer).getCenter();
+			Position myExpansionPosition = firstExpansionLocation.get(selfPlayer).getPosition();
+			Position enemyExpansionPosition = firstExpansionLocation.get(enemyPlayer).getPosition();
+			Position centerTilePosition = TilePositionUtils.getCenterTilePosition().toPosition();
 			
-//			System.out.println("###selfReadyToPos: " + selfReadyToPos);
-//			System.out.println("###enemyReadyToPos: " + enemyReadyToPos);
+			int myX = myExpansionPosition.getX() + centerTilePosition.getX();
+			int myY = myExpansionPosition.getY() + centerTilePosition.getY();
 			
-			readyToAttackPosition.put(selfPlayer, selfReadyToPos);
-			readyToAttackPosition.put(enemyPlayer, enemyReadyToPos);
+			int enemyX = enemyExpansionPosition.getX() + centerTilePosition.getX();
+			int enemyY = enemyExpansionPosition.getY() + centerTilePosition.getY();
+			
+			Position myReadyToPosition = new Position(myX / 2, myY / 2);
+			Position enemyReadyToPosition = new Position(enemyX / 2, enemyY / 2);
+			
+			readyToAttackPosition.put(selfPlayer, myReadyToPosition);
+			readyToAttackPosition.put(enemyPlayer, enemyReadyToPosition);
+			
+//			Chokepoint secChokeSelf = secondChokePoint.get(selfPlayer);
+//			Chokepoint secChokeEnemy = secondChokePoint.get(enemyPlayer);
+//			Position selfReadyToPos = getNextChokepoint(secChokeSelf, enemyPlayer).getCenter();
+//			Position enemyReadyToPos = getNextChokepoint(secChokeEnemy, selfPlayer).getCenter();
+//			
+//			readyToAttackPosition.put(selfPlayer, selfReadyToPos);
+//			readyToAttackPosition.put(enemyPlayer, enemyReadyToPos);
 			
 		} catch (Exception ex) {
 			System.out.println(ex);
@@ -1671,7 +1671,7 @@ public class InformationManager extends GameManager {
 		if (mapName.matches(".*CIRCUIT.*")) {
 			gameMap = GameMap.CIRCUITBREAKER;
 		} else if (mapName.matches(".*SPIRIT.*")) {
-			gameMap = GameMap.FIGHTING_SPRIRITS;
+			gameMap = GameMap.FIGHTING_SPIRITS;
 		} else {
 			gameMap = GameMap.UNKNOWN;
 		}
@@ -1826,16 +1826,16 @@ public class InformationManager extends GameManager {
 		return euiListInMyRegion.get(region);
 	}
 
-	public List<UnitInfo> getEuiListInBaseRegion() {
-		return euiListInBaseRegion;
+	public Set<UnitInfo> getEuisInBaseRegion() {
+		return euisInBaseRegion;
 	}
 
-	public List<UnitInfo> getEuiListInExpansionRegion() {
-		return euiListInExpansionRegion;
+	public Set<UnitInfo> getEuisInExpansionRegion() {
+		return euisInExpansionRegion;
 	}
 
-	public List<UnitInfo> getEuiListInThirdRegion() {
-		return euiListInThirdRegion;
+	public Set<UnitInfo> getEuisInThirdRegion() {
+		return euisInThirdRegion;
 	}
 
 	private void updateFirstScout() {

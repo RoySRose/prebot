@@ -86,9 +86,10 @@ public class AirForceManager {
 	
 	private List<Position> targetPositions = new ArrayList<>(); // 타깃포지션
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
-	private int achievementEffectiveFrame = 0;
-	private int accumulatedAchievement = 0;
+	private int achievementEffectiveFrame = 0; // 일정기간 안에서의 성취
+	private int accumulatedAchievement = 0; // 누적된 총 성취 (레이쓰 숫자가 조절되면 리셋)
 	private boolean airForceDefenseMode = false;
+	private int waitingEndFrame = 0;
 
 	public List<Position> getTargetPositions() {
 		return targetPositions;
@@ -148,12 +149,37 @@ public class AirForceManager {
 		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
 			powerOfEnemies += 250;
 		}
-//		System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
+//			System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
 		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
-			airForceDefenseMode = false;
+			if (TimeUtils.before(waitingEndFrame)) { // 역레이스 준비시간
+				int myTankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+				int myWraithCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
+				
+				if (myTankCount < 8) { // 탱크가 줄어들었다면 즉시 출발
+					waitingEndFrame = TimeUtils.elapsedFrames();
+					airForceDefenseMode = false;
+				} else if (myWraithCount >= 8) { // 레이쓰가 충분히 모였다면 즉시 출발
+					waitingEndFrame = TimeUtils.elapsedFrames();
+					airForceDefenseMode = false;
+				} else {
+					airForceDefenseMode = true;
+				}
+				
+			} else {
+				airForceDefenseMode = false;
+			}
 		} else {
 			airForceDefenseMode = true;
+		}	
+	}
+	
+	public void setAirForceWaiting() {
+		if (TimeUtils.before(waitingEndFrame)) {
+			return;
 		}
+		
+		StrategyIdea.wraithCount = 8;
+		waitingEndFrame = TimeUtils.elapsedFrames() + UnitType.Terran_Wraith.buildTime() * 5; // 투스타 기준 8마리 채우는데에 1마리 여유시간
 	}
 
 	private void setTargetPosition() {
@@ -167,7 +193,7 @@ public class AirForceManager {
 				}
 			}
 				
-			if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
+			if (StrategyIdea.nearAirEnemyPosition != Position.Unknown) {
 				defenseMode = true;
 			}
 		}
@@ -405,7 +431,7 @@ public class AirForceManager {
 		
 		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
 			if (InfoUtils.enemyRace() == Race.Terran) {
-				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 45 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
 				} else if (!StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) { // 메카닉이 아님
 					levelDown = true;
@@ -413,7 +439,7 @@ public class AirForceManager {
 					levelDown = true;
 				}
 			} else if (InfoUtils.enemyRace() == Race.Zerg) {
-				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 45 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
 				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 히드라 발견
 					levelDown = true;
@@ -431,7 +457,10 @@ public class AirForceManager {
 			}
 			
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
-			if (achievementEffectiveFrame >= 150) {
+			if (achievementEffectiveFrame <= -100) { // defense 모드로 변경
+				levelDown = true;
+			}
+			if (achievementEffectiveFrame >= 150 && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith) < 4) {
 				levelUp = true;
 			}
 		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {

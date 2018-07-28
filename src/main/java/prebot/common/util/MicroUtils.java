@@ -1,8 +1,11 @@
 package prebot.common.util;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.DamageType;
 import bwapi.Position;
@@ -232,6 +235,14 @@ public class MicroUtils {
 			kitingInvisible(rangedUnit, targetInfo, kOption);
 		} else {
 			kiting(rangedUnit, targetInfo.getUnit(), kOption);
+		}
+	}
+	
+	public static void holdControlToRemoveMine(Unit rangedUnit, Position minePosition, FleeOption fOption) {
+		if (rangedUnit.getGroundWeaponCooldown() <= 10) {
+			rangedUnit.holdPosition();
+		} else {
+			MicroUtils.flee(rangedUnit, minePosition, fOption);
 		}
 	}
 	
@@ -601,7 +612,7 @@ public class MicroUtils {
 			return false;
 		}
 		
-		return target.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isAttackFrame() && unit.isInWeaponRange(target);
+		return target.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(target);
 	}
 	
 	// (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다.
@@ -690,6 +701,37 @@ public class MicroUtils {
 			}
 		}
 		return count;
+	}
+	
+	public static boolean exposedByEnemy(Unit myUnit, Collection<UnitInfo> enemiesInfo) {
+		for (UnitInfo ei : enemiesInfo) {
+			if (myUnit.getDistance(ei.getLastPosition()) <= ei.getType().sightRange()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static Set<UnitInfo> filterFlyingTargetInfos(Collection<UnitInfo> targetInfos) {
+		Set<UnitInfo> newTargetInfos = new HashSet<>();
+		for (UnitInfo targetInfo : targetInfos) {
+			Unit target = UnitUtils.unitInSight(targetInfo);
+
+			if (target != null) {
+				if (!UnitUtils.isCompleteValidUnit(target)) {
+					continue;
+				}
+				if (target.isFlying()) {
+					newTargetInfos.add(targetInfo);
+				}
+			} else {
+				UnitType enemyUnitType = targetInfo.getType();
+				if (enemyUnitType.isFlyer()) {
+					newTargetInfos.add(targetInfo);
+				}
+			}
+		}
+		return newTargetInfos;
 	}
 
 }

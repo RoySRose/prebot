@@ -121,20 +121,20 @@ public class EnemyStrategyOptions {
 					if (commandCenter.isLifted()) {
 						continue;
 					}
-					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_BASE) {
+					RegionType regionType = PositionUtils.positionToRegionType(commandCenter.getPosition());
+					if (regionType == RegionType.MY_BASE) {
 						baseCommandCentertOk = true;
-					}
-					if (PositionUtils.positionToRegionType(commandCenter.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+					} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
 						expansionCommandCenterOk = true;
 					}
 				}
 				return baseCommandCentertOk && expansionCommandCenterOk;
 			
 			case NO_ENEMY: // 지상 적 없음
-				return StrategyIdea.enemyGroundSquadPosition == Position.Unknown;
+				return StrategyIdea.nearGroundEnemyPosition == Position.Unknown;
 				
 			case NO_AIR_ENEMY: // 공중 적 없음
-				return StrategyIdea.enemyAirSquadPosition == Position.Unknown;
+				return StrategyIdea.nearAirEnemyPosition == Position.Unknown;
 				
 			case COMSAT_OK: // 컴셋에너지보유
 				boolean comsatReady = false;
@@ -154,10 +154,10 @@ public class EnemyStrategyOptions {
 				boolean expansionTurretOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
-					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_BASE) {
+					RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+					if (regionType == RegionType.MY_BASE) {
 						baseTurretOk = true;
-					}
-					if (PositionUtils.positionToRegionType(turret.getPosition()) == RegionType.MY_FIRST_EXPANSION) {
+					} else if (regionType == RegionType.MY_FIRST_EXPANSION || regionType == RegionType.MY_THIRD_REGION) {
 						expansionTurretOk = true;
 					}
 				}

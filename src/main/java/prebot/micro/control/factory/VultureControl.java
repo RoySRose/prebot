@@ -45,7 +45,12 @@ public class VultureControl extends Control {
 				continue;
 			}
 			
-			Decision decision = decisionMaker.makeDecision(unit, euiList);
+			boolean overwhelm = false;
+			if (this.targetPosition != null) {
+				overwhelm = true;
+			}
+			
+			Decision decision = decisionMaker.makeDecision(unit, euiList, overwhelm);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 			} else if (decision.type == DecisionType.KITING_UNIT) {
@@ -55,9 +60,11 @@ public class VultureControl extends Control {
 					continue;
 				}
 				
-				Position targetPosition = this.targetPosition; // 게릴라 등
-				if (targetPosition == null) {
-					targetPosition = getCheckerTargetPosition(unit);
+				Position targetPosition;
+				if (this.targetPosition != null) {
+					targetPosition = this.targetPosition; // 게릴라 등
+				} else {
+					targetPosition = getCheckerTargetPosition(unit); // 체커
 				}
 				CommandUtils.attackMove(unit, targetPosition);
 			}

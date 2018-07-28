@@ -33,6 +33,7 @@ import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.StrategyConfig;
 
 public class ComsatControl extends Control {
+	private int scanEnemySquadFrame = 10 * TimeUtils.MINUTE;
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
@@ -84,6 +85,7 @@ public class ComsatControl extends Control {
 		}
 		if (comsatToUse != null) {
 			Position scanPositionForObservation = getScanPositionForObservation();
+//			System.out.println("################################################ SCCCCCCCCCCCCCCCCCCCCAN -> " + scanPositionForObservation);
 			
 			if (PositionUtils.isValidPosition(scanPositionForObservation)) {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
@@ -199,6 +201,14 @@ public class ComsatControl extends Control {
 				oldestLastCheckTime = lastCheckTime;
 			}
 		}
+		
+		if (StrategyIdea.totalEnemyCneterPosition != null && scanEnemySquadFrame < oldestLastCheckTime) {
+			if (!Prebot.Broodwar.isVisible(StrategyIdea.totalEnemyCneterPosition.toTilePosition())) {
+				scanEnemySquadFrame = TimeUtils.elapsedFrames();
+				return StrategyIdea.totalEnemyCneterPosition;	
+			}
+		}
+		
 		return oldestCheckPosition;
 	}
 	

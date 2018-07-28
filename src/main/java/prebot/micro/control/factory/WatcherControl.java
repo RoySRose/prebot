@@ -89,8 +89,9 @@ public class WatcherControl extends Control {
 				}
 				Unit enemyUnit = UnitUtils.unitInSight(decision.eui);
 				if (enemyUnit != null) {
-					if (enemyUnit.getType() == UnitType.Terran_Vulture_Spider_Mine && unit.isInWeaponRange(enemyUnit)) {
-						CommandUtils.holdPosition(unit);
+					if (MicroUtils.isRemovableEnemySpiderMine(unit, decision.eui)) {
+						MicroUtils.holdControlToRemoveMine(unit, decision.eui.getLastPosition(), fOption);
+					
 					} else {
 						if (unit.getDistance(fleePosition) < coverRadius) {
 							if (otherMechanics.size() >= 10) {

@@ -73,6 +73,8 @@ public class GameCommander {
 			MapGrid.Instance().updateTimeCheck();
 			StrategyManager.Instance().updateTimeCheck();
 			
+			BuildQueueProvider.Instance().executeCombatUnitTrainingBlocked();
+			
 			// 이니셜빌드가 끝나지 않았다면, 끝났는지 체크하고, 끝났다면 빌드 프로바이더
 			if (!InitialBuildProvider.Instance().InitialBuildFinished) {
 				InitialBuildProvider.Instance().updateInitialBuild();

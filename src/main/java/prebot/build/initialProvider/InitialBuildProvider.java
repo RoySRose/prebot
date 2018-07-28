@@ -4,13 +4,14 @@ package prebot.build.initialProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance; 
 import prebot.build.initialProvider.buildSets.AdaptNewStrategy;
 import prebot.build.initialProvider.buildSets.VsProtoss;
 import prebot.build.initialProvider.buildSets.VsTerran;
@@ -19,6 +20,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
@@ -27,6 +29,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
@@ -53,7 +56,10 @@ public class InitialBuildProvider {
 	public TilePosition barrackPos = TilePosition.None;
 	public TilePosition secondSupplyPos = TilePosition.None;
 	public TilePosition factoryPos = TilePosition.None;
-	public TilePosition bunkerPos = TilePosition.None; 
+	public TilePosition bunkerPos = TilePosition.None;
+	public TilePosition starport1 = TilePosition.None;
+	public TilePosition starport2 = TilePosition.None;
+	
 	
 	public void onStart() {
 		System.out.println("InitialBuildProvider onStart start");
@@ -71,8 +77,18 @@ public class InitialBuildProvider {
         secondSupplyPos = BlockingEntrance.Instance().second_supple;
         factoryPos = BlockingEntrance.Instance().factory;
         bunkerPos = BlockingEntrance.Instance().bunker;
+        starport1 = BlockingEntrance.Instance().starport1;
+        starport2 = BlockingEntrance.Instance().starport2;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 //        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
+        
+        ConstructionPlaceFinder.Instance().freeTiles(firstSupplyPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(secondSupplyPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(starport1, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(starport2, 4, 3);
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
@@ -86,6 +102,9 @@ public class InitialBuildProvider {
 	}
 
     public void updateInitialBuild(){
+    	
+    	
+    	
         if(BuildManager.Instance().buildQueue.isEmpty()){
         	
             InitialBuildFinished = true;
@@ -96,7 +115,7 @@ public class InitialBuildProvider {
         	nowStrategy = StrategyIdea.currentStrategy.expansionOption;
         	if(nowStrategy != ExpansionOption.ONE_FACTORY) {
         		FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild adapt new strategy ==>> " + nowStrategy);
-        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
+        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
         		InitialBuildFinished = false;
         		adaptStrategy = true;
         	}
@@ -147,17 +166,24 @@ public class InitialBuildProvider {
         	
         	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
         	
-        	 if(addMarineInitial()) {
-             	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
+        	if(addMachineShopInitial()) {
+        		iq.queueAsHighestPriority(UnitType.Terran_Machine_Shop, false);
+        	}
+        	
+        	if(addMarineInitial()) {
+            	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
              	orderMarine++;
-             }
+            }
         	
         	if(addSupplyInitial()) {
         		
-        		int nowSupply = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
+//        		int nowSupply = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
+        		//완성됐거나 지어지고 있는 서플라이 디포
+        		int nowSupply = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Supply_Depot);
 //        		if(nowSupply == 0) {
 //        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().first_supple, true);
-//        		}else 
+//        		}else
+        		//1개까지는 이니셜 빌드에 있다 치고 이거 괜찮나..........
         		if(nowSupply == 1) {
         			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().second_supple, true);
         		}else {
@@ -480,6 +506,10 @@ public class InitialBuildProvider {
     	
     	nowMarine = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
     	
+//    	마린이 2마리가 생산된 상태에서 팩토리가 없다면 팩토리 먼저
+    	if(nowMarine == 2 && UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) == 0) {
+    		return false;
+    	}
     	
 //    	20180721. hkk
 //    	마린을 프레임돌때마다 큐에 넣는것이 아니고. 생산이 될때마다 큐에 추가.
@@ -496,6 +526,46 @@ public class InitialBuildProvider {
     	}
     	return false;
     	
+    }
+    
+    
+    public boolean addMachineShopInitial(){
+    	
+    	if (Prebot.Broodwar.self().minerals() < 50 || Prebot.Broodwar.self().gas() < 50) {
+			return false;
+		}
+		
+		
+		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null);
+		if (buildQueueCount > 0) {
+			return false;
+		}
+		int constructionCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null);
+		if (constructionCount > 0) {
+			return false;
+		}
+		
+		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+		
+		
+		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+		
+			if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
+//				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
+				if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
+//					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
+					for (Unit factory : factories) {
+						if (factory.getAddon() != null || !factory.canBuildAddon()) {
+							continue;
+						}
+						return true;
+					}
+				}
+			}else {
+				return true;
+			}
+		}
+    	return false;
     }
 }
 

@@ -63,20 +63,20 @@ public class TimeMapForTerran {
 	}
 	
 	public static BuildTimeMap TERRAN_1FAC_DOUBLE_ARMORY() {
-		return TERRAN_MECHANIC()
+		return TERRAN_MECHANIC().setFeature(Feature.DEFENSE_FRONT)
 		.put(UnitType.Terran_Command_Center, 3, 40)
 		.put(UnitType.Terran_Armory, 4, 30)
 		.put(UnitType.Terran_Academy, 5, 30);
 	}
 	
 	public static BuildTimeMap TERRAN_2FAC() {
-		return TERRAN_MECHANIC()
+		return TERRAN_MECHANIC().setFeature(Feature.DEFENSE_FRONT)
 		.put(UnitType.Terran_Factory, 4, 0)
 		.put(UnitType.Terran_Vulture_Spider_Mine, 4, 10);
 	}
 	
 	public static BuildTimeMap TERRAN_1FAC_1STAR() {
-		return TERRAN_MECHANIC().setFeature(Feature.DETECT_IMPORTANT)
+		return TERRAN_MECHANIC().setFeature(Feature.DETECT_IMPORTANT, Feature.DEFENSE_FRONT)
 		.put(UnitType.Terran_Starport, 3, 30);
 	}
 	
@@ -87,7 +87,7 @@ public class TimeMapForTerran {
 	}
 	
 	public static BuildTimeMap TERRAN_BIONIC() {
-		return TERRAN_2BARRACKS().setFeature(Feature.BIONIC)
+		return TERRAN_2BARRACKS().setFeature(Feature.BIONIC, Feature.DEFENSE_FRONT)
 		  .put(UnitType.Terran_Academy, 3, 0)
 		  .put(TechType.Stim_Packs, 3, 50);
 	}

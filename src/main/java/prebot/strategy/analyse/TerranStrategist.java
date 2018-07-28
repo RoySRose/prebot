@@ -7,6 +7,7 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.manage.AirForceManager;
 
 public class TerranStrategist extends Strategist {
 	
@@ -165,11 +166,14 @@ public class TerranStrategist extends Strategist {
 			if (isBionic) {
 				return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
 			} else {
-				if (goliathCount == 0) {
-					return EnemyStrategy.TERRAN_MECHANIC_WRAITH_TANK;
-				} else {
-					return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
+				// 내 레이쓰 수가 0개 유지 상태, 적 골리앗이 1기 이하, 내 탱크가 10개 이상인 경우 역레이쓰 
+				if (goliathCount <= 2 && StrategyIdea.wraithCount == 0) {
+					int myTankCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
+					if (myTankCount >= 10) {
+						AirForceManager.Instance().setAirForceWaiting();
+					}
 				}
+				return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
 			}
 		} else {
 			return EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK;
