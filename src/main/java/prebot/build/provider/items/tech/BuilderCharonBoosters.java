@@ -1,5 +1,6 @@
 package prebot.build.provider.items.tech;
 
+import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
@@ -24,6 +25,9 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
 //    	FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || buildCondition || metaType =>" + metaType.toString());
 
     	//if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
+    		return false;
+    	}
     	
     	if(String.valueOf(researchSelector.getSelected()) != "null"){
 	    	if(researchSelector.getSelected().isUpgrade()) {

@@ -9,7 +9,7 @@ public class MapSpecificInformation {
 
 	public static enum GameMap {
 		UNKNOWN, CIRCUITBREAKER, OVERWATCH,
-		FIGHTING_SPRIRITS, LOST_TEMPLE, THE_HUNTERS
+		FIGHTING_SPIRITS, LOST_TEMPLE, THE_HUNTERS
 	}
 
 	private GameMap map;

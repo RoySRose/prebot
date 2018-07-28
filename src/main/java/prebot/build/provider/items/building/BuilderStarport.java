@@ -1,6 +1,7 @@
 package prebot.build.provider.items.building;
 
 import bwapi.UnitType;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
@@ -8,6 +9,7 @@ import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public class BuilderStarport extends DefaultBuildableItem {
 
@@ -24,11 +26,24 @@ public class BuilderStarport extends DefaultBuildableItem {
 		if (constructionQueueItemCount > 0) {
 			return false;
 		}
+		
+		if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+			if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+				setTilePosition(BlockingEntrance.Instance().starport1);
+				return true;
+			}else if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
+				setTilePosition(BlockingEntrance.Instance().starport2);
+				return true;
+			}
+				
+
+		}
 
 		int activatedCommandCount = UnitUtils.activatedCommandCenterCount();
 		int wraithCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith);
 		if (StrategyIdea.wraithCount > wraithCount && activatedCommandCount >= 2) {
 			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+				setTilePosition(BlockingEntrance.Instance().starport1);
 				return true;
 			}
 		}
@@ -36,6 +51,7 @@ public class BuilderStarport extends DefaultBuildableItem {
 		// TODO 필요한 정보 추가
 		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
 			boolean needVessel = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);
+			setTilePosition(BlockingEntrance.Instance().starport1);
 			return (needVessel && activatedCommandCount >= 2) || activatedCommandCount >= 3;
 		}
 		return false;
