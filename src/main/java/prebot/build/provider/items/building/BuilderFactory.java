@@ -65,15 +65,19 @@ public class BuilderFactory extends DefaultBuildableItem {
 				break;
 			}
 		}
+		
+		
+		
+		int activeCommandCount = UnitUtils.activatedCommandCenterCount();
 
 		int completeFactoryCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory).size();
 		int maxFactoryCount = 0;
-		if (completeFactoryCount <= 1) {
+		if (activeCommandCount == 1) {
 			maxFactoryCount = 3;
-		} else if (completeFactoryCount == 2) {
+		} else if (activeCommandCount == 2) {
 			maxFactoryCount = 6;
-		} else if (completeFactoryCount >= 3) {
-			maxFactoryCount = 9;
+		} else if (activeCommandCount >= 3) {
+			maxFactoryCount = 9 + activeCommandCount - 3;
 		}
 
 		

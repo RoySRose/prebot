@@ -91,11 +91,11 @@ public class InitialBuildProvider {
 //        ConstructionPlaceFinder.Instance().freeTiles(starport2, 4, 3);
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
 		} else {
-			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
+			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
 		}
 		
 		System.out.println("InitialBuildProvider onStart end");
@@ -171,8 +171,10 @@ public class InitialBuildProvider {
         	}
         	
         	if(addMarineInitial()) {
+        		int deadMarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
             	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
-             	orderMarine++;
+             	orderMarine = orderMarine + 1 - deadMarine;
+             	
             }
         	
         	if(addSupplyInitial()) {
@@ -505,6 +507,7 @@ public class InitialBuildProvider {
     	}
     	
     	nowMarine = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
+    	
     	
 //    	마린이 2마리가 생산된 상태에서 팩토리가 없다면 팩토리 먼저
     	if(nowMarine == 2 && UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) == 0) {

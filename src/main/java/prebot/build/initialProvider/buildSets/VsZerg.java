@@ -13,7 +13,9 @@ import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 public class VsZerg extends BaseBuild{
 
 
-    public VsZerg(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos, TilePosition bunkerPos) {
+    public VsZerg(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos
+    		, TilePosition factoryPos, TilePosition bunkerPos
+    		, TilePosition starport1, TilePosition starport2) {
   	
     	if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
     	

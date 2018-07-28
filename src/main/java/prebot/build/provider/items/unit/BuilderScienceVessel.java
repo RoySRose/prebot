@@ -12,11 +12,8 @@ import prebot.common.util.UnitUtils;
 
 public class BuilderScienceVessel extends DefaultBuildableItem {
 
-	StarportUnitSelector starportUnitSelector;
-
-	public BuilderScienceVessel(MetaType metaType, StarportUnitSelector starportUnitSelector) {
+	public BuilderScienceVessel(MetaType metaType) {
 		super(metaType);
-		this.starportUnitSelector = starportUnitSelector;
 	}
 
 	public final boolean buildCondition() {
@@ -30,10 +27,6 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 			return false;
 		}
 
-		if (starportUnitSelector.getSelected().equals(metaType.getUnitType())) {
-			return true;
-		}
-		
 		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Science_Vessel)) {
 			return false;
 		}

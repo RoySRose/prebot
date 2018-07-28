@@ -12,7 +12,9 @@ import prebot.strategy.MapSpecificInformation.GameMap;
 public class VsTerran extends BaseBuild{
 
 
-    public VsTerran(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos, TilePosition bunkerPos) {
+    public VsTerran(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos
+    		, TilePosition factoryPos, TilePosition bunkerPos
+    		, TilePosition starport1, TilePosition starport2) {
     	if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
 	    	/*2스타 레이스*/
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -25,17 +27,17 @@ public class VsTerran extends BaseBuild{
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 	    	queueBuild(true, UnitType.Terran_Factory, factoryPos);
 //	    	queueBuild(true, UnitType.Terran_Marine);
-	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Vulture);
-	    	queueBuild(true, UnitType.Terran_Starport);
-	    	queueBuild(true, UnitType.Terran_Starport);
-	    	queueBuild(true, UnitType.Terran_Bunker, bunkerPos);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Wraith, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Machine_Shop);
+//	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Vulture);
+//	    	queueBuild(true, UnitType.Terran_Starport);
+//	    	queueBuild(true, UnitType.Terran_Starport);
+//	    	queueBuild(true, UnitType.Terran_Bunker, bunkerPos);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Wraith, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Machine_Shop);
 	    	
 	    	
 	        /*queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
@@ -73,17 +75,17 @@ public class VsTerran extends BaseBuild{
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 	    	queueBuild(true, UnitType.Terran_Factory);
 //	    	queueBuild(true, UnitType.Terran_Marine);
-	    	queueBuild(true, UnitType.Terran_Supply_Depot);
-	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Vulture);
-	    	queueBuild(true, UnitType.Terran_Starport);
-	    	queueBuild(true, UnitType.Terran_Starport);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Wraith, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_SCV);
-	    	queueBuild(true, UnitType.Terran_Machine_Shop);
+//	    	queueBuild(true, UnitType.Terran_Supply_Depot);
+//	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Vulture);
+//	    	queueBuild(true, UnitType.Terran_Starport);
+//	    	queueBuild(true, UnitType.Terran_Starport);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Wraith, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_SCV);
+//	    	queueBuild(true, UnitType.Terran_Machine_Shop);
 	    	
 	    	
 	        /*queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);

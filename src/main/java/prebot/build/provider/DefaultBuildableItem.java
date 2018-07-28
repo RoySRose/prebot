@@ -46,7 +46,8 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public DefaultBuildableItem(MetaType metaType) {
-        buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.NoLocation, TilePosition.None);
+//        buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.NoLocation, TilePosition.None);
+    	buildCondition = new BuildCondition(false, false, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, TilePosition.None);
         this.metaType = metaType;
         //setProducerOfUnit();
         if(metaType.isUnit() && (!metaType.getUnitType().isBuilding() || metaType.getUnitType().isAddon())) {
@@ -58,7 +59,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     private final void build(){
     	if(!metaType.isUnit() && 
-    			(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation
+    			(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.MainBaseLocation
     			|| buildCondition.tilePosition != TilePosition.None)) {
             System.out.println("Only UnitType can have position attribute");
         }
@@ -74,7 +75,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     private final void setBuildQueue(){
 		if (buildCondition.highPriority) {
-			if (buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation) {
+			if (buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
 			} else if (buildCondition.tilePosition != TilePosition.None) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
@@ -82,7 +83,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(metaType, buildCondition.blocking);
 			}
 		} else {
-			if (buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation) {
+			if (buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.seedPositionStrategy, buildCondition.blocking);
 			} else if (buildCondition.tilePosition != TilePosition.None) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(metaType, buildCondition.tilePosition, buildCondition.blocking);
@@ -124,7 +125,8 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     private final void setDefaultConditions(){
         this.buildCondition.blocking = false;
         this.buildCondition.highPriority = false;
-        this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
+//        this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
+        this.buildCondition.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
         this.buildCondition.tilePosition = TilePosition.None;
     }
 
