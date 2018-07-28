@@ -14,6 +14,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig;
@@ -403,10 +404,16 @@ public class WorkerManager extends GameManager {
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if (unit.getType() == UnitType.Terran_Goliath || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-						|| unit.getType() == UnitType.Terran_Science_Vessel) {
+						|| unit.getType() == UnitType.Terran_Science_Vessel
+						) {
 					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 					setRepairWorker(repairWorker, unit);
 					repairWorkCnt = workerData.workerRepairMap.size();
+				} else if(unit.getType() == UnitType.Terran_Wraith){
+					if(unit.getDistance(InfoUtils.myBase()) < 200 && unit.getHitPoints() <= 50/* &&  workerData.workerWraithRepairMap.size() <= 3*/){
+						Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+						setRepairWorker(repairWorker, unit);
+					}
 				}
 			}
 
@@ -429,7 +436,7 @@ public class WorkerManager extends GameManager {
 		// if (currentRepairWorker != null && currentRepairWorker.exists() &&
 		// currentRepairWorker.getHitPoints() > 0 &&
 		// unit.getType().isBuilding())
-		if (Prebot.Broodwar.getFrameCount() <= 12000) {
+		if (Prebot.Broodwar.getFrameCount() <= 10) {
 			if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0
 					&& unit.getType().isBuilding()
 					&& (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot
