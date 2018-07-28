@@ -82,13 +82,13 @@ public class InitialBuildProvider {
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 //        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
         
-        ConstructionPlaceFinder.Instance().freeTiles(firstSupplyPos, 3, 2);
-        ConstructionPlaceFinder.Instance().freeTiles(secondSupplyPos, 3, 2);
-        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
-        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
-        ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
-        ConstructionPlaceFinder.Instance().freeTiles(starport1, 4, 3);
-        ConstructionPlaceFinder.Instance().freeTiles(starport2, 4, 3);
+//        ConstructionPlaceFinder.Instance().freeTiles(firstSupplyPos, 3, 2);
+//        ConstructionPlaceFinder.Instance().freeTiles(secondSupplyPos, 3, 2);
+//        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+//        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+//        ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
+//        ConstructionPlaceFinder.Instance().freeTiles(starport1, 4, 3);
+//        ConstructionPlaceFinder.Instance().freeTiles(starport2, 4, 3);
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
