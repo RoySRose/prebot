@@ -1671,7 +1671,7 @@ public class InformationManager extends GameManager {
 		if (mapName.matches(".*CIRCUIT.*")) {
 			gameMap = GameMap.CIRCUITBREAKER;
 		} else if (mapName.matches(".*SPIRIT.*")) {
-			gameMap = GameMap.FIGHTING_SPRIRITS;
+			gameMap = GameMap.FIGHTING_SPIRITS;
 		} else {
 			gameMap = GameMap.UNKNOWN;
 		}

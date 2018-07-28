@@ -4,6 +4,7 @@ package prebot.build.initialProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import bwapi.Race;
@@ -19,6 +20,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
+import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
@@ -54,7 +56,10 @@ public class InitialBuildProvider {
 	public TilePosition barrackPos = TilePosition.None;
 	public TilePosition secondSupplyPos = TilePosition.None;
 	public TilePosition factoryPos = TilePosition.None;
-	public TilePosition bunkerPos = TilePosition.None; 
+	public TilePosition bunkerPos = TilePosition.None;
+	public TilePosition starport1 = TilePosition.None;
+	public TilePosition starport2 = TilePosition.None;
+	
 	
 	public void onStart() {
 		System.out.println("InitialBuildProvider onStart start");
@@ -72,8 +77,18 @@ public class InitialBuildProvider {
         secondSupplyPos = BlockingEntrance.Instance().second_supple;
         factoryPos = BlockingEntrance.Instance().factory;
         bunkerPos = BlockingEntrance.Instance().bunker;
+        starport1 = BlockingEntrance.Instance().starport1;
+        starport2 = BlockingEntrance.Instance().starport2;
         //TilePosition entranceTurretPos = blockingEntrance.entrance_turret;
 //        FileUtils.appendTextToFile("log.txt", "\n InitialBuildProvider firstSupplyPos ==>> (" + firstSupplyPos.getX() +" , "+firstSupplyPos.getX()+" ) ");
+        
+        ConstructionPlaceFinder.Instance().freeTiles(firstSupplyPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(secondSupplyPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(barrackPos, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
+        ConstructionPlaceFinder.Instance().freeTiles(starport1, 4, 3);
+        ConstructionPlaceFinder.Instance().freeTiles(starport2, 4, 3);
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos);
@@ -87,6 +102,9 @@ public class InitialBuildProvider {
 	}
 
     public void updateInitialBuild(){
+    	
+    	
+    	
         if(BuildManager.Instance().buildQueue.isEmpty()){
         	
             InitialBuildFinished = true;
@@ -97,7 +115,7 @@ public class InitialBuildProvider {
         	nowStrategy = StrategyIdea.currentStrategy.expansionOption;
         	if(nowStrategy != ExpansionOption.ONE_FACTORY) {
         		FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild adapt new strategy ==>> " + nowStrategy);
-        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
+        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
         		InitialBuildFinished = false;
         		adaptStrategy = true;
         	}
@@ -533,9 +551,9 @@ public class InitialBuildProvider {
 		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 		
 			if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
-				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
+//				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
 				if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
-					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
+//					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
 					for (Unit factory : factories) {
 						if (factory.getAddon() != null || !factory.canBuildAddon()) {
 							continue;

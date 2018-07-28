@@ -79,11 +79,11 @@ public class ConstructionManager extends GameManager {
 				int height = b.getType().tileHeight();
 				
 				if (b.getType() == UnitType.Terran_Command_Center ||
-						b.getType() == UnitType.Terran_Factory ||
-						b.getType() == UnitType.Terran_Starport ||
-						b.getType() == UnitType.Terran_Science_Facility)
-					{
-						width += 2;
+					b.getType() == UnitType.Terran_Factory ||
+					b.getType() == UnitType.Terran_Starport ||
+					b.getType() == UnitType.Terran_Science_Facility)
+				{
+					width += 2;
 				}
 				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 			}

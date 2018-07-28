@@ -7,6 +7,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.UnitType;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.util.FileUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
@@ -15,7 +16,8 @@ import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 public class AdaptNewStrategy extends BaseBuild{
 
 
-    public AdaptNewStrategy(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos, TilePosition bunkerPos, ExpansionOption strategy) {
+    public AdaptNewStrategy(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos
+    		, TilePosition bunkerPos, TilePosition starport1, TilePosition starport2, ExpansionOption strategy) {
   	
     	if(strategy == ExpansionOption.TWO_STARPORT) {
     		
@@ -25,8 +27,8 @@ public class AdaptNewStrategy extends BaseBuild{
 	        		queueBuild(true, UnitType.Terran_Supply_Depot, secondSupplyPos);
 	        		queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 	    	    	queueBuild(true, UnitType.Terran_Vulture);
-	    	    	queueBuild(true, UnitType.Terran_Starport);
-	    	    	queueBuild(true, UnitType.Terran_Starport);
+	    	    	queueBuild(true, UnitType.Terran_Starport, starport1);
+	    	    	queueBuild(true, UnitType.Terran_Starport, starport2);
 	    	    	
 	        	}else {
 	        		

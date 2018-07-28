@@ -4,6 +4,7 @@ package prebot.build.initialProvider.buildSets;
 import bwapi.TilePosition;
 import bwapi.UnitType;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.util.FileUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
@@ -23,16 +24,9 @@ public class VsZerg extends BaseBuild{
 	    	queueBuild(true, UnitType.Terran_SCV);
 	    	queueBuild(true, UnitType.Terran_Refinery);
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-	    	ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
 	    	queueBuild(true, UnitType.Terran_Bunker, bunkerPos);
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV);
-
 	    	queueBuild(true, UnitType.Terran_Factory, factoryPos);
-//	    	queueBuild(true, UnitType.Terran_Supply_Depot, secondSupplyPos);
-//	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//	    	queueBuild(true, UnitType.Terran_Vulture);
-//	    	queueBuild(true, UnitType.Terran_Starport);
-//	    	queueBuild(true, UnitType.Terran_Starport);
 
     	}else {
     		
@@ -43,17 +37,8 @@ public class VsZerg extends BaseBuild{
 	    	queueBuild(true, UnitType.Terran_SCV);
 	    	queueBuild(true, UnitType.Terran_Refinery);
 	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//	    	queueBuild(true, UnitType.Terran_Marine);
-//	    	queueBuild(true, UnitType.Terran_SCV);
-	    	ConstructionPlaceFinder.Instance().freeTiles(bunkerPos, 3, 2);
 	    	queueBuild(true, UnitType.Terran_Bunker, bunkerPos);
 	    	queueBuild(true, UnitType.Terran_Factory, factoryPos);
-//	    	queueBuild(true, UnitType.Terran_Supply_Depot, secondSupplyPos);
-//	    	queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
-//	    	queueBuild(true, UnitType.Terran_Vulture);
-//	    	queueBuild(true, UnitType.Terran_Starport);
-//	    	queueBuild(true, UnitType.Terran_Starport);
     		
     	}
     }
