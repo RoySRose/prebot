@@ -42,9 +42,9 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.common.main.Prebot;
 
 public class BuildQueueProvider extends GameManager {
 
@@ -276,222 +276,124 @@ public class BuildQueueProvider extends GameManager {
     
     public void executeCombatUnitTrainingBlocked() {
 		
+		if (Prebot.Broodwar.self().supplyTotal() - Prebot.Broodwar.self().supplyUsed() < 4) {
+			return;
+		}
+		if (Prebot.Broodwar.self().supplyUsed() > 392) {
+			return;
+		}
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-		BuildOrderItem currentItem = null; 
-		Boolean goliathInTheQueue = false;
-		Boolean tankInTheQueue = false;
-		Boolean isarmoryexists = false;
-		
-		int vultureratio = StrategyIdea.factoryRatio.vulture;
-		int tankratio = StrategyIdea.factoryRatio.tank;
-		int goliathratio = StrategyIdea.factoryRatio.goliath;
-		int wgt = StrategyIdea.factoryRatio.weight;
-		
-		if(Prebot.Broodwar.self().supplyTotal() - Prebot.Broodwar.self().supplyUsed() < 4){
+		if (tempbuildQueue.isEmpty()) {
 			return;
 		}
-		if (!tempbuildQueue.isEmpty()) {
-			currentItem= tempbuildQueue.getHighestPriorityItem();
-			while(true){
-				
-				
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
+		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+		if (factories.isEmpty()) {
+			return;
+		}
+
+		boolean goliathInTheQueue = false;
+		boolean tankInTheQueue = false;
+
+		BuildOrderItem currentItem = tempbuildQueue.getHighestPriorityItem();
+		while (true) {
+			if (currentItem.metaType.isUnit()) {
+				UnitType unitType = currentItem.metaType.getUnitType();
+				if (unitType == UnitType.Terran_Goliath) {
 					goliathInTheQueue = true;
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+				} else if (currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
 					tankInTheQueue = true;
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Supply_Depot){
+					
+				} else if (unitType == UnitType.Terran_Supply_Depot
+						|| unitType == UnitType.Terran_Missile_Turret
+						|| unitType == UnitType.Terran_Vulture
+						|| unitType == UnitType.Terran_SCV) {
+//						|| unitType.isAddon()) {
 					return;
 				}
-//				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType().isAddon()){
-//					return;
-//				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Missile_Turret){
-					return;
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Vulture){
-					return;
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_SCV){
-					return;
-				}
-				if(currentItem.blocking == true){
-					break;
-				}
-				if(tempbuildQueue.canSkipCurrentItem() == true){
-					tempbuildQueue.skipCurrentItem();
-				}else{
-					break;
-				}
-				currentItem = tempbuildQueue.getItem();
 			}
-		}else{
-			return;
+			if (currentItem.blocking || !tempbuildQueue.canSkipCurrentItem()) {
+				break;
+			}
+
+			tempbuildQueue.skipCurrentItem();
+			currentItem = tempbuildQueue.getItem();
 		}
 		
+		boolean isArmoryExists = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) > 0;
+		boolean vultureInTheQueue = tempbuildQueue.getItemCount(UnitType.Terran_Vulture) > 0;
 		
-		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) > 0) {
-			isarmoryexists = true;
-		}
-		
-		List<Unit> factory = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
-		
-		if(factory.size() > 0) {
-			return;
-		}
-		
-		for (Unit unit : factory)
-		{
-			if (unit.isTraining() == false){
+		for (Unit factory : factories) {
+			if (factory.isTraining()) {
+				continue;
+			}
 				
-//				if(unit.isConstructing() == true){
-//					continue;
-//				}
-				
-				//TODO else 가 들어가야할까. addon 있는놈일때는 신겨 안쓰게끔?
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop && unit.getAddon() == null ){
-					continue;
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode){
-					if(unit.getAddon() != null && unit.getAddon().isCompleted() != true){
+			//TODO else 가 들어가야할까. addon 있는놈일때는 신겨 안쓰게끔?
+			if (currentItem.metaType.isUnit()) {
+				if (currentItem.metaType.getUnitType() == UnitType.Terran_Machine_Shop) {
+					if (factory.getAddon() == null) {
 						continue;
 					}
-				}
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == UnitType.Terran_Goliath){
-					if(isarmoryexists){
+				} else if (currentItem.metaType.getUnitType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+					if (factory.getAddon() != null && !factory.getAddon().isCompleted()) {
+						continue;
+					}
+				} else if (currentItem.metaType.getUnitType() == UnitType.Terran_Goliath) {
+					if (isArmoryExists) {
 						break;
 					}
 				}
-				
-				boolean eventually_vulture = true;
-				
-				int tot_vulture = GetCurrentTotBlocked(UnitType.Terran_Vulture);
-				int tot_tank = GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Tank_Mode) + GetCurrentTotBlocked(UnitType.Terran_Siege_Tank_Siege_Mode);
-				int tot_goliath = GetCurrentTotBlocked(UnitType.Terran_Goliath);
-				
-				UnitType selected = null; 
-				
-				selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
-				
-				
-				int minNeed = selected.mineralPrice();
-				
-				if(currentItem.metaType.isUnit() && currentItem.metaType.getUnitType()!=selected){
-					if(selected == UnitType.Terran_Siege_Tank_Tank_Mode && tankInTheQueue == false){
-						if(unit.getAddon() != null && unit.getAddon().isCompleted() == true){
-							if(currentItem.metaType.mineralPrice()+minNeed < Prebot.Broodwar.self().minerals() &&
-									currentItem.metaType.gasPrice()+selected.gasPrice() < Prebot.Broodwar.self().gas() && Prebot.Broodwar.self().supplyUsed() <= 392){
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								eventually_vulture = false;
-							}
-						}
-					}else if(selected == UnitType.Terran_Goliath && goliathInTheQueue == false){
-						if(isarmoryexists){
-							if(currentItem.metaType.mineralPrice()+minNeed < Prebot.Broodwar.self().minerals() &&
-									currentItem.metaType.gasPrice()+selected.gasPrice() < Prebot.Broodwar.self().gas() && Prebot.Broodwar.self().supplyUsed() <= 392){
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(selected,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-								eventually_vulture = false;
-							}
-						}
+			}
+			
+			int tot_vulture = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
+			int tot_tank = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+			int tot_goliath = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
+			
+
+			int vultureratio = StrategyIdea.factoryRatio.vulture;
+			int tankratio = StrategyIdea.factoryRatio.tank;
+			int goliathratio = StrategyIdea.factoryRatio.goliath;
+			int wgt = StrategyIdea.factoryRatio.weight;
+			
+			UnitType selected = FactoryUnitSelector.chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
+			
+			if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() != selected) {
+				if (selected == UnitType.Terran_Siege_Tank_Tank_Mode && !tankInTheQueue && factory.getAddon() != null && factory.getAddon().isCompleted()) {
+					int mineralNeed = currentItem.metaType.mineralPrice() + selected.mineralPrice();
+					int gasNeed = currentItem.metaType.gasPrice() + selected.gasPrice();
+					if (PlayerUtils.enoughResource(mineralNeed, gasNeed)) {
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+						return;
+					}
+				}
+				else if (selected == UnitType.Terran_Goliath && !goliathInTheQueue && isArmoryExists) {
+					int mineralNeed = currentItem.metaType.mineralPrice() + selected.mineralPrice();
+					int gasNeed = currentItem.metaType.gasPrice() + selected.gasPrice();
+					if (PlayerUtils.enoughResource(mineralNeed, gasNeed)) {
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+						return;
 					}
 				}
 				
-				if(eventually_vulture){
-					if(Prebot.Broodwar.self().gas() < 250){
-						minNeed = 75;
+			}
+			
+			if (!vultureInTheQueue) {
+				int mineralNeed = selected.mineralPrice();
+				if (Prebot.Broodwar.self().gas() < 250) {
+					mineralNeed = 75;
+				}
+				mineralNeed = currentItem.metaType.mineralPrice() + mineralNeed;
+				if (PlayerUtils.enoughResource(mineralNeed, 0)) {
+					if (factory.isConstructing() || ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) != 0) {
+						continue;
 					}
-					
-					if(currentItem.metaType.mineralPrice()+minNeed < Prebot.Broodwar.self().minerals() && Prebot.Broodwar.self().supplyUsed() <= 392){
-						if((unit.isConstructing() == true) || ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) != 0){
-							continue;
-						}
-//						if(selected == UnitType.Terran_Goliath && isarmoryexists == false){
-//							continue;
-//						}
-						if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Vulture) == 0){
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture,BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-						}
-					}
+					// if(selected == UnitType.Terran_Goliath && isarmoryexists == false){
+					// continue;
+					// }
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+					return;
 				}
 			}
  		}
-	}
-    
-    public int GetCurrentTotBlocked(UnitType checkunit) {
-		int cnt = Prebot.Broodwar.self().allUnitCount(checkunit);
-		return cnt;
-	}
-    
-    public static UnitType chooseunit(int ratea, int rateb, int ratec, int wgt, int tota, int totb, int totc) {
-
-		if (wgt < 1 || wgt > 3) {
-			wgt = 1;
-		}
-		double tempa = 0;
-		double tempb = 0;
-		double tempc = 0;
-		if (ratea == 0) {
-			tempa = 99999999;
-		} else {
-			tempa = 1.0 / ratea * tota;
-		}
-		if (rateb == 0) {
-			tempb = 99999999;
-		} else {
-			tempb = 1.0 / rateb * totb;
-		}
-		if (ratec == 0) {
-			tempc = 99999999;
-		} else {
-			tempc = 1.0 / ratec * totc;
-		}
-		int num = least(tempa, tempb, tempc, wgt);
-		if (num == 3) {// 1:벌쳐, 2:시즈, 3:골리앗
-			return UnitType.Terran_Goliath;
-		} else if (num == 2) {
-			return UnitType.Terran_Siege_Tank_Tank_Mode;
-		} else {
-			return UnitType.Terran_Vulture;
-		}
-	}
-	
-	public static int least(double a, double b, double c, int checker) {
-
-		int ret = 0;
-		if (a > b) {
-			if (b > c) {
-				ret = 3; // a>b>c
-			} else {
-				ret = 2; // a>b, b>=c
-			}
-		} else {
-			if (a > c) { // a<=b, a>c
-				ret = 3;
-			} else { // a<=b, a<=c
-				ret = 1;
-			}
-		}
-		if (ret == 1) {
-			if (a == b && checker != 3) {
-				ret = checker;
-			} else if (a == c && checker != 2) {
-				ret = checker;
-			}
-		} else if (ret == 2) {
-			if (b == a && checker != 3) {
-				ret = checker;
-			} else if (b == c && checker != 1) {
-				ret = checker;
-			}
-		} else if (ret == 3) {
-			if (c == a && checker != 2) {
-				ret = checker;
-			} else if (c == b && checker != 1) {
-				ret = checker;
-			}
-		}
-		return ret;
 	}
 
 	

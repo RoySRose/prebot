@@ -99,31 +99,20 @@ public class CombatManager extends GameManager {
 	}
 
 	private void combatUnitArrangement() {
-		// 유효한 공격유닛 필터링(일꾼 포함)
-		List<Unit> combatUnitList = new ArrayList<>();
-		for (Unit myUnit : Prebot.Broodwar.self().getUnits()) {
-			if (!UnitUtils.isCompleteValidUnit(myUnit)) {
-				continue;
-			}
-			combatUnitList.add(myUnit);
-		}
+		updateSquadDefault(SquadInfo.EARLY_DEFENSE);
+		updateSquadDefault(SquadInfo.MAIN_ATTACK);
+		updateSquadDefault(SquadInfo.WATCHER);
+		updateSquadDefault(SquadInfo.CHECKER);
+		updateSquadDefault(SquadInfo.SCV_SCOUT);
+		updateSquadDefault(SquadInfo.AIR_FORCE);
+		updateSquadDefault(SquadInfo.SPECIAL);
+		updateSquadDefault(SquadInfo.BUILDING);
 
-		BigWatch.start("arrangement");
-		updateSquadDefault(SquadInfo.EARLY_DEFENSE, combatUnitList);
-		updateSquadDefault(SquadInfo.MAIN_ATTACK, combatUnitList);
-		updateSquadDefault(SquadInfo.WATCHER, combatUnitList);
-		updateSquadDefault(SquadInfo.CHECKER, combatUnitList);
-		updateSquadDefault(SquadInfo.SCV_SCOUT, combatUnitList);
-		updateSquadDefault(SquadInfo.AIR_FORCE, combatUnitList);
-		updateSquadDefault(SquadInfo.SPECIAL, combatUnitList);
-		updateSquadDefault(SquadInfo.BUILDING, combatUnitList);
-
-		updateDefenseSquad(combatUnitList);
-		updateGuerillaSquad(combatUnitList);
-		BigWatch.record("arrangement");
+		updateDefenseSquad();
+		updateGuerillaSquad();
 	}
 
-	private void updateSquadDefault(SquadInfo squadInfo, List<Unit> combatUnitList) {
+	private void updateSquadDefault(SquadInfo squadInfo) {
 //		BigWatch.start("CombatManager.updateSquadDefault." + squadInfo.squadName);
 		Squad squad = squadData.getSquad(squadInfo.squadName);
 
@@ -147,22 +136,20 @@ public class CombatManager extends GameManager {
 	}
 
 	private void squadExecution() {
-		BigWatch.start("execution");
 		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
 		mainSquad.findEnemiesAndExecuteSquad();
 		
 		for (Squad squad : squadData.getSquadMap().values()) {
 			squad.findEnemiesAndExecuteSquad(); // squad 유닛 명령 지시
 		}
-		BigWatch.record("execution");
 	}
 
-	private void updateDefenseSquad(List<Unit> combatUnitList) {
+	private void updateDefenseSquad() {
 		// TODO Auto-generated method stub
 
 	}
 
-	private void updateGuerillaSquad(List<Unit> combatUnitList) {
+	private void updateGuerillaSquad() {
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		double maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
 		int maxCount = (int) (vultureCount * maxRatio);

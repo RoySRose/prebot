@@ -15,7 +15,7 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.debug.BigWatch;
 import prebot.common.debug.chat.ChatBot;
-import prebot.common.util.PlayerUtil;
+import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.WorkerManager;
@@ -204,7 +204,7 @@ public class GameCommander {
 	}
 
 	private boolean playableCondition() {
-		return !Prebot.Broodwar.isPaused() && !PlayerUtil.isDisabled(Prebot.Broodwar.self()) && !PlayerUtil.isDisabled(Prebot.Broodwar.enemy());
+		return !Prebot.Broodwar.isPaused() && !PlayerUtils.isDisabled(Prebot.Broodwar.self()) && !PlayerUtils.isDisabled(Prebot.Broodwar.enemy());
 	}
 
 }

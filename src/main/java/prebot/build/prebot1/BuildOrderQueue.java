@@ -263,17 +263,16 @@ public class BuildOrderQueue {
 	public boolean canSkipCurrentItem() 
 	{
 		// does the queue have more elements
-		boolean bigEnough = queue.size() > (int)(1 + numSkippedItems);
+		boolean bigEnough = queue.size() > (int) (1 + numSkippedItems);
 
-		if (!bigEnough) 
-		{
+		if (!bigEnough) {
 			return false;
 		}
 
 		// is the current highest priority item not blocking a skip
-		Object[] tempArr = queue.toArray();
+		BuildOrderItem[] tempArr = queue.toArray(new BuildOrderItem[queue.size()]);
 		//boolean highestNotBlocking = !((BuildOrderItem)tempArr[queue.size() - 1 - numSkippedItems]).blocking;
-		boolean highestNotBlocking = !((BuildOrderItem)tempArr[numSkippedItems]).blocking;
+		boolean highestNotBlocking = !tempArr[numSkippedItems].blocking;
 
 		// this tells us if we can skip
 		return highestNotBlocking;

@@ -10,10 +10,12 @@ import bwapi.WeaponType;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMaker;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.micro.targeting.WraithTargetCalculator;
@@ -107,7 +109,10 @@ public class AirForceControl extends Control {
 			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
 				if (airForceTeam.repairCenter != null && MicroUtils.arrivedToPosition(airForceTeam.leaderUnit, airForceTeam.repairCenter.getPosition())) {
 					for (Unit wraith : wraithList) {
-						CommandUtils.holdPosition(wraith); // 수리 대기상태에서 홀딩
+						if (MicroUtils.timeToRandomMove(wraith)) {
+							Position randomPosition = PositionUtils.randomPosition(wraith.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+							CommandUtils.attackMove(wraith, randomPosition);
+						}
 					}
 				} else {
 					for (Unit wraith : wraithList) {

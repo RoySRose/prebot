@@ -170,7 +170,7 @@ public class AirForceManager {
 			}
 		} else {
 			airForceDefenseMode = true;
-		}	
+		}
 	}
 	
 	public void setAirForceWaiting() {
@@ -470,10 +470,12 @@ public class AirForceManager {
 		if (levelDown) {
 			strikeLevel--;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-			setOffensePositions();
 		} else if (levelUp) {
 			strikeLevel++;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+		}
+		
+		if (levelDown || levelUp || achievementEffectiveFrame >= 150) {
 			setOffensePositions();
 		}
 	}

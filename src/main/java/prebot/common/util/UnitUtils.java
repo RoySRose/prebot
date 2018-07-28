@@ -89,6 +89,14 @@ public class UnitUtils {
 		return false;
 	}
 	
+	public static int hasUnitOrWillBeCount(UnitType... unitTypes) {
+		int unitCount = getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes);
+		for (UnitType unitType : unitTypes) {
+			unitCount += BuildManager.Instance().buildQueue.getItemCount(unitType);
+		}
+		return unitCount;
+	}
+	
 	private static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType unitType) {
 		switch (unitFindRange) {
 		case COMPLETE:
@@ -341,7 +349,7 @@ public class UnitUtils {
 	
 	/** position 근처의 유닛리스트를 리턴 */
 	public static void addUnitsInRadius(Collection<Unit> units, PlayerRange playerRange, Position position, int radius) {
-		Player player = PlayerUtil.getPlayerByRange(playerRange);
+		Player player = PlayerUtils.getPlayerByRange(playerRange);
 		for (Unit unit : Prebot.Broodwar.getUnitsInRadius(position, radius)) {
 			if (player != null && player != unit.getPlayer()) {
 				continue;

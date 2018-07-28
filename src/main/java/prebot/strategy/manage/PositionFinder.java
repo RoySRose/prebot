@@ -121,15 +121,13 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int SECOND_CHOKE_MARGIN = 20 * 4; // TODO 추후 상수로 변경
-				int FIRST_EXPANSION_MARGIN = 10 * 4; // TODO 추후 상수로 변경
+				int SECOND_CHOKE_MARGIN = 15 * 4; // TODO 추후 상수로 변경
+				int FIRST_EXPANSION_MARGIN = 8 * 4; // TODO 추후 상수로 변경
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					SECOND_CHOKE_MARGIN = 2 * 4;
 					FIRST_EXPANSION_MARGIN = 0;
-				} else if (firstExpansionOccupied()) {
-					SECOND_CHOKE_MARGIN = 4 * 4;
-					FIRST_EXPANSION_MARGIN = 2 * 4;
 				}
+				
 				// 병력이 쌓였다면 second choke에서 방어한다.
 				if (myTankSupplyCount >= 10 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
@@ -137,7 +135,8 @@ public class PositionFinder {
 				}
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 				if (myTankSupplyCount >= 4 * 4
-						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
+						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN
+						|| firstExpansionOccupied()) {
 					return firstExpansionBackwardPosition();
 				}
 			}
@@ -222,7 +221,7 @@ public class PositionFinder {
 		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (leader != null) {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
-			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
+			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 80);
 			StrategyIdea.mainSquadCenter = centerPosition;
 		} else {
 			StrategyIdea.mainSquadCoverRadius = 250;
@@ -377,6 +376,15 @@ public class PositionFinder {
 				return true;
 			}
 		}
+		
+		List<Unit> defenseTowerList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Bunker, UnitType.Terran_Missile_Turret);
+		for (Unit bunkerOrTurret : defenseTowerList) {
+			RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
+			if (towerRegionType == RegionType.MY_FIRST_EXPANSION || towerRegionType == RegionType.MY_THIRD_REGION) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 

@@ -40,7 +40,9 @@ public class EarlyDefenseSquad extends Squad {
 	public boolean want(Unit unit) {
 		if (unit.getType() == UnitType.Terran_SCV) {
 			List<Unit> enemyUnitsInRegion = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.ENEMY);
-			if (!enemyUnitsInRegion.isEmpty()) {
+			if (enemyUnitsInRegion.isEmpty()) {
+				return false;
+			} else {
 				return unit.getHitPoints() > 16;
 			}
 		}
@@ -90,6 +92,12 @@ public class EarlyDefenseSquad extends Squad {
 			if (defenseScv == null) {
 				break;
 			}
+			for (Unit unit : unitList) {
+				System.out.print(" / unit.getID() : " + unit.getID());
+			}
+			System.out.println();
+			System.out.println("defenseScv : " + defenseScv);
+			
 			squadData.excludeUnitFromSquad(defenseScv);
 			unitList.remove(defenseScv);
 		}

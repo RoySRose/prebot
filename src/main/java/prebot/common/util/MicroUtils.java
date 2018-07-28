@@ -36,6 +36,8 @@ import prebot.strategy.manage.AirForceManager;
  *
  */
 public class MicroUtils {
+	
+	private static final Map<Integer, Integer> UNIT_HEALED_FRAME = new HashMap<>();
 
 	private static final int WRAITH_MOVE_DISTANCE_48_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 48); // 2.0초간 움직이는 거리
 	private static final int WRAITH_MOVE_DISTANCE_24_FRAMES = moveDistancePerFrame(UnitType.Terran_Wraith, 24); // 1.0초간 움직이는 거리
@@ -659,7 +661,17 @@ public class MicroUtils {
 	}
 	
 	public static boolean timeToRandomMove(Unit unit) {
-		return !unit.isBeingHealed() && (unit.isIdle() || unit.isBraking());
+		return !isBeingHealed(unit) && (unit.isIdle() || unit.isBraking());
+	}
+	
+	public static boolean isBeingHealed(Unit unit) {
+		if (unit.isBeingHealed()) {
+			UNIT_HEALED_FRAME.put(unit.getID(), TimeUtils.elapsedFrames());
+			return true;
+		}
+		
+		Integer healedFrame = UNIT_HEALED_FRAME.get(unit.getID());
+		return healedFrame != null && TimeUtils.elapsedSeconds(healedFrame) < 1;
 	}
 
 	public static boolean canAttack(Unit myUnit, UnitInfo eui) {

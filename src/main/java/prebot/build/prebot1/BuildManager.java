@@ -24,6 +24,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 
@@ -65,9 +66,9 @@ public class BuildManager extends GameManager {
 		
 		
 		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (Prebot.Broodwar.getFrameCount() % 7 != 0){
-			return;
-		}
+//		if (Prebot.Broodwar.getFrameCount() % 7 != 0){
+//			return;
+//		}
 
 		if (buildQueue.isEmpty()) {
 			return;
@@ -323,7 +324,7 @@ public class BuildManager extends GameManager {
 			if (producerID != -1 && unit.getID() != producerID)	{ 
 				continue; 
 			}
-			if ((producerType == UnitType.Terran_Factory || producerType == UnitType.Terran_Starport || producerType == UnitType.Terran_Science_Facility || producerType == UnitType.Terran_Command_Center) && unit.getType() == producerType && unit.isConstructing() == true ) {
+			if (unit.isConstructing() && (producerType == UnitType.Terran_Factory || producerType == UnitType.Terran_Starport || producerType == UnitType.Terran_Science_Facility || producerType == UnitType.Terran_Command_Center)) {
 				continue;
 			}
 
@@ -383,10 +384,7 @@ public class BuildManager extends GameManager {
 					// not be building another one
 					// this deals with the frame-delay of telling a unit to
 					// build an addon and it actually starting to build
-					if (unit.getLastCommand().getUnitCommandType() == UnitCommandType.Build_Addon // C++
-																									// :
-																									// unit.getLastCommand().getType()
-							&& (Prebot.Broodwar.getFrameCount() - unit.getLastCommandFrame() < 10)) {
+					if (unit.getLastCommand().getUnitCommandType() == UnitCommandType.Build_Addon && TimeUtils.elapsedFrames(unit.getLastCommandFrame()) < 10) {
 						continue;
 					}
 
