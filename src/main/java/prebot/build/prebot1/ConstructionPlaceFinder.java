@@ -32,8 +32,8 @@ public class ConstructionPlaceFinder {
 	
 	
 	
-	public int maxSupplyCntX = 3;
-	public int maxSupplyCntY = 4;
+//	public int maxSupplyCntX = 3;
+//	public int maxSupplyCntY = 4;
 	
 	/// 건물 건설 예정 타일을 저장해놓기 위한 2차원 배열<br>
 	/// TilePosition 단위이기 때문에 보통 128*128 사이즈가 된다<br>
@@ -145,7 +145,7 @@ public class ConstructionPlaceFinder {
 						if(BuildManager.Instance().FisrtSupplePointFull == true){
 							tempTilePosition = BlockingEntrance.Instance().getSupplyPosition(tempTilePosition);
 							desiredPosition = getBuildLocationNear(buildingType, tempTilePosition);
-						
+//							setTilesToAvoidSupply(desiredPosition);
 							break;
 						}
 					}
@@ -420,10 +420,7 @@ public class ConstructionPlaceFinder {
 			int depostSizeX = 3;
 			int depostSizeY = 2;
 
-			//서킷브레이커만 4X4
-			if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-				maxSupplyCntX = 4;
-		    }
+			
 		
 			/*for(int y_position = 0; y_position < maxSupplyCntY ; y_position ++){
 				for(int x_position = 0; x_position < maxSupplyCntX ; x_position ++){
@@ -444,8 +441,8 @@ public class ConstructionPlaceFinder {
 				currentX = desiredPosition.getX();
 				currentY = currentY + depostSizeY;
 			}*/
-			for(int x_position= 0; x_position < maxSupplyCntX ; x_position ++){
-				for(int y_position  = 0; y_position < maxSupplyCntY ; y_position ++){
+			for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
+				for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
 					if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
 
 						isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
@@ -457,15 +454,18 @@ public class ConstructionPlaceFinder {
 						//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
 					}
 					
-					currentY = currentY + depostSizeY;
+					currentX = currentX + depostSizeX;
+//					currentY = currentY + depostSizeY;
 					//currentY = currentY + spiralDirectionY;
 				}
 				if (isPossiblePlace) {
 					break;
 				}
 				
-				currentY = desiredPosition.getY();
-				currentX = currentX + depostSizeX;
+//				currentY = desiredPosition.getY();
+//				currentX = currentX + depostSizeX;
+				currentX = desiredPosition.getX();
+				currentY = currentY + depostSizeY;
 			}
 			//System.out.println("supply position ==>>>>>>>>>>>  (" +currentX + " , " +currentY + ")");
 			
@@ -591,12 +591,10 @@ public class ConstructionPlaceFinder {
 				width += 3;
 			}
 	
-			if( (position.getX() == BlockingEntrance.Instance().first_supple.getX() && position.getY() == BlockingEntrance.Instance().first_supple.getY())
-				|| (position.getX() == BlockingEntrance.Instance().second_supple.getX() && position.getY() == BlockingEntrance.Instance().second_supple.getY())
-				|| (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY())
-				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY())
-				|| (position.getX() == BlockingEntrance.Instance().factory.getX() && position.getY() == BlockingEntrance.Instance().factory.getY())
-				|| (position.getX() == BlockingEntrance.Instance().barrack.getX() && position.getY() == BlockingEntrance.Instance().barrack.getY())){
+			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
+				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY() && b.getType() == UnitType.Terran_Starport)
+				|| (position.getX() == BlockingEntrance.Instance().factory.getX() && position.getY() == BlockingEntrance.Instance().factory.getY() && b.getType() == UnitType.Terran_Factory)
+				|| (position.getX() == BlockingEntrance.Instance().barrack.getX() && position.getY() == BlockingEntrance.Instance().barrack.getY() && b.getType() == UnitType.Terran_Barracks)){
 				
 //				FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace chk initial point:: buildingType "+ b.getType() + " // position :: " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 				width = 0;
@@ -652,15 +650,18 @@ public class ConstructionPlaceFinder {
 							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
 							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot) {
 						if (isTilesToAvoid(x, y)) {
+							return false;
 						}
 					}
 					//서플라이 지역은 서플라이 외에는 지을수 없다.
 					if (b.getType() != UnitType.Terran_Supply_Depot) {
 						if (isTilesToAvoidSupply(x, y)) {
+							return false;
 						}
 					}
 					
 					if (isTilesToAvoidAbsolute(x, y)) {
+						return false;
 					}
 					
 				}
@@ -964,15 +965,15 @@ public class ConstructionPlaceFinder {
 	/// (x, y) 가 BaseLocation 과 Mineral / Geyser 사이의 타일에 해당하는지 여부를 리턴합니다
 	public final boolean isTilesToAvoid(int x, int y)
 	{
-		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
-		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
-		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport1
-		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
-		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
-		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
-			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
-			return true;
-		}
+//		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport1
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
+//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			return true;
+//		}
 		
 		for (TilePosition t : tilesToAvoid) {
 			if (t.getX() == x && t.getY() == y) {
@@ -1172,7 +1173,7 @@ public class ConstructionPlaceFinder {
 	}
 	public void setTilesToAvoidSupply() {
 		
-//		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
+		System.out.println("setTilesToAvoidSupply start()");
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
 			
@@ -1181,8 +1182,34 @@ public class ConstructionPlaceFinder {
 			int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
 			int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
 			
-			for(int x = 0; x < 9 ; x++){
-				for(int y = 0; y < 8 ; y++){
+			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
+			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
+			
+			for(int x = 0; x < maxX ; x++){
+				for(int y = 0;  y < maxY ; y++){
+					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+					tilesToAvoidSupply.add(t);
+					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+				}
+			}
+		}
+		
+		System.out.println("setTilesToAvoidSupply end");
+	}
+	
+	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
+		
+//		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
+		
+			int supply_x = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getX();
+			int supply_y = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getY();
+			
+			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
+			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
+			
+			for(int x = 0; x < maxX ; x++){
+				for(int y = 0; y < maxY ; y++){
 					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
 					tilesToAvoidSupply.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
