@@ -84,8 +84,8 @@ public class MarineControl extends Control {
 				}
 				
 				if(!isInsidePositionToBase(marine.getPosition())){
-					//CommandUtils.attackMove(marine, safePosition);
-					MicroUtils.flee(marine, safePosition, fOption);
+					CommandUtils.attackMove(marine, safePosition);
+					//MicroUtils.flee(marine, safePosition, fOption);
 				}
 			}
 		} else {
@@ -151,10 +151,11 @@ public class MarineControl extends Control {
 		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
 			List<Unit> loadedUnits = bunker.getLoadedUnits();
 			Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
-			if (bunkerRegion == campRegion) {
+//			System.out.println("bunkerRegion : " + bunkerRegion.getPoint() + " campRegion : " + campRegion.getPoint());
+			//if (bunkerRegion == campRegion) {
 				bunkerInRegion = bunker;
 				break;
-			}
+			//}
 		}
 		return bunkerInRegion;
 	}
