@@ -8,6 +8,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -31,6 +32,8 @@ public class WorkerManager extends GameManager {
 	private Unit currentRepairWorker = null;
 
 	private static WorkerManager instance = new WorkerManager();
+	
+	private boolean scvIsOut = false;
 
 	/// static singleton 객체를 리턴합니다
 	public static WorkerManager Instance() {
@@ -55,7 +58,6 @@ public class WorkerManager extends GameManager {
 		// Drone 은 건설을 위해 isConstructing = true 상태로 건설장소까지 이동한 후,
 		// 잠깐 getBuildType() == none 가 되었다가, isConstructing = true, isMorphing =
 		// true 가 된 후, 건설을 시작한다
-
 		// for each of our Workers
 		for (Unit worker : workerData.getWorkers()) {
 			if (!worker.isCompleted()) {
@@ -94,6 +96,15 @@ public class WorkerManager extends GameManager {
 				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
 						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+				}
+			}
+			//입막 후 밖 scv가 있는지 확
+			if(InformationManager.Instance().isBlockingEnterance()){
+				BaseLocation expansionBase = InfoUtils.myFirstExpansion();
+				double compareDistance = BlockingEntrance.Instance().second_supple.toPosition().getDistance(expansionBase.getPosition());
+				double scvDistance = worker.getPosition().getDistance(expansionBase.getPosition());
+				if ( compareDistance > scvDistance + 100 && workerData.getWorkerJob(worker) != WorkerJob.Combat) {
+					scvIsOut = true;
 				}
 			}
 		}
@@ -436,7 +447,7 @@ public class WorkerManager extends GameManager {
 		// if (currentRepairWorker != null && currentRepairWorker.exists() &&
 		// currentRepairWorker.getHitPoints() > 0 &&
 		// unit.getType().isBuilding())
-		if (Prebot.Broodwar.getFrameCount() <= 10) {
+		if (Prebot.Broodwar.getFrameCount() <= 12000) {
 			if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0
 					&& unit.getType().isBuilding()
 					&& (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot
@@ -1207,6 +1218,10 @@ public class WorkerManager extends GameManager {
 				}
 			} 
 		}*/
+	}
+	
+	public boolean scvIsOutOfBase() {
+		return scvIsOut;
 	}
 
 }

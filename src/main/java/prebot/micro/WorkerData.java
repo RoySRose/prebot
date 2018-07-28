@@ -11,6 +11,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 
 public class WorkerData {
 
@@ -336,6 +337,12 @@ public class WorkerData {
 				{
 					CommandUtils.repair(unit, jobUnit);
 				}
+				
+				if(unit.getDistance(InfoUtils.myBase()) > 200 && jobUnit.getType() == UnitType.Terran_Wraith){
+					//Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+					//.getClass().setRepairWorker(repairWorker, unit);
+					clearPreviousJob(unit);
+				}
 			}
 	    }
 		else if (job == WorkerJob.Scout)
@@ -382,8 +389,7 @@ public class WorkerData {
 		}
 	}
 
-	public void clearPreviousJob(Unit unit)
-	{
+	public void clearPreviousJob(Unit unit) { 
 		if (unit == null) { return; }
 
 		WorkerJob previousJob = getWorkerJob(unit);
