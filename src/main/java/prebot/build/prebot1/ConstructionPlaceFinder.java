@@ -238,12 +238,12 @@ public class ConstructionPlaceFinder {
 		if (buildingType.isResourceDepot()) {
 			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
 		}
-		if(buildingType == UnitType.Terran_Barracks){
-			buildingGapSpace = 0;
-		}
-		if(buildingType == UnitType.Terran_Factory){
-			buildingGapSpace = 0;
-		}
+//		if(buildingType == UnitType.Terran_Barracks){
+//			buildingGapSpace = 0;
+//		}
+//		if(buildingType == UnitType.Terran_Factory){
+//			buildingGapSpace = 0;
+//		}
 		if (buildingType == UnitType.Terran_Supply_Depot) {
 			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
 			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
