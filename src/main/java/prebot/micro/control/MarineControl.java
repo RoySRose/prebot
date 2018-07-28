@@ -31,7 +31,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class MarineControl extends Control {
-	private static final int NEAR_BASE_DISTANCE = 200;
+	private static final int NEAR_BASE_DISTANCE = 250;
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
@@ -84,27 +84,45 @@ public class MarineControl extends Control {
 				}
 				
 				if(!isInsidePositionToBase(marine.getPosition())){
+					//CommandUtils.attackMove(marine, safePosition);
 					MicroUtils.flee(marine, safePosition, fOption);
 				}
 			}
 		} else {
+			boolean rangeUnit = false;
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
 					continue;
 				}
+				
+				
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.KITING_UNIT) {
-					//Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
-					List<Unit> enemyInSightList = new ArrayList<>();
+					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
+					/*List<Unit> enemyInSightList = new ArrayList<>();
 					for (UnitInfo eui : euiList) {
 						Unit enemy = UnitUtils.unitInSight(eui);
 						if (enemy != null) {
 							enemyInSightList.add(enemy);
 						}
-					}
-					Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
-					if (closeEnemyUnit != null) {
-						if(closeEnemyUnit.isInWeaponRange(marine) || marine.isInWeaponRange(closeEnemyUnit) || closeEnemyUnit.isInWeaponRange(bunker) || bunker.isInWeaponRange(closeEnemyUnit)) {
+					}*/
+					
+					//원거리 유닛이면 벙커에서 안나옴
+					//System.out.println("enemyInSight : " + enemyInSight.getType() + " MicroUtils.isRangeUnit(enemyInSight.getType()) : " + MicroUtils.isRangeUnit(enemyInSight.getType()));
+					//System.out.println("unitType.groundWeapon().maxRange() : " + enemyInSight.getType().groundWeapon().maxRange()  + "  UnitType.Zerg_Zergling.groundWeapon().maxRange() : " + UnitType.Terran_Marine.groundWeapon().maxRange());
+				
+					
+					//Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
+					if (enemyInSight != null) {
+						if(MicroUtils.isRangeUnit(enemyInSight.getType())){
+							rangeUnit = true;
+						}
+						if(rangeUnit){
+							intoTheBunker(bunker, marine);
+							continue;
+						}
+						
+						if(enemyInSight.isInWeaponRange(marine) || marine.isInWeaponRange(enemyInSight) || enemyInSight.isInWeaponRange(bunker) || bunker.isInWeaponRange(enemyInSight)) {
 							intoTheBunker(bunker, marine);
 						} else {
 							if(bunker.getLoadedUnits().size() > (unitList.size() / 2) ){

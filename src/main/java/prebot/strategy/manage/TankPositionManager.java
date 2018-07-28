@@ -33,7 +33,7 @@ public class TankPositionManager {
 	
 	private static final int NARROW_WIDTH = 250;
 	private static final int NEAR_BUILDING_DISTANCE = 80;
-	private static final int NEAR_CHOKE_DISTANCE = 100;
+	private static final int NEAR_CHOKE_DISTANCE = 180;
 	
 	private static final int POSITION_EXPIRE_FRAME = 24 * 4;
 
