@@ -25,6 +25,8 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions.UnitCondition;
+import prebot.common.util.internal.SpecificValueCache;
+import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.strategy.UnitInfo;
@@ -135,6 +137,24 @@ public class UnitUtils {
 			}
 			
 		}
+	}
+	
+	public static int activatedCommandCenterCount() {
+		Integer activatedCommandCount = SpecificValueCache.get(ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
+		if (activatedCommandCount != null) {
+//			System.out.println("cacahed data " + activatedCommandCount);
+			return activatedCommandCount;
+		}
+		activatedCommandCount = 0;
+		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		for (Unit commandCenter : commandCenters) {
+			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 8) {
+				activatedCommandCount++;
+			}
+		}
+		
+		SpecificValueCache.put(ValueType.ACTIVATED_COMMAND_COUNT, activatedCommandCount);
+		return activatedCommandCount;
 	}
 	
 	/** 유닛 보유 여부 */
@@ -337,6 +357,29 @@ public class UnitUtils {
 				return true;
 			}
 		});
+	}
+	
+	public static List<Unit> myBuildingsInMainSquadRegion() {
+		List<Unit> totalBuildings = UnitUtils.getUnitList(UnitFindRange.ALL
+				, UnitType.Terran_Command_Center, UnitType.Terran_Supply_Depot, UnitType.Terran_Barracks, UnitType.Terran_Factory, UnitType.Terran_Starport
+				, UnitType.Terran_Armory, UnitType.Terran_Academy, UnitType.Terran_Bunker, UnitType.Terran_Missile_Turret);
+		
+		List<Unit> buildingsInRegion = new ArrayList<>();
+		Region baseRegion = PositionUtils.regionTypeToRegion(RegionType.MY_BASE);
+		Region expansionRegion = PositionUtils.regionTypeToRegion(RegionType.MY_FIRST_EXPANSION);
+		Region thirdRegion = PositionUtils.regionTypeToRegion(RegionType.MY_THIRD_REGION);
+		
+	    for (Unit unit : totalBuildings) {
+	    	if (UnitUtils.isValidUnit(unit)) {
+	    		Region buildingRegion = BWTA.getRegion(unit.getPosition());
+	    		if (buildingRegion == baseRegion
+	    				|| buildingRegion == expansionRegion
+	    				|| buildingRegion == thirdRegion) {
+		            buildingsInRegion.add(unit);
+		        }
+	    	}
+	    }
+		return buildingsInRegion;
 	}
 	
 	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange, UnitCondition unitCondition) {

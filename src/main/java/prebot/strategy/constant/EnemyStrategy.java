@@ -277,9 +277,9 @@ public enum EnemyStrategy {
 	TERRAN_DOUBLE_MECHANIC(TERRAN_1FAC_DOUBLE), //
 
 	// PHASE3 : PHASE2 종료 ~
-	TERRAN_MECHANIC_VULTURE_TANK(0, 8, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)),
-	TERRAN_MECHANIC_GOLIATH_TANK(0, 4, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS, FacUp.GR)),
-	TERRAN_MECHANIC_WRAITH_TANK(0, 1, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)),
+	TERRAN_MECHANIC_VULTURE_TANK(1, 8, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)),
+	TERRAN_MECHANIC_GOLIATH_TANK(1, 4, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS, FacUp.GR)),
+//	TERRAN_MECHANIC_WRAITH_TANK(1, 8, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)),
 //	TERRAN_MECHANIC_BATTLE_TANK(0, 4, 1, UpgradeOrder.TS_VM_VS_GR),
 
 	UNKNOWN(ZERG_INIT);

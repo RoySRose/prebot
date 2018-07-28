@@ -110,6 +110,9 @@ public class PositionUtils {
 		if (regionType == RegionType.MY_FIRST_EXPANSION) {
 			return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		}
+		if (regionType == RegionType.MY_THIRD_REGION) {
+			return InfoUtils.myThirdRegion();
+		}
 		
 		if (InfoUtils.enemyBase() != null) {
 			if (regionType == RegionType.ENEMY_BASE) {
@@ -117,6 +120,9 @@ public class PositionUtils {
 			}
 			if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
 				return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+			}
+			if (regionType == RegionType.ENEMY_THIRD_REGION) {
+				return InfoUtils.enemyThirdRegion();
 			}
 		}
 		return null;

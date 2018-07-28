@@ -1577,12 +1577,16 @@ public class UXManager {
 		if (StrategyIdea.nearAirEnemyPosition != null) {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.nearAirEnemyPosition, "nearEnemySq(Air)");
 		}
+		if (StrategyIdea.totalEnemyCneterPosition != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.totalEnemyCneterPosition, "totalEnemySq");
+		}
 		if (InfoUtils.myReadyToPosition() != null) {
 			Prebot.Broodwar.drawTextMap(InfoUtils.myReadyToPosition(), "myReadyTo");
 		}
 		if (InfoUtils.enemyReadyToPosition() != null) {
 			Prebot.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
 		}
+		
 	}
 
 }

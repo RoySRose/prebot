@@ -136,6 +136,11 @@ public class MainAttackSquad extends Squad {
 		euiList.addAll(InfoUtils.euiListInBase());
 		euiList.addAll(InfoUtils.euiListInExpansion());
 		euiList.addAll(InfoUtils.euiListInThirdRegion());
+		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
+		for (Unit building : myBuildings) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+		}
+		
 		
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			for (Unit unit : unitList) {
@@ -144,15 +149,5 @@ public class MainAttackSquad extends Squad {
 		} else {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 		}
-		
-//		List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
-//			@Override public boolean correspond(Unit unit) {
-//				return unit.getType().isBuilding() && !unit.isFlying();
-//			}
-//		});
-//		for (Unit building : myBuildings) {
-//			UnitUtils.addEnemyUnitInfosInRadiusForGround(euisNearBuilding, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
-//		}
-	}
-	
+	}	
 }

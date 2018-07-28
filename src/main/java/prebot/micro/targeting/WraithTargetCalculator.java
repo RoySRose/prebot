@@ -80,7 +80,10 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 			}
 		}
 		if (targetScore != CommonCode.NONE) {
-			int distanceScore = getDistanceScore(unit, enemyUnit.getPosition());
+			int distanceScore = 0;
+			if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
+				distanceScore = getDistanceScore(unit, enemyUnit.getPosition());
+			}
 			return targetScore + distanceScore;
 		} else {
 			return CommonCode.NONE;
