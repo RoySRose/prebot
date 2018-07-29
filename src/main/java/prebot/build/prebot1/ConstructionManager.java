@@ -1,7 +1,9 @@
 package prebot.build.prebot1;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -25,6 +27,12 @@ public class ConstructionManager extends GameManager {
 	/// 건설 일꾼이 도중에 죽는 경우 다른 건설 일꾼을 지정하여 건설을 수행하게 하기 위해<br>
 	/// Construction Task 들의 목록을 constructionQueue 로 유지합니다
 	private Vector<ConstructionTask> constructionQueue = new Vector<ConstructionTask>();
+	
+	private Set<Integer> cancelBuildingIds = new HashSet<>();
+
+	public void addCancelBuildingId(Integer buildingId) {
+		cancelBuildingIds.add(buildingId);
+	}
 	
 	///< minerals reserved for planned buildings
 	private int reservedMinerals = 0;
@@ -657,16 +665,25 @@ public class ConstructionManager extends GameManager {
 
 	public void checkConstructionBuildings()
 	{
-		if (Prebot.Broodwar.self().getRace() != Race.Terran)
-		{
+		if (Prebot.Broodwar.self().getRace() != Race.Terran) {
 			return;
 		}
-		
-		for (Unit unit : Prebot.Broodwar.self().getUnits())
-		{
-			// 건설중인 건물의 경우 공격 받고 있고 에너지가 100밑이면 건설 취소 
-			if (unit.getType().isBuilding() && unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100 && unit.getHitPoints() < unit.getType().maxHitPoints()*0.1)
-			{
+
+		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			// 건설중인 건물의 경우 공격 받고 있고 에너지가 100밑이면 건설 취소
+			if (!unit.getType().isBuilding()) {
+				continue;
+			}
+
+			boolean cancelConstruction = false;
+			if (cancelBuildingIds.contains(unit.getID())) {
+				cancelConstruction = true;
+			} else if (unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100 && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.1) {
+				cancelConstruction = true;
+			}
+
+			if (cancelConstruction) {
+				cancelBuildingIds.remove(unit.getID());
 				unit.cancelConstruction();
 				cancelConstructionTask(unit.getType(), unit.getTilePosition());
 			}

@@ -2,16 +2,14 @@ package prebot.build.initialProvider;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance; 
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.initialProvider.buildSets.AdaptNewStrategy;
 import prebot.build.initialProvider.buildSets.VsProtoss;
 import prebot.build.initialProvider.buildSets.VsTerran;
@@ -20,7 +18,8 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
-import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.build.prebot1.ConstructionTask;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
@@ -28,12 +27,15 @@ import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
 public class InitialBuildProvider {
+	
+	public enum AdaptStrategyStatus {
+		BEFORE, PROGRESSING, COMPLETE
+	}
 
 	private static InitialBuildProvider instance = new InitialBuildProvider();
 	
@@ -41,8 +43,16 @@ public class InitialBuildProvider {
 		return instance;
 	}
 	
-	private boolean adaptStrategy = false;
+	private AdaptStrategyStatus adaptStrategyStatus = AdaptStrategyStatus.BEFORE;
+
+	public AdaptStrategyStatus getAdaptStrategyStatus() {
+		return adaptStrategyStatus;
+	}
 	
+	public boolean initialBuildFinished() {
+		return adaptStrategyStatus == AdaptStrategyStatus.COMPLETE;
+	}
+
 	public int nowMarine = 0;
 	
 	public int orderMarine  = 0;
@@ -50,8 +60,6 @@ public class InitialBuildProvider {
 	public ExpansionOption nowStrategy, bfStrategy;
 	public EnemyStrategy dbgNowStg, dbgBfStg;
 
-	public boolean InitialBuildFinished = false;
-	
 	public TilePosition firstSupplyPos = TilePosition.None;
 	public TilePosition barrackPos = TilePosition.None;
 	public TilePosition secondSupplyPos = TilePosition.None;
@@ -103,26 +111,45 @@ public class InitialBuildProvider {
 
     public void updateInitialBuild(){
     	
-    	
-    	
-        if(BuildManager.Instance().buildQueue.isEmpty()){
-        	
-            InitialBuildFinished = true;
-            FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild end ==>> " + InitialBuildFinished);
-        }
-        
-        if(InitialBuildFinished == true && adaptStrategy == false) {
-        	nowStrategy = StrategyIdea.currentStrategy.expansionOption;
-        	if(nowStrategy != ExpansionOption.ONE_FACTORY) {
-        		FileUtils.appendTextToFile("log.txt", "\n updateInitialBuild adapt new strategy ==>> " + nowStrategy);
-        		new AdaptNewStrategy(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
-        		InitialBuildFinished = false;
-        		adaptStrategy = true;
+		if (adaptStrategyStatus == AdaptStrategyStatus.BEFORE) {
+			if (BuildManager.Instance().buildQueue.isEmpty()) {
+				nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT) {
+	        		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
+	        	}
+				adaptStrategyStatus = AdaptStrategyStatus.PROGRESSING;
+			}
+			
+			
+        } else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
+        	if (nowStrategy != StrategyIdea.currentStrategy.expansionOption) {
+        		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+ 
+        		// 폭파하기
+        		cancelConstructionAndRemoveFromBuildQueue();
+        		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
+				// adaptStrategyStatus = AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
+        		
+        	} else {
+            	if (nowStrategy == ExpansionOption.TWO_FACTORY) {
+            		List<Unit> factoryList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+            		if (factoryList.size() == 2) {
+            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            		}
+            	} else if (nowStrategy == ExpansionOption.TWO_STARPORT) {
+            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+            		if (starportList.size() == 2) {
+            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            		}
+            	} else if (nowStrategy == ExpansionOption.ONE_FACTORY) {
+            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+            		if (starportList.size() == 2) {
+            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            		}
+            	}
         	}
         }
         
-        if(InitialBuildFinished == false) {
-        	
 //        	if(bfStrategy == null)	{
 //        		bfStrategy = StrategyIdea.currentStrategy.expansionOption;
 ////        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + bfStrategy.toString());
@@ -164,38 +191,34 @@ public class InitialBuildProvider {
         	
 //        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
         	
-        	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
-        	
-        	if(addMachineShopInitial()) {
-        		iq.queueAsHighestPriority(UnitType.Terran_Machine_Shop, false);
-        	}
-        	
-        	if(addMarineInitial()) {
-        		int deadMarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
-            	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
-             	orderMarine = orderMarine + 1 - deadMarine;
-             	
-            }
-        	
-        	if(addSupplyInitial()) {
-        		
+    	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
+    	
+    	if(addMachineShopInitial()) {
+    		iq.queueAsHighestPriority(UnitType.Terran_Machine_Shop, false);
+    	}
+    	
+    	if(addMarineInitial()) {
+    		int deadMarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
+        	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
+         	orderMarine = orderMarine + 1 - deadMarine;
+         	
+        }
+    	
+    	if(addSupplyInitial()) {
+    		
 //        		int nowSupply = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
-        		//완성됐거나 지어지고 있는 서플라이 디포
-        		int nowSupply = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Supply_Depot);
+    		//완성됐거나 지어지고 있는 서플라이 디포
+    		int nowSupply = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Supply_Depot);
 //        		if(nowSupply == 0) {
 //        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().first_supple, true);
 //        		}else
-        		//1개까지는 이니셜 빌드에 있다 치고 이거 괜찮나..........
-        		if(nowSupply == 1) {
-        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().second_supple, true);
-        		}else {
-        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint, false);
-        		}
-        	}
-        }
-        
-        
-       
+    		//1개까지는 이니셜 빌드에 있다 치고 이거 괜찮나..........
+    		if(nowSupply == 1) {
+    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().second_supple, true);
+    		}else {
+    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint, false);
+    		}
+    	}
 
 
         
@@ -205,6 +228,62 @@ public class InitialBuildProvider {
 
 
     }
+
+    /// 폭파취소시킨 건물이 있으면 true
+	private boolean cancelConstructionAndRemoveFromBuildQueue() {
+		List<Unit> cancelBuildings = new ArrayList<>();
+		if (nowStrategy == ExpansionOption.TWO_FACTORY) {
+			deleteFromBuildQueue(UnitType.Terran_Starport, false);
+			deleteFromConstructionQueue(UnitType.Terran_Starport, false);
+			cancelBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
+			
+		} else if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY) {
+			Unit completeFirstFactory = null;
+			List<Unit> completeBuildings = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+			List<Unit> incompleteBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Factory);
+			if (completeBuildings.size() >= 1) {
+				completeFirstFactory = completeBuildings.get(0);
+			}
+			
+			Unit incompleteFirstFactory = null;
+			if (completeFirstFactory == null) {
+				int minimumRemainingBuildTime = CommonCode.INT_MAX;
+				for (Unit incompleteBuilding : incompleteBuildings) {
+					if (incompleteBuilding.getRemainingBuildTime() < minimumRemainingBuildTime) {
+						incompleteFirstFactory = incompleteBuilding;
+						minimumRemainingBuildTime = incompleteBuilding.getRemainingBuildTime();
+					}
+				}
+			}
+
+			boolean notFirstOne = true;
+			if (completeFirstFactory != null) {
+				notFirstOne = false;
+			}
+			
+			int deleteCount = deleteFromConstructionQueue(UnitType.Terran_Factory, notFirstOne);
+			if (deleteCount == 0) {
+				if (incompleteFirstFactory != null || incompleteFirstFactory != null) {
+					notFirstOne = false;
+				} else {
+					notFirstOne = true;
+				}
+				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
+				deleteFromBuildQueue(UnitType.Terran_Factory, notFirstOne);
+			}
+			for (Unit incompleteBuilding : incompleteBuildings) {
+				if (incompleteFirstFactory == null || incompleteFirstFactory.getID() != incompleteBuilding.getID()) {
+					cancelBuildings.add(incompleteBuilding);
+				}
+			}
+			
+		}
+		
+		for (Unit cancelBuilding : cancelBuildings) {
+			ConstructionManager.Instance().addCancelBuildingId(cancelBuilding.getID());
+		}
+		return !cancelBuildings.isEmpty();
+	}
     
     public void debugingFromQueue(String setStr){
         BuildOrderItem dbgCheckItem= null;
@@ -229,32 +308,37 @@ public class InitialBuildProvider {
         }
         FileUtils.appendTextToFile("log.txt", "\n " + setStr + " debugingFromQueue end =============================");
     }
-
-    public int deleteFromQueue(UnitType unitType){
-        BuildOrderItem checkItem= null;
+    
+    public int deleteFromBuildQueue(UnitType unitType, boolean notFirstOne){
         BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
-
-        int cnt =0;
-
-        if (!tempbuildQueue.isEmpty()) {
-            checkItem= tempbuildQueue.getHighestPriorityItem();
-            while(true){
-                if(tempbuildQueue.canGetNextItem() == true){
-                    tempbuildQueue.canGetNextItem();
-                }else{
-                    break;
-                }
-                tempbuildQueue.PointToNextItem();
-                checkItem = tempbuildQueue.getItem();
-
-                if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
-                    cnt++;
-                    tempbuildQueue.removeCurrentItem();
-                    
-                }
-            }
+        if (tempbuildQueue.isEmpty()) {
+        	return 0;
         }
-        return cnt;
+        
+        return tempbuildQueue.removeUnitTypeItems(unitType, notFirstOne);
+    }
+    
+    public int deleteFromConstructionQueue(UnitType deleteType, boolean notFirstOne){
+        boolean haveToSkipFirstOne = notFirstOne;
+        
+        Vector<ConstructionTask> removeFromQueue = new Vector<>();
+    	Vector<ConstructionTask> constructionQueue = ConstructionManager.Instance().getConstructionQueue();
+    	for (ConstructionTask constructionTask : constructionQueue) {
+    		if (constructionTask.getType() == deleteType) {
+    			if (haveToSkipFirstOne) {
+    				haveToSkipFirstOne = false;
+    			} else {
+    				removeFromQueue.add(constructionTask);
+    			}
+    		}
+    	}
+    	
+    	int count = 0;
+    	for (ConstructionTask constructionTask : removeFromQueue) {
+    		ConstructionManager.Instance().cancelConstructionTask(constructionTask.getType(), constructionTask.getDesiredPosition());
+    		count++;
+    	}
+    	return count;
     }
     
     public void deleteFromQueueCnt(UnitType unitType, int chkCnt){

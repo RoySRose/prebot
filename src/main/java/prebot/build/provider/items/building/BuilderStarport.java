@@ -9,7 +9,6 @@ import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public class BuilderStarport extends DefaultBuildableItem {
 
@@ -26,17 +25,11 @@ public class BuilderStarport extends DefaultBuildableItem {
 		if (constructionQueueItemCount > 0) {
 			return false;
 		}
-		
-		if(StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-			if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				setTilePosition(BlockingEntrance.Instance().starport1);
-				return true;
-			}else if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
-				setTilePosition(BlockingEntrance.Instance().starport2);
-				return true;
-			}
-				
 
+		// TODO 수정 필요
+		if (StrategyIdea.wraithCount > 0 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
+			setTilePosition(BlockingEntrance.Instance().starport1);
+			return true;
 		}
 
 		int activatedCommandCount = UnitUtils.activatedCommandCenterCount();

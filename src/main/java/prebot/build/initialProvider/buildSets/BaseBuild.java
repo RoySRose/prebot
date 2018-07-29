@@ -30,8 +30,9 @@ public class BaseBuild {
         if(tilePosition == TilePosition.None) {
 //        	System.out.println("tilePosition is None");
         	bq.queueAsLowestPriority(type, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, blocking);
+        } else {
+        	bq.queueAsLowestPriority(type, tilePosition, blocking);
         }
-        bq.queueAsLowestPriority(type, tilePosition, blocking);
     }
 
     public void queueBuild(TechType type) {

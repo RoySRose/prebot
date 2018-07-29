@@ -148,7 +148,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public boolean checkInitialBuild(){
-		return InitialBuildProvider.Instance().InitialBuildFinished;
+		return InitialBuildProvider.Instance().initialBuildFinished();
     }
 
     private final boolean supplySpaceAvailable(){

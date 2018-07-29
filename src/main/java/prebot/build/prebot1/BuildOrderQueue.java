@@ -2,15 +2,16 @@ package prebot.build.prebot1;
 
 import java.awt.Point;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 
 import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.MetaType;
-import prebot.common.util.FileUtils;
 
 /// 빌드 오더 목록 자료구조 class
 public class BuildOrderQueue {
@@ -526,5 +527,28 @@ public class BuildOrderQueue {
 	public Deque<BuildOrderItem> getQueue()
 	{
 		return queue;
+	}
+	
+	public int removeUnitTypeItems(UnitType unitType, boolean notFirstOne) {
+		BuildOrderItem[] tempArr = queue.toArray(new BuildOrderItem[queue.size()]);
+		
+		boolean haveToSkipFirstOne = notFirstOne;
+		List<BuildOrderItem> removeList = new ArrayList<>();
+		for (BuildOrderItem temp : tempArr) {
+			if (temp.metaType.isUnit() && temp.metaType.getUnitType() == unitType) {
+				if (haveToSkipFirstOne) {
+					haveToSkipFirstOne = false;
+				} else {
+					removeList.add(temp);
+				}
+			}
+		}
+		for (BuildOrderItem temp : removeList) {
+			queue.remove(temp);
+		}
+		highestPriority = queue.isEmpty() ? 0 : queue.getFirst().priority;
+		lowestPriority = queue.isEmpty() ? 0 : lowestPriority;
+		
+		return removeList.size();
 	}
 }

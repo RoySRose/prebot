@@ -156,7 +156,7 @@ public class UnitUtils {
 		activatedCommandCount = 0;
 		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandCenter : commandCenters) {
-			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 8) {
+			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6) {
 				activatedCommandCount++;
 			}
 		}

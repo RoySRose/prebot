@@ -1,8 +1,10 @@
 package prebot.strategy.analyse;
 
+import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -48,9 +50,21 @@ public abstract class Strategist {
 	}
 
 	private boolean phase01End() {
-		if (TimeUtils.after(TimeUtils.timeToFrames(4, 30))) {
-			return true;
+		
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			if (TimeUtils.afterTime(3, 30)) {
+				return true;
+			}	
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (TimeUtils.afterTime(3, 30)) { // 1fac완료
+				return true;
+			}	
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			if (TimeUtils.afterTime(3, 30)) {
+				return true;
+			}	
 		}
+		
 		int buildTimeExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(phase01keyUnitType);
 		return buildTimeExpect != CommonCode.UNKNOWN && TimeUtils.after(buildTimeExpect + phase01keyUnitType.buildTime());
 	}

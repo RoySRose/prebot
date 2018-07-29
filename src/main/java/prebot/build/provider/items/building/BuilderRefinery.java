@@ -72,7 +72,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 				}
 			}
 
-			if (InitialBuildProvider.Instance().InitialBuildFinished == false && geyserAround != null) {
+			if (!InitialBuildProvider.Instance().initialBuildFinished() && geyserAround != null) {
 				if (InformationManager.Instance().getMyfirstGas() != null) {
 					if (geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())) {
 						continue;

@@ -1072,7 +1072,7 @@ public class BuildManager extends GameManager {
 						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								
-								if(InitialBuildProvider.Instance().InitialBuildFinished) {
+								if(InitialBuildProvider.Instance().initialBuildFinished()) {
 //								if (TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
 									if(unit.canBuildAddon() == false){
 										continue;

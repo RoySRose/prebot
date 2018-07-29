@@ -28,6 +28,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
@@ -54,13 +55,11 @@ import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
-import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
-import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 import prebot.strategy.manage.StrategyAnalyseManager;
@@ -69,7 +68,7 @@ import prebot.strategy.manage.StrategyAnalyseManager;
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
 public class UXManager {
 	
-	private int uxOption = 2;
+	private int uxOption = 1;
 
 	public void setUxOption(int uxOption) {
 		this.uxOption = uxOption;
@@ -110,7 +109,7 @@ public class UXManager {
 			
 		} else if (uxOption == 1) {
 			drawGameInformationOnScreen(5, 5);
-			drawUnitStatisticsOnScreen1(400, 15);
+//			drawUnitStatisticsOnScreen1(400, 15);
 			// drawUnitStatisticsOnScreen2(370, 50);
 			drawBWTAResultOnMap();
 //			drawMapGrid();
@@ -124,8 +123,8 @@ public class UXManager {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
-			drawTilesToAvoidOnMap();
-			drawLeaderUnitOnMap();
+//			drawTilesToAvoidOnMap();
+//			drawLeaderUnitOnMap();
 			// drawUnitExtendedInformationOnMap();
 			// 각 일꾼들의 임무 상황
 //			drawWorkerStateOnScreen(260, 60);
@@ -134,7 +133,7 @@ public class UXManager {
 			// 일꾼 자원채취 임무 상황
 			drawWorkerMiningStatusOnMap();
 			// 정찰
-			drawScoutInformation(220, 330);
+//			drawScoutInformation(220, 330);
 			// 공격
 			drawUnitTargetOnMap();
 			// 미사일, 럴커의 보이지않는 공격등을 표시
@@ -268,30 +267,28 @@ public class UXManager {
 		
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Current Strategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + StrategyManager.Instance().getCurrentStrategyBasic() +" <-- "+ StrategyManager.Instance().lastStrategy);
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + StrategyIdea.currentStrategy.name());
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Current EXStrategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 112, y, "" + UxColor.CHAR_WHITE + StrategyManager.Instance().getCurrentStrategyException() +" <-- "+ StrategyManager.Instance().lastStrategyException );
+		String history = "";
+		for (int i = StrategyIdea.strategyHistory.size() - 1; i >= 0; i--) {
+			if (i == StrategyIdea.strategyHistory.size() - 3) {
+				history = "... "+ history;
+				break;
+			} else {
+				history = StrategyIdea.strategyHistory.get(i).name() + " -> "+ history;
+			}
+		}
+		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Strategy History : ");
+		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + history);
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "vul:tank:goli : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_WHITE + TempBuildSourceCode.Instance().vultureratio+":"+TempBuildSourceCode.Instance().tankratio+":"+TempBuildSourceCode.Instance().goliathratio);
+		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio);
+		y += 11;
+		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount);
 		y += 11;
 
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "MyunitPoint(Fac) : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + UxColor.CHAR_WHITE + AttackExpansionManager.Instance().MyunitPoint);
-		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "ExpansionPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 80, y, "" + UxColor.CHAR_WHITE + AttackExpansionManager.Instance().ExpansionPoint);
-		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "UnitPoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_WHITE + AttackExpansionManager.Instance().UnitPoint);
-		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Attackpoint : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_WHITE + AttackExpansionManager.Instance().Attackpoint);
-		y += 11;
-		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
 		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_RED + Prebot.Broodwar.self().getKillScore());
 		y += 11;
@@ -883,7 +880,8 @@ public class UXManager {
 
 	/// BuildOrderQueue 를 Screen 에 표시합니다
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Build Order>");
+		char initialFinishedColor = InitialBuildProvider.Instance().initialBuildFinished() ? UxColor.CHAR_WHITE : UxColor.CHAR_YELLOW;
+		Prebot.Broodwar.drawTextScreen(x, y, initialFinishedColor + " <Build Order>");
 
 		/*
 		std.deque< BuildOrderItem >* queue = BuildManager.Instance().buildQueue.getQueue();

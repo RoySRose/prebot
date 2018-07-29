@@ -6,6 +6,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
@@ -74,11 +75,12 @@ public class GameCommander {
 			StrategyManager.Instance().updateTimeCheck();
 			
 			BuildQueueProvider.Instance().executeCombatUnitTrainingBlocked();
-			
+
 			// 이니셜빌드가 끝나지 않았다면, 끝났는지 체크하고, 끝났다면 빌드 프로바이더
-			if (!InitialBuildProvider.Instance().InitialBuildFinished) {
+			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
 				InitialBuildProvider.Instance().updateInitialBuild();
-			} else {
+			}
+			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
 				BuildQueueProvider.Instance().updateTimeCheck();
 			}
 			

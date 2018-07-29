@@ -49,7 +49,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 			
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			// TODO 투스타 전략이면 베슬을 많이 쓰지 않으므로 숫자를 조절할 필요가 있다.
-			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Egg)) {
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg)) {
 				return 2;
 			} else if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Mutalisk)) {
 				if (UnitUtils.getEnemyUnitInfoCount(EnemyUnitFindRange.ALL, UnitType.Zerg_Mutalisk) >= 8) {

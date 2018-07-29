@@ -94,7 +94,7 @@ public class PositionFinder {
 		// 적 클로킹유닛이 없거나 / 앞마당에 터렛이 있거나 / 1회이상 컴셋 사용 가능
 		if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Zerg) {
 			boolean firstExpansionDetectingOk = true;
-			if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Zerg_Lurker, UnitType.Zerg_Egg)) {
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg)) {
 				firstExpansionDetectingOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
@@ -376,15 +376,9 @@ public class PositionFinder {
 
 	/// 첫번째 확장기지를 차지하였는지 여부
 	private boolean firstExpansionOccupied() {
-		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
-		for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
-			if (occupiedBase == firstExpansion) {
-				return true;
-			}
-		}
-		
-		List<Unit> defenseTowerList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Bunker, UnitType.Terran_Missile_Turret);
-		for (Unit bunkerOrTurret : defenseTowerList) {
+		List<Unit> commandCenterOrDefenseTowerList = UnitUtils.getUnitList(UnitFindRange.ALL,
+				UnitType.Terran_Command_Center, UnitType.Terran_Missile_Turret, UnitType.Terran_Missile_Turret);
+		for (Unit bunkerOrTurret : commandCenterOrDefenseTowerList) {
 			RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
 			if (towerRegionType == RegionType.MY_FIRST_EXPANSION || towerRegionType == RegionType.MY_THIRD_REGION) {
 				return true;

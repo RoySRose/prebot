@@ -46,7 +46,7 @@ public class EnemyStrategyOptions {
 		}
 		@Override
 		public String toString() {
-			return "UNIT RATIO : vulture=" + vulture + ", tank=" + tank + ", goliath=" + goliath + ", weight=" + weight;
+			return "FAC RATIO : vulture=" + vulture + ", tank=" + tank + ", goliath=" + goliath + ", weight=" + weight;
 		}
 	}
 	
