@@ -5,11 +5,14 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -100,7 +103,9 @@ public abstract class BuildingFlyControl extends Control{
 
     public Position getFlyPosition0(Unit unit){
 
-        List<Unit> attackUnit = UnitUtils.getUnitList(UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Goliath);
+        List<Unit> attackUnit = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
+        attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode));
+        attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Goliath));
         List<UnitInfo> enemyUnit = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL);
         List<UnitInfo> dangerous_targets = new ArrayList<>();
 
@@ -148,7 +153,10 @@ public abstract class BuildingFlyControl extends Control{
 
     private Position calculatePosition(boolean fleeing, Unit leader, UnitInfo mostDangerousUnit, UnitInfo mostDangerousBuilding, Unit buildingUnit) {
 
-        Position leaderPos = leader.getPosition();
+    	Position leaderPos = null;
+    	if(leader != null) {
+    		leaderPos = leader.getPosition();
+    	}
         Position goalPos = null;
         Position orderPos = StrategyIdea.mainPosition;
 
@@ -159,41 +167,64 @@ public abstract class BuildingFlyControl extends Control{
         }else{
             halfway = new Position((SC.getX()*5+2048)/6, (SC.getY()*5+2048)/6);
         }
+    
+        boolean expansionOccupied = false;    
+        List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
+		for (BaseLocation enemyBase : enemyBases) {
+			if (enemyBase.equals(InfoUtils.enemyFirstExpansion())) {
+				expansionOccupied = true;
+				break;
+			}
+		}
 
+		BaseLocation attackBase = expansionOccupied ? InfoUtils.enemyFirstExpansion() : InfoUtils.enemyBase();
 
         if(fleeing){
-            goalPos = leaderPos;
+        	if(leader == null) {
+        		goalPos = SC.getPoint();
+        	}else {
+        		goalPos = leaderPos;
+        	}
         }else{
 
-            if(mostDangerousBuilding != null){
-                if(mostDangerousBuilding.getUnit().isVisible() == false){
-                    goalPos = mostDangerousBuilding.getLastPosition();
-                }
-            }
-            if(buildingUnit.getDistance(leader) > 350){
-                goalPos = leaderPos;
-            }
-
-            if(leader == null) {
+        	if (orderPos.getDistance(attackBase) > SC.getDistance(attackBase)) {
                 goalPos = halfway;
             }else {
-
-                if(mostDangerousUnit != null){
-                    if(buildingUnit.getDistance(leader) > 128){
-                        goalPos = buildingUnit.getPosition();
-                    }
-                }
-
-                if (leaderPos.getDistance(orderPos) > SC.getDistance(orderPos)) {
-                    goalPos = halfway;
-                }
-
-                if (leaderPos.getDistance(orderPos) < buildingUnit.getDistance(orderPos)) {
-                    goalPos = orderPos;
-                }
+        	
+	            if(mostDangerousBuilding != null){
+	                if(mostDangerousBuilding.getUnit().isVisible() == false){
+	                    goalPos = mostDangerousBuilding.getLastPosition();
+	                }
+	            }
+	           
+	            if(leader == null) {
+	                goalPos = halfway;
+	            }else {
+	            	
+	            	if(buildingUnit.getDistance(leader) > 350){
+	                    goalPos = leaderPos;
+	                }
+	
+	                if(mostDangerousUnit != null){
+	                	Position enemy = mostDangerousUnit.getLastPosition().getPoint();
+	                	int myDist = buildingUnit.getDistance(leader);
+	                	if(enemy.getDistance(buildingUnit) + myDist <= 135) {
+		                    if(myDist > 128){
+		                        goalPos = buildingUnit.getPosition();
+		                    }
+	                	}
+	                }
+	
+	                if (leaderPos.getDistance(orderPos) > SC.getDistance(orderPos)) {
+	                    goalPos = halfway;
+	                }
+	
+	                if (leaderPos.getDistance(orderPos) < buildingUnit.getDistance(orderPos)) {
+	                    goalPos = orderPos;
+	                }
+	            }
             }
         }
-
         return goalPos;
     }
 
