@@ -1,30 +1,36 @@
 package prebot.micro.control.building;
 
-import java.util.Collection;
-
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.micro.control.FlyCondition;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
+import java.util.Collection;
+
 public class BarracksControl extends BuildingFlyControl {
 
     @Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-        //setFlyPosition(getFlyPosition0(unitList));
+
+
         for(Unit unit :  unitList){
             buildingFlyMap.put(unit, new FlyCondition(false, true, BlockingEntrance.Instance().barrack));
+
+            if (Prebot.Broodwar.getFrameCount() > 12000) {
+                buildingFlyMap.get(unit).setFlyPosition(getFlyPosition0(unit));
+            }
+
             processFly(unit);
         }
 	}
