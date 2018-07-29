@@ -14,6 +14,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -77,7 +78,11 @@ public abstract class BuildingFlyControl extends Control{
                         flyCondition.setBuildingFly(BuildingFly.UP);
                         //System.out.println("wait!");
                     } else {
-                        flyCondition.setBuildingFly(BuildingFly.DOWN);
+						if (WorkerManager.Instance().scvIsOutOfBase() && checkEnemyNearBy(unit) == false) {
+							flyCondition.setBuildingFly(BuildingFly.UP);
+                    	}else {
+                    		flyCondition.setBuildingFly(BuildingFly.DOWN);
+                    	}
                     }
                 }
             } else {
