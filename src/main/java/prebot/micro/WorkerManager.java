@@ -42,6 +42,7 @@ public class WorkerManager extends GameManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
+		scvIsOut = false;
 		// 1초에 1번만 실행한다
 		// if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 		defaltMineralInfo();

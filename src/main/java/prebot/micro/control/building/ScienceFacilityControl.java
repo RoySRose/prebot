@@ -5,6 +5,7 @@ import java.util.Collection;
 import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
+import prebot.common.main.Prebot;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
@@ -20,6 +21,11 @@ public class ScienceFacilityControl extends BuildingFlyControl {
         for(Unit unit :  unitList){
 
             buildingFlyMap.put(unit, new FlyCondition(false, false, null));
+
+            if (Prebot.Broodwar.getFrameCount() > 12000) {
+                buildingFlyMap.get(unit).setFlyPosition(getFlyPosition0(unit));
+            }
+
             processFly(unit);
         }
 	}
