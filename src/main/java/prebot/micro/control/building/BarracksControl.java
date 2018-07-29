@@ -11,6 +11,8 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
+import prebot.micro.control.FlyCondition;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
@@ -18,33 +20,34 @@ import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class BarracksControl extends BuildingFlyControl {
 
-    public BarracksControl() {
-        super(false, true, BlockingEntrance.Instance().barrack);
-    }
-
     @Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
         //setFlyPosition(getFlyPosition0(unitList));
-        processFly(unitList, euiList);
+        for(Unit unit :  unitList){
+            buildingFlyMap.put(unit, new FlyCondition(false, true, BlockingEntrance.Instance().barrack));
+            processFly(unit);
+        }
 	}
 
     @Override
-    public void checkFlyCondition() {
+    public void checkFlyCondition(Unit unit) {
 
-        if(getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
-        	
+        FlyCondition flyCondition = buildingFlyMap.get(unit);
+
+        if(flyCondition.getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
+
             if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
                     && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3 ){
-                setBuildingFly(BuildingFly.UP);
+                flyCondition.setBuildingFly(BuildingFly.UP);
             }else if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
             	CommonCode.RegionType regionType = PositionUtils.positionToRegionType(StrategyIdea.campPosition);
                 if (regionType != CommonCode.RegionType.MY_BASE) {
-                    setBuildingFly(BuildingFly.UP);
+                    flyCondition.setBuildingFly(BuildingFly.UP);
                 }
 
             }else{
                 if( UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1){
-                    setBuildingFly(BuildingFly.UP);
+                    flyCondition.setBuildingFly(BuildingFly.UP);
                 }
             }
         }

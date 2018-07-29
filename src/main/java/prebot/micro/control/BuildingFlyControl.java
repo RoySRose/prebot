@@ -2,6 +2,7 @@ package prebot.micro.control;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Race;
@@ -18,106 +19,102 @@ import prebot.strategy.UnitInfo;
 
 public abstract class BuildingFlyControl extends Control{
 
-    private TilePosition landPosition;
-    private Position flyPosition;
-    private BuildingFly buildingFly;
-    boolean flyAlways;
-    boolean isGateway;
+    public Map<Unit, FlyCondition> buildingFlyMap;
 
-    public BuildingFlyControl(boolean flyAlways, boolean isGateway, TilePosition tilePosition) {
-        this.flyAlways = flyAlways;
-        this.isGateway = isGateway;
-        if(isGateway){
-            if(tilePosition == null){
-                System.out.println("TilePosition must not be null");
+//    public BuildingFlyControl(boolean flyAlways, boolean isGateway, TilePosition tilePosition) {
+//        this.flyAlways = flyAlways;
+//        this.isGateway = isGateway;
+//        if(isGateway){
+//            if(tilePosition == null){
+//                System.out.println("TilePosition must not be null");
+//            }
+//            this.landPosition = tilePosition;
+//        }else {
+//            this.landPosition = TilePosition.None;
+//        }
+//        this.flyPosition = Position.None;
+//    }
+//
+//    public BuildingFlyControl() {
+//        this.flyAlways = false;
+//        this.isGateway = false;
+//        this.landPosition = TilePosition.None;
+//        this.flyPosition = Position.None;
+//    }
+
+//    public final void setLandPosition(TilePosition landPosition){
+//        this.landPosition = landPosition;
+//    }
+//    public BuildingFly getBuildingFly() {
+//        return buildingFly;
+//    }
+//    public void setBuildingFly(BuildingFly buildingFly) {
+//        this.buildingFly = buildingFly;
+//    }
+//    public void setFlyPosition(Position flyPosition) {
+//        this.flyPosition = flyPosition;
+//    }
+
+
+    public final void processFly(Unit unit){
+
+        setDefaultBuildingFly(unit);
+
+        checkFlyCondition(unit);
+
+        executeFly(unit);
+
+    }
+
+    private void executeFly(Unit unit){
+
+        FlyCondition flyCondition = buildingFlyMap.get(unit);
+
+        if(!unit.isFlying() && flyCondition.getBuildingFly() == BuildingFly.UP){
+            CommandUtils.lift(unit);
+        }else if(unit.isFlying() && flyCondition.getBuildingFly() == BuildingFly.DOWN){
+            //System.out.print("inside excute to down: " + landPosition);
+            if(flyCondition.getLandPosition() != TilePosition.None) {
+                CommandUtils.land(unit, flyCondition.getLandPosition());
+                //System.out.println("send land command");
             }
-            this.landPosition = tilePosition;
-        }else {
-            this.landPosition = TilePosition.None;
-        }
-        this.flyPosition = Position.None;
-    }
-
-    public BuildingFlyControl() {
-        this.flyAlways = false;
-        this.isGateway = false;
-        this.landPosition = TilePosition.None;
-        this.flyPosition = Position.None;
-    }
-
-    public final void setLandPosition(TilePosition landPosition){
-        this.landPosition = landPosition;
-    }
-    public BuildingFly getBuildingFly() {
-        return buildingFly;
-    }
-    public void setBuildingFly(BuildingFly buildingFly) {
-        this.buildingFly = buildingFly;
-    }
-    public void setFlyPosition(Position flyPosition) {
-        this.flyPosition = flyPosition;
-    }
-
-
-    public final void processFly(Collection<Unit> unitList, Collection<UnitInfo> euiList){
-
-        setDefaultBuildingFly(unitList);
-        checkFlyCondition();
-
-        executeFly(unitList, euiList);
-
-    }
-
-    public void executeFly(Collection<Unit> unitList, Collection<UnitInfo> euiList){
-        for(Unit unit : unitList){
-
-            if(!unit.isFlying() && getBuildingFly() == BuildingFly.UP){
-                CommandUtils.lift(unit);
-            }else if(unit.isFlying() && getBuildingFly() == BuildingFly.DOWN){
-            	//System.out.print("inside excute to down: " + landPosition);
-                if(landPosition != TilePosition.None) {
-                    CommandUtils.land(unit, landPosition);
-                    //System.out.println("send land command");
-                }
-            }else if(unit.isFlying() && getBuildingFly() == BuildingFly.UP){
-                if(flyPosition != Position.None) {
-                    CommandUtils.move(unit, flyPosition);
-                }
+        }else if(unit.isFlying() && flyCondition.getBuildingFly() == BuildingFly.UP){
+            if(flyCondition.getFlyPosition() != Position.None) {
+                CommandUtils.move(unit, flyCondition.getFlyPosition());
             }
         }
     }
 
-    public abstract void checkFlyCondition();
+    public abstract void checkFlyCondition(Unit unit);
 
-    public final void setDefaultBuildingFly(Collection<Unit> unitList) {
+    public final void setDefaultBuildingFly(Unit unit) {
 
-        if(flyAlways){
-            this.buildingFly = BuildingFly.UP;
+        FlyCondition flyCondition = buildingFlyMap.get(unit);
+
+        if(flyCondition.isFlyAlways()){
+            flyCondition.setBuildingFly(BuildingFly.UP);
         }else {
-            if (isGateway) {
+            if (flyCondition.isGateway()) {
                 if (Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
-                    buildingFly = BuildingFly.DOWN;
+                    flyCondition.setBuildingFly(BuildingFly.DOWN);
                 }else{
                     if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
-                        buildingFly = BuildingFly.UP;
+                        flyCondition.setBuildingFly(BuildingFly.UP);
                         //System.out.println("wait!");
                     } else {
-                        buildingFly = BuildingFly.DOWN;
-                        
+                        flyCondition.setBuildingFly(BuildingFly.DOWN);
                     }
                 }
             } else {
-                buildingFly = BuildingFly.DOWN;
+                flyCondition.setBuildingFly(BuildingFly.DOWN);
             }
         }
         //System.out.println("default: " + getBuildingFly());
     }
 
-    private final boolean checkEnemyNearBy(List<Unit> unitList){
-        for(Unit units : unitList){
-            if(!UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, units.getPosition(),500).isEmpty() ){
-                return true;
-            }
+    private final boolean checkEnemyNearBy(Unit unit){
+        if(!UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, unit.getPosition(),500).isEmpty() ){
+            return true;
         }
         return false;
     }

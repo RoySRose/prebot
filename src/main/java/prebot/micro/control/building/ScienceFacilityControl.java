@@ -8,29 +8,30 @@ import bwapi.Unit;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
+import prebot.micro.control.FlyCondition;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 
 public class ScienceFacilityControl extends BuildingFlyControl {
 
-    public ScienceFacilityControl() {
-        super(false, false, null);
-    }
-
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 
-        processFly(unitList, euiList);
+        for(Unit unit :  unitList){
+
+            buildingFlyMap.put(unit, new FlyCondition(false, false, null));
+            processFly(unit);
+        }
 	}
 
     @Override
-    public void checkFlyCondition() {
+    public void checkFlyCondition(Unit unit) {
         if (InformationManager.Instance().enemyRace == Race.Zerg) {
             if (MicroConfig.Upgrade.hasResearched(TechType.Irradiate)) {
-                setBuildingFly(BuildingFly.UP);
+                buildingFlyMap.get(unit).setBuildingFly(BuildingFly.UP);
             }
         } else {
-            setBuildingFly(BuildingFly.UP);
+            buildingFlyMap.get(unit).setBuildingFly(BuildingFly.UP);
         }
     }
 }
