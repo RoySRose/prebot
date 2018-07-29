@@ -1,6 +1,7 @@
 package prebot.micro.control;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,12 +36,9 @@ public abstract class BuildingFlyControl extends Control{
 //        this.flyPosition = Position.None;
 //    }
 //
-//    public BuildingFlyControl() {
-//        this.flyAlways = false;
-//        this.isGateway = false;
-//        this.landPosition = TilePosition.None;
-//        this.flyPosition = Position.None;
-//    }
+    public BuildingFlyControl() {
+    	buildingFlyMap = new HashMap<>();
+    }
 
 //    public final void setLandPosition(TilePosition landPosition){
 //        this.landPosition = landPosition;
