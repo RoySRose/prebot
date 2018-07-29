@@ -1,13 +1,5 @@
 package prebot.common.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -31,6 +23,14 @@ import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class UnitUtils {
 	
@@ -699,8 +699,8 @@ public class UnitUtils {
 	}
 
 	public static Unit leaderOfUnit(Collection<Unit> unitList) {
-		if (unitList.isEmpty()) {
-			return null;
+        if (unitList == null || unitList.isEmpty()) {
+            return null;
 		}
 		if (InfoUtils.enemyBase() == null) {
 			return null;
