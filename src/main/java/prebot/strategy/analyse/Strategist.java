@@ -61,11 +61,6 @@ public abstract class Strategist {
 			return true;
 		}
 
-		// default mission
-		if (UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
-			return false;
-		}
-		
 		if (!StrategyIdea.currentStrategy.missionTypeList.isEmpty()) {
 			for (MissionType missionType : StrategyIdea.currentStrategy.missionTypeList) {
 				if (!Mission.complete(missionType)) {
@@ -76,6 +71,10 @@ public abstract class Strategist {
 			return true;
 			
 		} else {
+			// default mission
+			if (UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
+				return false;
+			}
 			
 			if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
 				return false;

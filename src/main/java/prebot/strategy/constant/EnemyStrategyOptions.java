@@ -116,7 +116,7 @@ public class EnemyStrategyOptions {
 			case EXPANSION: // 앞마당
 				boolean baseCommandCentertOk = false;
 				boolean expansionCommandCenterOk = false;
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				for (Unit commandCenter : commandCenterList) {
 					if (commandCenter.isLifted()) {
 						continue;

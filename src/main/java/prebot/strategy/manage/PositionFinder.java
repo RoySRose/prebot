@@ -341,15 +341,21 @@ public class PositionFinder {
 	private void updateWatcherPosition() {
 		Position watcherPosition = null;
 		
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			watcherPosition = StrategyIdea.mainPosition;
+		}
+		
 		// watcher 특수 포지션
-		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
-			watcherPosition = InfoUtils.myBase().getPosition(); // 드롭인 경우 본진
-			
-		} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
-			
-			// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
-			if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
-				watcherPosition = InfoUtils.mySecondChoke().getCenter();
+		if (watcherPosition == null) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
+				watcherPosition = InfoUtils.myBase().getPosition(); // 드롭인 경우 본진
+				
+			} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+				
+				// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
+				if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
+					watcherPosition = InfoUtils.mySecondChoke().getCenter();
+				}
 			}
 		}
 		

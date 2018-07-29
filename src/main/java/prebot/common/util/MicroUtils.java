@@ -344,7 +344,7 @@ public class MicroUtils {
 				: (targetUnit.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
 		double distanceToAttack = rangedUnit.getDistance(targetUnit) - Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
 		int catchTime = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
-		if (!targetUnit.isDetected()) {
+		if (!targetUnit.isDetected() && UnitUtils.availableScanningCount() == 0) {
 			catchTime -= TimeUtils.SECOND;
 		} else {
 			if (targetUnit.getType() == UnitType.Protoss_Dark_Templar) { // 다크를 죽여버린다.

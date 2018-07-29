@@ -69,7 +69,7 @@ public class DecisionMakerPrebot1 {
 					} else if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Bunker) {
 						// 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
 						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-							safeDistance += (Common.BACKOFF_DIST_DEF_TOWER * 2 / 3);
+							safeDistance += (Common.BACKOFF_DIST_DEF_TOWER / 3);
 						} else {
 							safeDistance += Common.BACKOFF_DIST_DEF_TOWER;
 						}
@@ -163,26 +163,20 @@ public class DecisionMakerPrebot1 {
 		for (UnitInfo enemyInfo : enemiesInfo) {
 			Unit enemy = UnitUtils.unitInSight(enemyInfo);
 			if (enemy == null) {
-
-//				int noUnitFrame = MicroSet.Common.NO_UNIT_FRAME;
-//				if (enemyInfo.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || enemyInfo.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-//					noUnitFrame = MicroSet.Common.NO_SIEGE_FRAME;
-//				}
-				
-				if (bestTargetInfo == null && !Prebot.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
-					
-					int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
-					if (saveUnitLevel == 0 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + 5) {
-						bestTargetInfo = enemyInfo;
-						targetOutOfSight = true;
-					} else if (saveUnitLevel >= 1 && distanceToTarget <= (Tank.SIEGE_MODE_MAX_RANGE + (int) Common.BACKOFF_DIST_SIEGE_TANK)) {
-						bestTargetInfo = enemyInfo;
-						targetOutOfSight = true;
-					} else {
-//						System.out.println(distanceToTarget + ", " + (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK));
+				if (bestTargetInfo == null && !enemyInfo.getType().isBuilding()) {
+					if (!Prebot.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
+						int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
+						if (saveUnitLevel == 0 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + 5) {
+							bestTargetInfo = enemyInfo;
+							targetOutOfSight = true;
+						} else if (saveUnitLevel >= 1 && distanceToTarget <= (Tank.SIEGE_MODE_MAX_RANGE + (int) Common.BACKOFF_DIST_SIEGE_TANK)) {
+							bestTargetInfo = enemyInfo;
+							targetOutOfSight = true;
+						} else {
+//							System.out.println(distanceToTarget + ", " + (MicroSet.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroSet.Common.BACKOFF_DIST_SIEGE_TANK));
+						}
 					}
 				}
-				
 				continue;
 			}
 

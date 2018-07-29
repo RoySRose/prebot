@@ -131,7 +131,9 @@ public class ComsatControl extends Control {
 
 				int weaponMaxRange = Prebot.Broodwar.self().weaponMaxRange(weaponType);
 				int weaponRangeMargin = 15; // 쉽게 스캔을 사용해 공격할 수 있도록 두는 여유값(조절필요)
-
+				if (!enemyUnit.isMoving()) {
+					weaponRangeMargin += 15;
+				}
 				int enemyUnitDistance = myAttackUnit.getDistance(enemyUnit);
 				if (enemyUnitDistance < weaponMaxRange + weaponRangeMargin) {
 					myAttackUnitInWeaponRangeCount++;

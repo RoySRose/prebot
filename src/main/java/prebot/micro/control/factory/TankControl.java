@@ -226,16 +226,25 @@ public class TankControl extends Control {
 			}
 
 			int distanceToTarget = tank.getDistance(eui.getLastPosition());
-			if (distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
+			int siegeModeDistance;
+			if (eui.getType().isBuilding()) {
+				siegeModeDistance = Tank.SIEGE_MODE_SIGHT;
+			} else {
+				siegeModeDistance = Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE;
+			}
+			
+			if (distanceToTarget <= siegeModeDistance && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
 				return true;
 			} else {
-				List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(PlayerRange.SELF, tank.getPosition(), Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
-				for (Unit siegeModeTank : siegeModeTanks) {
-					if (tank.getID() == siegeModeTank.getID()) {
-						continue;
-					}
-					if (siegeModeTank.getDistance(eui.getLastPosition()) <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5 && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
-						return true;
+				if (!eui.getType().isBuilding()) {
+					List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(PlayerRange.SELF, tank.getPosition(), Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
+					for (Unit siegeModeTank : siegeModeTanks) {
+						if (tank.getID() == siegeModeTank.getID()) {
+							continue;
+						}
+						if (siegeModeTank.getDistance(eui.getLastPosition()) <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5 && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
+							return true;
+						}
 					}
 				}
 			}

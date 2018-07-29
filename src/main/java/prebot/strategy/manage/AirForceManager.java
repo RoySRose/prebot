@@ -581,9 +581,8 @@ public class AirForceManager {
 		
 		for (Integer wraithId : needRepairWraithList) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
-			Unit repairCenter = UnitUtils.getClosestUnitToPosition(commandCenterList, wraith.getPosition());
-			
+
+			Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(wraith.getPosition());
 			if (repairCenter != null) {
 				airForceTeamMap.remove(wraithId);
 				

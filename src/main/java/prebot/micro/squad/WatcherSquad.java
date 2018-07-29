@@ -6,6 +6,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.WatcherControl;
 import prebot.micro.predictor.VultureFightPredictor;
@@ -70,7 +71,14 @@ public class WatcherSquad extends Squad {
 			regroupLeader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
 		}
 		
-		vultureWatcher.setSmallFightPredict(smallFightPredict);
+		int saveUnitLevel = 1;
+		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) {
+			saveUnitLevel = 0;
+		} else if (smallFightPredict == SmallFightPredict.OVERWHELM) {
+			saveUnitLevel = 0;
+		}
+		
+		vultureWatcher.setSaveUnitLevel(saveUnitLevel);
 		vultureWatcher.setRegroupLeader(regroupLeader);
 		
 		vultureWatcher.control(unitList, euiList);

@@ -15,34 +15,32 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMaker;
+import prebot.micro.DecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
-import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.SpiderMineManger;
 
 /// MainSquad <-> 적 기지 or 주력병력 주둔지 이동하여 마인 매설 
 public class WatcherControl extends Control {
 
 	private Unit regroupLeader;
-	private SmallFightPredict smallFightPredict;
+	private int saveUnitLevel;
 
 	public void setRegroupLeader(Unit regroupLeader) {
 		this.regroupLeader = regroupLeader;
 	}
-
-	public void setSmallFightPredict(SmallFightPredict smallFightPredict) {
-		this.smallFightPredict = smallFightPredict;
-	}
 	
+	public void setSaveUnitLevel(int saveUnitLevel) {
+		this.saveUnitLevel = saveUnitLevel;
+	}
+
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		Position fleePosition = StrategyIdea.mainSquadCenter;
@@ -64,8 +62,6 @@ public class WatcherControl extends Control {
 	}
 
 	private void fight(Collection<Unit> unitList, Collection<UnitInfo> euiList, Position fleePosition, int coverRadius) {
-		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-
 		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
@@ -79,7 +75,9 @@ public class WatcherControl extends Control {
 				continue;
 			}
 			
-			Decision decision = decisionMaker.makeDecision(unit, euiList, smallFightPredict == SmallFightPredict.OVERWHELM);
+//			Decision decision = decisionMaker.makeDecision(unit, euiList, smallFightPredict == SmallFightPredict.OVERWHELM);
+			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
+			
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 				

@@ -165,6 +165,20 @@ public class UnitUtils {
 		return activatedCommandCount;
 	}
 	
+	public static int availableScanningCount() {
+		Integer availableScanningCount = SpecificValueCache.get(ValueType.AVAILABLE_SCANNING_COUNT, Integer.class);
+		if (availableScanningCount != null) {
+			return availableScanningCount;
+		}
+		availableScanningCount = 0;
+		List<Unit> comsatStations = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		for (Unit comsatStation : comsatStations) {
+			availableScanningCount += comsatStation.getEnergy() / 50;
+		}
+		SpecificValueCache.put(ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
+		return availableScanningCount;
+	}
+	
 	/** 유닛 보유 여부 */
 	@Deprecated
 	public static boolean hasUnit(UnitFindRange unitFindRange, UnitType unitType) {
@@ -552,6 +566,16 @@ public class UnitUtils {
 			@Override
 			public boolean correspond(Unit unit) {
 				return !unitIds.contains(unit.getID());
+			}
+		});
+	}
+	
+	public static Unit getClosestActivatedCommandCenter(Position position) {
+		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		return getClosestUnitToPosition(commandCenters, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit commandCenter) {
+				return WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 8;
 			}
 		});
 	}
