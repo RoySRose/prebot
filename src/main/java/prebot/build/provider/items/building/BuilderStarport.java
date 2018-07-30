@@ -26,9 +26,12 @@ public class BuilderStarport extends DefaultBuildableItem {
 			return false;
 		}
 
-		// TODO 수정 필요
-		if (StrategyIdea.wraithCount > 0 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
-			setTilePosition(BlockingEntrance.Instance().starport1);
+		if (needStarportToTrainWraith()) {
+			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+				setTilePosition(BlockingEntrance.Instance().starport1);
+			} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
+				setTilePosition(BlockingEntrance.Instance().starport2);
+			}
 			return true;
 		}
 
@@ -46,6 +49,17 @@ public class BuilderStarport extends DefaultBuildableItem {
 			boolean needVessel = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);
 			setTilePosition(BlockingEntrance.Instance().starport1);
 			return (needVessel && activatedCommandCount >= 2) || activatedCommandCount >= 3;
+		}
+		return false;
+	}
+
+	private boolean needStarportToTrainWraith() {
+		int wraithToTrainCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Wraith) - StrategyIdea.wraithCount;
+		if (wraithToTrainCount >= 5 && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) <= 1) {
+			return true;
+		}
+		if (wraithToTrainCount > 0 && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+			return true;
 		}
 		return false;
 	}

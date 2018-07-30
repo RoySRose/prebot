@@ -95,7 +95,7 @@ public class TankControl extends Control {
 				}
 				
 			} else if (decision.type == DecisionType.ATTACK_POSITION) { // NO ENEMY
-				if (!TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition())) {
+				if (!TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition(), true)) {
 					CommandUtils.unsiege(siege);
 					TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
 				} else {
@@ -149,7 +149,7 @@ public class TankControl extends Control {
 				if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
 					int distToOrder = tank.getDistance(StrategyIdea.mainPosition);
 					if (distToOrder <= Tank.SIEGE_MODE_MAX_RANGE
-							&& TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) { // orderPosition의 둘러싼 대형을 만든다.
+							&& TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
 						if (tank.canSiege()) {
 							tank.siege();
 						} else {
@@ -172,7 +172,7 @@ public class TankControl extends Control {
 					if (positionToSiege != null) {
 						int stayCnt = TankPositionManager.Instance().isSiegeStayCnt(tank);
 						
-						if(tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE  && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
+						if(tank.getDistance(positionToSiege) <= POSITION_TO_SIEGE_ARRIVE_DISTANCE  && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) {
 							CommandUtils.siege(tank);
 							TankPositionManager.Instance().siegePositionMap.remove(tank.getID());
 						}else if(stayCnt > 100){
@@ -233,7 +233,7 @@ public class TankControl extends Control {
 				siegeModeDistance = Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE;
 			}
 			
-			if (distanceToTarget <= siegeModeDistance && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
+			if (distanceToTarget <= siegeModeDistance && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), false)) {
 				return true;
 			} else {
 				if (!eui.getType().isBuilding()) {
@@ -242,7 +242,7 @@ public class TankControl extends Control {
 						if (tank.getID() == siegeModeTank.getID()) {
 							continue;
 						}
-						if (siegeModeTank.getDistance(eui.getLastPosition()) <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5 && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition())) {
+						if (siegeModeTank.getDistance(eui.getLastPosition()) <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5 && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), false)) {
 							return true;
 						}
 					}

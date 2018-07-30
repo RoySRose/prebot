@@ -69,7 +69,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfAllUnitList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfAllUnitMap, unitType).size();
+			return selfAllUnitMap.getOrDefault(unitType, new ArrayList<>()).size();
 		}
 	}
 
@@ -77,7 +77,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfAllUnitList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfAllUnitMap, unitType);
+			return selfAllUnitMap.getOrDefault(unitType, new ArrayList<>());
 		}
 	}
 
@@ -85,7 +85,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfCompleteUnitList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfCompleteUnitMap, unitType).size();
+			return selfCompleteUnitMap.getOrDefault(unitType, new ArrayList<>()).size();
 		}
 	}
 
@@ -93,7 +93,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfCompleteUnitList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfCompleteUnitMap, unitType);
+			return selfCompleteUnitMap.getOrDefault(unitType, new ArrayList<>());
 		}
 	}
 
@@ -101,7 +101,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfIncompleteUnitList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfIncompleteUnitMap, unitType).size();
+			return selfIncompleteUnitMap.getOrDefault(unitType, new ArrayList<>()).size();
 		}
 	}
 
@@ -109,7 +109,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfIncompleteUnitList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfIncompleteUnitMap, unitType);
+			return selfIncompleteUnitMap.getOrDefault(unitType, new ArrayList<>());
 		}
 	}
 
@@ -117,7 +117,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return selfConstructionTaskList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(selfConstructionTaskMap, unitType).size();
+			return selfConstructionTaskMap.getOrDefault(unitType, new ArrayList<>()).size();
 		}
 	}
 
@@ -153,7 +153,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyAllUnitInfoList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyAllUnitInfoMap, unitType).size();
+			return enemyAllUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>()).size();
 		}
 	}
 
@@ -161,7 +161,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyAllUnitInfoList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyAllUnitInfoMap, unitType);
+			return enemyAllUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>());
 		}
 	}
 
@@ -169,7 +169,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyVisibileUnitInfoList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyVisibleUnitInfoMap, unitType).size();
+			return enemyVisibleUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>()).size();
 		}
 	}
 
@@ -177,7 +177,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyVisibileUnitInfoList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyVisibleUnitInfoMap, unitType);
+			return enemyVisibleUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>());
 		}
 	}
 
@@ -185,7 +185,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyInvisibleUnitInfoList.size();
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitType).size();
+			return enemyInvisibleUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>()).size();
 		}
 	}
 
@@ -193,7 +193,7 @@ public class UnitCache {
 		if (unitType == UnitType.AllUnits) {
 			return enemyInvisibleUnitInfoList;
 		} else {
-			return getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitType);
+			return enemyInvisibleUnitInfoMap.getOrDefault(unitType, new ArrayList<UnitInfo>());
 		}
 	}
 
@@ -231,11 +231,11 @@ public class UnitCache {
 			if (unit == null) {
 				continue;
 			}
-			
-			List<Unit> allUnitList = getUnitListReturnEmptyListIfNull(selfAllUnitMap, unit.getType());
-			List<Unit> completeUnitList = getUnitListReturnEmptyListIfNull(selfCompleteUnitMap, unit.getType());
-			List<Unit> incompleteUnitList = getUnitListReturnEmptyListIfNull(selfIncompleteUnitMap, unit.getType());
 
+			List<Unit> allUnitList = selfAllUnitMap.getOrDefault(unit.getType(), new ArrayList<>());
+			List<Unit> completeUnitList = selfCompleteUnitMap.getOrDefault(unit.getType(), new ArrayList<>());
+			List<Unit> incompleteUnitList = selfIncompleteUnitMap.getOrDefault(unit.getType(), new ArrayList<>());
+			
 			allUnitList.add(unit);
 			selfAllUnitList.add(unit);
 			if (unit.isCompleted()) {
@@ -245,15 +245,13 @@ public class UnitCache {
 				incompleteUnitList.add(unit);
 				selfIncompleteUnitList.add(unit);
 			}
-			
 			selfAllUnitMap.put(unit.getType(), allUnitList);
 			selfCompleteUnitMap.put(unit.getType(), completeUnitList);
 			selfIncompleteUnitMap.put(unit.getType(), incompleteUnitList);
 		}
-
 		Vector<ConstructionTask> constructionTaskvector = ConstructionManager.Instance().getConstructionQueue();
 		for (ConstructionTask constructionTask : constructionTaskvector) {
-			List<ConstructionTask> constructionTaskList = getUnitListReturnEmptyListIfNull(selfConstructionTaskMap, constructionTask.getType());
+			List<ConstructionTask> constructionTaskList = selfConstructionTaskMap.getOrDefault(constructionTask.getType(), new ArrayList<ConstructionTask>());
 			selfConstructionTaskList.add(constructionTask);
 			constructionTaskList.add(constructionTask);
 			selfConstructionTaskMap.put(constructionTask.getType(), constructionTaskList);
@@ -265,9 +263,9 @@ public class UnitCache {
 		for (int unitId : enemyUnitData.getUnitAndUnitInfoMap().keySet()) {
 			UnitInfo unitInfo = enemyUnitData.getUnitAndUnitInfoMap().get(unitId);
 
-			List<UnitInfo> allUnitList = getUnitListReturnEmptyListIfNull(enemyAllUnitInfoMap, unitInfo.getType());
-			List<UnitInfo> visibleUnitList = getUnitListReturnEmptyListIfNull(enemyVisibleUnitInfoMap, unitInfo.getType());
-			List<UnitInfo> invisibleUnitList = getUnitListReturnEmptyListIfNull(enemyInvisibleUnitInfoMap, unitInfo.getType());
+			List<UnitInfo> allUnitList = enemyAllUnitInfoMap.getOrDefault(unitInfo.getType(), new ArrayList<UnitInfo>());
+			List<UnitInfo> visibleUnitList = enemyVisibleUnitInfoMap.getOrDefault(unitInfo.getType(), new ArrayList<UnitInfo>());
+			List<UnitInfo> invisibleUnitList = enemyInvisibleUnitInfoMap.getOrDefault(unitInfo.getType(), new ArrayList<UnitInfo>());
 
 			allUnitList.add(unitInfo);
 			enemyAllUnitInfoList.add(unitInfo);
@@ -322,15 +320,5 @@ public class UnitCache {
 				}
 			}
 		}
-	}
-
-	private <T> List<T> getUnitListReturnEmptyListIfNull(Map<UnitType, List<T>> unitMap, UnitType unitType) {
-		return unitMap.getOrDefault(unitType, new ArrayList<T>());
-//		List<T> unitList = unitMap.get(unitType);
-//		if (unitList == null) {
-//			return new ArrayList<T>();
-//		} else {
-//			return unitList;
-//		}
 	}
 }

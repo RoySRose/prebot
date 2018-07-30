@@ -59,7 +59,7 @@ public enum EnemyStrategy {
 	
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	PROTOSS_FAST_DRAGOON(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_EXPANSION
-			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_FAST_DRAGOON()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
@@ -83,7 +83,7 @@ public enum EnemyStrategy {
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	
 	PROTOSS_ROBOTICS_OB_DRAGOON(5, 5, 2, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)
-			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_ROBOTICS_OB_DRAGOON()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),
 	// + WATCHER : 마인매설(+본진)

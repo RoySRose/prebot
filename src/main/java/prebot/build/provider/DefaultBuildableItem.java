@@ -6,6 +6,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
@@ -148,7 +149,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public boolean checkInitialBuild(){
-		return InitialBuildProvider.Instance().initialBuildFinished();
+		return InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE;
     }
 
     private final boolean supplySpaceAvailable(){

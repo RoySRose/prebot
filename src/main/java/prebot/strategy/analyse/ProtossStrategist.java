@@ -119,6 +119,10 @@ public class ProtossStrategist extends Strategist {
 			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 		}
 		
+		if (hasAnyInfo(ClueInfo.FAST_THREE_ZEALOT, ClueInfo.GATE_FAST_TWO)) {
+			return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;	
+		}
+		
 		if (hasAnyInfo(ClueInfo.NO_ASSIMILATOR, ClueInfo.ASSIMILATOR_LATE)) {
 			if (hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
 				if (hasInfo(ClueInfo.ASSIMILATOR_LATE)) {
@@ -128,19 +132,11 @@ public class ProtossStrategist extends Strategist {
 				}
 			} else if (hasType(ClueType.FAST_CORE)) {
 				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
-			} else if (hasAnyInfo(ClueInfo.GATE_FAST_TWO, ClueInfo.GATE_TWO)) {
+			} else if (hasAnyInfo(ClueInfo.GATE_TWO)) {
 				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
 			} else {
 				return EnemyStrategy.PROTOSS_DOUBLE_GROUND;
 			}
-		}
-		
-		if (hasInfo(ClueInfo.FAST_THREE_ZEALOT)) {
-			return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;	
-		}
-		
-		if (hasAnyInfo(ClueInfo.GATE_FAST_TWO)) {
-			return EnemyStrategy.PROTOSS_FAST_DRAGOON;
 		}
 		
 		return EnemyStrategy.PROTOSS_FAST_DARK;

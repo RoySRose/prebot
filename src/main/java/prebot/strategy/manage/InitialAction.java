@@ -32,7 +32,7 @@ public class InitialAction {
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, UnitType.Terran_Barracks.buildTime())); // 배럭짓고 출발
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0)); // 서플 완성후 출발
 				assignedFirstScout = true;
 			}
 			StrategyAnalyseManager.Instance().setUp(Race.Protoss);

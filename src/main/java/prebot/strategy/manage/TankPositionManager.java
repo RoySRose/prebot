@@ -1,6 +1,5 @@
 package prebot.strategy.manage;
 
-import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 
 import bwapi.Position;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -18,7 +16,6 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -102,7 +99,7 @@ public class TankPositionManager {
 					int yVector = (int) (distanceFromCenter * Math.sin(radianAdjust));
 				    Position movePosition = new Position(centerPosition.getX() + xVector, centerPosition.getY() + yVector);
 					if (PositionUtils.isValidGroundPosition(movePosition) && PositionUtils.isValidGroundPath(tank.getPosition(), movePosition)) {
-				    	if (!isProperPositionToSiege(movePosition)) {
+				    	if (!isProperPositionToSiege(movePosition, true)) {
 				    		continue;
 				    	}
 				    	
@@ -157,10 +154,14 @@ public class TankPositionManager {
 		return count;
 	}
 
-	public boolean isProperPositionToSiege(Position position) {
-		Chokepoint nearestChoke = BWTA.getNearestChokepoint(position);
+	public boolean isProperPositionToSiege(Position position, boolean notSiegeOnNarrowChoke) {
+		int narrowWidth = NARROW_WIDTH;
+		if (!notSiegeOnNarrowChoke) { // 적 공격시에는 기준을 완화한다.
+			narrowWidth = NARROW_WIDTH / 2;
+		}
 		
-		if (nearestChoke.getWidth() < NARROW_WIDTH) {
+		Chokepoint nearestChoke = BWTA.getNearestChokepoint(position);
+		if (nearestChoke.getWidth() < narrowWidth) {
 			if (nearestChoke.getCenter().getDistance(position) < NEAR_CHOKE_DISTANCE) {
 				return false;
 			}

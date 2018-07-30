@@ -289,7 +289,7 @@ public class BlockingEntrance {
 //    	맵 : CIRCUITBREAKER
     		if (InformationManager.Instance().enemyRace == Race.Protoss
 					|| InformationManager.Instance().enemyRace == Race.Terran) {
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)  , new TilePosition(122, 25));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)  , new TilePosition(122, 24));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BARRACK)   		 , new TilePosition(118, 23));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SECOND_SUPPLY)   , new TilePosition(125, 24));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FACTORY)   		 , new TilePosition(116, 16));

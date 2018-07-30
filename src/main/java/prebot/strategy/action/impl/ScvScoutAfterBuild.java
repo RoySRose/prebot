@@ -17,6 +17,7 @@ public class ScvScoutAfterBuild extends Action {
 	private final UnitType buildingType;
 	private final int remainingFrames;
 
+	private int marginFrames = 10;
 	private boolean assigned = false;
 
 	public ScvScoutAfterBuild(UnitType buildingType, int remainingFrames) {
@@ -27,10 +28,15 @@ public class ScvScoutAfterBuild extends Action {
 	@Override
 	public boolean exitCondition() {
 		if (assigned) {
-			if (InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()) == null) {
-				StrategyIdea.assignScoutScv = true;
+			if (marginFrames > 0) {
+				marginFrames--;
+				return false;
+			} else {
+				if (InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()) == null) {
+					StrategyIdea.assignScoutScv = true;
+				}
+				return true;
 			}
-			return true;
 		} else {
 			return false;
 		}
