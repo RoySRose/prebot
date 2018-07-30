@@ -9,9 +9,12 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerData.WorkerJob;
 
 public class WorkerData {
 
@@ -72,6 +75,7 @@ public class WorkerData {
 	public Map<Integer, Unit> workerRefineryMap = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
+	//수리중인 일꾼 
 	//CC에 배정된 미네랄 리스트(미네랄 트릭 위해)
 	public static Map<Unit, List<Minerals>> depotMineral = new HashMap<Unit, List<Minerals>>();
 	
@@ -338,11 +342,6 @@ public class WorkerData {
 					CommandUtils.repair(unit, jobUnit);
 				}
 				
-				if(unit.getDistance(InfoUtils.myBase()) > 200 && jobUnit.getType() == UnitType.Terran_Wraith){
-					//Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-					//.getClass().setRepairWorker(repairWorker, unit);
-					clearPreviousJob(unit);
-				}
 			}
 	    }
 		else if (job == WorkerJob.Scout)
