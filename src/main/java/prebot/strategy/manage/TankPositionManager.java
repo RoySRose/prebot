@@ -172,6 +172,14 @@ public class TankPositionManager {
  			return false;
 		}
 		
+		Position leftPosition = new Position(position.getX() - 30, position.getY());
+		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, leftPosition, NEAR_BUILDING_DISTANCE);
+    	for (Unit nearUnit : nearUnitList) {
+    		if (nearUnit.getType().isBuilding() && nearUnit.getType().canBuildAddon()) {
+				return false;
+    		}
+    	}
+		
 		
     	List<Unit> unitList = Prebot.Broodwar.getUnitsOnTile(position.getX(),position.getY());
     	for (Unit unit : unitList) {
