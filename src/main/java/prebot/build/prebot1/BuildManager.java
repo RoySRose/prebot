@@ -39,11 +39,11 @@ public class BuildManager extends GameManager {
 
 	private static BuildManager instance = new BuildManager();
 
-	public Boolean MainBaseLocationFull;
-	public Boolean FirstChokePointFull;
-	public Boolean FirstExpansionLocationFull;
-	public Boolean SecondChokePointFull;
-	public Boolean FisrtSupplePointFull;
+	public Boolean mainBaseLocationFull;
+	public Boolean firstChokePointFull;
+	public Boolean firstExpansionLocationFull;
+	public Boolean secondChokePointFull;
+	public Boolean fisrtSupplePointFull;
 	
 //	public boolean tank = false;
 	
@@ -53,11 +53,11 @@ public class BuildManager extends GameManager {
 	}
 	
 	public BuildManager() {
-		MainBaseLocationFull = false;
-		FirstChokePointFull = false;
-		FirstExpansionLocationFull = false;
-		SecondChokePointFull = false;
-		FisrtSupplePointFull = false;
+		mainBaseLocationFull = false;
+		firstChokePointFull = false;
+		firstExpansionLocationFull = false;
+		secondChokePointFull = false;
+		fisrtSupplePointFull = false;
 		
 	}
 
@@ -200,22 +200,12 @@ public class BuildManager extends GameManager {
 						}
 						// 그외 대부분 건물의 경우
 						else {
-							// ConstructionPlaceFinder 를 통해 건설 가능 위치
-							// desiredPosition 를 알아내서
-							// ConstructionManager 의 ConstructionTask Queue에 추가를
-							// 해서 desiredPosition 에 건설을 하게 한다.
-							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시
-							// ConstructionPlaceFinder 를 통해 건설 가능 위치를
-							// desiredPosition 주위에서 찾을 것이다
+							// ConstructionPlaceFinder 를 통해 건설 가능 위치 desiredPosition 를 알아내서 ConstructionManager 의 ConstructionTask Queue에 추가를 해서 desiredPosition 에 건설을 하게 한다.
+							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시 ConstructionPlaceFinder 를 통해 건설 가능 위치를 desiredPosition 주위에서 찾을 것이다
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
-							// std::cout << "BuildManager " +
-							// currentItem.metaType.getUnitType().getName().c_str()
-							// + " desiredPosition " + desiredPosition.x + "," +
-							// desiredPosition.y + std::endl;
 
 							if (desiredPosition != TilePosition.None) {
-								// Send the construction task to the
-								// construction manager
+								// Send the construction task to the construction manager
 								if(t.getUnitType() == UnitType.Terran_Starport) {
 									FileUtils.appendTextToFile("log.txt", "\n Terran_Starport to Construction from Build :: desiredPosition ::" + desiredPosition);
 								}
@@ -224,11 +214,8 @@ public class BuildManager extends GameManager {
 								}
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
-								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep
-								// 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에
-								// 없는 경우인데,
-								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음
-								// frame 에 건물 지을 공간을 다시 탐색하도록 한다.
+								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
+								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음 frame 에 건물 지을 공간을 다시 탐색하도록 한다.
 								System.out.print("\nThere is no place to construct :: " + currentItem.metaType.getUnitType()+ " :: strategy :: " + currentItem.seedLocationStrategy);
 								if (currentItem.seedLocation != null)
 									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
@@ -587,44 +574,40 @@ public class BuildManager extends GameManager {
 		
 		switch (seedPositionStrategy) {
 		case MainBaseLocation:
-			if(MainBaseLocationFull == true){
+			if (mainBaseLocationFull) {
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
 			}
 			break;
-//		case MainBaseBackYard:
-//			//seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
-//			break;
 		case FirstChokePoint:
-			if(FirstChokePointFull == true){
-				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			if (firstChokePointFull) {
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
 			}
 			break;
 		case FirstExpansionLocation:
-			if(FirstExpansionLocationFull == true){
-				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			if (firstExpansionLocationFull) {
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
 			}
 			break;
 		case SecondChokePoint:
-			if(SecondChokePointFull == true){
-				seedPositionStrategy =  BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+			if (secondChokePointFull) {
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
 			}
 			break;
 		case NextExpansionPoint:
 			break;
 			
 		case NextSupplePoint:
-			if(FisrtSupplePointFull == true){
-				if(MainBaseLocationFull == true){
+			if (fisrtSupplePointFull) {
+				if (mainBaseLocationFull) {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				}else{
+				} else {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
 				}
 			}
 			break;
 			
 		case LastBuilingPoint:
-			seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
-			FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition case LastBuilingPoint return ==>> " + seedPositionStrategy.toString());
+			//seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
 			break;
 			
 		default:
@@ -632,14 +615,6 @@ public class BuildManager extends GameManager {
 		}
 		
 		TilePosition desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-		/*
-		 * std::cout +
-		 * "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
-		 * + unitType.getName().c_str() + " strategy " + seedPositionStrategy +
-		 * " seedPosition " + seedPosition.x + "," + seedPosition.y +
-		 * " desiredPosition " + desiredPosition.x + "," + desiredPosition.y +
-		 * std::endl;
-		 */
 
 		// desiredPosition 을 찾을 수 없는 경우
 		boolean findAnotherPlace = true;
@@ -661,14 +636,16 @@ public class BuildManager extends GameManager {
 			case SecondChokePoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
+			case NextExpansionPoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
+				break;
 			case NextSupplePoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
 			case LastBuilingPoint:
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
 				break;
-			
-			case NextExpansionPoint:
+				
 			case SeedPositionSpecified:
 			case getLastBuilingFinalLocation:
 			default:
@@ -679,14 +656,6 @@ public class BuildManager extends GameManager {
 			// 다른 곳을 더 찾아본다
 			if (findAnotherPlace) {
 				desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-				/*
-				 * std::cout +
-				 * "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
-				 * + unitType.getName().c_str() + " strategy " +
-				 * seedPositionStrategy + " seedPosition " + seedPosition.x +
-				 * "," + seedPosition.y + " desiredPosition " +
-				 * desiredPosition.x + "," + desiredPosition.y + std::endl;
-				 */
 			}
 			// @@@@@@ 여기서 포기하면 됨? 다른 곳을 더 찾아보지 않고, 끝낸다
 			else {

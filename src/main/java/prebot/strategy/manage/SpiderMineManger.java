@@ -35,7 +35,7 @@ public class SpiderMineManger {
 	
 	private static final int RESV_EXPIRE_FRAME = 24 * 3;
 	private static final int MINE_REMOVE_TANK_DIST = 150;
-	private static final int MAX_MINE_COUNT = 250;
+	private static final int MAX_MINE_COUNT = 150;
 //	private static final int MINE_BETWEEN_DIST = 50;
 	
 	public enum MinePositionLevel {

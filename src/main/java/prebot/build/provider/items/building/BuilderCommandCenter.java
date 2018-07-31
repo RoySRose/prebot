@@ -34,6 +34,9 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     	if (buildQueueCount > 0) {
     		return false;
     	}
+    	if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 8) {
+    		return false;
+    	}
     	
     	int constructionQueueCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null);
     	if (constructionQueueCount > 0) {

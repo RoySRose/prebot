@@ -481,13 +481,24 @@ public class AirForceManager {
 	}
 
 	private void adjustWraithCount() {
-		if (StrategyIdea.wraithCount > 0 && accumulatedAchievement <= -UnitType.Terran_Wraith.maxHitPoints()) {
-			StrategyIdea.wraithCount--;
-			accumulatedAchievement = 0;
+		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount <= 12) {
+			if (accumulatedAchievement <= -UnitType.Terran_Wraith.maxHitPoints()) {
+				StrategyIdea.wraithCount--;
+				accumulatedAchievement = 0;
+			} else if (accumulatedAchievement >= UnitType.Terran_Wraith.maxHitPoints()) {
+				StrategyIdea.wraithCount++;
+				accumulatedAchievement = 0;
+			}
 			
-		} else if (StrategyIdea.wraithCount <= 12 && accumulatedAchievement >= UnitType.Terran_Wraith.maxHitPoints()) {
-			StrategyIdea.wraithCount++;
-			accumulatedAchievement = 0;
+		} else if (StrategyIdea.wraithCount > 12 && StrategyIdea.wraithCount <= 24) {
+			// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
+			if (accumulatedAchievement < UnitType.Terran_Wraith.maxHitPoints() / 2) {
+				StrategyIdea.wraithCount--;
+				accumulatedAchievement = 0;
+			} else if (accumulatedAchievement >= UnitType.Terran_Wraith.maxHitPoints() * 2) {
+				StrategyIdea.wraithCount++;
+				accumulatedAchievement = 0;
+			}
 		}
 		
 //		if (InfoUtils.enemyRace() == Race.Terran) {

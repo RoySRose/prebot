@@ -22,4 +22,8 @@ public class TilePositionUtils {
 	public static TilePosition getCenterTilePosition() {
 		return new TilePosition(64, 64);
 	}
+	
+	public static boolean isValidTilePosition(TilePosition tilePosition) {
+		return tilePosition != TilePosition.None && tilePosition != TilePosition.Unknown && tilePosition != TilePosition.Invalid && tilePosition.isValid();
+	}
 }
