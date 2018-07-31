@@ -7,6 +7,7 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.DropshipControl;
 import prebot.micro.control.airforce.VesselControl;
@@ -48,7 +49,7 @@ public class SpecialSquad extends Squad {
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.SPECIAL.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		}
 		return euiList;
 	}

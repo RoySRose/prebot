@@ -566,15 +566,16 @@ public class AirForceManager {
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			if (UnitUtils.isCompleteValidUnit(wraith)) {
-				if (wraith.getHitPoints() > 30) { // repair hit points
+				if (wraith.getHitPoints() <= 30 && UnitUtils.activatedCommandCenterCount() > 0) { // repair hit points
+					needRepairWraithList.add(wraithId);
+					
+				} else {
 					AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
 					if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
 						uncloakedWraithList.add(wraithId);
 					} else {
 						airForceTeam.memberList.add(wraith);
 					}
-				} else {
-					needRepairWraithList.add(wraithId);
 				}
 				
 			} else {
@@ -595,8 +596,6 @@ public class AirForceManager {
 
 			Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(wraith.getPosition());
 			if (repairCenter != null) {
-				airForceTeamMap.remove(wraithId);
-				
 				AirForceTeam needRepairTeam = new AirForceTeam(wraith);
 				needRepairTeam.memberList.add(wraith);
 				needRepairTeam.repairCenter = repairCenter;

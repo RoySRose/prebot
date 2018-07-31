@@ -276,7 +276,8 @@ public class UnitUtils {
 	}
 	
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euis, Position position, int radius, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euis, Position position, int radius
+			, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -575,7 +576,7 @@ public class UnitUtils {
 		return getClosestUnitToPosition(commandCenters, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit commandCenter) {
-				return WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 8;
+				return WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6;
 			}
 		});
 	}

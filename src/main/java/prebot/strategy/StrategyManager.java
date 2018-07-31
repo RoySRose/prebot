@@ -17,6 +17,7 @@ import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
+import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
@@ -44,40 +45,9 @@ public class StrategyManager extends GameManager {
 	public EnemyStrategy lastStrategy = null;
 	public EnemyStrategyException lastStrategyException = null;
 
-	public StrategyManager() {
-		currentStrategy = EnemyStrategy.PROTOSSBASIC_CARRIER;
-		currentStrategyException = EnemyStrategyException.INIT;
-	}
-
-	public void setCurrentStrategyBasic(EnemyStrategy strategy) {
-		if (currentStrategy != strategy) {
-			lastStrategy = currentStrategy;
-			currentStrategy = strategy;
-			TempBuildSourceCode.Instance().setCombatUnitRatio();
-		}
-	}
-	
-	public void setCurrentStrategyException(EnemyStrategyException strategy) {
-		if (currentStrategyException != strategy) {
-			lastStrategyException = currentStrategyException;
-			currentStrategyException = strategy;
-			TempBuildSourceCode.Instance().setCombatUnitRatio();
-		}
-	}
-
-	public EnemyStrategy getCurrentStrategyBasic() {
-		return currentStrategy;
-	}
-
-	public EnemyStrategyException getCurrentStrategyException() {
-		return currentStrategyException;
-	}
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {
-		AnalyzeStrategy.Instance().AnalyzeEnemyStrategyInit();
-		
-		AnalyzeStrategy.Instance().update();
 	}
 
 	/// 경기가 종료될 때 일회적으로 전략 결과 정리 관련 로직을 실행합니다
@@ -98,7 +68,6 @@ public class StrategyManager extends GameManager {
 		ActionManager.Instance().update();
 		DefenseTowerTimer.Instance().update();
 
-		AnalyzeStrategy.Instance().update(); // 추후 RaceAction이 대체하여 삭제할 예정
 		SpiderMineManger.Instance().update();
 		VultureTravelManager.Instance().update();
 		TankPositionManager.Instance().update();
@@ -107,7 +76,8 @@ public class StrategyManager extends GameManager {
 		EnemyBaseFinder.Instance().update();
 		
 		expansionOkay();
-		temporaryAttackTimer();
+//		temporaryAttackTimer();
+		AttackExpansionManager.Instance().executeCombat();
 	}
 
 	/// 테스트용 임시 공격 타이밍

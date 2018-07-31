@@ -57,7 +57,7 @@ public class UpgradeSelector implements Selector<MetaType>{
 		}
 
 		boolean standard = false;
-		int unitPoint = AttackExpansionManager.Instance().UnitPoint;
+		int unitPoint = AttackExpansionManager.Instance().unitPoint;
 
 		int myFactoryUnitSupplyCount = UnitUtils.myFactoryUnitSupplyCount();
 		if (myFactoryUnitSupplyCount > 42 || (unitPoint > 10 && myFactoryUnitSupplyCount > 30)) {

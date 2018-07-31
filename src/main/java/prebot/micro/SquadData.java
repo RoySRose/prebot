@@ -46,11 +46,8 @@ public class SquadData {
 		return squadMap.remove(squadName);
 	}
 	
-	public void clearSquadMap() {
-		squadMap.clear();
-	}
 
-	public Squad getUnitSquad(Unit unit) {
+	public Squad getSquad(Unit unit) {
 		for (String sqaudName : squadMap.keySet()) {
 			Squad squad = squadMap.get(sqaudName);
 			if (squad.hasUnit(unit)) {
@@ -60,27 +57,22 @@ public class SquadData {
 		return null;
 	}
 
-	public boolean canAssignUnitToSquad(Unit unit, Squad squad) {
-		Squad unitSqaud = getUnitSquad(unit);
-		return unitSqaud == null || unitSqaud.getPriority() < squad.getPriority();
-	}
-
-	public void assignUnitToSquad(Unit unit, Squad squad) {
-		Squad previousSquad = getUnitSquad(unit);
+	public void assign(Unit unit, Squad squad) {
+		Squad previousSquad = getSquad(unit);
 		if (previousSquad != null) {
-			previousSquad.removeUnit(unit);
+			previousSquad.unitList.remove(unit);
 		}
-		squad.addUnit(unit);
+		squad.unitList.add(unit);
 		
 		if (unit.getType() == UnitType.Terran_SCV) {
 			WorkerManager.Instance().setCombatWorker(unit); // SCV를 CombatManager에서 관리
 		}
 	}
 	
-	public void excludeUnitFromSquad(Unit unit) {
-		Squad previousSquad = getUnitSquad(unit);
+	public void exclude(Unit unit) {
+		Squad previousSquad = getSquad(unit);
 		if (previousSquad != null) {
-			previousSquad.removeUnit(unit);
+			previousSquad.unitList.remove(unit);
 		}
 		if (unit.getType() == UnitType.Terran_SCV) {
 			WorkerManager.Instance().setIdleWorker(unit); // SCV를 WorkerManager에서 관리

@@ -3,6 +3,7 @@ package prebot.common.debug;
 /**
  * 테스트를 위해 소요되는 시간을 체크
  */
+@Deprecated
 public class StopWatch {
 	private static final long DEFAULT_WARN_DURATION = 35;
 

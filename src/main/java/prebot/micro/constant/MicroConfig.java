@@ -14,6 +14,9 @@ import prebot.strategy.InformationManager;
 
 public class MicroConfig {
 
+	public static final int COMMON_ADD_RADIUS = 150;
+	public static final int LARGE_ADD_RADIUS = 500;
+	
 	public static enum MainSquadMode {
 		DEFENSE(0.0, false),
 		NORMAL(0.8, false),
@@ -31,27 +34,23 @@ public class MicroConfig {
 	}
 	
 	public static enum SquadInfo {
-		IDLE("IDLE", 0, 0),
-		EARLY_DEFENSE("EARLY_DEFENSE", 1, 30),
-		MAIN_ATTACK("MAIN_ATTACK", 2, 150),
-		WATCHER("WATCHER", 3, 150),
-		CHECKER("CHECKER", 4, 0),
-		GUERILLA_("GUERILLA_", 5, 150),
-		DEFENSE_("DEFENSE_", 6, 150),
-		SCV_SCOUT("SCV_SCOUT", 7, 150),
-		AIR_FORCE("AIR_FORCE", 8, 150),
-		SPECIAL("SPECIAL", 9, 500),
-		BUILDING("BUILDING", 10, 500);
+		IDLE("IDLE"),
+		EARLY_DEFENSE("EARLY_DEFENSE"),
+		MAIN_ATTACK("MAIN_ATTACK"),
+		WATCHER("WATCHER"),
+		CHECKER("CHECKER"),
+		GUERILLA_("GUERILLA_"),
+		DEFENSE_("DEFENSE_"),
+		SCV_SCOUT("SCV_SCOUT"),
+		AIR_FORCE("AIR_FORCE"),
+		SPECIAL("SPECIAL"),
+		BUILDING("BUILDING");
 		
-		private SquadInfo(String squadName, int priority, int additionalRadius) {
+		private SquadInfo(String squadName) {
 			this.squadName = squadName;
-			this.priority = priority;
-			this.squadRadius = additionalRadius;
 		}
 		
 		public String squadName;
-		public int priority;
-		public int squadRadius;
 	}
 
 	public static class Angles {

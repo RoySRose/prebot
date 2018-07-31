@@ -10,6 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.AirForceControl;
 import prebot.strategy.UnitInfo;
@@ -75,13 +76,13 @@ public class AirForceSquad extends Squad {
 				
 			} else { // not happen logic
 				for (Unit unit : unitList) {
-					UnitUtils.addEnemyUnitInfosInRadiusForAir(euis, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+					UnitUtils.addEnemyUnitInfosInRadiusForAir(euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 				}
 			}
 			
 		} else {
 			for (Unit unit : unitList) {
-				UnitUtils.addEnemyUnitInfosInRadius(euis, unit.getPosition(), unit.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadius(euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		}
 		

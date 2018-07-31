@@ -9,6 +9,7 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.strategy.StrategyIdea;
@@ -72,7 +73,7 @@ public class CheckerSquad extends Squad {
 		euiList.clear();
 		for (Unit unit : unitList) {
 			if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(unit.getID())) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.CHECKER.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		}
 	}

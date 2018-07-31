@@ -6,6 +6,7 @@ import bwapi.Order;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
@@ -16,10 +17,8 @@ import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.StrategyManager;
-import prebot.strategy.TempBuildSourceCode;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AttackExpansionManager {
 	
@@ -30,12 +29,12 @@ public class AttackExpansionManager {
 		return instance;
 	}
 
-	public int CombatTime = 0;
-	public int CombatStartCase = 0;
-	public int Attackpoint = 0;
-	public int MyunitPoint = 0;
-	public int ExpansionPoint = 0;
-	public int UnitPoint = 0;
+	public int combatTime = 0;
+	public int combatStartCase = 0;
+	public int attackPoint = 0;
+	public int myUnitPoint = 0;
+	public int expansionPoint = 0;
+	public int unitPoint = 0;
 
 	public void executeCombat() {
 		// TODO 상대방 신규 멀티를 찾았을때 공격 여부 한번더 돌려야함(상대 멀티 진행 여부 판단해야되므로
@@ -155,7 +154,7 @@ public class AttackExpansionManager {
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int plus = 0;
-			if (StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.TERRANBASIC_BIONIC) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.BIONIC)) {
 				plus = 2;
 			}
 
@@ -206,7 +205,7 @@ public class AttackExpansionManager {
 			// 공통 예외 상황
 			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
 				isAttackMode = true;
-				CombatStartCase = 1;
+				combatStartCase = 1;
 			}
 
 			if (totPoint > 120 && isAttackMode && myunitPoint > 80) {// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
@@ -221,28 +220,27 @@ public class AttackExpansionManager {
 				} else {
 					isAttackMode = true;
 				}
-				CombatStartCase = 2;
+				combatStartCase = 2;
 			}
 
-			if ((StrategyManager.Instance().lastStrategy == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO
-					|| StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO)
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)
 					&& !isAttackMode
 					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
 							+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
 				isAttackMode = true;
 				fastAttack = true;
-				CombatStartCase = 5;
+				combatStartCase = 5;
 
-				if (CombatTime == 0) {
-					CombatTime = Prebot.Broodwar.getFrameCount() + 5000;
+				if (combatTime == 0) {
+					combatTime = Prebot.Broodwar.getFrameCount() + 5000;
 				}
 			}
 
 			if (isAttackMode) {
-				if (CombatStartCase == 1 && myunitPoint < 30) {
+				if (combatStartCase == 1 && myunitPoint < 30) {
 					isAttackMode = false;
 				}
-				if (CombatStartCase == 2) {
+				if (combatStartCase == 2) {
 
 					if (InformationManager.Instance().enemyRace == Race.Zerg
 							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
@@ -258,14 +256,10 @@ public class AttackExpansionManager {
 						isAttackMode = false;
 					}
 				}
-				if (CombatStartCase == 5) {
+				if (combatStartCase == 5) {
 
-					if (CombatTime < Prebot.Broodwar.getFrameCount() && ((myunitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
-
+					if (combatTime < Prebot.Broodwar.getFrameCount() && ((myunitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
 						isAttackMode = false;
-						if (StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO) {
-							StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.PROTOSSBASIC);
-						}
 					}
 
 					if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer)
@@ -274,9 +268,6 @@ public class AttackExpansionManager {
 							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20) {
 						if (totPoint < 50) {
 							isAttackMode = false;
-							if (StrategyManager.Instance().currentStrategy == EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO) {
-								StrategyManager.Instance().setCurrentStrategyBasic(EnemyStrategy.PROTOSSBASIC);
-							}
 						}
 					}
 				}
@@ -329,10 +320,10 @@ public class AttackExpansionManager {
 			}
 		}
 
-		MyunitPoint = myunitPoint;
-		ExpansionPoint = expansionPoint;
-		UnitPoint = unitPoint;
-		Attackpoint = totPoint;
+		this.myUnitPoint = myunitPoint;
+		this.expansionPoint = expansionPoint;
+		this.unitPoint = unitPoint;
+		this.attackPoint = totPoint;
 		
 		if (isAttackMode) {
 			if (noMercyAttack) {
@@ -379,11 +370,11 @@ public class AttackExpansionManager {
 
 		// 앞마당 전
 		if (RealCCcnt == 1) {// TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
-			if (!TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
+			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
 				return;
 			}
 
-			if ((Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 40 && UnitPoint > 15) || (factoryUnitCount > 60 && Attackpoint > 60 && ExpansionPoint > 0)) {
+			if ((Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 40 && unitPoint > 15) || (factoryUnitCount > 60 && attackPoint > 60 && expansionPoint > 0)) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
@@ -444,14 +435,14 @@ public class AttackExpansionManager {
 			}
 
 			// 500 넘고 유리하면
-			if (Prebot.Broodwar.self().minerals() > 500 && factoryUnitCount > 50 && Attackpoint > 30) {
+			if (Prebot.Broodwar.self().minerals() > 500 && factoryUnitCount > 50 && attackPoint > 30) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
 				}
 			}
 			// 200 넘고 유리하면
-			if (Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 80 && Attackpoint > 40 && ExpansionPoint >= 0) {
+			if (Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 80 && attackPoint > 40 && expansionPoint >= 0) {
 				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
 						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);

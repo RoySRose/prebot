@@ -21,27 +21,21 @@ public abstract class Squad {
 	}
 
 	private String squadName;
-	private int priority;
 	private int squadRadius;
 	protected UnitType[] unitTypes;
 
 	public Set<Unit> unitList = new HashSet<>();
 	public Set<UnitInfo> euiList = new HashSet<>();
-	// public Position goalPosition = Position.None;
 
 	// private List<Unit> unitOldBies = new ArrayList<>();
 	// private List<Unit> unitNewBies = new ArrayList<>();
 
 	public Squad(SquadInfo squadInfo) {
 		this.squadName = squadInfo.squadName;
-		this.priority = squadInfo.priority;
-		this.squadRadius = squadInfo.squadRadius;
 	}
 
 	public Squad(SquadInfo squadInfo, Position targetPosition) {
 		this.squadName = squadInfo.squadName + targetPosition.toString();
-		this.priority = squadInfo.priority;
-		this.squadRadius = squadInfo.squadRadius;
 	}
 	
 	public void setUnitType(UnitType... unitTypes) {
@@ -54,18 +48,6 @@ public abstract class Squad {
 
 	public String getSquadName() {
 		return squadName;
-	}
-
-	public int getPriority() {
-		return priority;
-	}
-
-	public void addUnit(Unit unit) {
-		unitList.add(unit);
-	}
-
-	public void removeUnit(Unit unit) {
-		unitList.remove(unit);
 	}
 
 	public boolean hasUnit(Unit unit) {

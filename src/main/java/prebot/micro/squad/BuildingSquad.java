@@ -8,6 +8,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.building.BarracksControl;
 import prebot.micro.control.building.CommandCenterControl;
@@ -71,7 +72,7 @@ public class BuildingSquad extends Squad {
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.BUILDING.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForAir(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.LARGE_ADD_RADIUS);
 		}
 		return euiList;
 	}

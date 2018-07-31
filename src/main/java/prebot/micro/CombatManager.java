@@ -8,7 +8,6 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
@@ -99,40 +98,43 @@ public class CombatManager extends GameManager {
 	}
 
 	private void combatUnitArrangement() {
-		updateSquadDefault(SquadInfo.EARLY_DEFENSE);
+		// 단독
 		updateSquadDefault(SquadInfo.MAIN_ATTACK);
-		updateSquadDefault(SquadInfo.WATCHER);
-		updateSquadDefault(SquadInfo.CHECKER);
-		updateSquadDefault(SquadInfo.SCV_SCOUT);
 		updateSquadDefault(SquadInfo.AIR_FORCE);
 		updateSquadDefault(SquadInfo.SPECIAL);
 		updateSquadDefault(SquadInfo.BUILDING);
+		
+		// SCV유형별 구분
+		updateSquadDefault(SquadInfo.EARLY_DEFENSE);
+		updateSquadDefault(SquadInfo.SCV_SCOUT);
+		
+		// 벌처유형별 구분
+		updateSquadDefault(SquadInfo.WATCHER);
+		updateSquadDefault(SquadInfo.CHECKER);
+		updateGuerillaSquad();
 
 		updateDefenseSquad();
-		updateGuerillaSquad();
 	}
 
 	private void updateSquadDefault(SquadInfo squadInfo) {
-//		BigWatch.start("CombatManager.updateSquadDefault." + squadInfo.squadName);
 		Squad squad = squadData.getSquad(squadInfo.squadName);
 
 		for (Unit invalidUnit : squad.invalidUnitList()) {
-			squadData.excludeUnitFromSquad(invalidUnit);
+			squadData.exclude(invalidUnit);
 		}
 		
 		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, squad.getUnitTypes());
 		
 		List<Unit> assignableUnitList = new ArrayList<>();
 		for (Unit unit : squadTypeUnitList) {
-			if (squad.want(unit) && squadData.canAssignUnitToSquad(unit, squad)) {
+			if (squad.want(unit)) {
 				assignableUnitList.add(unit);
 			}
 		}
 		List<Unit> recruitUnitList = squad.recruit(assignableUnitList);
 		for (Unit recuitUnit : recruitUnitList) {
-			squadData.assignUnitToSquad(recuitUnit, squad);
+			squadData.assign(recuitUnit, squad);
 		}
-//		BigWatch.record("CombatManager.updateSquadDefault." + squadInfo.squadName);
 	}
 
 	private void squadExecution() {
@@ -160,10 +162,12 @@ public class CombatManager extends GameManager {
 			if (unit.getType() != UnitType.Terran_Vulture) {
 				continue;
 			}
-			Squad unitSqaud = squadData.getUnitSquad(unit);
-			if (unitSqaud == null || SquadInfo.GUERILLA_.priority > unitSqaud.getPriority()) {
-				assignableVultures.add(unit);
+			Squad unitSqaud = squadData.getSquad(unit);
+			if (unitSqaud instanceof GuerillaSquad) {
+				continue;
 			}
+			
+			assignableVultures.add(unit);
 			if (assignableVultures.size() > maxCount) {
 				break;
 			}
@@ -176,7 +180,7 @@ public class CombatManager extends GameManager {
 		List<Squad> guerillaSquads = squadData.getSquadList(SquadInfo.GUERILLA_.squadName);
 		for (Squad squad : guerillaSquads) {
 			for (Unit invalidUnit : squad.invalidUnitList()) {
-				squadData.excludeUnitFromSquad(invalidUnit);
+				squadData.exclude(invalidUnit);
 			}
 			if (removeGuerilla((GuerillaSquad) squad)) {
 				squadData.removeSquad(squad.getSquadName());
@@ -208,7 +212,7 @@ public class CombatManager extends GameManager {
 		// 게릴라 유닛이 남아있지 않다면 할당한다.
 		if (guerillaSquad.unitList.isEmpty()) {
 			for (Unit assignableVulture : assignableVultures) {
-				squadData.assignUnitToSquad(assignableVulture, guerillaSquad);
+				squadData.assign(assignableVulture, guerillaSquad);
 				int squadPower = VultureFightPredictor.powerOfWatchers(guerillaSquad.unitList);
 				if (squadPower > enemyPower + Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
 					break; // 충분한 파워

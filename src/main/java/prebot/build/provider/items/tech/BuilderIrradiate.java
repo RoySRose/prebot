@@ -7,8 +7,8 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
-import prebot.strategy.StrategyManager;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
+import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class BuilderIrradiate extends DefaultBuildableItem {
 
@@ -29,7 +29,7 @@ public class BuilderIrradiate extends DefaultBuildableItem {
 	            return true;
 	        }else{
 	        	if(BuildQueueProvider.Instance().respondSet) {
-	        		if(StrategyManager.Instance().getCurrentStrategyBasic() == EnemyStrategy.ZERGBASIC_MUTALMANY){
+					if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_PROTOSS_AIR3) {
 	        			if(Prebot.Broodwar.self().hasResearched(TechType.Irradiate) ==false &&Prebot.Broodwar.self().isResearching(TechType.Irradiate) ==false){
 	        				if(BuildManager.Instance().buildQueue.getItemCount(TechType.Irradiate) < 1){
 	//        					BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Irradiate);

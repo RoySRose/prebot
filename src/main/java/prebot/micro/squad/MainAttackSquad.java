@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.GoliathControl;
@@ -138,13 +139,12 @@ public class MainAttackSquad extends Squad {
 		euiList.addAll(InfoUtils.euiListInThirdRegion());
 		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 		for (Unit building : myBuildings) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		}
-		
 		
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			for (Unit unit : unitList) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.MAIN_ATTACK.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		} else {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);

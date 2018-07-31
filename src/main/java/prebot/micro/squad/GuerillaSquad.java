@@ -6,6 +6,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.strategy.manage.VultureTravelManager;
@@ -43,10 +44,10 @@ public class GuerillaSquad extends Squad {
 	@Override
 	public void findEnemies() {
 		euiList.clear();
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, targetPosition, UnitType.Terran_Vulture.sightRange() + SquadInfo.CHECKER.squadRadius);
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, targetPosition, UnitType.Terran_Vulture.sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		for (Unit unit : unitList) {
 			if (!VultureTravelManager.Instance().guerillaIgnoreModeEnabled(getSquadName())) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + SquadInfo.CHECKER.squadRadius);
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		}
 	}
