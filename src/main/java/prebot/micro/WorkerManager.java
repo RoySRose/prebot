@@ -94,13 +94,18 @@ public class WorkerManager extends GameManager {
 				Unit repairTargetUnit = workerData.getWorkerRepairUnit(worker);
 
 				if(repairTargetUnit.getType() == UnitType.Terran_Wraith && repairTargetUnit != null && repairTargetUnit.exists()){
-					for (Unit cc : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
-						if(repairTargetUnit.getDistance(cc.getPosition()) > 200){
-							workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+					List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+					boolean wraithRepair = false;
+					for (Unit cc : commandCenters) {
+						if(repairTargetUnit.getDistance(cc.getPosition()) < 200){
+							wraithRepair = true;
 						}
 					}
+					if(!wraithRepair){
+						workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+					}
 				}// 대상이 파괴되었거나, 수리가 다 끝난 경우
-				else if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
+				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
 						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
 				}
@@ -366,7 +371,8 @@ public class WorkerManager extends GameManager {
 			return;
 		}
 
-		int repairWorkCnt = workerData.workerRepairMap.size();
+		int repairWorkCnt = 0;
+		int repairWraithWorkCnt = 0;
 
 		int repairmax = 3;
 		if(StrategyIdea.mainSquadMode.isAttackMode){
@@ -377,77 +383,52 @@ public class WorkerManager extends GameManager {
 		}*/
 
 		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			repairWorkCnt = workerData.workerRepairMap.size();
+			repairWraithWorkCnt = workerData.workerWraithRepairMap.size();
 
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.isCompleted() == true
-					&& unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
+					&& unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9 && repairWorkCnt < repairmax) {
 				if (InformationManager.Instance().enemyRace == Race.Terran && unit.isFlying()) {
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 
-				// if((InformationManager.Instance().enemyRace == Race.Protoss
-				// || InformationManager.Instance().enemyRace == Race.Terran)){
-				// if(unit.isFlying() == true){
-				// continue;
-				// }
-				//// if(unit.getType() == UnitType.Terran_Barracks ||
-				// unit.getType() == UnitType.Terran_Supply_Depot){
-				//// if(unit.getHitPoints() > unit.getType().maxHitPoints()*
-				// 0.9){
-				//// continue;
-				//// }
-				//// }
-				// }
 				if (Prebot.Broodwar.getFrameCount() <= 12000) {
 					if ((unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot)
 							&& unit.getHitPoints() > unit.getType().maxHitPoints() * 0.9) {
 						setRepairWorker(repairWorker, unit);
-						repairWorkCnt = workerData.workerRepairMap.size();
 					}
 				}
 				if (unit.getType() == UnitType.Terran_Bunker) {
 					setRepairWorker(repairWorker, unit);
-					repairWorkCnt = workerData.workerRepairMap.size();
 				} else {
 					setRepairWorker(repairWorker, unit);
-					repairWorkCnt = workerData.workerRepairMap.size();
-					continue;
-				}
-				if (repairWorkCnt >= repairmax) {
-					return;
 				}
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
 			else if (unit.getType().isMechanical() && unit.isCompleted() == true
 					&& unit.getHitPoints() < unit.getType().maxHitPoints()) {
-				repairWorkCnt = workerData.workerRepairMap.size();
-
+				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
-				if (unit.getType() == UnitType.Terran_Goliath || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+				if ((unit.getType() == UnitType.Terran_Goliath 
+						|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-						|| unit.getType() == UnitType.Terran_Science_Vessel
-						) {
-					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+						|| unit.getType() == UnitType.Terran_Science_Vessel) && repairWorkCnt < repairmax) {
 					setRepairWorker(repairWorker, unit);
-					repairWorkCnt = workerData.workerRepairMap.size();
-				} else if(unit.getType() == UnitType.Terran_Wraith){
-					for (Unit cc : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
-						if(unit.getDistance(cc.getPosition()) < 200){
-							if(unit.getHitPoints() <= 50){
-								Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-								setRepairWorker(repairWorker, unit);
-								repairmax += 1;
-							}
-						}
+				} 
+			}
+			
+			if(unit.getType() == UnitType.Terran_Wraith && repairWraithWorkCnt < repairmax){
+				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+				List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+				for (Unit cc : commandCenters) {
+					if(unit.getDistance(cc.getPosition()) < 200){
+						setRepairWorker(repairWorker, unit);
 					}
 				}
-				if (repairWorkCnt >= repairmax) {
-					return;
-				}
 			}
-
 		}
 	}
 
@@ -495,7 +476,6 @@ public class WorkerManager extends GameManager {
 				}
 			}
 		}
-
 		if (currentRepairWorker == null || currentRepairWorker.exists() == false
 				|| currentRepairWorker.getHitPoints() <= 0) {
 			currentRepairWorker = closestWorker;
