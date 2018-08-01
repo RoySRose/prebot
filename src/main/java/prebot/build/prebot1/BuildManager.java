@@ -40,6 +40,7 @@ public class BuildManager extends GameManager {
 	private static BuildManager instance = new BuildManager();
 
 	public Boolean mainBaseLocationFull;
+    public Boolean secondStartLocationFull;
 	public Boolean firstChokePointFull;
 	public Boolean firstExpansionLocationFull;
 	public Boolean secondChokePointFull;
@@ -54,6 +55,7 @@ public class BuildManager extends GameManager {
 	
 	public BuildManager() {
 		mainBaseLocationFull = false;
+        secondStartLocationFull = false;
 		firstChokePointFull = false;
 		firstExpansionLocationFull = false;
 		secondChokePointFull = false;
@@ -598,7 +600,9 @@ public class BuildManager extends GameManager {
 			
 		case NextSupplePoint:
 			if (fisrtSupplePointFull) {
-				if (mainBaseLocationFull) {
+                if (secondStartLocationFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
+                }else if (mainBaseLocationFull) {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				} else {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
@@ -607,6 +611,9 @@ public class BuildManager extends GameManager {
 			break;
 			
 		case LastBuilingPoint:
+            if (secondStartLocationFull) {
+                seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;//TODO 다음 검색 위치
+            }
 			//seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
 			break;
 			
@@ -643,10 +650,13 @@ public class BuildManager extends GameManager {
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				break;
 			case LastBuilingPoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
 				break;
-				
-			case SeedPositionSpecified:
+            case LastBuilingPoint2:
+                seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+                break;
+
+                case SeedPositionSpecified:
 			case getLastBuilingFinalLocation:
 			default:
 				findAnotherPlace = false;
