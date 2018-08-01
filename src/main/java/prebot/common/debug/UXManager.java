@@ -141,7 +141,7 @@ public class UXManager {
 			drawUnitTargetOnMap();
 			// 미사일, 럴커의 보이지않는 공격등을 표시
 			// drawBulletsOnMap();
-
+			drawnextPoints();
 			// draw tile position of mouse cursor
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
@@ -170,6 +170,7 @@ public class UXManager {
 			drawManagerTimeSpent(500, 220);
 		}
 
+		
 		drawUnitIdOnMap();
 		drawPositionInformation();
 		drawTimer();
@@ -1055,6 +1056,44 @@ public class UXManager {
 		}
 	}
 
+	public void drawnextPoints() {
+		
+//		Position nextEX = InformationManager.Instance().getNextExpansionLocation().getPosition();
+//		Position nextBuild = InformationManager.Instance().getLastBuildingLocation().toPosition();
+//		Position lastBuild2 = InformationManager.Instance().getLastBuildingLocation2().toPosition();
+		
+	    BaseLocation getExpansionLocation = InformationManager.Instance().getExpansionLocation;
+	    TilePosition getLastBuildingLocation = InformationManager.Instance().getLastBuildingLocation;
+	    TilePosition getLastBuildingLocation2 = InformationManager.Instance().getLastBuildingLocation2;
+	    
+		if(getExpansionLocation!= null) {
+			Prebot.Broodwar.drawTextScreen(10, 120, "getExpansionLocation: " + getExpansionLocation.getTilePosition());
+			Prebot.Broodwar.drawTextMap(getExpansionLocation.getPosition(), "nextEX");
+		}else {
+			Prebot.Broodwar.drawTextScreen(10, 120, "getExpansionLocation: null");
+		}
+		if(getLastBuildingLocation!= null) {
+			Prebot.Broodwar.drawTextScreen(10, 130, "getLastBuildingLocation: " + getLastBuildingLocation);
+			Prebot.Broodwar.drawTextMap(getLastBuildingLocation.toPosition(), "nextBuild");
+		}else {
+			Prebot.Broodwar.drawTextScreen(10, 130, "getLastBuildingLocation: null");
+		}
+		if(getLastBuildingLocation2!= null) {
+			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation2: " + getLastBuildingLocation2);
+			Prebot.Broodwar.drawTextMap(getLastBuildingLocation2.toPosition(), "nextBuild2");
+		}else {
+			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation2: null");
+		}
+
+		
+		Prebot.Broodwar.drawTextScreen(10, 150, "mainBaseLocationFull: " + BuildManager.Instance().mainBaseLocationFull);
+		Prebot.Broodwar.drawTextScreen(10, 160, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
+		Prebot.Broodwar.drawTextScreen(10, 170, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
+
+	}
+	
+	
+	
 	/// Unit 의 Id 를 Map 에 표시합니다
 	public void drawUnitIdOnMap() {
 		for (Unit unit : Prebot.Broodwar.self().getUnits())
