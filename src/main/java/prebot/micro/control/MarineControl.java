@@ -117,7 +117,7 @@ public class MarineControl extends Control {
 						if(MicroUtils.isRangeUnit(enemyInSight.getType())){
 							rangeUnit = true;
 						}
-						if(rangeUnit){
+						if(rangeUnit && !enemyInSight.getType().isWorker()){
 							intoTheBunker(bunker, marine);
 							continue;
 						}
