@@ -18,6 +18,7 @@ import prebot.micro.control.factory.TankControl;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MainAttackSquad extends Squad {
 
@@ -134,9 +135,19 @@ public class MainAttackSquad extends Squad {
 	@Override
 	public void findEnemies() {
 		euiList.clear();
-		euiList.addAll(InfoUtils.euiListInBase());
-		euiList.addAll(InfoUtils.euiListInExpansion());
-		euiList.addAll(InfoUtils.euiListInThirdRegion());
+		
+		if (StrategyIdea.campType == CampType.INSIDE) {
+			euiList.addAll(InfoUtils.euiListInBase());
+		} else if (StrategyIdea.campType == CampType.FIRST_CHOKE || StrategyIdea.campType == CampType.EXPANSION) {
+			euiList.addAll(InfoUtils.euiListInBase());
+			euiList.addAll(InfoUtils.euiListInExpansion());
+		} else {
+			euiList.addAll(InfoUtils.euiListInBase());
+			euiList.addAll(InfoUtils.euiListInExpansion());
+			euiList.addAll(InfoUtils.euiListInThirdRegion());
+		}
+		
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 		for (Unit building : myBuildings) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);

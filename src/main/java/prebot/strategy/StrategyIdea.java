@@ -14,6 +14,7 @@ import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio;
 import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
+import prebot.strategy.manage.PositionFinder.CampType;
 import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 public class StrategyIdea {
@@ -76,6 +77,7 @@ public class StrategyIdea {
 	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
 	
 	// [포지션 정보]
+	public static CampType campType = null; // 수비 포지션 타입
 	public static Position campPosition = null; // 수비 포지션
 	public static Position mainPosition = null; // 메인스쿼드 목표 포지션
 	public static Position watcherPosition = null; // watcher 포지션

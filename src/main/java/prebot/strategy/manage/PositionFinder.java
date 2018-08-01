@@ -40,6 +40,10 @@ import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
  */
 public class PositionFinder {
 	
+	public enum CampType {
+		INSIDE, FIRST_CHOKE, EXPANSION, SECOND_CHOKE, READY_TO
+	}
+	
 	private static final int POSITION_EFFECTIVE_FRAME_SIZE = 20 * TimeUtils.SECOND;
 	private Position[] enemyGroundEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
@@ -54,7 +58,8 @@ public class PositionFinder {
 	}
 
 	public void update() {
-		StrategyIdea.campPosition = getCampPosition();
+		StrategyIdea.campType = getCampPositionType();
+		StrategyIdea.campPosition = campTypeToPosition(StrategyIdea.campType);
 		StrategyIdea.mainPosition = getMainPosition();
 
 		updateMainSquadCenter();
@@ -63,7 +68,7 @@ public class PositionFinder {
 	}
 
 	/// 주둔지
-	private Position getCampPosition() {
+	private CampType getCampPositionType() {
 		int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		int factorySupplyCount = UnitUtils.myFactoryUnitSupplyCount();
 		
@@ -131,39 +136,39 @@ public class PositionFinder {
 				// 병력이 쌓였다면 second choke에서 방어한다.
 				if (myTankSupplyCount >= 10 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
-					return InfoUtils.mySecondChoke().getCenter();
+					return CampType.SECOND_CHOKE;
 				}
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-				if (myTankSupplyCount >= 4 * 4
+				else if (myTankSupplyCount >= 4 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN
 						|| firstExpansionOccupied()) {
-					return firstExpansionBackwardPosition();
+					return CampType.EXPANSION;
 				}
 			}
 			
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				if (factorySupplyCount > 4 * 1) {
-					return firstChokeDefensePosition();
+					return CampType.FIRST_CHOKE;
 				}
 				// 마린이 일정이상 쌓이지 않았다면 커맨드센터 수비
 				int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
 				if (marineCount <= Math.max(enemyGroundUnitSupplyCount, 3)) {
-					return commandCenterInsidePosition();
+					return CampType.INSIDE;
 				}
 			}
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
 			// 병력이 쌓였다면 second choke에서 방어한다.
 			if (myTankSupplyCount >= 6 * 4 && InfoUtils.myReadyToPosition() != null) {
-				return InfoUtils.myReadyToPosition();
+				return CampType.READY_TO;
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 			if (myTankSupplyCount >= 3 * 4 || firstExpansionOccupied()) {
-				return InfoUtils.mySecondChoke().getCenter();
+				return CampType.SECOND_CHOKE;
 			}
 		}
 
-		return firstChokeDefensePosition();
+		return CampType.FIRST_CHOKE;
 		
 
 //		if (InfoUtils.enemyRace() == Race.Protoss) {
@@ -190,6 +195,25 @@ public class PositionFinder {
 //		}
 	}
 
+	private Position campTypeToPosition(CampType campType) {
+		if (campType == CampType.INSIDE) {
+			return commandCenterInsidePosition();
+			
+		} else if (campType == CampType.FIRST_CHOKE) {
+			return firstChokeDefensePosition();
+			
+		} else if (campType == CampType.EXPANSION) {
+			return firstExpansionBackwardPosition();
+			
+		} else if (campType == CampType.SECOND_CHOKE) {
+			return InfoUtils.mySecondChoke().getCenter();
+			
+		} else { // if (campType == CampType.READY_TO) {
+			return InfoUtils.myReadyToPosition();
+			
+		}
+	}
+
 	/// 메인부대 위치 지점
 	private Position getMainPosition() {
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
@@ -212,7 +236,7 @@ public class PositionFinder {
 			}
 
 		} else {
-			return getCampPosition();
+			return StrategyIdea.campPosition;
 		}
 	}
 
@@ -377,9 +401,10 @@ public class PositionFinder {
 	/// 첫번째 확장기지를 차지하였는지 여부
 	private boolean firstExpansionOccupied() {
 		List<Unit> commandCenterOrDefenseTowerList = UnitUtils.getUnitList(UnitFindRange.ALL,
-				UnitType.Terran_Command_Center, UnitType.Terran_Missile_Turret, UnitType.Terran_Missile_Turret);
+				UnitType.Terran_Command_Center, UnitType.Terran_Missile_Turret, UnitType.Terran_Bunker);
 		for (Unit bunkerOrTurret : commandCenterOrDefenseTowerList) {
 			RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
+			System.out.println("towerRegionType (" + bunkerOrTurret.getType() + ") : " + towerRegionType);
 			if (towerRegionType == RegionType.MY_FIRST_EXPANSION || towerRegionType == RegionType.MY_THIRD_REGION) {
 				return true;
 			}

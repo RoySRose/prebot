@@ -26,11 +26,11 @@ public class EnemyBaseFinder {
 			StrategyIdea.enemyBaseExpected = null;
 			return;
 		}
-		
+
+		BaseLocation closestBase = null;
 		List<UnitInfo> enemyUnits = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
 		for (UnitInfo eui : enemyUnits) {
 
-			BaseLocation closestBase = null;
 			if (eui.getType().isBuilding()) {
 				int minimumDistance = 999999;
 				for (BaseLocation startLocation : BWTA.getStartLocations()) {
@@ -65,10 +65,9 @@ public class EnemyBaseFinder {
 //					}
 //				}
 //			}
-
-			StrategyIdea.enemyBaseExpected = closestBase;
-			break;
 		}
+
+		StrategyIdea.enemyBaseExpected = closestBase;
 	}
 
 }

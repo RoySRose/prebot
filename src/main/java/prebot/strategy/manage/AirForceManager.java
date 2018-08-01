@@ -481,24 +481,29 @@ public class AirForceManager {
 	}
 
 	private void adjustWraithCount() {
-		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount <= 12) {
-			if (accumulatedAchievement <= -UnitType.Terran_Wraith.maxHitPoints()) {
-				StrategyIdea.wraithCount--;
-				accumulatedAchievement = 0;
-			} else if (accumulatedAchievement >= UnitType.Terran_Wraith.maxHitPoints()) {
-				StrategyIdea.wraithCount++;
-				accumulatedAchievement = 0;
-			}
-			
-		} else if (StrategyIdea.wraithCount > 12 && StrategyIdea.wraithCount <= 24) {
-			// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
-			if (accumulatedAchievement < UnitType.Terran_Wraith.maxHitPoints() / 2) {
-				StrategyIdea.wraithCount--;
-				accumulatedAchievement = 0;
-			} else if (accumulatedAchievement >= UnitType.Terran_Wraith.maxHitPoints() * 2) {
-				StrategyIdea.wraithCount++;
-				accumulatedAchievement = 0;
-			}
+		// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
+		int downAchievement;
+		int upAchievement;
+		if (StrategyIdea.wraithCount >= 0 && StrategyIdea.wraithCount < 6) {
+			downAchievement = -100;
+			upAchievement = +120;
+		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
+			downAchievement = -80;
+			upAchievement = +180;
+		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
+			downAchievement = -60;
+			upAchievement = +240;	
+		} else {
+			downAchievement = -20;
+			upAchievement = +500;
+		}
+
+		if (accumulatedAchievement <= downAchievement) {
+			StrategyIdea.wraithCount--;
+			accumulatedAchievement = 0;
+		} else if (accumulatedAchievement >= upAchievement) {
+			StrategyIdea.wraithCount++;
+			accumulatedAchievement = 0;
 		}
 		
 //		if (InfoUtils.enemyRace() == Race.Terran) {
@@ -522,8 +527,19 @@ public class AirForceManager {
 			}
 		}
 		
+		List<Integer> invalidUnitIds = new ArrayList<>();
+		for (Integer leaderId : airForceTeamMap.keySet()) {
+			if (airForceTeamMap.get(leaderId).leaderUnit == null) {
+				invalidUnitIds.add(leaderId);
+			}
+		}
+		for (Integer invalidUnitId : invalidUnitIds) {
+			airForceTeamMap.remove(invalidUnitId);
+		}
+		
 		// 리더의 위치를 비교하여 합칠 그룹인지 체크한다.
 		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
+		
 		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
 			if (airForceTeam.repairCenter != null) {

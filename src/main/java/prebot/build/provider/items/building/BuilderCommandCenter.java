@@ -6,7 +6,6 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
@@ -19,6 +18,7 @@ import prebot.micro.WorkerManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class BuilderCommandCenter extends DefaultBuildableItem {
 
@@ -70,8 +70,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
 					&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				if (allCommandCenterCount == 1) {
-					setBlocking(true);
-					setSeedPositionStrategy(getFirstExpansionSeedPosition());
+					setCommandCenterBlockAndSeedPosition();
 					return true;
 				}
 			}
@@ -79,7 +78,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	    		
 		return executeExpansion();
     }
-    
 
 	public boolean executeExpansion() {
 		if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
@@ -120,8 +118,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		if (realCCcnt == 1) {
 //			if (포인트에 따라 좀더 빨리 지을 수 있는 케이스) {}
 			if (Prebot.Broodwar.self().minerals() > 400) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
 		}
@@ -133,22 +130,19 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
 			if (isAttackMode && Prebot.Broodwar.self().minerals() > 250) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
 			
 			// 800 넘으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 800) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
 
@@ -180,13 +174,11 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
 			}
 			if (temp < 8000 && isAttackMode) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
 			if (factoryUnitCount > 160) {
-				setBlocking(true);
-				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
+				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
 		}
@@ -210,13 +202,13 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 		return mineralsNearDepot;
 	}
-	
-	private SeedPositionStrategy getFirstExpansionSeedPosition() {
-		// TODO CAMP POSITION에 따라서 SEED 포지션 결정 (앞마당 또는 메인베이스 초크언덕)
-		// SeedPositionStrategy.NextExpansionPoint;
 
-		return SeedPositionStrategy.FirstExpansionLocation;
+	private void setCommandCenterBlockAndSeedPosition() {
+		setBlocking(true);
+		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
+			setSeedPositionStrategy(SeedPositionStrategy.MainBaseLocation);
+		} else {
+			setSeedPositionStrategy(SeedPositionStrategy.FirstExpansionLocation);
+		}
 	}
-
-
 }

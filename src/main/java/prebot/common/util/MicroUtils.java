@@ -14,6 +14,7 @@ import bwapi.UnitSizeType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import bwapi.WeaponType;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -233,6 +234,11 @@ public class MicroUtils {
 		fleeUnit.rightClick(getFleeScoutPosition(fleeUnit, targetPosition, fOption));
 	}
 	public static void kiting(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption) {
+		if (LagObserver.groupsize() > 20) {
+			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
+			return;
+		}
+		
 		if (UnitUtils.unitInSight(targetInfo) == null) {
 			kitingInvisible(rangedUnit, targetInfo, kOption);
 		} else {

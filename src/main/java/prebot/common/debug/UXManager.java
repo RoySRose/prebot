@@ -39,6 +39,7 @@ import prebot.common.MapGrid;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -55,6 +56,7 @@ import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
+import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
@@ -63,6 +65,7 @@ import prebot.strategy.manage.AirForceTeam;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 import prebot.strategy.manage.StrategyAnalyseManager;
+import prebot.strategy.manage.VultureTravelManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
@@ -283,8 +286,13 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + history);
 		y += 11;
 		
+		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Vulture);
+		int tankCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
+		Prebot.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_BLACK + vultureCount + "      " + tankCount + "        " + goliathCount);
 		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio);
 		y += 11;
+		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
 		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount);
 		y += 11;
@@ -1374,12 +1382,13 @@ public class UXManager {
 		Map<String, Long> resultTimeMap = BigWatch.getResultTimeMap();
 		Map<String, Long> recordTimeMap = BigWatch.getRecordTimeMap();
 
-		List<String> tags = new ArrayList<>(resultTimeMap.keySet());
+		List<String> tags = new ArrayList<>(recordTimeMap.keySet());
 		Collections.sort(tags);
 		
 		int currentY = 0;
 		for (String tag : tags) {
 			Long resultTime = resultTimeMap.get(tag);
+			resultTime = resultTime == null ? 0L : resultTime;
 			Long recordTime = recordTimeMap.get(tag);
 			
 			char drawColor = UxColor.CHAR_WHITE;
@@ -1535,7 +1544,7 @@ public class UXManager {
 	
 	private void drawEnemyBaseToBaseTime() {
 		int y = 0;
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "campPosition : " + StrategyIdea.campPosition);
+		Prebot.Broodwar.drawTextScreen(10, y += 15, "campPosition : " + StrategyIdea.campPosition + " / " + StrategyIdea.campType);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainPosition : " + StrategyIdea.mainPosition);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "watcherPosition : " + StrategyIdea.watcherPosition);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainSquadCenter : " + StrategyIdea.mainSquadCenter);
@@ -1584,7 +1593,11 @@ public class UXManager {
 		if (InfoUtils.enemyReadyToPosition() != null) {
 			Prebot.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
 		}
-		
+		if (VultureTravelManager.Instance().getTravelSites() != null) {
+			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
+				Prebot.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site");
+			}
+		}
 	}
 
 }

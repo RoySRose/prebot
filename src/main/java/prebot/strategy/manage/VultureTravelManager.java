@@ -35,6 +35,10 @@ public class VultureTravelManager {
 	
 	private List<TravelSite> travelSites = new ArrayList<>(); // other exapnsions
 
+	public List<TravelSite> getTravelSites() {
+		return travelSites;
+	}
+
 	private Map<Integer, TravelSite> checkerSiteMap = new HashMap<>(); // key: checker unit id
 	private Map<String, Integer> guerillaIgnoreMap = new HashMap<>(); // key : squad name
 	

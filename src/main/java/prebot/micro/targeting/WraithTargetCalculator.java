@@ -65,7 +65,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 		if (targetScore == null) {
 			targetScore = 100;
 		}
-		int distanceScore = getDistanceScore(unit, enemyUnit.getPosition()) * 20; // 레이쓰 전투는 거리를 중요시한다.
+		int distanceScore = getDistanceScore(unit, enemyUnit.getPosition()) * 10; // 레이쓰 전투는 거리를 중요시한다.
 		int hitpointScore = getHitPointScore(enemyUnit);
 		
 		return targetScore + distanceScore + hitpointScore;
@@ -80,11 +80,9 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 			}
 		}
 		if (targetScore != CommonCode.NONE) {
-			int distanceScore = 0;
-			if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
-				distanceScore = getDistanceScore(unit, enemyUnit.getPosition());
-			}
-			return targetScore + distanceScore;
+			int distanceScore = getDistanceScore(unit, enemyUnit.getPosition());
+			int hitPointScore = (int) (getHitPointScore(enemyUnit) * 0.2);
+			return targetScore + distanceScore + hitPointScore;
 		} else {
 			return CommonCode.NONE;
 		}
