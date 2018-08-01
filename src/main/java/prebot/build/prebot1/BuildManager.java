@@ -600,13 +600,14 @@ public class BuildManager extends GameManager {
 			
 		case NextSupplePoint:
 			if (fisrtSupplePointFull) {
-                if (secondStartLocationFull) {
-                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
-                }else if (mainBaseLocationFull) {
+//				if (secondStartLocationFull) {
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
+//                } else
+                	if (mainBaseLocationFull) {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
 				} else {
 					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-				}
+				} 
 			}
 			break;
 			
