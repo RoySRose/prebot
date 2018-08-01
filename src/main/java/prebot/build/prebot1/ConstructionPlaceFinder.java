@@ -132,14 +132,27 @@ public class ConstructionPlaceFinder {
 			break;
 
 		case LastBuilingPoint:
-			TilePosition lastBuildingTilePosition = InformationManager.Instance().getLastBuilingLocation();
+			TilePosition lastBuildingTilePosition = InformationManager.Instance().getLastBuildingLocation();
 			if (lastBuildingTilePosition != null) {
 				if (buildingType == UnitType.Terran_Supply_Depot && BuildManager.Instance().fisrtSupplePointFull) {
 					lastBuildingTilePosition = BlockingEntrance.Instance().getSupplyPosition(lastBuildingTilePosition);
 				}
 				desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition);
 			}
+
+            if (desiredPosition == null) {
+                BuildManager.Instance().secondStartLocationFull = true;
+            }
 			break;
+
+        case LastBuilingPoint2:
+            TilePosition lastBuildingTilePosition2 = InformationManager.Instance().getLastBuildingLocation2();
+            if (lastBuildingTilePosition2 != null) {
+                desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition2);
+            }else{
+                desiredPosition = null;
+            }
+            break;
 
 		case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
 			TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
