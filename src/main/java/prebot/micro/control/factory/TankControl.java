@@ -48,10 +48,13 @@ public class TankControl extends Control {
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
 		this.flyingEnemisInfos = MicroUtils.filterFlyingTargetInfos(euiList);
+
+		euiList = MicroUtils.filterTargetInfos(euiList, false);
 		
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();

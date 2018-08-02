@@ -16,6 +16,7 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig;
@@ -42,6 +43,10 @@ public class WorkerManager extends GameManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
+		if (TimeUtils.executeRotation(5, 7)) {
+			return;
+		}
+		
 		scvIsOut = false;
 		// 1초에 1번만 실행한다
 		// if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;

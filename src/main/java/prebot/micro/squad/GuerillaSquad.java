@@ -38,7 +38,7 @@ public class GuerillaSquad extends Squad {
 	@Override
 	public void execute() {
 		vultureControl.setTargetPosition(targetPosition);
-		vultureControl.control(unitList, euiList);
+		vultureControl.controlIfUnitExist(unitList, euiList);
 	}
 
 	@Override

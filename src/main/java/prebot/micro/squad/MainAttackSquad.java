@@ -69,8 +69,8 @@ public class MainAttackSquad extends Squad {
 		tankControl.setSaveUnitLevel(saveUnitLevel);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 		
-		tankControl.control(tankList, euiList);
-		goliathControl.control(goliathList, euiList);
+		tankControl.controlIfUnitExist(tankList, euiList);
+		goliathControl.controlIfUnitExist(goliathList, euiList);
 	}
 
 	private void updateInitiatedFlag() {
@@ -147,7 +147,7 @@ public class MainAttackSquad extends Squad {
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 		
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, MicroConfig.COMMON_ADD_RADIUS);
 		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 		for (Unit building : myBuildings) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);

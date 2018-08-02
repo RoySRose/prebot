@@ -66,7 +66,7 @@ public class InformationManager extends GameManager {
 	private Unit firstVulture;
 
 	private Unit myfirstGas;
-	private Unit enemyFirstGas;
+//	private Unit enemyFirstGas;
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
 	private boolean checkGasRush;
@@ -162,7 +162,6 @@ public class InformationManager extends GameManager {
 		scoutStart = false;
 		vultureStart = false;
 		myfirstGas = null;
-		enemyFirstGas = null;
 		gasRushEnemyRefi = null;
 		gasRushed = false;
 		checkGasRush = true;
@@ -264,16 +263,12 @@ public class InformationManager extends GameManager {
 		updateBlockingEnterance();
 
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (TimeUtils.executeRotation(0, 24)) {
+		if (TimeUtils.executeRotation(0, 7)) {
 			updateBaseLocationInfo();
 		}
 
 		// setEveryMultiInfo();
 		UnitCache.getCurrentCache().updateCache();
-
-		if (enemyFirstGas == null) {
-			enemyFirstGas = WorkerManager.Instance().getWorkerData().getGasNearDepot(getMainBaseLocation(enemyPlayer));
-		}
 
 	}
 
@@ -930,9 +925,13 @@ public class InformationManager extends GameManager {
 	}
 
 	public TilePosition getLastBuildingLocation2() {
-		getLastBuildingLocation2 = getCloseButFarFromEnemyLocation(occupiedBaseLocations.get(selfPlayer), false,
-				secondStartPosition).getTilePosition();
-		return getLastBuildingLocation2;
+		BaseLocation getLastBuildingLocation2 = getCloseButFarFromEnemyLocation(occupiedBaseLocations.get(selfPlayer), false, secondStartPosition);
+		if (getLastBuildingLocation2 != null) {
+			this.getLastBuildingLocation2 = getLastBuildingLocation2.getTilePosition();
+			return getLastBuildingLocation2.getTilePosition();
+		} else {
+			return null;
+		}
 		// return
 	}
 
@@ -945,16 +944,16 @@ public class InformationManager extends GameManager {
 		}
 	}
 
-	private BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
+	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
 			BaseLocation secondStartPosition) {
 		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false, secondStartPosition);
 	}
 
-	private BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation) {
+	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation) {
 		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false);
 	}
 
-	private BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
+	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
 			boolean isMulti, boolean onlyGasMulti) {
 		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, isMulti, onlyGasMulti, null);
 	}
@@ -1467,10 +1466,6 @@ public class InformationManager extends GameManager {
 
 	public Unit getMyfirstGas() {
 		return myfirstGas;
-	}
-
-	public Unit getEnemyFirstGas() {
-		return enemyFirstGas;
 	}
 
 	public boolean isBlockingEnterance() {

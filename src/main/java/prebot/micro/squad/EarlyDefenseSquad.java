@@ -9,8 +9,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
@@ -40,8 +38,7 @@ public class EarlyDefenseSquad extends Squad {
 	@Override
 	public boolean want(Unit unit) {
 		if (unit.getType() == UnitType.Terran_SCV) {
-			List<Unit> enemyUnitsInRegion = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.ENEMY);
-			if (enemyUnitsInRegion.isEmpty()) {
+			if (InfoUtils.euiListInBase().isEmpty()) {
 				return false;
 			} else {
 				return unit.getHitPoints() > 16;
@@ -186,8 +183,8 @@ public class EarlyDefenseSquad extends Squad {
 		List<Unit> scvList = unitListMap.getOrDefault(UnitType.Terran_SCV, new ArrayList<Unit>());
 		List<Unit> marineList = unitListMap.getOrDefault(UnitType.Terran_Marine, new ArrayList<Unit>());
 		
-		marineControl.control(marineList, euiList);
-		gundamControl.control(scvList, euiList);
+		marineControl.controlIfUnitExist(marineList, euiList);
+		gundamControl.controlIfUnitExist(scvList, euiList);
 	}
 
 }

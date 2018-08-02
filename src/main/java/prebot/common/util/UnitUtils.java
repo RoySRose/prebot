@@ -269,7 +269,7 @@ public class UnitUtils {
 		return euiList;
 	}
 	
-	public static List<UnitInfo> getUnitInfosInRadiusForAirComplete(Position position, int radius, UnitType... unitTypes) {
+	public static List<UnitInfo> getCompleteEnemyInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
 		List<UnitInfo> euiList = new ArrayList<>();
 		addEnemyUnitInfosInRadius(false, true, euiList, position, radius, false, true, unitTypes);
 		return euiList;
@@ -293,7 +293,7 @@ public class UnitUtils {
 			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
-			if (!includeIncomplete && !eui.isCompleted()) {
+			if (!includeIncomplete && (!eui.isCompleted() && eui.getLastHealth() < eui.getType().maxHitPoints() * 0.8)) {
 				continue;
 			}
 			if (onlyCombatUnit && !MicroUtils.combatEnemyType(eui.getType())) {

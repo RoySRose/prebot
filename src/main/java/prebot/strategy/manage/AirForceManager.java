@@ -403,7 +403,7 @@ public class AirForceManager {
 				continue;
 			}
 
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(targetPosition, 20, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(targetPosition, 20, UnitUtils.enemyAirDefenseUnitType());
 			if (enemyDefTowerList.isEmpty()) {
 				continue;
 			}
@@ -484,7 +484,7 @@ public class AirForceManager {
 		// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
 		int downAchievement;
 		int upAchievement;
-		if (StrategyIdea.wraithCount >= 0 && StrategyIdea.wraithCount < 6) {
+		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount < 6) {
 			downAchievement = -100;
 			upAchievement = +120;
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
@@ -492,10 +492,9 @@ public class AirForceManager {
 			upAchievement = +180;
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
 			downAchievement = -60;
-			upAchievement = +240;	
+			upAchievement = +480;	
 		} else {
-			downAchievement = -20;
-			upAchievement = +500;
+			return;
 		}
 
 		if (accumulatedAchievement <= downAchievement) {

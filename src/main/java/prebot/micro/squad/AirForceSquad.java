@@ -52,7 +52,7 @@ public class AirForceSquad extends Squad {
 		for (Unit leaderWraith : leaderUnits) {
 			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(leaderWraith.getID());
 			Set<UnitInfo> euis = findEnemiesForTeam(airForceTeam.memberList);
-			airForceControl.control(airForceTeam.memberList, euis);
+			airForceControl.controlIfUnitExist(airForceTeam.memberList, euis);
 		}
 	}
 

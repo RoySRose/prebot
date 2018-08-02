@@ -74,9 +74,11 @@ public class LairAnalyser extends UnitAnalyser {
 			}
 			
 		} else {
-			int lairExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
-			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
-			if (baseLastCheckFrame > lairExpect + 5 * TimeUtils.SECOND) {
+			int lairExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair) + 5 * TimeUtils.SECOND;
+			int baseLastBaseCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
+			int baseLastExpansionCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+			
+			if (baseLastBaseCheckFrame > lairExpect && baseLastExpansionCheckFrame > lairExpect) {
 				ClueManager.Instance().addClueInfo(ClueInfo.NO_LAIR);
 			}
 		}

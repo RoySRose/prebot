@@ -130,10 +130,15 @@ public class DecisionMaker {
 					break;
 				}
 			}
-			if (isAirDefenseBuilding) {
-				euiListAirDefenseBuilding.add(eui);
-			} else if (MicroUtils.airEnemyType(eui.getType())) {
-				euiListAirWeapon.add(eui);
+			
+			if (eui.isCompleted() || eui.getLastHealth() >= eui.getType().maxHitPoints() * 0.8) {
+				if (isAirDefenseBuilding) {
+					euiListAirDefenseBuilding.add(eui);
+				} else if (MicroUtils.airEnemyType(eui.getType())) {
+					euiListAirWeapon.add(eui);
+				} else {
+					euiListFeed.add(eui);
+				}
 			} else {
 				euiListFeed.add(eui);
 			}

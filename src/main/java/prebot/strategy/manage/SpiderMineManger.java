@@ -7,14 +7,12 @@ import java.util.Map;
 
 import bwapi.Position;
 import bwapi.TechType;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
-import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -27,7 +25,6 @@ import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
-import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
@@ -131,7 +128,11 @@ public class SpiderMineManger {
 		StrategyIdea.watcherMinePositionLevel = mLevel;
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
 		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
-		StrategyIdea.checkerMaxNumber = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
+		int watcherCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
+		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath) >= 5 && watcherCount == 0) {
+			watcherCount = 1;
+		}
+		StrategyIdea.checkerMaxNumber = watcherCount;
 	}
 
 	private void updateMineReservedMap() {
@@ -325,95 +326,16 @@ public class SpiderMineManger {
 	}
 	
 	public List<BaseLocation> getMyExpansionBaseLocation() {
-		List<BaseLocation> myExpansions = new ArrayList<>();
-
-		double tempDistance;
-		double sourceDistance;
-		double closestDistance = 100000000;
+		List<BaseLocation> bases = new ArrayList<>();
+		BaseLocation expansion1 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getStartLocations(), true);
+		BaseLocation expansion2 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
+		BaseLocation expansion3 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false);
 		
-		BaseLocation res = null;
-		BaseLocation res2 = null;
-
-		BaseLocation sourceBaseLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
-		BaseLocation enemyfirstBaseLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
-		BaseLocation selfmainBaseLocations = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().selfPlayer);
-		BaseLocation enemymainBaseLocations = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		bases.add(expansion1);
+		bases.add(expansion2);
+		bases.add(expansion3);
 		
-		for (BaseLocation targetBaseLocation : BWTA.getStartLocations())
-		{
-			if (targetBaseLocation.getTilePosition().equals(selfmainBaseLocations.getTilePosition())) continue;
-			if (targetBaseLocation.getTilePosition().equals(enemymainBaseLocations.getTilePosition())) continue;
-			
-			sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
-			tempDistance = sourceDistance - enemymainBaseLocations.getGroundDistance(targetBaseLocation);
-			
-			if (tempDistance < closestDistance && sourceDistance > 0) {
-				closestDistance = tempDistance;
-				res2 = res;
-				res = targetBaseLocation;
-			}
-		}
-		if(res!= null){
-			myExpansions.add(res);
-		}
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS){
-			myExpansions.add(res2);
-		}
-		
-		res=null;
-		res2=null;
-		BaseLocation res3 = null;
-		BaseLocation res4 = null;
-		closestDistance = 100000000;
-		
-		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations()){
-
-			if (targetBaseLocation.isStartLocation()){
-				continue;
-			}
-			if (targetBaseLocation.getTilePosition().equals(sourceBaseLocation.getTilePosition())) continue;
-			if (targetBaseLocation.getTilePosition().equals(enemyfirstBaseLocation.getTilePosition())) continue;
-			
-			TilePosition findGeyser = ConstructionPlaceFinder.Instance().getRefineryPositionNear(targetBaseLocation.getTilePosition());
-			if(findGeyser != null){
-				if (findGeyser.getDistance(targetBaseLocation.getTilePosition())*32 > 400){
-					continue;
-				}
-			}
-			
-			sourceDistance = sourceBaseLocation.getGroundDistance(targetBaseLocation);
-			tempDistance = sourceDistance - enemymainBaseLocations.getGroundDistance(targetBaseLocation);
-			
-			if (tempDistance < closestDistance && sourceDistance > 0) {
-				closestDistance = tempDistance;
-				res4 = res3;
-				res3 = res2;
-				res2 = res;
-				res = targetBaseLocation;
-			}
-		}
-		
-		
-		if(res!= null){
-			myExpansions.add(res);
-		}
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.LOST_TEMPLE){
-			if(res2!= null){
-				myExpansions.add(res2);
-			}
-		}
-			
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS){
-			if(res3!= null){
-				myExpansions.add(res3);
-			}
-			if(res4!= null){
-				myExpansions.add(res4);
-			}
-		}
-		
-		
-		return myExpansions;
+		return bases;
 	}
 
 }

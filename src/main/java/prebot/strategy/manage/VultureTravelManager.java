@@ -45,6 +45,7 @@ public class VultureTravelManager {
 	private Map<Integer, Integer> checkerRetiredTimeMap = new HashMap<>();
 
 	private boolean initialized = false;
+	BaseLocation enemyCloseStartBase = null;
 
 	public void update() {
 		initializeTravelSite();
@@ -176,18 +177,15 @@ public class VultureTravelManager {
 			return site.baseLocation;
 		}
 		
-		BaseLocation currentBase = null;
-		if (InfoUtils.mapInformation().getMap() == GameMap.CIRCUITBREAKER) {
-			currentBase = BaseLocationUtils.getClosestBaseToPosition(BWTA.getStartLocations(), InfoUtils.enemyBase().getPosition(), new BaseCondition() {
+		if (enemyCloseStartBase == null) {
+			enemyCloseStartBase = BaseLocationUtils.getClosestBaseToPosition(BWTA.getStartLocations(), InfoUtils.enemyBase().getPosition(), new BaseCondition() {
 				@Override public boolean correspond(BaseLocation base) {
 					return !base.equals(InfoUtils.enemyBase()) && !base.equals(InfoUtils.myBase());
 				}
 			});
-		} else {
-			currentBase = InfoUtils.enemyFirstExpansion();
 		}
 		
-		return getCheckerTravelSite(checkerId, currentBase);
+		return getCheckerTravelSite(checkerId, enemyCloseStartBase);
 	}
 
 	public BaseLocation getCheckerTravelSite(Integer checkerId, BaseLocation currentBase) {

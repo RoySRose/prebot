@@ -65,7 +65,7 @@ public class CheckerSquad extends Squad {
 
 	@Override
 	public void execute() {
-		vultureControl.control(unitList, euiList);
+		vultureControl.controlIfUnitExist(unitList, euiList);
 	}
 
 	@Override

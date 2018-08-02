@@ -42,6 +42,6 @@ public class ScvScoutSquad extends Squad {
 
 	@Override
 	public void execute() {
-		scvScoutControl.control(unitList, euiList);
+		scvScoutControl.controlIfUnitExist(unitList, euiList);
 	}
 }

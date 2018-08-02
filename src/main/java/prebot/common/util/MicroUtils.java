@@ -98,12 +98,12 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
 			if (avoidEnemyUnit) {
-				List<UnitInfo> enemyAirWeaponList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
+				List<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
 				if (!enemyAirWeaponList.isEmpty()) {
 					continue;
 				}
@@ -129,13 +129,13 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (enemyDefTowerList.isEmpty()) {
 				realMoveRadian = adjustedRadian;
 				break;
 			}
 			if (avoidEnemyUnit) {
-				List<UnitInfo> enemyAirWeaponList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
+				List<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
 				if (!enemyAirWeaponList.isEmpty()) {
 					continue;
 				}
@@ -214,7 +214,7 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
@@ -747,6 +747,34 @@ public class MicroUtils {
 				if (enemyUnitType.isFlyer()) {
 					newTargetInfos.add(targetInfo);
 				}
+			}
+		}
+		return newTargetInfos;
+	}
+
+	public static Set<UnitInfo> filterTargetInfos(Collection<UnitInfo> euiList, boolean includeFlyer) {
+		Set<UnitInfo> newTargetInfos = new HashSet<>();
+		for (UnitInfo eui : euiList) {
+			Unit target = UnitUtils.unitInSight(eui);
+
+			if (target != null) {
+				if (!UnitUtils.isValidUnit(target)) {
+					continue;
+				}
+				
+				if (!includeFlyer && target.isFlying()) {
+					continue;
+				}
+				
+				if (target.isVisible() && !target.isStasised()) {
+					newTargetInfos.add(eui);
+				}
+			} else {
+				UnitType enemyUnitType = eui.getType();
+				if (!includeFlyer && enemyUnitType.isFlyer()) {
+					continue;
+				}
+				newTargetInfos.add(eui);
 			}
 		}
 		return newTargetInfos;

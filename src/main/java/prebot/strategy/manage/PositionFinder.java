@@ -50,6 +50,7 @@ public class PositionFinder {
 	
 	private Position commandCenterInsidePosition = null;
 	private Position basefirstChokeMiddlePosition = null;
+	private Position firstExpansionBackwardPosition = null;
 	
 	private static PositionFinder instance = new PositionFinder();
 
@@ -404,7 +405,6 @@ public class PositionFinder {
 				UnitType.Terran_Command_Center, UnitType.Terran_Missile_Turret, UnitType.Terran_Bunker);
 		for (Unit bunkerOrTurret : commandCenterOrDefenseTowerList) {
 			RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
-			System.out.println("towerRegionType (" + bunkerOrTurret.getType() + ") : " + towerRegionType);
 			if (towerRegionType == RegionType.MY_FIRST_EXPANSION || towerRegionType == RegionType.MY_THIRD_REGION) {
 				return true;
 			}
@@ -455,13 +455,17 @@ public class PositionFinder {
 
 	/// second choke보다 안쪽 포지션
 	private Position firstExpansionBackwardPosition() {
+		if (firstExpansionBackwardPosition != null) {
+			return firstExpansionBackwardPosition;
+		}
+		
 		Chokepoint firstChoke = InfoUtils.myFirstChoke();
 		Chokepoint secondChoke = InfoUtils.mySecondChoke();
 		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
 		
 		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
 		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
-		return new Position(x, y);
+		return firstExpansionBackwardPosition = new Position(x, y);
 
 		//First Expansion에서 약간 물러난 위치 (prebot 1 - overwatch, circuit 맵에 맞지 않음)
 //		double distanceFromFirstChoke = firstChoke.getDistance(secondChoke);

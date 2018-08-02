@@ -39,11 +39,11 @@ public class SpecialSquad extends Squad {
 		
 		List<Unit> dropshipList = unitListMap.getOrDefault(UnitType.Terran_Dropship, new ArrayList<Unit>());
 		List<UnitInfo> dropshipEuiList = findEnemies(dropshipList);
-		dropshipControl.control(dropshipList, dropshipEuiList);
+		dropshipControl.controlIfUnitExist(dropshipList, dropshipEuiList);
 		
 		List<Unit> scienceVesselList = unitListMap.getOrDefault(UnitType.Terran_Science_Vessel, new ArrayList<Unit>());
 		List<UnitInfo> scienceVesselEuiList = findEnemies(scienceVesselList);
-		vesselControl.control(scienceVesselList, scienceVesselEuiList);
+		vesselControl.controlIfUnitExist(scienceVesselList, scienceVesselEuiList);
 	}
 	
 	public List<UnitInfo> findEnemies(List<Unit> unitList) {

@@ -160,7 +160,7 @@ public class AirForceTeam {
 			}
 
 			Position nextPosition = AirForceManager.Instance().getTargetPositions().get(currentTargetIndex);
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getEnemyUnitInfosInRadiusForAir(nextPosition, 20, UnitUtils.enemyAirDefenseUnitType());
+			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(nextPosition, 20, UnitUtils.enemyAirDefenseUnitType());
 			foundCount = !enemyDefTowerList.isEmpty() ? foundCount - 1 : 0;
 		}
 	}

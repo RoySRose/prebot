@@ -61,14 +61,16 @@ public class AirForceControl extends Control {
 				// ATTACK_UNIT, KITING_UNIT 동일
 				if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 					int attackType = 0; // 0:move, 1:attack, 2:hold
-//					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
-//					if (enemyInSight != null && airForceTeam.leaderUnit.isInWeaponRange(enemyInSight)) {
-//						if (!MicroUtils.killedByNShot(airForceTeam.leaderUnit, enemyInSight, wraithList.size() / 2)) {
-//							attackType = 1;
-//						} else {
-//							attackType = 2;
-//						}
-//					}
+					if (decision.eui.getType() == UnitType.Zerg_Scourge) {
+						Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
+						if (enemyInSight != null && airForceTeam.leaderUnit.isInWeaponRange(enemyInSight)) {
+							if (!MicroUtils.killedByNShot(airForceTeam.leaderUnit, enemyInSight, wraithList.size() / 2)) {
+								attackType = 1;
+							} else {
+								attackType = 2;
+							}
+						}
+					}
 					attackType = 1; // TODO 홀드컨 중지(레이쓰가 흩어지는 현상)
 
 					boolean holdControlToggleSwitchOn = false;

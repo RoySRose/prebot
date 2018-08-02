@@ -81,7 +81,7 @@ public class WatcherSquad extends Squad {
 		vultureWatcher.setSaveUnitLevel(saveUnitLevel);
 		vultureWatcher.setRegroupLeader(regroupLeader);
 		
-		vultureWatcher.control(unitList, euiList);
+		vultureWatcher.controlIfUnitExist(unitList, euiList);
 	}
 
 //	private Position getOtherWatcherPosition(Position regroupPosition) {

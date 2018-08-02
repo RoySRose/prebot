@@ -13,9 +13,11 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
+import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 
@@ -115,7 +117,7 @@ public class ConstructionManager extends GameManager {
 	public void update()
 	{
 		// 1초에 4번만 실행합니다
-		if (Prebot.Broodwar.getFrameCount() % 6 != 0){
+		if (TimeUtils.executeRotation(4, 7)) {
 			return;
 		}
 
@@ -144,14 +146,17 @@ public class ConstructionManager extends GameManager {
 	    }
 	    */
 	    
-	    validateWorkersAndBuildings();  
+	    validateWorkersAndBuildings();
 	    //haltConstructionBuildings();
-	    assignWorkersToUnassignedBuildings();       
-	    checkForStartedConstruction();              
-	    constructAssignedBuildings();               
-	    checkForDeadTerranBuilders();               
-	    checkForCompletedBuildings();           
-		checkForDeadlockConstruction();			
+	    BigWatch.start("assignWorkersToUnassignedBuildings");
+	    assignWorkersToUnassignedBuildings();     
+	    BigWatch.record("assignWorkersToUnassignedBuildings");  
+	    
+		checkForStartedConstruction();
+		constructAssignedBuildings();
+		checkForDeadTerranBuilders();
+		checkForCompletedBuildings();
+		checkForDeadlockConstruction();
 		checkConstructionBuildings();
 	}
 
@@ -475,47 +480,49 @@ public class ConstructionManager extends GameManager {
 	/// 참고로, 프로토스 / 저그는 건설을 시작하면 일꾼 포인터를 null 로 만들기 때문에 (constructionWorker = null) 건설 도중에 죽은 일꾼을 신경쓸 필요 없습니다 
 	public void checkForDeadTerranBuilders()
 	{
-		if (Prebot.Broodwar.self().getRace() == Race.Terran) {
+		if (Prebot.Broodwar.self().getRace() != Race.Terran) {
+			return;
+		}
 
-			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) <= 0) return;
-				
-			// for each of our buildings under construction
-			for (ConstructionTask b : constructionQueue)
-			{
-				// if a terran building whose worker died mid construction, 
-				// send the right click command to the buildingUnit to resume construction			
-				if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal()) {
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) <= 0) {
+			return;
+		}
+			
+		// for each of our buildings under construction
+		for (ConstructionTask b : constructionQueue) {
+			// if a terran building whose worker died mid construction, 
+			// send the right click command to the buildingUnit to resume construction			
+			if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal()) {
 
-					if (b.getBuildingUnit().isCompleted()) continue;
+				if (b.getBuildingUnit().isCompleted()) continue;
 //					//건설중인 일꾼 에너지 20이하로 idle 되었으나 여기선 되지 않아 건물 재건설 안하는 현상 발생
 //					//여기 할당된 워커 null로 변경
 //					if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
 //						b.setConstructionWorker(null);
 //					}
-					if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
-				
-						//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
-						/*
-						 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
-						 */
+				if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
+			
+					//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
+					/*
+					 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
+					 */
 //						if(( CombatManager.Instance().FastZerglingsInOurBase >0) 
 //								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks 
 //								|| b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot || b.getBuildingUnit().getType() == UnitType.Terran_Factory)){
 //							continue;
 //						} 
-						// grab a worker unit from WorkerManager which is closest to this final position	
-						Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
-	
-						if (workerToAssign != null)
-						{
-							//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
+					// grab a worker unit from WorkerManager which is closest to this final position	
+					Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
 
-							b.setConstructionWorker(workerToAssign);								
-							CommandUtils.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
-							b.setBuildCommandGiven(true);
-							b.setLastBuildCommandGivenFrame(Prebot.Broodwar.getFrameCount());
-							b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
-						}
+					if (workerToAssign != null)
+					{
+						//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
+
+						b.setConstructionWorker(workerToAssign);								
+						CommandUtils.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
+						b.setBuildCommandGiven(true);
+						b.setLastBuildCommandGivenFrame(Prebot.Broodwar.getFrameCount());
+						b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 					}
 				}
 			}
