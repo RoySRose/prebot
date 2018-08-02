@@ -3,7 +3,6 @@ package prebot.strategy.manage;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.TimeUtils;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
@@ -41,7 +40,7 @@ public class InitialAction {
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Barracks, UnitType.Terran_Barracks.buildTime() - 10 * TimeUtils.SECOND)); // 배럭짓고 10초후 출발
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, UnitType.Terran_Supply_Depot.buildTime())); // 서플 시작후 출발
 				assignedFirstScout = true;
 			}
 			StrategyAnalyseManager.Instance().setUp(Race.Zerg);

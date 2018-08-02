@@ -1634,7 +1634,7 @@ public class UXManager {
 		}
 		if (VultureTravelManager.Instance().getTravelSites() != null) {
 			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
-				Prebot.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site");
+				Prebot.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
 			}
 		}
 	}

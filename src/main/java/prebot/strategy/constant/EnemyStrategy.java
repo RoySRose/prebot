@@ -165,7 +165,7 @@ public enum EnemyStrategy {
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
-	ZERG_FAST_MUTAL(1, 1, 5, Weight.GOLIATH, UpgradeOrder.get(FacUp.VS, FacUp.VM) // camp=F_CHOKE
+	ZERG_FAST_MUTAL(2, 0, 5, Weight.GOLIATH, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),

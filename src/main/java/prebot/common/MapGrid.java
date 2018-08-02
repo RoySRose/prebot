@@ -11,6 +11,7 @@ import bwta.BWTA;
 import prebot.build.constant.BuildConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.TimeUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.constant.StrategyConfig;
 
@@ -190,6 +191,10 @@ public class MapGrid extends GameManager {
 	/// 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록 등을 업데이트 합니다
 	public void update()
 	{
+		if (TimeUtils.executeRotation(2, 7)) {
+			return;
+		}
+		
 		// clear the grid
 		clearGrid();
 

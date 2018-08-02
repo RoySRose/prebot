@@ -129,7 +129,7 @@ public class SpiderMineManger {
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
 		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
 		int watcherCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
-		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath) >= 5 && watcherCount == 0) {
+		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith) >= 5 && watcherCount == 0) {
 			watcherCount = 1;
 		}
 		StrategyIdea.checkerMaxNumber = watcherCount;

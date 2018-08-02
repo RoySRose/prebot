@@ -38,22 +38,32 @@ public class AirForceControl extends Control {
 
 		// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)
 		Decision decision = null;
-		if (!airForceTeam.retreating()) {
-			decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList, AirForceManager.Instance().getStrikeLevel());
-		} else {
-			decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
-		}
-
 		// 결정상세(공격, 카이팅, 이동시): 공격(ATTACK_UNIT), 뭉치기(UNITE), 카이팅(KITING_UNIT), 이동(ATTACK_POSITION)
 		Decision decisionDetail = null;
-		if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
-			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, Arrays.asList(decision.eui), false);
-		} else if (decision.type == DecisionType.ATTACK_POSITION) { // 목적지 이동시 준수할 세부사항
-			decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, euiList, true);
-		}
+		
+		if (AirForceManager.Instance().isAirForceDefenseMode() && dangerousOutOfMyRegion(airForceTeam.leaderUnit)) {
+			Position airFleePosition = PositionFinder.Instance().basefirstChokeMiddlePosition();
+			Position airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+			airForceTeam.leaderOrderPosition = airDrivingPosition;
+			decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
+			
+		} else {
+			if (!airForceTeam.retreating()) {
+				decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList, AirForceManager.Instance().getStrikeLevel());
+			} else {
+				decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
+			}
 
-//		System.out.println("decision: " + decision + " / " + decisionDetail);
-		this.applyAirForceDecision(airForceTeam, decision, decisionDetail);
+			if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
+				decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, Arrays.asList(decision.eui), false);
+			} else if (decision.type == DecisionType.ATTACK_POSITION) { // 목적지 이동시 준수할 세부사항
+				decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, euiList, true);
+			}
+
+//			System.out.println("decision: " + decision + " / " + decisionDetail);
+			this.applyAirForceDecision(airForceTeam, decision, decisionDetail);
+		}
+		
 
 		if (decisionDetail != null) {
 			// 공격 쿨타임

@@ -135,7 +135,10 @@ public class PositionFinder {
 				}
 				
 				// 병력이 쌓였다면 second choke에서 방어한다.
-				if (myTankSupplyCount >= 10 * 4
+				if (UnitUtils.myFactoryUnitSupplyCount() > 25 * 4) {
+					return CampType.READY_TO;
+				}
+				else if (myTankSupplyCount >= 10 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
 					return CampType.SECOND_CHOKE;
 				}
@@ -165,7 +168,12 @@ public class PositionFinder {
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 			if (myTankSupplyCount >= 3 * 4 || firstExpansionOccupied()) {
-				return CampType.SECOND_CHOKE;
+				int tankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+				if (tankCount >= 1) {
+					return CampType.SECOND_CHOKE;
+				} else {
+					return CampType.EXPANSION;
+				}
 			}
 		}
 

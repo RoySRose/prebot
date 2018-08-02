@@ -145,19 +145,27 @@ public class ConstructionManager extends GameManager {
 			}
 	    }
 	    */
-	    
-	    validateWorkersAndBuildings();
+
+	    BigWatch.start("construction1");
+	    validateWorkersAndBuildings();  
 	    //haltConstructionBuildings();
-	    BigWatch.start("assignWorkersToUnassignedBuildings");
-	    assignWorkersToUnassignedBuildings();     
-	    BigWatch.record("assignWorkersToUnassignedBuildings");  
+	    assignWorkersToUnassignedBuildings();
+	    BigWatch.record("construction1");
 	    
+	    BigWatch.start("construction2");
 		checkForStartedConstruction();
 		constructAssignedBuildings();
+		BigWatch.record("construction2");
+
+	    BigWatch.start("construction3");
 		checkForDeadTerranBuilders();
 		checkForCompletedBuildings();
+		BigWatch.record("construction3");
+
+	    BigWatch.start("construction4");
 		checkForDeadlockConstruction();
 		checkConstructionBuildings();
+		BigWatch.record("construction4");
 	}
 
 	public void haltConstructionBuildings()

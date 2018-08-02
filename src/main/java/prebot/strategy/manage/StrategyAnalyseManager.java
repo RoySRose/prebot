@@ -92,12 +92,14 @@ public class StrategyAnalyseManager {
 	}
 	
 	public void update() {
-		updateVisitFrame();
-		EnemyBuildTimer.Instance().update();
-		
-		for (UnitAnalyser analyser : analysers) {
-			analyser.upateFoundInfo();
-			analyser.analyse();
+		if (strategist != null && strategist.getPhase() < 3) {
+			updateVisitFrame();
+			EnemyBuildTimer.Instance().update();
+			
+			for (UnitAnalyser analyser : analysers) {
+				analyser.upateFoundInfo();
+				analyser.analyse();
+			}
 		}
 
 		if (StrategyChanger.stopStrategiestForDebugging) {
@@ -204,7 +206,7 @@ public class StrategyAnalyseManager {
 	
 	/// 유닛 발견 맵을 업데이트한다.
 	private void updateVisitFrame() {
-		if (InfoUtils.enemyBase() == null) {
+		if (InfoUtils.enemyBase() == null || InfoUtils.enemyBaseGas() == null) {
 			return;
 		}
 		

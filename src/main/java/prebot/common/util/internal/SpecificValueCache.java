@@ -9,7 +9,8 @@ public class SpecificValueCache {
 	
 	public enum ValueType {
 		ACTIVATED_COMMAND_COUNT,
-		AVAILABLE_SCANNING_COUNT;
+		AVAILABLE_SCANNING_COUNT,
+		FACTORY_SUPPLY_COUNT
 	};
 	
 	private static Map<ValueType, Object> data = new HashMap<>();

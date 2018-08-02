@@ -1,6 +1,7 @@
 package prebot.strategy;
 
 import bwta.BaseLocation;
+import prebot.common.util.TimeUtils;
 
 public class TravelSite {
 	public TravelSite(BaseLocation baseLocation, int visitFrame, int visitAssignedFrame, int guerillaExamFrame) {
@@ -16,7 +17,8 @@ public class TravelSite {
 
 	@Override
 	public String toString() {
-		return "TravelSite [baseLocation=" + baseLocation.getPosition() + ", visitFrame=" + visitFrame + ", visitAssignedFrame="
-				+ visitAssignedFrame + ", guerillaExamFrame=" + guerillaExamFrame + "]";
+		return baseLocation.getPosition() + "\nvisitFrame=" + TimeUtils.framesToTimeString(visitFrame)
+				+ "\nvisitAssignedFrame=" + TimeUtils.framesToTimeString(visitAssignedFrame)
+				+ "\nguerillaExamFrame=" + TimeUtils.framesToTimeString(guerillaExamFrame);
 	}
 }

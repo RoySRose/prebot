@@ -126,6 +126,11 @@ public class TankControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
 
 		for (Unit tank : tankModeList) {
+			if (dangerousOutOfMyRegion(tank)) {
+				CommandUtils.move(tank, StrategyIdea.campPosition);
+				continue;
+			}
+			
 			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(tank, euiList, flyingEnemisInfos, saveUnitLevel);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(tank, decision.eui.getLastPosition(), fOption);

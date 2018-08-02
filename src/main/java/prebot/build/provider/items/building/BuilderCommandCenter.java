@@ -13,6 +13,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.StrategyIdea;
@@ -32,9 +33,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center);
     	if (buildQueueCount > 0) {
-    		return false;
-    	}
-    	if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 8) {
     		return false;
     	}
     	
@@ -80,21 +78,23 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     }
 
 	public boolean executeExpansion() {
-		if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
-				return false;
+		if (TimeUtils.beforeTime(10, 0)) {
+			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
+					return false;
+				}
 			}
-		}
 
-		if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
-			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 1) {
-				return false;
+			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
+				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 1) {
+					return false;
+				}
 			}
-		}
 
-		if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
-			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 2) {
-				return false;
+			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
+				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 2) {
+					return false;
+				}
 			}
 		}
 

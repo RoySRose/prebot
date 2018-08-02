@@ -688,10 +688,17 @@ public class UnitUtils {
 	}
 	
 	public static int myFactoryUnitSupplyCount() {
-		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
+		Integer factorySupplyCount = SpecificValueCache.get(ValueType.FACTORY_SUPPLY_COUNT, Integer.class);
+		if (factorySupplyCount != null) {
+			return factorySupplyCount;
+		}
+		int factoryUnitCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
 				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 		
-		return totalSupplyCount * 4; // 인구수 기준이므로
+		
+		factorySupplyCount = factoryUnitCount * 4; // 인구수 기준이므로;
+		SpecificValueCache.put(ValueType.FACTORY_SUPPLY_COUNT, factorySupplyCount);
+		return factorySupplyCount;
 	}
 	
 	public static int myWraithUnitSupplyCount() {

@@ -18,7 +18,6 @@ import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
-import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 
@@ -42,6 +41,10 @@ public class VultureTravelManager {
 	private Map<Integer, TravelSite> checkerSiteMap = new HashMap<>(); // key: checker unit id
 	private Map<String, Integer> guerillaIgnoreMap = new HashMap<>(); // key : squad name
 	
+	public Map<Integer, TravelSite> getCheckerSiteMap() {
+		return checkerSiteMap;
+	}
+
 	private Map<Integer, Integer> checkerRetiredTimeMap = new HashMap<>();
 
 	private boolean initialized = false;

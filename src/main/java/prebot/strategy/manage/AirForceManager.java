@@ -149,7 +149,7 @@ public class AirForceManager {
 		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
 			powerOfEnemies += 250;
 		}
-//			System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
+		// System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
 		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
 			if (TimeUtils.before(waitingEndFrame)) { // 역레이스 준비시간
 				int myTankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
@@ -489,10 +489,18 @@ public class AirForceManager {
 			upAchievement = +120;
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
 			downAchievement = -80;
-			upAchievement = +180;
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				upAchievement = +300;	
+			} else {
+				upAchievement = +180;
+			}
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
 			downAchievement = -60;
-			upAchievement = +480;	
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				upAchievement = +700;	
+			} else {
+				upAchievement = +500;
+			}
 		} else {
 			return;
 		}

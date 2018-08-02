@@ -147,7 +147,7 @@ public class MainAttackSquad extends Squad {
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 		
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, MicroConfig.COMMON_ADD_RADIUS);
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 		for (Unit building : myBuildings) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
