@@ -98,18 +98,25 @@ public class WorkerManager extends GameManager {
 			if (workerData.getWorkerJob(worker) == WorkerJob.Repair) {
 				Unit repairTargetUnit = workerData.getWorkerRepairUnit(worker);
 
-				if(repairTargetUnit.getType() == UnitType.Terran_Wraith && repairTargetUnit != null && repairTargetUnit.exists()){
-					List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+				if(repairTargetUnit.getType() == UnitType.Terran_Wraith){
+					/*List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 					boolean wraithRepair = false;
 					for (Unit cc : commandCenters) {
-						if(repairTargetUnit.getDistance(cc.getPosition()) < 200){
+						if(repairTargetUnit.getDistance(cc.getPosition()) < 200 && worker.getDistance(cc.getPosition()) < 200){
 							wraithRepair = true;
 						}
 					}
 					if(!wraithRepair){
 						workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+					}*/
+					if(workerData.wraithToCC.containsKey(repairTargetUnit.getID())){
+						if(workerData.wraithToCC.get(repairTargetUnit.getID()).getDistance(worker) > 200){
+							workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
+						}
 					}
-				}// 대상이 파괴되었거나, 수리가 다 끝난 경우
+				}
+				// 대상이 파괴되었거나, 수리가 다 끝난 경우
+				
 				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
 						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
@@ -426,11 +433,13 @@ public class WorkerManager extends GameManager {
 			}
 			
 			if(unit.getType() == UnitType.Terran_Wraith && repairWraithWorkCnt < repairmax){
-				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 				for (Unit cc : commandCenters) {
 					if(unit.getDistance(cc.getPosition()) < 200){
+						Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
+						System.out.println(commandCenters.size() + " : " + " repairWorker : "+ repairWorker.getID());
 						setRepairWorker(repairWorker, unit);
+						setWraithToCC(repairWorker, cc);
 					}
 				}
 			}
@@ -450,7 +459,7 @@ public class WorkerManager extends GameManager {
 		// if (currentRepairWorker != null && currentRepairWorker.exists() &&
 		// currentRepairWorker.getHitPoints() > 0 &&
 		// unit.getType().isBuilding())
-		if (Prebot.Broodwar.getFrameCount() <= 12000) {
+	/*	if (Prebot.Broodwar.getFrameCount() <= 12000) {
 			if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0
 					&& unit.getType().isBuilding()
 					&& (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot
@@ -460,7 +469,7 @@ public class WorkerManager extends GameManager {
 		} else if (currentRepairWorker != null && currentRepairWorker.exists() && currentRepairWorker.getHitPoints() > 0
 				&& unit.getType().isBuilding() && unit.getType() != UnitType.Terran_Bunker) {
 			return currentRepairWorker;
-		}
+		}*/
 
 		// for each of our workers
 		for (Unit worker : workerData.getWorkers()) {
@@ -481,10 +490,10 @@ public class WorkerManager extends GameManager {
 				}
 			}
 		}
-		if (currentRepairWorker == null || currentRepairWorker.exists() == false
+	/*	if (currentRepairWorker == null || currentRepairWorker.exists() == false
 				|| currentRepairWorker.getHitPoints() <= 0) {
 			currentRepairWorker = closestWorker;
-		}
+		}*/
 
 		return closestWorker;
 	}
@@ -910,6 +919,10 @@ public class WorkerManager extends GameManager {
 
 	public void setRepairWorker(Unit worker, Unit unitToRepair) {
 		workerData.setWorkerJob(worker, WorkerJob.Repair, unitToRepair);
+	}
+	
+	public void setWraithToCC(Unit wraith, Unit cc) {
+		workerData.wraithToCC.put(wraith.getID(),cc);
 	}
 
 	public void stopRepairing(Unit worker) {
