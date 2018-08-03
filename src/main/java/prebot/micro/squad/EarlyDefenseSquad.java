@@ -91,10 +91,7 @@ public class EarlyDefenseSquad extends Squad {
 				break;
 			}
 			for (Unit unit : unitList) {
-				System.out.print(" / unit.getID() : " + unit.getID());
 			}
-			System.out.println();
-			System.out.println("defenseScv : " + defenseScv);
 			
 			squadData.exclude(defenseScv);
 			unitList.remove(defenseScv);

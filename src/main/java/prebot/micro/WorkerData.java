@@ -76,6 +76,7 @@ public class WorkerData {
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	public Map<Integer, Unit> workerWraithRepairMap = new HashMap<Integer, Unit>();
+	public Map<Integer, Unit> wraithToCC = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	//CC에 배정된 미네랄 리스트(미네랄 트릭 위해)
 	public static Map<Unit, List<Minerals>> depotMineral = new HashMap<Unit, List<Minerals>>();
@@ -133,6 +134,9 @@ public class WorkerData {
 					}
 					if (workerWraithRepairMap.containsKey(worker.getID())) {
 						workerWraithRepairMap.remove(worker.getID());
+					}
+					if (wraithToCC.containsKey(worker.getID())) {
+						wraithToCC.remove(worker.getID());
 					}
 					if (workerMoveMap.containsKey(worker.getID())) {
 						workerMoveMap.remove(worker.getID());
@@ -431,6 +435,7 @@ public class WorkerData {
 				workerRepairMap.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
 			}else if(workerWraithRepairMap.containsKey(unit.getID())){
 				workerWraithRepairMap.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
+				wraithToCC.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
 			}
 		}
 		else if (previousJob == WorkerJob.Move)
