@@ -111,7 +111,7 @@ public class PositionFinder {
 				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
 					RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
-					if (regionType == RegionType.MY_FIRST_EXPANSION) {
+					if (regionType == RegionType.MY_FIRST_EXPANSION || regionType == RegionType.MY_THIRD_REGION) {
 						firstExpansionDetectingOk = true;
 						break;
 					}
@@ -133,18 +133,18 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int SECOND_CHOKE_MARGIN = 15 * 4; // TODO 추후 상수로 변경
-				int FIRST_EXPANSION_MARGIN = 8 * 4; // TODO 추후 상수로 변경
+				int SECOND_CHOKE_MARGIN = 10 * 4; // TODO 추후 상수로 변경
+				int FIRST_EXPANSION_MARGIN = 5 * 4; // TODO 추후 상수로 변경
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					SECOND_CHOKE_MARGIN = 2 * 4;
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
 				// 병력이 쌓였다면 second choke에서 방어한다.
-				if (UnitUtils.myFactoryUnitSupplyCount() > 25 * 4) {
+				if (UnitUtils.myFactoryUnitSupplyCount() > 25 * 4 && UnitUtils.availableScanningCount() >= 1) {
 					return CampType.READY_TO;
 				}
-				else if (myTankSupplyCount >= 10 * 4
+				else if (myTankSupplyCount >= 8 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
 					return CampType.SECOND_CHOKE;
 				}
@@ -154,6 +154,9 @@ public class PositionFinder {
 						|| firstExpansionOccupied()) {
 					return CampType.EXPANSION;
 				}
+//				System.out.println("###########################################");
+//				System.out.println("myTankSupplyCount : " + myTankSupplyCount);
+//				System.out.println("factorySupplyCount : " + factorySupplyCount + " / " + "enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN : " + (enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN));
 			}
 			
 			if (InfoUtils.enemyRace() == Race.Zerg) {
@@ -260,7 +263,7 @@ public class PositionFinder {
 		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (leader != null) {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
-			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 80);
+			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 70);
 			StrategyIdea.mainSquadCenter = centerPosition;
 		} else {
 			StrategyIdea.mainSquadCoverRadius = 250;
@@ -436,7 +439,15 @@ public class PositionFinder {
 						if (!enemyOccupiedBases.isEmpty()) {
 							BaseLocation occupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.myFirstExpansion(), new BaseCondition() {
 								@Override public boolean correspond(BaseLocation base) {
-									return !base.equals(InfoUtils.enemyBase()) && !base.equals(InfoUtils.enemyFirstExpansion());
+									if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
+										return false;
+									}
+									
+									if (Prebot.Broodwar.isVisible(base.getTilePosition())) {
+										return false;
+									}
+									
+									return true;
 								}
 							});
 							if (occupied != null) {

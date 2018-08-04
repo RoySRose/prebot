@@ -17,8 +17,8 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
-import prebot.common.util.FileUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 
@@ -149,9 +149,11 @@ public class ConstructionManager extends GameManager {
 
 	    BigWatch.start("construction1");
 	    validateWorkersAndBuildings();  
+	    BigWatch.record("construction1");
+	    BigWatch.start("construction1-2");
 	    //haltConstructionBuildings();
 	    assignWorkersToUnassignedBuildings();
-	    BigWatch.record("construction1");
+	    BigWatch.record("construction1-2");
 	    
 	    BigWatch.start("construction2");
 		checkForStartedConstruction();
@@ -235,14 +237,15 @@ public class ConstructionManager extends GameManager {
 			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
-			TilePosition testLocation = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
+			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
 
-			if (testLocation == TilePosition.None || testLocation == TilePosition.Invalid || testLocation.isValid() == false) {
+			if (!TilePositionUtils.isValidTilePosition(relocationTilePosition)) {
 				// 지금 건물 지을 장소를 전혀 찾을 수 없게 된 경우는, 
 				// desiredPosition 주위에 다른 건물/유닛들이 있게 되었거나, Pylon 이 파괴되었거나, Creep 이 없어진 경우이고,
 				// 대부분 다른 건물/유닛들이 있게된 경우이므로 다음 frame 에서 다시 지을 곳을 탐색합니다
+	        	System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
 				continue;
 			}
 
@@ -250,34 +253,35 @@ public class ConstructionManager extends GameManager {
 			
 	        // grab a worker unit from WorkerManager which is closest to this final position
 			// 건설을 못하는 worker 가 계속 construction worker 로 선정될 수 있다. 직전에 선정되었었던 worker 는 다시 선정안하도록 합니다
-			Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), testLocation, true, b.getLastConstructionWorkerID());
+			Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), relocationTilePosition, true, b.getLastConstructionWorkerID());
+	        if (workerToAssign == null) {
+	        	System.out.println("No worker to assing " + b.getType().toString() + ". lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
+	        	System.out.println(b.getType().toString() + relocationTilePosition + ", " + b.getLastConstructionWorkerID());
+	        	continue;
+	        }
+			//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
+
+			b.setConstructionWorker(workerToAssign);
+			b.setFinalPosition(relocationTilePosition);
+			b.setStatus(ConstructionTask.ConstructionStatus.Assigned.ordinal());
+
+			int width = b.getType().tileWidth();
+			int height = b.getType().tileHeight();
 			
-	        if (workerToAssign != null)
-	        {
-				//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
-
-				b.setConstructionWorker(workerToAssign);
-				b.setFinalPosition(testLocation);
-				b.setStatus(ConstructionTask.ConstructionStatus.Assigned.ordinal());
-
-				int width = b.getType().tileWidth();
-				int height = b.getType().tileHeight();
-				
-				if (b.getType() == UnitType.Terran_Command_Center ||
-						b.getType() == UnitType.Terran_Factory ||
-						b.getType() == UnitType.Terran_Starport ||
-						b.getType() == UnitType.Terran_Science_Facility)
-					{
-						width += 2;
-				}
-				
+			if (b.getType() == UnitType.Terran_Command_Center ||
+					b.getType() == UnitType.Terran_Factory ||
+					b.getType() == UnitType.Terran_Starport ||
+					b.getType() == UnitType.Terran_Science_Facility)
+				{
+					width += 2;
+			}
+			
 //				System.out.println("reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
 //				FileUtils.appendTextToFile("log.txt", "\n reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
-				
-				// reserve this building's space
-				ConstructionPlaceFinder.Instance().reserveTiles(testLocation, width, height);
-				b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
-	        }
+			
+			// reserve this building's space
+			ConstructionPlaceFinder.Instance().reserveTiles(relocationTilePosition, width, height);
+			b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 	    }
 	}
 

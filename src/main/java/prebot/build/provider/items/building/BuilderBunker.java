@@ -31,10 +31,10 @@ public class BuilderBunker extends DefaultBuildableItem {
     	
 		boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
 		if (!entranceBlocked) {
-			setBlocking(true);
-			setHighPriority(true);
-			setTilePosition(BlockingEntrance.Instance().bunker);
-			return true;
+//			setBlocking(true);
+//			setHighPriority(true);
+//			setTilePosition(BlockingEntrance.Instance().bunker);
+//			return true;
 		}
 		
 		return false;

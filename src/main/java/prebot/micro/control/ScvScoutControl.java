@@ -209,14 +209,21 @@ public class ScvScoutControl extends Control {
 		}
 		// if we are still fleeing from the previous frame, get the next location if we are close enough
 		else {
-			double distanceFromCurrentVertex = regionVertices.get(vertexIndex).getDistance(scoutWorker.getPosition());
+			if (regionVertices.size() - 1 < vertexIndex) {
+				// scout scv가 오래 살아남았을 때 regionVertices가 변경되어 ArrayIndexOutOfBoundsException 발생 방지
+				System.out.println("reset vertexIndex to 0. regionVertices.size()=" + regionVertices.size() + ", vertexIndex=" + vertexIndex);
+				vertexIndex = 0;
+				
+			} else {
+				double distanceFromCurrentVertex = regionVertices.get(vertexIndex).getDistance(scoutWorker.getPosition());
 
-			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
-			int limit = 0;
-			while (distanceFromCurrentVertex < 128 && limit < regionVertices.size()) {
-				limit++;
-				vertexIndex = (vertexIndex + 1) % regionVertices.size();
-				distanceFromCurrentVertex = regionVertices.get(vertexIndex).getDistance(scoutWorker.getPosition());
+				// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
+				int limit = 0;
+				while (distanceFromCurrentVertex < 128 && limit < regionVertices.size()) {
+					limit++;
+					vertexIndex = (vertexIndex + 1) % regionVertices.size();
+					distanceFromCurrentVertex = regionVertices.get(vertexIndex).getDistance(scoutWorker.getPosition());
+				}
 			}
 			scoutVertexIndexMap.put(scoutWorker.getID(), vertexIndex);
 			return regionVertices.get(vertexIndex);

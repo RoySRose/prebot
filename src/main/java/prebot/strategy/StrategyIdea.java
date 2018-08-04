@@ -75,6 +75,8 @@ public class StrategyIdea {
 	// 수비모드, 공격모드에 따라 적 선택 방식이 달라진다.(수비모드인 경우 건물 위주, 공격모드인 경우 유닛 위주)
 	// 공격모드 종류에 따라 적 진영으로 빠르게 전진할지, 부하가 걸리는 컨트롤을 사용할지 여부 등을 결정한다. 
 	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
+	public static int attackStartedFrame = CommonCode.NONE;
+	public static int retreatFrame = CommonCode.NONE;
 	
 	// [포지션 정보]
 	public static CampType campType = null; // 수비 포지션 타입

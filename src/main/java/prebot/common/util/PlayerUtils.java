@@ -1,6 +1,7 @@
 package prebot.common.util;
 
 import bwapi.Player;
+import bwapi.UnitType;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 
@@ -25,6 +26,10 @@ public class PlayerUtils {
 		} else {
 			return null;
 		}
+	}
+	
+	public static boolean enoughResource(UnitType unitType) {
+		return enoughResource(unitType.mineralPrice(), unitType.gasPrice());
 	}
 	
 	public static boolean enoughResource(int mineralNeed, int gasNeed) {

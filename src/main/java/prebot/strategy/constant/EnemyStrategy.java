@@ -25,13 +25,13 @@ public enum EnemyStrategy {
 	// : (입구막기) 1팩 -> 마린6기 -> 애드온 -> 탱크 -> 마인업 -> 벌처 -> 앞마당전진(FD) -> 멀티 -> 시즈업
 	
 	// PHASE1 : 시작 ~ 코어완료 OR 일정시간 경과
-	PROTOSS_INIT(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS)
-			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.ONE_FACTORY
+	PROTOSS_INIT(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM)
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_1GATE_CORE()),
 	
 	PROTOSS_1GATE_CORE(PROTOSS_INIT),
 	
-	PROTOSS_2GATE(5, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
+	PROTOSS_2GATE(5, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_2GATE()),
 	
@@ -64,7 +64,7 @@ public enum EnemyStrategy {
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE, MissionType.TANK)),
 	// + 위험종료 : PROTOSS_DEFAULT와 다르지 않으므로 바로종료 (TODO TBD: 정면이 위험하면 입구심시티)
 	
-	PROTOSS_FAST_DARK(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
+	PROTOSS_FAST_DARK(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_FAST_DARK()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.VULTURE, MissionType.TANK)),
@@ -72,7 +72,7 @@ public enum EnemyStrategy {
 	// + CHECKER : 할당량 감소(거의 할당하지 않음)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 벌처 일정량 이상 보유.
 	
-	PROTOSS_DARK_DROP(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
+	PROTOSS_DARK_DROP(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=(다크타이밍이 안전할 경우에만) F_EXPANSION
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_DARK_DROP()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.VULTURE, MissionType.TANK)),
@@ -89,7 +89,7 @@ public enum EnemyStrategy {
 	// + WATCHER : 마인매설(+본진)
 	// + 위험종료 : BASE근처에 적이 없음. 포지션별 터렛 완성. 골리앗 생산 완료.
 	
-	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)
+	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS, FacUp.VS)
 			, MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_HARDCORE_ZEALOT()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),

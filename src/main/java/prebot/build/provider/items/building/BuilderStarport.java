@@ -1,11 +1,14 @@
 package prebot.build.provider.items.building;
 
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -36,11 +39,22 @@ public class BuilderStarport extends DefaultBuildableItem {
 		}
 
 		int activatedCommandCount = UnitUtils.activatedCommandCenterCount();
-		int wraithCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith);
-		if (StrategyIdea.wraithCount > wraithCount && activatedCommandCount >= 2) {
-			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				setTilePosition(BlockingEntrance.Instance().starport1);
-				return true;
+		if (activatedCommandCount >= 2) {
+			int wraithCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith);
+			if (StrategyIdea.wraithCount > wraithCount) {
+				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+					setTilePosition(BlockingEntrance.Instance().starport1);
+					return true;
+				}
+			}
+			
+			int vihicleWeaponUpgradeLevel = Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons);
+			if (vihicleWeaponUpgradeLevel == 0) {
+				int upgradeRemainingFrame = BuildQueueProvider.Instance().upgradeRemainingFrame(UpgradeType.Terran_Vehicle_Weapons);
+				if (upgradeRemainingFrame != CommonCode.UNKNOWN && upgradeRemainingFrame < UpgradeType.Terran_Vehicle_Weapons.upgradeTime() * 2 / 3) {
+					setTilePosition(BlockingEntrance.Instance().starport1);
+					return true;
+				}
 			}
 		}
 		

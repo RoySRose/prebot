@@ -220,11 +220,11 @@ public class BuildManager extends GameManager {
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
 								// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음 frame 에 건물 지을 공간을 다시 탐색하도록 한다.
-								System.out.print("\nThere is no place to construct :: " + currentItem.metaType.getUnitType()+ " :: strategy :: " + currentItem.seedLocationStrategy);
+								System.out.println("There is no place to construct :: " + currentItem.metaType.getUnitType()+ " :: strategy :: " + currentItem.seedLocationStrategy);
 								if (currentItem.seedLocation != null)
-									System.out.print(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
+									System.out.println(" seedPosition " + currentItem.seedLocation.getX() + ","+ currentItem.seedLocation.getY());
 								if (desiredPosition != null)
-									System.out.print(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
+									System.out.println(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								
 								isOkToRemoveQueue = false;
 							}

@@ -1,19 +1,24 @@
 package prebot.micro.control.building;
 
+import java.util.Collection;
+
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.main.Prebot;
+import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.micro.control.FlyCondition;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-
-import java.util.Collection;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class CommandCenterControl extends BuildingFlyControl {
 
@@ -48,9 +53,12 @@ public class CommandCenterControl extends BuildingFlyControl {
             BaseLocation correctLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 
             if (checkCC.isLifted() == false) {
-                if (checkCC.getTilePosition().getX() != correctLocation.getTilePosition().getX() || checkCC.getTilePosition().getY() != correctLocation.getTilePosition().getY()) {
-                    buildingFlyMap.get(checkCC).setBuildingFly(BuildingFly.UP);
-                }
+            	if (StrategyIdea.campType != CampType.INSIDE && StrategyIdea.campType != CampType.FIRST_CHOKE) {
+            		if (checkCC.getTilePosition().getX() != correctLocation.getTilePosition().getX() || checkCC.getTilePosition().getY() != correctLocation.getTilePosition().getY()) {
+                        buildingFlyMap.get(checkCC).setBuildingFly(BuildingFly.UP);
+                    }
+            	}
+                
             } else {
                 buildingFlyMap.get(checkCC).setLandPosition(new TilePosition(correctLocation.getTilePosition().getX(), correctLocation.getTilePosition().getY()));
                 buildingFlyMap.get(checkCC).setBuildingFly(BuildingFly.DOWN);
@@ -60,19 +68,22 @@ public class CommandCenterControl extends BuildingFlyControl {
     }
 
     public Unit getSecondCommandCenter(){
-
-        if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2
-                && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) == 2) {
-
-            for (Unit commandCenter : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
-                if (commandCenter.getTilePosition().getX() == BlockingEntrance.Instance().starting.getX() && commandCenter.getTilePosition().getY() == BlockingEntrance.Instance().starting.getY()) {
-                    continue;
-                } else {
-                    return commandCenter;
-                }
-            }
-        }
-        return null;
+    	
+    	for (Unit commandCenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+    		if (commandCenter.getTilePosition().equals(BlockingEntrance.Instance().starting)) {
+    			continue;
+    		}
+    		Region centerRegion = BWTA.getRegion(commandCenter.getPosition());
+    		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+    		if (centerRegion == baseRegion) {
+    			return commandCenter;
+    		}
+    		Region expansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+    		if (centerRegion == expansionRegion) {
+    			return commandCenter;
+    		}
+    	}
+    	return null;
     }
 
 }

@@ -8,6 +8,8 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.Region;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
@@ -274,6 +276,13 @@ public class DecisionMakerPrebot1 {
 				return Decision.doNothing(mechanicUnit);
 			} else if (existCloakTarget) {
 				if (cloakTargetUnit.getType() == UnitType.Protoss_Dark_Templar) {
+					if (InformationManager.Instance().isBlockingEnterance()) {
+						Region darkRegion = BWTA.getRegion(cloakTargetUnit.getPosition());
+						Region tankRegion = BWTA.getRegion(mechanicUnit.getPosition());
+						if (darkRegion != tankRegion) {
+							return Decision.doNothing(mechanicUnit);
+						}
+					}
 					return Decision.change(mechanicUnit);
 				} else if (cloakTargetUnit.getType() == UnitType.Zerg_Lurker) {
 					return Decision.doNothing(mechanicUnit);

@@ -1,17 +1,15 @@
 package prebot.build.provider;
 
 
-import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.constant.EnemyStrategyOptions.UpgradeOrder;
 import prebot.strategy.manage.AttackExpansionManager;
-import prebot.strategy.constant.EnemyStrategy.*;
 
 public class UpgradeSelector implements Selector<MetaType>{
 
@@ -24,13 +22,7 @@ public class UpgradeSelector implements Selector<MetaType>{
 
     public final void select(){
     	// 업그레이드
-    	if(BuildQueueProvider.Instance().respondSet) {
-    		//unitType = UnitType.None;
-    	}else {
-			if (Prebot.Broodwar.getFrameCount() % 53 == 0) {
-				executeUpgrade();
-			}
-    	}
+		executeUpgrade();
 
         //buildCondition = new BuildCondition();
         //metaType = new MetaType(UpgradeType.Terran_Infantry_Armor);
@@ -47,7 +39,7 @@ public class UpgradeSelector implements Selector<MetaType>{
     private void executeUpgrade() {
 
 		Unit armory = null;
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Armory)) {
 			if (unit.getType() == UnitType.Terran_Armory) {
 				armory = unit;
 			}

@@ -1,8 +1,11 @@
 package prebot.common.util;
 
+import java.util.HashSet;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.TilePosition;
+import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.internal.IConditions.BaseCondition;
@@ -67,5 +70,13 @@ public class BaseLocationUtils {
 			}
 		}
 		return closestBase;
+	}
+	
+	public static HashSet<TilePosition> getBaseLocationTileHashSet() {
+		HashSet<TilePosition> baseTileSet = new HashSet<>();
+		for (BaseLocation base : BWTA.getBaseLocations()) {
+			baseTileSet.add(base.getTilePosition());
+		}
+		return baseTileSet;
 	}
 }

@@ -13,6 +13,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -127,7 +128,7 @@ public class SpiderMineManger {
 		}
 		StrategyIdea.watcherMinePositionLevel = mLevel;
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
-		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount / 10 + 1;
+		StrategyIdea.spiderMineNumberPerGoodPosition = Math.min(vultureCount / 10 + 1, 3);
 		int watcherCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
 		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith) >= 5 && watcherCount == 0) {
 			watcherCount = 1;
@@ -160,17 +161,36 @@ public class SpiderMineManger {
 		for (Integer spiderMineId : expiredRemoveList) {
 			mineRemoveMap.remove(spiderMineId);
 		}
-	}
-	
-	public void addRemoveMineNearTank(Unit siegeTank) {
-		if (siegeTank.getType() != UnitType.Terran_Siege_Tank_Siege_Mode) {
-			return;
+		
+		List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
+		for (Unit siegeTank : siegeList) {
+			List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+			for (Unit mine : nearMineList) {
+				if (mineRemoveMap.get(mine.getID()) == null) {
+					mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+				}
+			}
+		}
+		for (Unit siegeTank : siegeList) {
+			List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+			for (Unit mine : nearMineList) {
+				if (mineRemoveMap.get(mine.getID()) == null) {
+					mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+				}
+			}
 		}
 		
-		List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
-		for (Unit mine : nearMineList) {
-			if (mineRemoveMap.get(mine.getID()) == null) {
-				mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+		if (LagObserver.groupsize() <= 10) {
+			if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
+				List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+				
+				Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+				for (Unit spiderMine : spiderMineList) {
+					Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
+					if (myBaseRegion == mineRegion) {
+						mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+					}
+				}
 			}
 		}
 	}

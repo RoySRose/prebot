@@ -8,6 +8,7 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
@@ -28,7 +29,6 @@ import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.TankPositionManager;
 
 public class TankControl extends Control {
@@ -77,8 +77,6 @@ public class TankControl extends Control {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
-			SpiderMineManger.Instance().addRemoveMineNearTank(siege);
-			
 //			Decision decision = decisionMaker.makeDecisionForSiegeMode(siege, euiList);
 			Decision decision = DecisionMakerPrebot1.makeDecisionForSiegeMode(siege, euiList, siegeModeList, saveUnitLevel);
 			if (decision.type == DecisionType.ATTACK_UNIT) {
@@ -205,6 +203,11 @@ public class TankControl extends Control {
 
 	private boolean shouldSiege(Unit tank, UnitInfo eui) {
 		if (!tank.canSiege()) {
+			return false;
+		}
+		
+		// 렉 있으면 그냥 퉁퉁포로 조지기
+		if (LagObserver.groupsize() > 20 && eui.getType().groundWeapon().maxRange() < UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange()) {
 			return false;
 		}
 		
