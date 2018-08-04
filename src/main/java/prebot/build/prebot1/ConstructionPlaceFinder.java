@@ -478,7 +478,7 @@ public class ConstructionPlaceFinder {
 //						currentX = currentX + depostSizeX;
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
-						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}
 				
@@ -529,7 +529,7 @@ public class ConstructionPlaceFinder {
 							}
 							
 							currentX = currentX - depostSizeX;
-							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -541,7 +541,7 @@ public class ConstructionPlaceFinder {
 //						currentX = currentX + depostSizeX;
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
-						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}
 			}
@@ -1150,7 +1150,7 @@ public class ConstructionPlaceFinder {
 	}
 	public void setTilesToAvoidSupply() {
 		
-		System.out.println("setTilesToAvoidSupply start()");
+//		System.out.println("setTilesToAvoidSupply start()");
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
 			
@@ -1200,13 +1200,13 @@ public class ConstructionPlaceFinder {
 			}
 		}
 		
-		System.out.println("setTilesToAvoidSupply end");
+//		System.out.println("setTilesToAvoidSupply end");
 	}
 	
 	
 	public void setTilesToAvoidCCAddon() {
 		
-		System.out.println("setTilesToAvoidCCAddon start()");
+//		System.out.println("setTilesToAvoidCCAddon start()");
 		
 		for(BaseLocation baseLocation : BWTA.getBaseLocations())
 		{
@@ -1222,7 +1222,7 @@ public class ConstructionPlaceFinder {
 			}
 		}
 		
-		System.out.println("setTilesToAvoidCCAddon end");
+//		System.out.println("setTilesToAvoidCCAddon end");
 	}
 	
 //	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
