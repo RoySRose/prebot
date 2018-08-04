@@ -593,7 +593,7 @@ public class AirForceManager {
 		for (Integer wraithId : airForceTeamMap.keySet()) {
 			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
 			if (UnitUtils.isCompleteValidUnit(wraith)) {
-				if (wraith.getHitPoints() <= 30 && UnitUtils.activatedCommandCenterCount() > 0) { // repair hit points
+				if (wraith.getHitPoints() <= 50 && UnitUtils.activatedCommandCenterCount() > 0) { // repair hit points
 					needRepairWraithList.add(wraithId);
 					
 				} else {
