@@ -12,6 +12,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 //import prebot.common.util.UnitUtils;
 import prebot.common.util.UnitUtils;
 
@@ -108,12 +109,15 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public final boolean activateRecovery(){
+    	
+    	
 		if (!metaType.isUnit()) {
 			return false;
 		}
 		if (recoverItemCount == -1) {
 			return false;
 		}
+		
 		return recoverItemCount > getCurrentItemCount();
     }
 

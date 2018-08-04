@@ -199,6 +199,8 @@ public class BuildManager extends GameManager {
 							if (producer.isConstructing() == false) {
 								isOkToRemoveQueue = false;
 							}
+							
+
 						}
 						// 그외 대부분 건물의 경우
 						else {
@@ -375,6 +377,19 @@ public class BuildManager extends GameManager {
 					// build an addon and it actually starting to build
 					if (unit.getLastCommand().getUnitCommandType() == UnitCommandType.Build_Addon && TimeUtils.elapsedFrames(unit.getLastCommandFrame()) < 10) {
 						continue;
+					}
+					
+//					20180804. hkk. Comsat_Station 의 경우 CommandCenter 가 baseLocation 이 아니면 짓지 않는다.
+					if(t.getUnitType() == UnitType.Terran_Comsat_Station
+						&& unit.getType() == UnitType.Terran_Command_Center) {
+						for(BaseLocation baseLocation : BWTA.getBaseLocations())
+						{
+							if(baseLocation.getTilePosition().getX() != unit.getTilePosition().getX()
+								|| baseLocation.getTilePosition().getY() != unit.getTilePosition().getY()) {
+								FileUtils.appendTextToFile("log.txt", "\n 선택된 커맨드센터가 제위치가 아님");
+								continue;
+							}
+						}
 					}
 
 					boolean isBlocked = false;

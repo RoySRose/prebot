@@ -10,6 +10,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 
 public class BuilderBarracks extends DefaultBuildableItem {
@@ -18,7 +19,30 @@ public class BuilderBarracks extends DefaultBuildableItem {
         super(metaType);
     }
     
+    public int setRecoverBarrack = 0;
+    
+    public int bfBarrack = 0;
+    public int nowBarrack = 0;
+    
     public final boolean buildCondition(){
+    	
+    	nowBarrack = Prebot.Broodwar.self().incompleteUnitCount(UnitType.Terran_Barracks) + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks);
+    	
+    	if(nowBarrack > 0) {
+    		bfBarrack = nowBarrack;
+    	}
+//    	빌드큐에서 빠져서 만들어지기 시작하거나 완성이 되면, 배럭은 그 수만큼 복구 대상이다.
+//    	if(nowBarrack > 0 
+//    		&& setRecoverBarrack != nowBarrack) {
+//    		setRecoverBarrack = nowBarrack;
+//    		System.out.println("barrack set Recover Item ==> " + UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Barracks));
+//    		
+//    	}
+    	if(bfBarrack > 0 && bfBarrack > nowBarrack) {
+    		setRecoverItemCount(setRecoverBarrack);
+    		setHighPriority(true);
+    	}
+    	
     	int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Barracks);
     	if (buildQueueCount > 0) {
     		return false;
@@ -28,7 +52,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
 			return false;
 		}
     	
-    	setRecoverItemCount(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks));
+    	
 		
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 0) {
 			return true;
@@ -44,6 +68,16 @@ public class BuilderBarracks extends DefaultBuildableItem {
 		}
 
 		return false;
+    }
+    
+    @Override
+    public boolean checkInitialBuild(){
+    	
+//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) < 2) {
+//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Machine_Shop ==>>> override true");
+//    	}
+    	
+		return true;
     }
 
 }
