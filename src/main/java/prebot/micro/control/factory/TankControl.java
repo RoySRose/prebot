@@ -119,7 +119,7 @@ public class TankControl extends Control {
 	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
+		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit tank : tankModeList) {
 			if (dangerousOutOfMyRegion(tank)) {

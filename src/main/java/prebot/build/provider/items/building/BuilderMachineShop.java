@@ -30,7 +30,6 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			return false;
 		}
 		
-		
 		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop, null);
 		if (buildQueueCount > 0) {
 			return false;
@@ -42,12 +41,10 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		
 		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
-		
 		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
-		
 			if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
 //				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
-				if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
+				if (UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture)) {
 //					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
 					for (Unit factory : factories) {
 						if (factory.getAddon() != null || !factory.canBuildAddon()) {

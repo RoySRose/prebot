@@ -300,7 +300,7 @@ public class BuildQueueProvider extends GameManager {
 		if (Prebot.Broodwar.self().supplyUsed() > 392) {
 			return;
 		}
-		if (Prebot.Broodwar.self().minerals() < 300 && Prebot.Broodwar.self().gas() < 300) {
+		if (Prebot.Broodwar.self().minerals() < 300) {
 			return;
 		}
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();

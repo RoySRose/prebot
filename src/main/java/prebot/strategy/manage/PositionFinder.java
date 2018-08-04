@@ -16,6 +16,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
@@ -54,6 +55,7 @@ public class PositionFinder {
 	private Position[] enemyGroundEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	
+	private Position baseInsidePosition = null;
 	private Map<Integer, Position> commandCenterInsidePositions = new HashMap<>();
 	
 	private Position basefirstChokeMiddlePosition = null;
@@ -70,7 +72,7 @@ public class PositionFinder {
 
 	public void update() {
 		StrategyIdea.campType = getCampPositionType();
-		StrategyIdea.campPosition = campTypeToPosition(StrategyIdea.campType);
+		StrategyIdea.campPosition = campTypeToPosition();
 		StrategyIdea.mainPosition = getMainPosition();
 
 		updateMainSquadCenter();
@@ -164,14 +166,16 @@ public class PositionFinder {
 			}
 			
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				if (factorySupplyCount > 4 * 1) {
-					return CampType.FIRST_CHOKE;
-				}
-				// 마린이 일정이상 쌓이지 않았다면 커맨드센터 수비
-				int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
-				if (marineCount <= Math.max(enemyGroundUnitSupplyCount, 3)) {
-					return CampType.INSIDE;
-				}
+				return CampType.INSIDE;
+				
+//				if (factorySupplyCount > 4 * 1) {
+//					return CampType.FIRST_CHOKE;
+//				}
+//				// 마린이 일정이상 쌓이지 않았다면 커맨드센터 수비
+//				int marineCount = InfoUtils.myNumUnits(UnitType.Terran_Marine) / 2;
+//				if (marineCount <= Math.max(enemyGroundUnitSupplyCount, 3)) {
+//					return CampType.INSIDE;
+//				}
 			}
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
@@ -217,9 +221,10 @@ public class PositionFinder {
 //		}
 	}
 
-	private Position campTypeToPosition(CampType campType) {
+	private Position campTypeToPosition() {
+		CampType campType = StrategyIdea.campType;
 		if (campType == CampType.INSIDE) {
-			return commandCenterInsidePosition();
+			return baseInsidePosition();
 			
 		} else if (campType == CampType.FIRST_CHOKE) {
 			return firstChokeDefensePosition();
@@ -491,6 +496,29 @@ public class PositionFinder {
 		return false;
 	}
 
+	public Position baseInsidePosition() {
+		if (baseInsidePosition != null) {
+			return baseInsidePosition;
+		}
+		
+		Position basePosition = InfoUtils.myBase().getPosition();
+		Position bunkerPosition = null;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			TilePosition bunker = BlockingEntrance.Instance().bunker;
+			if (bunker != null) {
+				bunkerPosition = bunker.toPosition();
+			}
+		}
+		
+		if (bunkerPosition != null) {
+			int x = basePosition.getX() + bunkerPosition.getX();
+			int y = basePosition.getY() + bunkerPosition.getY();
+			return baseInsidePosition = new Position(x / 2, y / 2).makeValid();
+		} else {
+			return basePosition;
+		}
+	}
+	
 	/// 커맨드센터와 미네랄 사이의 방어지역
 	public Position commandCenterInsidePosition() {
 		TilePosition baseTile = InfoUtils.myBase().getTilePosition();
