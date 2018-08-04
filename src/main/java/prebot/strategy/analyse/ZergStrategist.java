@@ -109,31 +109,24 @@ public class ZergStrategist extends Strategist {
 //		int hiveCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Hive);
 //		
 //		int zerglingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
-		int hydraCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Hydralisk);
-		int lurkerCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg);
-		int ultraCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Ultralisk);
-		int defilerCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Defiler);
-		
-		int mutalCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Mutalisk);
-		int guardianCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Guardian);
+		int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
+		int enemyAirUnitPower = UnitUtils.enemyAirUnitPower();
 
 		boolean hydraDiscovered = UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Hydralisk, UnitType.Zerg_Lurker, UnitType.Zerg_Hydralisk_Den);
 		boolean spireExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Spire, UnitType.Zerg_Greater_Spire) > 0;
 		
-		int groundUnitPoint = (hydraCount * 1) + (lurkerCount * 2) + (ultraCount * 5) + (defilerCount * 3);
-		int airUnitPoint = (mutalCount * 1) + (guardianCount * 4);
-		if (groundUnitPoint > airUnitPoint) {
-			if (airUnitPoint == 0 && !spireExist) {
+		if (enemyGroundUnitPower > enemyAirUnitPower) {
+			if (enemyAirUnitPower == 0 && !spireExist) {
 				return EnemyStrategy.ZERG_GROUND3;
-			} else if (groundUnitPoint > airUnitPoint * 1.5) {
+			} else if (enemyGroundUnitPower > enemyAirUnitPower * 1.5) {
 				return EnemyStrategy.ZERG_GROUND2;
-			} else if (groundUnitPoint > airUnitPoint * 2) {
+			} else if (enemyGroundUnitPower > enemyAirUnitPower * 2) {
 				return EnemyStrategy.ZERG_GROUND1;
 			} else {
 				return EnemyStrategy.ZERG_MIXED;
 			}
 		} else {
-			if (groundUnitPoint == 0 && !hydraDiscovered) {
+			if (enemyGroundUnitPower == 0 && !hydraDiscovered) {
 				return EnemyStrategy.ZERG_AIR2;
 			} else {
 				return EnemyStrategy.ZERG_AIR1;

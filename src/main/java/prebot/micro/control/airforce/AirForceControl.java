@@ -31,9 +31,31 @@ public class AirForceControl extends Control {
 		if (wraithList.isEmpty()) {
 			return;
 		}
+		
+//		boolean letsFindRat = false;
+//		if (letsFindRat) {
+//			Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+//			for (Unit wraith : wraithList) {
+//				if (wraith.isIdle()) {
+//					Position randomPosition = PositionUtils.randomPosition(centerPosition, 5000);
+//					CommandUtils.attackMove(wraith, randomPosition);
+//				}
+//			}
+//			return;
+//		}
 
 		// 팀 단위로 wraithList가 세팅되어야 한다.
-		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(wraithList.iterator().next().getID());
+		int memberId = wraithList.iterator().next().getID();
+		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(memberId);
+		if (airForceTeam.leaderUnit == null) {
+			System.out.println(memberId + "'s airSquad has no leader. member.size=" + airForceTeam.memberList.size());
+			return;
+		}
+		if (AirForceManager.Instance().getTargetPositions().isEmpty()) {
+			System.out.println("AirForceManager targetPositions is empty");
+			return;
+		}
+		
 		DecisionMaker decisionMaker = new DecisionMaker(new WraithTargetCalculator());
 
 		// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)

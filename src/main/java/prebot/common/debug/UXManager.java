@@ -35,6 +35,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.prebot1.ConstructionTask;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.MetaType;
@@ -292,7 +293,7 @@ public class UXManager {
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Vulture);
 		int tankCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
-		Prebot.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_BLACK + vultureCount + "      " + tankCount + "        " + goliathCount);
+		Prebot.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_TEAL + "" + vultureCount + "      " + tankCount + "        " + goliathCount);
 		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio);
 		y += 11;
 		
@@ -1392,6 +1393,15 @@ public class UXManager {
 					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + smallFightPredict.toString());
 				}
 			}
+			
+			Map<Integer, TravelSite> checkerSiteMap = VultureTravelManager.Instance().getCheckerSiteMap();
+			for (Integer checkerId : checkerSiteMap.keySet()) {
+				Unit unit = Prebot.Broodwar.getUnit(checkerId);
+				if (UnitUtils.isValidUnit(unit)) {
+					TravelSite travelSite = checkerSiteMap.get(checkerId);
+					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 5, UxColor.CHAR_ORANGE + travelSite.baseLocation.getPosition().toString());
+				}
+			}
 		}
 	}
 	
@@ -1424,6 +1434,7 @@ public class UXManager {
 				StrategyManager.Instance(),
 				MapGrid.Instance(),
 				BuildManager.Instance(),
+				BuildQueueProvider.Instance(),
 				ConstructionManager.Instance(),
 				WorkerManager.Instance(),
 				CombatManager.Instance());

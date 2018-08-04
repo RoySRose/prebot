@@ -43,8 +43,6 @@ public class WatcherControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		euiList = MicroUtils.filterTargetInfos(euiList, false);
-		
 		Position fleePosition = StrategyIdea.mainSquadCenter;
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {

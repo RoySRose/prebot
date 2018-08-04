@@ -144,16 +144,11 @@ public class ProtossStrategist extends Strategist {
 	
 	@Override
 	protected EnemyStrategy strategyPhase03() {
-		int zealotCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot);
-		int dragoonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dragoon);
-		int darkCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dark_Templar);
-		int highCount = InfoUtils.enemyNumUnits(UnitType.Protoss_High_Templar);
-		int archonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Archon);
 
 		boolean carrierExist = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Fleet_Beacon, UnitType.Protoss_Carrier);
 		if (carrierExist) {
-			int groundUnitPoint = zealotCount + dragoonCount + darkCount + highCount + archonCount;
-			if (groundUnitPoint < 10) {
+			int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
+			if (enemyGroundUnitPower < 10) {
 				return EnemyStrategy.PROTOSS_PROTOSS_AIR3;
 			} else {
 				return EnemyStrategy.PROTOSS_PROTOSS_AIR2;

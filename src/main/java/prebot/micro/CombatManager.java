@@ -99,31 +99,25 @@ public class CombatManager extends GameManager {
 	}
 
 	private void combatUnitArrangement() {
-		BigWatch.start("combatUnitArrangement1");
+		BigWatch.start("combatUnitArrangement");
 		// 단독
 		updateSquadDefault(SquadInfo.MAIN_ATTACK);
 		updateSquadDefault(SquadInfo.AIR_FORCE);
 		updateSquadDefault(SquadInfo.SPECIAL);
 		updateSquadDefault(SquadInfo.BUILDING);
-		BigWatch.record("combatUnitArrangement1");
 
 		// SCV유형별 구분
-		BigWatch.start("combatUnitArrangement2");
 		updateSquadDefault(SquadInfo.EARLY_DEFENSE);
-		BigWatch.record("combatUnitArrangement2");
-		
-		BigWatch.start("combatUnitArrangement3");
 		updateSquadDefault(SquadInfo.SCV_SCOUT);
-		BigWatch.record("combatUnitArrangement3");
 
 		// 벌처유형별 구분
-		BigWatch.start("combatUnitArrangement4");
 		updateSquadDefault(SquadInfo.WATCHER);
 		updateSquadDefault(SquadInfo.CHECKER);
-		BigWatch.record("combatUnitArrangement4");
 		updateGuerillaSquad();
 
 		updateDefenseSquad();
+		
+		BigWatch.record("combatUnitArrangement");
 	}
 
 	private void updateSquadDefault(SquadInfo squadInfo) {
@@ -148,15 +142,11 @@ public class CombatManager extends GameManager {
 	}
 
 	private void squadExecution() {
-		BigWatch.start("squadExecution - MAINSQUAD");
 		Squad mainSquad = squadData.getSquadMap().get(SquadInfo.MAIN_ATTACK.squadName);
 		mainSquad.findEnemiesAndExecuteSquad();
-		BigWatch.record("squadExecution - MAINSQUAD");
 		
 		for (Squad squad : squadData.getSquadMap().values()) {
-			BigWatch.start("squadExecution - " + squad.getSquadName());
 			squad.findEnemiesAndExecuteSquad(); // squad 유닛 명령 지시
-			BigWatch.record("squadExecution - " + squad.getSquadName());
 		}
 	}
 

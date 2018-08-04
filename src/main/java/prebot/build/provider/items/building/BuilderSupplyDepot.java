@@ -12,7 +12,6 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 
 public class BuilderSupplyDepot extends DefaultBuildableItem {
@@ -29,11 +28,9 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
     	
 //    	frame으로 처리되어 있는 이유. initial이 끝난 후로 하면 되지 않나?
 //    	일단 기존 조건대로 처리. 셀렉터는 이니셜 빌드 이후에 도므로 아래 조건의 필요 유무 판단
-    	
-    	if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
-    		
-    		return false;
-    	}
+//    	if (!(Prebot.Broodwar.getFrameCount() % 29 == 0 && Prebot.Broodwar.getFrameCount() > 4500)) {
+//    		return false;
+//    	}
 
         if (Prebot.Broodwar.self().supplyTotal() >= 400) {
             return false;

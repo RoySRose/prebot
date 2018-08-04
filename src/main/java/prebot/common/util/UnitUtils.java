@@ -1,5 +1,13 @@
 package prebot.common.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
@@ -21,16 +29,9 @@ import prebot.common.util.internal.SpecificValueCache;
 import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class UnitUtils {
 	
@@ -147,38 +148,6 @@ public class UnitUtils {
 		}
 	}
 	
-	public static int activatedCommandCenterCount() {
-		Integer activatedCommandCount = SpecificValueCache.get(ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
-		if (activatedCommandCount != null) {
-//			System.out.println("cacahed data " + activatedCommandCount);
-			return activatedCommandCount;
-		}
-		activatedCommandCount = 0;
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
-		for (Unit commandCenter : commandCenters) {
-			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6) {
-				activatedCommandCount++;
-			}
-		}
-		
-		SpecificValueCache.put(ValueType.ACTIVATED_COMMAND_COUNT, activatedCommandCount);
-		return activatedCommandCount;
-	}
-	
-	public static int availableScanningCount() {
-		Integer availableScanningCount = SpecificValueCache.get(ValueType.AVAILABLE_SCANNING_COUNT, Integer.class);
-		if (availableScanningCount != null) {
-			return availableScanningCount;
-		}
-		availableScanningCount = 0;
-		List<Unit> comsatStations = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
-		for (Unit comsatStation : comsatStations) {
-			availableScanningCount += comsatStation.getEnergy() / 50;
-		}
-		SpecificValueCache.put(ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
-		return availableScanningCount;
-	}
-	
 	/** 유닛 보유 여부 */
 	@Deprecated
 	public static boolean hasUnit(UnitFindRange unitFindRange, UnitType unitType) {
@@ -235,49 +204,42 @@ public class UnitUtils {
 		}
 	}
 	
-	public static void addEnemyUnitInfosInRadiusForEarlyDefense(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, false, unitTypes);
+	public static void addEnemyUnitInfosInRadiusForEarlyDefense(Collection<UnitInfo> euis, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, euis, position, radius, true, false, unitTypes);
 	}
 	
-	public static void addEnemyUnitInfosInRadiusForGround(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, false, unitTypes);
+	public static void addEnemyUnitInfosInRadiusForGround(Collection<UnitInfo> euis, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, euis, position, radius, true, false, unitTypes);
 	}
 	
-	public static void addEnemyUnitInfosInRadiusForAir(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, true, unitTypes);
+	public static void addEnemyUnitInfosInRadiusForAir(Collection<UnitInfo> euis, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, euis, position, radius, false, true, unitTypes);
 	}
 	
-	public static void addEnemyUnitInfosInRadius(Collection<UnitInfo> euiList, Position position, int radius, UnitType... unitTypes) {
-		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, true, unitTypes);
+	public static void addEnemyUnitInfosInRadius(Collection<UnitInfo> euis, Position position, int radius, UnitType... unitTypes) {
+		addEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, euis, position, radius, true, true, unitTypes);
 	}
 	
 	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, true, false, unitTypes);
-		return euiList;
+		List<UnitInfo> euis = new ArrayList<>();
+		addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, euis, position, radius, true, false, unitTypes);
+		return euis;
 	}
 	
 	public static List<UnitInfo> getAllEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, false, euiList, position, radius, true, false, unitTypes);
-		return euiList;
-	}
-	
-	public static List<UnitInfo> getEnemyUnitInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(true, true, euiList, position, radius, false, true, unitTypes);
-		return euiList;
+		List<UnitInfo> euis = new ArrayList<>();
+		addEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, euis, position, radius, true, false, unitTypes);
+		return euis;
 	}
 	
 	public static List<UnitInfo> getCompleteEnemyInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euiList = new ArrayList<>();
-		addEnemyUnitInfosInRadius(false, true, euiList, position, radius, false, true, unitTypes);
-		return euiList;
+		List<UnitInfo> euis = new ArrayList<>();
+		addEnemyUnitInfosInRadius(TargetFilter.INCOMPLETE|TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE, euis, position, radius, false, true, unitTypes);
+		return euis;
 	}
-	
+
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
-	private static void addEnemyUnitInfosInRadius(boolean includeIncomplete, boolean onlyCombatUnit, Collection<UnitInfo> euis, Position position, int radius
-			, boolean enemyGroundWeopon, boolean enemyAirWeopon, UnitType... unitTypes) {
+	private static void addEnemyUnitInfosInRadius(int targetFilter, Collection<UnitInfo> euis, Position position, int radius, boolean addGroundWeoponRadius, boolean addAirWeoponRadius, UnitType... unitTypes) {
 		Collection<UnitInfo> values = null;
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
@@ -293,10 +255,9 @@ public class UnitUtils {
 			if (eui.getUnitID() == 0 && eui.getType() == UnitType.None) {
 				continue;
 			}
-			if (!includeIncomplete && (!eui.isCompleted() && eui.getLastHealth() < eui.getType().maxHitPoints() * 0.8)) {
-				continue;
-			}
-			if (onlyCombatUnit && !MicroUtils.combatEnemyType(eui.getType())) {
+			if (TargetFilter.excludeByFilter(eui, targetFilter)) {
+//				String temp = ""; for (UnitType unitType : unitTypes) { temp += unitType.toString(); }
+//				System.out.println(eui.getType() + " is filtered. targetFilter=" + targetFilter + "\n" + temp);
 				continue;
 			}
 			if (ignorableEnemyUnitInfo(eui)) {
@@ -308,22 +269,21 @@ public class UnitUtils {
 			if (eui.getType() == UnitType.Terran_Bunker) {
 				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 			} else {
-				if (enemyAirWeopon) {
+				if (addGroundWeoponRadius) {
 					if (eui.getType().airWeapon() != WeaponType.None) {
 						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 					}
 				}
-				if (enemyGroundWeopon) {
+				if (addAirWeoponRadius) {
 					if (eui.getType().groundWeapon() != WeaponType.None) {
 						weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
 					}
 				}
 			}
 			
-			if (eui.getLastPosition().getDistance(position) > radius + weaponRange) {
-				continue;
+			if (eui.getLastPosition().getDistance(position) < radius + weaponRange) {
+				euis.add(eui);
 			}
-			euis.add(eui);
 		}
 	}
 	
@@ -686,25 +646,6 @@ public class UnitUtils {
 		}
 		return totalCount;
 	}
-	
-	public static int myFactoryUnitSupplyCount() {
-		Integer factorySupplyCount = SpecificValueCache.get(ValueType.FACTORY_SUPPLY_COUNT, Integer.class);
-		if (factorySupplyCount != null) {
-			return factorySupplyCount;
-		}
-		int factoryUnitCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
-				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
-		
-		
-		factorySupplyCount = factoryUnitCount * 4; // 인구수 기준이므로;
-		SpecificValueCache.put(ValueType.FACTORY_SUPPLY_COUNT, factorySupplyCount);
-		return factorySupplyCount;
-	}
-	
-	public static int myWraithUnitSupplyCount() {
-		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
-		return totalSupplyCount * 4; // 인구수 기준이므로
-	}
 
 	public static Unit leaderOfUnit(Collection<Unit> unitList) {
         if (unitList == null || unitList.isEmpty()) {
@@ -777,6 +718,125 @@ public class UnitUtils {
 		} else {
 			return new UnitType[] {};
 		}
+	}
+
+	public static int myWraithUnitSupplyCount() {
+		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
+		return totalSupplyCount * 4; // 인구수 기준이므로
+	}
+	
+	public static int myFactoryUnitSupplyCount() {
+		Integer factorySupplyCount = SpecificValueCache.get(ValueType.FACTORY_SUPPLY_COUNT, Integer.class);
+		if (factorySupplyCount != null) {
+			return factorySupplyCount;
+		}
+		int factoryUnitCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
+				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
+		
+		
+		factorySupplyCount = factoryUnitCount * 4; // 인구수 기준이므로;
+		SpecificValueCache.put(ValueType.FACTORY_SUPPLY_COUNT, factorySupplyCount);
+		return factorySupplyCount;
+	}
+	
+	public static int activatedCommandCenterCount() {
+		Integer activatedCommandCount = SpecificValueCache.get(ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
+		if (activatedCommandCount != null) {
+//			System.out.println("cacahed data " + activatedCommandCount);
+			return activatedCommandCount;
+		}
+		activatedCommandCount = 0;
+		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		for (Unit commandCenter : commandCenters) {
+			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6) {
+				activatedCommandCount++;
+			}
+		}
+		
+		SpecificValueCache.put(ValueType.ACTIVATED_COMMAND_COUNT, activatedCommandCount);
+		return activatedCommandCount;
+	}
+	
+	public static int availableScanningCount() {
+		Integer availableScanningCount = SpecificValueCache.get(ValueType.AVAILABLE_SCANNING_COUNT, Integer.class);
+		if (availableScanningCount != null) {
+			return availableScanningCount;
+		}
+		availableScanningCount = 0;
+		List<Unit> comsatStations = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		for (Unit comsatStation : comsatStations) {
+			availableScanningCount += comsatStation.getEnergy() / 50;
+		}
+		SpecificValueCache.put(ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
+		return availableScanningCount;
+	}
+	
+	public static int enemyGroundUnitPower() {
+		Integer enemyGroundUnitPower = SpecificValueCache.get(ValueType.ENEMY_GROUND_UNIT_POWER, Integer.class);
+		if (enemyGroundUnitPower != null) {
+			return enemyGroundUnitPower;
+		}
+		enemyGroundUnitPower = 0;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			int hydraCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Hydralisk);
+			int lurkerCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg);
+			int ultraCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Ultralisk);
+			int defilerCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Defiler);
+			
+			enemyGroundUnitPower = (hydraCount * 1) + (lurkerCount * 2) + (ultraCount * 5) + (defilerCount * 3);
+			
+		} else if (InfoUtils.enemyRace() == Race.Protoss) {
+			int zealotCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot);
+			int dragoonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dragoon);
+			int darkCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Dark_Templar);
+			int highCount = InfoUtils.enemyNumUnits(UnitType.Protoss_High_Templar);
+			int archonCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Archon);
+			
+			enemyGroundUnitPower = zealotCount + dragoonCount + darkCount + highCount + archonCount;
+
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			int marineCount = InfoUtils.enemyNumUnits(UnitType.Terran_Marine);
+			int vultureCount = InfoUtils.enemyNumUnits(UnitType.Terran_Vulture);
+			int goliathCount = InfoUtils.enemyNumUnits(UnitType.Terran_Goliath);
+			int tankCount = InfoUtils.enemyNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+
+			enemyGroundUnitPower = (marineCount * 1) + (vultureCount * 1) + (goliathCount * 2) + (tankCount * 3);
+		}
+		
+		SpecificValueCache.put(ValueType.ENEMY_GROUND_UNIT_POWER, enemyGroundUnitPower);
+		return enemyGroundUnitPower;
+	}
+	
+	public static int enemyAirUnitPower() {
+		Integer enemyAirUnitPower = SpecificValueCache.get(ValueType.ENEMY_AIR_UNIT_POWER, Integer.class);
+		if (enemyAirUnitPower != null) {
+			return enemyAirUnitPower;
+		}
+		enemyAirUnitPower = 0;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			int mutalCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Mutalisk);
+			int guardianCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Guardian);
+			
+			enemyAirUnitPower = (mutalCount * 1) + (guardianCount * 4);
+			
+		} else if (InfoUtils.enemyRace() == Race.Protoss) {
+			int scoutCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Scout);
+			int carrierCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Carrier);
+			int arbiterCount = InfoUtils.enemyNumUnits(UnitType.Protoss_Arbiter);
+			
+			enemyAirUnitPower = (scoutCount * 1) + (carrierCount * 4) + (arbiterCount * 2);
+
+		} else if (InfoUtils.enemyRace() == Race.Terran) {
+			int wraithCount = InfoUtils.enemyNumUnits(UnitType.Terran_Wraith);
+//			int valkyrieCount = InfoUtils.enemyNumUnits(UnitType.Terran_Valkyrie);
+//			int dropshipCount = InfoUtils.enemyNumUnits(UnitType.Terran_Dropship);
+			int battleCount = InfoUtils.enemyNumUnits(UnitType.Terran_Battlecruiser);
+			
+			enemyAirUnitPower = wraithCount + (battleCount * 4);
+		}
+		
+		SpecificValueCache.put(ValueType.ENEMY_AIR_UNIT_POWER, enemyAirUnitPower);
+		return enemyAirUnitPower;
 	}
 
 }

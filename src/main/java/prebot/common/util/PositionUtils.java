@@ -166,6 +166,6 @@ public class PositionUtils {
 	public static Position randomPosition(Position sourcePosition, int dist) {
 		int x = sourcePosition.getX() + (int) (Math.random() * dist) - dist / 2;
 		int y = sourcePosition.getY() + (int) (Math.random() * dist) - dist / 2;
-		return new Position(x, y);
+		return new Position(x, y).makeValid();
 	}
 }

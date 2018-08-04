@@ -2,6 +2,7 @@ package prebot.strategy.manage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import bwapi.Position;
 import bwapi.Race;
@@ -18,11 +19,13 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -52,6 +55,9 @@ public class PositionFinder {
 	private Position basefirstChokeMiddlePosition = null;
 	private Position firstExpansionBackwardPosition = null;
 	
+	private int watcherOtherPositionFrame = CommonCode.NONE;
+	private Position watcherOtherPosition = null;
+
 	private static PositionFinder instance = new PositionFinder();
 
 	public static PositionFinder Instance() {
@@ -336,12 +342,12 @@ public class PositionFinder {
 			totalEnemyCneterPosition = Position.Unknown;
 		}
 		if (groundCount > 0) {
-			nearGroundEnemyPosition = new Position(sumOfGroundX / groundCount, sumOfGroundY / groundCount);
+			nearGroundEnemyPosition = new Position(sumOfGroundX / groundCount, sumOfGroundY / groundCount).makeValid();
 		} else {
 			nearGroundEnemyPosition = Position.Unknown;
 		}
 		if (airCount > 0) {
-			nearAirEnemyPosition = new Position(sumOfAirX / airCount, sumOfAirY / airCount);
+			nearAirEnemyPosition = new Position(sumOfAirX / airCount, sumOfAirY / airCount).makeValid();
 		} else {
 			nearAirEnemyPosition = Position.Unknown;
 		}
@@ -372,14 +378,14 @@ public class PositionFinder {
 	}
 	
 	private void updateWatcherPosition() {
-		Position watcherPosition = null;
+		Position watcherPosition = Position.Unknown;
 		
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			watcherPosition = StrategyIdea.mainPosition;
 		}
-		
-		// watcher 특수 포지션
-		if (watcherPosition == null) {
+
+		// watcher 방어모드(특수)
+		if (watcherPosition == Position.Unknown) {
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
 				watcherPosition = InfoUtils.myBase().getPosition(); // 드롭인 경우 본진
 				
@@ -388,17 +394,66 @@ public class PositionFinder {
 				// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
 				if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
+				} else {
+					watcherPosition = InfoUtils.mySecondChoke().getCenter();
 				}
 			}
 		}
 		
-		// watcher 기본 포지션
-		if (watcherPosition == null) {
+		// watcher 방어모드1
+		if (watcherPosition == Position.Unknown) {
 			if (PositionUtils.isValidGroundPosition(StrategyIdea.nearGroundEnemyPosition)) {
 				watcherPosition = StrategyIdea.nearGroundEnemyPosition;
-			} else if (InfoUtils.enemyBase() != null) {
+			}
+		}
+		
+		// watcher 방어모드2
+		if (watcherPosition == Position.Unknown) {
+			Set<UnitInfo> euiListInBase = InfoUtils.euiListInBase();
+			for (UnitInfo eui : euiListInBase) {
+				if (!eui.getType().isFlyer()) {
+					watcherPosition = eui.getLastPosition();
+					break;
+				}
+			}
+		}
+		
+		// watcher 특수 포지션
+		if (watcherPosition == Position.Unknown) {
+			if (InfoUtils.enemyBase() != null) {
+				// 대략적으로다가 지상유닛에 안전한 상황에서는 watcher를 다른 곳으로 돌린다.
+				if (watcherOtherPosition != null) {
+					watcherPosition = watcherOtherPosition;
+				} else {
+					int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
+					int zergingCount = 0;
+					if (InfoUtils.enemyRace() == Race.Zerg) {
+						zergingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
+					}
+					if (enemyGroundUnitPower <= 3 && zergingCount <= 2) {
+						//TODO
+						List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
+						if (!enemyOccupiedBases.isEmpty()) {
+							BaseLocation occupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.myFirstExpansion(), new BaseCondition() {
+								@Override public boolean correspond(BaseLocation base) {
+									return !base.equals(InfoUtils.enemyBase()) && !base.equals(InfoUtils.enemyFirstExpansion());
+								}
+							});
+							if (occupied != null) {
+								watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
+								watcherOtherPosition = occupied.getPosition();
+								watcherPosition = watcherOtherPosition;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// watcher 기본 포지션
+		if (watcherPosition == Position.Unknown) {
+			if (InfoUtils.enemyBase() != null) {
 				watcherPosition = InfoUtils.enemyBase().getPosition();
-				// if (otherWatcherPosition != null) {watcherPosition = otherWatcherPosition;} else {}
 			} else {
 				watcherPosition = InfoUtils.mySecondChoke().getCenter();
 			}
@@ -406,7 +461,7 @@ public class PositionFinder {
 		
 		StrategyIdea.watcherPosition = watcherPosition;
 	}
-
+	
 	/// 첫번째 확장기지를 차지하였는지 여부
 	private boolean firstExpansionOccupied() {
 		List<Unit> commandCenterOrDefenseTowerList = UnitUtils.getUnitList(UnitFindRange.ALL,
@@ -540,7 +595,7 @@ public class PositionFinder {
 		if (enemyExpansion != null && !Prebot.Broodwar.isExplored(enemyExpansion.getTilePosition())) {
 			return enemyExpansion.getPosition();
 		}
-
+		
 		// 제 3멀티 중에서 탐험되지 않은 지역
 		List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansionsSorted();
 		if (otherExpansions != null) {
@@ -550,8 +605,34 @@ public class PositionFinder {
 				}
 			}
 		}
-
+		
+//		TilePosition center = TilePositionUtils.getCenterTilePosition();
 		return new Position(2222, 2222);
+	}
+
+	public boolean otherPositionTimeUp(Unit regroupLeader) {
+		if (watcherOtherPosition == null) {
+			return false;
+		}
+		
+		// 일정시간 경과 후퇴
+		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 20) {
+			System.out.println("time's up");
+			watcherOtherPosition = null;
+			return true;
+		}
+		
+		// 일꾼이 없으면 후퇴
+		if (regroupLeader.getDistance(watcherOtherPosition) < 200) {
+			List<UnitInfo> workers = UnitUtils.getEnemyUnitInfosInRadiusForGround(watcherOtherPosition, 500, UnitType.Zerg_Drone, UnitType.Protoss_Probe, UnitType.Terran_SCV);
+			if (workers.isEmpty()) {
+				System.out.println("no worker");
+				watcherOtherPosition = null;
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	//

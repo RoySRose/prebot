@@ -486,18 +486,22 @@ public class AirForceManager {
 		int upAchievement;
 		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount < 6) {
 			downAchievement = -100;
-			upAchievement = +120;
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				upAchievement = +200;	
+			} else {
+				upAchievement = +120;
+			}
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
 			downAchievement = -80;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				upAchievement = +300;	
+				upAchievement = +400;	
 			} else {
 				upAchievement = +180;
 			}
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
 			downAchievement = -60;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				upAchievement = +700;	
+				upAchievement = +800;	
 			} else {
 				upAchievement = +500;
 			}

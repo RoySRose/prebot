@@ -5,10 +5,12 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class GuerillaSquad extends Squad {
@@ -37,6 +39,7 @@ public class GuerillaSquad extends Squad {
 
 	@Override
 	public void execute() {
+		euiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
 		vultureControl.setTargetPosition(targetPosition);
 		vultureControl.controlIfUnitExist(unitList, euiList);
 	}

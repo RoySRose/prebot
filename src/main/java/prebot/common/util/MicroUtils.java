@@ -27,6 +27,7 @@ import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.constant.MicroConfig.Flee;
 import prebot.micro.constant.MicroConfig.Tank;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
 
@@ -752,28 +753,10 @@ public class MicroUtils {
 		return newTargetInfos;
 	}
 
-	public static Set<UnitInfo> filterTargetInfos(Collection<UnitInfo> euiList, boolean includeFlyer) {
+	public static Set<UnitInfo> filterTargetInfos(Collection<UnitInfo> euiList, int targetFilter) {
 		Set<UnitInfo> newTargetInfos = new HashSet<>();
 		for (UnitInfo eui : euiList) {
-			Unit target = UnitUtils.unitInSight(eui);
-
-			if (target != null) {
-				if (!UnitUtils.isValidUnit(target)) {
-					continue;
-				}
-				
-				if (!includeFlyer && target.isFlying()) {
-					continue;
-				}
-				
-				if (target.isVisible() && !target.isStasised()) {
-					newTargetInfos.add(eui);
-				}
-			} else {
-				UnitType enemyUnitType = eui.getType();
-				if (!includeFlyer && enemyUnitType.isFlyer()) {
-					continue;
-				}
+			if (!TargetFilter.excludeByFilter(eui, targetFilter)) {
 				newTargetInfos.add(eui);
 			}
 		}

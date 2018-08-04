@@ -3,18 +3,21 @@ package prebot.micro.squad;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -53,7 +56,6 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public void execute() {
-		
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		List<Unit> tankList = new ArrayList<>();
 		List<Unit> goliathList = new ArrayList<>();
@@ -68,8 +70,12 @@ public class MainAttackSquad extends Squad {
 		
 		tankControl.setSaveUnitLevel(saveUnitLevel);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
-		
-		tankControl.controlIfUnitExist(tankList, euiList);
+
+		Set<UnitInfo> groundEuiList;
+		if (!tankList.isEmpty()) {
+			groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
+			tankControl.controlIfUnitExist(tankList, groundEuiList);
+		}
 		goliathControl.controlIfUnitExist(goliathList, euiList);
 	}
 

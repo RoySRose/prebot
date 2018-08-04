@@ -4,14 +4,17 @@ import java.util.List;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.WatcherControl;
 import prebot.micro.predictor.VultureFightPredictor;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.manage.PositionFinder;
 
 public class WatcherSquad extends Squad {
 
@@ -51,24 +54,28 @@ public class WatcherSquad extends Squad {
 		if (unitList.isEmpty()) {
 			return;
 		}
-
-		Unit regroupLeader = null;
+		
+		euiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT);
+		Unit regroupLeader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
+		
 		if (StrategyIdea.initiated) {
 			smallFightPredict = SmallFightPredict.ATTACK;
 		} else {
 			if (TimeUtils.elapsedSeconds(watcherFleeStartFrame) <= WATCHER_FLEE_SECONDS) {
 				smallFightPredict = SmallFightPredict.BACK;
+				
+			} else if (PositionFinder.Instance().otherPositionTimeUp(regroupLeader)) {
+				smallFightPredict = SmallFightPredict.BACK;
+				watcherFleeStartFrame = TimeUtils.elapsedFrames();
+				System.out.println("watcher flee - other position time up");
+				
 			} else {
 				smallFightPredict = VultureFightPredictor.watcherPredictByUnitInfo(unitList, euiList);
 				if (smallFightPredict == SmallFightPredict.BACK) {
 					watcherFleeStartFrame = TimeUtils.elapsedFrames();
-					regroupLeader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
-//					otherWatcherPosition = getOtherWatcherPosition(regroupLeader.getPosition());
+					System.out.println("watcher flee - enemy");
 				}
 			}
-		}
-		if (smallFightPredict == SmallFightPredict.BACK && regroupLeader == null) {
-			regroupLeader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
 		}
 		
 		int saveUnitLevel = 1;
@@ -76,6 +83,10 @@ public class WatcherSquad extends Squad {
 			saveUnitLevel = 0;
 		} else if (smallFightPredict == SmallFightPredict.OVERWHELM) {
 			saveUnitLevel = 0;
+		}
+		
+		if (smallFightPredict != SmallFightPredict.BACK) {
+			regroupLeader = null;
 		}
 		
 		vultureWatcher.setSaveUnitLevel(saveUnitLevel);

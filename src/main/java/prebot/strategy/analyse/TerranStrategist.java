@@ -2,6 +2,7 @@ package prebot.strategy.analyse;
 
 import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
@@ -152,20 +153,13 @@ public class TerranStrategist extends Strategist {
 		int goliathCount = InfoUtils.enemyNumUnits(UnitType.Terran_Goliath);
 //		int tankCount = InfoUtils.enemyNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		
-		int wraithCount = InfoUtils.enemyNumUnits(UnitType.Terran_Wraith);
-//		int valkyrieCount = InfoUtils.enemyNumUnits(UnitType.Terran_Valkyrie);
-//		int dropshipCount = InfoUtils.enemyNumUnits(UnitType.Terran_Dropship);
-		int battleCount = InfoUtils.enemyNumUnits(UnitType.Terran_Wraith);
-		
-		int airUnitPoint = wraithCount + battleCount;
+		int airUnitPoint = UnitUtils.enemyAirUnitPower();
 		if (airUnitPoint ==  0) {
 			boolean isBionic = false;
 			if (marineCount > vultureCount + goliathCount) {
 				isBionic = true;
 			}
-			if (isBionic) {
-				return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
-			} else {
+			if (!isBionic) {
 				// 내 레이쓰 수가 0개 유지 상태, 적 골리앗이 1기 이하, 내 탱크가 10개 이상인 경우 역레이쓰 
 				if (goliathCount <= 2 && StrategyIdea.wraithCount == 0) {
 					int myTankCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
@@ -173,8 +167,9 @@ public class TerranStrategist extends Strategist {
 						AirForceManager.Instance().setAirForceWaiting();
 					}
 				}
-				return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
 			}
+			return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
+			
 		} else {
 			return EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK;
 		}

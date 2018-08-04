@@ -8,6 +8,7 @@ import java.util.Set;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.debug.BigWatch;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -68,8 +69,14 @@ public abstract class Squad {
 //			System.out.println("ALREADY EXECUTED SQUAD - " + squadName);
 			return;
 		}
+		BigWatch.start("findEnemies - " + squadName);
 		findEnemies();
+		BigWatch.record("findEnemies - " + squadName);
+		
+		BigWatch.start("squadExecution - " + squadName);
 		execute();
+		BigWatch.record("squadExecution - " + squadName);
+		
 		squadExecutedFrame = TimeUtils.elapsedFrames();
 	}
 	
