@@ -141,12 +141,12 @@ public class AirForceControl extends Control {
 			}
 			// 전진 카이팅, 카이팅
 			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
-				if (airForceTeam.repairCenter != null && MicroUtils.arrivedToPosition(airForceTeam.leaderUnit, airForceTeam.repairCenter.getPosition())) {
+				if (airForceTeam.repairCenter != null && MicroUtils.arrivedToPosition(airForceTeam.leaderUnit, PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter))) {
 					for (Unit wraith : wraithList) {
-						if (MicroUtils.timeToRandomMove(wraith)) {
-							Position randomPosition = PositionUtils.randomPosition(wraith.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
-							CommandUtils.attackMove(wraith, randomPosition);
-						}
+//						if (MicroUtils.timeToRandomMove(wraith)) {
+//							Position randomPosition = PositionUtils.randomPosition(wraith.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+							//CommandUtils.attackMove(wraith, randomPosition);
+						//}
 					}
 				} else {
 					for (Unit wraith : wraithList) {
@@ -225,7 +225,8 @@ public class AirForceControl extends Control {
 			
 		} else if (decision.type == DecisionType.ATTACK_POSITION) {
 			if (airForceTeam.repairCenter != null) {
-				airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.repairCenter.getPosition(), airForceTeam.driveAngle);
+				Position repariCenter = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
+				airDrivingPosition = airDrivingPosition(airForceTeam, repariCenter, airForceTeam.driveAngle);
 				
 			} else {
 				airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.getTargetPosition(), airForceTeam.driveAngle);

@@ -59,6 +59,13 @@ public class MarineControl extends Control {
 				
 				Position safePosition = InformationManager.Instance().isSafePosition();
 				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
+
+				if(dangerousOutOfMyRegion(marine)){
+					CommandUtils.attackMove(marine, safePosition);
+					continue;
+					//MicroUtils.flee(marine, safePosition, fOption);
+				}
+				
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
@@ -83,10 +90,7 @@ public class MarineControl extends Control {
 					}
 				}
 				
-				if(!isInsidePositionToBase(marine.getPosition())){
-					CommandUtils.attackMove(marine, safePosition);
-					//MicroUtils.flee(marine, safePosition, fOption);
-				}
+				
 			}
 		} else {
 			boolean rangeUnit = false;
@@ -111,6 +115,10 @@ public class MarineControl extends Control {
 					//System.out.println("enemyInSight : " + enemyInSight.getType() + " MicroUtils.isRangeUnit(enemyInSight.getType()) : " + MicroUtils.isRangeUnit(enemyInSight.getType()));
 					//System.out.println("unitType.groundWeapon().maxRange() : " + enemyInSight.getType().groundWeapon().maxRange()  + "  UnitType.Zerg_Zergling.groundWeapon().maxRange() : " + UnitType.Terran_Marine.groundWeapon().maxRange());
 				
+					if(dangerousOutOfMyRegion(marine)){
+						intoTheBunker(bunker, marine);
+						continue;
+					}
 					
 					//Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
 					if (enemyInSight != null) {
@@ -139,9 +147,7 @@ public class MarineControl extends Control {
 					intoTheBunker(bunker, marine);
 				}
 				
-				if(!isInsidePositionToBase(marine.getPosition())){
-					intoTheBunker(bunker, marine);
-				}
+				
 			}
 		}
 	}
@@ -160,8 +166,7 @@ public class MarineControl extends Control {
 		return bunkerInRegion;
 	}
 
-	private Unit getIncompleteBunker(Region campRegion) {
-		Unit bunkerInRegion = null;
+	private Unit getIncompleteBunker(Region campRegion) { Unit bunkerInRegion = null;
 		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker)) {
 			if (bunker.getRemainingBuildTime() > 3 * TimeUtils.SECOND) {
 				continue;
@@ -172,7 +177,7 @@ public class MarineControl extends Control {
 				break;
 			}
 		}
-		return bunkerInRegion;
+		return null;
 	}
 
 	private void intoTheBunker(Unit bunker, Unit marine) {
@@ -201,12 +206,15 @@ public class MarineControl extends Control {
 		return false;
 	}
 	
-	public boolean isInsidePositionToBase(Position position) {
+	//public boolean isInsidePositionToBase(Position position) {
+	public boolean isInsidePositionToBase(Unit marine) {
 		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
 //		System.out.println("position.getDistance(expansionBase.getPosition() : " + position.getDistance(expansionBase.getPosition()));
-		if (position.getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
- 			return false;
+		if(BWTA.getRegion(marine.getPosition()) != BWTA.getRegion(InfoUtils.myBase().getPosition())){
+			return false;
 		}
+		/*if (position.getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
+		}*/
     	return true;
 	}
 	
