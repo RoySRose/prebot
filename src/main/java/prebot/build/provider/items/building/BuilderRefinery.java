@@ -6,6 +6,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
@@ -14,6 +15,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -72,7 +74,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 				}
 			}
 
-			if (!InitialBuildProvider.Instance().initialBuildFinished() && geyserAround != null) {
+			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE && geyserAround != null) {
 				if (InformationManager.Instance().getMyfirstGas() != null) {
 					if (geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())) {
 						continue;
@@ -99,5 +101,15 @@ public class BuilderRefinery extends DefaultBuildableItem {
         return false;
     }
 
+    
+    @Override
+    public boolean checkInitialBuild(){
+    	
+//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Refinery) < 4) {
+//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Refinery ==>>> override true");
+//    	}
+    	
+		return true;
+    }
 
 }

@@ -18,6 +18,7 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.FileUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 
@@ -269,6 +270,9 @@ public class ConstructionManager extends GameManager {
 					{
 						width += 2;
 				}
+				
+//				System.out.println("reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
+//				FileUtils.appendTextToFile("log.txt", "\n reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
 				
 				// reserve this building's space
 				ConstructionPlaceFinder.Instance().reserveTiles(testLocation, width, height);

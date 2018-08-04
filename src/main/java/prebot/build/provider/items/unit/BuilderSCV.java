@@ -13,6 +13,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -179,6 +180,16 @@ public class BuilderSCV extends DefaultBuildableItem {
     	}
 
         return false;
+    }
+    
+    @Override
+    public boolean checkInitialBuild(){
+    	
+    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) < 15) {
+//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of SCV ==>>> override true");
+    	}
+    	
+		return true;
     }
 
 }

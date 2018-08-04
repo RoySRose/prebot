@@ -19,7 +19,7 @@ import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 
 public class BuilderMachineShop extends DefaultBuildableItem {
 	
-	public static boolean machine_shop_chk = false;
+//	public static boolean machine_shop_chk = false;
 
     public BuilderMachineShop(MetaType metaType){
         super(metaType);
@@ -102,25 +102,11 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 					addition = 0;
 				}
 			}
-
-//			4fac
-//			1 mac +0
-//			3 여유
 			if (machineShopCount + addition < factoryCountForMachineShop) {
 				return true;
 			}
 		}
-		
-//		4개 이상부터는 절반 머신샵 유지
-//		if(factories.size() >= 4 && factories.size()/2 >machineShopCount) {
-//			for (Unit factory : factories) {
-//				if (factory.getAddon() != null || !factory.canBuildAddon()) {
-//					continue;
-//				}
-//				return true;
-//			}
-//			
-//		}
+
         
         return false;
     }
@@ -128,5 +114,15 @@ public class BuilderMachineShop extends DefaultBuildableItem {
     public int GetCurrentTot(UnitType checkunit) {
 		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + Prebot.Broodwar.self().allUnitCount(checkunit);
 	}
+    
+    @Override
+    public boolean checkInitialBuild(){
+    	
+//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) < 2) {
+//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Machine_Shop ==>>> override true");
+//    	}
+    	
+		return true;
+    }
 
 }

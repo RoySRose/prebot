@@ -27,6 +27,8 @@ public class BuilderBarracks extends DefaultBuildableItem {
     	if (constructionQueueCount > 0) {
 			return false;
 		}
+    	
+    	setRecoverItemCount(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks));
 		
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 0) {
 			return true;
