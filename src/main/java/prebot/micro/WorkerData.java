@@ -76,7 +76,6 @@ public class WorkerData {
 	//수리중인 일꾼 
 	public Map<Integer, Unit> workerRepairMap = new HashMap<Integer, Unit>();
 	public Map<Integer, Unit> workerWraithRepairMap = new HashMap<Integer, Unit>();
-	public Map<Integer, Unit> wraithToCC = new HashMap<Integer, Unit>();
 	//수리중인 일꾼 
 	//CC에 배정된 미네랄 리스트(미네랄 트릭 위해)
 	public static Map<Unit, List<Minerals>> depotMineral = new HashMap<Unit, List<Minerals>>();
@@ -134,9 +133,6 @@ public class WorkerData {
 					}
 					if (workerWraithRepairMap.containsKey(worker.getID())) {
 						workerWraithRepairMap.remove(worker.getID());
-					}
-					if (wraithToCC.containsKey(worker.getID())) {
-						wraithToCC.remove(worker.getID());
 					}
 					if (workerMoveMap.containsKey(worker.getID())) {
 						workerMoveMap.remove(worker.getID());
@@ -340,17 +336,20 @@ public class WorkerData {
 	        // only SCV can repair
 			if (unit.getType() == UnitType.Terran_SCV) {
 				// set the unit the worker is to repair
-				if(jobUnit.getType() == UnitType.Terran_Wraith){
-					workerWraithRepairMap.put(unit.getID(), jobUnit);
-				}else{
-					workerRepairMap.put(unit.getID(), jobUnit);
-				}
-				// start repairing if it is not repairing 
 				// 기존이 이미 수리를 하고 있으면 계속 기존 것을 수리한다
 				if (!unit.isRepairing())
 				{
+					if(jobUnit.getType() == UnitType.Terran_Wraith){
+						workerWraithRepairMap.put(unit.getID(), jobUnit);
+					}else{
+						workerRepairMap.put(unit.getID(), jobUnit);
+					}
+					
 					CommandUtils.repair(unit, jobUnit);
 				}
+				
+				// start repairing if it is not repairing 
+				
 			}
 	    }
 		else if (job == WorkerJob.Scout)
@@ -433,9 +432,9 @@ public class WorkerData {
 		{
 			if(workerRepairMap.containsKey(unit.getID())){
 				workerRepairMap.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
-			}else if(workerWraithRepairMap.containsKey(unit.getID())){
+			}
+			if(workerWraithRepairMap.containsKey(unit.getID())){
 				workerWraithRepairMap.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
-				wraithToCC.remove(unit.getID()); // C++ : workerRepairMap.erase(unit);
 			}
 		}
 		else if (previousJob == WorkerJob.Move)

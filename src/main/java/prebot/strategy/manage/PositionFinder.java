@@ -1,11 +1,14 @@
 package prebot.strategy.manage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
@@ -51,7 +54,8 @@ public class PositionFinder {
 	private Position[] enemyGroundEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	private Position[] enemyAirEffectivePostions = new Position[POSITION_EFFECTIVE_FRAME_SIZE];
 	
-	private Position commandCenterInsidePosition = null;
+	private Map<Integer, Position> commandCenterInsidePositions = new HashMap<>();
+	
 	private Position basefirstChokeMiddlePosition = null;
 	private Position firstExpansionBackwardPosition = null;
 	
@@ -489,60 +493,47 @@ public class PositionFinder {
 
 	/// 커맨드센터와 미네랄 사이의 방어지역
 	public Position commandCenterInsidePosition() {
-		if (this.commandCenterInsidePosition != null) {
-			return commandCenterInsidePosition;
-		}
+		TilePosition baseTile = InfoUtils.myBase().getTilePosition();
+		List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		
+		for (Unit commandCenter : commandCenterList) {
+			if (commandCenter.getTilePosition().equals(baseTile)) {
+				return commandCenterInsidePosition(commandCenter);
+			}
+		}
+		return InfoUtils.myBase().getPosition();
+	}
+
+	/// 커맨드센터와 미네랄 사이의 방어지역
+	public Position commandCenterInsidePosition(Unit commandCenter) {
+		Position insidePosition = commandCenterInsidePositions.get(commandCenter.getID());
+		if (insidePosition != null) {
+			return insidePosition;
+		}
+
 		int x = 0;
 		int y = 0;
 		int mineralCnt = 0;
-		
-		Position basePosition = InfoUtils.myBase().getPosition();
-		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()){
-			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(basePosition) < 320) {
+
+		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()) {
+			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(commandCenter) < 320) {
 				x += mineral.getPosition().getX();
 				y += mineral.getPosition().getY();
 				mineralCnt++;
 			}
 		}
 		if (mineralCnt == 0) {
-			return basePosition;
+			return commandCenter.getPosition();
 		}
 		int finalx = x / mineralCnt;
 		int finaly = y / mineralCnt;
-		finalx = (finalx + basePosition.getX()) / 2;
-		finaly = (finaly + basePosition.getY()) / 2;
-		
-		return commandCenterInsidePosition = new Position(finalx, finaly);
-	}
+		finalx = (finalx + commandCenter.getPosition().getX()) / 2;
+		finaly = (finaly + commandCenter.getPosition().getY()) / 2;
 
-	/// 커맨드센터와 미네랄 사이의 방어지역
-		public Position commandCenterInsidePosition(Unit CommandCenter) {
-			if (this.commandCenterInsidePosition != null) {
-				return commandCenterInsidePosition;
-			}
-			
-			int x = 0;
-			int y = 0;
-			int mineralCnt = 0;
-			
-			for (Unit mineral : Prebot.Broodwar.neutral().getUnits()){
-				if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(CommandCenter) < 320) {
-					x += mineral.getPosition().getX();
-					y += mineral.getPosition().getY();
-					mineralCnt++;
-				}
-			}
-			if (mineralCnt == 0) {
-				return CommandCenter.getPosition();
-			}
-			int finalx = x / mineralCnt;
-			int finaly = y / mineralCnt;
-			finalx = (finalx + CommandCenter.getPosition().getX()) / 2;
-			finaly = (finaly + CommandCenter.getPosition().getY()) / 2;
-			
-			return commandCenterInsidePosition = new Position(finalx, finaly);
-		}
+		insidePosition = new Position(finalx, finaly).makeValid();
+		commandCenterInsidePositions.put(commandCenter.getID(), insidePosition);
+		return insidePosition;
+	}
 		
 	public Position basefirstChokeMiddlePosition() {
 		if (this.basefirstChokeMiddlePosition != null) {
