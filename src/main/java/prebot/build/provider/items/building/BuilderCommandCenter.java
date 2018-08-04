@@ -45,7 +45,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 		
 		
-    	int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 		Race enemyRace = InfoUtils.enemyRace();
 		if (enemyRace == Race.Zerg) {
 //			if (allCommandCenterCount == 1) {
@@ -67,6 +66,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	    	// TODO 이니셜에 들어가야하는 부분인지 확인
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
 					&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+		    	int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 				if (allCommandCenterCount == 1) {
 					setCommandCenterBlockAndSeedPosition();
 					return true;
@@ -204,11 +204,20 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	}
 
 	private void setCommandCenterBlockAndSeedPosition() {
-		setBlocking(true);
-		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
-			setSeedPositionStrategy(SeedPositionStrategy.MainBaseLocation);
-		} else {
-			setSeedPositionStrategy(SeedPositionStrategy.FirstExpansionLocation);
-		}
+		SeedPositionStrategy seedPosition = null;
+
+		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+    	if (allCommandCenterCount <= 1) {
+    		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
+    			seedPosition = SeedPositionStrategy.MainBaseLocation;
+    		} else {
+    			seedPosition = SeedPositionStrategy.FirstExpansionLocation;
+    		}
+    	} else if (allCommandCenterCount >= 2) {
+    		seedPosition = SeedPositionStrategy.FirstExpansionLocation;
+    	}
+    	
+    	setSeedPositionStrategy(seedPosition);
+    	setBlocking(true);
 	}
 }
