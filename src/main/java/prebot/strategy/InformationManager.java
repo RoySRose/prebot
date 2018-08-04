@@ -1986,6 +1986,7 @@ public class InformationManager extends GameManager {
 		for (Unit barrack : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Barracks)) {
 			if (barrack.getTilePosition().equals(firstBarracks) && !barrack.isLifted()) {
 				firstBarrack = true;
+				break;
 			}
 		}
 

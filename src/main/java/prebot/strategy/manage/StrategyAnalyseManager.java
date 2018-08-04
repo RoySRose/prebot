@@ -11,6 +11,7 @@ import prebot.common.debug.chat.impl.StrategyChanger;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.ProtossStrategist;
 import prebot.strategy.analyse.Strategist;
@@ -102,28 +103,31 @@ public class StrategyAnalyseManager {
 			}
 		}
 
-		if (StrategyChanger.stopStrategiestForDebugging) {
-			return;
-		}
-		
 		EnemyStrategy strategyToApply;
 		if (strategist != null) {
 			strategyToApply = strategist.strategyToApply();
 		} else {
 			strategyToApply = EnemyStrategy.ZERG_INIT;
 		}
-			
-		if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
-			Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
-			StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
-			StrategyIdea.currentStrategy = strategyToApply;
-			this.applyDetailValue(strategyToApply);
+
+		if (!StrategyChanger.stopStrategiestForDebugging) {
+			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
+				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
+				StrategyIdea.currentStrategy = strategyToApply;
+				this.applyDetailValue(strategyToApply);
+			}
+		}
+		
+		if (InfoUtils.enemyRace() == Race.Protoss && UnitUtils.myFactoryUnitSupplyCount() >= 3 * 3) {
+			StrategyIdea.marineCount = 0;
 		}
 	}
 
 	private void applyDetailValue(EnemyStrategy currentStrategy) {
 		StrategyIdea.factoryRatio = currentStrategy.factoryRatio;
 		StrategyIdea.upgrade = currentStrategy.upgrade;
+		
 		StrategyIdea.marineCount = currentStrategy.marineCount;
 		
 		if (currentStrategy.addOnOption != null) {

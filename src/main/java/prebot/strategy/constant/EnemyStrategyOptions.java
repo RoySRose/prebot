@@ -173,8 +173,7 @@ public class EnemyStrategyOptions {
 				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
 				
 			case RETREAT: // 공격모드 해제
-				return !StrategyIdea.mainSquadMode.isAttackMode;
-				
+				return StrategyIdea.attackStartedFrame > 0 && !StrategyIdea.mainSquadMode.isAttackMode;
 			}
 			
 			return true;

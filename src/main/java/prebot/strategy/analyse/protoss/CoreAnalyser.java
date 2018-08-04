@@ -43,7 +43,7 @@ public class CoreAnalyser extends UnitAnalyser {
 	// 빠른 드라군 사업 여부
 	private void fastDragoonRange() {
 		int coreBuildStartFrameExpected = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Protoss_Cybernetics_Core);
-		int fastDragoonRangeFrame = coreBuildStartFrameExpected + UnitType.Protoss_Cybernetics_Core.buildTime() + 20 * TimeUtils.SECOND;
+		int fastDragoonRangeFrame = coreBuildStartFrameExpected + UnitType.Protoss_Cybernetics_Core.buildTime() + 25 * TimeUtils.SECOND;
 		if (TimeUtils.after(fastDragoonRangeFrame)) {
 			return;
 		}

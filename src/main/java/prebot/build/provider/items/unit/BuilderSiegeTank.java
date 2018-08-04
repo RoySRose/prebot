@@ -1,14 +1,11 @@
 package prebot.build.provider.items.unit;
 
 import bwapi.UnitType;
-import prebot.build.prebot1.BuildManager;
-import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
-import prebot.strategy.RespondToStrategy;
+import prebot.common.util.UnitUtils;
 
 public class BuilderSiegeTank extends DefaultBuildableItem {
 
@@ -35,7 +32,9 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
 //        		setBlocking(true);
 //        		RespondToStrategy.Instance().once_tank = false;
 //        	}
-       	
+        	if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
+        		setHighPriority(true);
+        	}
         	return true;
         	
         }

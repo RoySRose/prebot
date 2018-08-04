@@ -1,7 +1,8 @@
 package prebot.build.provider.items.upgrade;
 
+import bwapi.UpgradeType;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
-import prebot.build.provider.ResearchSelector;
 import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
 
@@ -16,11 +17,11 @@ public class BuilderTerranVehicleWeapons extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-
-        if(upgradeSelector.getSelected().equals(metaType)) {
-            return true;
-        }else{
-            return false;
-        }
+		if (upgradeSelector.getSelected().equals(metaType)) {
+			BuildQueueProvider.Instance().startUpgrade(UpgradeType.Terran_Vehicle_Weapons);
+			return true;
+		} else {
+			return false;
+		}
     }
 }

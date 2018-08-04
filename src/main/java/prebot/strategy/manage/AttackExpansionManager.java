@@ -6,12 +6,9 @@ import bwapi.Order;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
-import prebot.build.prebot1.ConstructionManager;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
@@ -326,6 +323,10 @@ public class AttackExpansionManager {
 		this.attackPoint = totPoint;
 		
 		if (isAttackMode) {
+			if (!StrategyIdea.mainSquadMode.isAttackMode) {
+				StrategyIdea.attackStartedFrame = TimeUtils.elapsedFrames();
+			}
+			
 			if (noMercyAttack) {
 				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
 			} else if (fastAttack) {
@@ -335,6 +336,10 @@ public class AttackExpansionManager {
 			}
 
 		} else {
+			if (StrategyIdea.mainSquadMode.isAttackMode) {
+				StrategyIdea.retreatFrame = TimeUtils.elapsedFrames();
+			}
+			
 			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
 		}
 	}

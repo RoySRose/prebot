@@ -12,6 +12,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 
 public class BuilderSupplyDepot extends DefaultBuildableItem {
@@ -176,11 +177,6 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
     
     @Override
     public boolean checkInitialBuild(){
-    	
-//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot) < 5) {
-//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Supply Depot ==>>> override true");
-//    	}
-    	
-		return true;
+		return TimeUtils.afterTime(3, 0);
     }
 }
