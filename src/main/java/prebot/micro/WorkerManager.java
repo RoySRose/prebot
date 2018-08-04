@@ -104,9 +104,8 @@ public class WorkerManager extends GameManager {
 				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
 						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
-				}
-				
-				if(repairTargetUnit.getType() == UnitType.Terran_Wraith){
+					
+				} else if(repairTargetUnit.getType() == UnitType.Terran_Wraith){
 					if(repairTargetUnit.isMoving() || worker.getOrder() != bwapi.Order.Repair){
 						workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
 					}

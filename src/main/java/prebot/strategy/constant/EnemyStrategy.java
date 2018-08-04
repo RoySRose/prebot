@@ -165,18 +165,18 @@ public enum EnemyStrategy {
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
-	ZERG_FAST_MUTAL(2, 0, 5, Weight.GOLIATH, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
+	ZERG_FAST_MUTAL(2, 0, 5, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
 	
 	ZERG_FAST_LURKER(1, 2, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_FAST_LURKER()
 			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.TANK)),
 	
-	ZERG_HYDRA_WAVE(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+	ZERG_HYDRA_WAVE(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
@@ -185,12 +185,12 @@ public enum EnemyStrategy {
 			, TimeMapForZerg.ZERG_NO_LAIR_LING()
 			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE)),
 	
-	ZERG_NO_LAIR_HYDRA(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+	ZERG_NO_LAIR_HYDRA(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
-	ZERG_LAIR_MIXED(2, 3, 5, Weight.GOLIATH, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
+	ZERG_LAIR_MIXED(1, 3, 5, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_LAIR_MIXED()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK, MissionType.TURRET_OK)),

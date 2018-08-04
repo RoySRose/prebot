@@ -59,7 +59,7 @@ public abstract class Control {
 		Region expansionRegion = BWTA.getRegion(expansionPosition);
 		if (unitRegion == expansionRegion) {
 			return false;
-		} else if (unit.getDistance(expansionPosition) < 100) {
+		} else if (unit.getDistance(expansionPosition) < 150) {
 			return false;
 		}
 		if (campType == CampType.EXPANSION) {
@@ -75,7 +75,10 @@ public abstract class Control {
 		}
 		
 		// 세번째 지역 반경 OK
-		if (unit.getDistance(InfoUtils.myThirdRegion()) < 500) {
+		if (unit.getDistance(InfoUtils.myThirdRegion()) < 600) {
+			return false;
+		}
+		if (unit.getDistance(InfoUtils.myReadyToPosition()) < 300) {
 			return false;
 		}
 
