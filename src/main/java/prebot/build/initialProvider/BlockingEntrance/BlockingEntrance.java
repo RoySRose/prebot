@@ -25,9 +25,9 @@ public class BlockingEntrance {
 	public int maxSupplyCntY = 3;
 	
 //	xinc 는 x축의 증감여부(true 면 증가)
-	public boolean xinc = false;
+	public boolean xinc;;
 //	yinc 는 y축의 증감여부(true 면 증가)
-	public boolean yinc = false;
+	public boolean yinc;
 	
     //필요한것
     //스타팅 위치
@@ -192,6 +192,7 @@ public class BlockingEntrance {
         loc_t = loc;
         
         System.out.println("this map & location ==>>>>  " + mapName + " : " + loc);
+        System.out.println("xinc ==> " + xinc + " // yinc ==> " + yinc);
         
     }
 

@@ -1150,6 +1150,9 @@ public class ConstructionPlaceFinder {
 	}
 	public void setTilesToAvoidSupply() {
 		
+		boolean xinc = BlockingEntrance.Instance().xinc;
+		boolean yinc = BlockingEntrance.Instance().yinc;
+		
 //		System.out.println("setTilesToAvoidSupply start()");
 		
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
@@ -1199,6 +1202,9 @@ public class ConstructionPlaceFinder {
 				}
 			}
 		}
+		
+		BlockingEntrance.Instance().xinc = xinc; 
+		BlockingEntrance.Instance().yinc = yinc;
 		
 //		System.out.println("setTilesToAvoidSupply end");
 	}
