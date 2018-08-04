@@ -505,6 +505,34 @@ public class PositionFinder {
 		return commandCenterInsidePosition = new Position(finalx, finaly);
 	}
 
+	/// 커맨드센터와 미네랄 사이의 방어지역
+		public Position commandCenterInsidePosition(Unit CommandCenter) {
+			if (this.commandCenterInsidePosition != null) {
+				return commandCenterInsidePosition;
+			}
+			
+			int x = 0;
+			int y = 0;
+			int mineralCnt = 0;
+			
+			for (Unit mineral : Prebot.Broodwar.neutral().getUnits()){
+				if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(CommandCenter) < 320) {
+					x += mineral.getPosition().getX();
+					y += mineral.getPosition().getY();
+					mineralCnt++;
+				}
+			}
+			if (mineralCnt == 0) {
+				return CommandCenter.getPosition();
+			}
+			int finalx = x / mineralCnt;
+			int finaly = y / mineralCnt;
+			finalx = (finalx + CommandCenter.getPosition().getX()) / 2;
+			finaly = (finaly + CommandCenter.getPosition().getY()) / 2;
+			
+			return commandCenterInsidePosition = new Position(finalx, finaly);
+		}
+		
 	public Position basefirstChokeMiddlePosition() {
 		if (this.basefirstChokeMiddlePosition != null) {
 			return basefirstChokeMiddlePosition;
