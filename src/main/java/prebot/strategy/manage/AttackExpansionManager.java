@@ -339,147 +339,147 @@ public class AttackExpansionManager {
 		}
 	}
 
-	public void executeExpansion() {
-
-		if (Prebot.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center) > 0) {
-			return;
-		}
-		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) != 0) {
-			return;
-		}
-
-		int MaxCCcount = 4;
-		int CCcnt = 0;
-
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-			if (unit == null)
-				continue;
-			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted()) {
-				if (getValidMineralsForExspansionNearDepot(unit) > 6) {
-					CCcnt++;
-				}
-			}
-		}
-		if (CCcnt >= MaxCCcount) {
-			return;
-		}
-
-		int factoryUnitCount = UnitUtils.myFactoryUnitSupplyCount();
-		int RealCCcnt = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-
-		// 앞마당 전
-		if (RealCCcnt == 1) {// TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
-			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
-				return;
-			}
-
-			if ((Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 40 && unitPoint > 15) || (factoryUnitCount > 60 && attackPoint > 60 && expansionPoint > 0)) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-				}
-			}
-			if (Prebot.Broodwar.getFrameCount() > 9000 && Prebot.Broodwar.self().minerals() > 400) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-				}
-			}
-			if (Prebot.Broodwar.getFrameCount() > 12000 && factoryUnitCount > 40) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-				}
-			}
-			if (Prebot.Broodwar.getFrameCount() > 80000 && factoryUnitCount > 80) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-				}
-			}
-			if ((Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 40)) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-				}
-			}
-
-		}
-
-		// 앞마당 이후
-		else if (RealCCcnt >= 2) {
-			
-			boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
-
-			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
-			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-			// 공격시 돈 250 넘으면 멀티하기
-			if (isAttackMode && Prebot.Broodwar.self().minerals() > 250) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-			// 800 넘으면 멀티하기
-			if (Prebot.Broodwar.self().minerals() > 800) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-
-			// 500 넘고 유리하면
-			if (Prebot.Broodwar.self().minerals() > 500 && factoryUnitCount > 50 && attackPoint > 30) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-			// 200 넘고 유리하면
-			if (Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 80 && attackPoint > 40 && expansionPoint >= 0) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-			// 공격시 돈 250 넘으면 멀티하기
-
-			if (Prebot.Broodwar.getFrameCount() > 14000) {
-
-				if (factoryUnitCount > 80 && Prebot.Broodwar.self().deadUnitCount() - Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture) < 12) {
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-					}
-				}
-			}
-
-			int temp = 0;
-			for (Unit units : Prebot.Broodwar.self().getUnits()) {
-				if (units.getType() == UnitType.Terran_Command_Center && units.isCompleted()) {
-					temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
-				}
-			}
-			if (temp < 8000 && isAttackMode) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-			if (factoryUnitCount > 160) {
-				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
-						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
-				}
-			}
-		}
-	}
+//	public void executeExpansion() {
+//
+//		if (Prebot.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center) > 0) {
+//			return;
+//		}
+//		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) != 0) {
+//			return;
+//		}
+//
+//		int MaxCCcount = 4;
+//		int CCcnt = 0;
+//
+//		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+//			if (unit == null)
+//				continue;
+//			if (unit.getType() == UnitType.Terran_Command_Center && unit.isCompleted()) {
+//				if (getValidMineralsForExspansionNearDepot(unit) > 6) {
+//					CCcnt++;
+//				}
+//			}
+//		}
+//		if (CCcnt >= MaxCCcount) {
+//			return;
+//		}
+//
+//		int factoryUnitCount = UnitUtils.myFactoryUnitSupplyCount();
+//		int RealCCcnt = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+//
+//		// 앞마당 전
+//		if (RealCCcnt == 1) {// TODO 이거 손봐야된다... 만약 위로 띄어서 해야한다면?? 본진에 지어진거 카운트 안되는 상황에서 앞마당에 지어버리겟네
+//			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
+//				return;
+//			}
+//
+//			if ((Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 40 && unitPoint > 15) || (factoryUnitCount > 60 && attackPoint > 60 && expansionPoint > 0)) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//				}
+//			}
+//			if (Prebot.Broodwar.getFrameCount() > 9000 && Prebot.Broodwar.self().minerals() > 400) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//				}
+//			}
+//			if (Prebot.Broodwar.getFrameCount() > 12000 && factoryUnitCount > 40) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//				}
+//			}
+//			if (Prebot.Broodwar.getFrameCount() > 80000 && factoryUnitCount > 80) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//				}
+//			}
+//			if ((Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 40)) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+//				}
+//			}
+//
+//		}
+//
+//		// 앞마당 이후
+//		else if (RealCCcnt >= 2) {
+//			
+//			boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
+//
+//			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
+//			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//			// 공격시 돈 250 넘으면 멀티하기
+//			if (isAttackMode && Prebot.Broodwar.self().minerals() > 250) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//			// 800 넘으면 멀티하기
+//			if (Prebot.Broodwar.self().minerals() > 800) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//
+//			// 500 넘고 유리하면
+//			if (Prebot.Broodwar.self().minerals() > 500 && factoryUnitCount > 50 && attackPoint > 30) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//			// 200 넘고 유리하면
+//			if (Prebot.Broodwar.self().minerals() > 200 && factoryUnitCount > 80 && attackPoint > 40 && expansionPoint >= 0) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//			// 공격시 돈 250 넘으면 멀티하기
+//
+//			if (Prebot.Broodwar.getFrameCount() > 14000) {
+//
+//				if (factoryUnitCount > 80 && Prebot.Broodwar.self().deadUnitCount() - Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture) < 12) {
+//					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//							+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//					}
+//				}
+//			}
+//
+//			int temp = 0;
+//			for (Unit units : Prebot.Broodwar.self().getUnits()) {
+//				if (units.getType() == UnitType.Terran_Command_Center && units.isCompleted()) {
+//					temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
+//				}
+//			}
+//			if (temp < 8000 && isAttackMode) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//			if (factoryUnitCount > 160) {
+//				if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center, null)
+//						+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Command_Center, null) == 0) {
+//					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint, true);
+//				}
+//			}
+//		}
+//	}
 
 	private int getTotDeadCombatUnits() {
 
