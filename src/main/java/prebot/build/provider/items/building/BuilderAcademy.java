@@ -1,6 +1,7 @@
 package prebot.build.provider.items.building;
 
 import bwapi.UnitType;
+import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.util.TimeUtils;
@@ -17,6 +18,8 @@ public class BuilderAcademy extends DefaultBuildableItem {
 		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Academy)) {
 			return false;
 		}
+		
+		setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 
 		if (TimeUtils.after(StrategyIdea.academyFrame)) {
 			setBlocking(true);

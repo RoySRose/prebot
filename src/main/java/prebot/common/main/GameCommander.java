@@ -46,6 +46,7 @@ public class GameCommander {
 		BlockingEntrance.Instance().setBlockingEntrance();
 		BlockingEntrance.Instance().SetBlockingTilePosition();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
+		ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
@@ -77,12 +78,16 @@ public class GameCommander {
 			BuildQueueProvider.Instance().executeCombatUnitTrainingBlocked();
 
 			// 이니셜빌드가 끝나지 않았다면, 끝났는지 체크하고, 끝났다면 빌드 프로바이더
-			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
+//			if (!InitialBuildProvider.Instance().initialBuildFinished()) {
+			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE) {
 				InitialBuildProvider.Instance().updateInitialBuild();
 			}
-			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
-				BuildQueueProvider.Instance().updateTimeCheck();
-			}
+//			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
+//				
+//			}
+			
+			//progressive & complete => initial end
+			BuildQueueProvider.Instance().updateTimeCheck();
 			
 			BuildManager.Instance().updateTimeCheck();
 			ConstructionManager.Instance().updateTimeCheck();

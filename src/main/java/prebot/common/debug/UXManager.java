@@ -29,6 +29,7 @@ import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
@@ -81,6 +82,7 @@ public class UXManager {
 	private int[][] blue = null;
 	private int[][] cyan = null;
 	private int[][] orange = null;
+	private int[][] purple = null;
 	private List<Position> yellow = new ArrayList<Position>();
 	private List<Position> green1 = new ArrayList<Position>();
 	private List<Position> green2 = new ArrayList<Position>();
@@ -126,7 +128,7 @@ public class UXManager {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
-//			drawTilesToAvoidOnMap();
+			drawTilesToAvoidOnMap();
 //			drawLeaderUnitOnMap();
 			// drawUnitExtendedInformationOnMap();
 			// 각 일꾼들의 임무 상황
@@ -706,12 +708,14 @@ public class UXManager {
 		int blueCount = 0;
 		int cyanCount = 0;
 		int orangeCount = 0;
+//		int purpleCount = 0;
 		
 		if(hasSavedBWTAInfo == false)
 		{
 			for(BaseLocation baseLocation : BWTA.getBaseLocations())
 			{
 				blueCount++;
+//				purpleCount++;
 				for(Unit unit : baseLocation.getStaticMinerals())
 				{
 					cyanCount++;
@@ -720,6 +724,7 @@ public class UXManager {
 				{
 					orangeCount++;
 				}
+				
 			}
 			
 			blue = new int[blueCount][4];
@@ -728,6 +733,9 @@ public class UXManager {
 			int cyanIndex = 0;
 			orange = new int[orangeCount][4];
 			int orangeIndex = 0;
+			
+//			purple = new int[purpleCount][4];
+//			int purpleIndex = 0;
 			
 			for(BaseLocation baseLocation : BWTA.getBaseLocations())
 			{
@@ -739,6 +747,12 @@ public class UXManager {
 				blue[blueIndex][2] = p.getX() * 32 + 4 * 32;
 				blue[blueIndex][3] = p.getY() * 32 + 3 * 32;
 				blueIndex++;
+				
+//				purple[purpleIndex][0] = (p.getX()+4) * 32;
+//				purple[purpleIndex][1] = (p.getY()+1) * 32;
+//				purple[purpleIndex][2] = (p.getX()+4) * 32 + 2 * 32;
+//				purple[purpleIndex][3] = (p.getY()+1) * 32 + 2 * 32;
+//				purpleIndex++;
 				
 				//draw a circle at each mineral patch
 				// C++ : for (BWAPI.Unitset.iterator j = (*i).getStaticMinerals().begin(); j != (*i).getStaticMinerals().end(); j++)
@@ -803,6 +817,10 @@ public class UXManager {
 			{
 				Prebot.Broodwar.drawBoxMap(blue[i1][0], blue[i1][1], blue[i1][2], blue[i1][3], Color.Blue);
 			}
+//			for(int i1=0 ; i1<purple.length ; i1++)
+//			{
+//				Prebot.Broodwar.drawBoxMap(purple[i1][0], purple[i1][1], purple[i1][2], purple[i1][3], Color.Purple);
+//			}
 			for(int i2=0 ; i2<cyan.length ; i2++)
 			{
 				Prebot.Broodwar.drawCircleMap(cyan[i2][0], cyan[i2][1], 30, Color.Cyan);	
@@ -889,7 +907,7 @@ public class UXManager {
 
 	/// BuildOrderQueue 를 Screen 에 표시합니다
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
-		char initialFinishedColor = InitialBuildProvider.Instance().initialBuildFinished() ? UxColor.CHAR_WHITE : UxColor.CHAR_YELLOW;
+		char initialFinishedColor = InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE ? UxColor.CHAR_WHITE : UxColor.CHAR_YELLOW;
 		Prebot.Broodwar.drawTextScreen(x, y, initialFinishedColor + " <Build Order>");
 
 		/*
@@ -1011,6 +1029,17 @@ public class UXManager {
 			int y2 = (t.getY() + 1) * 32 - 8;
 
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
+		}
+		
+		Set<TilePosition> tilesToAvoidSupply = ConstructionPlaceFinder.Instance().getTilesToAvoidSupply();
+		for (TilePosition t : tilesToAvoidSupply)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 		}
 		
 	}

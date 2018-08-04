@@ -49,10 +49,6 @@ public class InitialBuildProvider {
 		return adaptStrategyStatus;
 	}
 	
-	public boolean initialBuildFinished() {
-		return adaptStrategyStatus == AdaptStrategyStatus.COMPLETE;
-	}
-
 	public int nowMarine = 0;
 	
 	public int orderMarine  = 0;
@@ -119,9 +115,9 @@ public class InitialBuildProvider {
 	        	}
 				adaptStrategyStatus = AdaptStrategyStatus.PROGRESSING;
 			}
-			
-			
-        } else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
+
+		
+		} else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
         	if (nowStrategy != StrategyIdea.currentStrategy.expansionOption) {
         		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
  
@@ -149,76 +145,35 @@ public class InitialBuildProvider {
             	}
         	}
         }
-        
-//        	if(bfStrategy == null)	{
-//        		bfStrategy = StrategyIdea.currentStrategy.expansionOption;
-////        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + bfStrategy.toString());
-//        		dbgBfStg = StrategyIdea.currentStrategy;
-////        		FileUtils.appendTextToFile("log.txt", "\n bfStrategy is null & update ==>> " + dbgBfStg.toString());
-//        	}
-//    		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
-//    		dbgNowStg = StrategyIdea.currentStrategy;
+        	
+//    	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
+    	
+//    	if(addMachineShopInitial()) {
+//    		iq.queueAsHighestPriority(UnitType.Terran_Machine_Shop, false);
+//    	}
+    	
+//    	if(addMarineInitial()) {
+//    		int deadMarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
+//        	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
+//         	orderMarine = orderMarine + 1 - deadMarine;
+//         	
+//        }
+    	
+//    	if(addSupplyInitial()) {
 //    		
-////    		최초 전략과 현재 전략이 다르면 빌드오더 날리고 새로 심기
-//    		if(bfStrategy != nowStrategy) {
-//    			FileUtils.appendTextToFile("log.txt", "\n strategy is diffrent ::  nowStrategy : " + dbgNowStg.toString() + " & dbgBfStg : " + dbgNowStg.toString());
-////    			FileUtils.appendTextToFile("log.txt", "\n bfStrategy : " + bfStrategy.toString() + " & nowStrategy : " + nowStrategy.toString());
-//    			BuildManager.Instance().getBuildQueue().clearAll();
-////    			deleteFromQueueAll();
-//    			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, nowStrategy);
-////    			debugingFromQueue("before");
-//    			
-//    			List<Unit> unitList = Prebot.Broodwar.self().getUnits();
-//				
-//				Collections.sort(unitList, new Comparator<Unit>() {
-//					@Override
-//					public int compare(Unit p1, Unit p2) {
-//						return p1.getType().toString().compareTo(p2.getType().toString());
-//					}
-//				});
-//				UnitType nowUnit = UnitType.None;
-//    			for(Unit unit : unitList) {
-//    				if(nowUnit != unit.getType()) {
-//    					nowUnit = unit.getType();
-//    					deleteFromQueueCnt(nowUnit
-//    							,ConstructionManager.Instance().getConstructionQueueItemCount(nowUnit, null) 
-//    							+Prebot.Broodwar.self().completedUnitCount(nowUnit));
-//    				}
-//    			}
-//    			bfStrategy = nowStrategy;
-////    			debugingFromQueue("after");
+////        		int nowSupply = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
+//    		//완성됐거나 지어지고 있는 서플라이 디포
+//    		int nowSupply = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Supply_Depot);
+////        		if(nowSupply == 0) {
+////        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().first_supple, true);
+////        		}else
+//    		//1개까지는 이니셜 빌드에 있다 치고 이거 괜찮나..........
+//    		if(nowSupply == 1) {
+//    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().second_supple, true);
+//    		}else {
+//    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint, false);
 //    		}
-        	
-//        	System.out.println("nowMarine ==>> " + nowMarine + " / orderMarine ==>> " + orderMarine);
-        	
-    	BuildOrderQueue iq = BuildManager.Instance().buildQueue;
-    	
-    	if(addMachineShopInitial()) {
-    		iq.queueAsHighestPriority(UnitType.Terran_Machine_Shop, false);
-    	}
-    	
-    	if(addMarineInitial()) {
-    		int deadMarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
-        	iq.queueAsHighestPriority(UnitType.Terran_Marine, false);
-         	orderMarine = orderMarine + 1 - deadMarine;
-         	
-        }
-    	
-    	if(addSupplyInitial()) {
-    		
-//        		int nowSupply = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
-    		//완성됐거나 지어지고 있는 서플라이 디포
-    		int nowSupply = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Supply_Depot);
-//        		if(nowSupply == 0) {
-//        			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().first_supple, true);
-//        		}else
-    		//1개까지는 이니셜 빌드에 있다 치고 이거 괜찮나..........
-    		if(nowSupply == 1) {
-    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BlockingEntrance.Instance().second_supple, true);
-    		}else {
-    			iq.queueAsHighestPriority(UnitType.Terran_Supply_Depot, BuildOrderItem.SeedPositionStrategy.NextSupplePoint, false);
-    		}
-    	}
+//    	}
 
 
         

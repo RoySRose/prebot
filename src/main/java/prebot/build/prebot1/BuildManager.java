@@ -19,6 +19,7 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
@@ -208,10 +209,10 @@ public class BuildManager extends GameManager {
 							if (desiredPosition != TilePosition.None) {
 								// Send the construction task to the construction manager
 								if(t.getUnitType() == UnitType.Terran_Starport) {
-									FileUtils.appendTextToFile("log.txt", "\n Terran_Starport to Construction from Build :: desiredPosition ::" + desiredPosition);
+//									FileUtils.appendTextToFile("log.txt", "\n Terran_Starport to Construction from Build :: desiredPosition ::" + desiredPosition);
 								}
 								if(t.getUnitType() == UnitType.Terran_Factory) {
-									FileUtils.appendTextToFile("log.txt", "\n Terran_Factory to Construction from Build :: desiredPosition ::" + desiredPosition);
+//									FileUtils.appendTextToFile("log.txt", "\n Terran_Factory to Construction from Build :: desiredPosition ::" + desiredPosition);
 								}
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
@@ -1051,7 +1052,7 @@ public class BuildManager extends GameManager {
 						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								
-								if(InitialBuildProvider.Instance().initialBuildFinished()) {
+								if(InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
 //								if (TempBuildSourceCode.Instance().isInitialBuildOrderFinished()) {
 									if(unit.canBuildAddon() == false){
 										continue;

@@ -14,6 +14,7 @@ import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
@@ -43,7 +44,11 @@ public class ConstructionPlaceFinder {
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
 	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
 	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
-	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>(); //서플라이 짓는 지역
+
+	//서플라이 짓는 지역
+	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
+	//커맨드 센터 및 컴셋 지역
+	private Set<TilePosition> tilesToAvoidCCAddon = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -64,6 +69,7 @@ public class ConstructionPlaceFinder {
 	/// seedPosition, seedPositionStrategy 을 입력하지 않으면, MainBaseLocation 주위에서 가능한 곳을 리턴합니다
 	public final TilePosition getBuildLocationWithSeedPositionAndStrategy(UnitType buildingType, TilePosition seedPosition, BuildOrderItem.SeedPositionStrategy seedPositionStrategy)
 	{
+		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (TilePositionUtils.isValidTilePosition(seedPosition)) {
 			TilePosition desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
@@ -118,7 +124,7 @@ public class ConstructionPlaceFinder {
 			break;
 
 		case NextSupplePoint:
-			if (buildingType == UnitType.Terran_Supply_Depot) {
+			if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 				if (BuildManager.Instance().fisrtSupplePointFull != true) {
 					TilePosition supplyPosition = BlockingEntrance.Instance().getSupplyPosition();
 					desiredPosition = getBuildLocationNear(buildingType, supplyPosition);
@@ -134,7 +140,8 @@ public class ConstructionPlaceFinder {
 		case LastBuilingPoint:
 			TilePosition lastBuildingTilePosition = InformationManager.Instance().getLastBuildingLocation();
 			if (lastBuildingTilePosition != null) {
-				if (buildingType == UnitType.Terran_Supply_Depot && BuildManager.Instance().fisrtSupplePointFull) {
+				if ((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
+				&& BuildManager.Instance().fisrtSupplePointFull) {
 					lastBuildingTilePosition = BlockingEntrance.Instance().getSupplyPosition(lastBuildingTilePosition);
 				}
 				desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition);
@@ -191,7 +198,9 @@ public class ConstructionPlaceFinder {
 
 		// TODO 과제 : 건설 위치 탐색 방법은 ConstructionPlaceSearchMethod::SpiralMethod 로 하는데, 더 좋은 방법은 생각해볼 과제이다
 		int constructionPlaceSearchMethod = 0;
-		if (buildingType == UnitType.Terran_Supply_Depot && !methodFix) {
+
+		if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
+				&& methodFix == false){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		} else {
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
@@ -200,6 +209,63 @@ public class ConstructionPlaceFinder {
 		int buildingGapSpace = getBuildingSpaceGap(buildingType, desiredPosition, methodFix, spaceZero, constructionPlaceSearchMethod);
 
 		TilePosition buildPosition = TilePosition.None;
+		// ResourceDepot (Nexus, Command Center, Hatchery),
+		// Protoss_Pylon, Terran_Supply_Depot, 
+		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
+		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
+		if (buildingType.isResourceDepot()) {
+			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
+		}
+//		if(buildingType == UnitType.Terran_Barracks){
+//			buildingGapSpace = 0;
+//		}
+//		if(buildingType == UnitType.Terran_Factory){
+//			buildingGapSpace = 0;
+//		}
+		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
+			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
+			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
+				buildingGapSpace=0;
+			}
+//			20180719. hkk. 저그전에 대비해서 첫서플과 두번째 서플은 건물들을 붙여지어야 함
+			if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
+			|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())){
+				buildingGapSpace = 0;
+			}
+			if(methodFix == true){
+				buildingGapSpace=1;
+			}
+			if(spaceZero == true){
+				buildingGapSpace=0;
+			}
+		}
+		
+//		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
+//			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
+		else if (buildingType == UnitType.Terran_Missile_Turret) {
+			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
+//			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
+//			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
+			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
+				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
+//					FileUtils.appendTextToFile("log.txt","\\n entrance_turret : buildingGapSpace : " + buildingGapSpace);
+					buildingGapSpace = 0; 
+				}
+			}
+		}else if (buildingType == UnitType.Terran_Bunker) {
+			buildingGapSpace = 0;
+		}
+		
+//		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
+		if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
+		|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
+		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
+		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
+		|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
+		|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())){
+			buildingGapSpace = 0;
+		}
+		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
 			while (buildingGapSpace >= 0) {
 				buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
@@ -225,6 +291,7 @@ public class ConstructionPlaceFinder {
 			
 		} else {
 			buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+
 		}
 
 		if (TilePositionUtils.isValidTilePosition(buildPosition)) {
@@ -297,6 +364,7 @@ public class ConstructionPlaceFinder {
 		int maxRange = 35; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal()) {
+
 			// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
 			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
 			int currentX = desiredPosition.getX();
@@ -309,9 +377,11 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
 				if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 					if (isPossiblePlace) {
 						resultPosition = new TilePosition(currentX, currentY);
+
 						break;
 					}
 				}
@@ -346,26 +416,134 @@ public class ConstructionPlaceFinder {
 			int currentY = desiredPosition.getY();
 			int depostSizeX = 3;
 			int depostSizeY = 2;
+			boolean isPossiblePlace = false;
+			
+			if(BlockingEntrance.Instance().xinc) {
+				if(BlockingEntrance.Instance().yinc) {
+//					1시
+					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
+						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
+							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
 
-			for (int y_position = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY; y_position++) {
-				boolean isPossiblePlace = false;
-				for (int x_position = 0; x_position < BlockingEntrance.Instance().maxSupplyCntX; x_position++) {
-					if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
-						isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+
+								if (isPossiblePlace) {
+									resultPosition = new TilePosition(currentX, currentY);
+									break;
+								}
+								//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+							}
+							
+							currentX = currentX + depostSizeX;
+//							currentY = currentY + depostSizeY;
+							//currentY = currentY + spiralDirectionY;
+						}
 						if (isPossiblePlace) {
-							resultPosition = new TilePosition(currentX, currentY);
 							break;
 						}
+						
+//						currentY = desiredPosition.getY();
+//						currentX = currentX + depostSizeX;
+						currentX = desiredPosition.getX();
+						currentY = currentY + depostSizeY;
+//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 1시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
+				}else {
+//					5시
+					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
+						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
+							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
 
-					currentX = currentX + depostSizeX;
-				}
-				if (isPossiblePlace) {
-					break;
-				}
+								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
 
-				currentX = desiredPosition.getX();
-				currentY = currentY + depostSizeY;
+								if (isPossiblePlace) {
+									resultPosition = new TilePosition(currentX, currentY);
+									break;
+								}
+								//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+							}
+	
+							currentX = currentX + depostSizeX;
+//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							currentY = currentY + depostSizeY;
+							//currentY = currentY + spiralDirectionY;
+						}
+						
+						if (isPossiblePlace) {
+							break;
+						}
+
+						
+//						currentY = desiredPosition.getY();
+//						currentX = currentX + depostSizeX;
+						currentX = desiredPosition.getX();
+						currentY = currentY - depostSizeY;
+						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+					}
+				}
+				
+			}else {
+				if(BlockingEntrance.Instance().yinc) {
+//					11시
+					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
+						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
+							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+
+								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+
+								if (isPossiblePlace) {
+									resultPosition = new TilePosition(currentX, currentY);
+									break;
+								}
+								//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+							}
+							
+							currentX = currentX - depostSizeX;
+//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							currentY = currentY + depostSizeY;
+							//currentY = currentY + spiralDirectionY;
+						}
+						if (isPossiblePlace) {
+							break;
+						}
+						
+//						currentY = desiredPosition.getY();
+//						currentX = currentX + depostSizeX;
+						currentX = desiredPosition.getX();
+						currentY = currentY + depostSizeY;
+//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+					}
+				}else {
+//					7시
+					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
+						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
+							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+
+								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
+
+								if (isPossiblePlace) {
+									resultPosition = new TilePosition(currentX, currentY);
+									break;
+								}
+								//System.out.println("is impossible place ==> (" + currentX + " / " + currentY + ")");
+							}
+							
+							currentX = currentX - depostSizeX;
+							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							currentY = currentY + depostSizeY;
+							//currentY = currentY + spiralDirectionY;
+						}
+						if (isPossiblePlace) {
+							break;
+						}
+						
+//						currentY = desiredPosition.getY();
+//						currentX = currentX + depostSizeX;
+						currentX = desiredPosition.getX();
+						currentY = currentY - depostSizeY;
+						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+					}
+				}
 			}
 			
 		} else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.NewMethod.ordinal()) {
@@ -425,6 +603,8 @@ public class ConstructionPlaceFinder {
 				b.getType() == UnitType.Terran_Starport ||
 				b.getType() == UnitType.Terran_Science_Facility) {
 				width += 3;
+//				buildingGapSpace = 0;
+//				horizontalOnly = true;
 			}
 	
 			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
@@ -477,8 +657,11 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
-					//서플라이 지역은 서플라이 외에는 지을수 없다.
-					if (b.getType() != UnitType.Terran_Supply_Depot) {
+					//서플라이 지역은 서플라이 / 아카데미 / 아머리 외에는 지을수 없다.
+					if (b.getType() != UnitType.Terran_Supply_Depot
+						&& b.getType() != UnitType.Terran_Academy
+						&& b.getType() != UnitType.Terran_Armory
+						) {
 						if (isTilesToAvoidSupply(x, y)) {
 							return false;
 						}
@@ -508,9 +691,13 @@ public class ConstructionPlaceFinder {
 		}
 		
 		// check the reserve map
-		for (int x = position.getX(); x < position.getX() + b.getType().tileWidth(); x++) {
-			for (int y = position.getY(); y < position.getY() + b.getType().tileHeight(); y++) {
-				if (reserveMap[x][y]) {
+		for (int x = position.getX() ; x < position.getX() + b.getType().tileWidth(); x++)
+		{
+			for (int y = position.getY() ; y < position.getY() + b.getType().tileHeight(); y++)
+			{
+				//if (reserveMap.get(x).get(y))
+				if (reserveMap[x][y])
+				{
 					return false;
 				}
 			}
@@ -968,18 +1155,47 @@ public class ConstructionPlaceFinder {
 		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
 			
 //			System.out.println("setTilesToAvoidSupply map is not UNKNOWN");
-		
-			int supply_x = BlockingEntrance.Instance().getSupplyPosition().getX();
-			int supply_y = BlockingEntrance.Instance().getSupplyPosition().getY();
 			
-			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
-			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
-			
-			for(int x = 0; x < maxX ; x++){
-				for(int y = 0;  y < maxY ; y++){
-					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
-					tilesToAvoidSupply.add(t);
-					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+//			for(BaseLocation baseLocation : BWTA.getBaseLocations())
+			for(BaseLocation baseLocation : BWTA.getStartLocations())
+			{
+				TilePosition mainbase = baseLocation.getTilePosition();
+				
+				int supply_x = BlockingEntrance.Instance().getSupplyPosition(mainbase).getX();
+				int supply_y = BlockingEntrance.Instance().getSupplyPosition(mainbase).getY();
+				
+//				System.out.println("main base ==>> " + supply_x +" / " + supply_y);
+				
+				
+//				1시는 변동 없음
+				if(BlockingEntrance.Instance().xinc) {
+					if(!BlockingEntrance.Instance().yinc) {
+//						5시
+//						supply_x = BlockingEntrance.Instance().getSupplyPosition(mainbase).getX();
+						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
+					}
+
+					
+				}else {
+					if(BlockingEntrance.Instance().yinc) {
+//						11시
+						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;  
+					}else {
+//						7시
+						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;
+						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
+					}
+				}
+				
+				int max_supX = BlockingEntrance.Instance().maxSupplyCntX * 3;
+				int max_sup_Y = BlockingEntrance.Instance().maxSupplyCntY * 2;
+				
+				for(int x = 0; x < max_supX ; x++){
+					for(int y = 0;  y < max_sup_Y ; y++){
+						TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+						tilesToAvoidSupply.add(t);
+//						System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+					}
 				}
 			}
 		}
@@ -987,26 +1203,48 @@ public class ConstructionPlaceFinder {
 		System.out.println("setTilesToAvoidSupply end");
 	}
 	
-	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
+	
+	public void setTilesToAvoidCCAddon() {
 		
-//		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
+		System.out.println("setTilesToAvoidCCAddon start()");
 		
-			int supply_x = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getX();
-			int supply_y = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getY();
-			
-			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
-			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
-			
-			for(int x = 0; x < maxX ; x++){
-				for(int y = 0; y < maxY ; y++){
-					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
-					tilesToAvoidSupply.add(t);
+		for(BaseLocation baseLocation : BWTA.getBaseLocations())
+		{
+			TilePosition cc = baseLocation.getTilePosition();
+			int addonX = cc.getX()+4;
+			int addonY = cc.getY()+1;
+			for(int x = 0; x < 2 ; x++){
+				for(int y = 0;  y < 2 ; y++){
+					TilePosition t = new TilePosition(addonX+x,addonY+y);
+					tilesToAvoid.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
 				}
 			}
 		}
+		
+		System.out.println("setTilesToAvoidCCAddon end");
 	}
+	
+//	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
+//		
+////		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
+//		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
+//		
+//			int supply_x = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getX();
+//			int supply_y = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getY();
+//			
+//			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
+//			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
+//			
+//			for(int x = 0; x < maxX ; x++){
+//				for(int y = 0; y < maxY ; y++){
+//					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
+//					tilesToAvoidSupply.add(t);
+//					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+//				}
+//			}
+//		}
+//	}
 
     public void setTilesToAvoidForFirstGas()
 	{
@@ -1036,10 +1274,16 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidAbsolute;
 	}
 	
+	public Set<TilePosition> getTilesToAvoidSupply() {
+		return tilesToAvoidSupply;
+	}
+	
 	public void setTilesToAvoidFac(Unit unit) {
 		
 		int fromx = unit.getTilePosition().getX()-1;
+//		int fromx = unit.getTilePosition().getX();
 		int fromy = unit.getTilePosition().getY()-1;
+//		int fromy = unit.getTilePosition().getY();
 		
 		/*if(fromx<0){
 			fromx=0;
@@ -1049,14 +1293,18 @@ public class ConstructionPlaceFinder {
 		}*/
 		
 		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
+//		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
-	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-	            {
+//	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
+			for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
+            {
 				if((x==fromx + 6 || x==fromx + 7) && y == fromy){
 					continue;
 				}
-				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoidAbsolute.add(temp);
+				if(!isTilesToAvoidSupply(x, y)) {
+					TilePosition temp = new TilePosition(x,y);
+					tilesToAvoidAbsolute.add(temp);
+            	}
 			}
 		}
 	}
