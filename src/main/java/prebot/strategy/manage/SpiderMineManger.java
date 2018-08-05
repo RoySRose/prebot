@@ -347,13 +347,13 @@ public class SpiderMineManger {
 	
 	public List<BaseLocation> getMyExpansionBaseLocation() {
 		List<BaseLocation> bases = new ArrayList<>();
-		BaseLocation expansion1 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getStartLocations(), true);
-		BaseLocation expansion2 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
-		BaseLocation expansion3 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false);
+		BaseLocation expansion1 = InformationManager.Instance().getSecondStartPosition();
+		List<BaseLocation> addbase = InformationManager.Instance().getFutureCloseButFarFromEnemyLocation();
+		bases.addAll(addbase);
+		//BaseLocation expansion3 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false);
 		
 		bases.add(expansion1);
-		bases.add(expansion2);
-		bases.add(expansion3);
+
 		
 		return bases;
 	}
