@@ -15,6 +15,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 import java.util.Collection;
 
@@ -52,9 +53,13 @@ public class BarracksControl extends BuildingFlyControl {
                 }
 
             }else{
-                if( UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1){
-                    flyCondition.setBuildingFly(BuildingFly.UP);
-                }
+				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1) {
+					flyCondition.setBuildingFly(BuildingFly.UP);
+				
+				// 앞마당으로 바뀐 경우 안전한 상황이라고 가정한다. 공격 또는 커맨드 건설 등을 위해 배럭을 띄운다.
+				} else if (StrategyIdea.campType != CampType.INSIDE && StrategyIdea.campType != CampType.FIRST_CHOKE) {
+					flyCondition.setBuildingFly(BuildingFly.UP);
+				}
             }
         }
         //System.out.println("change fly: " + getBuildingFly());

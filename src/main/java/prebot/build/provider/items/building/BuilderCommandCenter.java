@@ -16,6 +16,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
@@ -80,19 +81,19 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	public boolean executeExpansion() {
 		if (TimeUtils.beforeTime(10, 0)) {
 			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) < 2) {
+				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 2) {
 					return false;
 				}
 			}
 
 			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
-				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 1) {
+				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 1) {
 					return false;
 				}
 			}
 
 			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
-				if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) < 2) {
+				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 2) {
 					return false;
 				}
 			}
@@ -135,7 +136,8 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
-			if (isAttackMode && Prebot.Broodwar.self().minerals() > 250) {
+			if (isAttackMode && StrategyIdea.mainSquadMode != MainSquadMode.SPEED_ATTCK
+					&& Prebot.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
@@ -214,7 +216,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     			seedPosition = SeedPositionStrategy.FirstExpansionLocation;
     		}
     	} else if (allCommandCenterCount >= 2) {
-    		seedPosition = SeedPositionStrategy.FirstExpansionLocation;
+    		seedPosition = SeedPositionStrategy.NextExpansionPoint;
     	}
     	
     	setSeedPositionStrategy(seedPosition);

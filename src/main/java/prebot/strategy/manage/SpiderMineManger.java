@@ -129,11 +129,11 @@ public class SpiderMineManger {
 		StrategyIdea.watcherMinePositionLevel = mLevel;
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
 		StrategyIdea.spiderMineNumberPerGoodPosition = Math.min(vultureCount / 15 + 1, 3);
-		int watcherCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
-		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith) >= 5 && watcherCount == 0) {
-			watcherCount = 1;
+		int checkerCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
+		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith) >= 5 && checkerCount == 0) {
+			checkerCount = 1;
 		}
-		StrategyIdea.checkerMaxNumber = watcherCount;
+		StrategyIdea.checkerMaxNumber = checkerCount;
 	}
 
 	private void updateMineReservedMap() {

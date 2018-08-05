@@ -118,7 +118,7 @@ public class ConstructionManager extends GameManager {
 	public void update()
 	{
 		// 1초에 4번만 실행합니다
-		if (TimeUtils.executeRotation(4, 7)) {
+		if (TimeUtils.executeRotation(5, 7)) {
 			return;
 		}
 

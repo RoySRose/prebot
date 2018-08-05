@@ -4,6 +4,7 @@ import bwapi.UnitType;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 
@@ -15,13 +16,16 @@ public class BuilderArmory extends DefaultBuildableItem {
 
 	public final boolean buildCondition() {
 //		setRecoverItemCount(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory));
-		
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
+			return false;
+		}
 		
 		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Armory)) {
 			return false;
 		}
 
 		setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
+		
 		// 전략적 판단에 대한 부분은 리더에게 오더 받는다. 변경예정.
 		// 긴급할 경우 자원 체크로직이 필요한가? 어차피 맨위 true로 올릴텐데?
 		if (UnitUtils.enemyCompleteUnitDiscovered(
@@ -30,8 +34,6 @@ public class BuilderArmory extends DefaultBuildableItem {
 				UnitType.Terran_Wraith, UnitType.Terran_Dropship)) {
 			setBlocking(true);
 			setHighPriority(true);
-//			setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
-//			setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 //			setRecoverItemCount(1);
 			return true;
 		}
@@ -39,12 +41,17 @@ public class BuilderArmory extends DefaultBuildableItem {
 		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
 			setBlocking(true);
 			setHighPriority(true);
-//			setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
-//			setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 			return true;
 		}
 
 		if (TimeUtils.afterTime(9, 0)) {
+			return true;
+		}
+		
+		// 활성화 되기 전 2팩이상 가스 여유가 있으면 빠른  아머리
+		int commandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int factoryCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
+		if (commandCenterCount == 2 && factoryCount >= 2 && Prebot.Broodwar.self().gas() > 200) {
 			return true;
 		}
 

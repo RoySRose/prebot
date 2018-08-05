@@ -139,10 +139,10 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int SECOND_CHOKE_MARGIN = 10 * 4; // TODO 추후 상수로 변경
-				int FIRST_EXPANSION_MARGIN = 5 * 4; // TODO 추후 상수로 변경
+				int SECOND_CHOKE_MARGIN = 4 * 4; // TODO 추후 상수로 변경
+				int FIRST_EXPANSION_MARGIN = 2 * 4; // TODO 추후 상수로 변경
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-					SECOND_CHOKE_MARGIN = 2 * 4;
+					SECOND_CHOKE_MARGIN = 1 * 4;
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
@@ -151,12 +151,12 @@ public class PositionFinder {
 					return CampType.READY_TO;
 				}
 				else if (myTankSupplyCount >= 8 * 4
-						|| factorySupplyCount >= enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN) {
+						|| factorySupplyCount >= enemyGroundUnitSupplyCount * 1.5 + SECOND_CHOKE_MARGIN) {
 					return CampType.SECOND_CHOKE;
 				}
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 				else if (myTankSupplyCount >= 4 * 4
-						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN
+						|| factorySupplyCount >= enemyGroundUnitSupplyCount * 1.5 + FIRST_EXPANSION_MARGIN
 						|| firstExpansionOccupied()) {
 					return CampType.EXPANSION;
 				}
@@ -166,7 +166,15 @@ public class PositionFinder {
 			}
 			
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				return CampType.INSIDE;
+				if (firstExpansionOccupied()) {
+					return CampType.FIRST_CHOKE;
+				} else {
+					if (StrategyIdea.campType != CampType.INSIDE) {
+						return CampType.FIRST_CHOKE;
+					} else {
+						return CampType.INSIDE;
+					}
+				}
 				
 //				if (factorySupplyCount > 4 * 1) {
 //					return CampType.FIRST_CHOKE;
