@@ -254,8 +254,15 @@ public class ConstructionPlaceFinder {
 //			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
 //			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
 			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
-//					FileUtils.appendTextToFile("log.txt","\\n entrance_turret : buildingGapSpace : " + buildingGapSpace);
+//				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
+					FileUtils.appendTextToFile("log.txt","\\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
+					buildingGapSpace = 0; 
+				}
+			}
+			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret2) {
+					FileUtils.appendTextToFile("log.txt","\\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
 					buildingGapSpace = 0; 
 				}
 			}
@@ -264,12 +271,18 @@ public class ConstructionPlaceFinder {
 		}
 		
 //		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-		if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
-		|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
-		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
-		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
-		|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
-		|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())){
+//		if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
+//		|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
+//		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
+//		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
+//		|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
+//		|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())){
+		if( (desiredPosition == BlockingEntrance.Instance().first_supple)
+			|| (desiredPosition == BlockingEntrance.Instance().second_supple)
+			|| (desiredPosition == BlockingEntrance.Instance().starport1)
+			|| (desiredPosition == BlockingEntrance.Instance().starport2)
+			|| (desiredPosition == BlockingEntrance.Instance().factory)
+			|| (desiredPosition == BlockingEntrance.Instance().barrack)){	
 			buildingGapSpace = 0;
 		}
 		
@@ -333,11 +346,18 @@ public class ConstructionPlaceFinder {
 			
 		} else if (buildingType == UnitType.Terran_Missile_Turret) {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
-			if (BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-				if (desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX()
-						&& desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
-					// 20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
-					buildingGapSpace = 0;
+
+			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
+//				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
+					FileUtils.appendTextToFile("log.txt","\\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
+					buildingGapSpace = 0; 
+				}
+			}
+			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
+				if(desiredPosition == BlockingEntrance.Instance().entrance_turret2) {
+					FileUtils.appendTextToFile("log.txt","\\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
+					buildingGapSpace = 0; 
 				}
 			}
 			
@@ -368,6 +388,7 @@ public class ConstructionPlaceFinder {
 
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
+		// 값을 찾아내라. = BaseLocation.isStartingLocation 을 체크해서 메인이면 저값. 나머진 다른값
 		int maxRange = 35; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal()) {

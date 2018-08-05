@@ -48,14 +48,14 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			setBlocking(true);
 			setTilePosition(BlockingEntrance.Instance().entrance_turret1);
 			return true;
-		}else {
-			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
-				if(BlockingEntrance.Instance().entrance_turret2.isValid() && buildQueueCount + constructionCount == 0) {
-					setHighPriority(true);
-					setBlocking(true);
-					setTilePosition(BlockingEntrance.Instance().entrance_turret2);
-					return true;
-				}
+		}
+		
+		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret) == 1) {
+			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None && buildQueueCount + constructionCount == 0) {
+				setHighPriority(true);
+				setBlocking(true);
+				setTilePosition(BlockingEntrance.Instance().entrance_turret2);
+				return true;
 			}
 		}
 		
