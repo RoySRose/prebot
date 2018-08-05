@@ -47,8 +47,8 @@ public class ConstructionPlaceFinder {
 
 	//서플라이 짓는 지역
 	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
-	//커맨드 센터 및 컴셋 지역
-	private Set<TilePosition> tilesToAvoidCCAddon = new HashSet<TilePosition>();
+	//팩토리 건설 지역
+	private Set<TilePosition> tilesToAvoidFac = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -664,6 +664,14 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
+//					20180805. hkk. 팩토리는 붙여짓기 가능
+					if (b.getType() == UnitType.Terran_Factory ||
+						b.getType() == UnitType.Terran_Starport ||
+						b.getType() == UnitType.Terran_Science_Facility) {
+						if (isTilesToAvoidFac(x, y)) {
+							return false;
+						}
+					}
 					//서플라이 지역은 서플라이 / 아카데미 / 아머리 외에는 지을수 없다.
 					if (b.getType() != UnitType.Terran_Supply_Depot
 						&& b.getType() != UnitType.Terran_Academy
@@ -967,6 +975,28 @@ public class ConstructionPlaceFinder {
 
 		return false;
 	}
+	
+	public final boolean isTilesToAvoidFac(int x, int y)
+	{
+//		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport1
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
+//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			return true;
+//		}
+		
+		for (TilePosition t : tilesToAvoidFac) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 	public final boolean isTilesToAvoidAbsolute(int x, int y)
 	{
 		for (TilePosition t : tilesToAvoidAbsolute) {
@@ -1207,36 +1237,36 @@ public class ConstructionPlaceFinder {
 //						System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
 					}
 				}
+				
 			}
 		}
 		
 		BlockingEntrance.Instance().xinc = xinc; 
 		BlockingEntrance.Instance().yinc = yinc;
 		
+		for(int a = 1; a<=2; a++) {
+	    	TilePosition turret = BlockingEntrance.Instance().getTurretPosition(a);
+//			int turret_y = BlockingEntrance.Instance().getTurretPosition(a).getY();
+			
+//			TilePosition turret = new TilePosition(turret_x,turret_y);
+	    	
+			if(turret != TilePosition.None) {
+				int turret_x = turret.getX();
+		    	int turret_y = turret.getY();
+				for(int x = 0; x<2; x++) {
+					for(int y = 0; y<2; y++) {
+						TilePosition turret_p = new TilePosition(turret_x+x,turret_y+y);
+						tilesToAvoid.add(turret_p);
+					}
+					
+				}
+			}
+    	}
+		
 //		System.out.println("setTilesToAvoidSupply end");
 	}
 	
-	
-	public void setTilesToAvoidCCAddon() {
-		
-//		System.out.println("setTilesToAvoidCCAddon start()");
-		
-		for(BaseLocation baseLocation : BWTA.getBaseLocations())
-		{
-			TilePosition cc = baseLocation.getTilePosition();
-			int addonX = cc.getX()+4;
-			int addonY = cc.getY()+1;
-			for(int x = 0; x < 2 ; x++){
-				for(int y = 0;  y < 2 ; y++){
-					TilePosition t = new TilePosition(addonX+x,addonY+y);
-					tilesToAvoid.add(t);
-					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
-				}
-			}
-		}
-		
-//		System.out.println("setTilesToAvoidCCAddon end");
-	}
+
 	
 //	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
 //		
@@ -1263,8 +1293,8 @@ public class ConstructionPlaceFinder {
 	{
 		Unit firstgas = InformationManager.Instance().getMyfirstGas();
 	
-		int fromx = firstgas.getTilePosition().getX()-2;
-		int fromy = firstgas.getTilePosition().getY()-2;
+		int fromx = firstgas.getTilePosition().getX()-1;
+		int fromy = firstgas.getTilePosition().getY()-1;
 		
 		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
@@ -1277,6 +1307,20 @@ public class ConstructionPlaceFinder {
 				tilesToAvoid.add(temp);
 			}
 		}
+	}
+    
+    public void setTilesToAvoidTurret() {
+		
+    	for(int a = 1; a<=2; a++) {
+	    	int turret_x = BlockingEntrance.Instance().getTurretPosition(a).getX();
+			int turret_y = BlockingEntrance.Instance().getTurretPosition(a).getY();
+			
+			TilePosition turret = new TilePosition(turret_x,turret_y);
+			if(turret != TilePosition.None) {
+				tilesToAvoid.add(turret);
+			}
+    	}
+		
 	}
 	/// BaseLocation 과 Mineral / Geyser 사이의 타일들의 목록을 리턴합니다		
 	public Set<TilePosition> getTilesToAvoid() {
@@ -1316,7 +1360,7 @@ public class ConstructionPlaceFinder {
 				}
 				if(!isTilesToAvoidSupply(x, y)) {
 					TilePosition temp = new TilePosition(x,y);
-					tilesToAvoidAbsolute.add(temp);
+					tilesToAvoidFac.add(temp);
             	}
 			}
 		}
@@ -1343,13 +1387,50 @@ public class ConstructionPlaceFinder {
 		int fromx = unit.getTilePosition().getX()+4;
 		int fromy = unit.getTilePosition().getY();
 		
-		for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
-		{
-			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-			for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+		if(unit.getType() == UnitType.Terran_Command_Center) {
+		
+			for(BaseLocation baseLocation : BWTA.getBaseLocations())
 			{
-				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoidAbsolute.add(temp);
+				if(unit.getTilePosition() == baseLocation.getTilePosition()) {
+					for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
+					{
+						//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+						for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+						{
+							TilePosition temp = new TilePosition(x,y);
+							tilesToAvoidAbsolute.add(temp);
+						}
+					}
+				}
+			}
+		}else {
+		
+			for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
+			{
+				//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+				for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+				{
+					TilePosition temp = new TilePosition(x,y);
+					tilesToAvoidAbsolute.add(temp);
+				}
+			}
+		}
+	}
+	
+	
+	public void setTilesToAvoidCCAddon() {
+		
+		for(BaseLocation baseLocation : BWTA.getBaseLocations())
+		{
+			TilePosition cc = baseLocation.getTilePosition();
+			int addonX = cc.getX()+4;
+			int addonY = cc.getY();
+			for(int x = 0; x < 3 ; x++){
+				for(int y = 0;  y < 3 ; y++){
+					TilePosition t = new TilePosition(addonX+x,addonY+y);
+					tilesToAvoid.add(t);
+					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
+				}
 			}
 		}
 	}
