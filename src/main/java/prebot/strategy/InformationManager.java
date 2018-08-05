@@ -1,6 +1,7 @@
 package prebot.strategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class InformationManager extends GameManager {
 
 	public BaseLocation getExpansionLocation;
 	public TilePosition getLastBuildingLocation;
-	public TilePosition getLastBuildingLocation2;
+	public TilePosition getLastBuildingFinalLocation;
 
 	// 입막시 방어 안전 위치
 	private Position safePosition;
@@ -142,7 +143,7 @@ public class InformationManager extends GameManager {
 
 	private Map<Player, List<BaseLocation>> occupiedByCCBaseLocations = new HashMap<Player, List<BaseLocation>>();
 
-    private BaseLocation secondStartPosition;
+    public BaseLocation secondStartPosition;
 
 	/// static singleton 객체를 리턴합니다
 	public static InformationManager Instance() {
@@ -942,6 +943,7 @@ public class InformationManager extends GameManager {
 	public TilePosition getLastBuilingFinalLocation() {
 		BaseLocation closeButFarFromEnemyLocation = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false);
 		if (closeButFarFromEnemyLocation != null) {
+			closeButFarFromEnemyLocation.getTilePosition();
 			return closeButFarFromEnemyLocation.getTilePosition();
 		} else {
             System.out.println("이거모야!! 나오면 안되니까 나오면 성욱이에게!");
@@ -1013,6 +1015,101 @@ public class InformationManager extends GameManager {
 			}
 		}
 
+		return resultBase;
+	}
+	
+	public List<BaseLocation> getFutureCloseButFarFromEnemyLocation() {
+		List<BaseLocation> resultBase = new ArrayList<>();
+		
+		BaseLocation base1 = null;
+		BaseLocation base2 = null;
+		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
+		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
+
+		BaseLocation firstExpansion = firstExpansionLocation.get(selfPlayer);
+		
+		
+		double firstExpansionToOccupied = 0;
+		double enemyBaseToOccupied = 0;
+		double closeFromMyExpansionButFarFromEnemy = 0;
+
+		double closestDistance = 1000000000;
+
+		for (BaseLocation base : BWTA.getBaseLocations()) {
+			if (base.isStartLocation())
+				continue;
+			if (base.getTilePosition().equals(mainBaseLocation.getTilePosition()))
+				continue;
+			if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
+				continue;
+			if (base.getTilePosition().equals(firstExpansion.getTilePosition()))
+				continue;
+			if (firstExpansionLocation.get(enemyPlayer) != null) {
+				if (base.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
+					continue;
+			}
+			if (base.getTilePosition().equals(secondStartPosition.getTilePosition()))
+				continue;
+			
+			TilePosition findGeyser = ConstructionPlaceFinder.Instance()
+					.getRefineryPositionNear(base.getTilePosition());
+			if (findGeyser != null) {
+				if (findGeyser.getDistance(base.getTilePosition()) * 32 > 300) {
+					continue;
+				}
+			}
+		
+
+			firstExpansionToOccupied = firstExpansion.getGroundDistance(base); // 내 앞마당 ~ 내 점령지역 지상거리
+			enemyBaseToOccupied = enemyBaseLocation.getGroundDistance(base); // 적 베이스 ~ 내 점령지역 지상거리
+			closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
+
+			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
+				closestDistance = closeFromMyExpansionButFarFromEnemy;
+				base1 = base;
+				base2 = base1;
+			}
+		}
+
+		if(base2 == null) {
+			for (BaseLocation base : BWTA.getBaseLocations()) {
+				if (base.isStartLocation())
+					continue;
+				if (base.getTilePosition().equals(mainBaseLocation.getTilePosition()))
+					continue;
+				if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
+					continue;
+				if (base.getTilePosition().equals(firstExpansion.getTilePosition()))
+					continue;
+				if (firstExpansionLocation.get(enemyPlayer) != null) {
+					if (base.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
+						continue;
+				}
+				if (base.getTilePosition().equals(secondStartPosition.getTilePosition()))
+					continue;
+				if(base.getTilePosition().equals(base1.getTilePosition()))
+					continue;
+				TilePosition findGeyser = ConstructionPlaceFinder.Instance()
+						.getRefineryPositionNear(base.getTilePosition());
+				if (findGeyser != null) {
+					if (findGeyser.getDistance(base.getTilePosition()) * 32 > 300) {
+						continue;
+					}
+				}
+			
+				firstExpansionToOccupied = firstExpansion.getGroundDistance(base); // 내 앞마당 ~ 내 점령지역 지상거리
+				enemyBaseToOccupied = enemyBaseLocation.getGroundDistance(base); // 적 베이스 ~ 내 점령지역 지상거리
+				closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
+
+				if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
+					closestDistance = closeFromMyExpansionButFarFromEnemy;
+					base2 = base;
+				}
+			}
+		}
+		
+		resultBase.add(base1);
+		resultBase.add(base2);
 		return resultBase;
 	}
 
@@ -1154,9 +1251,9 @@ public class InformationManager extends GameManager {
             BaseLocation resultBase = null;
 
             for (BaseLocation baseLocation : BWTA.getStartLocations()) {
-                if (baseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
+                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition()))
                     continue;
-                if (baseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition()))
+                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
                     continue;
 
 
@@ -2037,4 +2134,6 @@ public class InformationManager extends GameManager {
 				supple.getPosition().getY() + fleeVector.getY()); // 회피지점
 
 	}
+
+	
 }
