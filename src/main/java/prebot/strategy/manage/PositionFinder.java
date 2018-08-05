@@ -571,7 +571,7 @@ public class PositionFinder {
 		return insidePosition;
 	}
 		
-	public Position basefirstChokeMiddlePosition() {
+	public Position baseFirstChokeMiddlePosition() {
 		if (this.basefirstChokeMiddlePosition != null) {
 			return basefirstChokeMiddlePosition;
 		}

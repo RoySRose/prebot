@@ -86,8 +86,8 @@ public class AirForceManager {
 	
 	private List<Position> targetPositions = new ArrayList<>(); // 타깃포지션
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
-	private int achievementEffectiveFrame = 0; // 일정기간 안에서의 성취
-	private int accumulatedAchievement = 0; // 누적된 총 성취 (레이쓰 숫자가 조절되면 리셋)
+	private int achievementEffectiveFrame = 0; // 일정기간 안에서의 성취 (공격성 레벨 조절)
+	private int accumulatedAchievement = 0; // 누적된 총 성취 (레이쓰 숫자 조절. 조절되면 값 리셋)
 	private boolean airForceDefenseMode = false;
 	private int waitingEndFrame = 0;
 
@@ -429,6 +429,7 @@ public class AirForceManager {
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
+		int airunitCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
 		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
 			if (InfoUtils.enemyRace() == Race.Terran) {
 				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
@@ -450,17 +451,17 @@ public class AirForceManager {
 			
 		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
-			if (achievementEffectiveFrame <= -50) {
+			int levelDownSeconds = Math.max(15 - airunitCount, 1);
+			if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > levelDownSeconds * TimeUtils.SECOND) {
 				levelDown = true;
-			} else if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 8 * TimeUtils.SECOND) {
+			} else if (achievementEffectiveFrame <= -50) {
 				levelDown = true;
 			}
 			
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
 			if (achievementEffectiveFrame <= -100) { // defense 모드로 변경
 				levelDown = true;
-			}
-			if (achievementEffectiveFrame >= 150 && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith) < 4) {
+			} else if (achievementEffectiveFrame >= 150) {
 				levelUp = true;
 			}
 		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
@@ -470,12 +471,11 @@ public class AirForceManager {
 		if (levelDown) {
 			strikeLevel--;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
+			setOffensePositions();
+			
 		} else if (levelUp) {
 			strikeLevel++;
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
-		}
-		
-		if (levelDown || levelUp || achievementEffectiveFrame >= 150) {
 			setOffensePositions();
 		}
 	}
@@ -529,17 +529,17 @@ public class AirForceManager {
 	}
 
 	/// update air force team
-	public void updateAirForceTeam(Collection<Unit> wraiths) {
+	public void updateAirForceTeam(Collection<Unit> airunits) {
 		
-		// remove wraith of invalid team 
+		// remove airunit of invalid team 
 		List<Integer> invalidUnitIds = new ArrayList<>();
 		
-		for (Integer wraithId : airForceTeamMap.keySet()) {
-			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			if (!UnitUtils.isCompleteValidUnit(wraith)) {
-				invalidUnitIds.add(wraithId);
-			} else if (airForceTeamMap.get(wraithId).leaderUnit == null) {
-				invalidUnitIds.add(wraithId);
+		for (Integer airunitId : airForceTeamMap.keySet()) {
+			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			if (!UnitUtils.isCompleteValidUnit(airunit)) {
+				invalidUnitIds.add(airunitId);
+			} else if (airForceTeamMap.get(airunitId).leaderUnit == null) {
+				invalidUnitIds.add(airunitId);
 			}
 		}
 		for (Integer invalidUnitId : invalidUnitIds) {
@@ -547,92 +547,112 @@ public class AirForceManager {
 		}
 		
 		// new team
-		for (Unit wraith : wraiths) {
-			AirForceTeam teamOfWraith = airForceTeamMap.get(wraith.getID());
-			if (teamOfWraith == null) {
-				airForceTeamMap.put(wraith.getID(), new AirForceTeam(wraith));
+		for (Unit airunit : airunits) {
+			AirForceTeam teamOfAirunit = airForceTeamMap.get(airunit.getID());
+			if (teamOfAirunit == null) {
+				airForceTeamMap.put(airunit.getID(), new AirForceTeam(airunit));
 			}
 		}
 		
 		// 리더의 위치를 비교하여 합칠 그룹인지 체크한다.
-		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
-		
+		// - 클로킹모드 상태가 다른 그룹은 합치지 않는다.
+		// - 수리 상태의 그룹은 합치지 않는다.
+		List<AirForceTeam> airForceTeamList = new ArrayList<>(new HashSet<>(airForceTeamMap.values()));
 		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
-		for (AirForceTeam airForceTeam : airForceTeamSet) {
+		
+		for (int i = 0; i < airForceTeamList.size(); i++) {
+			AirForceTeam airForceTeam = airForceTeamList.get(i);
 			if (airForceTeam.repairCenter != null) {
 				continue;
 			}
+			
 			boolean cloakingMode = airForceTeam.cloakingMode;
-			for (AirForceTeam compareForceUnit : airForceTeamSet) {
+			for (int j = i + 1; j < airForceTeamList.size(); j++) {
+				AirForceTeam compareForceUnit = airForceTeamList.get(j);
 				if (compareForceUnit.repairCenter != null) {
 					continue;
 				}
 				if (cloakingMode != compareForceUnit.cloakingMode) { // 클로킹상태가 다른 레이쓰부대는 합쳐질 수 없다.
 					continue;
 				}
+				
 				Unit airForceLeader = airForceTeam.leaderUnit;
 				Unit compareForceLeader = compareForceUnit.leaderUnit;
+				if (airForceLeader.getID() == compareForceLeader.getID()) {
+					System.out.println("no sense. the same id = " + airForceLeader.getID());
+					continue;
+				}
 				if (airForceLeader.getDistance(compareForceLeader) <= AIR_FORCE_TEAM_MERGE_DISTANCE) {
 					airForceTeamMergeMap.put(compareForceLeader.getID(), airForceLeader.getID());
 				}
 			}
 		}
 
-		// 합쳐지는 팀 레이쓰의 airForceTeamMap을 재설정한다.
-		for (Unit wraith : wraiths) {
-			Integer fromForceUnitLeaderId = airForceTeamMap.get(wraith.getID()).leaderUnit.getID();
+		// 합쳐지는 에어포스팀의 airForceTeamMap을 재설정한다.
+		for (Unit airunit : airunits) {
+			Integer fromForceUnitLeaderId = airForceTeamMap.get(airunit.getID()).leaderUnit.getID();
 			Integer toForceUnitLeaderId = airForceTeamMergeMap.get(fromForceUnitLeaderId);
 			if (toForceUnitLeaderId != null) {
-				airForceTeamMap.put(wraith.getID(), airForceTeamMap.get(toForceUnitLeaderId));
+				airForceTeamMap.put(airunit.getID(), airForceTeamMap.get(toForceUnitLeaderId));
 			}
 		}
 		
 		// team 멤버 세팅
-		airForceTeamSet = new HashSet<>(airForceTeamMap.values());
+		Set<AirForceTeam> airForceTeamSet = new HashSet<>(airForceTeamMap.values());
 		for (AirForceTeam airForceTeam : airForceTeamSet) {
 			airForceTeam.memberList.clear();
 		}
-		List<Integer> uncloakedWraithList = new ArrayList<>(); // 언클락 레이쓰
-		List<Integer> needRepairWraithList = new ArrayList<>(); // 치료가 필요한 레이쓰
 		
-		for (Integer wraithId : airForceTeamMap.keySet()) {
-			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			if (wraith.getHitPoints() <= 50 && UnitUtils.activatedCommandCenterCount() > 0) { // repair hit points
-				needRepairWraithList.add(wraithId);
-				
-			} else {
-				AirForceTeam airForceTeam = airForceTeamMap.get(wraith.getID());
-				if (airForceTeam.cloakingMode && wraith.getEnergy() < 15) {
-					uncloakedWraithList.add(wraithId);
-				} else {
-					airForceTeam.memberList.add(wraith);
+		List<Integer> needRepairAirunitList = new ArrayList<>(); // 치료가 필요한 유닛
+		Map<Integer, Unit> airunitRepairCenterMap = new HashMap<>(); // 치료받을 커맨드센터
+		List<Integer> uncloakedAirunitList = new ArrayList<>(); // 언클락 유닛
+		
+		for (Integer airunitId : airForceTeamMap.keySet()) {
+			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			if (airunit.getHitPoints() <= 50) { // repair hit points
+				AirForceTeam repairTeam = airForceTeamMap.get(airunitId);
+				if (repairTeam == null || repairTeam.repairCenter == null) {
+					Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(airunit.getPosition());
+					if (repairCenter != null) {
+						needRepairAirunitList.add(airunitId);
+						airunitRepairCenterMap.put(airunitId, repairCenter);
+						continue;
+					}
 				}
 			}
-	}
-		for (Integer wraithId : uncloakedWraithList) {
-			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-			airForceTeamMap.remove(wraithId);
-		
-			AirForceTeam uncloackedForceTeam = new AirForceTeam(wraith);
-			uncloackedForceTeam.memberList.add(wraith);
-			airForceTeamMap.put(wraithId, uncloackedForceTeam);
-		}
-		
-		for (Integer wraithId : needRepairWraithList) {
-			Unit wraith = Prebot.Broodwar.getUnit(wraithId);
-
-			Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(wraith.getPosition());
-			if (repairCenter != null) {
-				AirForceTeam needRepairTeam = new AirForceTeam(wraith);
-				needRepairTeam.memberList.add(wraith);
-				needRepairTeam.repairCenter = repairCenter;
-				airForceTeamMap.put(wraithId, needRepairTeam);
+			
+			AirForceTeam airForceTeam = airForceTeamMap.get(airunit.getID());
+			if (airForceTeam.cloakingMode && (airunit.getType() != UnitType.Terran_Wraith || airunit.getEnergy() < 15)) {
+				uncloakedAirunitList.add(airunitId);
+				continue;
 			}
+
+			airForceTeam.memberList.add(airunit);
 		}
 		
-		airForceTeamSet = new HashSet<>(airForceTeamMap.values());
+		// create separated team for no energy airunit
+		for (Integer airunitId : uncloakedAirunitList) {
+			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			AirForceTeam uncloackedForceTeam = new AirForceTeam(airunit);
+			uncloackedForceTeam.memberList.add(airunit);
+			
+			airForceTeamMap.put(airunitId, uncloackedForceTeam);
+		}
+		
+		// create repair airforce team
+		for (Integer airunitId : needRepairAirunitList) {
+			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			AirForceTeam needRepairTeam = new AirForceTeam(airunit);
+			needRepairTeam.memberList.add(airunit);
+			needRepairTeam.repairCenter = airunitRepairCenterMap.get(airunit.getID());
+			
+			airForceTeamMap.put(airunitId, needRepairTeam);
+		}
+		
+		// etc (changing leader, finishing repair, achievement) 
+		Set<AirForceTeam> reorganizedSet = new HashSet<>(airForceTeamMap.values());
 		achievementEffectiveFrame = 0;
-		for (AirForceTeam airForceTeam : airForceTeamSet) {
+		for (AirForceTeam airForceTeam : reorganizedSet) {
 			// leader 교체
 			Unit newLeader = UnitUtils.getClosestUnitToPosition(airForceTeam.memberList, airForceTeam.getTargetPosition());
 			airForceTeam.leaderUnit = newLeader;
@@ -640,8 +660,8 @@ public class AirForceManager {
 			// repair 완료처리
 			if (airForceTeam.repairCenter != null) {
 				boolean repairComplete = true;
-				for (Unit wraith : airForceTeam.memberList) {
-					if (wraith.getHitPoints() < 115) { // repair complete hit points
+				for (Unit airunit : airForceTeam.memberList) {
+					if (airunit.getHitPoints() < airunit.getType().maxHitPoints() * 0.95) { // repair complete hit points
 						repairComplete = false;
 						break;
 					}
@@ -667,8 +687,7 @@ public class AirForceManager {
 		}
 	}
 
-
-	public AirForceTeam airForTeamOfWraith(int wraithID) {
-		return airForceTeamMap.get(wraithID);
+	public AirForceTeam airForTeamOfUnit(int unitID) {
+		return airForceTeamMap.get(unitID);
 	}
 }

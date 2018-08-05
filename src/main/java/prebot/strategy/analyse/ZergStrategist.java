@@ -1,8 +1,10 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
@@ -111,6 +113,7 @@ public class ZergStrategist extends Strategist {
 //		int zerglingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
 		int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
 		int enemyAirUnitPower = UnitUtils.enemyAirUnitPower();
+		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
 
 		boolean hydraDiscovered = UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Hydralisk, UnitType.Zerg_Lurker, UnitType.Zerg_Hydralisk_Den);
 		boolean spireExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Spire, UnitType.Zerg_Greater_Spire) > 0;
@@ -119,16 +122,21 @@ public class ZergStrategist extends Strategist {
 			if (enemyAirUnitPower == 0 && !spireExist) {
 				return EnemyStrategy.ZERG_GROUND3;
 			} else if (enemyGroundUnitPower > enemyAirUnitPower * 1.5) {
+				StrategyIdea.valkyrieCount = 0;
 				return EnemyStrategy.ZERG_GROUND2;
 			} else if (enemyGroundUnitPower > enemyAirUnitPower * 2) {
+				StrategyIdea.valkyrieCount = 0;
 				return EnemyStrategy.ZERG_GROUND1;
 			} else {
+				StrategyIdea.valkyrieCount = 0;
 				return EnemyStrategy.ZERG_MIXED;
 			}
 		} else {
 			if (enemyGroundUnitPower == 0 && !hydraDiscovered) {
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 5);
 				return EnemyStrategy.ZERG_AIR2;
 			} else {
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 3);
 				return EnemyStrategy.ZERG_AIR1;
 			}
 		}

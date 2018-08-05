@@ -1,12 +1,17 @@
 package prebot.build.provider.items.building;
 
+import bwapi.Race;
 import bwapi.UnitType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class BuilderBunker extends DefaultBuildableItem {
 
@@ -31,10 +36,19 @@ public class BuilderBunker extends DefaultBuildableItem {
     	
 		boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
 		if (!entranceBlocked) {
-//			setBlocking(true);
-//			setHighPriority(true);
-//			setTilePosition(BlockingEntrance.Instance().bunker);
-//			return true;
+			if (InfoUtils.enemyRace() == Race.Protoss) {
+				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+					setBlocking(true);
+					setHighPriority(true);
+					setTilePosition(BlockingEntrance.Instance().bunker);
+					return true;
+				}
+			} else {
+				setBlocking(true);
+				setHighPriority(true);
+				setTilePosition(BlockingEntrance.Instance().bunker);
+				return true;
+			}
 		}
 		
 		return false;

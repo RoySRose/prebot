@@ -43,16 +43,18 @@ public class BarracksControl extends BuildingFlyControl {
 
         if(flyCondition.getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
 
-            if((StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE))
-                    && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3 ){
-                flyCondition.setBuildingFly(BuildingFly.UP);
-            }else if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
+					flyCondition.setBuildingFly(BuildingFly.UP);
+				}
+                
+			} else if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
             	CommonCode.RegionType regionType = PositionUtils.positionToRegionType(StrategyIdea.campPosition);
                 if (regionType != CommonCode.RegionType.MY_BASE) {
                     flyCondition.setBuildingFly(BuildingFly.UP);
                 }
 
-            }else{
+			} else {
 				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1) {
 					flyCondition.setBuildingFly(BuildingFly.UP);
 				

@@ -15,6 +15,7 @@ import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.control.airforce.ValkyrieControl;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
 import prebot.micro.targeting.TargetFilter;
@@ -38,10 +39,11 @@ public class MainAttackSquad extends Squad {
 
 	private TankControl tankControl = new TankControl();
 	private GoliathControl goliathControl = new GoliathControl();
+	private ValkyrieControl valkyrieControl = new ValkyrieControl();
 	
 	public MainAttackSquad() {
 		super(SquadInfo.MAIN_ATTACK);
-		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
+		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Valkyrie);
 	}
 
 	@Override
@@ -59,10 +61,12 @@ public class MainAttackSquad extends Squad {
 		Map<UnitType, List<Unit>> unitListMap = UnitUtils.makeUnitListMap(unitList);
 		List<Unit> tankList = new ArrayList<>();
 		List<Unit> goliathList = new ArrayList<>();
+		List<Unit> valkyrieList = new ArrayList<>();
 		
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Tank_Mode, new ArrayList<Unit>()));
 		tankList.addAll(unitListMap.getOrDefault(UnitType.Terran_Siege_Tank_Siege_Mode, new ArrayList<Unit>()));
 		goliathList.addAll(unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>()));
+		valkyrieList.addAll(unitListMap.getOrDefault(UnitType.Terran_Valkyrie, new ArrayList<Unit>()));
 
 		this.updateInitiatedFlag();
 		int saveUnitLevel = this.saveUnitLevel(tankList, goliathList);
@@ -71,12 +75,15 @@ public class MainAttackSquad extends Squad {
 		tankControl.setSaveUnitLevel(saveUnitLevel);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 
-		Set<UnitInfo> groundEuiList;
 		if (!tankList.isEmpty()) {
-			groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
+			Set<UnitInfo> groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
 			tankControl.controlIfUnitExist(tankList, groundEuiList);
 		}
 		goliathControl.controlIfUnitExist(goliathList, euiList);
+		if (!valkyrieList.isEmpty()) {
+			Set<UnitInfo> airEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.GROUND_UNIT);
+			valkyrieControl.controlIfUnitExist(valkyrieList, airEuiList);
+		}
 	}
 
 	private void updateInitiatedFlag() {
@@ -96,33 +103,15 @@ public class MainAttackSquad extends Squad {
 	}
 	
 	private int saveUnitLevel(List<Unit> tankList, List<Unit> goliathList) {
-		List<UnitInfo> closeTankEnemies = new ArrayList<>();
+		int saveUnitLevel = 1; // 거리재기 전진
 		if (InfoUtils.enemyRace() == Race.Terran) {
-			List<UnitInfo> nearTankEnemies = new ArrayList<>();
-			for (Unit tank : tankList) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(nearTankEnemies, tank.getPosition(), 200);
-			}
-			for (UnitInfo enemyInfo : nearTankEnemies) {
-				Unit enemy = UnitUtils.unitInSight(enemyInfo);
-				if (enemy != null) {
-					if (!UnitUtils.isCompleteValidUnit(enemy)) {
-						continue;
-					}
-				}
-				
-				if (enemyInfo.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || enemyInfo.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-					closeTankEnemies.add(enemyInfo);
+			List<UnitInfo> closeTankEnemies = new ArrayList<>();
+			for (UnitInfo eui : euiList) {
+				if (eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+					closeTankEnemies.add(eui);
 				}
 			}
-		}
-		
-		// 탱크 vs 탱크 전투 판단여부
-		int saveUnitLevel = 1;
-		if (InfoUtils.enemyRace() == Race.Terran) {
-			if (closeTankEnemies.size() * 3 <= tankList.size()) {
-				// System.out.println("go ahead");
-				saveUnitLevel = 1; // 거리재기 전진
-			} else {
+			if (closeTankEnemies.size() * 4 > tankList.size()) {
 				// System.out.println("keep in line");
 				saveUnitLevel = 2; // 안전거리 유지
 			}

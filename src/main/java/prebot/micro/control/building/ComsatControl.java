@@ -37,9 +37,6 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-//		if (TimeUtils.executeRotation(0, 24)) {
-//			return;
-//		}
 		
 		// 상대 클록 유닛
 		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
@@ -48,6 +45,10 @@ public class ComsatControl extends Control {
 				Unit comsatMaxEnergy = null;
 				int maxEnergy = 50;
 				for (Unit comsat : unitList) {
+//					if (TimeUtils.elapsedFrames(comsat.getLastCommandFrame()) < 5 * TimeUtils.SECOND) {
+//						continue;
+//					}
+					
 					if (comsat.getEnergy() >= maxEnergy && comsat.canUseTech(TechType.Scanner_Sweep, scanPosition)) {
 						maxEnergy = comsat.getEnergy();
 						comsatMaxEnergy = comsat;
@@ -67,6 +68,11 @@ public class ComsatControl extends Control {
 			}
 		}
 
+
+		if (TimeUtils.executeRotation(0, 48)) {
+			return;
+		}
+		
 		Unit comsatToUse = null;
 		int usableEnergy = 75;
 		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
@@ -84,6 +90,10 @@ public class ComsatControl extends Control {
 		}
 		
 		for (Unit comsatStation : unitList) {
+			if (TimeUtils.elapsedFrames(comsatStation.getLastCommandFrame()) < 5 * TimeUtils.SECOND) {
+				continue;
+			}
+			
 			if (comsatStation.getEnergy() >= usableEnergy) {
 				comsatToUse = comsatStation;
 				usableEnergy = comsatStation.getEnergy();

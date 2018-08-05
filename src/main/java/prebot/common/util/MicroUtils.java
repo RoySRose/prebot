@@ -655,7 +655,7 @@ public class MicroUtils {
 	}
 	
 	public static boolean isMeleeUnit(UnitType unitType) {
-		return unitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE; // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
+		return !unitType.isWorker() && unitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE; // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
 	}
 	public static boolean isRangeUnit(UnitType unitType) {
         return unitType.groundWeapon().maxRange() > UnitType.Zerg_Zergling.groundWeapon().maxRange(); // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
