@@ -80,95 +80,97 @@ public class ConstructionPlaceFinder {
 		TilePosition desiredPosition = TilePosition.None;
 		switch (seedPositionStrategy) {
 
-		case MainBaseLocation:
-			desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition(), true);
-			if (desiredPosition == null) {
-				BuildManager.Instance().mainBaseLocationFull = true;
-			}
-			break;
+            case MainBaseLocation:
+                desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition(), true);
+                if (desiredPosition == null) {
+                    BuildManager.Instance().mainBaseLocationFull = true;
+                }
+                break;
 
-		case FirstExpansionLocation:
-			if (InfoUtils.myFirstExpansion() != null) {
-				desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstExpansion().getTilePosition());
-				if (desiredPosition == null) {
-					BuildManager.Instance().firstExpansionLocationFull = true;
-				}
-			}
-			break;
+            case FirstExpansionLocation:
+                if (InfoUtils.myFirstExpansion() != null) {
+                    desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstExpansion().getTilePosition());
+                    if (desiredPosition == null) {
+                        BuildManager.Instance().firstExpansionLocationFull = true;
+                    }
+                }
+                break;
 
-		case FirstChokePoint:
-			if (InfoUtils.myFirstChoke() != null) {
-				desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstChoke().getCenter().toTilePosition());
-				if (desiredPosition == null) {
-					BuildManager.Instance().firstChokePointFull = true;
-				}
-			}
-			break;
+            case FirstChokePoint:
+                if (InfoUtils.myFirstChoke() != null) {
+                    desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstChoke().getCenter().toTilePosition());
+                    if (desiredPosition == null) {
+                        BuildManager.Instance().firstChokePointFull = true;
+                    }
+                }
+                break;
 
-		case SecondChokePoint:
-			if (InfoUtils.mySecondChoke() != null) {
-				desiredPosition = getBuildLocationNear(buildingType, InfoUtils.mySecondChoke().getCenter().toTilePosition());
-				if (desiredPosition == null) {
-					BuildManager.Instance().secondChokePointFull = true;
-				}
-			}
-			break;
+            case SecondChokePoint:
+                if (InfoUtils.mySecondChoke() != null) {
+                    desiredPosition = getBuildLocationNear(buildingType, InfoUtils.mySecondChoke().getCenter().toTilePosition());
+                    if (desiredPosition == null) {
+                        BuildManager.Instance().secondChokePointFull = true;
+                    }
+                }
+                break;
 
-		case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
-			BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
-			if (nextExpansionLocation != null) {
-				desiredPosition = getBuildLocationNear(buildingType, nextExpansionLocation.getTilePosition());
-			} else {
-				desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition());
-			}
-			break;
+            case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+                BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
+                if (nextExpansionLocation != null) {
+                    desiredPosition = getBuildLocationNear(buildingType, nextExpansionLocation.getTilePosition());
+                } else {
+                    desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition());
+                }
+                break;
 
-		case NextSupplePoint:
-			if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
-				if (BuildManager.Instance().fisrtSupplePointFull != true) {
-					TilePosition supplyPosition = BlockingEntrance.Instance().getSupplyPosition();
-					desiredPosition = getBuildLocationNear(buildingType, supplyPosition);
+            case NextSupplePoint:
+            	if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
+                    if (BuildManager.Instance().fisrtSupplePointFull != true) {
+                        TilePosition supplyPosition = BlockingEntrance.Instance().getSupplyPosition();
+                        desiredPosition = getBuildLocationNear(buildingType, supplyPosition);
 
-					if (desiredPosition == null) {
-						BuildManager.Instance().fisrtSupplePointFull = true;
-					}
-					break;
-				}
-			}
-			break;
+                        if (desiredPosition == null) {
+                            BuildManager.Instance().fisrtSupplePointFull = true;
+                        }
+                        break;
+                    }
+                }
+                break;
 
-		case LastBuilingPoint:
-			TilePosition lastBuildingTilePosition = InformationManager.Instance().getLastBuildingLocation();
-			if (lastBuildingTilePosition != null) {
-				if ((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
-				&& BuildManager.Instance().fisrtSupplePointFull) {
-					lastBuildingTilePosition = BlockingEntrance.Instance().getSupplyPosition(lastBuildingTilePosition);
-				}
-				desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition);
-			}
+            case SecondMainBaseLocation:
+                desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getSecondStartPosition().getTilePosition(), true);
+                if (desiredPosition == null) {
+                    BuildManager.Instance().secondStartLocationFull = true;
+                }else{
+                	if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory && BuildManager.Instance().fisrtSupplePointFull) {
+                        desiredPosition = BlockingEntrance.Instance().getSupplyPosition(desiredPosition);
+                    }
+                    desiredPosition = getBuildLocationNear(buildingType, desiredPosition);
+                }
+                break;
 
-            if (desiredPosition == null) {
-                BuildManager.Instance().secondStartLocationFull = true;
-            }
-			break;
+            case LastBuilingPoint:
+                desiredPosition = InformationManager.Instance().getLastBuildingLocation().getTilePosition();
 
-        case LastBuilingPoint2:
-            TilePosition lastBuildingTilePosition2 = InformationManager.Instance().getLastBuildingLocation2();
-            if (lastBuildingTilePosition2 != null) {
-                desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition2);
-            }else{
-                desiredPosition = null;
-            }
-            break;
+                break;
 
-		case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
-			TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
-			desiredPosition = getBuildLocationNear(buildingType, lastBuilingFinalLocation);
-			break;
+//            case LastBuilingPoint2:
+//                TilePosition lastBuildingTilePosition2 = InformationManager.Instance().getLastBuildingLocation2();
+//                if (lastBuildingTilePosition2 != null) {
+//                    desiredPosition = getBuildLocationNear(buildingType, lastBuildingTilePosition2);
+//                }else{
+//                    desiredPosition = null;
+//                }
+//                break;
 
-		default:
-			break;
-		}
+            case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
+                TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
+                desiredPosition = getBuildLocationNear(buildingType, lastBuilingFinalLocation);
+                break;
+
+            default:
+                break;
+        }
 
 		return desiredPosition;
 	}

@@ -21,6 +21,7 @@ public class BuildOrderItem {
 	public enum SeedPositionStrategy {
         NoLocation,                 /// < Default
 		MainBaseLocation,			///< 아군 베이스
+        SecondMainBaseLocation,		///< My 2nd Base
 		MainBaseBackYard,			///< 아군 베이스 뒷편
 		FirstChokePoint,			///< 아군 첫번째 길목
 		FirstExpansionLocation,		///< 아군 첫번째 앞마당
@@ -29,7 +30,7 @@ public class BuildOrderItem {
 		NextExpansionPoint,    		///< 다음 멀티 위치
 		NextSupplePoint,    		///< 다음 서플 위치
 		LastBuilingPoint,			///< 최종 건물 위치
-        LastBuilingPoint2,			///< 최종 건물 위치
+        //LastBuilingPoint2,			///< 최종 건물 위치
 		getLastBuilingFinalLocation ///< 완전 더이상 없다
 	};
 	

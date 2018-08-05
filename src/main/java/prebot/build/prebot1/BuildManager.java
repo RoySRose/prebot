@@ -588,106 +588,111 @@ public class BuildManager extends GameManager {
 	// SeedPositionSpecified 이 아닌 경우에는 seedLocationStrategy 를 조금씩 바꿔가며 계속 찾아본다.<br>
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
-		
-		switch (seedPositionStrategy) {
-		case MainBaseLocation:
-			if (mainBaseLocationFull) {
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
-			}
-			break;
-		case FirstChokePoint:
-			if (firstChokePointFull) {
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
-			}
-			break;
-		case FirstExpansionLocation:
-			if (firstExpansionLocationFull) {
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
-			}
-			break;
-		case SecondChokePoint:
-			if (secondChokePointFull) {
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;// TODO 다음 검색 위치
-			}
-			break;
-		case NextExpansionPoint:
-			break;
-			
-		case NextSupplePoint:
-			if (fisrtSupplePointFull) {
-//				if (secondStartLocationFull) {
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
-//                } else
-                	if (mainBaseLocationFull) {
-					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				} else {
-					seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-				} 
-			}
-			break;
-			
-		case LastBuilingPoint:
-            if (secondStartLocationFull) {
-                seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;//TODO 다음 검색 위치
+
+        TilePosition desiredPosition = null;
+
+	    while(true) {
+            if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
+                if (mainBaseLocationFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
+                }
+            } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.FirstChokePoint) {
+                if (firstChokePointFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
+                }
+            } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation) {
+                if (firstExpansionLocationFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
+                }
+            } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.NextSupplePoint) {
+                if (fisrtSupplePointFull) {
+                    if (mainBaseLocationFull) {
+                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+                    } else {
+                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+                    }
+                }
             }
-			//seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
-			break;
-			
-		default:
-			break;
-		}
-		
-		TilePosition desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 
-		// desiredPosition 을 찾을 수 없는 경우
-		boolean findAnotherPlace = true;
-		while (desiredPosition == TilePosition.None) {
+            if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SecondChokePoint) {
+                if (secondChokePointFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;//TODO 다음 검색 위치
+                }
+            }
+            if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation) {
+                if (secondStartLocationFull) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
+                }
+            }
 
-			switch (seedPositionStrategy) {
-			case MainBaseLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;//TODO 다음 검색 위치
-				break;
-			case MainBaseBackYard:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case FirstChokePoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case FirstExpansionLocation:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case SecondChokePoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case NextExpansionPoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case NextSupplePoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-				break;
-			case LastBuilingPoint:
-				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint2;
-				break;
-            case LastBuilingPoint2:
-                seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
-                break;
+            desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 
-                case SeedPositionSpecified:
-			case getLastBuilingFinalLocation:
-			default:
-				findAnotherPlace = false;
-				break;
-			}
-
-			// 다른 곳을 더 찾아본다
-			if (findAnotherPlace) {
-				desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-			}
-			// @@@@@@ 여기서 포기하면 됨? 다른 곳을 더 찾아보지 않고, 끝낸다
-			else {
-				break;
-			}
-		}
+            if(desiredPosition == null) {
+                if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
+                    System.out.println("Fixed seedPosition out");
+                    break;
+                }
+                if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation) {
+                    System.out.println("LastFinal seedPosition out, should not happen!!!!!!");
+                    break;
+                }
+                if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.LastBuilingPoint) {
+                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+                }
+            }
+        }
+//		// desiredPosition 을 찾을 수 없는 경우
+//		boolean findAnotherPlace = true;
+//		while (desiredPosition == TilePosition.None) {
+//
+//			switch (seedPositionStrategy) {
+//                case MainBaseLocation:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
+//                    break;
+//                case MainBaseBackYard:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
+//                    break;
+//                case FirstChokePoint:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
+//                    break;
+//                case FirstExpansionLocation:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
+//                    break;
+//                case SecondChokePoint:// 끝까지 상대 location 못 찾았을때
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+//                    break;
+//                case NextExpansionPoint:
+//                    System.out.println("이런 일이 생기면 절대 안됨! 다음 멀티 포지션을 못 찾다니!! 이거 뜨면 Roy에게 알려줄것");
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+//                    break;
+//                case NextSupplePoint:
+//                    System.out.println("이런 일은 딱 한번 말고는 생기면 안될거 같은데... 다음 서플 포지션은 항상 찾는다!! 이거 뜨면 Roy에게 알려줄것");
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
+//                    break;
+//                case SecondMainBaseLocation:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
+//                    break;
+//                case LastBuilingPoint:
+//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+//                    break;
+//                case getLastBuilingFinalLocation:
+//                    break;
+//
+//                case SeedPositionSpecified:
+//                default:
+//                    findAnotherPlace = false;
+//                    break;
+//			}
+//
+//			// 다른 곳을 더 찾아본다
+//			if (findAnotherPlace) {
+//				desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
+//			}
+//			// @@@@@@ 여기서 포기하면 됨? 다른 곳을 더 찾아보지 않고, 끝낸다
+//			else {
+//				break;
+//			}
+//		}
 
 		return desiredPosition;
 	}
