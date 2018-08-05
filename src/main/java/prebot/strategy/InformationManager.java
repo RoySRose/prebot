@@ -141,7 +141,8 @@ public class InformationManager extends GameManager {
 	public Map<UnitType, Integer> baseToBaseUnit = new HashMap<UnitType, Integer>();
 
 	private Map<Player, List<BaseLocation>> occupiedByCCBaseLocations = new HashMap<Player, List<BaseLocation>>();
-	public BaseLocation secondStartPosition;
+
+    private BaseLocation secondStartPosition;
 
 	/// static singleton 객체를 리턴합니다
 	public static InformationManager Instance() {
@@ -680,6 +681,7 @@ public class InformationManager extends GameManager {
 				for (BaseLocation location : occupiedBaseLocations.get(selfPlayer)) {
 					if (existsPlayerBuildingInRegion(BWTA.getRegion(location.getTilePosition()), selfPlayer)) {
 						mainBaseLocations.put(selfPlayer, location);
+                        secondStartPosition = null;
 						mainBaseLocationChanged.put(selfPlayer, new Boolean(true));
 						break;
 					}
@@ -873,7 +875,7 @@ public class InformationManager extends GameManager {
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 			if (numberOfCC == 2) {
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getStartLocations(), true);
+				resultBase = secondStartPosition;
 			} else {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			}
@@ -887,33 +889,35 @@ public class InformationManager extends GameManager {
 		return resultBase;
 	}
 
-	public TilePosition getLastBuildingLocation() {
-		List<BaseLocation> myOccupiedBases = occupiedByCCBaseLocations.get(selfPlayer);
+    public BaseLocation getLastBuildingLocation() {
+        BaseLocation closeButFarFromEnemyLocation = getCloseButFarFromEnemyLocation(occupiedByCCBaseLocations.get(selfPlayer), false);
+        if (closeButFarFromEnemyLocation != null) {
+            return closeButFarFromEnemyLocation;
+        } else {
+            return null;
+        }
+    }
 
-		int currentStartLocations = 0;
-
-		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
-
-		// System.out.println("occupiedByCCBaseLocations : " +
-		// occupiedByCCBaseLocations.size());
-		for (BaseLocation baselocation : myOccupiedBases) {
-			if (baselocation.isStartLocation()) {
-
-				currentStartLocations++;
-				if (!baselocation.getTilePosition().equals(mainBaseLocation.getTilePosition())) {
-					secondStartPosition = baselocation;
-				}
-			}
-		}
-		// System.out.println("currentStartLocations : " + currentStartLocations);
-
-		if (currentStartLocations <= 1) {
-			getLastBuildingLocation = getNextExpansionLocation().getTilePosition();
-			return getNextExpansionLocation().getTilePosition();
-		} else {
-			getLastBuildingLocation = secondStartPosition.getTilePosition();
-			return secondStartPosition.getTilePosition();
-		}
+//	public TilePosition getLastBuildingLocation() {
+//		List<BaseLocation> myOccupiedBases = occupiedByCCBaseLocations.get(selfPlayer);
+//
+//		int currentStartLocations = 0;
+//
+//		for (BaseLocation baselocation : myOccupiedBases) {
+//			if (baselocation.isStartLocation()) {
+//
+//				currentStartLocations++;
+//			}
+//		}
+//		// System.out.println("currentStartLocations : " + currentStartLocations);
+//
+//		if (currentStartLocations <= 1) {
+//			getLastBuildingLocation = getNextExpansionLocation().getTilePosition();
+//			return getNextExpansionLocation().getTilePosition();
+//		} else {
+//			getLastBuildingLocation = secondStartPosition.getTilePosition();
+//			return secondStartPosition.getTilePosition();
+//		}
 
 //		BaseLocation closeButFarFromEnemyLocation = getCloseButFarFromEnemyLocation(myOccupiedBases, true);
 //
@@ -922,44 +926,35 @@ public class InformationManager extends GameManager {
 //		} else {
 //			return null;
 //		}
-	}
+//	}
 
-	public TilePosition getLastBuildingLocation2() {
-		BaseLocation getLastBuildingLocation2 = getCloseButFarFromEnemyLocation(occupiedBaseLocations.get(selfPlayer), false, secondStartPosition);
-		if (getLastBuildingLocation2 != null) {
-			this.getLastBuildingLocation2 = getLastBuildingLocation2.getTilePosition();
-			return getLastBuildingLocation2.getTilePosition();
-		} else {
-			return null;
-		}
-		// return
-	}
+//	public TilePosition getLastBuildingLocation2() {
+//		BaseLocation getLastBuildingLocation2 = getCloseButFarFromEnemyLocation(occupiedBaseLocations.get(selfPlayer), false,  secondStartPosition);
+//		if (getLastBuildingLocation2 != null) {
+//			this.getLastBuildingLocation2 = getLastBuildingLocation2.getTilePosition();
+//			return getLastBuildingLocation2.getTilePosition();
+//		} else {
+//			return null;
+//		}
+//		// return
+//	}
 
 	public TilePosition getLastBuilingFinalLocation() {
 		BaseLocation closeButFarFromEnemyLocation = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false);
 		if (closeButFarFromEnemyLocation != null) {
 			return closeButFarFromEnemyLocation.getTilePosition();
 		} else {
+            System.out.println("이거모야!! 나오면 안되니까 나오면 성욱이에게!");
 			return null;
 		}
-	}
-
-	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
-			BaseLocation secondStartPosition) {
-		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false, secondStartPosition);
 	}
 
 	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation) {
 		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false);
 	}
 
-	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
-			boolean isMulti, boolean onlyGasMulti) {
-		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, isMulti, onlyGasMulti, null);
-	}
-
 	private BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
-			boolean isMulti, boolean onlyGasMulti, BaseLocation secondStartPosition) {
+			boolean isMulti, boolean onlyGasMulti) {
 		BaseLocation resultBase = null;
 		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
 		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
@@ -979,11 +974,6 @@ public class InformationManager extends GameManager {
 				continue;
 			if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
 				continue;
-
-			if (secondStartPosition != null) {
-				if (base.getTilePosition().equals(secondStartPosition.getTilePosition()))
-					continue;
-			}
 
 			if (isMulti) {
 
@@ -1039,12 +1029,11 @@ public class InformationManager extends GameManager {
 				double tempDistance;
 				double closestDistance = 1000000000;
 				for (BaseLocation targetBaseLocation : BWTA.getBaseLocations()) {
-					if (targetBaseLocation.getTilePosition()
-							.equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
+					if (targetBaseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
 						continue;
 
-					tempDistance = PositionUtils.getGroundDistance(sourceBaseLocation.getPosition(),
-							targetBaseLocation.getPosition());
+					tempDistance = PositionUtils.getGroundDistance(sourceBaseLocation.getPosition(),targetBaseLocation.getPosition());
+
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
 						firstExpansionLocation.put(selfPlayer, targetBaseLocation);
@@ -1140,6 +1129,8 @@ public class InformationManager extends GameManager {
 				}
 				this.updateReadyToAttackPosition();
 				this.updateOtherExpansionLocation(enemySourceBaseLocation);
+
+				this.updateMySecondBaseLocation();
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
 			baseToBaseUnit.clear();
@@ -1155,6 +1146,33 @@ public class InformationManager extends GameManager {
 		BaseLocation base;
 		double distance;
 	}
+
+    public void updateMySecondBaseLocation() {
+
+	    if(secondStartPosition == null) {
+            int closestDistance = 99999999;
+            BaseLocation resultBase = null;
+
+            for (BaseLocation baseLocation : BWTA.getStartLocations()) {
+                if (baseLocation.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
+                    continue;
+                if (baseLocation.getTilePosition().equals(firstExpansionLocation.get(selfPlayer).getTilePosition()))
+                    continue;
+
+
+                int enemyFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(enemyPlayer).getPosition(), baseLocation.getPosition());
+                int selfFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(selfPlayer).getPosition(), baseLocation.getPosition());
+
+                int closeFromMyExpansionButFarFromEnemy = selfFirstToBase - enemyFirstToBase;
+
+                if (closeFromMyExpansionButFarFromEnemy < closestDistance) {
+                    closestDistance = closeFromMyExpansionButFarFromEnemy;
+                    resultBase = baseLocation;
+                }
+            }
+            secondStartPosition = resultBase;
+        }
+    }
 
 	public void updateOtherExpansionLocation(BaseLocation baseLocation) {
 
@@ -1404,6 +1422,7 @@ public class InformationManager extends GameManager {
 	/// 해당 Player (아군 or 적군) 의 Main BaseLocation 을 리턴합니다
 	public BaseLocation getMainBaseLocation(Player player) {
 		return mainBaseLocations.get(player);
+
 	}
 
 	/// 해당 Player (아군 or 적군) 의 Main BaseLocation 에서 가장 가까운 ChokePoint 를 리턴합니다
@@ -1864,6 +1883,10 @@ public class InformationManager extends GameManager {
 		regionVertices = sortedVertices;
 		baseRegionVerticesMap.put(base.getPosition(), regionVertices);
 	}
+
+    public BaseLocation getSecondStartPosition() {
+        return secondStartPosition;
+    }
 
 	public Vector<Position> getBaseRegionVerticesMap(BaseLocation base) {
 		return baseRegionVerticesMap.get(base.getPosition());
