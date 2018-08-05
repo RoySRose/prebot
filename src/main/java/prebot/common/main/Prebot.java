@@ -81,7 +81,7 @@ public class Prebot extends DefaultBWListener {
 		// 계산되도록 한다
 		try {
 			BigWatch.clear();
-			gameCommander.onFrame();
+//			gameCommander.onFrame();
 		} catch (Exception e) {
 			Broodwar.printf("[Error Stack Trace]");
 			System.out.println("[Error Stack Trace]");
