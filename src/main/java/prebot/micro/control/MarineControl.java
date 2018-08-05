@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
@@ -29,6 +31,7 @@ import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MarineControl extends Control {
 	private static final int NEAR_BASE_DISTANCE = 250;
@@ -103,17 +106,6 @@ public class MarineControl extends Control {
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.KITING_UNIT) {
 					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
-					/*List<Unit> enemyInSightList = new ArrayList<>();
-					for (UnitInfo eui : euiList) {
-						Unit enemy = UnitUtils.unitInSight(eui);
-						if (enemy != null) {
-							enemyInSightList.add(enemy);
-						}
-					}*/
-					
-					//원거리 유닛이면 벙커에서 안나옴
-					//System.out.println("enemyInSight : " + enemyInSight.getType() + " MicroUtils.isRangeUnit(enemyInSight.getType()) : " + MicroUtils.isRangeUnit(enemyInSight.getType()));
-					//System.out.println("unitType.groundWeapon().maxRange() : " + enemyInSight.getType().groundWeapon().maxRange()  + "  UnitType.Zerg_Zergling.groundWeapon().maxRange() : " + UnitType.Terran_Marine.groundWeapon().maxRange());
 				
 					if(dangerousOutOfMyRegion(marine)){
 						intoTheBunker(bunker, marine);
@@ -207,15 +199,57 @@ public class MarineControl extends Control {
 	}
 	
 	//public boolean isInsidePositionToBase(Position position) {
-	public boolean isInsidePositionToBase(Unit marine) {
-		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
-//		System.out.println("position.getDistance(expansionBase.getPosition() : " + position.getDistance(expansionBase.getPosition()));
-		if(BWTA.getRegion(marine.getPosition()) != BWTA.getRegion(InfoUtils.myBase().getPosition())){
+	public boolean dangerousOutOfMyRegion(Unit marine) {
+		if (LagObserver.groupsize() > 20) {
 			return false;
 		}
-		/*if (position.getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
-		}*/
-    	return true;
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			return false;
+		}
+		
+		Region unitRegion = BWTA.getRegion(marine.getPosition());
+		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+		
+		CampType campType = StrategyIdea.campType;
+			// 베이스 지역 OK
+			if (unitRegion == baseRegion) {
+				return false;
+			}
+			
+			if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
+				if(InformationManager.Instance().enemyRace != Race.Terran){
+					return true;
+				}else{
+					return false;
+				}
+			}
+				
+		// 앞마당 지역, 또는 앞마당 반경이내 OK
+		Position expansionPosition = InfoUtils.myFirstExpansion().getPosition();
+		Region expansionRegion = BWTA.getRegion(expansionPosition);
+		if (unitRegion == expansionRegion) {
+			return false;
+		} else if (marine.getDistance(expansionPosition) < 100) {
+			return false;
+		}
+		if (campType == CampType.EXPANSION) {
+			return true;
+		}
+		
+		// 세번째 지역까지 OK
+		if (unitRegion == InfoUtils.myThirdRegion()) {
+			return false;
+		}
+		if (campType == CampType.SECOND_CHOKE) {
+			return true;
+		}
+		
+		// 세번째 지역 반경 OK
+		if (marine.getDistance(InfoUtils.myThirdRegion()) < 500) {
+			return false;
+		}
+
+		return true;
 	}
 	
 }
