@@ -1086,86 +1086,6 @@ public class ConstructionPlaceFinder {
 					}
 				}
 
-				/*
-				// Geyser 가 Base Location 의 어느방향에 있는가에 따라 최소한의 타일만 판단해서 tilesToAvoid 에 추가하는 방법도 있다
-				//
-				//    11시방향   12시방향  1시방향
-				//
-				//     9시방향             3시방향
-				//
-				//     7시방향    6시방향  5시방향
-				int whichPosition = 0;
-
-				// dimensions of the tilesToAvoid
-				int vx0 = 0;
-				int vx1 = 0;
-				int vy0 = 0;
-				int vy1 = 0;
-
-				// 11시 방향
-				if (gx0 < bx0 && gy0 < by0) {
-					vx0 = gx0 + 1; // Geyser 의 중앙
-					vy0 = gy0;     // Geyser 의 상단
-					vx1 = bx0 + 3; // ResourceDepot 의 중앙
-					vy1 = by0;     // ResourceDepot의 상단
-				}
-				// 9시 방향
-				else if (gx0 < bx0 && gy0 <= by3) {
-					vx0 = gx4; // Geyser 의 오른쪽끝
-					vy0 = gy0; // Geyser 의 상단
-					vx1 = bx0; // ResourceDepot 의 왼쪽끝
-					vy1 = gy2; // Geyser 의 하단 
-				}
-				// 7시 방향
-				else if (gx0 < bx0 && gy2 > by3) {
-					vx0 = gx0 + 1; // Geyser 의 상단 중앙
-					vy0 = by3;     // ResourceDepot 의 하단
-					vx1 = bx0 + 3; // ResourceDepot 의 하단 중앙
-					vy1 = gy0;     // Geyser 의 상단
-				}
-				// 6시 방향
-				else if (gx0 < bx4 && gy0 > by3) {
-					vx0 = bx0 + 1; // ResourceDepot 의 하단 중앙
-					vy0 = by3;     // ResourceDepot 의 하단 
-					vx1 = gx0 + 3; // Geyser 의 상단 중앙
-					vy1 = gy0;     // Geyser 의 상단
-				}
-				// 12시 방향
-				else if (gx0 < bx4 && gy0 < by0) {
-					vx0 = gx0;     // Geyser 의 하단 왼쪽끝
-					vy0 = gy2; 
-					vx1 = gx0 + 3; // Geyser 의 중앙
-					vy1 = by0;     // ResourceDepot 의 상단
-				}
-				// 1시 방향
-				else if (gx0 > bx0 && gy0 < by0) {
-					vx0 = bx0 + 2; // ResourceDepot 의 상단 중앙
-					vy0 = gy0 + 1; // Geyser 의 하단
-					vx1 = gx0 + 2; // Geyser 의 중앙
-					vy1 = by0 + 1; // ResourceDepot 의 상단
-				}
-				// 5시 방향
-				else if (gx0 > bx0 && gy0 >= by3) {
-					vx0 = bx0 + 2; // ResourceDepot 의 하단 중앙
-					vy0 = by0 + 2; // ResourceDepot 의 하단
-					vx1 = gx0 + 2; // Geyser 의 중앙
-					vy1 = gy0 + 1; // Geyser 의 하단
-				}
-				// 3시 방향
-				else if (gx0 > bx0 && gy0 >= by0) {
-					vx0 = bx4; // ResourceDepot 의 오른쪽끝
-					vy0 = gy0; // Geyser 의 상단
-					vx1 = gx0; // Geyser 의 왼쪽 끝
-					vy1 = gy2; // Geyser 의 하단
-				}
-
-				for (int i = vx0; i < vx1; i++) {
-					for (int j = vy0; j < vy1; j++) {
-						_tilesToAvoid.insert(BWAPI::TilePosition(i, j));
-					}
-				}
-				*/
-
 			}
 
 			// BaseLocation 과 Mineral 사이의 타일을 BWTA::getShortestPath 를 사용해서 구한 후 _tilesToAvoid 에 추가
@@ -1283,32 +1203,8 @@ public class ConstructionPlaceFinder {
 				}
 			}
     	}
-		
-//		System.out.println("setTilesToAvoidSupply end");
 	}
 	
-
-	
-//	public void setTilesToAvoidSupply(TilePosition nextSupPos) {
-//		
-////		System.out.println("map name of setTilesToAvoidSupply ==>> " + InformationManager.Instance().getMapSpecificInformation().getMap());
-//		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
-//		
-//			int supply_x = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getX();
-//			int supply_y = BlockingEntrance.Instance().getSupplyPosition(nextSupPos).getY();
-//			
-//			int maxX = BlockingEntrance.Instance().maxSupplyCntX * 3;
-//			int maxY = BlockingEntrance.Instance().maxSupplyCntX * 2;
-//			
-//			for(int x = 0; x < maxX ; x++){
-//				for(int y = 0; y < maxY ; y++){
-//					TilePosition t = new TilePosition(supply_x+x,supply_y+y);
-//					tilesToAvoidSupply.add(t);
-//					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
-//				}
-//			}
-//		}
-//	}
 
     public void setTilesToAvoidForFirstGas()
 	{
@@ -1444,9 +1340,9 @@ public class ConstructionPlaceFinder {
 		for(BaseLocation baseLocation : BWTA.getBaseLocations())
 		{
 			TilePosition cc = baseLocation.getTilePosition();
-			int addonX = cc.getX()+4;
+			int addonX = cc.getX();
 			int addonY = cc.getY();
-			for(int x = 0; x < 3 ; x++){
+			for(int x = 0; x < 7 ; x++){
 				for(int y = 0;  y < 3 ; y++){
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
 					tilesToAvoid.add(t);
