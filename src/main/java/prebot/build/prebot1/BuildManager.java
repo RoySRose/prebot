@@ -639,6 +639,8 @@ public class BuildManager extends GameManager {
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.LastBuilingPoint) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
                 }
+            }else {
+            	break;
             }
         }
 //		// desiredPosition 을 찾을 수 없는 경우

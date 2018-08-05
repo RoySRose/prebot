@@ -150,8 +150,13 @@ public class ConstructionPlaceFinder {
                 break;
 
             case LastBuilingPoint:
-                desiredPosition = InformationManager.Instance().getLastBuildingLocation().getTilePosition();
-
+                BaseLocation temp = InformationManager.Instance().getLastBuildingLocation();
+                if(temp != null) {
+                	desiredPosition = temp.getTilePosition();
+                }else {
+                	desiredPosition = null;
+                }
+              
                 break;
 
 //            case LastBuilingPoint2:
