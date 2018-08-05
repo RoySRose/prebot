@@ -51,7 +51,7 @@ public class EnemyStrategyOptions {
 	}
 	
 	public static class MarineCount {
-		public static final int ONE_MARINE = 0;
+		public static final int ONE_MARINE = 1;
 		public static final int TWO_MARINE = 2;
 		public static final int FOUR_MARINE = 4;
 		public static final int SIX_MARINE = 6;

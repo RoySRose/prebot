@@ -14,7 +14,7 @@ import prebot.strategy.InformationManager;
 
 public class MicroConfig {
 
-	public static final int COMMON_ADD_RADIUS = 150;
+	public static final int COMMON_ADD_RADIUS = 50;
 	public static final int LARGE_ADD_RADIUS = 500;
 	
 	public static enum MainSquadMode {

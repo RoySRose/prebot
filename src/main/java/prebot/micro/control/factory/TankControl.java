@@ -207,9 +207,9 @@ public class TankControl extends Control {
 		}
 		
 		// 렉 있으면 그냥 퉁퉁포로 조지기
-		if (LagObserver.groupsize() > 20 && eui.getType().groundWeapon().maxRange() < UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange()) {
-			return false;
-		}
+//		if (LagObserver.groupsize() > 20 && eui.getType().groundWeapon().maxRange() < UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange()) {
+//			return false;
+//		}
 		
 		if (eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
 			
@@ -242,7 +242,7 @@ public class TankControl extends Control {
 				siegeModeDistance = Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE;
 			}
 			
-			if (distanceToTarget <= siegeModeDistance && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), false)) {
+			if (distanceToTarget <= siegeModeDistance) { // TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), false)
 				return true;
 			} else {
 				if (!eui.getType().isBuilding()) {

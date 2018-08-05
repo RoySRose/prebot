@@ -155,18 +155,14 @@ public class TankPositionManager {
 	}
 
 	public boolean isProperPositionToSiege(Position position, boolean notSiegeOnNarrowChoke) {
-		int narrowWidth = NARROW_WIDTH;
-		if (!notSiegeOnNarrowChoke) { // 적 공격시에는 기준을 완화한다.
-			narrowWidth = NARROW_WIDTH / 2;
-		}
-		
-		Chokepoint nearestChoke = BWTA.getNearestChokepoint(position);
-		if (nearestChoke.getWidth() < narrowWidth) {
-			if (nearestChoke.getCenter().getDistance(position) < NEAR_CHOKE_DISTANCE) {
-				return false;
+		if (notSiegeOnNarrowChoke) { // 적 공격시에는 기준을 완화한다.
+			Chokepoint nearestChoke = BWTA.getNearestChokepoint(position);
+			if (nearestChoke.getWidth() < NARROW_WIDTH) {
+				if (nearestChoke.getCenter().getDistance(position) < NEAR_CHOKE_DISTANCE) {
+					return false;
+				}
 			}
 		}
-		
     	
 		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
 		if (position.getDistance(expansionBase.getPosition()) < NEAR_BUILDING_DISTANCE) {

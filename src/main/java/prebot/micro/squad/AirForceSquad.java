@@ -41,16 +41,16 @@ public class AirForceSquad extends Squad {
 		// airForceUnit 머지
 		AirForceManager.Instance().updateAirForceTeam(unitList);
 		
-		List<Unit> leaderUnits = new ArrayList<>();
-		for (Unit wraith : unitList) {
-			if (AirForceManager.Instance().isLeader(wraith.getID())) {
-				leaderUnits.add(wraith);
+		List<Unit> leaderAirunits = new ArrayList<>();
+		for (Unit airunit : unitList) {
+			if (AirForceManager.Instance().isLeader(airunit.getID())) {
+				leaderAirunits.add(airunit);
 			}
 		}
 		
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행한다.
-		for (Unit leaderWraith : leaderUnits) {
-			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfWraith(leaderWraith.getID());
+		for (Unit leaderAirunit : leaderAirunits) {
+			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfUnit(leaderAirunit.getID());
 			Set<UnitInfo> euis = findEnemiesForTeam(airForceTeam.memberList);
 			airForceControl.controlIfUnitExist(airForceTeam.memberList, euis);
 		}

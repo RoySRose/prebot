@@ -9,6 +9,7 @@ import java.util.Set;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
+import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -19,6 +20,7 @@ public class AirForceTeam {
 
 	private static final int MAX_TARGET_TRY_COUNT = 2; // 타깃포지션별 재공격 시도 횟수
 	private static final int RETREAT_TIME = 2 * TimeUtils.SECOND; // 후퇴시간
+	private static final int RETREAT_TIME_REPAIR = 4 * TimeUtils.SECOND; // 후퇴시간
 	private static final int WRAITH_EFFECTIVE_FRAME_SIZE = 25 * TimeUtils.SECOND;
 
 	public Unit leaderUnit;
@@ -116,7 +118,8 @@ public class AirForceTeam {
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
 			return false;
 		}
-		return TimeUtils.elapsedFrames(retreatFrame) < RETREAT_TIME;
+		int retreatTime = repairCenter != null ? RETREAT_TIME_REPAIR : RETREAT_TIME;
+		return TimeUtils.elapsedFrames(retreatFrame) < retreatTime;
 	}
 	
 	public void retreat(UnitInfo eui) {
@@ -181,8 +184,8 @@ public class AirForceTeam {
 			return false;
 		}
 		
-		for (Unit wraith : memberList) {
-			if (wraith.getEnergy() < TechType.Cloaking_Field.energyCost() + 20) {
+		for (Unit airunit : memberList) {
+			if (airunit.getEnergy() < TechType.Cloaking_Field.energyCost() + 20) {
 				return false;
 			}
 		}
@@ -195,7 +198,7 @@ public class AirForceTeam {
 
 	@Override
 	public String toString() {
-		return "Team" + leaderUnit.getID() + "(" + (cloakingMode ? "C":"U") + ") size=" + memberList.size() + ", achieve=" + killedEffectiveFrame + "/" + damagedEffectiveFrame;
+		return "Team" + leaderUnit.getID() + "(" + (cloakingMode ? "C":"U") + ") size=" + memberList.size() + ", achieve=" + killedEffectiveFrame + "/" + damagedEffectiveFrame + (repairCenter != null ? " * repair" : "");
 	}
 
 }

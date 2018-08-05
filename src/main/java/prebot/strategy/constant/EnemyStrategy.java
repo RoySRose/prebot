@@ -247,7 +247,7 @@ public enum EnemyStrategy {
 			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
-	TERRAN_2FAC(0, 2, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.TS)
+	TERRAN_2FAC(1, 2, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.TS)
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2FAC()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),

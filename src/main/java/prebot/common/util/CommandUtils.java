@@ -1,5 +1,8 @@
 package prebot.common.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.TilePosition;
@@ -9,6 +12,8 @@ import bwapi.UnitCommandType;
 import prebot.common.main.Prebot;
 
 public class CommandUtils {
+	public static Map<Integer, Integer> siegeModeChangeMap = new HashMap<>();
+	
 	public static void attackUnit(Unit unit, Unit target) {
 		if (validCommand(unit, target, UnitCommandType.Attack_Unit, true, false)) {
 			unit.attack(target);
@@ -83,13 +88,21 @@ public class CommandUtils {
 
 	public static void siege(Unit tank) {
 		if (tank.canSiege() && validCommand(tank, UnitCommandType.Siege)) {
-			tank.siege();
+			Integer changeTime = siegeModeChangeMap.get(tank.getID());
+			if (changeTime == null || TimeUtils.elapsedFrames(changeTime) > 4 * TimeUtils.SECOND) {
+				siegeModeChangeMap.put(tank.getID(), TimeUtils.elapsedFrames());
+				tank.siege();
+			}
 		}
 	}
 	
 	public static void unsiege(Unit tank) {
 		if (tank.canUnsiege() && validCommand(tank, UnitCommandType.Unsiege)) {
-			tank.unsiege();
+			Integer changeTime = siegeModeChangeMap.get(tank.getID());
+			if (changeTime == null || TimeUtils.elapsedFrames(changeTime) > 4 * TimeUtils.SECOND) {
+				siegeModeChangeMap.put(tank.getID(), TimeUtils.elapsedFrames());
+				tank.unsiege();
+			}
 		}
 	}
 

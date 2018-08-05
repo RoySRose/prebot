@@ -109,9 +109,9 @@ public class DecisionMaker {
 	}
 
 	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, int strikeLevel) {
-		int wraithMemorySeconds = 3;
+		int airunitMemorySeconds = 3;
 		if (strikeLevel < StrikeLevel.SORE_SPOT) {
-			wraithMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
+			airunitMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}
 		
 		List<UnitInfo> euiListAirDefenseBuilding = new ArrayList<>();
@@ -119,7 +119,7 @@ public class DecisionMaker {
 		List<UnitInfo> euiListFeed = new ArrayList<>();
 		List<UnitInfo> euiListDetector = new ArrayList<>();
 		for (UnitInfo eui : euiList) {
-			if (UnitUtils.ignorableEnemyUnitInfo(eui, wraithMemorySeconds)) { // 레이쓰는 기억력이 안좋다.
+			if (UnitUtils.ignorableEnemyUnitInfo(eui, airunitMemorySeconds)) { // 레이쓰는 기억력이 안좋다.
 				continue;
 			}
 
@@ -174,23 +174,28 @@ public class DecisionMaker {
 		}
 
 		UnitInfo bestTargetInfo = null;
-
-		if (!euiListAirWeapon.isEmpty()) {
-			if (AirForceManager.Instance().isAirForceDefenseMode()) {
+		
+		if (AirForceManager.Instance().isAirForceDefenseMode()) {
+			if (!euiListAirWeapon.isEmpty()) {
 				if (airForceTeam.cloakable()) {
 					return Decision.change(airForceTeam.leaderUnit);
 				}
 				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
-				
 			} else {
+				if (airForceTeam.uncloakable()) {
+					return Decision.change(airForceTeam.leaderUnit);
+				}
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
+			}
+		} else {
+			if (!euiListAirWeapon.isEmpty()) {
 				boolean detectUnitExist = !euiListDetector.isEmpty() || airForceTeam.damagedEffectiveFrame > 10; // 10 hitpoints reduced
 				boolean cloakingBonus = airForceTeam.cloakingMode && !detectUnitExist;
 				boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
-//				System.out.println("cloakingBonus : " + cloakingBonus);
+				// System.out.println("cloakingBonus : " + cloakingBonus);
 				
 				SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
-//				System.out.println("fightPredict = " + fightPredict);
-				
+				// System.out.println("fightPredict = " + fightPredict);
 				if (fightPredict == SmallFightPredict.ATTACK) {
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 
@@ -219,15 +224,10 @@ public class DecisionMaker {
 					}
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding, StrikeLevel.SORE_SPOT);
 				}
+				
+			} else {
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
 			}
-			
-		} else {
-			if (AirForceManager.Instance().isAirForceDefenseMode()) {
-				if (airForceTeam.uncloakable()) {
-					return Decision.change(airForceTeam.leaderUnit);
-				}
-			}
-			bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
 		}
 
 		if (bestTargetInfo != null) {
@@ -290,14 +290,14 @@ public class DecisionMaker {
 	
 	public Decision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, boolean movingAttack) {
 		boolean allUnitCoolTimeReady = true;
-		for (Unit wraith : airForceTeam.memberList) {
-			if (wraith.getGroundWeaponCooldown() > 0) {
+		for (Unit airunit : airForceTeam.memberList) {
+			if (airunit.getGroundWeaponCooldown() > 0) {
 				allUnitCoolTimeReady = false;
 				break;
 			}
 		}
 		
-		if (allUnitCoolTimeReady) {
+		if (allUnitCoolTimeReady && airForceTeam.repairCenter == null) {
 			UnitInfo targetInfo = null;
 			int minimumLinearDistance = CommonCode.INT_MAX;
 			for (UnitInfo eui : euiList) {

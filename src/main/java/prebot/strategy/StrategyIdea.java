@@ -36,6 +36,7 @@ public class StrategyIdea {
 	public static BuildTimeMap buildTimeMap;
 	
 	public static int wraithCount = 0;
+	public static int valkyrieCount = 0;
 
 	// 벙커가 필요한 frame (bunkerBuildStartFrame 이전에는 벙커를 짓지 않는다.) 
 //	public static int bunkerNeedFrame = CommonCode.INT_MAX;

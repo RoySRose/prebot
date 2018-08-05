@@ -136,9 +136,18 @@ public class StrategyAnalyseManager {
 		if (currentStrategy.expansionOption != null) {
 			StrategyIdea.expansionOption = currentStrategy.expansionOption;
 			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-				StrategyIdea.wraithCount = 4; // default wraith count
+				if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame < TimeUtils.timeToFrames(5, 30)) {
+//					StrategyIdea.wraithCount = 0;
+//					StrategyIdea.valkyrieCount = 3;
+					StrategyIdea.wraithCount = 4;
+					StrategyIdea.valkyrieCount = 0;
+				} else {
+					StrategyIdea.wraithCount = 4;
+					StrategyIdea.valkyrieCount = 0;
+				}
 			} else {
 				StrategyIdea.wraithCount = 0;
+				StrategyIdea.valkyrieCount = 0;
 			}
 		}
 		if (currentStrategy.buildTimeMap != null) {

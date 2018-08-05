@@ -270,13 +270,13 @@ public class UnitUtils {
 				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 			} else {
 				if (addGroundWeoponRadius) {
-					if (eui.getType().airWeapon() != WeaponType.None) {
-						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
+					if (eui.getType().groundWeapon() != WeaponType.None) {
+						weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
 					}
 				}
 				if (addAirWeoponRadius) {
-					if (eui.getType().groundWeapon() != WeaponType.None) {
-						weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
+					if (eui.getType().airWeapon() != WeaponType.None) {
+						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 					}
 				}
 			}
