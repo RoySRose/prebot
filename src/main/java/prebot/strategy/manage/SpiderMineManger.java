@@ -350,10 +350,7 @@ public class SpiderMineManger {
 		BaseLocation expansion1 = InformationManager.Instance().getSecondStartPosition();
 		List<BaseLocation> addbase = InformationManager.Instance().getFutureCloseButFarFromEnemyLocation();
 		bases.addAll(addbase);
-		//BaseLocation expansion3 = InformationManager.Instance().getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false);
-		
 		bases.add(expansion1);
-
 		
 		return bases;
 	}
