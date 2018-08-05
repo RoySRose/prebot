@@ -30,7 +30,6 @@ public class ChatBot {
 		chatExecuters.add(new UxOptionChanger('d'));
 		chatExecuters.add(new StrategyChanger('$'));
 		chatExecuters.add(new StrikeLevelAdjuster('w'));
-		chatExecuters.add(new StrikeLevelAdjuster('w'));
 	}
 
 	/**
