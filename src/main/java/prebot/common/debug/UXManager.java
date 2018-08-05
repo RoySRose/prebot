@@ -1093,9 +1093,16 @@ public class UXManager {
 //		Position lastBuild2 = InformationManager.Instance().getLastBuildingLocation2().toPosition();
 		
 	    BaseLocation getExpansionLocation = InformationManager.Instance().getExpansionLocation;
+	    BaseLocation secondStartPosition = InformationManager.Instance().getSecondStartPosition();
 	    TilePosition getLastBuildingLocation = InformationManager.Instance().getLastBuildingLocation;
-	    TilePosition getLastBuildingLocation2 = InformationManager.Instance().getLastBuildingLocation2;
+	    TilePosition getLastBuildingFinalLocation = InformationManager.Instance().getLastBuildingFinalLocation;
 	    
+		if(secondStartPosition!= null) {
+			Prebot.Broodwar.drawTextScreen(10, 110, "secondStartPosition: " + secondStartPosition.getTilePosition());
+			Prebot.Broodwar.drawTextMap(secondStartPosition.getPosition(), "secondStartPosition");
+		}else {
+			Prebot.Broodwar.drawTextScreen(10, 110, "secondStartPosition: null");
+		}
 		if(getExpansionLocation!= null) {
 			Prebot.Broodwar.drawTextScreen(10, 120, "getExpansionLocation: " + getExpansionLocation.getTilePosition());
 			Prebot.Broodwar.drawTextMap(getExpansionLocation.getPosition(), "nextEX");
@@ -1108,17 +1115,18 @@ public class UXManager {
 		}else {
 			Prebot.Broodwar.drawTextScreen(10, 130, "getLastBuildingLocation: null");
 		}
-		if(getLastBuildingLocation2!= null) {
-			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation2: " + getLastBuildingLocation2);
-			Prebot.Broodwar.drawTextMap(getLastBuildingLocation2.toPosition(), "nextBuild2");
+		if(getLastBuildingFinalLocation!= null) {
+			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingFinalLocation: " + getLastBuildingFinalLocation);
+			Prebot.Broodwar.drawTextMap(getLastBuildingFinalLocation.toPosition(), "LastBuild");
 		}else {
-			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation2: null");
+			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingFinalLocation: null");
 		}
 
 		
 		Prebot.Broodwar.drawTextScreen(10, 150, "mainBaseLocationFull: " + BuildManager.Instance().mainBaseLocationFull);
-		Prebot.Broodwar.drawTextScreen(10, 160, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
-		Prebot.Broodwar.drawTextScreen(10, 170, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
+		Prebot.Broodwar.drawTextScreen(10, 160, "secondChokePointFull: " + BuildManager.Instance().secondChokePointFull);
+		Prebot.Broodwar.drawTextScreen(10, 170, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
+		Prebot.Broodwar.drawTextScreen(10, 180, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
 
 	}
 	
