@@ -47,7 +47,6 @@ public class GameCommander {
 		BlockingEntrance.Instance().SetBlockingTilePosition();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon();
-		ConstructionPlaceFinder.Instance().setTilesToAvoidMaxRange();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();

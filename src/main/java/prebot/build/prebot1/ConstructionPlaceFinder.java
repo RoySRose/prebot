@@ -13,15 +13,11 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.build.initialProvider.BlockingEntrance.Map;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
-import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 
@@ -53,10 +49,6 @@ public class ConstructionPlaceFinder {
 	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
 	//팩토리 건설 지역
 	private Set<TilePosition> tilesToAvoidFac = new HashSet<TilePosition>();
-	
-	private Set<TilePosition> tilesToAvoidMaxRange = new HashSet<TilePosition>();
-	
-	private Set<TilePosition> tilesToAvoidBasePoint = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -587,8 +579,6 @@ public class ConstructionPlaceFinder {
 
 		return resultPosition;
 	}
-	
-	
 
 	/// 해당 위치에 건물 건설이 가능한지 여부를 buildingGapSpace 조건을 포함해서 판단하여 리턴합니다<br>
 	/// Broodwar 의 canBuildHere, isBuildableTile, isReservedTile 를 체크합니다
@@ -1366,14 +1356,6 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidSupply;
 	}
 	
-	public Set<TilePosition> getTilesToAvoidMaxRange() {
-		return tilesToAvoidMaxRange;
-	}
-	
-	public Set<TilePosition> getTilesToAvoidBasePotin() {
-		return tilesToAvoidBasePoint;
-	}
-	
 	public void setTilesToAvoidFac(Unit unit) {
 		
 		int fromx = unit.getTilePosition().getX()-1;
@@ -1469,138 +1451,6 @@ public class ConstructionPlaceFinder {
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
 					tilesToAvoid.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
-				}
-			}
-		}
-	}
-	
-	/// 해당 buildingType 이 건설될 수 있는 위치를 desiredPosition 근처에서 탐색해서 탐색결과를 리턴합니다<br>
-	/// buildingGapSpace를 반영해서 canBuildHereWithSpace 를 사용해서 체크<br>
-	/// 못찾는다면 BWAPI::TilePositions::None 을 리턴합니다<br>
-	/// TODO 과제 : 건물을 계획없이 지을수 있는 곳에 짓는 것을 계속 하다보면, 유닛이 건물 사이에 갇히는 경우가 발생할 수 있는데, 이를 방지하는 방법은 생각해볼 과제입니다
-	public final void displayUxMaxRange(TilePosition desiredPosition) {
-		int maxRange = 35; // maxRange = BWAPI::Broodwar->mapWidth()/4;
-			
-		// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
-		// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
-		int currentX = desiredPosition.getX();
-		int currentY = desiredPosition.getY();
-		int spiralMaxLength = 1;
-		int numSteps = 0;
-		boolean isFirstStep = true;
-
-		int spiralDirectionX = 0;
-		int spiralDirectionY = 1;
-		while (spiralMaxLength < maxRange) {
-			TilePosition temp = new TilePosition(currentX,currentX);
-			tilesToAvoidMaxRange.add(temp);
-
-			currentX = currentX + spiralDirectionX;
-			currentY = currentY + spiralDirectionY;
-			numSteps++;
-			
-			// 다른 방향으로 전환한다
-			if (numSteps == spiralMaxLength) {
-				numSteps = 0;
-
-				if (!isFirstStep)
-					spiralMaxLength++;
-
-				isFirstStep = !isFirstStep;
-
-				if (spiralDirectionX == 0) {
-					spiralDirectionX = spiralDirectionY;
-					spiralDirectionY = 0;
-				} else {
-					spiralDirectionY = -spiralDirectionX;
-					spiralDirectionX = 0;
-				}
-			}
-		}
-	}
-	
-	
-	/// 해당 buildingType 이 건설될 수 있는 위치를 desiredPosition 근처에서 탐색해서 탐색결과를 리턴합니다<br>
-	/// buildingGapSpace를 반영해서 canBuildHereWithSpace 를 사용해서 체크<br>
-	/// 못찾는다면 BWAPI::TilePositions::None 을 리턴합니다<br>
-	/// TODO 과제 : 건물을 계획없이 지을수 있는 곳에 짓는 것을 계속 하다보면, 유닛이 건물 사이에 갇히는 경우가 발생할 수 있는데, 이를 방지하는 방법은 생각해볼 과제입니다
-	public final void setTilesToAvoidMaxRange() {
-		 // maxRange = BWAPI::Broodwar->mapWidth()/4;
-			
-		// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
-		// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
-		
-		
-		
-		for (BaseLocation base : BWTA.getBaseLocations()) {
-			boolean conti = true;
-			int maxRange = 0;
-			if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-				maxRange = 30;
-			
-				if(!base.isStartLocation()) {
-					maxRange = 15;
-					conti = false;
-				}
-			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
-				maxRange = 36;
-				
-				if(!base.isStartLocation()) {
-					maxRange = 18;
-					conti = false;
-				}
-			}else {
-				maxRange = 35;
-				
-				if(!base.isStartLocation()) {
-					maxRange = 20;
-					conti = false;
-				}
-			}
-			
-			if(!conti) {
-				
-			
-				int currentX = 0;
-				int currentY = 0;
-				int spiralMaxLength = 1;
-				int numSteps = 0;
-				boolean isFirstStep = true;
-	
-				int spiralDirectionX = 0;
-				int spiralDirectionY = 1;
-				
-				System.out.println(" base Location to avoid tile of max ragne ==> " + base.getTilePosition());
-				currentX = base.getTilePosition().getX();
-				currentY = base.getTilePosition().getY();
-				TilePosition temp = new TilePosition(currentX,currentY);
-				tilesToAvoidBasePoint.add(temp);
-				while (spiralMaxLength < maxRange) {
-					
-					temp = new TilePosition(currentX,currentY);
-					tilesToAvoidMaxRange.add(temp);
-		
-					currentX = currentX + spiralDirectionX;
-					currentY = currentY + spiralDirectionY;
-					numSteps++;
-					
-					// 다른 방향으로 전환한다
-					if (numSteps == spiralMaxLength) {
-						numSteps = 0;
-		
-						if (!isFirstStep)
-							spiralMaxLength++;
-		
-						isFirstStep = !isFirstStep;
-		
-						if (spiralDirectionX == 0) {
-							spiralDirectionX = spiralDirectionY;
-							spiralDirectionY = 0;
-						} else {
-							spiralDirectionY = -spiralDirectionX;
-							spiralDirectionX = 0;
-						}
-					}
 				}
 			}
 		}

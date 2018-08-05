@@ -45,7 +45,6 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -1011,54 +1010,30 @@ public class UXManager {
 	
 	/// Construction 을 하지 못하는 Tile 들을 Map 에 표시합니다
 	public void drawTilesToAvoidOnMap() {
-//		Set<TilePosition> tilesToAvoid = ConstructionPlaceFinder.Instance().getTilesToAvoid();
-//		for (TilePosition t : tilesToAvoid)
-//		{
-//			int x1 = t.getX() * 32 + 8;
-//			int y1 = t.getY() * 32 + 8;
-//			int x2 = (t.getX() + 1) * 32 - 8;
-//			int y2 = (t.getY() + 1) * 32 - 8;
-//
-//			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
-//		}
-//		
-//		Set<TilePosition> tilesToAvoid3 = ConstructionPlaceFinder.Instance().getTilesToAvoidAbsolute();
-//		for (TilePosition t : tilesToAvoid3)
-//		{
-//			int x1 = t.getX() * 32 + 8;
-//			int y1 = t.getY() * 32 + 8;
-//			int x2 = (t.getX() + 1) * 32 - 8;
-//			int y2 = (t.getY() + 1) * 32 - 8;
-//
-//			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
-//		}
-//		
-//		Set<TilePosition> tilesToAvoidSupply = ConstructionPlaceFinder.Instance().getTilesToAvoidSupply();
-//		for (TilePosition t : tilesToAvoidSupply)
-//		{
-//			int x1 = t.getX() * 32 + 8;
-//			int y1 = t.getY() * 32 + 8;
-//			int x2 = (t.getX() + 1) * 32 - 8;
-//			int y2 = (t.getY() + 1) * 32 - 8;
-//
-//			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
-//		}
-		
-//		FileUtils.appendTextToFile("log.txt", "\n drawTilesToAvoidOnMap");
-		
-		Set<TilePosition> tilesToAvoidMaxRange = ConstructionPlaceFinder.Instance().getTilesToAvoidMaxRange();
-		for (TilePosition t : tilesToAvoidMaxRange)
+		Set<TilePosition> tilesToAvoid = ConstructionPlaceFinder.Instance().getTilesToAvoid();
+		for (TilePosition t : tilesToAvoid)
 		{
 			int x1 = t.getX() * 32 + 8;
 			int y1 = t.getY() * 32 + 8;
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Cyan, false);
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
 		}
 		
-		Set<TilePosition> tilesToAvoidBasePoint = ConstructionPlaceFinder.Instance().getTilesToAvoidBasePotin();
-		for (TilePosition t : tilesToAvoidBasePoint)
+		Set<TilePosition> tilesToAvoid3 = ConstructionPlaceFinder.Instance().getTilesToAvoidAbsolute();
+		for (TilePosition t : tilesToAvoid3)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
+		}
+		
+		Set<TilePosition> tilesToAvoidSupply = ConstructionPlaceFinder.Instance().getTilesToAvoidSupply();
+		for (TilePosition t : tilesToAvoidSupply)
 		{
 			int x1 = t.getX() * 32 + 8;
 			int y1 = t.getY() * 32 + 8;
