@@ -104,7 +104,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 				} else if (completeFactoryCount <= 6) {
 					return true;
 				} else {
-					setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.LastBuilingPoint);
+					setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation);
 					return true;
 				}
 			}
