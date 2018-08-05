@@ -1066,8 +1066,8 @@ public class InformationManager extends GameManager {
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
 				closestDistance = closeFromMyExpansionButFarFromEnemy;
-				base1 = base;
 				base2 = base1;
+				base1 = base;
 			}
 		}
 
@@ -1089,6 +1089,7 @@ public class InformationManager extends GameManager {
 					continue;
 				if(base.getTilePosition().equals(base1.getTilePosition()))
 					continue;
+				
 				TilePosition findGeyser = ConstructionPlaceFinder.Instance()
 						.getRefineryPositionNear(base.getTilePosition());
 				if (findGeyser != null) {
@@ -1110,6 +1111,7 @@ public class InformationManager extends GameManager {
 		
 		resultBase.add(base1);
 		resultBase.add(base2);
+		
 		return resultBase;
 	}
 
