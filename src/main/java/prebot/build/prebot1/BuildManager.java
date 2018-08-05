@@ -68,7 +68,7 @@ public class BuildManager extends GameManager {
 	public void update() {
 		
 		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (TimeUtils.executeRotation(3, 7)) {
+		if (TimeUtils.executeRotation(4, 7)) {
 			return;
 		}
 

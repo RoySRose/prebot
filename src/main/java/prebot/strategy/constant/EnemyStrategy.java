@@ -53,7 +53,7 @@ public enum EnemyStrategy {
 			, MarineCount.ONE_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_FORGE_DOUBLE()),
 	
-	PROTOSS_GATE_DOUBLE(1, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS), // camp=F_EXPANSION, 공격실패시 F_EXPANSION
+	PROTOSS_GATE_DOUBLE(1, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS), // camp=F_EXPANSION, 공격실패시 F_EXPANSION
 			MarineCount.ONE_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_FACTORY
 			, TimeMapForProtoss.PROTOSS_GATE_DOUBLE()),
 	
@@ -170,22 +170,22 @@ public enum EnemyStrategy {
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
 	
-	ZERG_FAST_LURKER(1, 2, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
+	ZERG_FAST_LURKER(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_FAST_LURKER()
 			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.TANK)),
 	
-	ZERG_HYDRA_WAVE(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
+	ZERG_HYDRA_WAVE(1, 3, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
-	ZERG_NO_LAIR_LING(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
+	ZERG_NO_LAIR_LING(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_LING()
 			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE)),
 	
-	ZERG_NO_LAIR_HYDRA(1, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
+	ZERG_NO_LAIR_HYDRA(1, 3, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),

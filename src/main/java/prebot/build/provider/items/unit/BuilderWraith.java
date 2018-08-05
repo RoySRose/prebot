@@ -21,19 +21,17 @@ public class BuilderWraith extends DefaultBuildableItem {
     	
     	int maxWraithCnt = StrategyIdea.wraithCount;
     	
-//    	maxWraithCnt = 10;
-    	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
-    		return false;
-    	}
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
+			return false;
+		}
 
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) <= maxWraithCnt) {
-//    		if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
-    		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
-    			return true;
-    		}
-    	}
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) <= maxWraithCnt) {
+			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+				return true;
+			}
+		}
 
     	
     	
