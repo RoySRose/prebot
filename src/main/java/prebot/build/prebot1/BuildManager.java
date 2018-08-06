@@ -379,17 +379,21 @@ public class BuildManager extends GameManager {
 						continue;
 					}
 					
+					
 //					20180804. hkk. Comsat_Station 의 경우 CommandCenter 가 baseLocation 이 아니면 짓지 않는다.
 					if(t.getUnitType() == UnitType.Terran_Comsat_Station
 						&& unit.getType() == UnitType.Terran_Command_Center) {
+						boolean comsat_ret = false;
 						for(BaseLocation baseLocation : BWTA.getBaseLocations())
 						{
-							if(baseLocation.getTilePosition().getX() != unit.getTilePosition().getX()
-								|| baseLocation.getTilePosition().getY() != unit.getTilePosition().getY()) {
-								FileUtils.appendTextToFile("log.txt", "\n 선택된 커맨드센터가 제위치가 아님");
-								continue;
+							if(baseLocation.getTilePosition().getX() == unit.getTilePosition().getX()
+								&& baseLocation.getTilePosition().getY() == unit.getTilePosition().getY()) {
+								FileUtils.appendTextToFile("log.txt", "\n CommandCenter is right postion ==>> " + baseLocation.getTilePosition());
+								comsat_ret = true;
+								break;
 							}
 						}
+						if(comsat_ret == false) continue;
 					}
 
 					boolean isBlocked = false;
@@ -592,6 +596,7 @@ public class BuildManager extends GameManager {
         TilePosition desiredPosition = null;
 
 	    while(true) {
+	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
                 if (mainBaseLocationFull) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
@@ -628,6 +633,7 @@ public class BuildManager extends GameManager {
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 
             if(desiredPosition == null) {
+            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
                     System.out.println("Fixed seedPosition out");
                     break;
@@ -640,6 +646,7 @@ public class BuildManager extends GameManager {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
                 }
             }else {
+            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             	break;
             }
         }

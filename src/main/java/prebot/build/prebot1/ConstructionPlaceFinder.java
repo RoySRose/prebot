@@ -72,12 +72,16 @@ public class ConstructionPlaceFinder {
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (TilePositionUtils.isValidTilePosition(seedPosition)) {
+			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + seedPosition);
 			TilePosition desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
 			return desiredPosition;
 		}
 		
 		// seedPosition 을 입력하지 않은 경우
 		TilePosition desiredPosition = TilePosition.None;
+		
+		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy SeedPositionStrategy ==>> " + buildingType + " :: " + seedPositionStrategy);
+		
 		switch (seedPositionStrategy) {
 
             case MainBaseLocation:
@@ -210,6 +214,7 @@ public class ConstructionPlaceFinder {
 				&& methodFix == false){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		} else {
+			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
 		}
 		
@@ -220,15 +225,12 @@ public class ConstructionPlaceFinder {
 		// Protoss_Pylon, Terran_Supply_Depot, 
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
 		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
+		
+/*		
+//		getBuildingSpaceGap 에 같은 내용으로 값을 리턴하므로 주석처리
 		if (buildingType.isResourceDepot()) {
 			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
 		}
-//		if(buildingType == UnitType.Terran_Barracks){
-//			buildingGapSpace = 0;
-//		}
-//		if(buildingType == UnitType.Terran_Factory){
-//			buildingGapSpace = 0;
-//		}
 		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
 			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
@@ -247,23 +249,18 @@ public class ConstructionPlaceFinder {
 			}
 		}
 		
-//		else if (buildingType == UnitType.Protoss_Photon_Cannon || buildingType == UnitType.Terran_Bunker 
-//			|| buildingType == UnitType.Terran_Missile_Turret || buildingType == UnitType.Zerg_Creep_Colony) {
 		else if (buildingType == UnitType.Terran_Missile_Turret) {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
-//			FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
-//			20180716. hkk. 입막 좌표의 터렛일 경우 서플라이에 붙여짓기.
 			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-//				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
 				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
-					FileUtils.appendTextToFile("log.txt","\\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
-					buildingGapSpace = 0; 
+					buildingGapSpace = 0;
+					FileUtils.appendTextToFile("log.txt","\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
 				}
 			}
 			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
 				if(desiredPosition == BlockingEntrance.Instance().entrance_turret2) {
-					FileUtils.appendTextToFile("log.txt","\\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
-					buildingGapSpace = 0; 
+					buildingGapSpace = 0;
+					FileUtils.appendTextToFile("log.txt","\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
 				}
 			}
 		}else if (buildingType == UnitType.Terran_Bunker) {
@@ -271,12 +268,6 @@ public class ConstructionPlaceFinder {
 		}
 		
 //		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-//		if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
-//		|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
-//		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
-//		|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
-//		|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
-//		|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())){
 		if( (desiredPosition == BlockingEntrance.Instance().first_supple)
 			|| (desiredPosition == BlockingEntrance.Instance().second_supple)
 			|| (desiredPosition == BlockingEntrance.Instance().starport1)
@@ -285,9 +276,11 @@ public class ConstructionPlaceFinder {
 			|| (desiredPosition == BlockingEntrance.Instance().barrack)){	
 			buildingGapSpace = 0;
 		}
+*/
 		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
 			while (buildingGapSpace >= 0) {
+				FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 turret while ==>> "+ buildingType + " :: " + desiredPosition + " :: buildingGapSpace => " +buildingGapSpace);
 				buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
 				if (TilePositionUtils.isValidTilePosition(buildPosition)) {
 					return buildPosition;
@@ -324,13 +317,15 @@ public class ConstructionPlaceFinder {
 	private int getBuildingSpaceGap(UnitType buildingType, TilePosition desiredPosition, Boolean methodFix, Boolean spaceZero, int constructionPlaceSearchMethod) {
 		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
 		int buildingGapSpace = BuildConfig.buildingSpacing;
+		
+		FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 
 		// ResourceDepot (Nexus, Command Center, Hatchery), Protoss_Pylon, Terran_Supply_Depot, 
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 buildingGapSpace을 다른 Config 값으로 설정하도록 한다
 		if (buildingType.isResourceDepot()) {
 			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
 			
-		} else if (buildingType == UnitType.Terran_Supply_Depot) {
+		} else if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
 			if (spaceZero) {
 				buildingGapSpace = 0;
@@ -348,16 +343,17 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
 
 			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-//				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().entrance_turret1.getY()) {
-				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
-					FileUtils.appendTextToFile("log.txt","\\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
-					buildingGapSpace = 0; 
+				if(desiredPosition.equals(BlockingEntrance.Instance().entrance_turret1)) {
+//				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX()
+//				 &&desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX()) {
+					buildingGapSpace = 0;
+					FileUtils.appendTextToFile("log.txt","\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
 				}
 			}
 			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
-				if(desiredPosition == BlockingEntrance.Instance().entrance_turret2) {
-					FileUtils.appendTextToFile("log.txt","\\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
-					buildingGapSpace = 0; 
+				if(desiredPosition.equals(BlockingEntrance.Instance().entrance_turret2)) {
+					buildingGapSpace = 0;
+					FileUtils.appendTextToFile("log.txt","\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
 				}
 			}
 			
@@ -366,14 +362,24 @@ public class ConstructionPlaceFinder {
 		}
 		
 //		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-		if ((desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
-				|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
-				|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
-				|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
-				|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
-				|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())) {
+		if( (desiredPosition.equals(BlockingEntrance.Instance().first_supple))
+			|| (desiredPosition.equals(BlockingEntrance.Instance().second_supple))
+			|| (desiredPosition.equals(BlockingEntrance.Instance().starport1))
+			|| (desiredPosition.equals(BlockingEntrance.Instance().starport2))
+			|| (desiredPosition.equals(BlockingEntrance.Instance().factory))
+			|| (desiredPosition.equals(BlockingEntrance.Instance().barrack))){
+//		if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
+//			|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())
+//			|| (desiredPosition.getX() == BlockingEntrance.Instance().starport1.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport1.getY())
+//			|| (desiredPosition.getX() == BlockingEntrance.Instance().starport2.getX() && desiredPosition.getY() == BlockingEntrance.Instance().starport2.getY())
+//			|| (desiredPosition.getX() == BlockingEntrance.Instance().factory.getX() && desiredPosition.getY() == BlockingEntrance.Instance().factory.getY())
+//			|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())
+//		){
 			buildingGapSpace = 0;
+			FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap initial set " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 		}
+		
+		FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap return space :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 		return buildingGapSpace;
 	}
 
@@ -389,13 +395,42 @@ public class ConstructionPlaceFinder {
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
 		// 값을 찾아내라. = BaseLocation.isStartingLocation 을 체크해서 메인이면 저값. 나머진 다른값
-		int maxRange = 35; // maxRange = BWAPI::Broodwar->mapWidth()/4;
+		int maxRange = 0; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal()) {
 
 			// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
 			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
-			int currentX = desiredPosition.getX();
+			
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+				maxRange = 20;
+				for (BaseLocation base : BWTA.getBaseLocations()) {
+					if(base.isStartLocation() && base.getTilePosition() == desiredPosition) {
+						maxRange = 30;
+						break;
+					}
+				}
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+				maxRange = 18;
+				for (BaseLocation base : BWTA.getBaseLocations()) {
+					if(base.isStartLocation() && base.getTilePosition() == desiredPosition) {
+						maxRange = 36;
+						break;
+					}
+				}
+			}else {
+				maxRange = 20;
+				for (BaseLocation base : BWTA.getBaseLocations()) {
+					if(base.isStartLocation() && base.getTilePosition() == desiredPosition) {
+						maxRange = 35;
+						break;
+					}
+				}
+			}
+			
+			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear maxrange ==>> "+ buildingType + " :: " + desiredPosition + " ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
+	            
+            int currentX = desiredPosition.getX();
 			int currentY = desiredPosition.getY();
 			int spiralMaxLength = 1;
 			int numSteps = 0;
@@ -586,6 +621,7 @@ public class ConstructionPlaceFinder {
 	{
 		//if we can't build here, we of course can't build here with space
 		if (!canBuildHere(position, b)) {
+			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace canBuildHere false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		}
 
@@ -635,16 +671,16 @@ public class ConstructionPlaceFinder {
 //				horizontalOnly = true;
 			}
 	
-			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
-				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY() && b.getType() == UnitType.Terran_Starport)
-				|| (position.getX() == BlockingEntrance.Instance().factory.getX() && position.getY() == BlockingEntrance.Instance().factory.getY() && b.getType() == UnitType.Terran_Factory)
-				|| (position.getX() == BlockingEntrance.Instance().barrack.getX() && position.getY() == BlockingEntrance.Instance().barrack.getY() && b.getType() == UnitType.Terran_Barracks)){
-				
-//				FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace chk initial point:: buildingType "+ b.getType() + " // position :: " + position  +" // buildingGapSpace :: " + buildingGapSpace);
-				width = 0;
-				height = 0;
-				buildingGapSpace = 0;
-			}
+//			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
+//				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY() && b.getType() == UnitType.Terran_Starport)
+//				|| (position.getX() == BlockingEntrance.Instance().factory.getX() && position.getY() == BlockingEntrance.Instance().factory.getY() && b.getType() == UnitType.Terran_Factory)
+//				|| (position.getX() == BlockingEntrance.Instance().barrack.getX() && position.getY() == BlockingEntrance.Instance().barrack.getY() && b.getType() == UnitType.Terran_Barracks)){
+//				
+////				FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace chk initial point:: buildingType "+ b.getType() + " // position :: " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+//				width = 0;
+//				height = 0;
+//				buildingGapSpace = 0;
+//			}
 
 
 			// 상하좌우에 buildingGapSpace 만큼 간격을 띄운다
@@ -669,10 +705,12 @@ public class ConstructionPlaceFinder {
 				{
 					// if we can't build here, or space is reserved, we can't build here
 					if (isBuildableTile(b, x, y) == false) {
+						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 
 					if (isReservedTile(x, y)) {
+						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 
@@ -704,6 +742,7 @@ public class ConstructionPlaceFinder {
 					}
 					
 					if (isTilesToAvoidAbsolute(x, y)) {
+						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidAbsolute false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 				}
@@ -734,6 +773,7 @@ public class ConstructionPlaceFinder {
 				//if (reserveMap.get(x).get(y))
 				if (reserveMap[x][y])
 				{
+					FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here :: " + x + " , " + y);
 					return false;
 				}
 			}
