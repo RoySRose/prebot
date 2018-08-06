@@ -2,8 +2,10 @@ package prebot.micro.squad;
 
 import java.util.List;
 
+import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -87,13 +89,18 @@ public class WatcherSquad extends Squad {
 		} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 			saveUnitLevel = 0;
 		}
-		
 		if (smallFightPredict != SmallFightPredict.BACK) {
 			regroupLeader = null;
+		}
+
+		Position avoidBunkerPosition = null;
+		if (TimeUtils.beforeTime(10, 0) && BlockingEntrance.Instance().bunker != null && !UnitUtils.myUnitDiscovered(UnitType.Terran_Bunker)) {
+			avoidBunkerPosition = BlockingEntrance.Instance().bunker.toPosition();
 		}
 		
 		vultureWatcher.setSaveUnitLevel(saveUnitLevel);
 		vultureWatcher.setRegroupLeader(regroupLeader);
+		vultureWatcher.setAvoidBunkerPosition(avoidBunkerPosition);
 		
 		vultureWatcher.controlIfUnitExist(unitList, euiList);
 	}

@@ -33,7 +33,9 @@ import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.Squad;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
@@ -469,26 +471,57 @@ public class PositionFinder {
 					}
 					
 					if (goOtherPosition) {
-						//TODO
-						List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
-						if (!enemyOccupiedBases.isEmpty()) {
-							BaseLocation occupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.myFirstExpansion(), new BaseCondition() {
-								@Override public boolean correspond(BaseLocation base) {
-									if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
-										return false;
-									}
-									
-									if (Prebot.Broodwar.isVisible(base.getTilePosition())) {
-										return false;
-									}
-									
-									return true;
+						// 1. 방어가 필요하고 벌처로 방어가능한 내 멀티
+						List<BaseLocation> myOccupiedBases = InfoUtils.myOccupiedBases();
+						if (!myOccupiedBases.isEmpty()) {
+							BaseLocation myOccupiedNeedDefense = null;
+							List<UnitInfo> enemyUnitInfosInRadius = new ArrayList<>();
+							for (BaseLocation occupiedBase : myOccupiedBases) {
+								enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, occupiedBase.getPosition(), 500, true, false);
+								if (enemyUnitInfosInRadius.isEmpty()) {
+									continue;
 								}
-							});
-							if (occupied != null) {
+								// 만약 이길수 있다면
+								Squad watcherSquad = CombatManager.Instance().squadData.getSquadMap().get(SquadInfo.WATCHER.squadName);
+								int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(enemyUnitInfosInRadius);
+								int watcherPower = VultureFightPredictor.powerOfWatchers(watcherSquad.unitList);
+								if (watcherPower > enemyPower) {
+									myOccupiedNeedDefense = occupiedBase;
+									break;
+								}
+							}
+							
+							if (myOccupiedNeedDefense != null) {
 								watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
-								watcherOtherPosition = occupied.getPosition();
+								watcherOtherPosition = myOccupiedNeedDefense.getPosition();
 								watcherPosition = watcherOtherPosition;
+							}
+						}
+						
+						// 2. 내 first expansion과 가까운 적 멀티 (시야가 밝혀지지 않은)
+						if (watcherPosition == Position.Unknown) {
+							List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
+							if (!enemyOccupiedBases.isEmpty()) {
+								BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.myFirstExpansion(), new BaseCondition() {
+									@Override public boolean correspond(BaseLocation base) {
+										if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
+											return false;
+										}
+										if (Prebot.Broodwar.isVisible(base.getTilePosition())) {
+											return false;
+										}
+										List<UnitInfo> enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, base.getPosition(), 500, true, false);
+										if (enemyUnitInfosInRadius.isEmpty()) {
+											return false;
+										}
+										return true;
+									}
+								});
+								if (enemyOccupied != null) {
+									watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
+									watcherOtherPosition = enemyOccupied.getPosition();
+									watcherPosition = watcherOtherPosition;
+								}
 							}
 						}
 					}
@@ -650,8 +683,10 @@ public class PositionFinder {
 		return enemyUnitList.isEmpty();
 	}
 
+	// 쥐 함수
 	private Position letsfindRatPosition() {
 		// 적 건물
+		StrategyIdea.letsFindRat = false;
 		for (UnitInfo eui : InfoUtils.enemyUnitInfoMap().values()) {
 			if (eui.getType().isBuilding() && PositionUtils.isValidPosition(eui.getLastPosition())) {
 				return eui.getLastPosition();
@@ -691,6 +726,7 @@ public class PositionFinder {
 		}
 		
 //		TilePosition center = TilePositionUtils.getCenterTilePosition();
+		StrategyIdea.letsFindRat = true;
 		return new Position(2222, 2222);
 	}
 
@@ -700,7 +736,7 @@ public class PositionFinder {
 		}
 		
 		// 일정시간 경과 후퇴
-		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 20) {
+		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 30) {
 			System.out.println("time's up");
 			watcherOtherPosition = null;
 			return true;
@@ -708,9 +744,9 @@ public class PositionFinder {
 		
 		// 일꾼이 없으면 후퇴
 		if (regroupLeader.getDistance(watcherOtherPosition) < 200) {
-			List<UnitInfo> workers = UnitUtils.getEnemyUnitInfosInRadiusForGround(watcherOtherPosition, 500, UnitType.Zerg_Drone, UnitType.Protoss_Probe, UnitType.Terran_SCV);
-			if (workers.isEmpty()) {
-				System.out.println("no worker");
+			List<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, watcherOtherPosition, 500, true, false);
+			if (euis.isEmpty()) {
+				System.out.println("no ground enemy");
 				watcherOtherPosition = null;
 				return true;
 			}

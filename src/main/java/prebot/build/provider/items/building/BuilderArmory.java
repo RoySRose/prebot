@@ -1,14 +1,18 @@
 package prebot.build.provider.items.building;
 
+import bwapi.Race;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
+import prebot.strategy.manage.EnemyBuildTimer;
 
 public class BuilderArmory extends DefaultBuildableItem {
 
@@ -28,11 +32,19 @@ public class BuilderArmory extends DefaultBuildableItem {
 
 		setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 
-		// 전략적 판단에 대한 부분은 리더에게 오더 받는다. 변경예정.
+		// 아머리가 조금 빨라야 하는 상황
 		if (StrategyIdea.currentStrategy.missionTypeList.contains(MissionType.ARMORY)) {
-			setBlocking(true);
-			setHighPriority(true);
-			return true;
+			int armoryBuildStartFrame = CommonCode.UNKNOWN;
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				armoryBuildStartFrame = EnemyBuildTimer.Instance().mutaliskInMyBaseFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
+			} else if (InfoUtils.enemyRace() == Race.Terran) {
+				armoryBuildStartFrame = EnemyBuildTimer.Instance().cloakingWraithFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
+			}
+			if (armoryBuildStartFrame != CommonCode.UNKNOWN && TimeUtils.after(armoryBuildStartFrame)) {
+				setBlocking(true);
+				setHighPriority(true);
+				return true;
+			}
 		}
 		
 		// 긴급할 경우 자원 체크로직이 필요한가? 어차피 맨위 true로 올릴텐데?

@@ -2,11 +2,13 @@ package prebot.micro.control.airforce;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
@@ -30,18 +32,12 @@ public class AirForceControl extends Control {
 			return;
 		}
 		
-//		boolean letsFindRat = false;
-//		if (letsFindRat) {
-//			Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
-//			for (Unit airunit : airunits) {
-//				if (airunit.isIdle()) {
-//					Position randomPosition = PositionUtils.randomPosition(centerPosition, 5000);
-//					CommandUtils.attackMove(airunit, randomPosition);
-//				}
-//			}
-//			return;
-//		}
-
+		List<UnitInfo> enemyUnitInfoList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		if (Prebot.Broodwar.self().supplyUsed() > 300 && enemyUnitInfoList.size() <= 3) {
+			findRat(airunits);
+			return;
+		}
+		
 		// 팀 단위로 wraithList가 세팅되어야 한다.
 		int memberId = airunits.iterator().next().getID();
 		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfUnit(memberId);

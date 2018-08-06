@@ -163,24 +163,28 @@ public class SpiderMineManger {
 			mineRemoveMap.remove(spiderMineId);
 		}
 		
-		List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
-		for (Unit siegeTank : siegeList) {
-			List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
-			for (Unit mine : nearMineList) {
-				if (mineRemoveMap.get(mine.getID()) == null) {
-					mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+		// 탱크 주변 마인 (테란 상대로는 제거 안함)
+		if (InfoUtils.enemyRace() != Race.Terran) {
+			List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
+			for (Unit siegeTank : siegeList) {
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+				for (Unit mine : nearMineList) {
+					if (mineRemoveMap.get(mine.getID()) == null) {
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+					}
 				}
 			}
-		}
-		for (Unit siegeTank : siegeList) {
-			List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
-			for (Unit mine : nearMineList) {
-				if (mineRemoveMap.get(mine.getID()) == null) {
-					mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+			for (Unit siegeTank : siegeList) {
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+				for (Unit mine : nearMineList) {
+					if (mineRemoveMap.get(mine.getID()) == null) {
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+					}
 				}
 			}
 		}
 		
+		// 급해서 본진에 박은 마인 제거
 		if (LagObserver.groupsize() <= 10) {
 			if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
 				List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
@@ -240,12 +244,12 @@ public class SpiderMineManger {
 
 			int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
 			
-			boolean defaultMineNumber = false;
+			boolean defaultMineNumber = true;
 			if (InfoUtils.enemyRace() == Race.Terran) {
-				if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 500 || vulture.getDistance(InfoUtils.enemyThirdRegion()) < 300) {
+				if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 800 || vulture.getDistance(InfoUtils.enemyThirdRegion()) < 500) {
 					defaultMineNumber = false;
 					mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition * 3, 10);
-				} else if (vulture.getDistance(InfoUtils.myThirdRegion()) < 300) {
+				} else if (vulture.getDistance(InfoUtils.myThirdRegion()) < 500) {
 					defaultMineNumber = false;
 					mineNumberPerPosition = Math.max(StrategyIdea.spiderMineNumberPerPosition, 1);
 				}

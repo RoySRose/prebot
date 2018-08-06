@@ -7,7 +7,10 @@ import bwapi.Unit;
 import bwta.BWTA;
 import bwta.Region;
 import prebot.common.LagObserver;
+import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PositionUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -18,7 +21,11 @@ public abstract class Control {
 	// TODO 추후 모든 컨트롤 적용 필요
 	public void controlIfUnitExist(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		if (!unitList.isEmpty()) {
-			control(unitList, euiList);
+			if (StrategyIdea.letsFindRat) {
+				findRat(unitList);
+			} else {
+				control(unitList, euiList);
+			}
 		}
 	}
 
@@ -32,6 +39,19 @@ public abstract class Control {
 	
 	protected boolean skipControl(Unit unit) {
 		return !TimeUtils.executeUnitRotation(unit, LagObserver.groupsize());
+	}
+	
+	public boolean findRat(Collection<Unit> unitList) {
+		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+		for (Unit unit : unitList) {
+			if (unit.isIdle()) {
+				Position randomPosition = PositionUtils.randomPosition(centerPosition, 5000);
+				if (unit.isFlying() || PositionUtils.isValidGroundPosition(randomPosition)) {
+					CommandUtils.attackMove(unit, randomPosition);
+				}
+			}
+		}
+		return false;
 	}
 	
 	/// 수비시 campType에 따라 나가지 말아야 할 경계를 넘으면 되될아온다.
