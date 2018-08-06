@@ -110,7 +110,8 @@ public class MicroUtils {
 				}
 			}
 			
-			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
+//			double distance = getDistanceAfterSeconds(candiPosition, endPosition, AIR_DRIVING_PRE_EXPECT_SECS);
+			double distance = startPosition.getDistance(endPosition);
 			if (distance < minimumDistance) {
 				minimumDistance = distance;
 				minimumDistanceRadian = moveRadian;

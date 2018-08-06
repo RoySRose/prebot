@@ -14,6 +14,7 @@ import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.PositionFinder;
 
 public class WatcherSquad extends Squad {
@@ -82,6 +83,8 @@ public class WatcherSquad extends Squad {
 		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) {
 			saveUnitLevel = 0;
 		} else if (smallFightPredict == SmallFightPredict.OVERWHELM) {
+			saveUnitLevel = 0;
+		} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 			saveUnitLevel = 0;
 		}
 		

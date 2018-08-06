@@ -164,7 +164,7 @@ public class TerranStrategist extends Strategist {
 					int myTankCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
 					if (myTankCount >= 10) {
 //						AirForceManager.Instance().setAirForceWaiting();
-						StrategyIdea.wraithCount = 8;
+						StrategyIdea.wraithCount = 5;
 					}
 				}
 			}

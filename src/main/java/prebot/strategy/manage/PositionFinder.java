@@ -407,15 +407,22 @@ public class PositionFinder {
 		// watcher 방어모드(특수)
 		if (watcherPosition == Position.Unknown) {
 			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
-				watcherPosition = InfoUtils.myBase().getPosition(); // 드롭인 경우 본진
+				// 드롭인 경우 본진과 세컨초크를 왓다리갓다리 한다.
+				int nSeconds = 12 * TimeUtils.SECOND;
+				int zeroToNSeconds = Prebot.Broodwar.getFrameCount() % nSeconds;
+				if (zeroToNSeconds < (nSeconds / 2)) {
+					watcherPosition = InfoUtils.myBase().getPosition();	
+				} else {
+					watcherPosition = InfoUtils.mySecondChoke().getCenter();
+				}
 				
 			} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
 				
 				// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
 				if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
-				} else {
-					watcherPosition = InfoUtils.mySecondChoke().getCenter();
+				} else if (InfoUtils.enemyBase() != null) {
+					watcherPosition = InfoUtils.enemyBase().getPosition();
 				}
 			}
 		}
@@ -445,12 +452,23 @@ public class PositionFinder {
 				if (watcherOtherPosition != null) {
 					watcherPosition = watcherOtherPosition;
 				} else {
-					int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
-					int zergingCount = 0;
+					boolean goOtherPosition = false;
 					if (InfoUtils.enemyRace() == Race.Zerg) {
-						zergingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
+						int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
+						int zergingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
+						if (enemyGroundUnitPower <= 3 && zergingCount <= 2) {
+							goOtherPosition = true;
+						}
+					} else if (InfoUtils.enemyRace() == Race.Protoss) {
+						int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
+						if (enemyGroundUnitPower <= 3) {
+							goOtherPosition = true;
+						}
+					} else if (InfoUtils.enemyRace() == Race.Terran) {
+						goOtherPosition = true;
 					}
-					if (enemyGroundUnitPower <= 3 && zergingCount <= 2) {
+					
+					if (goOtherPosition) {
 						//TODO
 						List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
 						if (!enemyOccupiedBases.isEmpty()) {

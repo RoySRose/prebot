@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -237,13 +238,21 @@ public class SpiderMineManger {
 			return position;
 		} else {
 
-			boolean vultureInMyOccupied = false;
-			boolean vultureInEnemyNear = false;
-			if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 800
-					|| vulture.getDistance(InfoUtils.enemyThirdRegion()) < 500) {
-				vultureInEnemyNear = true;
-				
-			} else {
+			int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
+			
+			boolean defaultMineNumber = false;
+			if (InfoUtils.enemyRace() == Race.Terran) {
+				if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 500 || vulture.getDistance(InfoUtils.enemyThirdRegion()) < 300) {
+					defaultMineNumber = false;
+					mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition * 3, 10);
+				} else if (vulture.getDistance(InfoUtils.myThirdRegion()) < 300) {
+					defaultMineNumber = false;
+					mineNumberPerPosition = Math.max(StrategyIdea.spiderMineNumberPerPosition, 1);
+				}
+			}
+			
+			if (defaultMineNumber) {
+				boolean vultureInMyOccupied = false;
 				Region vultureRegion = BWTA.getRegion(vulture.getPosition());
 				for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
 					if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
@@ -251,20 +260,15 @@ public class SpiderMineManger {
 						break;
 					}
 				}
-			}
-			
-			int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
-			
-			if (vultureInEnemyNear) {
-				mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition * 3, 10);
-				
-			} else if (vultureInMyOccupied) {
-				if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
-					return null;
-				} else {
-					mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
+				if (vultureInMyOccupied) {
+					if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
+						return null;
+					} else {
+						mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
+					}
 				}
 			}
+			
 			
 			Position position = positionToMineNearPosition(vulture, vulture.getPosition(), mineNumberPerPosition);
 			if (position != null) {

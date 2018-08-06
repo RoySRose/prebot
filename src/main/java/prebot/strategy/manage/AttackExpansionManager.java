@@ -26,6 +26,7 @@ public class AttackExpansionManager {
 		return instance;
 	}
 
+	public boolean pushSiegeLine = false;
 	public int combatTime = 0;
 	public int combatStartCase = 0;
 	public int attackPoint = 0;
@@ -165,7 +166,6 @@ public class AttackExpansionManager {
 					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6 + plus) {
 				isAttackMode = true;
 			}
-
 			int CC = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 			if (isAttackMode && unitPoint < 0) {
 				if (CC == 1 && myunitPoint + unitPoint < 0) {
@@ -181,22 +181,23 @@ public class AttackExpansionManager {
 			if (CC > 4) {
 				CC = 4;
 			}
-//			if ((myunitPoint > 250 - CC * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
-//				OldCombatManager.Instance().pushSiegeLine = true;
-//				CombatStartCase = 1;
-//			}
-//
-//			if (CombatStartCase == 1 && myunitPoint < 90) {
-//				OldCombatManager.Instance().pushSiegeLine = false;
-//			}
-//
-//			if (myunitPoint > 100 && unitPoint > 40) {
-//				OldCombatManager.Instance().pushSiegeLine = true;
-//				CombatStartCase = 2;
-//			}
-//			if (CombatStartCase == 2 && unitPoint < 10) {
-//				OldCombatManager.Instance().pushSiegeLine = false;
-//			}
+			pushSiegeLine = false;
+			if ((myunitPoint > 250 - CC * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
+				pushSiegeLine = true;
+				combatStartCase = 1;
+			}
+
+			if (combatStartCase == 1 && myunitPoint < 90) {
+				pushSiegeLine = false;
+			}
+
+			if (myunitPoint > 100 && unitPoint > 40) {
+				pushSiegeLine = true;
+				combatStartCase = 2;
+			}
+			if (combatStartCase == 2 && unitPoint < 10) {
+				pushSiegeLine = false;
+			}
 
 		} else {
 			// 공통 예외 상황

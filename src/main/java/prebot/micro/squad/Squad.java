@@ -22,7 +22,6 @@ public abstract class Squad {
 	}
 
 	private String squadName;
-	private int squadRadius;
 	protected UnitType[] unitTypes;
 
 	public Set<Unit> unitList = new HashSet<>();
@@ -73,9 +72,13 @@ public abstract class Squad {
 		findEnemies();
 		BigWatch.record("findEnemies - " + squadName);
 		
-		BigWatch.start("squadExecution - " + squadName);
+		if (!squadExecuted()) {
+			BigWatch.start("squadExecution - " + squadName);
+		}
 		execute();
-		BigWatch.record("squadExecution - " + squadName);
+		if (!squadExecuted()) {
+			BigWatch.record("squadExecution - " + squadName);
+		}
 		
 		squadExecutedFrame = TimeUtils.elapsedFrames();
 	}
@@ -97,7 +100,7 @@ public abstract class Squad {
 	protected void findEnemies() {
 		euiList.clear();
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + squadRadius);
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
 		}
 	}
 

@@ -494,28 +494,39 @@ public class AirForceManager {
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
 			downAchievement = -80;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				upAchievement = +400;	
+				upAchievement = +300;	
 			} else {
 				upAchievement = +180;
 			}
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
 			downAchievement = -60;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
-				upAchievement = +800;	
+				upAchievement = +600;	
 			} else {
-				upAchievement = +500;
+				upAchievement = +200;
 			}
 		} else {
 			return;
 		}
 
+		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
 		if (accumulatedAchievement <= downAchievement) {
 			StrategyIdea.wraithCount--;
 			accumulatedAchievement = 0;
+			
+			if (StrategyIdea.wraithCount < wraithCount - 5) {
+				StrategyIdea.wraithCount++;
+			}
 		} else if (accumulatedAchievement >= upAchievement) {
 			StrategyIdea.wraithCount++;
 			accumulatedAchievement = 0;
+			
+			// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
+			if (StrategyIdea.wraithCount > wraithCount + 5) {
+				StrategyIdea.wraithCount--;
+			}
 		}
+		
 		
 //		if (InfoUtils.enemyRace() == Race.Terran) {
 //			StrategyIdea.wraithCount = 4;
