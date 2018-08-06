@@ -26,4 +26,12 @@ public class TilePositionUtils {
 	public static boolean isValidTilePosition(TilePosition tilePosition) {
 		return tilePosition != TilePosition.None && tilePosition != TilePosition.Unknown && tilePosition != TilePosition.Invalid && tilePosition.isValid();
 	}
+	
+	public static boolean equals(TilePosition tilePosition1, TilePosition tilePosition2) {
+		if (tilePosition1 == null || tilePosition2 == null) {
+			System.out.println("tile position is null. yahokuku. tilePosition1=" + tilePosition1 + ", tilePosition2" + tilePosition2);
+			return false;
+		}
+		return tilePosition1.getX() == tilePosition2.getX() && tilePosition1.getY() == tilePosition2.getY();
+	}
 }
