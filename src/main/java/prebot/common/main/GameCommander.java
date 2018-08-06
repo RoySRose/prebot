@@ -107,6 +107,9 @@ public class GameCommander {
 			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
 				ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
 			}
+//			if ((unit.getType() == UnitType.Terran_Supply_Depot || unit.getType() == UnitType.Terran_Academy || unit.getType() == UnitType.Terran_Armory)) {
+//				ConstructionPlaceFinder.Instance().setTilesToAvoidSupply(unit);
+//			}
 		}
 	}
 

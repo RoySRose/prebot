@@ -12,6 +12,9 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public class BuilderStarport extends DefaultBuildableItem {
 
@@ -28,12 +31,20 @@ public class BuilderStarport extends DefaultBuildableItem {
 		if (constructionQueueItemCount > 0) {
 			return false;
 		}
+		
+		boolean starport_settile = false;
+		
+		if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) starport_settile = true;
 
 		if (needStarportToTrainWraith()) {
 			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				setTilePosition(BlockingEntrance.Instance().starport1);
+				if(starport_settile == true) {
+					setTilePosition(BlockingEntrance.Instance().starport1);
+				}
 			} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
-				setTilePosition(BlockingEntrance.Instance().starport2);
+				if(starport_settile == true) {
+					setTilePosition(BlockingEntrance.Instance().starport2);
+				}
 			}
 			return true;
 		}
@@ -43,7 +54,7 @@ public class BuilderStarport extends DefaultBuildableItem {
 			int wraithCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith);
 			if (StrategyIdea.wraithCount > wraithCount) {
 				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-					setTilePosition(BlockingEntrance.Instance().starport1);
+//					setTilePosition(BlockingEntrance.Instance().starport1);
 					return true;
 				}
 			}
@@ -52,7 +63,7 @@ public class BuilderStarport extends DefaultBuildableItem {
 			if (vihicleWeaponUpgradeLevel == 0) {
 				int upgradeRemainingFrame = BuildQueueProvider.Instance().upgradeRemainingFrame(UpgradeType.Terran_Vehicle_Weapons);
 				if (upgradeRemainingFrame != CommonCode.UNKNOWN && upgradeRemainingFrame < UpgradeType.Terran_Vehicle_Weapons.upgradeTime() * 2 / 3) {
-					setTilePosition(BlockingEntrance.Instance().starport1);
+//					setTilePosition(BlockingEntrance.Instance().starport1);
 					return true;
 				}
 			}
@@ -61,7 +72,7 @@ public class BuilderStarport extends DefaultBuildableItem {
 		// TODO 필요한 정보 추가
 		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
 			boolean needVessel = UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);
-			setTilePosition(BlockingEntrance.Instance().starport1);
+//			setTilePosition(BlockingEntrance.Instance().starport1);
 			return (needVessel && activatedCommandCount >= 2) || activatedCommandCount >= 3;
 		}
 		return false;

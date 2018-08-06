@@ -69,7 +69,7 @@ public class ConstructionManager extends GameManager {
 		reservedGas += type.gasPrice();
 
 		constructionQueue.add(b); // C++ : constructionQueue.push_back(b);
-		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: " + b.getDesiredPosition());
+//		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: " + b.getDesiredPosition());
 	}
 
 	/// constructionQueue 에서 ConstructionTask 를 취소합니다
@@ -239,7 +239,7 @@ public class ConstructionManager extends GameManager {
 			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
-	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+//	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );

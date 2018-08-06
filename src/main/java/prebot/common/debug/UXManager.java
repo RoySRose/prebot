@@ -129,7 +129,7 @@ public class UXManager {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
-			drawTilesToAvoidOnMap();
+//			drawTilesToAvoidOnMap();
 //			drawLeaderUnitOnMap();
 			// drawUnitExtendedInformationOnMap();
 			// 각 일꾼들의 임무 상황
@@ -1041,6 +1041,17 @@ public class UXManager {
 			int y2 = (t.getY() + 1) * 32 - 8;
 
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
+		}
+		
+		Set<TilePosition> tilesToAvoidFac = ConstructionPlaceFinder.Instance().getTilesToAvoidFac();
+		for (TilePosition t : tilesToAvoidFac)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Cyan, false);
 		}
 		
 	}
