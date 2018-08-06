@@ -237,6 +237,12 @@ public class UnitUtils {
 		addEnemyUnitInfosInRadius(TargetFilter.INCOMPLETE|TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE, euis, position, radius, false, true, unitTypes);
 		return euis;
 	}
+	
+	public static List<UnitInfo> getEnemyUnitInfosInRadius(int targetFilter, Position position, int radius, boolean addGroundWeoponRadius, boolean addAirWeoponRadius, UnitType... unitTypes) {
+		List<UnitInfo> euis = new ArrayList<>();
+		addEnemyUnitInfosInRadius(targetFilter, euis, position, radius, addGroundWeoponRadius, addAirWeoponRadius, unitTypes);
+		return euis;
+	}
 
 	/** position으로부터의 반경 radius이내에 있는 유닛정보를 enemyUnitInfoList에 세팅 */
 	private static void addEnemyUnitInfosInRadius(int targetFilter, Collection<UnitInfo> euis, Position position, int radius, boolean addGroundWeoponRadius, boolean addAirWeoponRadius, UnitType... unitTypes) {

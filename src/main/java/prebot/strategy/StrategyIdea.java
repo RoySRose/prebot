@@ -88,6 +88,7 @@ public class StrategyIdea {
 	public static int mainSquadCoverRadius = 0; // 메인스쿼드가 차지한 지역
 
 	public static BaseLocation enemyBaseExpected = null; // 적base 예상 지점
+	public static boolean letsFindRat = false;
 
 	public static int checkerMaxNumber = 0; // 정찰벌처 최대수
 	public static int spiderMineNumberPerPosition = 1; // 

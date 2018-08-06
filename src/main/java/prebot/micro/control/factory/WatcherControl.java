@@ -32,6 +32,7 @@ public class WatcherControl extends Control {
 
 	private Unit regroupLeader;
 	private int saveUnitLevel;
+	private Position avoidBunkerPosition;
 
 	public void setRegroupLeader(Unit regroupLeader) {
 		this.regroupLeader = regroupLeader;
@@ -39,6 +40,10 @@ public class WatcherControl extends Control {
 	
 	public void setSaveUnitLevel(int saveUnitLevel) {
 		this.saveUnitLevel = saveUnitLevel;
+	}
+
+	public void setAvoidBunkerPosition(Position avoidBunkerPosition) {
+		this.avoidBunkerPosition = avoidBunkerPosition;
 	}
 
 	@Override
@@ -112,9 +117,14 @@ public class WatcherControl extends Control {
 					continue;
 				}
 				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.watcherPosition)) {
-					if (MicroUtils.timeToRandomMove(unit)) {
-						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
-						CommandUtils.attackMove(unit, randomPosition);
+					if (avoidBunkerPosition != null) {
+						Position bunkerAvoidPosition = new Position(avoidBunkerPosition.getX(), avoidBunkerPosition.getY() + 80).makeValid();
+						CommandUtils.attackMove(unit, bunkerAvoidPosition);
+					} else {
+						if (MicroUtils.timeToRandomMove(unit)) {
+							Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+							CommandUtils.attackMove(unit, randomPosition);
+						}
 					}
 
 				} else {

@@ -686,6 +686,7 @@ public class ConstructionManager extends GameManager {
 
 		for (ConstructionTask i : toCancel)
 		{
+			System.out.println("cacnel type=" + i.getType() + ", desiredPosition=" + i.getDesiredPosition());
 			cancelConstructionTask(i.getType(), i.getDesiredPosition());
 		}
 	}
