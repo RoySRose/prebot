@@ -388,7 +388,7 @@ public class BuildManager extends GameManager {
 						{
 							if(baseLocation.getTilePosition().getX() == unit.getTilePosition().getX()
 								&& baseLocation.getTilePosition().getY() == unit.getTilePosition().getY()) {
-								FileUtils.appendTextToFile("log.txt", "\n CommandCenter is right postion ==>> " + baseLocation.getTilePosition());
+//								FileUtils.appendTextToFile("log.txt", "\n CommandCenter is right postion ==>> " + baseLocation.getTilePosition());
 								comsat_ret = true;
 								break;
 							}
@@ -596,7 +596,7 @@ public class BuildManager extends GameManager {
         TilePosition desiredPosition = null;
 
 	    while(true) {
-	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
                 if (mainBaseLocationFull) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
@@ -633,7 +633,7 @@ public class BuildManager extends GameManager {
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 
             if(desiredPosition == null) {
-            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
                     System.out.println("Fixed seedPosition out");
                     break;
@@ -646,7 +646,7 @@ public class BuildManager extends GameManager {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
                 }
             }else {
-            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ desiredPosition + " :: " + seedPositionStrategy);
             	break;
             }
         }

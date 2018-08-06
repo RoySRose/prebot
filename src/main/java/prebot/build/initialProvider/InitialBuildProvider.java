@@ -245,7 +245,7 @@ public class InitialBuildProvider {
         BuildOrderQueue dbgTempbuildQueue = BuildManager.Instance().getBuildQueue();
 
         int cnt =0;
-        FileUtils.appendTextToFile("log.txt", "\n "+ setStr + " debugingFromQueue start =============================");
+//        FileUtils.appendTextToFile("log.txt", "\n "+ setStr + " debugingFromQueue start =============================");
         if (!dbgTempbuildQueue.isEmpty()) {
         	dbgCheckItem= dbgTempbuildQueue.getHighestPriorityItem();
             while(true){
@@ -257,11 +257,11 @@ public class InitialBuildProvider {
                 dbgTempbuildQueue.PointToNextItem();
                 dbgCheckItem = dbgTempbuildQueue.getItem();
                 cnt ++;
-                FileUtils.appendTextToFile("log.txt", "\n debugingFromQueue ::  unitType : " + cnt + " :: " + dbgCheckItem.metaType.getUnitType());
+//                FileUtils.appendTextToFile("log.txt", "\n debugingFromQueue ::  unitType : " + cnt + " :: " + dbgCheckItem.metaType.getUnitType());
                 //tempbuildQueue.removeCurrentItem();
             }
         }
-        FileUtils.appendTextToFile("log.txt", "\n " + setStr + " debugingFromQueue end =============================");
+//        FileUtils.appendTextToFile("log.txt", "\n " + setStr + " debugingFromQueue end =============================");
     }
     
     public int deleteFromBuildQueue(UnitType unitType, boolean notFirstOne){
@@ -307,7 +307,7 @@ public class InitialBuildProvider {
         if(unitType == UnitType.Terran_SCV) {
         	chkCnt = chkCnt-4;
         }
-        FileUtils.appendTextToFile("log.txt", "\n delete of new build order ::  unitType : " + unitType.toString() + " & chkCnt : " + chkCnt);
+//        FileUtils.appendTextToFile("log.txt", "\n delete of new build order ::  unitType : " + unitType.toString() + " & chkCnt : " + chkCnt);
 
         if (!tempbuildQueue.isEmpty()) {
 //            checkItem= tempbuildQueue.getHighestPriorityItem();
@@ -323,7 +323,7 @@ public class InitialBuildProvider {
 //                checkItem = tempbuildQueue.getItem();
 
                 if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
-                    FileUtils.appendTextToFile("log.txt", "\n delete unit ::  unitType : " + checkItem.metaType.getUnitType() + " to " + cnt);
+//                    FileUtils.appendTextToFile("log.txt", "\n delete unit ::  unitType : " + checkItem.metaType.getUnitType() + " to " + cnt);
                     tempbuildQueue.removeCurrentItem();
                     cnt++;
 //                    debugingFromQueue(" deleteFromQueueCnt "+ cnt + " :: " + unitType.toString());
@@ -340,7 +340,7 @@ public class InitialBuildProvider {
     public int deleteFromQueueNext(BuildOrderQueue tempQueue, UnitType unit){
     	if(tempQueue.canGetNextItem() == true){
 	    	tempQueue.PointToNextItem();
-	    	FileUtils.appendTextToFile("log.txt", "\n deleteFromQueueNext ::  queue unitType : " + tempQueue.getItem().metaType.getUnitType() + " &&  deleteUnit ::" + unit);
+//	    	FileUtils.appendTextToFile("log.txt", "\n deleteFromQueueNext ::  queue unitType : " + tempQueue.getItem().metaType.getUnitType() + " &&  deleteUnit ::" + unit);
 	    	if( tempQueue.getItem().metaType.getUnitType() == unit) {
 	    		tempQueue.removeCurrentItem();
 	    		return 1;

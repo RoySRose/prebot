@@ -129,7 +129,7 @@ public class BlockingEntrance {
         if(starting.getX() < SMALL
                 && starting.getY() < SMALL){
             loc = Location.Eleven;
-            xinc = false;
+            xinc = true;
             yinc = true;
         }
         if(SMALL < starting.getX()  && starting.getX() < BIG
@@ -139,7 +139,7 @@ public class BlockingEntrance {
         if(BIG < starting.getX()
                 && starting.getY() < SMALL){
             loc = Location.One;
-            xinc = true;
+            xinc = false;
             yinc = true;
         }
         if(starting.getX() < SMALL
@@ -158,7 +158,7 @@ public class BlockingEntrance {
         if(starting.getX() < SMALL
                 && starting.getY() > BIG){
             loc = Location.Seven;
-            xinc = false;
+            xinc = true;
             yinc = false;
         }
        if(SMALL < starting.getX()  && starting.getX() < BIG
@@ -168,7 +168,7 @@ public class BlockingEntrance {
         if(BIG < starting.getX()
                 && starting.getY() > BIG){
             loc = Location.Five;
-            xinc = true;
+            xinc = false;
             yinc = false;
         }
         
@@ -294,10 +294,10 @@ public class BlockingEntrance {
     	
     	else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
 			
-			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SUPPLY_AREA), new TilePosition(97, 0));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SUPPLY_AREA), new TilePosition(97, 125));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(28, 125));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(28, 0));
+			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SUPPLY_AREA), new TilePosition(115, 0));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SUPPLY_AREA), new TilePosition(115, 125));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(10, 125));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(10, 0));
 	    	
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT1),    new TilePosition(121, 0  ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(101, 4  ));
@@ -489,7 +489,7 @@ public class BlockingEntrance {
     			} else if (InformationManager.Instance().enemyRace == Race.Terran) {
     				postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Eleven, Building.BUNKER)   		  , new TilePosition(22, 37));
     			}
-    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Eleven, Building.ENTRANCE_TURRET1), new TilePosition(10	,24));
+    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Eleven, Building.ENTRANCE_TURRET1), new TilePosition(13	,26));
     			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Eleven, Building.ENTRANCE_TURRET2), new TilePosition(20	,29));
     			
 
@@ -626,7 +626,7 @@ public class BlockingEntrance {
         if(tilepos.getX() < SMALL
                 && tilepos.getY() < SMALL){
             loc = Location.Eleven;
-            xinc = false;
+            xinc = true;
             yinc = true;
         }
         if(SMALL < tilepos.getX()  && tilepos.getX() < BIG
@@ -636,7 +636,7 @@ public class BlockingEntrance {
         if(BIG < tilepos.getX()
                 && tilepos.getY() < SMALL){
             loc = Location.One;
-            xinc = true;
+            xinc = false;
             yinc = true;
         }
         if(tilepos.getX() < SMALL
@@ -655,7 +655,7 @@ public class BlockingEntrance {
         if(tilepos.getX() < SMALL
                 && tilepos.getY() > BIG){
             loc = Location.Seven;
-            xinc = false;
+            xinc = true;
             yinc = false;
         }
        if(SMALL < tilepos.getX()  && tilepos.getX() < BIG
@@ -665,7 +665,7 @@ public class BlockingEntrance {
         if(BIG < tilepos.getX()
                 && tilepos.getY() > BIG){
             loc = Location.Five;
-            xinc = true;
+            xinc = false;
             yinc = false;
         }
         
