@@ -8,9 +8,11 @@ import java.util.Set;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
@@ -22,6 +24,7 @@ import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MainAttackSquad extends Squad {
@@ -116,11 +119,13 @@ public class MainAttackSquad extends Squad {
 				saveUnitLevel = 2; // 안전거리 유지
 			}
 		}
-
+		
 		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) { // strategy manager 판단
 			saveUnitLevel = 0;
 		} else if (InformationManager.Instance().enemyRace != Race.Terran) { // combat manager 자체 판단
 			if (Prebot.Broodwar.self().supplyUsed() >= 360) { // || pushLine) {
+				saveUnitLevel = 0;
+			} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 				saveUnitLevel = 0;
 			}
 		}
@@ -142,10 +147,12 @@ public class MainAttackSquad extends Squad {
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 		
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
-		List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
-		for (Unit building : myBuildings) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+		if (TimeUtils.beforeTime(9, 0) && LagObserver.groupsize() < 5) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
+			List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
+			for (Unit building : myBuildings) {
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+			}
 		}
 
 		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);

@@ -7,6 +7,8 @@ import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
 
 public class BuilderArmory extends DefaultBuildableItem {
 
@@ -25,8 +27,14 @@ public class BuilderArmory extends DefaultBuildableItem {
 		}
 
 		setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
-		
+
 		// 전략적 판단에 대한 부분은 리더에게 오더 받는다. 변경예정.
+		if (StrategyIdea.currentStrategy.missionTypeList.contains(MissionType.ARMORY)) {
+			setBlocking(true);
+			setHighPriority(true);
+			return true;
+		}
+		
 		// 긴급할 경우 자원 체크로직이 필요한가? 어차피 맨위 true로 올릴텐데?
 		if (UnitUtils.enemyCompleteUnitDiscovered(
 				UnitType.Protoss_Scout, UnitType.Protoss_Shuttle, UnitType.Protoss_Carrier,

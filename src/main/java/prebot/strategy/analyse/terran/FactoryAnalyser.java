@@ -46,7 +46,7 @@ public class FactoryAnalyser extends UnitAnalyser {
 				}
 			}
 		} else {
-			int firstBuildFrame = EnemyStrategy.TERRAN_2FAC.buildTimeMap.frame(UnitType.Terran_Barracks, 15);
+			int firstBuildFrame = EnemyStrategy.TERRAN_2FAC.buildTimeMap.frame(UnitType.Terran_Barracks, 30);
 			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > firstBuildFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.FACTORY_NOT_FOUND);

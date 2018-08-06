@@ -65,7 +65,10 @@ public class DecisionMakerPrebot1 {
 							}
 
 						} else {
-							safeDistance += Common.BACKOFF_DIST_SIEGE_TANK + 50;
+							safeDistance += Common.BACKOFF_DIST_SIEGE_TANK;
+							if (mechanicUnit.getType() != UnitType.Terran_Siege_Tank_Tank_Mode) {
+								safeDistance += 50;
+							}
 						}
 
 					} else if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Bunker) {

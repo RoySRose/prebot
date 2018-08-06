@@ -126,10 +126,9 @@ public class EnemyBuildTimer {
 		} else {
 			int starportFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Terran_Starport);
 			if (starportFrame != CommonCode.UNKNOWN) {
-				cloakingWraithFrame = starportFrame + UnitType.Terran_Starport.buildTime() + UnitType.Terran_Control_Tower.buildTime() + TechType.Cloaking_Field.researchTime();
-				StrategyIdea.academyFrame = cloakingWraithFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
-				
 				if (StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
+					cloakingWraithFrame = starportFrame + UnitType.Terran_Starport.buildTime() + UnitType.Terran_Control_Tower.buildTime() + TechType.Cloaking_Field.researchTime();
+					StrategyIdea.academyFrame = cloakingWraithFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime();
 					StrategyIdea.turretNeedFrame = cloakingWraithFrame;
 				}
 			}

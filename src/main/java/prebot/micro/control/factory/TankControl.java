@@ -8,7 +8,6 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
@@ -128,6 +127,7 @@ public class TankControl extends Control {
 			}
 			
 			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(tank, euiList, flyingEnemisInfos, saveUnitLevel);
+//			System.out.println(decision);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(tank, decision.eui.getLastPosition(), fOption);
 
@@ -223,7 +223,7 @@ public class TankControl extends Control {
 
 			if (saveUnitLevel == 0 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + 5) {
 				return true;
-			} else if (saveUnitLevel == 1 && distanceToTarget <= Tank.SIEGE_MODE_SIGHT + 80) {
+			} else if (saveUnitLevel == 1 && distanceToTarget <= Tank.SIEGE_MODE_SIGHT + 80.0) {
 				return true;
 			} else if (saveUnitLevel == 2 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK + 10) {
 				return true;

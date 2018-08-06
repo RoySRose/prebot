@@ -98,7 +98,7 @@ public class EnemyStrategyOptions {
 		public static enum MissionType {
 			EXPANSION, RETREAT
 			, NO_ENEMY, NO_AIR_ENEMY
-			, COMSAT_OK, TURRET_OK
+			, COMSAT_OK, TURRET_OK, ARMORY
 			, VULTURE, TANK, GOLIATH
 		}	
 		
@@ -174,6 +174,9 @@ public class EnemyStrategyOptions {
 				
 			case RETREAT: // 공격모드 해제
 				return StrategyIdea.attackStartedFrame > 0 && !StrategyIdea.mainSquadMode.isAttackMode;
+				
+			case ARMORY:
+				return UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Armory);
 			}
 			
 			return true;

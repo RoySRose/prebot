@@ -165,10 +165,10 @@ public enum EnemyStrategy {
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
-	ZERG_FAST_MUTAL(2, 0, 5, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
+	ZERG_FAST_MUTAL(2, 0, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
-			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.ARMORY)),
 	
 	ZERG_FAST_LURKER(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
@@ -215,11 +215,11 @@ public enum EnemyStrategy {
 	
 	TERRAN_MECHANIC(TERRAN_INIT),
 	
-	TERRAN_2BARRACKS(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
+	TERRAN_2BARRACKS(1, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForTerran.TERRAN_2BARRACKS()),
 	
-	TERRAN_BBS(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
+	TERRAN_BBS(1, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.TS, FacUp.VM)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForTerran.TERRAN_BBS()),
 	
@@ -245,22 +245,22 @@ public enum EnemyStrategy {
 	TERRAN_1FAC_DOUBLE_ARMORY(1, 0, 0, Weight.VULTURE, UpgradeOrder.get()
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_1FAC_DOUBLE_ARMORY()
-			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION)),
 	
 	TERRAN_2FAC(1, 0, 0, Weight.VULTURE, UpgradeOrder.get()
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2FAC()
-			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),
+			, Mission.missions(MissionType.EXPANSION)),
 	
 	TERRAN_1FAC_1STAR(1, 0, 0, Weight.VULTURE, UpgradeOrder.get()
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_1FAC_1STAR()
-			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK)),
+			, Mission.missions(MissionType.EXPANSION)),
 	
-	TERRAN_2STAR(1, 0, 1, Weight.VULTURE, UpgradeOrder.get()
+	TERRAN_2STAR(1, 0, 0, Weight.VULTURE, UpgradeOrder.get()
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2STAR()
-			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.GOLIATH)),
+			, Mission.missions(MissionType.ARMORY)),
 	
 	TERRAN_BIONIC(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.TS)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
@@ -279,6 +279,7 @@ public enum EnemyStrategy {
 	// PHASE3 : PHASE2 종료 ~
 	TERRAN_MECHANIC_VULTURE_TANK(1, 8, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)),
 	TERRAN_MECHANIC_GOLIATH_TANK(1, 4, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
+	TERRAN_MECHANIC_GOL_GOL_TANK(1, 4, 4, Weight.TANK, UpgradeOrder.get(FacUp.GR, FacUp.VM, FacUp.TS, FacUp.VS)),
 //	TERRAN_MECHANIC_WRAITH_TANK(1, 8, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)),
 //	TERRAN_MECHANIC_BATTLE_TANK(0, 4, 1, UpgradeOrder.TS_VM_VS_GR),
 
