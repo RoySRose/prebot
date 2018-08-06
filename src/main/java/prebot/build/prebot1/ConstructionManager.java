@@ -17,6 +17,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -68,6 +69,7 @@ public class ConstructionManager extends GameManager {
 		reservedGas += type.gasPrice();
 
 		constructionQueue.add(b); // C++ : constructionQueue.push_back(b);
+		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: " + b.getDesiredPosition());
 	}
 
 	/// constructionQueue 에서 ConstructionTask 를 취소합니다
@@ -237,6 +239,7 @@ public class ConstructionManager extends GameManager {
 			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
+	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
@@ -246,7 +249,7 @@ public class ConstructionManager extends GameManager {
 				// desiredPosition 주위에 다른 건물/유닛들이 있게 되었거나, Pylon 이 파괴되었거나, Creep 이 없어진 경우이고,
 				// 대부분 다른 건물/유닛들이 있게된 경우이므로 다음 frame 에서 다시 지을 곳을 탐색합니다
 //	        	System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
-				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition());
+				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
 				continue;
 			}
 
