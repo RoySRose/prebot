@@ -8,7 +8,6 @@ import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
-import prebot.strategy.manage.AirForceManager;
 
 public class TerranStrategist extends Strategist {
 	

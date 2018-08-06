@@ -37,6 +37,9 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		if (TimeUtils.executeRotation(0, 48)) {
+			return;
+		}
 		
 		// 상대 클록 유닛
 		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
@@ -67,11 +70,6 @@ public class ComsatControl extends Control {
 				}
 			}
 		}
-
-
-		if (TimeUtils.executeRotation(0, 48)) {
-			return;
-		}
 		
 		Unit comsatToUse = null;
 		int usableEnergy = 75;
@@ -101,11 +99,10 @@ public class ComsatControl extends Control {
 		}
 		if (comsatToUse != null) {
 			Position scanPositionForObservation = getScanPositionForObservation();
-//			System.out.println("################################################ SCCCCCCCCCCCCCCCCCCCCAN -> " + scanPositionForObservation);
-			
+
 			if (PositionUtils.isValidPosition(scanPositionForObservation)) {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
-				CommandUtils.useTechPosition(comsatToUse, TechType.Scanner_Sweep, scanPositionForObservation);
+				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
 			}
 		}
 		

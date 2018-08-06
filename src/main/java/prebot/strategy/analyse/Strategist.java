@@ -70,7 +70,7 @@ public abstract class Strategist {
 	}
 
 	private boolean phase02End() {
-		if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
+		if (TimeUtils.after(8 * TimeUtils.MINUTE)) {
 			System.out.println("TIME IS UP");
 			return true;
 		}

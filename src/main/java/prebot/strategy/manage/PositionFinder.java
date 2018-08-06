@@ -400,7 +400,7 @@ public class PositionFinder {
 	private void updateWatcherPosition() {
 		Position watcherPosition = Position.Unknown;
 		
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
+		if (StrategyIdea.mainSquadMode.isAttackMode && InfoUtils.enemyRace() != Race.Terran) {
 			watcherPosition = StrategyIdea.mainPosition;
 		}
 
