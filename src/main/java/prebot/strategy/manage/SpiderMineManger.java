@@ -236,17 +236,29 @@ public class SpiderMineManger {
 			}
 			return position;
 		} else {
+
 			boolean vultureInMyOccupied = false;
-			Region vultureRegion = BWTA.getRegion(vulture.getPosition());
-			for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
-				if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
-					vultureInMyOccupied = true;
-					break;
+			boolean vultureInEnemyNear = false;
+			if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 800
+					|| vulture.getDistance(InfoUtils.enemyThirdRegion()) < 500) {
+				vultureInEnemyNear = true;
+				
+			} else {
+				Region vultureRegion = BWTA.getRegion(vulture.getPosition());
+				for (BaseLocation occupiedBase : InfoUtils.myOccupiedBases()) {
+					if (vultureRegion == BWTA.getRegion(occupiedBase.getPosition())) {
+						vultureInMyOccupied = true;
+						break;
+					}
 				}
 			}
 			
 			int mineNumberPerPosition = StrategyIdea.spiderMineNumberPerPosition;
-			if (vultureInMyOccupied) {
+			
+			if (vultureInEnemyNear) {
+				mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition * 3, 10);
+				
+			} else if (vultureInMyOccupied) {
 				if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
 					return null;
 				} else {

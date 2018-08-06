@@ -120,9 +120,9 @@ public class AirForceControl extends Control {
 			// 전진 카이팅, 카이팅
 			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
 				if (airForceTeam.repairCenter != null) {
-//					Position insidePosition = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
+					Position insidePosition = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
 					for (Unit airunit : airunits) {
-						if (!MicroUtils.isBeingHealed(airunit)) {
+						if (!MicroUtils.isBeingHealed(airunit) && airunit.getDistance(insidePosition) > 30) {
 							CommandUtils.rightClick(airunit, airForceTeam.leaderOrderPosition);
 						}
 						// if (MicroUtils.timeToRandomMove(wraith)) {

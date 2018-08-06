@@ -45,36 +45,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			return false;
 		}
 		
-		
-		Race enemyRace = InfoUtils.enemyRace();
-		if (enemyRace == Race.Zerg) {
-//			if (allCommandCenterCount == 1) {
-//				if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() >= 25) {
-//					BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
-//					List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
-//
-//					for (BaseLocation enemyOccupiedBase : enemyOccupiedBases) {
-//						if (enemyFirstExpansion.equals(enemyOccupiedBase)) {
-//							setSeedPositionStrategy(getExpansionSeedPosition());
-//							setBlocking(true);
-//							return true;
-//						}
-//					}
-//				}
-//			}
-			
-		} else if (enemyRace == Race.Protoss) {
-	    	// TODO 이니셜에 들어가야하는 부분인지 확인
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
-					&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
-		    	int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-				if (allCommandCenterCount == 1) {
-					setCommandCenterBlockAndSeedPosition();
-					return true;
-				}
-			}
-		}
-	    		
 		return executeExpansion();
     }
 
@@ -117,6 +87,27 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 
 		// 앞마당 전
 		if (realCCcnt == 1) {
+			if (InfoUtils.enemyRace() == Race.Protoss) {
+		    	// TODO 이니셜에 들어가야하는 부분인지 확인
+				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
+						&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+			    	int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+					if (allCommandCenterCount == 1) {
+						setCommandCenterBlockAndSeedPosition();
+						return true;
+					}
+				}
+				
+			} else if (InfoUtils.enemyRace() == Race.Terran) {
+				List<Unit> bunkers = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker);
+				List<Unit> tankWraiths = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+				if (!bunkers.isEmpty() && tankWraiths.size() >= 4) {
+					setCommandCenterBlockAndSeedPosition();
+					return true;
+				}
+			}
+			
+			
 //			if (포인트에 따라 좀더 빨리 지을 수 있는 케이스) {}
 			if (Prebot.Broodwar.self().minerals() > 400) {
 				setCommandCenterBlockAndSeedPosition();
