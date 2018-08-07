@@ -72,8 +72,8 @@ public class UpgradeSelector implements Selector<MetaType>{
 				metaType =  new MetaType(UpgradeType.Terran_Vehicle_Plating);
 			}
 		}
-		// Fac Unit 30 마리 이상, 일정 이상의 자원 2단계
-		else if (Prebot.Broodwar.self().minerals() > 250 && Prebot.Broodwar.self().gas() > 225) {
+		// Fac Unit 30 마리 이상, 사이언스 퍼실리티가 있고, 일정 이상의 자원 2단계
+		else if (Prebot.Broodwar.self().minerals() > 250 && Prebot.Broodwar.self().gas() > 225 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Facility) > 0) {
 			if ((Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 2 && myFactoryUnitSupplyCount > 140)
 					|| (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 3 && myFactoryUnitSupplyCount > 80)) {
 
