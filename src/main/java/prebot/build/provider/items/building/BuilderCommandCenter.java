@@ -127,10 +127,16 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
-			if (isAttackMode && StrategyIdea.mainSquadMode != MainSquadMode.SPEED_ATTCK
-					&& Prebot.Broodwar.self().minerals() > 250) {
+			if (isAttackMode && StrategyIdea.mainSquadMode != MainSquadMode.SPEED_ATTCK && Prebot.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
 				System.out.println("attack and next commandcenter - attack & over 250 minerals");
+				return true;
+			}
+			
+			// READY TO POSITION 까지 나왔는데 아직 커맨드가 2개이면 250 넘었을 때 멀티
+			if (StrategyIdea.campType == CampType.READY_TO && allCommandCenterCount == 2 && Prebot.Broodwar.self().minerals() > 250) {
+				setCommandCenterBlockAndSeedPosition();
+				System.out.println("ready to commandcenter - only 2 center & over 250 minerals");
 				return true;
 			}
 			
@@ -140,7 +146,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				System.out.println("minerals next commandcenter - over 800 minerals");
 				return true;
 			}
-
+			
 			// 500 넘고 유리하면
 //			if (Prebot.Broodwar.self().minerals() > 500 && factoryUnitCount > 50 && AttackExpansionManager.Instance().Attackpoint > 30) {
 //				setBlocking(true);
@@ -168,7 +174,13 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			for (Unit units : commandCenters) {
 				leftMinerals += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
 			}
+//			System.out.println("minerals lefted only " + leftMinerals);
 			if (leftMinerals < 8000 && isAttackMode) {
+				setCommandCenterBlockAndSeedPosition();
+				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
+				return true;
+			}
+			if (leftMinerals < 4000) {
 				setCommandCenterBlockAndSeedPosition();
 				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;

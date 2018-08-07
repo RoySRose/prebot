@@ -12,8 +12,6 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public class BuilderStarport extends DefaultBuildableItem {

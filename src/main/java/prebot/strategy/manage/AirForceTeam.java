@@ -9,7 +9,6 @@ import java.util.Set;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
-import bwapi.UnitType;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -163,7 +162,7 @@ public class AirForceTeam {
 			}
 
 			Position nextPosition = AirForceManager.Instance().getTargetPositions().get(currentTargetIndex);
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(nextPosition, 20, UnitUtils.enemyAirDefenseUnitType());
+			Set<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(nextPosition, 20, UnitUtils.enemyAirDefenseUnitType());
 			foundCount = !enemyDefTowerList.isEmpty() ? foundCount - 1 : 0;
 		}
 	}

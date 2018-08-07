@@ -8,6 +8,7 @@ import java.util.Set;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -99,8 +100,17 @@ public abstract class Squad {
 	/// 적 탐색
 	protected void findEnemies() {
 		euiList.clear();
-		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
+		if (LagObserver.groupsize() > 10) {
+			for (Unit unit : unitList) {
+				if (!TimeUtils.executeUnitRotation(unit, LagObserver.groupsize())) {
+					continue;
+				}
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
+			}	
+		} else {
+			for (Unit unit : unitList) {
+				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
+			}
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.Unit;
 import bwta.BWTA;
@@ -14,7 +15,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
@@ -118,6 +118,7 @@ public class VultureTravelManager {
 			BaseLocation newTravelSite = getCheckerTravelSite(unitId, travelSite.baseLocation); // travelSite 변경(currentBase에서 가까운 곳)
 			if (newTravelSite == null) {
 				// no site to travel
+				System.out.println("no site to travel");
 				Unit vulture = Prebot.Broodwar.getUnit(unitId);
 				if (vulture.getSpiderMineCount() == 0) {
 					checkerRetiredTimeMap.put(vulture.getID(), TimeUtils.elapsedFrames());
@@ -134,16 +135,16 @@ public class VultureTravelManager {
 			return;
 		}
 
-		String ignoreExpiredSquad = null;
+		String ignoreExpiredSquadName = null;
 		for (String squadName : guerillaIgnoreMap.keySet()) {
 			Integer startTime = guerillaIgnoreMap.get(squadName);
-			if (startTime != null && TimeUtils.elapsedFrames(startTime) > Vulture.CHECKER_IGNORE_FRAME) {
-				ignoreExpiredSquad = squadName;
+			if (startTime != null && TimeUtils.elapsedFrames(startTime) > Vulture.GEURILLA_IGNORE_FRAME) {
+				ignoreExpiredSquadName = squadName;
 				break;
 			}
 		}
-		if (ignoreExpiredSquad != null) {
-			guerillaIgnoreMap.remove(ignoreExpiredSquad);
+		if (ignoreExpiredSquadName != null) {
+			guerillaIgnoreMap.remove(ignoreExpiredSquadName);
 		}
 	}
 
@@ -250,7 +251,7 @@ public class VultureTravelManager {
 				continue;
 			}
 
-			List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) { // 적군이 존재하지 않음
 				continue;
 			}
@@ -280,7 +281,7 @@ public class VultureTravelManager {
 	public boolean checkerIgnoreModeEnabled(int unitId) {
 		TravelSite travelSite = checkerSiteMap.get(unitId);
 		if (travelSite != null) {
-			if (travelSite.visitAssignedFrame != 0 && TimeUtils.elapsedFrames(travelSite.visitAssignedFrame) < MicroConfig.Vulture.IGNORE_MOVE_FRAME) {
+			if (travelSite.visitAssignedFrame != 0 && TimeUtils.elapsedFrames(travelSite.visitAssignedFrame) < Vulture.CHECKER_IGNORE_MOVE_FRAME) {
 				return true;
 			}
 		}

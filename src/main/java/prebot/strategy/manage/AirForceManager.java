@@ -403,7 +403,7 @@ public class AirForceManager {
 				continue;
 			}
 
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(targetPosition, 20, UnitUtils.enemyAirDefenseUnitType());
+			Set<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(targetPosition, 20, UnitUtils.enemyAirDefenseUnitType());
 			if (enemyDefTowerList.isEmpty()) {
 				continue;
 			}

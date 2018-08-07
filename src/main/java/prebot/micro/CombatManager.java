@@ -2,7 +2,9 @@ package prebot.micro;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -11,6 +13,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -27,6 +30,7 @@ import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.VultureTravelManager;
@@ -114,8 +118,6 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(SquadInfo.WATCHER);
 		updateSquadDefault(SquadInfo.CHECKER);
 		updateGuerillaSquad();
-
-		updateDefenseSquad();
 		
 		BigWatch.record("combatUnitArrangement");
 	}
@@ -150,22 +152,17 @@ public class CombatManager extends GameManager {
 		}
 	}
 
-	private void updateDefenseSquad() {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void updateGuerillaSquad() {
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-		double maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
+		double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
+		if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadMode == MainSquadMode.ATTCK) {
+			maxRatio = 0.4d;
+		}
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();
 		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		for (Unit unit : squadTypeUnitList) {
-			if (unit.getType() != UnitType.Terran_Vulture) {
-				continue;
-			}
 			Squad unitSqaud = squadData.getSquad(unit);
 			if (unitSqaud instanceof GuerillaSquad) {
 				continue;
@@ -199,7 +196,7 @@ public class CombatManager extends GameManager {
 		}
 
 		// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-		List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+		Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 		int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
 		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
 		if (vulturePower < enemyPower) {
@@ -233,7 +230,7 @@ public class CombatManager extends GameManager {
 
 		// 게릴라 지역에 적군이 없다.
 		if (Prebot.Broodwar.isVisible(squad.getTargetPosition().toTilePosition())) {
-			List<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) {
 				return true;
 			}
@@ -241,13 +238,16 @@ public class CombatManager extends GameManager {
 			// 일꾼이 없는 경우
 			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {
-				SmallFightPredict predict = VultureFightPredictor.watcherPredictByUnitInfo(squad.unitList, euiList);
-				if (predict == SmallFightPredict.BACK) {
+				int vulturePower = VultureFightPredictor.powerOfWatchers(squad.unitList);
+				int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
+				if (vulturePower < enemyPower - 50) { // 질것 같으면 후퇴
+					System.out.println("remove guerialla - retreat");
 					return true;
 				}
 
-				int guerillaScore = GuerillaScore.guerillaScoreByUnitInfo(euiList);
+				int guerillaScore = GuerillaScore.guerillaScoreByUnitInfo(euiList); // 이득볼게 없으면 후퇴
 				if (guerillaScore <= 0) {
+					System.out.println("remove guerialla - nothing to do");
 					return true;
 				}
 			}
