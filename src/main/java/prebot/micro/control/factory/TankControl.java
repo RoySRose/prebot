@@ -47,7 +47,6 @@ public class TankControl extends Control {
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
@@ -72,6 +71,10 @@ public class TankControl extends Control {
 	}
 
 	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList) {
+		if (StrategyIdea.letsFindRat) {
+			findRat(siegeModeList);
+			return;
+		}
 
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
@@ -116,6 +119,11 @@ public class TankControl extends Control {
 	}
 
 	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
+		if (StrategyIdea.letsFindRat) {
+			findRat(tankModeList);
+			return;
+		}
+		
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);

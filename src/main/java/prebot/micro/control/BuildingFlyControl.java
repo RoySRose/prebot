@@ -74,7 +74,7 @@ public abstract class BuildingFlyControl extends Control{
                 if (Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
                     flyCondition.setBuildingFly(BuildingFly.DOWN);
                 }else{
-                    if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
+                    if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount() && checkEnemyNearBy(unit) == false) {
                         flyCondition.setBuildingFly(BuildingFly.UP);
                         //System.out.println("wait!");
                     } else {
