@@ -47,6 +47,10 @@ public class TankControl extends Control {
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		if (StrategyIdea.letsFindRat) {
+			findRat(unitList);
+			return;
+		}
 		
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
