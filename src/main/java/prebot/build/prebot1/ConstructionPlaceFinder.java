@@ -12,7 +12,9 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
+import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
@@ -431,7 +433,7 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
-				maxRange = 18;
+				maxRange = 25;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
 					if(base.isStartLocation() && TilePositionUtils.equals(base.getTilePosition(), desiredPosition)) {
 						maxRange = 36;
@@ -460,7 +462,7 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
 				if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
-
+//					FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: spiralMaxLength ==>> "+ spiralMaxLength + " :: [" + currentX+" , "+currentY+"] ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 					if (isPossiblePlace) {
 						resultPosition = new TilePosition(currentX, currentY);
@@ -666,6 +668,7 @@ public class ConstructionPlaceFinder {
 		//buildingGapSpace = 0;@@@@@@
 		
 		boolean horizontalOnly = false;
+		boolean canAddonBuilding = false;
 
 		if (b.getType().isAddon()) { // Addon 타입의 건물일 경우에는, 그 Addon 건물 왼쪽에 whatBuilds 건물이 있는지를 체크한다
 			final UnitType builderType = b.getType().whatBuilds().first;
@@ -694,6 +697,7 @@ public class ConstructionPlaceFinder {
 				b.getType() == UnitType.Terran_Starport ||
 				b.getType() == UnitType.Terran_Science_Facility) {
 				width += 3;
+				canAddonBuilding = true;
 //				buildingGapSpace = 0;
 //				horizontalOnly = true;
 			}
@@ -730,14 +734,32 @@ public class ConstructionPlaceFinder {
 			{
 				for (int y = starty; y < endy; y++)
 				{
+					
+					if(canAddonBuilding == true && 
+						((x == position.getX() + 4 && y == position.getY())
+						||(x == position.getX() + 5 && y == position.getY()))) {
+//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: hereis up of addon :: no tile check :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+						continue;
+					}
+					
+					if( (TilePositionUtils.equals(position, BlockingEntrance.Instance().first_supple)
+						||TilePositionUtils.equals(position, BlockingEntrance.Instance().second_supple)
+						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport1)
+						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
+						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
+						||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
+						&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE
+					){
+						continue;
+					}
 					// if we can't build here, or space is reserved, we can't build here
 					if (isBuildableTile(b, x, y) == false) {
-//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 
 					if (isReservedTile(x, y)) {
-//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 
@@ -747,6 +769,7 @@ public class ConstructionPlaceFinder {
 							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
 							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot) {
 						if (isTilesToAvoid(x, y)) {
+//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoid false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
@@ -768,6 +791,7 @@ public class ConstructionPlaceFinder {
 						}
 					}else {
 						if (isTilesToAvoidFac(x, y)) {
+//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidFac false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
@@ -781,12 +805,13 @@ public class ConstructionPlaceFinder {
 //						&& b.getType() != UnitType.Terran_Barracks
 						) {
 						if (isTilesToAvoidSupply(x, y)) {
+//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidSupply false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
 					
 					if (isTilesToAvoidAbsolute(x, y)) {
-//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidAbsolute false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidAbsolute false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
 				}
@@ -795,8 +820,10 @@ public class ConstructionPlaceFinder {
 
 		// if this rectangle doesn't fit on the map we can't build here
 		if (startx < 0 || starty < 0 || endx > Prebot.Broodwar.mapWidth() || endx < position.getX() + width || endy > Prebot.Broodwar.mapHeight()) {
+//			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return false :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		} else {
+//			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return true :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return true;
 		}
 
@@ -818,7 +845,7 @@ public class ConstructionPlaceFinder {
 				//if (reserveMap.get(x).get(y))
 				if (reserveMap[x][y])
 				{
-//					FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here :: " + x + " , " + y);
+//					FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here reserveMap :: " + x + " , " + y);
 					return false;
 				}
 			}
@@ -1414,12 +1441,12 @@ public class ConstructionPlaceFinder {
 //				System.out.println("main base ==>> " + supply_x +" / " + supply_y);
 				
 				
-//				1시는 변동 없음
+//				x축 y축 모두 증가는 변동없음
 				if(BlockingEntrance.Instance().xinc) {
 					if(!BlockingEntrance.Instance().yinc) {
 //						5시
 //						supply_x = BlockingEntrance.Instance().getSupplyPosition(mainbase).getX();
-						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
+						supply_y = supply_y - 1 - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
 					}
 
 					
@@ -1430,7 +1457,7 @@ public class ConstructionPlaceFinder {
 					}else {
 //						7시
 						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;
-						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
+						supply_y = supply_y - 1 - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
 					}
 				}
 				
