@@ -22,23 +22,44 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 //    	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
 //    	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || buildCondition || metaType =>" + metaType.toString());
 
-    	//if(researchSelector.getSelected().getTechType().equals(metaType.getTechType())) {
-    	if(String.valueOf(researchSelector.getSelected()) != "null"){
-	    	if(researchSelector.getSelected().isTech()) {
-		    	if(researchSelector.getSelected().getTechType() == metaType.getTechType()) {
-		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
-		    	//if(researchSelector.getSelected().equals(metaType)) {
-		//        	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());
-			        	if (researchSelector.currentResearched <= 2) {
-			//        		FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || block & high");
-			        		setBlocking(true);
-			        		setHighPriority(true);
-			        	}
-			            return true;
-		    		}
-		        }
-	    	}
-    	}
-    	return false;
+    	
+    	
+		if (String.valueOf(researchSelector.getSelected()) == "null") {
+			return false;
+		}
+		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
+			return false;
+		}
+		if (!researchSelector.getSelected().isTech()) {
+			return false;
+		}
+		if (researchSelector.getSelected().getTechType() != metaType.getTechType()) {
+			return false;
+		}
+		if (Prebot.Broodwar.self().isResearching(researchSelector.getSelected().getTechType())) {
+			return false;
+		}
+
+//    	if(String.valueOf(researchSelector.getSelected()) != "null"){
+//	    	if(researchSelector.getSelected().isTech()) {
+//		    	if(researchSelector.getSelected().getTechType() == metaType.getTechType()) {
+//		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
+//		    	//if(researchSelector.getSelected().equals(metaType)) {
+//		//        	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());
+//			        	if (researchSelector.currentResearched <= 2) {
+//			//        		FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || block & high");
+//			        		setBlocking(true);
+//			        		setHighPriority(true);
+//			        	}
+//			            return true;
+//		    		}
+//		        }
+//	    	}
+//    	}
+    	if (researchSelector.currentResearched <= 2) {
+			setBlocking(true);
+			setHighPriority(true);
+		}
+		return true;
     }
 }

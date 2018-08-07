@@ -16,10 +16,11 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
 	}
 
 	public final boolean buildCondition() {
-		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
+		
+		if (String.valueOf(researchSelector.getSelected()) == "null") {
 			return false;
 		}
-		if (String.valueOf(researchSelector.getSelected()) == "null") {
+		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
 			return false;
 		}
 		if (!researchSelector.getSelected().isTech()) {
@@ -32,14 +33,6 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
 			return false;
 		}
 
-		// FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
-		// FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || buildCondition || metaType =>" + metaType.toString());
-		// FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || buildCondition => " + researchSelector.getSelected().getTechType() + " || metaType => " +
-		// metaType.getTechType());
-
-		// if(researchSelector.getSelected().equals(metaType)) {
-		// FileUtils.appendTextToFile("log.txt", "\n BuilderTankSiegeMode || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType =>
-		// " + metaType.getTechType());
 		if (researchSelector.currentResearched <= 2) {
 			setBlocking(true);
 			setHighPriority(true);

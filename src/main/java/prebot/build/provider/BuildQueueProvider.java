@@ -36,9 +36,15 @@ import prebot.build.provider.items.tech.BuilderTankSiegeMode;
 import prebot.build.provider.items.unit.BuilderGoliath;
 import prebot.build.provider.items.unit.BuilderMarine;
 import prebot.build.provider.items.unit.BuilderSCV;
+import prebot.build.provider.items.unit.BuilderScienceVessel;
 import prebot.build.provider.items.unit.BuilderSiegeTank;
+import prebot.build.provider.items.unit.BuilderValkyrie;
 import prebot.build.provider.items.unit.BuilderVulture;
 import prebot.build.provider.items.unit.BuilderWraith;
+import prebot.build.provider.items.upgrade.BuilderTerranShipPlating;
+import prebot.build.provider.items.upgrade.BuilderTerranShipWeapons;
+import prebot.build.provider.items.upgrade.BuilderTerranVehiclePlating;
+import prebot.build.provider.items.upgrade.BuilderTerranVehicleWeapons;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -150,12 +156,13 @@ public class BuildQueueProvider extends GameManager {
         buildableList.add(new BuilderSiegeTank				(new MetaType(UnitType.Terran_Siege_Tank_Tank_Mode), factoryUnitSelector));
         buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith)));
         buildableList.add(new BuilderMarine               (new MetaType(UnitType.Terran_Marine)));
+        buildableList.add(new BuilderScienceVessel        (new MetaType(UnitType.Terran_Science_Vessel)));
+        buildableList.add(new BuilderValkyrie             (new MetaType(UnitType.Terran_Valkyrie)));
         
         /*
         buildableList.add(new BuilderBattlecruiser        (new MetaType(UnitType.Terran_Battlecruiser),starportUnitSelector));
         buildableList.add(new BuilderDropship             (new MetaType(UnitType.Terran_Dropship),starportUnitSelector));
-        buildableList.add(new BuilderScienceVessel        (new MetaType(UnitType.Terran_Science_Vessel), starportUnitSelector));
-        buildableList.add(new BuilderValkyrie             (new MetaType(UnitType.Terran_Valkyrie), starportUnitSelector));
+        
         buildableList.add(new BuilderWraith               (new MetaType(UnitType.Terran_Wraith), starportUnitSelector));*/
         
         
@@ -189,7 +196,10 @@ public class BuildQueueProvider extends GameManager {
         /*upgrade(tech)*/
         ionThrusters               = new BuilderIonThrusters         (new MetaType(UpgradeType.Ion_Thrusters  ), researchSelector);
         charonBoosters             = new BuilderCharonBoosters       (new MetaType(UpgradeType.Charon_Boosters  ), researchSelector);
-        
+        terranShipPlating          = new BuilderTerranShipPlating    (new MetaType(UpgradeType.Terran_Ship_Plating  ), upgradeSelector);
+        terranShipWeapons          = new BuilderTerranShipWeapons    (new MetaType(UpgradeType.Terran_Ship_Weapons  ), upgradeSelector);
+        terranVehiclePlating       = new BuilderTerranVehiclePlating (new MetaType(UpgradeType.Terran_Vehicle_Plating  ), upgradeSelector);
+        terranVehicleWeapons       = new BuilderTerranVehicleWeapons (new MetaType(UpgradeType.Terran_Vehicle_Weapons  ), upgradeSelector);
         /*
         
         apolloReactor              = new BuilderApolloReactor        (new MetaType(UpgradeType.Apollo_Reactor  ));
@@ -199,10 +209,6 @@ public class BuildQueueProvider extends GameManager {
         ocularImplants             = new BuilderOcularImplants       (new MetaType(UpgradeType.Ocular_Implants  ), upgradeSelector);
         terranInfantryArmor        = new BuilderTerranInfantryArmor  (new MetaType(UpgradeType.Terran_Infantry_Armor  ), upgradeSelector);
         terranInfantryWeapons      = new BuilderTerranInfantryWeapons(new MetaType(UpgradeType.Terran_Infantry_Weapons  ), upgradeSelector);
-        terranShipPlating          = new BuilderTerranShipPlating    (new MetaType(UpgradeType.Terran_Ship_Plating  ), upgradeSelector);
-        terranShipWeapons          = new BuilderTerranShipWeapons    (new MetaType(UpgradeType.Terran_Ship_Weapons  ), upgradeSelector);
-        terranVehiclePlating       = new BuilderTerranVehiclePlating (new MetaType(UpgradeType.Terran_Vehicle_Plating  ), upgradeSelector);
-        terranVehicleWeapons       = new BuilderTerranVehicleWeapons (new MetaType(UpgradeType.Terran_Vehicle_Weapons  ), upgradeSelector);
         titanReactor               = new BuilderTitanReactor         (new MetaType(UpgradeType.Titan_Reactor  ), upgradeSelector);
         u238Shells                 = new BuilderU238Shells           (new MetaType(UpgradeType.U_238_Shells  ), upgradeSelector);*/
 
@@ -210,6 +216,7 @@ public class BuildQueueProvider extends GameManager {
         spiderMines                = new BuilderSpiderMines          (new MetaType(TechType.Spider_Mines    ), researchSelector);
         tankSiegeMode              = new BuilderTankSiegeMode        (new MetaType(TechType.Tank_Siege_Mode    ), researchSelector);
         cloakingField              = new BuilderCloakingField        (new MetaType(TechType.Cloaking_Field    ));
+       
         /*empShockwave               = new BuilderEMPShockwave         (new MetaType(TechType.EMP_Shockwave    ), researchSelector2);
         irradiate                  = new BuilderIrradiate            (new MetaType(TechType.Irradiate    ), researchSelector2);
         lockdown                   = new BuilderLockdown             (new MetaType(TechType.Lockdown    ), researchSelector2);
@@ -226,6 +233,10 @@ public class BuildQueueProvider extends GameManager {
         /*upgrade*/
         buildableList.add(charonBoosters);
         buildableList.add(ionThrusters);
+        buildableList.add(terranShipPlating);
+        buildableList.add(terranShipWeapons);
+        buildableList.add(terranVehiclePlating);
+        buildableList.add(terranVehicleWeapons);
         /*buildableList.add(apolloReactor);
         buildableList.add(caduceusReactor);
         buildableList.add(colossusReactor);
@@ -233,10 +244,6 @@ public class BuildQueueProvider extends GameManager {
         buildableList.add(ocularImplants);
         buildableList.add(terranInfantryArmor);
         buildableList.add(terranInfantryWeapons);
-        buildableList.add(terranShipPlating);
-        buildableList.add(terranShipWeapons);
-        buildableList.add(terranVehiclePlating);
-        buildableList.add(terranVehicleWeapons);
         buildableList.add(titanReactor);
         buildableList.add(u238Shells);*/
 
@@ -278,6 +285,23 @@ public class BuildQueueProvider extends GameManager {
     	if(Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
     		buildableList.remove(cloakingField);
     	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Plating) == 3) {
+    		buildableList.remove(terranShipPlating);
+    	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Weapons) == 3) {
+    		buildableList.remove(terranShipWeapons);
+    	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 3) {
+    		buildableList.remove(terranVehiclePlating);
+    	}
+    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 3) {
+    		buildableList.remove(terranVehicleWeapons);
+    	}
+    	
+//    	 buildableList.add(terranShipPlating);
+//         buildableList.add(terranShipWeapons);
+//         buildableList.add(terranVehiclePlating);
+//         buildableList.add(terranVehicleWeapons);
 
     }
 
