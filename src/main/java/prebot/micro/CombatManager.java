@@ -32,7 +32,6 @@ import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class CombatManager extends GameManager {
@@ -156,7 +155,7 @@ public class CombatManager extends GameManager {
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
 		if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadMode == MainSquadMode.ATTCK) {
-			maxRatio = 0.4d;
+			maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
 		}
 		int maxCount = (int) (vultureCount * maxRatio);
 

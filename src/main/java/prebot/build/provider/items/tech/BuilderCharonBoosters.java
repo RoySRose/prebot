@@ -32,7 +32,7 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
     	if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
 			return false;
 		}
-		if (String.valueOf(researchSelector.getSelected()) == "null") {
+		if (researchSelector.getSelected() == null) {
 			return false;
 		}
 		if (!researchSelector.getSelected().isUpgrade()) {
@@ -45,7 +45,7 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
 			return false;
 		}
     	
-//    	if(String.valueOf(researchSelector.getSelected()) != "null"){
+//    	if(researchSelector.getSelected() != null){
 //	    	if(researchSelector.getSelected().isUpgrade()) {
 //		    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType() && Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType()) == false) {
 //			    	//if(researchSelector.getSelected().equals(metaType)) {

@@ -19,7 +19,7 @@ public class MicroConfig {
 	
 	public static enum MainSquadMode {
 		DEFENSE(0.0, false),
-		NORMAL(0.8, false),
+		NORMAL(0.3, false),
 		ATTCK(0.2, true),
 		SPEED_ATTCK(0.0, true),
 		NO_MERCY(0.8, true);
