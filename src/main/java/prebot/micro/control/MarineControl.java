@@ -115,7 +115,7 @@ public class MarineControl extends Control {
 					//Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
 					if (enemyInSight != null) {
 						if(enemyInSight.getType().isWorker()){
-							MicroUtils.kiting(marine, decision.eui, kOption);
+							outOfTheBunker(marine, bunker, decision.eui, kOption);
 							continue;
 						}
 						
