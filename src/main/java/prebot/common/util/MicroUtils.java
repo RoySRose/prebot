@@ -99,12 +99,12 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
+			Set<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
 			if (avoidEnemyUnit) {
-				List<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
+				Set<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
 				if (!enemyAirWeaponList.isEmpty()) {
 					continue;
 				}
@@ -131,13 +131,13 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
+			Set<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE, UnitUtils.enemyAirDefenseUnitType());
 			if (enemyDefTowerList.isEmpty()) {
 				realMoveRadian = adjustedRadian;
 				break;
 			}
 			if (avoidEnemyUnit) {
-				List<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
+				Set<UnitInfo> enemyAirWeaponList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, AirForceManager.AIR_FORCE_SAFE_DISTANCE2, UnitUtils.wraithKillerUnitType());
 				if (!enemyAirWeaponList.isEmpty()) {
 					continue;
 				}
@@ -216,7 +216,7 @@ public class MicroUtils {
 			if (!PositionUtils.isValidPosition(candiPosition)) {
 				continue;
 			}
-			List<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
+			Set<UnitInfo> enemyDefTowerList = UnitUtils.getCompleteEnemyInfosInRadiusForAir(candiPosition, 0, UnitUtils.enemyAirDefenseUnitType());
 			if (!enemyDefTowerList.isEmpty()) {
 				continue;
 			}
@@ -627,7 +627,7 @@ public class MicroUtils {
 	
 	// (지상유닛 대상) position의 적의 사정거리에서 안전한 지역인지 판단한다.
 	public static boolean isSafePlace(Position position) {
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(position, 0);
+		Set<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadiusForGround(position, 0);
 		
 		for (UnitInfo ui : euiList) {
 			if (ui.getType().isWorker() || !typeCanAttackGround(ui.getType())) {

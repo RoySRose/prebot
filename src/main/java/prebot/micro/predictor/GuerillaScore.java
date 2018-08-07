@@ -1,5 +1,6 @@
 package prebot.micro.predictor;
 
+import java.util.Collection;
 import java.util.List;
 
 import bwapi.Unit;
@@ -28,7 +29,7 @@ public class GuerillaScore {
 		return score;
 	}
 
-	public static int guerillaScoreByUnitInfo(List<UnitInfo> euiList) {
+	public static int guerillaScoreByUnitInfo(Collection<UnitInfo> euiList) {
 		int score = 0;
 		for (UnitInfo eui : euiList) {
 			if (eui.getType().isResourceDepot()) { // 자원채취한다 100점

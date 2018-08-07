@@ -2,6 +2,7 @@ package prebot.strategy.manage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,13 +24,11 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -470,7 +469,7 @@ public class PositionFinder {
 		if (watcherPosition == Position.Unknown) {
 			if (InfoUtils.enemyBase() != null) {
 				// 대략적으로다가 지상유닛에 안전한 상황에서는 watcher를 다른 곳으로 돌린다.
-				if (watcherOtherPosition == null) {
+				if (watcherOtherPosition != null) {
 					watcherPosition = watcherOtherPosition;
 				} else {
 					watcherPosition = watcherSpecialPosition();
@@ -499,7 +498,7 @@ public class PositionFinder {
 		List<BaseLocation> myOccupiedBases = InfoUtils.myOccupiedBases();
 		if (!myOccupiedBases.isEmpty()) {
 			BaseLocation myOccupiedNeedDefense = null;
-			List<UnitInfo> enemyUnitInfosInRadius = new ArrayList<>();
+			Set<UnitInfo> enemyUnitInfosInRadius = new HashSet<>();
 			for (BaseLocation occupiedBase : myOccupiedBases) {
 				enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, occupiedBase.getPosition(), 500, true, false);
 				if (enemyUnitInfosInRadius.isEmpty()) {
@@ -769,7 +768,7 @@ public class PositionFinder {
 		
 		// 일꾼이 없으면 후퇴
 		if (regroupLeader.getDistance(watcherOtherPosition) < 200) {
-			List<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, watcherOtherPosition, 500, true, false);
+			Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, watcherOtherPosition, 500, true, false);
 			if (euis.isEmpty()) {
 				System.out.println("no ground enemy");
 				watcherOtherPosition = null;

@@ -1,20 +1,22 @@
 package prebot.micro.squad;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class CheckerSquad extends Squad {
@@ -67,17 +69,19 @@ public class CheckerSquad extends Squad {
 
 	@Override
 	public void execute() {
-		euiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
-		vultureControl.controlIfUnitExist(unitList, euiList);
+		for (Unit unit : unitList) {
+			Set<UnitInfo> euiList = new HashSet<>();
+			if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(unit.getID())) {
+				euiList = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG|TargetFilter.INVISIBLE
+						, unit.getPosition(), unit.getType().sightRange(), true, false);
+			}
+			
+			vultureControl.controlIfUnitExist(new HashSet<>(Arrays.asList(unit)), euiList);
+		}
 	}
 
 	@Override
 	public void findEnemies() {
-		euiList.clear();
-		for (Unit unit : unitList) {
-			if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(unit.getID())) {
-				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
-			}
-		}
+		// do nothing
 	}
 }

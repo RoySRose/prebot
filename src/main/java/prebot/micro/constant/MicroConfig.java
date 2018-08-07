@@ -91,13 +91,14 @@ public class MicroConfig {
 		public static final int GEURILLA_EXTRA_ENEMY_POWER = 150;
 		public static final int GEURILLA_INTERVAL_FRAME = 35 * 24; // 게릴라지역이 선정되고 일정시간이 지나야 다시 게릴라 지역으로 선정가능
 		public static final int GEURILLA_FREE_VULTURE_COUNT = 15; // GEURILLA_INTERVAL_FRAME 대기 없이 게릴라벌처를 할당가능한 숫자
-		public static final int CHECKER_IGNORE_FRAME = 30 * 24; // 10초
+		public static final int GEURILLA_IGNORE_FRAME = 30 * 24; // 10초
+		
 		public static final int CHECKER_INTERVAL_FRAME = 20 * 24; // 30초
 		public static final int CHECKER_RETIRE_FRAME = 20 * 24; // 20초
 		
 		public static final int CHECKER_MAX_COUNT = 3;
 
-		public static final int IGNORE_MOVE_FRAME = 8 * 24; // 5초
+		public static final int CHECKER_IGNORE_MOVE_FRAME = 5 * 24; // 5초
 		
 		// 마인 매설 관련 상수
 		public static final int MINE_EXACT_RADIUS = 10;

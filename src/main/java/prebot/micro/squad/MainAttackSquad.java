@@ -99,7 +99,9 @@ public class MainAttackSquad extends Squad {
 					&& !eui.getType().isBuilding()
 					&& !eui.getType().isWorker()
 					&& !eui.getType().isFlyer()) {
-				return true;
+				if (StrategyIdea.mainSquadCenter.getDistance(eui.getLastPosition()) < StrategyIdea.mainSquadCoverRadius) {
+					return true;
+				}
 			}
 		}
 		return false;

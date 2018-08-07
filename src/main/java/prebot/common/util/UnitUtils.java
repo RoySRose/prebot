@@ -220,26 +220,26 @@ public class UnitUtils {
 		addEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, euis, position, radius, true, true, unitTypes);
 	}
 	
-	public static List<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euis = new ArrayList<>();
+	public static Set<UnitInfo> getEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
+		Set<UnitInfo> euis = new HashSet<>();
 		addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, euis, position, radius, true, false, unitTypes);
 		return euis;
 	}
 	
-	public static List<UnitInfo> getAllEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euis = new ArrayList<>();
+	public static Set<UnitInfo> getAllEnemyUnitInfosInRadiusForGround(Position position, int radius, UnitType... unitTypes) {
+		Set<UnitInfo> euis = new HashSet<>();
 		addEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, euis, position, radius, true, false, unitTypes);
 		return euis;
 	}
 	
-	public static List<UnitInfo> getCompleteEnemyInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
-		List<UnitInfo> euis = new ArrayList<>();
+	public static Set<UnitInfo> getCompleteEnemyInfosInRadiusForAir(Position position, int radius, UnitType... unitTypes) {
+		Set<UnitInfo> euis = new HashSet<>();
 		addEnemyUnitInfosInRadius(TargetFilter.INCOMPLETE|TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE, euis, position, radius, false, true, unitTypes);
 		return euis;
 	}
 	
-	public static List<UnitInfo> getEnemyUnitInfosInRadius(int targetFilter, Position position, int radius, boolean addGroundWeoponRadius, boolean addAirWeoponRadius, UnitType... unitTypes) {
-		List<UnitInfo> euis = new ArrayList<>();
+	public static Set<UnitInfo> getEnemyUnitInfosInRadius(int targetFilter, Position position, int radius, boolean addGroundWeoponRadius, boolean addAirWeoponRadius, UnitType... unitTypes) {
+		Set<UnitInfo> euis = new HashSet<>();
 		addEnemyUnitInfosInRadius(targetFilter, euis, position, radius, addGroundWeoponRadius, addAirWeoponRadius, unitTypes);
 		return euis;
 	}

@@ -14,6 +14,7 @@ public class TargetFilter {
 	public static final int LARVA_LURKER_EGG = 4;
 	public static final int INCOMPLETE = 8;
 	public static final int UNFIGHTABLE = 16;
+	public static final int INVISIBLE = 32;
 	
 	public static boolean excludeByFilter(UnitInfo eui, int targetFilter) {
 		Unit target = UnitUtils.unitInSight(eui);
@@ -61,7 +62,9 @@ public class TargetFilter {
 			if (TargetFilter.exclude(targetFilter, TargetFilter.UNFIGHTABLE) && !MicroUtils.combatEnemyType(eui.getType())) {
 				return true;
 			}
-
+			if (TargetFilter.exclude(targetFilter, TargetFilter.INVISIBLE)) {
+				return true;
+			}
 			return false;
 		}
 	}
