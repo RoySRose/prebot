@@ -24,7 +24,7 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 
     	
     	
-		if (String.valueOf(researchSelector.getSelected()) == "null") {
+		if (researchSelector.getSelected() == null) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
@@ -40,7 +40,7 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 			return false;
 		}
 
-//    	if(String.valueOf(researchSelector.getSelected()) != "null"){
+//    	if(researchSelector.getSelected() != null){
 //	    	if(researchSelector.getSelected().isTech()) {
 //		    	if(researchSelector.getSelected().getTechType() == metaType.getTechType()) {
 //		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {

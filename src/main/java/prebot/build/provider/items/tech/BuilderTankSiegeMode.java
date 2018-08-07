@@ -17,7 +17,7 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
 
 	public final boolean buildCondition() {
 		
-		if (String.valueOf(researchSelector.getSelected()) == "null") {
+		if (researchSelector.getSelected() == null) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {

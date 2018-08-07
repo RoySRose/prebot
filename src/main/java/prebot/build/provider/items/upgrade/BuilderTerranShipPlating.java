@@ -23,7 +23,7 @@ public class BuilderTerranShipPlating extends DefaultBuildableItem {
     	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
     		return false;
     	}
-		if (String.valueOf(upgradeSelector.getSelected()) == "null") {
+		if (upgradeSelector.getSelected() == null) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(upgradeSelector.getSelected(), null) != 0) {

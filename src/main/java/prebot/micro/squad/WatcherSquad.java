@@ -9,6 +9,7 @@ import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.WatcherControl;
@@ -44,6 +45,10 @@ public class WatcherSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
+		Squad squad = CombatManager.Instance().squadData.getSquad(unit);
+		if (squad instanceof CheckerSquad || squad instanceof GuerillaSquad) {
+			return false;
+		}
 		return true;
 	}
 

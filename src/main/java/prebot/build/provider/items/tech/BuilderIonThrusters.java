@@ -23,7 +23,7 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
 
         //if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
     	
-		if (String.valueOf(researchSelector.getSelected()) == "null") {
+		if (researchSelector.getSelected() == null) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) != 0) {
@@ -39,7 +39,7 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
 			return false;
 		}
     	
-//    	if(String.valueOf(researchSelector.getSelected()) != "null"){
+//    	if(researchSelector.getSelected() != null){
 //	    	if(researchSelector.getSelected().isUpgrade()) {
 //		    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType()) {
 //		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {

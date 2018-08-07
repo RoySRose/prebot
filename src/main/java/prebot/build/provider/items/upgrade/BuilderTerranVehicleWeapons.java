@@ -24,7 +24,7 @@ public class BuilderTerranVehicleWeapons extends DefaultBuildableItem {
     	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
     		return false;
     	}
-		if (String.valueOf(upgradeSelector.getSelected()) == "null") {
+		if (upgradeSelector.getSelected() == null) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(upgradeSelector.getSelected(), null) != 0) {
@@ -41,6 +41,7 @@ public class BuilderTerranVehicleWeapons extends DefaultBuildableItem {
 		}
     	
 		if (upgradeSelector.getSelected().equals(metaType)) {
+			BuildQueueProvider.Instance().startUpgrade(UpgradeType.Terran_Vehicle_Weapons);
 			return true;
 		} else {
 			return false;

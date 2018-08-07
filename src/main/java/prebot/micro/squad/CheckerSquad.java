@@ -12,6 +12,7 @@ import java.util.Set;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.micro.targeting.TargetFilter;
@@ -29,6 +30,10 @@ public class CheckerSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
+		Squad squad = CombatManager.Instance().squadData.getSquad(unit);
+		if (squad instanceof GuerillaSquad) {
+			return false;
+		}
 		return !VultureTravelManager.Instance().checkerRetired(unit.getID());
 	}
 
