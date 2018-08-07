@@ -20,6 +20,7 @@ import bwta.Region;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
+import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
@@ -209,13 +210,7 @@ public class BuildManager extends GameManager {
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
-								// Send the construction task to the construction manager
-								if(t.getUnitType() == UnitType.Terran_Starport) {
-//									FileUtils.appendTextToFile("log.txt", "\n Terran_Starport to Construction from Build :: desiredPosition ::" + desiredPosition);
-								}
-								if(t.getUnitType() == UnitType.Terran_Factory) {
-//									FileUtils.appendTextToFile("log.txt", "\n Terran_Factory to Construction from Build :: desiredPosition ::" + desiredPosition);
-								}
+								
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -226,7 +221,14 @@ public class BuildManager extends GameManager {
 								if (desiredPosition != null)
 									System.out.println(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								
-								isOkToRemoveQueue = false;
+								desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+								
+								if (desiredPosition != TilePosition.None) {
+									System.out.println(" re calculate desiredPosition :: " + desiredPosition.getX() + ","+ desiredPosition.getY());
+									ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
+								}else {
+									isOkToRemoveQueue = false;
+								}
 							}
 						}
 					}
