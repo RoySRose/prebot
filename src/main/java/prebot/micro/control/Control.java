@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
 import prebot.common.LagObserver;
@@ -21,11 +22,7 @@ public abstract class Control {
 	// TODO 추후 모든 컨트롤 적용 필요
 	public void controlIfUnitExist(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		if (!unitList.isEmpty()) {
-			if (StrategyIdea.letsFindRat) {
-				findRat(unitList);
-			} else {
-				control(unitList, euiList);
-			}
+			control(unitList, euiList);
 		}
 	}
 
@@ -44,10 +41,18 @@ public abstract class Control {
 	public boolean findRat(Collection<Unit> unitList) {
 		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
 		for (Unit unit : unitList) {
-			if (unit.isIdle()) {
-				Position randomPosition = PositionUtils.randomPosition(centerPosition, 5000);
-				if (unit.isFlying() || PositionUtils.isValidGroundPosition(randomPosition)) {
-					CommandUtils.attackMove(unit, randomPosition);
+			if (skipControl(unit)) {
+				continue;
+			}
+
+			if (unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode && unit.canUnsiege()) {
+				CommandUtils.unsiege(unit);
+			} else {
+				if (unit.isIdle()) {
+					Position randomPosition = PositionUtils.randomPosition(centerPosition, 5000);
+					if (unit.isFlying() || PositionUtils.isValidGroundPosition(randomPosition)) {
+						CommandUtils.attackMove(unit, randomPosition);
+					}
 				}
 			}
 		}
