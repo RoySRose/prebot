@@ -9,9 +9,11 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
+import prebot.micro.WorkerData;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
@@ -83,6 +85,8 @@ public class EarlyDefenseSquad extends Squad {
 		
 		// 얼마나 SCV 동원이 필요한지 체크
 		double scvCountForDefense = scvCountForDefense(enemyInSightList);
+		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
+		scvCountForDefense = (scvCountForDefense > workerData.getNumWorkers() -3) ? scvCountForDefense-3 : scvCountForDefense;
 		/*유닛이 줄었을때 필요일꾼 만큼만 스쿼드 유지 나머지는 idle*/
 		while(marineList.size() + unitList.size() > scvCountForDefense){
 			SquadData squadData = new SquadData();

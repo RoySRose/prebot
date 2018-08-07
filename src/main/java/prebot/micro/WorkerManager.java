@@ -396,12 +396,16 @@ public class WorkerManager extends GameManager {
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-				if (TimeUtils.beforeTime(7, 0)) {
-					if (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot || unit.getType() == UnitType.Terran_Bunker) {
+				if(repairWorker != null){
+					if (TimeUtils.beforeTime(7, 0)) {
+						if(unit.getType() == UnitType.Terran_Bunker && unit.getHitPoints() < unit.getType().maxHitPoints()){
+							setRepairWorker(repairWorker, unit);
+						}else if (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
+							setRepairWorker(repairWorker, unit);
+						}
+					} else {
 						setRepairWorker(repairWorker, unit);
 					}
-				} else {
-					setRepairWorker(repairWorker, unit);
 				}
 			}
 			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
@@ -410,20 +414,24 @@ public class WorkerManager extends GameManager {
 						&& unit.getHitPoints() < unit.getType().maxHitPoints() && unit.isIdle() && !unit.isMoving()) {
 				
 					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-					if(unit.getDistance(repairWorker) < 200 && repairWorker.getOrder() != bwapi.Order.Repair && !repairWorker.isRepairing()						){
-						setRepairWorker(repairWorker, unit);
+					if(repairWorker != null){
+						if(unit.getDistance(repairWorker) < 200 && repairWorker.getOrder() != bwapi.Order.Repair && !repairWorker.isRepairing()						){
+							setRepairWorker(repairWorker, unit);
+						}
 					}
 				}
 			}
 			else if (unit.getType().isMechanical() && unit.getHitPoints() < unit.getType().maxHitPoints()) {
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
-				if ((unit.getType() == UnitType.Terran_Goliath 
-						|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-						|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-						|| unit.getType() == UnitType.Terran_Science_Vessel) && repairWorkCnt < repairmax) {
-					setRepairWorker(repairWorker, unit);
-				} 
+				if(repairWorker != null){
+					if ((unit.getType() == UnitType.Terran_Goliath 
+							|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+							|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+							|| unit.getType() == UnitType.Terran_Science_Vessel) && repairWorkCnt < repairmax) {
+						setRepairWorker(repairWorker, unit);
+					} 
+				}
 			}
 			
 			
