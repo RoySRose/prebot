@@ -9,12 +9,8 @@ import java.util.Map;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.InfoUtils;
-import prebot.common.util.UnitUtils;
-import prebot.micro.WorkerData.WorkerJob;
 
 public class WorkerData {
 
@@ -653,9 +649,9 @@ public class WorkerData {
 
 		int mineralsNearDepot = 0;
 
-		for (Unit unit : Prebot.Broodwar.getAllUnits())
+		for (Unit unit : Prebot.Broodwar.getMinerals())
 		{
-			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320)
+			if (unit.getDistance(depot) < 320)
 			{
 				mineralsNearDepot += unit.getResources();
 			}

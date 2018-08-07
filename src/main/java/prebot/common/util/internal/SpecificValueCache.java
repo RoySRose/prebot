@@ -14,6 +14,7 @@ public class SpecificValueCache {
 
 		ENEMY_GROUND_UNIT_POWER,
 		ENEMY_AIR_UNIT_POWER,
+		ENEMY_FIRST_EXPANSION_OCCUPIED,
 	};
 	
 	private static Map<ValueType, Object> data = new HashMap<>();

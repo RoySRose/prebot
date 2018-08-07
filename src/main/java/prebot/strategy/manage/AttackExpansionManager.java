@@ -2,12 +2,13 @@ package prebot.strategy.manage;
 
 import java.util.List;
 
-import bwapi.Order;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -35,75 +36,70 @@ public class AttackExpansionManager {
 	public int unitPoint = 0;
 
 	public void executeCombat() {
-		// TODO 상대방 신규 멀티를 찾았을때 공격 여부 한번더 돌려야함(상대 멀티 진행 여부 판단해야되므로
+
 		int unitPoint = 0;
 		int expansionPoint = 0;
-		int totPoint = 0;
 
-		int selfbasecnt = 0;
-		int enemybasecnt = 0;
-
-		// boolean allaware = InformationManager.Instance().isReceivingEveryMultiInfo();
-
-		// TODO 아군은 돌아가기 시작하고 scv 특정 수 이상 붙은 컴맨드만 쳐야 하지 않나?
-		selfbasecnt = InformationManager.Instance().getOccupiedBaseLocationsCnt(InformationManager.Instance().selfPlayer);
-		enemybasecnt = InformationManager.Instance().getOccupiedBaseLocationsCnt(InformationManager.Instance().enemyPlayer);
-		// TODO상대가 다른곳에 파일론만 지으면.. 문제 되는데..
-		// CombatManager.Instance().setCombatStrategy(CombatStrategy.DEFENCE_INSIDE);
-
-		if (enemybasecnt == 0) {
+		int selfBaseCount = InfoUtils.myOccupiedBases().size();
+		int enemyBaseCount = InfoUtils.enemyOccupiedBases().size();
+		if (enemyBaseCount == 0) {
 			return;
 		}
 
-		int myunitPoint = UnitUtils.myFactoryUnitSupplyCount();
+		int myFactoryUnitPoint = UnitUtils.myFactoryUnitSupplyCount();
 
 		// 공통 기본 로직, 팩토리 유닛 50마리 기준 유닛 Kill Death 상황에 따라 변경.
 
-		int deadcombatunit = getTotDeadCombatUnits();
 		int killedcombatunit = getTotKilledCombatUnits();
+		int deadCombatunit = myDeadCombatUnitSupplies();
+		
+		int totworkerkilled = Prebot.Broodwar.self().killedUnitCount(InformationManager.Instance().getWorkerType(InfoUtils.enemyRace())) * 2;
 		int totworkerdead = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_SCV) * 2;
-		int totworkerkilled = Prebot.Broodwar.self().killedUnitCount(InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace)) * 2;
-		int totaldeadunit = Prebot.Broodwar.self().deadUnitCount();
-		int totalkilledunit = Prebot.Broodwar.self().deadUnitCount();
-
-		// if(selfbasecnt > enemybasecnt){ //약 시작 ~ 15분까지
-		if (Prebot.Broodwar.getFrameCount() < 20000) { // 약 시작 ~ 15분까지
+		
+		if (TimeUtils.beforeTime(15, 0)) { // 약 시작 ~ 15분까지
 			unitPoint += (totworkerkilled - totworkerdead) * (-Prebot.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
-			unitPoint += (killedcombatunit - deadcombatunit);
+			unitPoint += (killedcombatunit - deadCombatunit);
 
-		} else if (Prebot.Broodwar.getFrameCount() < 40000) { // 약 15분 ~ 28분까지 // 여기서부턴 시간보다.... 현재 전체 규모수가 중요할듯?
+		} else if (TimeUtils.beforeTime(28, 0)) { // 약 15분 ~ 28분까지 // 여기서부턴 시간보다.... 현재 전체 규모수가 중요할듯?
 			unitPoint += (totworkerkilled - totworkerdead) * (-Prebot.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
-			unitPoint += (killedcombatunit - deadcombatunit) * (-Prebot.Broodwar.getFrameCount() / 20000.0 + 2.0);
+			unitPoint += (killedcombatunit - deadCombatunit) * (-Prebot.Broodwar.getFrameCount() / 20000.0 + 2.0);
 		}
+		
+		int myExpansioningCount = selfExspansioningCount();
+		
+		boolean myExpansioning = myExpansioningCount > 0;
+		boolean enemyExpansioning = enemyExspansioning();
 
-		if (selfbasecnt == enemybasecnt && selfExspansioning() == 0 && enemyExspansioning() == false) { // 베이스가 동일할때
-			if (InformationManager.Instance().enemyRace == Race.Zerg || InformationManager.Instance().enemyRace == Race.Protoss) {
+		if (selfBaseCount == enemyBaseCount && !myExpansioning && !enemyExspansioning()) { // 베이스가 동일할때
+			if (InfoUtils.enemyRace() == Race.Zerg || InfoUtils.enemyRace() == Race.Protoss) {
 				expansionPoint += 5;
 			}
-		} else if (selfbasecnt > enemybasecnt) {// 우리가 베이스가 많으면
-			if (selfbasecnt - enemybasecnt == 1) {
-				if (selfExspansioning() > 0) {
-					if (enemyExspansioning() == false) {
+			
+		} else if (selfBaseCount > enemyBaseCount) {// 우리가 베이스가 많으면
+			if (selfBaseCount - enemyBaseCount == 1) {
+				if (myExpansioning) {
+					if (!enemyExspansioning()) {
 						expansionPoint -= 15;
 					} else {
 						expansionPoint += 10;
 					}
-				} else if (selfExspansioning() == 0) {
-					if (enemyExspansioning() == true) {
+				} else {
+					if (enemyExspansioning()) {
 						expansionPoint += 40;
-					}
-					if (enemyExspansioning() == false) {
+					} else {
 						expansionPoint += 20;
 					}
 				}
+			} else if (selfBaseCount - enemyBaseCount > 1) {
+				 if (selfBaseCount - enemyBaseCount > myExpansioningCount) {
+					 expansionPoint += 20 + 20 * (selfBaseCount - enemyBaseCount);
+				 }
 			}
-			if (selfbasecnt - enemybasecnt > 1 && selfbasecnt - enemybasecnt > selfExspansioning()) {
-				expansionPoint += 20 + 20 * (selfbasecnt - enemybasecnt);
-			}
-		} else if (selfbasecnt < enemybasecnt) {// 우리가 베이스가 적으면
-			if (enemybasecnt - selfbasecnt == 1) {
-				if (selfExspansioning() > 0) {
-					if (enemyExspansioning() == false) {
+			
+		} else if (selfBaseCount < enemyBaseCount) {// 우리가 베이스가 적으면
+			if (enemyBaseCount - selfBaseCount == 1) {
+				if (myExpansioning) {
+					if (!enemyExpansioning) {
 						expansionPoint -= 20;
 						if (InformationManager.Instance().enemyRace == Race.Zerg || InformationManager.Instance().enemyRace == Race.Protoss) {
 							expansionPoint += 5;
@@ -112,7 +108,7 @@ public class AttackExpansionManager {
 						expansionPoint -= 10;
 					}
 				} else {
-					if (enemyExspansioning() == true) {
+					if (enemyExpansioning) {
 						expansionPoint += 10;
 					}
 				}
@@ -123,20 +119,18 @@ public class AttackExpansionManager {
 
 		// 종족별 예외 상황
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			if (myunitPoint > 80 && killedcombatunit - deadcombatunit > myunitPoint / 4) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
+			if (myFactoryUnitPoint > 80 && killedcombatunit - deadCombatunit > myFactoryUnitPoint / 4) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
 				unitPoint += 20;
 			}
-		}
-		if (InformationManager.Instance().enemyRace == Race.Protoss) {
-			if (myunitPoint > 80 && killedcombatunit - deadcombatunit > myunitPoint / 3) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
+		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+			if (myFactoryUnitPoint > 80 && killedcombatunit - deadCombatunit > myFactoryUnitPoint / 3) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
 				unitPoint += 20;
 			}
 
 			unitPoint += InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) * 4;
-		}
-
-		if (InformationManager.Instance().enemyRace == Race.Zerg) {
-			if (myunitPoint > 80 && killedcombatunit - deadcombatunit > myunitPoint / 3) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
+			
+		} else if (InformationManager.Instance().enemyRace == Race.Zerg) {
+			if (myFactoryUnitPoint > 80 && killedcombatunit - deadCombatunit > myFactoryUnitPoint / 3) {// 죽인수 - 죽은수 가 현재 내 유닛의 일정 비율이 넘으면 가산점
 				unitPoint += 20;
 			}
 			unitPoint += InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) * 4;
@@ -144,7 +138,7 @@ public class AttackExpansionManager {
 		}
 
 		// 내 팩토리 유닛 인구수 만큼 추가
-		totPoint = myunitPoint + expansionPoint + unitPoint;
+		int totPoint = myFactoryUnitPoint + expansionPoint + unitPoint;
 		
 		boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
 		boolean fastAttack = StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK;
@@ -166,32 +160,31 @@ public class AttackExpansionManager {
 					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6 + plus) {
 				isAttackMode = true;
 			}
-			int CC = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+			int completeCommandCenterCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 			if (isAttackMode && unitPoint < 0) {
-				if (CC == 1 && myunitPoint + unitPoint < 0) {
+				if (completeCommandCenterCount == 1 && myFactoryUnitPoint + unitPoint < 0) {
 					isAttackMode = false;
-				}
-				if (CC == 2 && myunitPoint + unitPoint / 2 < 0) {
+				} else if (completeCommandCenterCount == 2 && myFactoryUnitPoint + unitPoint / 2 < 0) {
 					isAttackMode = false;
-				}
-				if (CC > 3 && myunitPoint < 20) {
+				} else if (completeCommandCenterCount > 3 && myFactoryUnitPoint < 20) {
 					isAttackMode = false;
 				}
 			}
-			if (CC > 4) {
-				CC = 4;
+			if (completeCommandCenterCount > 4) {
+				completeCommandCenterCount = 4;
 			}
+			
 			pushSiegeLine = false;
-			if ((myunitPoint > 250 - CC * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
+			if ((myFactoryUnitPoint > 250 - completeCommandCenterCount * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
 				pushSiegeLine = true;
 				combatStartCase = 1;
 			}
 
-			if (combatStartCase == 1 && myunitPoint < 90) {
+			if (combatStartCase == 1 && myFactoryUnitPoint < 90) {
 				pushSiegeLine = false;
 			}
 
-			if (myunitPoint > 100 && unitPoint > 40) {
+			if (myFactoryUnitPoint > 100 && unitPoint > 40) {
 				pushSiegeLine = true;
 				combatStartCase = 2;
 			}
@@ -201,12 +194,12 @@ public class AttackExpansionManager {
 
 		} else {
 			// 공통 예외 상황
-			if ((myunitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
+			if ((myFactoryUnitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
 				isAttackMode = true;
 				combatStartCase = 1;
 			}
 
-			if (totPoint > 120 && isAttackMode && myunitPoint > 80) {// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
+			if (totPoint > 120 && isAttackMode && myFactoryUnitPoint > 80) {// 팩토리 유닛이 30마리(즉 스타 인구수 200 일때)
 
 				if (InformationManager.Instance().enemyRace == Race.Zerg
 						&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
@@ -221,10 +214,8 @@ public class AttackExpansionManager {
 				combatStartCase = 2;
 			}
 
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)
-					&& !isAttackMode
-					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-							+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
+			if (!isAttackMode && StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)
+					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
 				isAttackMode = true;
 				fastAttack = true;
 				combatStartCase = 5;
@@ -235,10 +226,10 @@ public class AttackExpansionManager {
 			}
 
 			if (isAttackMode) {
-				if (combatStartCase == 1 && myunitPoint < 30) {
+				if (combatStartCase == 1 && myFactoryUnitPoint < 30) {
 					isAttackMode = false;
-				}
-				if (combatStartCase == 2) {
+					
+				} else if (combatStartCase == 2) {
 
 					if (InformationManager.Instance().enemyRace == Race.Zerg
 							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
@@ -253,17 +244,12 @@ public class AttackExpansionManager {
 					} else if (totPoint < 50) {
 						isAttackMode = false;
 					}
-				}
-				if (combatStartCase == 5) {
-
-					if (combatTime < Prebot.Broodwar.getFrameCount() && ((myunitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
+				} else if (combatStartCase == 5) {
+					if (combatTime < Prebot.Broodwar.getFrameCount() && ((myFactoryUnitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
 						isAttackMode = false;
-					}
-
-					if (InformationManager.Instance().getNumUnits(UnitType.Protoss_Zealot, InformationManager.Instance().enemyPlayer)
-							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Zealot)
-							+ InformationManager.Instance().getNumUnits(UnitType.Protoss_Dragoon, InformationManager.Instance().enemyPlayer)
-							+ Prebot.Broodwar.enemy().deadUnitCount(UnitType.Protoss_Dragoon) > 20) {
+						
+					} else if (InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon)
+							+ InfoUtils.enemyDeadNumUnits(UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon) > 20) {
 						if (totPoint < 50) {
 							isAttackMode = false;
 						}
@@ -271,54 +257,32 @@ public class AttackExpansionManager {
 				}
 
 				if (InformationManager.Instance().enemyRace == Race.Protoss) {
-					if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
-							&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Comsat_Station) == 0) {
-						for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
-							if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() == false) {
-								Prebot.Broodwar.printf("dark and no comsat or vessel");
-								isAttackMode = false;
-							}
-						}
-					} else if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Comsat_Station) > 0) {
-						boolean energy = false;
-						boolean dark = false;
-						for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
-							if (unit.isVisible() && (!unit.isDetected() || unit.getOrder() == Order.Burrowing) && unit.getPosition().isValid() && unit.isFlying() == false) {
-								dark = true;
-							}
-						}
-						if (dark) {
-							for (Unit myunit : Prebot.Broodwar.self().getUnits()) {
-								if (myunit.getType() == UnitType.Terran_Comsat_Station && myunit.isCompleted() && myunit.getEnergy() > 50) {
-									energy = true;
-								}
-							}
-							if (energy == false) {
-								isAttackMode = false;
-							}
+					
+					if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)) {
+						if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
+								&& UnitUtils.availableScanningCount() == 0) {
+							Prebot.Broodwar.printf("dark and no comsat or vessel");
+							isAttackMode = false;
 						}
 					}
 				}
 
-				if (isAttackMode && expansionPoint >= 0 && myunitPoint > 120 && unitPoint + totPoint * 0.1 > 55) {
-					if (InformationManager.Instance().enemyRace == Race.Protoss
-							&& InformationManager.Instance().getNumUnits(UnitType.Protoss_Photon_Cannon, InformationManager.Instance().enemyPlayer) <= 3) {
+				if (isAttackMode && expansionPoint >= 0 && myFactoryUnitPoint > 30 * 4 && unitPoint + totPoint * 0.1 > 55) {
+					if (InformationManager.Instance().enemyRace == Race.Protoss && InfoUtils.enemyNumUnits(UnitType.Protoss_Photon_Cannon) <= 3) {
 						noMercyAttack = true;
 					}
-					if (InformationManager.Instance().enemyRace == Race.Zerg
-							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Sunken_Colony, InformationManager.Instance().enemyPlayer) <= 3) {
+					if (InformationManager.Instance().enemyRace == Race.Zerg && InfoUtils.enemyNumUnits(UnitType.Zerg_Sunken_Colony) <= 3) {
 						noMercyAttack = true;
 					}
-
 				}
 
-				if (!isAttackMode || (noMercyAttack && (expansionPoint < 0 || (myunitPoint < 40 || unitPoint < 10)))) {
+				if (!isAttackMode || (noMercyAttack && (expansionPoint < 0 || (myFactoryUnitPoint < 40 || unitPoint < 10)))) {
 					noMercyAttack = false;
 				}
 			}
 		}
 
-		this.myUnitPoint = myunitPoint;
+		this.myUnitPoint = myFactoryUnitPoint;
 		this.expansionPoint = expansionPoint;
 		this.unitPoint = unitPoint;
 		this.attackPoint = totPoint;
@@ -487,9 +451,7 @@ public class AttackExpansionManager {
 //		}
 //	}
 
-	private int getTotDeadCombatUnits() {
-
-		int res = 0;
+	private int myDeadCombatUnitSupplies() {
 
 		int totmarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
 		int tottank = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
@@ -498,15 +460,11 @@ public class AttackExpansionManager {
 		int totwraith = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
 		int totvessel = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
 
-		res = tottank + totgoliath + totvulture + totwraith + totvessel;
-		res = res * 2 + totmarine;
-
-		return res * 2;// 스타에서는 두배
+		int result = (tottank + totgoliath + totvulture + totwraith + totvessel) * 2 + totmarine;
+		return result * 2;// 스타에서는 두배
 	}
 
 	private int getTotKilledCombatUnits() {
-
-		int res = 0;
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int totbio = 0;
@@ -519,7 +477,7 @@ public class AttackExpansionManager {
 			totbio = Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Marine) + Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Firebat)
 					+ Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Medic);
 
-			res = tottank + totgoliath + totvulture + totwraith + totvessel;
+			int res = tottank + totgoliath + totvulture + totwraith + totvessel;
 			res = res * 2 + totbio;
 
 			return res * 2;
@@ -542,7 +500,7 @@ public class AttackExpansionManager {
 			int totultra = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Ultralisk);
 			int totsunken = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Sunken_Colony);
 
-			res = totzerling + +totsunken * 2 + tothydra * 2 + totmutal * 4 + totoverload * 3 + totlurker * 5 + totguardian * 8 + totultra * 10;
+			int res = totzerling + (totsunken * 2) + (tothydra * 2) + (totmutal * 4) + (totoverload * 3) + (totlurker * 5) + (totguardian * 8) + (totultra * 10);
 			return res; // 저그는 저글링 때문에 이미 2배 함
 
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
@@ -557,40 +515,35 @@ public class AttackExpansionManager {
 			int totdark = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Dark_Templar);
 			int totcarrier = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
 
-			res = (totzealot + totdragoon + totphoto + tothigh + totdark) * 2 + totarchon * 4 + totcarrier * 8;
-
+			int res = (totzealot + totdragoon + totphoto + tothigh + totdark) * 2 + totarchon * 4 + totcarrier * 8;
 			return res * 2;
+			
 		} else {
 			return 0;
 		}
 	}
 
 	private boolean enemyExspansioning() {
-		List<UnitInfo> enemyCC = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace));
-
-		for (UnitInfo target : enemyCC) {
-			if (target.isCompleted()) {
+		List<UnitInfo> enemyResourceDepot = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, InformationManager.Instance().getBasicResourceDepotBuildingType(InfoUtils.enemyRace()));
+		for (UnitInfo enemyDepot : enemyResourceDepot) {
+			if (enemyDepot.isCompleted()) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private int selfExspansioning() {
-
-		int cnt = 0;
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-			if (unit == null)
-				continue;
-			if (unit.getType() == UnitType.Terran_Command_Center) {
-				if (unit.isCompleted() == false) {
-					cnt++;
-				} else if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(unit) < 7) {
-					cnt++;
-				}
+	private int selfExspansioningCount() {
+		int count = 0;
+		List<Unit> incompleteCenters = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Command_Center);
+		count += incompleteCenters.size();
+		
+		for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandcenter) < 7) {
+				count++;
 			}
 		}
-		return cnt;
+		return count;
 	}
 
 	public int getValidMineralsForExspansionNearDepot(Unit depot) {

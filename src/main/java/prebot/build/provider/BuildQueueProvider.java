@@ -412,6 +412,7 @@ public class BuildQueueProvider extends GameManager {
 					int mineralNeed = blockingItem.metaType.mineralPrice() + selected.mineralPrice();
 					int gasNeed = blockingItem.metaType.gasPrice() + selected.gasPrice();
 					if (PlayerUtils.enoughResource(mineralNeed, gasNeed)) {
+						System.out.println("block tank provided");
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 						return;
 					}
@@ -420,6 +421,7 @@ public class BuildQueueProvider extends GameManager {
 					int mineralNeed = blockingItem.metaType.mineralPrice() + selected.mineralPrice();
 					int gasNeed = blockingItem.metaType.gasPrice() + selected.gasPrice();
 					if (PlayerUtils.enoughResource(mineralNeed, gasNeed)) {
+						System.out.println("block goliath provided");
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(selected, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 						return;
 					}
@@ -440,6 +442,7 @@ public class BuildQueueProvider extends GameManager {
 					// if(selected == UnitType.Terran_Goliath && isarmoryexists == false){
 					// continue;
 					// }
+					System.out.println("block vulture provided");
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Vulture, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					return;
 				}

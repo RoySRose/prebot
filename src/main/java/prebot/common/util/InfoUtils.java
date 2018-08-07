@@ -13,6 +13,8 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.main.Prebot;
+import prebot.common.util.internal.SpecificValueCache;
+import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.squad.Squad;
@@ -86,6 +88,25 @@ public class InfoUtils {
 		return InformationManager.Instance().getOccupiedBaseLocations(Prebot.Broodwar.enemy());
 	}
 	
+	public static boolean enemyFirstExpansionOccupied() {
+		Boolean enemyFirstExpansionOccupied = SpecificValueCache.get(ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, Boolean.class);
+		if (enemyFirstExpansionOccupied != null) {
+			return enemyFirstExpansionOccupied;
+		}
+		enemyFirstExpansionOccupied = Boolean.FALSE;
+		BaseLocation enemyFirstExpansion = enemyFirstExpansion();
+		if (enemyFirstExpansion != null) {
+			for (BaseLocation base : InfoUtils.enemyOccupiedBases()) {
+				if (base.equals(enemyFirstExpansion)) {
+					enemyFirstExpansionOccupied = Boolean.TRUE;
+					break;
+				}
+			}
+		}
+		SpecificValueCache.put(ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, enemyFirstExpansionOccupied);
+		return enemyFirstExpansionOccupied;
+	}
+	
 	public static Unit myBaseGas() {
 		if (myBase() != null) {
 			List<Unit> geysers = myBase().getGeysers();
@@ -118,6 +139,22 @@ public class InfoUtils {
 		int numUnits = 0;
 		for (UnitType unitType : unitTypes) {
 			numUnits += InformationManager.Instance().getNumUnits(unitType, Prebot.Broodwar.enemy());
+		}
+		return numUnits;
+	}
+	
+	public static int myDeadNumUnits(UnitType... unitTypes) {
+		int numUnits = 0;
+		for (UnitType unitType : unitTypes) {
+			numUnits += Prebot.Broodwar.self().deadUnitCount(unitType);
+		}
+		return numUnits;
+	}
+	
+	public static int enemyDeadNumUnits(UnitType... unitTypes) {
+		int numUnits = 0;
+		for (UnitType unitType : unitTypes) {
+			numUnits += Prebot.Broodwar.enemy().deadUnitCount(unitType);
 		}
 		return numUnits;
 	}
