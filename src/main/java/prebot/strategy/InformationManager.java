@@ -626,7 +626,7 @@ public class InformationManager extends GameManager {
 
 		// 끝까지 상대 location 못 찾았을때
 		if (mainBaseLocations.get(enemyPlayer) == null && firstScoutAlive == false
-				&& (firstVultureAlive == false || Prebot.Broodwar.getFrameCount() >= 8500)) {
+				&& (firstVultureAlive == false || Prebot.Broodwar.getFrameCount() >= 4000)) {
 			if (StrategyIdea.enemyBaseExpected != null) {
 				mainBaseLocations.put(enemyPlayer, StrategyIdea.enemyBaseExpected);
 				mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
@@ -2078,6 +2078,7 @@ public class InformationManager extends GameManager {
 	private void updateBlockingEnterance() {
 		// 터렛지어지면 더이상 체크 안함
 		if (UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret)) {
+			blockingEnterance = false;
 			return;
 		}
 		// 저그는 입막 안하므로 체크 안함
@@ -2097,11 +2098,11 @@ public class InformationManager extends GameManager {
 		for (Unit supple : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Supply_Depot)) {
 			if (supple.getTilePosition().equals(firstSupplePos)) {
 				firstSupple = true;
+				if (safePosition == null) {
+					earlyDefenseSafePosition(UnitType.Terran_Marine, supple);
+				}
 			} else if (supple.getTilePosition().equals(secondSupplePos)) {
 				secondSupple = true;
-			}
-			if (safePosition == null) {
-				earlyDefenseSafePosition(UnitType.Terran_Marine, supple);
 			}
 		}
 
@@ -2129,13 +2130,11 @@ public class InformationManager extends GameManager {
 		final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
-		int moveCalcSize = (int) (unitType.topSpeed() * 20);
+		int moveCalcSize = (int) (unitType.topSpeed() * 30);
 		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
 				(int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
 		safePosition = new Position(supple.getPosition().getX() + fleeVector.getX(),
 				supple.getPosition().getY() + fleeVector.getY()); // 회피지점
 
 	}
-
-	
 }

@@ -34,7 +34,7 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MarineControl extends Control {
-	private static final int NEAR_BASE_DISTANCE = 250;
+	private static final int NEAR_BASE_DISTANCE = 400;
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
@@ -63,7 +63,7 @@ public class MarineControl extends Control {
 				Position safePosition = InformationManager.Instance().isSafePosition();
 				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
 
-				if(dangerousOutOfMyRegion(marine)){
+				if(marineDangerousOutOfMyRegion(marine)){
 					CommandUtils.attackMove(marine, safePosition);
 					continue;
 					//MicroUtils.flee(marine, safePosition, fOption);
@@ -107,13 +107,18 @@ public class MarineControl extends Control {
 				if (decision.type == DecisionType.KITING_UNIT) {
 					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
 				
-					if(dangerousOutOfMyRegion(marine)){
+					if(marineDangerousOutOfMyRegion(marine)){
 						intoTheBunker(bunker, marine);
 						continue;
 					}
 					
 					//Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
 					if (enemyInSight != null) {
+						if(enemyInSight.getType().isWorker()){
+							MicroUtils.kiting(marine, decision.eui, kOption);
+							continue;
+						}
+						
 						if(MicroUtils.isRangeUnit(enemyInSight.getType())){
 							rangeUnit = true;
 						}
@@ -199,8 +204,13 @@ public class MarineControl extends Control {
 	}
 	
 	//public boolean isInsidePositionToBase(Position position) {
-	public boolean dangerousOutOfMyRegion(Unit marine) {
-		if (LagObserver.groupsize() > 20) {
+	public boolean marineDangerousOutOfMyRegion(Unit marine) {
+		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
+		if (marine.getPosition().getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
+ 			return true;
+		}
+    	return false;
+		/*if (LagObserver.groupsize() > 20) {
 			return false;
 		}
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
@@ -249,7 +259,7 @@ public class MarineControl extends Control {
 			return false;
 		}
 
-		return true;
+		return true;*/
 	}
 	
 }
