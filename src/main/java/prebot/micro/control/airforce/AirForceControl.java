@@ -19,6 +19,7 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.micro.targeting.WraithTargetCalculator;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
@@ -31,9 +32,8 @@ public class AirForceControl extends Control {
 		if (airunits.isEmpty()) {
 			return;
 		}
-		
-		List<UnitInfo> enemyUnitInfoList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
-		if (Prebot.Broodwar.self().supplyUsed() > 300 && enemyUnitInfoList.size() <= 3) {
+    
+		if (StrategyIdea.letsFindRat || (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 3)) {
 			findRat(airunits);
 			return;
 		}

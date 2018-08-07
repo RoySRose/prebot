@@ -29,6 +29,11 @@ public class GoliathControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		if (StrategyIdea.letsFindRat) {
+			findRat(unitList);
+			return;
+		}
+		
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);

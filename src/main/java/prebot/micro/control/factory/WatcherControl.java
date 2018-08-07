@@ -48,6 +48,11 @@ public class WatcherControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		if (StrategyIdea.letsFindRat) {
+			findRat(unitList);
+			return;
+		}
+		
 		Position fleePosition = StrategyIdea.mainSquadCenter;
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
