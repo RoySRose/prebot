@@ -73,18 +73,19 @@ public class ComsatControl extends Control {
 		
 		Unit comsatToUse = null;
 		int usableEnergy = 75;
-		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
-			usableEnergy = 150;
-		}
 		
-		if (usableEnergy < 180 && TimeUtils.afterTime(13, 0)) {
+		if (TimeUtils.afterTime(16, 0)) {
+			usableEnergy = 195;
+		} else if (TimeUtils.afterTime(13, 0)) {
 			usableEnergy = 180;
-			
-		} else if (TimeUtils.afterTime(10, 0)) {
-			usableEnergy = 130;
-			
-		} else if (TimeUtils.afterTime(7, 0)) {
-			usableEnergy = 80;
+		} else {
+			if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+				usableEnergy = 150;
+			} else if (TimeUtils.afterTime(10, 0)) {
+				usableEnergy = 130;
+			} else if (TimeUtils.afterTime(7, 0)) {
+				usableEnergy = 80;
+			}
 		}
 		
 		for (Unit comsatStation : unitList) {

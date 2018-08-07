@@ -8,7 +8,6 @@ import java.util.Set;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.LagObserver;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -71,7 +70,7 @@ public class MainAttackSquad extends Squad {
 		goliathList.addAll(unitListMap.getOrDefault(UnitType.Terran_Goliath, new ArrayList<Unit>()));
 		valkyrieList.addAll(unitListMap.getOrDefault(UnitType.Terran_Valkyrie, new ArrayList<Unit>()));
 
-		this.updateInitiatedFlag();
+		StrategyIdea.initiated = this.updateInitiatedFlag();
 		int saveUnitLevel = this.saveUnitLevel(tankList, goliathList);
 		int goliathSaveUnitLevel = Math.min(saveUnitLevel, 1);
 		
@@ -89,9 +88,9 @@ public class MainAttackSquad extends Squad {
 		}
 	}
 
-	private void updateInitiatedFlag() {
+	private boolean updateInitiatedFlag() {
 		if (euiList.isEmpty()) {
-			StrategyIdea.initiated = false;
+			return false;
 		}
 		
 		for (UnitInfo eui : euiList) {
@@ -100,9 +99,10 @@ public class MainAttackSquad extends Squad {
 					&& !eui.getType().isBuilding()
 					&& !eui.getType().isWorker()
 					&& !eui.getType().isFlyer()) {
-				StrategyIdea.initiated = true;
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	private int saveUnitLevel(List<Unit> tankList, List<Unit> goliathList) {
@@ -147,7 +147,7 @@ public class MainAttackSquad extends Squad {
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 		
-		if (TimeUtils.beforeTime(9, 0) && LagObserver.groupsize() < 5) {
+		if (TimeUtils.beforeTime(10, 0)) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 			List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 			for (Unit building : myBuildings) {
@@ -155,10 +155,10 @@ public class MainAttackSquad extends Squad {
 			}
 		}
 
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50);
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			for (Unit unit : unitList) {
-				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius) {
+				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
 					UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 				}
 			}

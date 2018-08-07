@@ -83,19 +83,18 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 
 		int factoryUnitCount = UnitUtils.myFactoryUnitSupplyCount();
-		int realCCcnt = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 
 		// 앞마당 전
-		if (realCCcnt == 1) {
+		if (allCommandCenterCount == 1) {
+//			if (포인트에 따라 좀더 빨리 지을 수 있는 케이스) {}
 			if (InfoUtils.enemyRace() == Race.Protoss) {
 		    	// TODO 이니셜에 들어가야하는 부분인지 확인
 				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
 						&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
-			    	int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-					if (allCommandCenterCount == 1) {
-						setCommandCenterBlockAndSeedPosition();
-						return true;
-					}
+					setCommandCenterBlockAndSeedPosition();
+					System.out.println("fast 2nd commandcenter - for double (vs protoss)");
+					return true;
 				}
 				
 			} else if (InfoUtils.enemyRace() == Race.Terran) {
@@ -103,26 +102,27 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				List<Unit> tankWraiths = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (!bunkers.isEmpty() && tankWraiths.size() >= 4) {
 					setCommandCenterBlockAndSeedPosition();
+					System.out.println("fast 2nd commandcenter - bunker defense (vs terran)");
 					return true;
 				}
 			}
 			
-			
-//			if (포인트에 따라 좀더 빨리 지을 수 있는 케이스) {}
 			if (Prebot.Broodwar.self().minerals() > 400) {
 				setCommandCenterBlockAndSeedPosition();
+				System.out.println("normal 2nd commandcenter - over 400 minerals");
 				return true;
 			}
 		}
 
 		// 앞마당 이후
-		else if (realCCcnt >= 2) {
+		else if (allCommandCenterCount >= 2) {
 			
 			boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
 
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
-			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 120) {
+			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 30 * 4) {
 				setCommandCenterBlockAndSeedPosition();
+				System.out.println("normal next commandcenter - over 30 mechanics & over 600 minerals");
 				return true;
 
 			}
@@ -130,12 +130,14 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			if (isAttackMode && StrategyIdea.mainSquadMode != MainSquadMode.SPEED_ATTCK
 					&& Prebot.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
+				System.out.println("attack and next commandcenter - attack & over 250 minerals");
 				return true;
 			}
 			
 			// 800 넘으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 800) {
 				setCommandCenterBlockAndSeedPosition();
+				System.out.println("minerals next commandcenter - over 800 minerals");
 				return true;
 			}
 
@@ -162,15 +164,17 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 //				}
 //			}
 
-			int temp = 0;
+			int leftMinerals = 0;
 			for (Unit units : commandCenters) {
-				temp += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
+				leftMinerals += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
 			}
-			if (temp < 8000 && isAttackMode) {
+			if (leftMinerals < 8000 && isAttackMode) {
 				setCommandCenterBlockAndSeedPosition();
+				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;
 			}
-			if (factoryUnitCount > 160) {
+			if (factoryUnitCount > 40 * 4) {
+				System.out.println("next commandcenter - over 40 mechanics");
 				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}

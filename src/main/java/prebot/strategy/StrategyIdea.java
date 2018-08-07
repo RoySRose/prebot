@@ -65,6 +65,7 @@ public class StrategyIdea {
 	public static Position totalEnemyCneterPosition = Position.Unknown;
 	public static Position nearGroundEnemyPosition = Position.Unknown;
 	public static Position nearAirEnemyPosition = Position.Unknown;
+	public static Position dropEnemyPosition = Position.Unknown;
 	
 	// [아군 메인부대의 전투개시 여부]
 	// 컴뱃매니저: 시즈모드 변경시, watcher전투 판단시 

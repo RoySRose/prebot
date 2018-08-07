@@ -187,13 +187,15 @@ public class SpiderMineManger {
 		// 급해서 본진에 박은 마인 제거
 		if (LagObserver.groupsize() <= 10) {
 			if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
-				List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
-				
-				Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
-				for (Unit spiderMine : spiderMineList) {
-					Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
-					if (myBaseRegion == mineRegion) {
-						mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+				if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
+					List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+					
+					Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+					for (Unit spiderMine : spiderMineList) {
+						Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
+						if (myBaseRegion == mineRegion) {
+							mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+						}
 					}
 				}
 			}
