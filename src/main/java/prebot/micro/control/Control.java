@@ -22,7 +22,11 @@ public abstract class Control {
 	// TODO 추후 모든 컨트롤 적용 필요
 	public void controlIfUnitExist(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		if (!unitList.isEmpty()) {
-			control(unitList, euiList);
+			if (StrategyIdea.letsFindRat) {
+				findRat(unitList);
+			} else {
+				control(unitList, euiList);
+			}
 		}
 	}
 
