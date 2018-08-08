@@ -47,6 +47,7 @@ public class WorkerManager extends GameManager {
 			return;
 		}
 		
+		// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
 		scvIsOut = false;
 		// 1초에 1번만 실행한다
 		// if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
@@ -400,7 +401,12 @@ public class WorkerManager extends GameManager {
 					if (TimeUtils.beforeTime(7, 0)) {
 						if(unit.getType() == UnitType.Terran_Bunker && unit.getHitPoints() < unit.getType().maxHitPoints()){
 							setRepairWorker(repairWorker, unit);
-						}else if (unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
+						}else if(unit.getType() == UnitType.Terran_Missile_Turret 
+								&& unit.getHitPoints() < unit.getType().maxHitPoints()
+								&& BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(InfoUtils.myBase().getPosition())){
+							setRepairWorker(repairWorker, unit);
+						}else if (unit.getType() == UnitType.Terran_Barracks 
+								|| unit.getType() == UnitType.Terran_Supply_Depot && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
 							setRepairWorker(repairWorker, unit);
 						}
 					} else {

@@ -304,10 +304,11 @@ public class MicroUtils {
 	public static void BlockingKitingInvisible(Unit rangedUnit, UnitInfo targetInfo, KitingOption kOption, Position safePosition) {
 		WeaponType weapon = getWeapon(rangedUnit.getType(), targetInfo.getType());
 		if (weapon == WeaponType.None || rangedUnit.getDistance(targetInfo.getLastPosition()) > weapon.maxRange() + 50) {
-			CommandUtils.attackMove(rangedUnit, targetInfo.getLastPosition());
+			CommandUtils.attackMove(rangedUnit, safePosition);
 		} else {
 			//flee(rangedUnit, safePosition, kOption.fOption);
-			CommandUtils.move(rangedUnit,safePosition);
+			//CommandUtils.move(rangedUnit,safePosition);
+			rangedUnit.move(safePosition);
 		}
 	}
 	
@@ -321,7 +322,8 @@ public class MicroUtils {
 		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
 			CommandUtils.attackUnit(rangedUnit, targetUnit);
 		} else {
-			CommandUtils.move(rangedUnit,safePosition);
+			//CommandUtils.move(rangedUnit,safePosition);
+			rangedUnit.move(safePosition);
 		}
 	}
 	

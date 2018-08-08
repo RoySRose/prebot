@@ -2076,8 +2076,9 @@ public class InformationManager extends GameManager {
 
 	private void updateBlockingEnterance() {
 		// 터렛지어지면 더이상 체크 안함
-		if (UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret)) {
-			blockingEnterance = false;
+		if (UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret) 
+				&& !UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)
+				||  Prebot.Broodwar.getFrameCount() > 12000) {
 			return;
 		}
 		// 저그는 입막 안하므로 체크 안함
@@ -2129,7 +2130,7 @@ public class InformationManager extends GameManager {
 		final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
-		int moveCalcSize = (int) (unitType.topSpeed() * 30);
+		int moveCalcSize = (int) (unitType.topSpeed() * 20);
 		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
 				(int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
 		safePosition = new Position(supple.getPosition().getX() + fleeVector.getX(),

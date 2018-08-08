@@ -2,7 +2,11 @@ package prebot.micro.control;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.plaf.synth.SynthSpinnerUI;
 
 import bwapi.Position;
 import bwapi.Race;
@@ -34,10 +38,12 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MarineControl extends Control {
-	private static final int NEAR_BASE_DISTANCE = 400;
+	private static final int NEAR_BASE_DISTANCE = 120;
+	private static Unit kitingMarine = null; //마린 한마리만 카이팅
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = getCompleteBunker(campRegion);
 		if (bunker == null) {
@@ -64,33 +70,36 @@ public class MarineControl extends Control {
 				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
 
 				if(marineDangerousOutOfMyRegion(marine)){
-					CommandUtils.attackMove(marine, safePosition);
+					marine.move(safePosition);
 					continue;
-					//MicroUtils.flee(marine, safePosition, fOption);
 				}
 				
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
-					MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
+					if(InformationManager.Instance().isBlockingEnterance()){
+						CommandUtils.attackMove(marine, safePosition);
+					}else{
+						MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
+					}
 				} else if (decision.type == DecisionType.KITING_UNIT) {
 					if(InformationManager.Instance().isBlockingEnterance()){
-						MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
+						if(kitingMarine == null || !kitingMarine.exists()){//마린 한마리만 왔다갔다 카이팅
+							kitingMarine = marine;
+						}else if(kitingMarine == marine){
+							MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
+						}else{
+							if (marine.getDistance(BlockingEntrance.Instance().first_supple.toPosition()) < 40){
+								CommandUtils.holdPosition(marine);
+							}else{
+								CommandUtils.attackMove(marine, BlockingEntrance.Instance().first_supple.toPosition());
+							}
+						}
 					}else{
+						//MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
 						MicroUtils.kiting(marine, decision.eui, kOption);
 					}
 				} else {
-					if(InformationManager.Instance().isBlockingEnterance()){
-						//if (MicroUtils.timeToRandomMove(marine)) {
-							CommandUtils.attackMove(marine, StrategyIdea.campPosition);
-						//}
-					}else if (marine.getDistance(StrategyIdea.campPosition) < 30) { // TODO 추후 변경
-						if (MicroUtils.timeToRandomMove(marine)) {
-							Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 20);
-							CommandUtils.attackMove(marine, randomPosition);
-						}
-					} else {
-						CommandUtils.attackMove(marine, StrategyIdea.campPosition);
-					}
+					CommandUtils.attackMove(marine, StrategyIdea.campPosition);
 				}
 				
 				
@@ -112,7 +121,6 @@ public class MarineControl extends Control {
 						continue;
 					}
 					
-					//Unit closeEnemyUnit = UnitUtils.getClosestUnitToPosition(enemyInSightList, marine.getPosition());
 					if (enemyInSight != null) {
 						if(enemyInSight.getType().isWorker()){
 							outOfTheBunker(marine, bunker, decision.eui, kOption);
@@ -205,12 +213,7 @@ public class MarineControl extends Control {
 	
 	//public boolean isInsidePositionToBase(Position position) {
 	public boolean marineDangerousOutOfMyRegion(Unit marine) {
-		BaseLocation expansionBase = InfoUtils.myFirstExpansion();
-		if (marine.getPosition().getDistance(expansionBase.getPosition()) < NEAR_BASE_DISTANCE) {
- 			return true;
-		}
-    	return false;
-		/*if (LagObserver.groupsize() > 20) {
+		if (LagObserver.groupsize() > 20) {
 			return false;
 		}
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
@@ -221,18 +224,21 @@ public class MarineControl extends Control {
 		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		
 		CampType campType = StrategyIdea.campType;
-			// 베이스 지역 OK
+		// 베이스 지역 OK
+		if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
+			Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
+			if(marine.getDistance(firstCheokePoint) < NEAR_BASE_DISTANCE){
+				return true;
+			}
 			if (unitRegion == baseRegion) {
 				return false;
 			}
-			
-			if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
-				if(InformationManager.Instance().enemyRace != Race.Terran){
-					return true;
-				}else{
-					return false;
-				}
+			if(InformationManager.Instance().enemyRace != Race.Terran){
+				return true;
+			}else{
+				return false;
 			}
+		}
 				
 		// 앞마당 지역, 또는 앞마당 반경이내 OK
 		Position expansionPosition = InfoUtils.myFirstExpansion().getPosition();
@@ -242,7 +248,7 @@ public class MarineControl extends Control {
 		} else if (marine.getDistance(expansionPosition) < 100) {
 			return false;
 		}
-		if (campType == CampType.EXPANSION) {
+		/*if (campType == CampType.EXPANSION) {
 			return true;
 		}
 		
@@ -257,9 +263,9 @@ public class MarineControl extends Control {
 		// 세번째 지역 반경 OK
 		if (marine.getDistance(InfoUtils.myThirdRegion()) < 500) {
 			return false;
-		}
+		}*/
 
-		return true;*/
+		return false;
 	}
 	
 }
