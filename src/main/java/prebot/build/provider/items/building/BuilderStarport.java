@@ -32,7 +32,7 @@ public class BuilderStarport extends DefaultBuildableItem {
 
 		if (needStarportToTrainWraith()) {
 			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT || StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
+				if(StrategyIdea.expansionOption == ExpansionOption.ONE_STARPORT || StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
 					setTilePosition(BlockingEntrance.Instance().starport1);
 				}
 			} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
