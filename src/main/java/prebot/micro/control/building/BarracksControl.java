@@ -43,7 +43,7 @@ public class BarracksControl extends BuildingFlyControl {
 
         if(flyCondition.getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
 
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
 				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
 					flyCondition.setBuildingFly(BuildingFly.UP);
 				}

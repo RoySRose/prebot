@@ -86,7 +86,7 @@ public class StrategyManager extends GameManager {
 	/// 테스트용 임시 공격 타이밍
 	private void temporaryAttackTimer() {
 		if (!StrategyIdea.mainSquadMode.isAttackMode) {
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
 				
 			} else {

@@ -43,8 +43,14 @@ public class ValkyrieControl extends Control {
 				continue;
 			}
 			
-			Decision decision = decisionMaker.makeDecision(unit, euiList);
+			if (StrategyIdea.mainSquadMode.isAttackMode) {
+				if (StrategyIdea.mainSquadCenter.getDistance(unit) > StrategyIdea.mainSquadCoverRadius) {
+					CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
+					continue;
+				}
+			}
 			
+			Decision decision = decisionMaker.makeDecision(unit, euiList);
 			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 
@@ -52,13 +58,13 @@ public class ValkyrieControl extends Control {
 				MicroUtils.kiting(unit, decision.eui, kOption);
 
 			} else if (decision.type == DecisionType.ATTACK_POSITION) {
-				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainPosition)) {
+				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainSquadCenter)) {
 					if (MicroUtils.timeToRandomMove(unit)) {
 						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
 						CommandUtils.attackMove(unit, randomPosition);
 					}
 				} else {
-					CommandUtils.attackMove(unit, StrategyIdea.mainPosition);
+					CommandUtils.attackMove(unit, StrategyIdea.mainSquadCenter);
 				}
 			}
 		}

@@ -99,7 +99,7 @@ public class WatcherSquad extends Squad {
 		}
 
 		Position avoidBunkerPosition = null;
-		if (TimeUtils.beforeTime(10, 0) && BlockingEntrance.Instance().bunker != null && !UnitUtils.myUnitDiscovered(UnitType.Terran_Bunker)) {
+		if (TimeUtils.beforeTime(8, 0) && BlockingEntrance.Instance().bunker != null && !UnitUtils.myUnitDiscovered(UnitType.Terran_Bunker)) {
 			avoidBunkerPosition = BlockingEntrance.Instance().bunker.toPosition();
 		}
 		

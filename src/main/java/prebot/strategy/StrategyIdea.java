@@ -28,12 +28,12 @@ public class StrategyIdea {
 	public static EnemyStrategy currentStrategy = EnemyStrategy.UNKNOWN;
 	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
 	
-	public static FactoryRatio factoryRatio;
-	public static List<MetaType> upgrade;
-	public static int marineCount;
-	public static AddOnOption addOnOption;
-	public static ExpansionOption expansionOption;
-	public static BuildTimeMap buildTimeMap;
+	public static FactoryRatio factoryRatio = FactoryRatio.ratio(0, 0, 0, 1);
+	public static List<MetaType> upgrade = new ArrayList<>();
+	public static int marineCount = 0;
+	public static AddOnOption addOnOption = null;
+	public static ExpansionOption expansionOption = null;
+	public static BuildTimeMap buildTimeMap = new BuildTimeMap();
 	
 	public static int wraithCount = 0;
 	public static int valkyrieCount = 0;

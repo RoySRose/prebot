@@ -1,13 +1,16 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ZergStrategist extends Strategist {
 	
@@ -81,14 +84,14 @@ public class ZergStrategist extends Strategist {
 			} else if (hydraTech) {
 				return EnemyStrategy.ZERG_FAST_LURKER;
 			} else if (spireTech) {
-				return EnemyStrategy.ZERG_FAST_MUTAL;
+				return fastMutaliskByTime();
 			} else {
-				return EnemyStrategy.ZERG_FAST_MUTAL;
+				return fastMutaliskByTime();
 			}
 			
 		} else if (hasAnyInfo(ClueInfo.NO_LAIR)) {
 			if (hasType(ClueType.SPIRE)) {
-				return EnemyStrategy.ZERG_FAST_MUTAL; // no lair, no mute
+				return fastMutaliskByTime(); // no lair, no mute
 			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;
 			} else {
@@ -96,10 +99,24 @@ public class ZergStrategist extends Strategist {
 			}
 		} else {
 			if (hasType(ClueType.SPIRE)) {
-				return EnemyStrategy.ZERG_FAST_MUTAL; // no lair, no mute
+				return fastMutaliskByTime(); // no lair, no mute
 			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;
 			}
+			return fastMutaliskByTime();
+		}
+	}
+	
+	private EnemyStrategy fastMutaliskByTime() {
+//		System.out.println(EnemyBuildTimer.Instance().mutaliskInMyBaseFrame + " / " + TimeUtils.timeToFrames(5, 30));
+		if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame == CommonCode.UNKNOWN) {
+			System.out.println("mutaliskInMyBaseFrame is unknown.");
+			return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+		}
+		
+		if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame < TimeUtils.timeToFrames(6, 20)) {
+			return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+		} else {
 			return EnemyStrategy.ZERG_FAST_MUTAL;
 		}
 	}
@@ -133,10 +150,10 @@ public class ZergStrategist extends Strategist {
 			}
 		} else {
 			if (enemyGroundUnitPower == 0 && !hydraDiscovered) {
-				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 5);
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 7);
 				return EnemyStrategy.ZERG_AIR2;
 			} else {
-				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 3);
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 5, 5);
 				return EnemyStrategy.ZERG_AIR1;
 			}
 		}

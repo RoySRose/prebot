@@ -109,17 +109,19 @@ public class EnemyBuildTimer {
 			} else if (lurkTime) {
 				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 10 * TimeUtils.SECOND;
 			}
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
 				StrategyIdea.turretNeedFrame += 3 * TimeUtils.MINUTE;
 			}
 			
 			if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
 				StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
 				
-				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
 					StrategyIdea.academyFrame += 3 * TimeUtils.MINUTE;
 				} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
-					StrategyIdea.academyFrame += 2 * TimeUtils.MINUTE;
+					StrategyIdea.academyFrame += 4 * TimeUtils.MINUTE;
+				} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_VERY_FAST_MUTAL) {
+					StrategyIdea.academyFrame += 5 * TimeUtils.MINUTE;
 				}
 			}
 			
@@ -330,6 +332,9 @@ public class EnemyBuildTimer {
 			return buildingType == UnitType.Protoss_Citadel_of_Adun || buildingType == UnitType.Protoss_Templar_Archives;
 			
 		} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
+			return buildingType == UnitType.Zerg_Spire;
+			
+		}  else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_VERY_FAST_MUTAL) {
 			return buildingType == UnitType.Zerg_Spire;
 		}
 		return false;

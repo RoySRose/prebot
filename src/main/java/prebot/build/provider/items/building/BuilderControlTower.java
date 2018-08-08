@@ -9,6 +9,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.StrategyIdea;
 
 public class BuilderControlTower extends DefaultBuildableItem {
 
@@ -28,6 +29,8 @@ public class BuilderControlTower extends DefaultBuildableItem {
 		boolean addControlTower = false;
 			
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
+			addControlTower = true;
+		} else if (StrategyIdea.valkyrieCount > 0) {
 			addControlTower = true;
 		}
 		

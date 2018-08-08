@@ -6,7 +6,6 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
@@ -76,9 +75,7 @@ public class GameCommander {
 			StrategyManager.Instance().updateTimeCheck();
 			
 			// progressive & complete => initial end
-			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE) {
-				InitialBuildProvider.Instance().updateInitialBuild();
-			}
+			InitialBuildProvider.Instance().updateInitialBuild();
 			BuildQueueProvider.Instance().updateTimeCheck();
 			BuildManager.Instance().updateTimeCheck();
 			

@@ -173,6 +173,10 @@ public abstract class BuildingFlyControl extends Control{
             halfway = new Position((SC.getX()*5+2048)/6, (SC.getY()*5+2048)/6);
         }
     
+        if (InfoUtils.enemyBase() == null) {
+        	return orderPos;
+        }
+        
         boolean expansionOccupied = false;    
         List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
 		for (BaseLocation enemyBase : enemyBases) {

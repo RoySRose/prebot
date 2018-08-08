@@ -36,18 +36,27 @@ public class StrategyChanger extends ChatExecuter {
 		StrategyIdea.factoryRatio = currentStrategy.factoryRatio;
 		StrategyIdea.upgrade = currentStrategy.upgrade;
 		StrategyIdea.marineCount = currentStrategy.marineCount;
-		
+
+		// addOn option
 		if (currentStrategy.addOnOption != null) {
 			StrategyIdea.addOnOption = currentStrategy.addOnOption;
 		}
+		
+		// air unit count
 		if (currentStrategy.expansionOption != null) {
 			StrategyIdea.expansionOption = currentStrategy.expansionOption;
 			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-				StrategyIdea.wraithCount = 4; // default wraith count
+				StrategyIdea.wraithCount = 4;
+				StrategyIdea.valkyrieCount = 0;
+			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_STARPORT) {
+				StrategyIdea.wraithCount = 0;
+				StrategyIdea.valkyrieCount = 2;
 			} else {
 				StrategyIdea.wraithCount = 0;
+				StrategyIdea.valkyrieCount = 0;
 			}
 		}
+		
 		if (currentStrategy.buildTimeMap != null) {
 			StrategyIdea.buildTimeMap = currentStrategy.buildTimeMap;
 		}

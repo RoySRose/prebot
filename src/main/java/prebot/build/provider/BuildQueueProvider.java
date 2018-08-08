@@ -134,6 +134,10 @@ public class BuildQueueProvider extends GameManager {
 //    BarrackUnitSelector barrackUnitSelector;
     FactoryUnitSelector factoryUnitSelector;
 //    StarportUnitSelector starportUnitSelector;
+    
+    public FactoryUnitSelector getFactoryUnitSelector() {
+		return factoryUnitSelector;
+	}
 
     public BuildQueueProvider(){
 
