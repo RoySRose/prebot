@@ -26,7 +26,7 @@ public class BuilderWraith extends DefaultBuildableItem {
 		}
 
     	
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) <= maxWraithCnt) {
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) < maxWraithCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
 				return true;

@@ -29,18 +29,14 @@ public class BuilderStarport extends DefaultBuildableItem {
 		if (constructionQueueItemCount > 0) {
 			return false;
 		}
-		
-		boolean starport_settile = false;
-		
-		if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) starport_settile = true;
 
 		if (needStarportToTrainWraith()) {
 			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				if(starport_settile == true) {
+				if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT || StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
 					setTilePosition(BlockingEntrance.Instance().starport1);
 				}
 			} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
-				if(starport_settile == true) {
+				if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
 					setTilePosition(BlockingEntrance.Instance().starport2);
 				}
 			}
