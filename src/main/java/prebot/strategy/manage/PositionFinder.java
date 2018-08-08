@@ -35,6 +35,7 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.Squad;
 import prebot.micro.targeting.TargetFilter;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
@@ -686,10 +687,21 @@ public class PositionFinder {
 	/// First Choke Point 방어지역
 	private Position firstChokeDefensePosition() {
 		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
-		Position myBasePosition = InfoUtils.myBase().getPosition();
-		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
-
-		Position firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 220);
+		Position firstChokeDefensePosition = firstChokePosition;
+		double radian = 0;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			Position myBasePosition = InfoUtils.myBase().getPosition();
+			radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
+			firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 250);
+		}else{
+			Position firstSupplePos = BlockingEntrance.Instance().first_supple.toPosition();
+			radian = MicroUtils.targetDirectionRadian(firstChokePosition, firstSupplePos);
+			Position fleeVector = new Position((int) (10 * Math.cos(radian)),
+					(int) (10 * Math.sin(radian))); // 이동벡터
+			firstChokeDefensePosition = new Position(firstSupplePos.getX() + fleeVector.getX(),
+					firstSupplePos.getY() + fleeVector.getY());
+	
+		}
 		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
 			return firstChokeDefensePosition;
 		} else {
