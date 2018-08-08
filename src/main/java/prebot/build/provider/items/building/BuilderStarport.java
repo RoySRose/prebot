@@ -53,12 +53,14 @@ public class BuilderStarport extends DefaultBuildableItem {
 				}
 			}
 			
-			int vihicleWeaponUpgradeLevel = Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons);
-			if (vihicleWeaponUpgradeLevel == 0) {
-				int upgradeRemainingFrame = BuildQueueProvider.Instance().upgradeRemainingFrame(UpgradeType.Terran_Vehicle_Weapons);
-				if (upgradeRemainingFrame != CommonCode.UNKNOWN && upgradeRemainingFrame < UpgradeType.Terran_Vehicle_Weapons.upgradeTime() * 2 / 3) {
-//					setTilePosition(BlockingEntrance.Instance().starport1);
-					return true;
+			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
+				int vihicleWeaponUpgradeLevel = Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons);
+				if (vihicleWeaponUpgradeLevel == 0) {
+					int upgradeRemainingFrame = BuildQueueProvider.Instance().upgradeRemainingFrame(UpgradeType.Terran_Vehicle_Weapons);
+					if (upgradeRemainingFrame != CommonCode.UNKNOWN && upgradeRemainingFrame < UpgradeType.Terran_Vehicle_Weapons.upgradeTime() * 2 / 3) {
+	//					setTilePosition(BlockingEntrance.Instance().starport1);
+						return true;
+					}
 				}
 			}
 		}

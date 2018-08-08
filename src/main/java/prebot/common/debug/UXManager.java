@@ -96,6 +96,8 @@ public class UXManager {
 	private String bulletTypeName = "";
 	private String tempUnitName = "";
 	
+	private UnitType factorySelected = UnitType.None;
+	
 	private Map<Integer, Decision> decisionListForUx = new HashMap<>();
 	private static UXManager instance = new UXManager();
 	
@@ -293,12 +295,23 @@ public class UXManager {
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Vulture);
 		int tankCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
+		
+		UnitType selected = BuildQueueProvider.Instance().getFactoryUnitSelector().getSelected();
+		if (selected != UnitType.None) {
+			factorySelected = selected;
+		}
+		
+		
 		Prebot.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_TEAL + "" + vultureCount + "      " + tankCount + "        " + goliathCount);
-		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio);
+		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio + ", selected=" + factorySelected);
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
 		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount);
+		y += 11;
+		
+		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Valkyrie Count : ");
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount);
 		y += 11;
 
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
@@ -908,7 +921,16 @@ public class UXManager {
 
 	/// BuildOrderQueue 를 Screen 에 표시합니다
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
-		char initialFinishedColor = InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE ? UxColor.CHAR_WHITE : UxColor.CHAR_YELLOW;
+		char initialFinishedColor;
+		AdaptStrategyStatus adaptStrategyStatus = InitialBuildProvider.Instance().getAdaptStrategyStatus();
+		if (adaptStrategyStatus == AdaptStrategyStatus.COMPLETE) {
+			initialFinishedColor = UxColor.CHAR_WHITE;
+		} else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
+			initialFinishedColor = UxColor.CHAR_YELLOW;
+		} else {
+			initialFinishedColor = UxColor.CHAR_GREEN;
+		}
+		
 		Prebot.Broodwar.drawTextScreen(x, y, initialFinishedColor + " <Build Order>");
 
 		/*
@@ -1555,6 +1577,7 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "ADDON     : " + StrategyIdea.addOnOption);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "EXPANSION : " + StrategyIdea.expansionOption);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "WRAITH CNT : " + StrategyIdea.wraithCount);
+		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "VALKYRIE CNT : " + StrategyIdea.valkyrieCount);
 		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MISSION    : " + strategy.missionTypeList);
 		Prebot.Broodwar.drawTextScreen(20, y += 20, UxColor.CHAR_YELLOW + "" + strategy.buildTimeMap);
 		

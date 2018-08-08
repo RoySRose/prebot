@@ -40,7 +40,7 @@ public class GasAdjustmentMechanic extends Action {
 					adjustGasWorkerCount = 1;
 				}
 			} else {
-				if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
+				if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
 					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
 						adjustGasWorkerCount = 2;
 					} else {

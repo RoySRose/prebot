@@ -13,6 +13,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -49,20 +50,20 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     }
 
 	public boolean executeExpansion() {
-		if (TimeUtils.beforeTime(10, 0)) {
-			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+		if (TimeUtils.beforeTime(8, 0) && !PlayerUtils.enoughResource(800, 0)) {
+			if (StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
 				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 2) {
 					return false;
 				}
-			}
-
-			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY) {
+			} else if (StrategyIdea.expansionOption == ExpansionOption.ONE_STARPORT) {
+				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 1) {
+					return false;
+				}
+			} else if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
 				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 1) {
 					return false;
 				}
-			}
-
-			if (StrategyIdea.currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
+			} else if (StrategyIdea.expansionOption == ExpansionOption.TWO_FACTORY) {
 				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 2) {
 					return false;
 				}
@@ -90,8 +91,8 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 //			if (포인트에 따라 좀더 빨리 지을 수 있는 케이스) {}
 			if (InfoUtils.enemyRace() == Race.Protoss) {
 		    	// TODO 이니셜에 들어가야하는 부분인지 확인
-				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)
-						&& !StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)
+						&& !StrategyIdea.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 					setCommandCenterBlockAndSeedPosition();
 					System.out.println("fast 2nd commandcenter - for double (vs protoss)");
 					return true;

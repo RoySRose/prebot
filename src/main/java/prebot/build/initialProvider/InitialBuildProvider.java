@@ -22,7 +22,6 @@ import prebot.build.prebot1.ConstructionTask;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -106,11 +105,14 @@ public class InitialBuildProvider {
 	}
 
     public void updateInitialBuild(){
+    	if (InitialBuildProvider.Instance().getAdaptStrategyStatus() == AdaptStrategyStatus.COMPLETE) {
+    		return;
+    	}
     	
 		if (adaptStrategyStatus == AdaptStrategyStatus.BEFORE) {
 			if (BuildManager.Instance().buildQueue.isEmpty()) {
-				nowStrategy = StrategyIdea.currentStrategy.expansionOption;
-				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT) {
+				nowStrategy = StrategyIdea.expansionOption;
+				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_STARPORT) {
 	        		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
 	        	}
 				adaptStrategyStatus = AdaptStrategyStatus.PROGRESSING;
@@ -118,8 +120,8 @@ public class InitialBuildProvider {
 
 		
 		} else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
-        	if (nowStrategy != StrategyIdea.currentStrategy.expansionOption) {
-        		nowStrategy = StrategyIdea.currentStrategy.expansionOption;
+        	if (nowStrategy != StrategyIdea.expansionOption) {
+        		nowStrategy = StrategyIdea.expansionOption;
  
         		// 폭파하기
         		cancelConstructionAndRemoveFromBuildQueue();
@@ -137,6 +139,12 @@ public class InitialBuildProvider {
             		if (starportList.size() == 2) {
             			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
             		}
+            	} else if (nowStrategy == ExpansionOption.ONE_STARPORT) {
+            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+            		if (starportList.size() == 1) {
+            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            		}
+            		
             	} else if (nowStrategy == ExpansionOption.ONE_FACTORY) {
             		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
             		if (starportList.size() == 2) {
@@ -184,60 +192,109 @@ public class InitialBuildProvider {
 
     }
 
-    /// 폭파취소시킨 건물이 있으면 true
-	private boolean cancelConstructionAndRemoveFromBuildQueue() {
+    /// 빌드큐, 컨스트럭션 큐, 건설 중 건물을 취소한다.
+	private void cancelConstructionAndRemoveFromBuildQueue() {
+		
+		int removedFromBuildQueue = 0;
+		int removedFromConstructionQueue = 0;
 		List<Unit> cancelBuildings = new ArrayList<>();
+		
+		// 2팩 : 모든 스타포트를 취소한다.
 		if (nowStrategy == ExpansionOption.TWO_FACTORY) {
-			deleteFromBuildQueue(UnitType.Terran_Starport, false);
-			deleteFromConstructionQueue(UnitType.Terran_Starport, false);
+			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, false);
+			removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, false);
 			cancelBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
-			
-		} else if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY) {
-			Unit completeFirstFactory = null;
-			List<Unit> completeBuildings = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
-			List<Unit> incompleteBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Factory);
-			if (completeBuildings.size() >= 1) {
-				completeFirstFactory = completeBuildings.get(0);
+		}
+		
+		// 1팩토리, 1스타포트, 2스타포트 : 2번째 팩토리를 취소한다.
+		if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
+			Unit completeFirstFactory = null; // 첫번째 팩토리 (완성)
+			List<Unit> completeFactories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+			if (completeFactories.size() >= 1) {
+				completeFirstFactory = completeFactories.get(0);
 			}
 			
-			Unit incompleteFirstFactory = null;
+			List<Unit> incompleteFactories = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Factory);
+			Unit incompleteFirstFactory = null; // 첫번째 팩토리 (미완성 - 완성된 팩토리가 없는 경우)
 			if (completeFirstFactory == null) {
 				int minimumRemainingBuildTime = CommonCode.INT_MAX;
-				for (Unit incompleteBuilding : incompleteBuildings) {
-					if (incompleteBuilding.getRemainingBuildTime() < minimumRemainingBuildTime) {
-						incompleteFirstFactory = incompleteBuilding;
-						minimumRemainingBuildTime = incompleteBuilding.getRemainingBuildTime();
+				for (Unit incompleteFactory : incompleteFactories) {
+					if (incompleteFactory.getRemainingBuildTime() < minimumRemainingBuildTime) {
+						incompleteFirstFactory = incompleteFactory;
+						minimumRemainingBuildTime = incompleteFactory.getRemainingBuildTime();
 					}
 				}
 			}
 
-			boolean notFirstOne = true;
-			if (completeFirstFactory != null) {
-				notFirstOne = false;
+			// 컨스트럭션 큐에서 지운다.
+			boolean notFirstOne = completeFirstFactory == null; // 큐에서 첫번째 있는 팩토리를 폭파시키지 않는다.
+			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Factory, notFirstOne);
+			
+			// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
+			if (removedFromConstructionQueue == 0) {
+				notFirstOne = completeFirstFactory == null && incompleteFirstFactory == null;
+				removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Factory, notFirstOne);
 			}
 			
-			int deleteCount = deleteFromConstructionQueue(UnitType.Terran_Factory, notFirstOne);
-			if (deleteCount == 0) {
-				if (incompleteFirstFactory != null || incompleteFirstFactory != null) {
-					notFirstOne = false;
-				} else {
-					notFirstOne = true;
+			// 완성되지 않은 팩토리를 취소한다. (첫번째 팩토리면 취소하지 않는다.)
+			for (Unit incompleteFactory : incompleteFactories) {
+				if (incompleteFirstFactory == null // completeFirstFactory가 있는 경우
+						|| incompleteFirstFactory.getID() != incompleteFactory.getID()) {
+					cancelBuildings.add(incompleteFactory);
 				}
-				BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
-				deleteFromBuildQueue(UnitType.Terran_Factory, notFirstOne);
 			}
-			for (Unit incompleteBuilding : incompleteBuildings) {
-				if (incompleteFirstFactory == null || incompleteFirstFactory.getID() != incompleteBuilding.getID()) {
-					cancelBuildings.add(incompleteBuilding);
-				}
+		}
+		
+		// 1스타포트 : 2번째 스타포트를 취소한다.
+		if (nowStrategy == ExpansionOption.ONE_STARPORT) {
+			Unit completeFirstStarport = null; // 첫번째 스타포트 (완성)
+			List<Unit> completeBuildings = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+			if (completeBuildings.size() >= 1) {
+				completeFirstStarport = completeBuildings.get(0);
 			}
 			
+			List<Unit> incompleteStarports = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
+			Unit incompleteFirstStarport = null; // 두번째 스타포트 (미완성 - 완성된 스타포트가 없는 경우)
+			if (completeFirstStarport == null) {
+				int minimumRemainingBuildTime = CommonCode.INT_MAX;
+				for (Unit incompleteStarport : incompleteStarports) {
+					if (incompleteStarport.getRemainingBuildTime() < minimumRemainingBuildTime) {
+						incompleteFirstStarport = incompleteStarport;
+						minimumRemainingBuildTime = incompleteStarport.getRemainingBuildTime();
+					}
+				}
+			}
+
+			// 컨스트럭션 큐에서 지운다.
+			boolean notFirstOne = completeFirstStarport == null; // 큐에서 첫번째 있는 스타포트 폭파시키지 않는다.
+			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, notFirstOne);
+			
+			// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
+			if (removedFromConstructionQueue == 0) {
+				notFirstOne = completeFirstStarport == null && incompleteFirstStarport == null;
+				removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, notFirstOne);
+			}
+			
+			// 완성되지 않은 스타포트를 취소한다. (첫번째 스타포트면 취소하지 않는다.)
+			for (Unit incompleteStarport : incompleteStarports) {
+				if (incompleteFirstStarport == null // completeFirstFactory가 있는 경우
+						|| incompleteFirstStarport.getID() != incompleteStarport.getID()) {
+					cancelBuildings.add(incompleteStarport);
+				}
+			}
 		}
 		
 		for (Unit cancelBuilding : cancelBuildings) {
 			ConstructionManager.Instance().addCancelBuildingId(cancelBuilding.getID());
 		}
-		return !cancelBuildings.isEmpty();
+
+		if (removedFromBuildQueue > 0 || removedFromConstructionQueue > 0 || cancelBuildings.size() > 0) {
+			System.out.println("########################################");
+			System.out.println("removed from build queue : " + removedFromBuildQueue);
+			System.out.println("removed from construction queue : " + removedFromConstructionQueue);
+			System.out.println("canceled incomplete building = " + cancelBuildings.size());
+			System.out.println("########################################");
+		}
 	}
     
     public void debugingFromQueue(String setStr){
@@ -592,7 +649,7 @@ public class InitialBuildProvider {
 		
 		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 		
-			if(StrategyIdea.currentStrategy.addOnOption == AddOnOption.VULTURE_FIRST) {
+			if(StrategyIdea.addOnOption == AddOnOption.VULTURE_FIRST) {
 //				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
 				if(UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture) && !UnitUtils.hasUnitOrWillBe(UnitType.Terran_Machine_Shop)){
 //					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");

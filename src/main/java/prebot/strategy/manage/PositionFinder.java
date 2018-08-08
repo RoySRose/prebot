@@ -35,7 +35,6 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.Squad;
 import prebot.micro.targeting.TargetFilter;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
@@ -427,7 +426,7 @@ public class PositionFinder {
 
 		// watcher 방어모드(특수)
 		if (watcherPosition == Position.Unknown) {
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
 				// 드롭인 경우 본진과 세컨초크를 왓다리갓다리 한다.
 				int nSeconds = 12 * TimeUtils.SECOND;
 				int zeroToNSeconds = Prebot.Broodwar.getFrameCount() % nSeconds;
@@ -437,10 +436,10 @@ public class PositionFinder {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
 				}
 				
-			} else if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
 				
 				// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
-				if (!StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
+				if (!StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
 				} else if (InfoUtils.enemyBase() != null) {
 					watcherPosition = InfoUtils.enemyBase().getPosition();

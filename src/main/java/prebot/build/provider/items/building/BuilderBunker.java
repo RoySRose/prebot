@@ -37,7 +37,7 @@ public class BuilderBunker extends DefaultBuildableItem {
 		boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
 		if (!entranceBlocked) {
 			if (InfoUtils.enemyRace() == Race.Protoss) {
-				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
 					setBlocking(true);
 					setHighPriority(true);
 					setTilePosition(BlockingEntrance.Instance().bunker);

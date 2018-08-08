@@ -146,7 +146,7 @@ public class AttackExpansionManager {
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int plus = 0;
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.BIONIC)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.BIONIC)) {
 				plus = 2;
 			}
 

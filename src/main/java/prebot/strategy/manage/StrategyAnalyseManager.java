@@ -127,25 +127,23 @@ public class StrategyAnalyseManager {
 	private void applyDetailValue(EnemyStrategy currentStrategy) {
 		StrategyIdea.factoryRatio = currentStrategy.factoryRatio;
 		StrategyIdea.upgrade = currentStrategy.upgrade;
-		
 		StrategyIdea.marineCount = currentStrategy.marineCount;
-		
+
+		// addOn option
 		if (currentStrategy.addOnOption != null) {
 			StrategyIdea.addOnOption = currentStrategy.addOnOption;
 		}
+		
+		// air unit count
 		if (currentStrategy.expansionOption != null) {
 			StrategyIdea.expansionOption = currentStrategy.expansionOption;
 			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
-				if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame < TimeUtils.timeToFrames(5, 30)) {
-//					StrategyIdea.wraithCount = 0;
-//					StrategyIdea.valkyrieCount = 3;
-					StrategyIdea.wraithCount = 4;
-					StrategyIdea.valkyrieCount = 0;
-				} else {
-					StrategyIdea.wraithCount = 4;
-					StrategyIdea.valkyrieCount = 0;
-				}
-			} else {
+				StrategyIdea.wraithCount = 4;
+				StrategyIdea.valkyrieCount = 0;
+			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_STARPORT) {
+				StrategyIdea.wraithCount = 0;
+				StrategyIdea.valkyrieCount = 2;
+			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY || currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
 				StrategyIdea.wraithCount = 0;
 				StrategyIdea.valkyrieCount = 0;
 			}

@@ -116,15 +116,15 @@ public class SpiderMineManger {
 		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
 
 		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
-		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+		if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
 			mineNumPerPosition += 2;
 		} else if (mineCount > MAX_MINE_COUNT) {
 			mineNumPerPosition = 1;
 		}
 
 		MinePositionLevel mLevel = MinePositionLevel.NOT_MY_OCCUPIED;
-		if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)
-				|| StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+		if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)
+				|| StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
 			mLevel = MinePositionLevel.ANYWHERE;
 		}
 		StrategyIdea.watcherMinePositionLevel = mLevel;

@@ -125,7 +125,7 @@ public enum EnemyStrategy {
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_9DRONE()),
 	
-	ZERG_5DRONE(5, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.GR, FacUp.TS) // camp=BASE, 벙커
+	ZERG_5DRONE(5, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.GR, FacUp.TS) // camp=BASE, 벙커
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_5DRONE()),
 	
@@ -137,23 +137,23 @@ public enum EnemyStrategy {
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_9DRONE_GAS()),
 	
-	ZERG_9DRONE_GAS_DOUBLE(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // 마린=MORE, camp=F_CHOKE, 벙커
+	ZERG_9DRONE_GAS_DOUBLE(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // 마린=MORE, camp=F_CHOKE, 벙커
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_9DRONE_GAS_DOUBLE()),
 	
-	ZERG_OVERPOOL(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
+	ZERG_OVERPOOL(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_OVERPOOL()),
 	
-	ZERG_OVERPOOL_GAS(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // camp=F_CHOKE
+	ZERG_OVERPOOL_GAS(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_OVERPOOL_GAS()),
 	
-	ZERG_OVERPOOL_GAS_DOUBLE(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // camp=F_CHOKE
+	ZERG_OVERPOOL_GAS_DOUBLE(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.VM, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_OVERPOOL_GAS_DOUBLE()),
 	
-	ZERG_2HAT_GAS(2, 1, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=S_CHOKE, 벙커(공격)
+	ZERG_2HAT_GAS(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=S_CHOKE, 벙커(공격)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_2HAT_GAS()),
 	
@@ -165,10 +165,15 @@ public enum EnemyStrategy {
 
 	// PHASE2 : PHASE1 종료 ~ PHASE2 에 대한 위험이 종료되는 시점 (camp가 F_EXPANSION으로 이동, 적 병력/다크, 아군 병력/터렛/컴셋 고려)
 	// PHASE2 : 시작 ~ 레어발견 OR 일정시간 경과
-	ZERG_FAST_MUTAL(2, 0, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
+	ZERG_VERY_FAST_MUTAL(1, 0, 2, Weight.VULTURE, UpgradeOrder.get(FacUp.GR, FacUp.VS)
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.ONE_STARPORT
+			, TimeMapForZerg.ZERG_FAST_MUTAL()
+			, Mission.missions(MissionType.ARMORY)),
+	
+	ZERG_FAST_MUTAL(1, 0, 1, Weight.VULTURE, UpgradeOrder.get(FacUp.VS, FacUp.GR) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
-			, Mission.missions(MissionType.EXPANSION, MissionType.NO_AIR_ENEMY, MissionType.TURRET_OK, MissionType.ARMORY)),
+			, Mission.missions(MissionType.ARMORY)),
 	
 	ZERG_FAST_LURKER(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
@@ -183,7 +188,7 @@ public enum EnemyStrategy {
 	ZERG_NO_LAIR_LING(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_LING()
-			, Mission.missions(MissionType.EXPANSION, MissionType.VULTURE)),
+			, Mission.missions(MissionType.VULTURE)),
 	
 	ZERG_NO_LAIR_HYDRA(1, 3, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
@@ -257,7 +262,7 @@ public enum EnemyStrategy {
 			, TimeMapForTerran.TERRAN_1FAC_1STAR()
 			, Mission.missions(MissionType.EXPANSION)),
 	
-	TERRAN_2STAR(1, 0, 0, Weight.VULTURE, UpgradeOrder.get()
+	TERRAN_2STAR(1, 0, 1, Weight.VULTURE, UpgradeOrder.get()
 			, MarineCount.TWO_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForTerran.TERRAN_2STAR()
 			, Mission.missions(MissionType.ARMORY)),

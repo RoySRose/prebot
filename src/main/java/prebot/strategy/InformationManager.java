@@ -624,8 +624,7 @@ public class InformationManager extends GameManager {
 		}
 
 		// 끝까지 상대 location 못 찾았을때
-		if (mainBaseLocations.get(enemyPlayer) == null && firstScoutAlive == false
-				&& (firstVultureAlive == false || Prebot.Broodwar.getFrameCount() >= 4000)) {
+		if (mainBaseLocations.get(enemyPlayer) == null && TimeUtils.after(4500)) {
 			if (StrategyIdea.enemyBaseExpected != null) {
 				mainBaseLocations.put(enemyPlayer, StrategyIdea.enemyBaseExpected);
 				mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));

@@ -149,7 +149,7 @@ public class MainAttackSquad extends Squad {
 			euiList.addAll(InfoUtils.euiListInThirdRegion());
 		}
 		
-		if (TimeUtils.beforeTime(10, 0)) {
+		if (TimeUtils.beforeTime(8, 0)) {
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius);
 			List<Unit> myBuildings = UnitUtils.myBuildingsInMainSquadRegion();
 			for (Unit building : myBuildings) {
