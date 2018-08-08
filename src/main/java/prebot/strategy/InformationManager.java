@@ -2130,7 +2130,7 @@ public class InformationManager extends GameManager {
 		final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
-		int moveCalcSize = (int) (unitType.topSpeed() * 20);
+		int moveCalcSize = (int) (unitType.topSpeed() * 30);
 		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
 				(int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
 		safePosition = new Position(supple.getPosition().getX() + fleeVector.getX(),
