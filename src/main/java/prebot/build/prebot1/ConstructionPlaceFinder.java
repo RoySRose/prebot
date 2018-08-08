@@ -363,27 +363,29 @@ public class ConstructionPlaceFinder {
 			
 		} else if (buildingType == UnitType.Terran_Bunker) {
 			buildingGapSpace = 0;
-
+		}
 			
 //			프리봇 1조건 테스트 추가
-		} else if(buildingType == UnitType.Terran_Barracks){
-			buildingGapSpace = 0;
-		} else if(buildingType == UnitType.Terran_Factory){
-			buildingGapSpace = 0;
-		} else if(buildingType == UnitType.Terran_Starport){
-			buildingGapSpace = 0;
-		} else if(buildingType == UnitType.Terran_Science_Facility){
+//		} else if(buildingType == UnitType.Terran_Barracks){
+//			buildingGapSpace = 0;
+//		} else if(buildingType == UnitType.Terran_Factory){
+//			buildingGapSpace = 0;
+//		} else if(buildingType == UnitType.Terran_Starport){
+//			buildingGapSpace = 0;
+//		} else if(buildingType == UnitType.Terran_Science_Facility){
+//			buildingGapSpace = 0;
+//		}
+		
+		
+		
+//		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
+		if( TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
+			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2)
+			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().factory)
+			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().barrack)
+		){
 			buildingGapSpace = 0;
 		}
-		
-////		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-//		if( TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().first_supple)
-//			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().second_supple)
-//			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
-//			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2)
-//			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().factory)
-//			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().barrack)
-//		){
 ////		if( (desiredPosition.equals(BlockingEntrance.Instance().first_supple))
 ////			|| (desiredPosition.equals(BlockingEntrance.Instance().second_supple))
 ////			|| (desiredPosition.equals(BlockingEntrance.Instance().starport1))
@@ -1293,9 +1295,9 @@ public class ConstructionPlaceFinder {
 	
 	public void setTilesToAvoidFac(Unit unit) {
 		
-		int fromx = unit.getTilePosition().getX()-1;
+		int fromx = unit.getTilePosition().getX();
 //		int fromx = unit.getTilePosition().getX();
-		int fromy = unit.getTilePosition().getY()-1;
+		int fromy = unit.getTilePosition().getY();
 //		int fromy = unit.getTilePosition().getY();
 		
 		/*if(fromx<0){
@@ -1305,13 +1307,14 @@ public class ConstructionPlaceFinder {
 			fromy =0;
 		}*/
 		
-		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
+
+		for (int x = fromx; x > 0 && x < fromx + 6 && x < Prebot.Broodwar.mapWidth(); x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
+			for (int y = fromy ; y > 0 && y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
             {
-				if((x==fromx + 6 || x==fromx + 7) && y == fromy){
+				if((x==fromx + 4 || x==fromx + 5) && y == fromy){
 					continue;
 				}
 				if(!isTilesToAvoidSupply(x, y)) {
@@ -1320,6 +1323,23 @@ public class ConstructionPlaceFinder {
             	}
 			}
 		}
+		
+//		20180808. hkk. original source		
+//		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
+////	for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
+//        {
+////            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
+//		for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
+//        {
+//			if((x==fromx + 6 || x==fromx + 7) && y == fromy){
+//				continue;
+//			}
+//			if(!isTilesToAvoidSupply(x, y)) {
+//				TilePosition temp = new TilePosition(x,y);
+//				tilesToAvoidFac.add(temp);
+//        	}
+//		}
+//	}
 	}
 	
 	public void setTilesToAvoidAddon(Unit unit) {
