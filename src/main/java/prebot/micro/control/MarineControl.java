@@ -88,10 +88,10 @@ public class MarineControl extends Control {
 						}else if(kitingMarine == marine){
 							MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
 						}else{
-							if (marine.getDistance(BlockingEntrance.Instance().first_supple.toPosition()) < 40){
+							if (marine.getDistance(safePosition) < 30){
 								CommandUtils.holdPosition(marine);
 							}else{
-								CommandUtils.attackMove(marine, BlockingEntrance.Instance().first_supple.toPosition());
+								CommandUtils.attackMove(marine, safePosition);
 							}
 						}
 					}else{
@@ -160,13 +160,8 @@ public class MarineControl extends Control {
 	public Unit getCompleteBunker(Region campRegion) {
 		Unit bunkerInRegion = null;
 		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
-			List<Unit> loadedUnits = bunker.getLoadedUnits();
-			Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
-//			System.out.println("bunkerRegion : " + bunkerRegion.getPoint() + " campRegion : " + campRegion.getPoint());
-			//if (bunkerRegion == campRegion) {
 				bunkerInRegion = bunker;
 				break;
-			//}
 		}
 		return bunkerInRegion;
 	}
