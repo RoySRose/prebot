@@ -50,6 +50,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -68,6 +69,7 @@ public class BuildQueueProvider extends GameManager {
 	private Map<UpgradeType, Integer> upgradeStartMap = new HashMap<>();
 	
 	public void startUpgrade(UpgradeType upgradeType) {
+		FileUtils.appendTextToFile("log.txt", "\n set startUpgrade Frame:: " + upgradeType + " :: " + TimeUtils.elapsedFrames());
 		upgradeStartMap.put(upgradeType, TimeUtils.elapsedFrames());
 	}
 	

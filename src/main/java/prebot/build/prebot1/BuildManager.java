@@ -21,6 +21,7 @@ import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
+import prebot.build.provider.BuildQueueProvider;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
@@ -245,6 +246,9 @@ public class BuildManager extends GameManager {
 					producer.research(t.getTechType());
 				} else if (t.isUpgrade()) {
 					producer.upgrade(t.getUpgradeType());
+					if(t.getUpgradeType() == UpgradeType.Terran_Vehicle_Weapons) {
+						BuildQueueProvider.Instance().startUpgrade(t.getUpgradeType());
+					}
 				}
 				// remove it from the buildQueue
 				if (isOkToRemoveQueue) {

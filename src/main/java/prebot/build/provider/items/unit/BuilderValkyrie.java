@@ -30,7 +30,7 @@ public class BuilderValkyrie extends DefaultBuildableItem {
 		
 		int maxValkyrieCnt = StrategyIdea.valkyrieCount; 
 		
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) <= maxValkyrieCnt) {
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) < maxValkyrieCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie, null) == 0) {
 				return true;

@@ -63,7 +63,7 @@ public class EnemyStrategyOptions {
 	}
 	
 	public static enum ExpansionOption {
-		ONE_FACTORY, TWO_FACTORY, TWO_STARPORT;
+		ONE_FACTORY, TWO_FACTORY, TWO_STARPORT, ONE_STARPORT;
 	}
 
 	public static class UpgradeOrder {
