@@ -46,9 +46,12 @@ public class GoliathControl extends Control {
 				CommandUtils.holdPosition(unit);
 				continue;
 			}
-			if (dangerousOutOfMyRegion(unit)) {
-				CommandUtils.move(unit, StrategyIdea.campPosition);
-				continue;
+			
+			if (!StrategyIdea.mainSquadMode.isAttackMode) {
+				if (dangerousOutOfMyRegion(unit)) {
+					CommandUtils.move(unit, StrategyIdea.campPosition);
+					continue;
+				}
 			}
 			
 			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);

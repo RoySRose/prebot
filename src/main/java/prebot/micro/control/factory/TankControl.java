@@ -125,9 +125,11 @@ public class TankControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit tank : tankModeList) {
-			if (dangerousOutOfMyRegion(tank)) {
-				CommandUtils.move(tank, StrategyIdea.campPosition);
-				continue;
+			if (!StrategyIdea.mainSquadMode.isAttackMode) {
+				if (dangerousOutOfMyRegion(tank)) {
+					CommandUtils.move(tank, StrategyIdea.campPosition);
+					continue;
+				}
 			}
 			
 			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(tank, euiList, flyingEnemisInfos, saveUnitLevel);

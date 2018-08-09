@@ -46,6 +46,7 @@ import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
@@ -1683,17 +1684,17 @@ public class UXManager {
 	private void drawPositionInformation() {
 
 		if (StrategyIdea.campPosition.equals(StrategyIdea.mainPosition)) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, "camp & main");
+			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_ORANGE + "camp & main");
 		} else {
 			if (StrategyIdea.campPosition != null) {
-				Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, "camp");
+				Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_YELLOW + "camp");
 			}
 			if (StrategyIdea.mainPosition != null) {
-				Prebot.Broodwar.drawTextMap(StrategyIdea.mainPosition, "main");
+				Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainPosition, 0, -10), UxColor.CHAR_RED + "main");
 			}
 		}
 		if (StrategyIdea.watcherPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.watcherPosition, "watcherPos");
+			Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.watcherPosition, 0, -20), UxColor.CHAR_BLUE + "watcherPos");
 		}
 		if (StrategyIdea.mainSquadCenter != null) {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.mainSquadCenter, "mainSqCntr");

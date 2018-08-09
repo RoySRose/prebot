@@ -38,12 +38,12 @@ public class ValkyrieControl extends Control {
 				CommandUtils.holdPosition(unit);
 				continue;
 			}
-			if (dangerousOutOfMyRegion(unit)) {
-				CommandUtils.move(unit, StrategyIdea.campPosition);
-				continue;
-			}
-			
-			if (StrategyIdea.mainSquadMode.isAttackMode) {
+			if (!StrategyIdea.mainSquadMode.isAttackMode) {
+				if (dangerousOutOfMyRegion(unit)) {
+					CommandUtils.move(unit, StrategyIdea.campPosition);
+					continue;
+				}
+			} else {
 				if (StrategyIdea.mainSquadCenter.getDistance(unit) > StrategyIdea.mainSquadCoverRadius) {
 					CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
 					continue;

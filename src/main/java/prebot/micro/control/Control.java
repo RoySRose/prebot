@@ -64,9 +64,6 @@ public abstract class Control {
 		if (LagObserver.groupsize() > 20) {
 			return false;
 		}
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			return false;
-		}
 		
 		// 베이스 지역 OK
 		Region unitRegion = BWTA.getRegion(unit.getPosition());
