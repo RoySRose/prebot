@@ -451,7 +451,7 @@ public class AirForceManager {
 			
 		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
-			int levelDownSeconds = Math.max(15 - airunitCount, 1);
+			int levelDownSeconds = Math.max(10 - airunitCount, 1);
 			if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > levelDownSeconds * TimeUtils.SECOND) {
 				levelDown = true;
 			} else if (achievementEffectiveFrame <= -50) {

@@ -16,7 +16,6 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
 import prebot.strategy.manage.EnemyBuildTimer;
 
 public class BuilderArmory extends DefaultBuildableItem {
@@ -77,10 +76,11 @@ public class BuilderArmory extends DefaultBuildableItem {
 	}
 	
 	private boolean fastArmoryByStrategy() {
-		if (!StrategyIdea.currentStrategy.missionTypeList.contains(MissionType.ARMORY)) {
+		if (StrategyIdea.factoryRatio.goliath == 0) {
 			return false;
 		}
 		
+		// 발키리용 아머리 타이밍
 		if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_VERY_FAST_MUTAL) {
 			int compelteStarportCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			if (compelteStarportCount > 0) {
@@ -94,16 +94,22 @@ public class BuilderArmory extends DefaultBuildableItem {
 					return true;						
 				}
 			}
-		}
-		
-		int armoryBuildStartFrame = CommonCode.UNKNOWN;
-		if (InfoUtils.enemyRace() == Race.Zerg) {
-			armoryBuildStartFrame = EnemyBuildTimer.Instance().mutaliskInMyBaseFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
-		} else if (InfoUtils.enemyRace() == Race.Terran) {
-			armoryBuildStartFrame = EnemyBuildTimer.Instance().cloakingWraithFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
-		}
-		if (armoryBuildStartFrame != CommonCode.UNKNOWN && TimeUtils.after(armoryBuildStartFrame)) {
-			return true;
+		} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL || StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
+			int armoryBuildStartFrame = CommonCode.UNKNOWN;
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				armoryBuildStartFrame = EnemyBuildTimer.Instance().mutaliskInMyBaseFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
+			} else if (InfoUtils.enemyRace() == Race.Terran) {
+				armoryBuildStartFrame = EnemyBuildTimer.Instance().cloakingWraithFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
+			}
+			if (armoryBuildStartFrame != CommonCode.UNKNOWN && TimeUtils.after(armoryBuildStartFrame)) {
+				return true;
+			}
+		} else if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_STARGATE || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DOUBLE_CARRIER) {
+			boolean siegeModeTankDiscovered = UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Siege_Mode);
+			boolean vultureDiscovered = UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Vulture);
+			if (siegeModeTankDiscovered && vultureDiscovered) {
+				return true;
+			}
 		}
 		
 		return false;

@@ -168,4 +168,11 @@ public class PositionUtils {
 		int y = sourcePosition.getY() + (int) (Math.random() * dist) - dist / 2;
 		return new Position(x, y).makeValid();
 	}
+
+	public static Position positionAdjsuted(Position position, int x, int y) {
+		if (!PositionUtils.isValidPosition(position)) {
+			return Position.None;
+		}
+		return new Position(position.getX() + x, position.getY() + y).makeValid();
+	}
 }

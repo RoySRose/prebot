@@ -77,8 +77,8 @@ public class MainAttackSquad extends Squad {
 		tankControl.setSaveUnitLevel(saveUnitLevel);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 
+		Set<UnitInfo> groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT);
 		if (!tankList.isEmpty()) {
-			Set<UnitInfo> groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
 			tankControl.controlIfUnitExist(tankList, groundEuiList);
 		}
 		goliathControl.controlIfUnitExist(goliathList, euiList);
@@ -157,11 +157,11 @@ public class MainAttackSquad extends Squad {
 			}
 		}
 
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50);
+		UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50, true, false);
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			for (Unit unit : unitList) {
 				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
-					UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
 				}
 			}
 		}
