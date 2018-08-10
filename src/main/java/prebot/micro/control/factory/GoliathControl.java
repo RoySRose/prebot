@@ -7,6 +7,7 @@ import bwapi.Unit;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
 import prebot.micro.DecisionMakerPrebot1;
@@ -29,7 +30,7 @@ public class GoliathControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (StrategyIdea.letsFindRat) {
+		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
 			findRat(unitList);
 			return;
 		}

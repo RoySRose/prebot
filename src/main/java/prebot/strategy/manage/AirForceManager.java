@@ -670,6 +670,13 @@ public class AirForceManager {
 			
 			// repair 완료처리
 			if (airForceTeam.repairCenter != null) {
+				if (!UnitUtils.isValidUnit(airForceTeam.repairCenter)) {
+					Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(airForceTeam.leaderUnit.getPosition());
+					if (repairCenter != null) {
+						airForceTeam.repairCenter = repairCenter;
+					}
+				}
+				
 				boolean repairComplete = true;
 				for (Unit airunit : airForceTeam.memberList) {
 					if (airunit.getHitPoints() < airunit.getType().maxHitPoints() * 0.95) { // repair complete hit points

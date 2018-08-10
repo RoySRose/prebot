@@ -14,6 +14,7 @@ import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
@@ -47,7 +48,7 @@ public class TankControl extends Control {
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (StrategyIdea.letsFindRat) {
+		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
 			findRat(unitList);
 			return;
 		}
