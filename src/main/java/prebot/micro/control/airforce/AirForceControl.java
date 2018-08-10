@@ -2,15 +2,17 @@ package prebot.micro.control.airforce;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.Decision;
 import prebot.micro.Decision.DecisionType;
@@ -32,10 +34,14 @@ public class AirForceControl extends Control {
 			return;
 		}
 		
-		if (StrategyIdea.letsFindRat || (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 3)) {
+		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
 			findRat(airunits);
 			return;
 		}
+//		else if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 4 && UnitUtils.enemyAirUnitPower() == 0) {
+//			findRat(airunits);
+//			return;
+//		}
 		
 		// 팀 단위로 wraithList가 세팅되어야 한다.
 		int memberId = airunits.iterator().next().getID();
@@ -58,21 +64,27 @@ public class AirForceControl extends Control {
 		
 		boolean applyDefenseModeFree = false;
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
-			if (dangerousOutOfMyRegion(airForceTeam.leaderUnit)) {
-				if (StrategyIdea.mainSquadMode.isAttackMode) {
-					applyDefenseModeFree = StrategyIdea.mainSquadCenter.getDistance(airForceTeam.leaderUnit) > StrategyIdea.mainSquadCoverRadius;
-				} else {
-					applyDefenseModeFree = true;
+			if (airForceTeam.repairCenter == null) {
+				if (dangerousOutOfMyRegion(airForceTeam.leaderUnit)) {
+					if (StrategyIdea.mainSquadMode.isAttackMode) {
+						applyDefenseModeFree = StrategyIdea.mainSquadCenter.getDistance(airForceTeam.leaderUnit) > StrategyIdea.mainSquadCoverRadius + 250;
+						if (!applyDefenseModeFree) {
+							Set<UnitInfo> killerInRadius = UnitUtils.getCompleteEnemyInfosInRadiusForAir(airForceTeam.leaderUnit.getPosition(), 120, UnitUtils.wraithKillerUnitType());
+							applyDefenseModeFree = !killerInRadius.isEmpty();
+						}
+						
+					} else {
+						applyDefenseModeFree = true;
+					}
 				}
-			}
+				if (applyDefenseModeFree) {
+					decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
 
-			if (applyDefenseModeFree) {
-				decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
-
-				// apply airforce decision
-				Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
-				Position airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
-				airForceTeam.leaderOrderPosition = airDrivingPosition;
+					// apply airforce decision
+					Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
+					Position airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+					airForceTeam.leaderOrderPosition = airDrivingPosition;
+				}
 			}
 		}
 		
@@ -129,13 +141,16 @@ public class AirForceControl extends Control {
 				if (airForceTeam.repairCenter != null) {
 					Position insidePosition = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
 					for (Unit airunit : airunits) {
-						if (!MicroUtils.isBeingHealed(airunit) && airunit.getDistance(insidePosition) > 30) {
-							CommandUtils.rightClick(airunit, airForceTeam.leaderOrderPosition);
+						if (!MicroUtils.isBeingHealed(airunit)) {
+							if (airunit.getDistance(insidePosition) < 100) {
+								if (MicroUtils.timeToRandomMove(airunit) && TimeUtils.elapsedFrames(airunit.getLastCommandFrame()) > 8 * TimeUtils.SECOND) {
+									Position randomPosition = PositionUtils.randomPosition(insidePosition, 100);
+									CommandUtils.attackMove(airunit, randomPosition);
+								}
+							} else {
+								CommandUtils.rightClick(airunit, airForceTeam.leaderOrderPosition);
+							}
 						}
-						// if (MicroUtils.timeToRandomMove(wraith)) {
-						// Position randomPosition = PositionUtils.randomPosition(wraith.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
-						// CommandUtils.attackMove(wraith, randomPosition);
-						// }
 					}
 				} else {
 					for (Unit airunit : airunits) {

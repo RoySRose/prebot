@@ -249,6 +249,12 @@ public class PositionFinder {
 
 	/// 메인부대 위치 지점
 	private Position getMainPosition() {
+		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
+			if (InfoUtils.enemyBase() != null) {
+				StrategyIdea.letsFindRatFrame = CommonCode.NONE;
+			}
+		}
+		
 		if (StrategyIdea.mainSquadMode.isAttackMode) {
 			BaseLocation enemyBase = InfoUtils.enemyBase();
 			if (enemyBase == null) {
@@ -721,7 +727,6 @@ public class PositionFinder {
 	// 쥐 함수
 	private Position letsfindRatPosition() {
 		// 적 건물
-		StrategyIdea.letsFindRat = false;
 		for (UnitInfo eui : InfoUtils.enemyUnitInfoMap().values()) {
 			if (eui.getType().isBuilding() && PositionUtils.isValidPosition(eui.getLastPosition())) {
 				return eui.getLastPosition();
@@ -761,7 +766,7 @@ public class PositionFinder {
 		}
 		
 //		TilePosition center = TilePositionUtils.getCenterTilePosition();
-		StrategyIdea.letsFindRat = true;
+		StrategyIdea.letsFindRatFrame = TimeUtils.elapsedFrames();
 		return new Position(2222, 2222);
 	}
 

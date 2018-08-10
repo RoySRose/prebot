@@ -467,17 +467,17 @@ public class WorkerManager extends GameManager {
 
 		// for each of our workers
 		for (Unit worker : workerData.getWorkers()) {
-			if (worker == null) {
+			if (worker == null || !worker.isCompleted()) {
+				continue;
+			}
+			if (worker.isCarryingMinerals() || worker.isCarryingGas()) {
 				continue;
 			}
 
-			if (worker.isCompleted() && (workerData.getWorkerJob(worker) == WorkerJob.Minerals
-					|| workerData.getWorkerJob(worker) == WorkerJob.Idle
-					|| workerData.getWorkerJob(worker) == WorkerJob.Move)) {
+			WorkerJob workerJob = workerData.getWorkerJob(worker);
+			if (workerJob == WorkerJob.Minerals || workerJob == WorkerJob.Idle || workerJob == WorkerJob.Move) {
 				double dist = worker.getDistance(unit);
-
-				if (worker.isCarryingMinerals() || worker.isCarryingGas())
-					continue;
+				
 				if (closestWorker == null || (dist < closestDist)) {
 					closestWorker = worker;
 					dist = closestDist;

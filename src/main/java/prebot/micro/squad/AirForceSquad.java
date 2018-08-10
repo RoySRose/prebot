@@ -13,6 +13,8 @@ import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.AirForceControl;
+import prebot.micro.targeting.TargetFilter;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceTeam;
@@ -60,29 +62,24 @@ public class AirForceSquad extends Squad {
 		Set<UnitInfo> euis = new HashSet<>();
 		
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
-//			List<Unit> myBuildings = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.SELF, new UnitCondition() {
-//				@Override public boolean correspond(Unit unit) {
-//					return unit.getType().isBuilding() && !unit.isFlying();
-//				}
-//			});
-//			euiList.clear();
-//			for (Unit building : myBuildings) {
-//				UnitUtils.addEnemyUnitInfosInRadius(euiList, building.getPosition(), building.getType().sightRange() + SquadInfo.AIR_FORCE.squadRadius);
-//			}
-			
 			Set<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
 			if (mainSquadEnemies != null) {
 				euis = mainSquadEnemies;
-				
-			} else { // not happen logic
+			}
+			
+			if (StrategyIdea.mainSquadMode.isAttackMode) {
 				for (Unit unit : unitList) {
-					UnitUtils.addEnemyUnitInfosInRadiusForAir(euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+					if (AirForceManager.Instance().isLeader(unit.getID())) {
+						UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true, unitTypes);
+					}
 				}
 			}
 			
 		} else {
 			for (Unit unit : unitList) {
-				UnitUtils.addEnemyUnitInfosInRadius(euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+				if (AirForceManager.Instance().isLeader(unit.getID())) {
+					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true, unitTypes);
+				}
 			}
 		}
 		
