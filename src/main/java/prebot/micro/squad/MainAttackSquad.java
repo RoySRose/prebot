@@ -125,7 +125,7 @@ public class MainAttackSquad extends Squad {
 		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) { // strategy manager 판단
 			saveUnitLevel = 0;
 		} else if (InformationManager.Instance().enemyRace != Race.Terran) { // combat manager 자체 판단
-			if (Prebot.Broodwar.self().supplyUsed() >= 360) { // || pushLine) {
+			if (Prebot.Broodwar.self().supplyUsed() >= 380) { // || pushLine) {
 				saveUnitLevel = 0;
 			} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 				saveUnitLevel = 0;

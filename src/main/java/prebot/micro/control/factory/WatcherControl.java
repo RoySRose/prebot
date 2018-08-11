@@ -150,7 +150,7 @@ public class WatcherControl extends Control {
 			if (skipControl(unit)) {
 				continue;
 			}
-			if (unit.getDistance(fleePosition) < coverRadius / 2) {
+			if (unit.getDistance(fleePosition) < coverRadius * 3 / 5) {
 				fightUnitList.add(unit);
 				continue;
 			}

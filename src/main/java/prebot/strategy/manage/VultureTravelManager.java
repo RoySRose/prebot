@@ -59,17 +59,21 @@ public class VultureTravelManager {
 	}
 
 	private void initializeTravelSite() {
-		if (travelSites.isEmpty()) {
-			List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansionsSorted();
-			if (otherBases.isEmpty()) {
-				return;
-			}
-
-			for (BaseLocation base : otherBases) {
-				travelSites.add(new TravelSite(base, 0, 0, 0));
-			}
-			initialized = true;
+		if (!travelSites.isEmpty()) {
+			return;
 		}
+		List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansionsSorted();
+		if (otherBases.isEmpty()) {
+			return;
+		}
+
+		System.out.println("travel site initiated");
+		for (BaseLocation base : otherBases) {
+			travelSites.add(new TravelSite(base, 0, 0, 0));
+			System.out.print(base.getPosition() + " / ");
+		}
+		System.out.println();
+		initialized = true;
 	}
 
 	private void updateVisitFrame() {

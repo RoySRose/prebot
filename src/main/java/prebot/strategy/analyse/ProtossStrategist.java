@@ -1,7 +1,6 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
-import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
@@ -74,14 +73,14 @@ public class ProtossStrategist extends Strategist {
 	@Override
 	protected EnemyStrategy strategyPhase02() {
 		if (hasAnyInfo(ClueInfo.TEMPLAR_ARCH_FAST, ClueInfo.ADUN_FAST, ClueInfo.FAST_DARK)) {
-			if (hasAnyInfo(ClueInfo.ROBO_FAST, ClueInfo.FAST_SHUTTLE)) {
+			if (hasAnyType(ClueType.FAST_ROBO, ClueType.FAST_SHUTTLE)) {
 				return EnemyStrategy.PROTOSS_DARK_DROP;
 			} else {
 				return EnemyStrategy.PROTOSS_FAST_DARK;
 			}
 		}
 		
-		if (hasAnyInfo(ClueInfo.ROBO_FAST, ClueInfo.FAST_SHUTTLE)) {
+		if (hasAnyType(ClueType.FAST_ROBO, ClueType.FAST_SHUTTLE)) {
 			if (hasAnyInfo(ClueInfo.ROBO_SUPPORT_FAST, ClueInfo.FAST_REAVER)) {
 				return EnemyStrategy.PROTOSS_ROBOTICS_REAVER;
 			} else if (hasAnyInfo(ClueInfo.OBSERVERTORY_FAST, ClueInfo.FAST_OBSERVER)) {
@@ -121,6 +120,16 @@ public class ProtossStrategist extends Strategist {
 		
 		if (hasAnyInfo(ClueInfo.FAST_THREE_ZEALOT, ClueInfo.GATE_FAST_TWO)) {
 			return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;	
+		}
+		
+		if (hasAnyType(ClueType.FAST_ROBO)) {
+			if (hasAnyType(ClueType.FAST_ADUN, ClueType.FAST_TEMPLAR_ARCH)) {
+				return EnemyStrategy.PROTOSS_DARK_DROP;
+			} else if (hasAnyType(ClueType.FAST_ROBO_SUPPORT)) {
+				return EnemyStrategy.PROTOSS_ROBOTICS_REAVER;
+			} else if (hasAnyType(ClueType.FAST_OB)) {
+				return EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON;
+			}
 		}
 		
 		if (hasAnyInfo(ClueInfo.NO_ASSIMILATOR, ClueInfo.ASSIMILATOR_LATE)) {

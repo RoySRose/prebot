@@ -162,7 +162,7 @@ public class UXManager {
 			//drawCCtoScvCount();
 		} else if (uxOption == 4) {
 			drawSquadInfoOnMap(20, 30);
-			drawManagerTimeSpent(500, 220);
+			drawManagerTimeSpent(490, 210);
 			drawDecision();
 			drawEnemyAirDefenseRange();
 			drawAirForceInformation();
@@ -173,7 +173,7 @@ public class UXManager {
 			
 		} else if (uxOption == 6) {
 			drawBigWatch();
-			drawManagerTimeSpent(500, 220);
+			drawManagerTimeSpent(490, 210);
 		}
 
 		
@@ -1454,6 +1454,9 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(x +110, y, UxColor.CHAR_WHITE + " <Unit Size>");
 		
 		y += 15;
+		Prebot.Broodwar.drawTextScreen(x, y, "" + "*" + "SCV");
+		Prebot.Broodwar.drawTextScreen(x +120, y, "" + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_SCV));
+		y += 10;
 		for (Squad squad : CombatManager.Instance().squadData.getSquadMap().values()) {
 			Color squadColor = UxColor.SQUAD_COLOR.get(squad.getClass());
 			if (squadColor != null) {
@@ -1497,6 +1500,7 @@ public class UXManager {
 		}
 
 		Prebot.Broodwar.drawTextScreen(x, currentY += 15, "* group size: " + LagObserver.groupsize());
+		Prebot.Broodwar.drawTextScreen(x, currentY += 10, "* manager rotation size: " + LagObserver.managerRotationSize());
 	}
 
 	private void drawBigWatch() {

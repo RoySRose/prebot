@@ -8,11 +8,18 @@ public class LagObserver {
 	public static int groupsize() {
 		return groupsize;
 	}
+	
+	private static int managerLagLevel = 1;
+	private static final int MANAGER_ROTATION_SIZE = 7;
+	public static int managerRotationSize() { // 7, 14, 21, 28
+		return MANAGER_ROTATION_SIZE * managerLagLevel;
+	}
 
 	private static final boolean ADJUST_ON = true;
 	
 	private static final long MILLISEC_MAX_COAST = 50;
 //	private static final long MILLISEC_MIN_COAST = 30;
+	
 	
 	private static int groupMaxSize = 48; // max : 2초 딜레이
 	private static int groupMinSize = 1;
@@ -65,6 +72,8 @@ public class LagObserver {
 					}
 				}
 			}
+			
+			managerLagLevel = groupsize / 6 + 1;				
 		}
 	}
 

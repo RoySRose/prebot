@@ -22,11 +22,11 @@ import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.provider.BuildQueueProvider;
+import prebot.common.LagObserver;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -69,8 +69,7 @@ public class BuildManager extends GameManager {
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
 		
-		// 1초(24프레임)에 4번 정도만 실행해도 충분하다
-		if (TimeUtils.executeRotation(4, 7)) {
+		if (TimeUtils.executeRotation(4, LagObserver.managerRotationSize())) {
 			return;
 		}
 

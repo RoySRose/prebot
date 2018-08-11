@@ -6,6 +6,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.util.InfoUtils;
@@ -61,7 +62,7 @@ public class StrategyManager extends GameManager {
 
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
-		if (TimeUtils.executeRotation(1, 7)) {
+		if (TimeUtils.executeRotation(1, LagObserver.managerRotationSize())) {
 			return;
 		}
 

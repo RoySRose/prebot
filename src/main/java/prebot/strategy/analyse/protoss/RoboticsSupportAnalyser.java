@@ -5,6 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -21,6 +22,10 @@ public class RoboticsSupportAnalyser extends UnitAnalyser {
 	}
 
 	private void fastRoboSupport() {
+		if (ClueManager.Instance().containsClueType(ClueType.FAST_ROBO_SUPPORT)) {
+			return;
+		}
+		
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
@@ -28,6 +33,8 @@ public class RoboticsSupportAnalyser extends UnitAnalyser {
 
 			if (buildFrame < fastRoboSupportFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.ROBO_SUPPORT_FAST);
+			} else {
+				ClueManager.Instance().addClueInfo(ClueInfo.ROBO_SUPPORT_FOUND);
 			}
 		}
 	}

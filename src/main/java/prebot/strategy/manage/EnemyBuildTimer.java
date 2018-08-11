@@ -83,7 +83,7 @@ public class EnemyBuildTimer {
 			}
 			
 			if (darkTemplarInMyBaseFrame != CommonCode.UNKNOWN) {
-				StrategyIdea.academyFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
+				StrategyIdea.academyFrame = darkTemplarInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 20 * TimeUtils.SECOND;
 			}
 			
 		} else if (enemyRace == Race.Zerg) {
