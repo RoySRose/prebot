@@ -74,10 +74,14 @@ public class MarineControl extends Control {
 				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				
 				if(marineDangerousOutOfMyRegion(marine,decision.eui)){
-					marine.move(safePosition);
+					Position randomPosition = PositionUtils.randomPosition(safePosition, 5);
+					marine.move(randomPosition);
 					continue;
 				}
 				
+				/*while(marine.getDistance(safePosition) < 30) { // TODO 추후 변경
+					CommandUtils.attackMove(marine, safePosition);
+				} */
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					if(InformationManager.Instance().isBlockingEnterance()){
 						CommandUtils.attackMove(marine, safePosition);
@@ -108,7 +112,6 @@ public class MarineControl extends Control {
 				} else {
 					CommandUtils.attackMove(marine, StrategyIdea.campPosition);
 				}
-				
 				
 			}
 		} else if(bunker == null && inCompleteBunker != null){
@@ -261,24 +264,25 @@ public class MarineControl extends Control {
 		} else if (marine.getDistance(expansionPosition) < 100) {
 			return false;
 		}
-		
+		/*
 		if (campType == CampType.EXPANSION) {
 			return true;
 		}
+		 */
 		
-		/*
+		
+		
 		// 세번째 지역까지 OK
 		if (unitRegion == InfoUtils.myThirdRegion()) {
-			return false;
+			return true;
 		}
 		if (campType == CampType.SECOND_CHOKE) {
 			return true;
 		}
-		
 		// 세번째 지역 반경 OK
 		if (marine.getDistance(InfoUtils.myThirdRegion()) < 500) {
-			return false;
-		}*/
+			return true;
+		}
 
 		return false;
 	}
