@@ -182,11 +182,11 @@ public class WorkerManager extends GameManager {
 			int workerCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_SCV).size();
 			if (workerCount >= 30) {
 				int gasunbalance = Prebot.Broodwar.self().gas() - Prebot.Broodwar.self().minerals();
-				if (gasunbalance > 2400) {
+				if (gasunbalance > 2000) {
 					return 0;
-				} else if (gasunbalance > 1600) {
+				} else if (gasunbalance > 1000) {
 					return 1;
-				} else if (gasunbalance > 800) {
+				} else if (gasunbalance > 500) {
 					return 2;
 				} else {
 					return 3;

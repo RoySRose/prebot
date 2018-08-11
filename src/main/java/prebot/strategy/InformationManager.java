@@ -1296,14 +1296,21 @@ public class InformationManager extends GameManager {
 		for (BaseLocation base : BWTA.getBaseLocations()) {
 			// BaseLocation을 equal로 비교하면 오류가 있을 수 있다.
 			if (tileSet.contains(base.getTilePosition())) {
+				System.out.println(tileSet + " skiped");
 				continue;
 			}
 			if (base.minerals() < 1000) {
+				System.out.println(tileSet + " skiped(mineral)");
 				continue;
 			}
 			otherExpansionLocations.get(selfPlayer).add(base);
 			otherExpansionLocations.get(enemyPlayer).add(base);
 		}
+
+//		System.out.println("tileSet: " + tileSet);
+//		System.out.println("otherExpansionLocations1: " + otherExpansionLocations.get(selfPlayer));
+//		System.out.println("otherExpansionLocations2: " + otherExpansionLocations.get(enemyPlayer));
+		
 		// System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " +
 		// mainBaseCnt);
 

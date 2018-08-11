@@ -104,7 +104,7 @@ public class ProtossStrategist extends Strategist {
 		
 		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
 			if (hasType(ClueType.FAST_CORE)) {
-				return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+				return EnemyStrategy.PROTOSS_TWOGATE_TECH;
 			} else {
 				return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
 			}
@@ -135,7 +135,7 @@ public class ProtossStrategist extends Strategist {
 		if (hasAnyInfo(ClueInfo.NO_ASSIMILATOR, ClueInfo.ASSIMILATOR_LATE)) {
 			if (hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
 				if (hasInfo(ClueInfo.ASSIMILATOR_LATE)) {
-					return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+					return EnemyStrategy.PROTOSS_TWOGATE_TECH;
 				} else if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
 					return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
 				}

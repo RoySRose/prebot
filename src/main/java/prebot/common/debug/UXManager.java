@@ -1436,12 +1436,16 @@ public class UXManager {
 				}
 			}
 			
-			Map<Integer, TravelSite> checkerSiteMap = VultureTravelManager.Instance().getCheckerSiteMap();
+			Map<Integer, Integer> checkerSiteMap = VultureTravelManager.Instance().getCheckerSiteMap2();
+			List<BaseLocation> baseList = VultureTravelManager.Instance().getBaseLocationsCheckerOrdered();
 			for (Integer checkerId : checkerSiteMap.keySet()) {
 				Unit unit = Prebot.Broodwar.getUnit(checkerId);
 				if (UnitUtils.isValidUnit(unit)) {
-					TravelSite travelSite = checkerSiteMap.get(checkerId);
-					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 5, UxColor.CHAR_ORANGE + travelSite.baseLocation.getPosition().toString());
+					Integer index = checkerSiteMap.get(checkerId);
+					if (index != null) {
+						Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 5, UxColor.CHAR_ORANGE + baseList.get(index).getPosition().toString());
+					}
+					
 				}
 			}
 		}

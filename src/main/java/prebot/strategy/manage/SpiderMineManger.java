@@ -29,8 +29,8 @@ import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.MapSpecificInformation.GameMap;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class SpiderMineManger {
@@ -47,6 +47,7 @@ public class SpiderMineManger {
 	}
 
 	private static final List<Position> GOOD_POSITIONS = new ArrayList<>(); // 마인 심기 좋은 지역
+	private static final List<Position> GOOD_POSITIONS_LATE = new ArrayList<>(); // 마인 심기 좋은 지역
 	
 	private Map<Integer, PositionReserveInfo> mineRemoveMap = new HashMap<>(); // key : spider mine id
 	private Map<Integer, PositionReserveInfo> mineReservedMap = new HashMap<>(); // key : vulture id
@@ -54,6 +55,7 @@ public class SpiderMineManger {
 	private static SpiderMineManger instance = new SpiderMineManger();
 	
 	private boolean initialized = false;
+	private boolean secondInitialized = false;
 	
 	private SpiderMineManger() {}
 	
@@ -82,9 +84,15 @@ public class SpiderMineManger {
 			// 3rd 멀티지역
 			for (BaseLocation base : otherBases) {
 				if (!myExpansions.contains(base)) {
-					GOOD_POSITIONS.add(base.getPosition());
+					if (base.getGroundDistance(enemyFirstExpansion) > 2500) {
+						GOOD_POSITIONS_LATE.add(base.getPosition());
+					} else {
+						GOOD_POSITIONS.add(base.getPosition());
+					}
 				}
 			}
+			System.out.println("good position      : " + GOOD_POSITIONS);
+			System.out.println("late good position : " + GOOD_POSITIONS_LATE);
 			
 			// 공격준비지역
 //			GOOD_POSITIONS.add(myReadyToAttackPos);
@@ -98,18 +106,28 @@ public class SpiderMineManger {
 		}
 		return false;
 	}
+
+	private boolean secondInit() {
+		GOOD_POSITIONS.addAll(GOOD_POSITIONS_LATE);
+		System.out.println("late good position added : " + GOOD_POSITIONS_LATE);
+		return true;
+	}
+
 	
 	public void update() {
 		if (!initialized) {
 			initialized = init();
 			return;
 		}
+		if (!secondInitialized && UnitUtils.activatedCommandCenterCount() > 2) {
+			secondInitialized = secondInit();	
+		}
 		
 		updateMineReservedMap(); // 만료 매설 만료시간 관리
 		updateMineRemoveMap(); // 만료 제거 만료시간 관리
 		updateVulturePolicy(); // 벌처 정책 관리
 	}
-
+	
 	private void updateVulturePolicy() {
 		if (!initialized) {
 			return;
@@ -177,8 +195,12 @@ public class SpiderMineManger {
 					}
 				}
 			}
+			int mineRemoveDist = MINE_REMOVE_TANK_DIST;
+			if (TimeUtils.beforeTime(9, 0)) {
+				mineRemoveDist = MINE_REMOVE_TANK_DIST / 2;
+			}
 			for (Unit siegeTank : siegeList) {
-				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
@@ -188,16 +210,18 @@ public class SpiderMineManger {
 		}
 		
 		// 급해서 본진에 박은 마인 제거
-		if (LagObserver.groupsize() <= 10) {
-			if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
-				if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
-					List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
-					
-					Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
-					for (Unit spiderMine : spiderMineList) {
-						Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
-						if (myBaseRegion == mineRegion) {
-							mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+		if (TimeUtils.afterTime(9, 0)) {
+			if (LagObserver.groupsize() <= 10) {
+				if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
+					if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
+						List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+						
+						Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+						for (Unit spiderMine : spiderMineList) {
+							Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
+							if (myBaseRegion == mineRegion) {
+								mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+							}
 						}
 					}
 				}
