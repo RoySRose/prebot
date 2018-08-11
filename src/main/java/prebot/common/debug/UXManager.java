@@ -132,7 +132,7 @@ public class UXManager {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
-//			drawTilesToAvoidOnMap();
+			drawTilesToAvoidOnMap();
 //			drawLeaderUnitOnMap();
 			// drawUnitExtendedInformationOnMap();
 			// 각 일꾼들의 임무 상황
