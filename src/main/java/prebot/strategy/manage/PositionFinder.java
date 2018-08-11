@@ -35,6 +35,7 @@ import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.Squad;
 import prebot.micro.targeting.TargetFilter;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
@@ -699,12 +700,13 @@ public class PositionFinder {
 			radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
 			firstChokeDefensePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 250);
 		}else{
-			Position firstSupplePos = BlockingEntrance.Instance().first_supple.toPosition();
+			/*Position firstSupplePos = BlockingEntrance.Instance().first_supple.toPosition();
 			radian = MicroUtils.targetDirectionRadian(firstChokePosition, firstSupplePos);
 			Position fleeVector = new Position((int) (10 * Math.cos(radian)),
 					(int) (10 * Math.sin(radian))); // 이동벡터
 			firstChokeDefensePosition = new Position(firstSupplePos.getX() + fleeVector.getX(),
-					firstSupplePos.getY() + fleeVector.getY());
+					firstSupplePos.getY() + fleeVector.getY());*/
+			firstChokeDefensePosition = InformationManager.Instance().isSafePosition();
 	
 		}
 		if (PositionUtils.isValidPosition(firstChokeDefensePosition)) {
