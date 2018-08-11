@@ -45,6 +45,7 @@ import prebot.build.provider.items.upgrade.BuilderTerranShipPlating;
 import prebot.build.provider.items.upgrade.BuilderTerranShipWeapons;
 import prebot.build.provider.items.upgrade.BuilderTerranVehiclePlating;
 import prebot.build.provider.items.upgrade.BuilderTerranVehicleWeapons;
+import prebot.common.LagObserver;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -312,7 +313,7 @@ public class BuildQueueProvider extends GameManager {
     }
 
 	public void update() {
-		if (TimeUtils.executeRotation(3, 7)) {
+		if (TimeUtils.executeRotation(3, LagObserver.managerRotationSize())) {
 			return;
 		}
 		
@@ -335,7 +336,7 @@ public class BuildQueueProvider extends GameManager {
 		if (Prebot.Broodwar.self().supplyUsed() > 392) {
 			return;
 		}
-		if (Prebot.Broodwar.self().minerals() < 300) {
+		if (Prebot.Broodwar.self().minerals() < 500) {
 			return;
 		}
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -361,7 +362,7 @@ public class BuildQueueProvider extends GameManager {
 			if (notOperatingFrame == null) {
 				notOperatingFactoryTime.put(factory.getID(), TimeUtils.elapsedFrames());
 			} else {
-				if (TimeUtils.elapsedSeconds(notOperatingFrame) >= 2) {
+				if (TimeUtils.elapsedSeconds(notOperatingFrame) >= 3) {
 					notOperatingFactories.add(factory);
 				}
 			}

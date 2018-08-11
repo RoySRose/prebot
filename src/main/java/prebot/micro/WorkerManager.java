@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
@@ -43,7 +44,7 @@ public class WorkerManager extends GameManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
-		if (TimeUtils.executeRotation(6, 7)) {
+		if (TimeUtils.executeRotation(6, LagObserver.managerRotationSize())) {
 			return;
 		}
 		
@@ -180,7 +181,16 @@ public class WorkerManager extends GameManager {
 		} else {
 			int workerCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_SCV).size();
 			if (workerCount >= 30) {
-				return 3;
+				int gasunbalance = Prebot.Broodwar.self().gas() - Prebot.Broodwar.self().minerals();
+				if (gasunbalance > 2400) {
+					return 0;
+				} else if (gasunbalance > 1600) {
+					return 1;
+				} else if (gasunbalance > 800) {
+					return 2;
+				} else {
+					return 3;
+				}
 			} else if (workerCount <= 7) {
 				return 0;
 

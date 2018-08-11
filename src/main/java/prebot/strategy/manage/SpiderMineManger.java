@@ -18,16 +18,19 @@ import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.MapSpecificInformation.GameMap;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class SpiderMineManger {
@@ -373,8 +376,35 @@ public class SpiderMineManger {
 		List<BaseLocation> addbase = InformationManager.Instance().getFutureCloseButFarFromEnemyLocation();
 		bases.addAll(addbase);
 		bases.add(expansion1);
+
+		int times = 2;
+		if (InfoUtils.mapInformation().getMap().equals(GameMap.CIRCUITBREAKER)) {
+			times = 3;
+		}
+		for (int i = 0; i < times; i++) {
+			BaseLocation nearBase = nearestToExpansionBase(bases);
+			if (nearBase != null) {
+				bases.add(nearBase);
+			}
+		} 
 		
 		return bases;
+	}
+
+	// 우리 base 근처의 base에는 마인을 매설하지 않는다.(꼭 확장을 하지 않더라도 적 기지에 마인을 심는 것이 이득이므로)
+	private BaseLocation nearestToExpansionBase(List<BaseLocation> nextExpansionBases) {
+		BaseLocation myBase = InfoUtils.myBase();
+		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
+		BaseLocation enemyBase = InfoUtils.enemyBase();
+		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
+		
+		return BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getBaseLocations(), myFirstExpansion, new BaseCondition() {
+			@Override
+			public boolean correspond(BaseLocation base) {
+				return !nextExpansionBases.contains(base) && !base.equals(myBase) && !base.equals(myFirstExpansion)
+						&& !base.equals(enemyBase) && !base.equals(enemyFirstExpansion);
+			}
+		});
 	}
 
 }

@@ -152,11 +152,17 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateGuerillaSquad() {
+		
 		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
-		if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadMode == MainSquadMode.ATTCK) {
-			maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
+		if (StrategyIdea.nearGroundEnemyPosition != null) {
+			maxRatio = 0.0d;
+		} else {
+			if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadMode == MainSquadMode.ATTCK) {
+				maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
+			}
 		}
+		
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();
@@ -168,7 +174,7 @@ public class CombatManager extends GameManager {
 			}
 			
 			assignableVultures.add(unit);
-			if (assignableVultures.size() > maxCount) {
+			if (assignableVultures.size() >= maxCount) {
 				break;
 			}
 		}

@@ -699,7 +699,31 @@ public class UnitUtils {
 		} else {
 			return null;
 		}
-		
+	}
+	
+	public static Position centerPositionOfUnitInfo(Collection<UnitInfo> euiList, Position leaderPosition, int limitDistance) {
+		int count = 0;
+		int x = 0;
+		int y = 0;
+		for (UnitInfo eui : euiList) {
+			Unit unitInSight = UnitUtils.unitInSight(eui);
+			if (unitInSight == null) {
+				continue;
+			}
+			
+			if (unitInSight.getDistance(leaderPosition) > limitDistance) {
+				continue;
+			}
+			
+			count++;
+			x += unitInSight.getPosition().getX();
+			y += unitInSight.getPosition().getY();
+		}
+		if (count > 0) {
+			return new Position(x / count, y / count);
+		} else {
+			return null;
+		}
 	}
 	
 	public static UnitType[] enemyAirDefenseUnitType() {

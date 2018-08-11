@@ -11,7 +11,6 @@ import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -39,9 +38,30 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			return false;
 		}
 		
+		// 커맨드센터 개수에 따른 머신샵 max 설정
+		int maxCountByCommandCenter = 0;
+		int commandCenterCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		
+		if (commandCenterCount == 1) {
+			maxCountByCommandCenter = 1;
+		} else if (commandCenterCount == 2) {
+			maxCountByCommandCenter = 2;
+		} else if (commandCenterCount == 3) {
+			maxCountByCommandCenter = 3;
+		}
+		
+		if (Prebot.Broodwar.self().gas() > 300) {
+			maxCountByCommandCenter++;
+		}
+		
+		int machineShopCountIncludeQueue = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Machine_Shop);
+		if (machineShopCountIncludeQueue > maxCountByCommandCenter) {
+			return false;
+		}
+		
 		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
-		if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 			if(StrategyIdea.addOnOption == AddOnOption.VULTURE_FIRST) {
 //				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
 				if (UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture)) {
@@ -53,7 +73,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 						return true;
 					}
 				}
-			}else {
+			} else {
 				return true;
 			}
 		}

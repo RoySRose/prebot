@@ -13,6 +13,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.micro.targeting.TargetFilter;
@@ -78,7 +79,7 @@ public class CheckerSquad extends Squad {
 			Set<UnitInfo> euiList = new HashSet<>();
 			if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(unit.getID())) {
 				euiList = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG|TargetFilter.INVISIBLE
-						, unit.getPosition(), unit.getType().sightRange(), true, false);
+						, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
 			}
 			
 			vultureControl.controlIfUnitExist(new HashSet<>(Arrays.asList(unit)), euiList);

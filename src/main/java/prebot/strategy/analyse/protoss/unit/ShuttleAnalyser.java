@@ -5,6 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -17,6 +18,10 @@ public class ShuttleAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		if (ClueManager.Instance().containsClueType(ClueType.FAST_SHUTTLE)) {
+			return;
+		}
+		
 		List<UnitInfo> found = found();
 		if (!found.isEmpty()) {
 			int minimumUpdateFrame = found.get(0).getUpdateFrame();
@@ -25,6 +30,8 @@ public class ShuttleAnalyser extends UnitAnalyser {
 			int reaverInMyRegionFrame = reaverFrame + baseToBaseFrame(UnitType.Protoss_Shuttle);
 			if (minimumUpdateFrame < reaverInMyRegionFrame) {
 				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SHUTTLE);
+			} else {
+				ClueManager.Instance().addClueInfo(ClueInfo.SHUTTLE_FOUND);
 			}
 		}
 	}

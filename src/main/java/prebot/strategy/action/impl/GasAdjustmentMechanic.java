@@ -42,12 +42,24 @@ public class GasAdjustmentMechanic extends Action {
 			} else {
 				if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
 					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
-						adjustGasWorkerCount = 2;
+						if (Prebot.Broodwar.self().gas() <= 250) {
+							adjustGasWorkerCount = 2;
+						} else {
+							adjustGasWorkerCount = 1;
+						}
 					} else {
 						gasAjustmentFinshed = true;
 					}
 				} else {
-					gasAjustmentFinshed = true;
+					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
+						if (Prebot.Broodwar.self().gas() <= 100) {
+							adjustGasWorkerCount = 3;
+						} else {
+							adjustGasWorkerCount = 2;
+						}
+					} else {
+						gasAjustmentFinshed = true;
+					}
 				}
 			}
 		}

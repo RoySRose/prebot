@@ -27,6 +27,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -264,7 +265,7 @@ public class InformationManager extends GameManager {
 		updateBlockingEnterance();
 
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
-		if (TimeUtils.executeRotation(0, 7)) {
+		if (TimeUtils.executeRotation(0, LagObserver.managerRotationSize())) {
 			updateBaseLocationInfo();
 		}
 
@@ -1285,20 +1286,16 @@ public class InformationManager extends GameManager {
 
 		otherExpansionLocations.get(selfPlayer).clear();
 		otherExpansionLocations.get(enemyPlayer).clear();
+		
+		Set<TilePosition> tileSet = new HashSet<>();
+		tileSet.add(myBase.getTilePosition());
+		tileSet.add(myFirstExpansion.getTilePosition());
+		tileSet.add(enemyBase.getTilePosition());
+		tileSet.add(enemyFirstExpansion.getTilePosition());
 
-		int islandCnt = 0;
-		int mainBaseCnt = 0;
 		for (BaseLocation base : BWTA.getBaseLocations()) {
-			if (base.isIsland()) {
-				islandCnt++;
-				continue;
-			}
 			// BaseLocation을 equal로 비교하면 오류가 있을 수 있다.
-			if (base.getPosition().equals(myBase.getPosition())
-					|| base.getPosition().equals(myFirstExpansion.getPosition())
-					|| base.getPosition().equals(enemyBase.getPosition())
-					|| base.getPosition().equals(enemyFirstExpansion.getPosition())) {
-				mainBaseCnt++;
+			if (tileSet.contains(base.getTilePosition())) {
 				continue;
 			}
 			if (base.minerals() < 1000) {

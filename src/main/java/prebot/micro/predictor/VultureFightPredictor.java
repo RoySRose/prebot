@@ -56,7 +56,7 @@ public class VultureFightPredictor {
 		VULTURE_TARGET.put(UnitType.Protoss_High_Templar, 0); // 하템 암살해야됨
 		VULTURE_TARGET.put(UnitType.Protoss_Dark_Archon, 0);
 		VULTURE_TARGET.put(UnitType.Protoss_Probe, 1);
-		VULTURE_TARGET.put(UnitType.Protoss_Zealot, 20);
+		VULTURE_TARGET.put(UnitType.Protoss_Zealot, 10);
 		VULTURE_TARGET.put(UnitType.Protoss_Archon, 50);
 		VULTURE_TARGET.put(UnitType.Protoss_Dark_Templar, 100);
 		VULTURE_TARGET.put(UnitType.Protoss_Dragoon, 120); // hitpoint 점수 사용 *

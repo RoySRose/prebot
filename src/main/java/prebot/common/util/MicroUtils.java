@@ -265,6 +265,9 @@ public class MicroUtils {
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		}
+		if (!targetUnit.isDetected()) {
+			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
+		}
 
 		boolean timeToAttack = timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack);
 		if (timeToAttack) {

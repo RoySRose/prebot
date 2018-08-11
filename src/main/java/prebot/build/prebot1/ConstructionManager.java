@@ -14,11 +14,11 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
+import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -120,8 +120,7 @@ public class ConstructionManager extends GameManager {
 	
 	public void update()
 	{
-		// 1초에 4번만 실행합니다
-		if (TimeUtils.executeRotation(5, 7)) {
+		if (TimeUtils.executeRotation(5, LagObserver.managerRotationSize())) {
 			return;
 		}
 

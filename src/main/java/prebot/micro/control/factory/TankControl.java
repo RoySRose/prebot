@@ -8,8 +8,12 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.Chokepoint;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -60,6 +64,24 @@ public class TankControl extends Control {
 		
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();
+		
+		int leaderId = CommonCode.NONE;
+		if (StrategyIdea.mainSquadMode.isAttackMode && unitList.size() >= 3) {
+			Unit leaderOfUnit = UnitUtils.leaderOfUnit(unitList);
+			if (leaderOfUnit != null) {
+//				System.out.println("leaderOfUnit: " + leaderOfUnit.getID());
+				boolean nearChoke = false;
+				Chokepoint nearestChoke = BWTA.getNearestChokepoint(leaderOfUnit.getPosition());
+				if (nearestChoke.getWidth() < 250) {
+					if (nearestChoke.getCenter().getDistance(leaderOfUnit.getPosition()) < 180) {
+						nearChoke = true;
+					}
+				}
+				if (!nearChoke) {
+					leaderId = leaderOfUnit.getID();
+				}
+			}
+		}
 
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -72,12 +94,11 @@ public class TankControl extends Control {
 			}
 		}
 
-		executeSiegeMode(siegeModeList, euiList);
+		executeSiegeMode(siegeModeList, euiList, leaderId);
 		executeTankMode(tankModeList, euiList);
 	}
 
-	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList) {
-
+	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList, int leaderId) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
@@ -93,7 +114,7 @@ public class TankControl extends Control {
 				CommandUtils.holdPosition(siege);
 				
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
-				if (siege.canUnsiege()) {
+				if (siege.canUnsiege() && siege.getID() != leaderId) {
 					CommandUtils.unsiege(siege);
 				}
 				
@@ -110,8 +131,10 @@ public class TankControl extends Control {
 						
 					} else {
 						if (distance > siegeModeSpreadRadius) {
-							CommandUtils.unsiege(siege);
-							TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
+							if (siege.canUnsiege() && siege.getID() != leaderId) {
+								CommandUtils.unsiege(siege);
+								TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
+							}
 						}
 					}
 					
@@ -237,8 +260,10 @@ public class TankControl extends Control {
 			}
 			
 		} else {
-			if (!hasEnoughBackUpUnitToSiege && MicroUtils.isMeleeUnit(eui.getType())) {
-				return false;
+			if (MicroUtils.isMeleeUnit(eui.getType())) {
+				if (!hasEnoughBackUpUnitToSiege || Prebot.Broodwar.self().supplyUsed() > 380) {
+					return false;
+				}
 			}
 
 			int distanceToTarget = tank.getDistance(eui.getLastPosition());
