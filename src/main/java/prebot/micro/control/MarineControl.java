@@ -46,8 +46,9 @@ public class MarineControl extends Control {
 		
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = getCompleteBunker(campRegion);
+		Unit inCompleteBunker = getCompleteBunker(campRegion);
 		if (bunker == null) {
-			bunker = getIncompleteBunker(campRegion);
+			inCompleteBunker = getIncompleteBunker(campRegion);
 		}
 
 		// 벙커가 있다면 벙커 주위로 회피
@@ -60,7 +61,7 @@ public class MarineControl extends Control {
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
 		
 		// TODO 초반 저글링 디펜스가 필요한 경우 일꾼 사이로 위치 고정
-		if (bunker == null) {
+		if (bunker == null && inCompleteBunker == null) {
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
 					continue;
@@ -69,12 +70,14 @@ public class MarineControl extends Control {
 				Position safePosition = InformationManager.Instance().isSafePosition();
 				safePosition = (InformationManager.Instance().isSafePosition() == null) ? BlockingEntrance.Instance().first_supple.toPosition() : safePosition;
 
-				if(marineDangerousOutOfMyRegion(marine)){
+				
+				Decision decision = decisionMaker.makeDecision(marine, euiList);
+				
+				if(marineDangerousOutOfMyRegion(marine,decision.eui)){
 					marine.move(safePosition);
 					continue;
 				}
 				
-				Decision decision = decisionMaker.makeDecision(marine, euiList);
 				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
 					if(InformationManager.Instance().isBlockingEnterance()){
 						CommandUtils.attackMove(marine, safePosition);
@@ -83,15 +86,19 @@ public class MarineControl extends Control {
 					}
 				} else if (decision.type == DecisionType.KITING_UNIT) {
 					if(InformationManager.Instance().isBlockingEnterance()){
-						if(kitingMarine == null || !kitingMarine.exists()){//마린 한마리만 왔다갔다 카이팅
-							kitingMarine = marine;
-						}else if(kitingMarine == marine){
+						if(MicroUtils.isRangeUnit(decision.eui.getType())){
 							MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
 						}else{
-							if (marine.getDistance(safePosition) < 30){
-								CommandUtils.holdPosition(marine);
+							if(kitingMarine == null || !kitingMarine.exists()){//마린 한마리만 왔다갔다 카이팅
+								kitingMarine = marine;
+							}else if(kitingMarine == marine){
+								MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
 							}else{
-								CommandUtils.attackMove(marine, safePosition);
+								if (marine.getDistance(safePosition) < 30){
+									CommandUtils.holdPosition(marine);
+								}else{
+									CommandUtils.attackMove(marine, safePosition);
+								}
 							}
 						}
 					}else{
@@ -104,7 +111,14 @@ public class MarineControl extends Control {
 				
 				
 			}
-		} else {
+		} else if(bunker == null && inCompleteBunker != null){
+			for (Unit marine : unitList) {
+				if (skipControl(marine)) {
+					continue;
+				}
+				CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
+			}
+		}else{
 			boolean rangeUnit = false;
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
@@ -116,7 +130,7 @@ public class MarineControl extends Control {
 				if (decision.type == DecisionType.KITING_UNIT) {
 					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
 				
-					if(marineDangerousOutOfMyRegion(marine)){
+					if(marineDangerousOutOfMyRegion(marine,decision.eui)){
 						intoTheBunker(bunker, marine);
 						continue;
 					}
@@ -166,18 +180,19 @@ public class MarineControl extends Control {
 		return bunkerInRegion;
 	}
 
-	private Unit getIncompleteBunker(Region campRegion) { Unit bunkerInRegion = null;
+	private Unit getIncompleteBunker(Region campRegion) { 
+		Unit bunkerInRegion = null;
 		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker)) {
-			if (bunker.getRemainingBuildTime() > 3 * TimeUtils.SECOND) {
+			/*if (bunker.getRemainingBuildTime() > 3 * TimeUtils.SECOND) {
 				continue;
-			}
-			Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
-			if (bunkerRegion == campRegion) {
+			}*/
+			/*Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
+			if (bunkerRegion == campRegion) {*/
 				bunkerInRegion = bunker;
-				break;
-			}
+				//break;
+			//}
 		}
-		return null;
+		return bunkerInRegion;
 	}
 
 	private void intoTheBunker(Unit bunker, Unit marine) {
@@ -207,7 +222,7 @@ public class MarineControl extends Control {
 	}
 	
 	//public boolean isInsidePositionToBase(Position position) {
-	public boolean marineDangerousOutOfMyRegion(Unit marine) {
+	public boolean marineDangerousOutOfMyRegion(Unit marine,UnitInfo eui) {
 		if (LagObserver.groupsize() > 20) {
 			return false;
 		}
@@ -222,8 +237,11 @@ public class MarineControl extends Control {
 		// 베이스 지역 OK
 		if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
 			Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
-			if(marine.getDistance(firstCheokePoint) < NEAR_BASE_DISTANCE){
-				return true;
+			
+			if(eui != null && !MicroUtils.isRangeUnit(eui.getType())){
+				if(marine.getDistance(firstCheokePoint) < NEAR_BASE_DISTANCE){
+					return true;
+				}
 			}
 			if (unitRegion == baseRegion) {
 				return false;
@@ -243,10 +261,12 @@ public class MarineControl extends Control {
 		} else if (marine.getDistance(expansionPosition) < 100) {
 			return false;
 		}
-		/*if (campType == CampType.EXPANSION) {
+		
+		if (campType == CampType.EXPANSION) {
 			return true;
 		}
 		
+		/*
 		// 세번째 지역까지 OK
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return false;
