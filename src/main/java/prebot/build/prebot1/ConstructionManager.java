@@ -13,6 +13,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
+import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -250,7 +251,15 @@ public class ConstructionManager extends GameManager {
 				// 대부분 다른 건물/유닛들이 있게된 경우이므로 다음 frame 에서 다시 지을 곳을 탐색합니다
 //	        	System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
 				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
-				continue;
+				
+				
+				relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+				if (relocationTilePosition == TilePosition.None) {
+					System.out.println(" relocationTilePosition recalculate desiredPosition None");
+					continue;
+				}else{
+					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
+				}
 			}
 
 			//System.out.println("assignWorkersToUnassignedBuildings - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + testLocation.getX() + "," + testLocation.getY());

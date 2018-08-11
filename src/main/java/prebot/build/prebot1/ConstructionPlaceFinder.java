@@ -148,7 +148,7 @@ public class ConstructionPlaceFinder {
                 if (desiredPosition == null) {
                     BuildManager.Instance().secondStartLocationFull = true;
                 }else{
-                	if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory && BuildManager.Instance().fisrtSupplePointFull) {
+                	if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory) && BuildManager.Instance().fisrtSupplePointFull) {
                         desiredPosition = BlockingEntrance.Instance().getSupplyPosition(desiredPosition);
                     }
                     desiredPosition = getBuildLocationNear(buildingType, desiredPosition);
@@ -379,13 +379,26 @@ public class ConstructionPlaceFinder {
 		
 		
 //		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-		if( TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
-			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2)
-			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().factory)
-			||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().barrack)
+		if( (TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
+				||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2) )
+				&& buildingType == UnitType.Terran_Starport
 		){
 			buildingGapSpace = 0;
 		}
+		
+		if( TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().factory)
+			&& buildingType == UnitType.Terran_Factory)
+		{
+			buildingGapSpace = 0;
+		}
+		
+		if( TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().barrack)
+				&& buildingType == UnitType.Terran_Barracks)
+		{
+			buildingGapSpace = 0;
+		}
+		
+		
 ////		if( (desiredPosition.equals(BlockingEntrance.Instance().first_supple))
 ////			|| (desiredPosition.equals(BlockingEntrance.Instance().second_supple))
 ////			|| (desiredPosition.equals(BlockingEntrance.Instance().starport1))
