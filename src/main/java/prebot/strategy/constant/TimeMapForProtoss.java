@@ -85,6 +85,12 @@ public class TimeMapForProtoss {
 		.put(UnitType.Protoss_Citadel_of_Adun, 4, 20)
 		.put(UnitType.Protoss_Templar_Archives, 5, 00);
 	}
+	
+	public static BuildTimeMap PROTOSS_TWOGATE_TECH() {
+		return PROTOSS_2GATE()
+		.put(UnitType.Protoss_Citadel_of_Adun, 4, 20)
+		.put(UnitType.Protoss_Templar_Archives, 5, 00);
+	}
 
 	public static BuildTimeMap PROTOSS_POWER_DRAGOON() { // non-precise
 		return PROTOSS_1GATE_CORE().setFeature(Feature.DETECT_IMPORTANT)

@@ -2,16 +2,18 @@ package prebot.strategy.manage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import bwapi.Unit;
-import bwta.BWTA;
 import bwta.BaseLocation;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
@@ -33,19 +35,33 @@ public class VultureTravelManager {
 	}
 	
 	private List<TravelSite> travelSites = new ArrayList<>(); // other exapnsions
+	private List<BaseLocation> baseLocationsCheckerOrdered = new ArrayList<>();
 
 	public List<TravelSite> getTravelSites() {
 		return travelSites;
 	}
 
-	private Map<Integer, TravelSite> checkerSiteMap = new HashMap<>(); // key: checker unit id
+//	private Map<Integer, TravelSite> checkerSiteMap = new HashMap<>(); // key: checker unit id
+	private Map<Integer, Integer> checkerSiteMap2 = new HashMap<>(); // key: checker unit id
 	private Map<String, Integer> guerillaIgnoreMap = new HashMap<>(); // key : squad name
 	
-	public Map<Integer, TravelSite> getCheckerSiteMap() {
-		return checkerSiteMap;
+	public Map<Integer, Integer> getCheckerSiteMap2() {
+		return checkerSiteMap2;
+	}
+	public List<BaseLocation> getBaseLocationsCheckerOrdered() {
+		return baseLocationsCheckerOrdered;
 	}
 
 	private Map<Integer, Integer> checkerRetiredTimeMap = new HashMap<>();
+	private int gurillaFailFrame = CommonCode.NONE;
+	
+	public int getGurillaFailFrame() {
+		return gurillaFailFrame;
+	}
+
+	public void setGurillaFailFrame(int gurillaFailFrame) {
+		this.gurillaFailFrame = gurillaFailFrame;
+	}
 
 	private boolean initialized = false;
 	BaseLocation enemyCloseStartBase = null;
@@ -67,10 +83,30 @@ public class VultureTravelManager {
 			return;
 		}
 
-		System.out.println("travel site initiated");
-		for (BaseLocation base : otherBases) {
-			travelSites.add(new TravelSite(base, 0, 0, 0));
-			System.out.print(base.getPosition() + " / ");
+		baseLocationsCheckerOrdered = new ArrayList<>();
+		Set<BaseLocation> baseSet = new HashSet<>();
+		BaseLocation beforeBase = null; 
+		for (int i = 0; i < otherBases.size(); i++) {
+			if (beforeBase == null) {
+				beforeBase = InfoUtils.myFirstExpansion();
+			}
+			BaseLocation closeBase = BaseLocationUtils.getGroundClosestBaseToPosition(otherBases, beforeBase, new BaseCondition() {
+				@Override public boolean correspond(BaseLocation base) {
+					return !baseSet.contains(base);
+				}
+			});
+			baseLocationsCheckerOrdered.add(closeBase);
+			beforeBase = closeBase;
+			baseSet.add(closeBase);
+		}
+		System.out.println("baseLocationsCheckerOrdered initiated (size=" + baseLocationsCheckerOrdered.size()+ ")");
+		
+		// old
+		System.out.println("travel site initiated (size=" + otherBases.size()+ ")");
+		for (int i = 0; i < baseLocationsCheckerOrdered.size(); i++) {
+			BaseLocation baseLocation = baseLocationsCheckerOrdered.get(i);
+			travelSites.add(new TravelSite(baseLocation, 0, 0, 0, i));
+			System.out.print(baseLocation.getPosition() + " / ");
 		}
 		System.out.println();
 		initialized = true;
@@ -91,46 +127,27 @@ public class VultureTravelManager {
 		}
 
 		List<Integer> invalidList = new ArrayList<>(); // 유효하지 않은 벌처
-		List<Integer> jobFinishedList = new ArrayList<>(); // 목적지 시야가 밝혀짐
-		List<Integer> expiredList = new ArrayList<>(); // 어떤 이유에서 너무 오래걸림(취소)
 
-		for (Integer vultureId : checkerSiteMap.keySet()) {
-			TravelSite travelSite = checkerSiteMap.get(vultureId);
+		for (Integer vultureId : checkerSiteMap2.keySet()) {
 			// 유효하지 않은 벌처
-			if (!UnitUtils.isCompleteValidUnit(Prebot.Broodwar.getUnit(vultureId))) {
-				invalidList.add(vultureId);
-			}
-			// 시야가 밝혀진 목적지
-			else if (TimeUtils.elapsedFrames(travelSite.visitFrame) == 0) {
-				jobFinishedList.add(vultureId);
-			}
-			// 방문시간 만료
-			else if (TimeUtils.elapsedFrames(travelSite.visitAssignedFrame) > Vulture.CHECKER_INTERVAL_FRAME) {
-				expiredList.add(vultureId);
-			}
-		}
-
-		for (Integer unitId : invalidList) {
-			checkerSiteMap.remove(unitId);
-		}
-		for (Integer unitId : jobFinishedList) {
-			TravelSite travelSite = checkerSiteMap.get(unitId);
-			if (travelSite == null || TimeUtils.elapsedFrames(travelSite.visitFrame) > 0) {
+			Unit checker = Prebot.Broodwar.getUnit(vultureId);
+			if (!UnitUtils.isCompleteValidUnit(checker)) {
+				invalidList.add(checker.getID());
 				continue;
 			}
-			checkerSiteMap.remove(unitId);
-			BaseLocation newTravelSite = getCheckerTravelSite(unitId, travelSite.baseLocation); // travelSite 변경(currentBase에서 가까운 곳)
-			if (newTravelSite == null) {
-				// no site to travel
-				System.out.println("no site to travel");
-				Unit vulture = Prebot.Broodwar.getUnit(unitId);
-				if (vulture.getSpiderMineCount() == 0) {
-					checkerRetiredTimeMap.put(vulture.getID(), TimeUtils.elapsedFrames());
-				}
+			Integer index = checkerSiteMap2.get(checker.getID());
+			if (index == null) {
+				index = 0;
+			}
+			BaseLocation baseLocation = baseLocationsCheckerOrdered.get(index);
+			if (MicroUtils.arrivedToPosition(checker, baseLocation.getPosition())) {
+				int nextIndex = (index + 1) % baseLocationsCheckerOrdered.size();
+				checkerSiteMap2.put(checker.getID(), nextIndex);
 			}
 		}
-		for (Integer unitId : expiredList) {
-			checkerSiteMap.remove(unitId);
+		
+		for (Integer invalidCheckerId : invalidList) {
+			checkerSiteMap2.remove(invalidCheckerId);
 		}
 	}
 
@@ -171,68 +188,20 @@ public class VultureTravelManager {
 		}
 	}
 
-	// 벌처스쿼드가 정찰할 base를 선택한다.
-	// 1. 방문한지 가장 오래된 location으로 이동
-	// 2. 방문한지 가장 오래된 location이 복수개이면, 가까운 곳부터 간다.
-	// (currentBase에서 가장 가까운 곳, checker unit id만 입력받은 경우 적 앞마당에서 가장 가까운 곳)
 	public BaseLocation getCheckerTravelSite(Integer checkerId) {
 		if (!initialized) {
 			return null;
 		}
-
-		TravelSite site = checkerSiteMap.get(checkerId);
-		if (site != null) {
-			return site.baseLocation;
-		}
-		
-		if (enemyCloseStartBase == null) {
-			enemyCloseStartBase = BaseLocationUtils.getClosestBaseToPosition(BWTA.getStartLocations(), InfoUtils.enemyBase().getPosition(), new BaseCondition() {
-				@Override public boolean correspond(BaseLocation base) {
-					return !base.equals(InfoUtils.enemyBase()) && !base.equals(InfoUtils.myBase());
-				}
-			});
-		}
-		
-		return getCheckerTravelSite(checkerId, enemyCloseStartBase);
-	}
-
-	public BaseLocation getCheckerTravelSite(Integer checkerId, BaseLocation currentBase) {
-		if (!initialized) {
-			return null;
-		}
-
-		TravelSite site = checkerSiteMap.get(checkerId);
-		if (site != null) {
-			return site.baseLocation;
-		}
-
-		int longestVisitPassedFrame = Vulture.CHECKER_INTERVAL_FRAME;
-		double shortestDistance = 999999.0;
-
-		TravelSite bestTravelSite = null;
-
-		for (TravelSite travelSite : travelSites) {
-			if (checkerSiteMap.values().contains(travelSite)) {
-				continue;
-			}
-
-			int visitPassedFrame = TimeUtils.elapsedFrames(travelSite.visitFrame);
-			double distance = currentBase.getGroundDistance(travelSite.baseLocation);
-
-			if (visitPassedFrame > longestVisitPassedFrame || (visitPassedFrame == longestVisitPassedFrame && distance < shortestDistance)) {
-				longestVisitPassedFrame = visitPassedFrame;
-				shortestDistance = distance;
-				bestTravelSite = travelSite;
-			}
-		}
-
-		if (bestTravelSite != null) {
-			checkerSiteMap.put(checkerId, bestTravelSite);
-			bestTravelSite.visitAssignedFrame = Prebot.Broodwar.getFrameCount();
-			return bestTravelSite.baseLocation;
+		Integer index = checkerSiteMap2.get(checkerId);
+		if (index != null) {
+			return baseLocationsCheckerOrdered.get(index);
 		} else {
-			checkerSiteMap.remove(checkerId);
-			return null;
+			if (!baseLocationsCheckerOrdered.isEmpty()) {
+				checkerSiteMap2.put(checkerId, 0);
+				return baseLocationsCheckerOrdered.get(0);
+			} else {
+				return null;
+			}
 		}
 	}
 
@@ -280,16 +249,6 @@ public class VultureTravelManager {
 
 	public boolean checkerRetired(int unitId) {
 		return checkerRetiredTimeMap.containsKey(unitId);
-	}
-	
-	public boolean checkerIgnoreModeEnabled(int unitId) {
-		TravelSite travelSite = checkerSiteMap.get(unitId);
-		if (travelSite != null) {
-			if (travelSite.visitAssignedFrame != 0 && TimeUtils.elapsedFrames(travelSite.visitAssignedFrame) < Vulture.CHECKER_IGNORE_MOVE_FRAME) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	public boolean guerillaIgnoreModeEnabled(String squadName) {

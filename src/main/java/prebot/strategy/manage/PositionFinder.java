@@ -15,7 +15,6 @@ import bwapi.UnitType;
 import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
-import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
@@ -221,7 +220,18 @@ public class PositionFinder {
 	}
 
 	private Position campTypeToPosition() {
+		CampType campType = StrategyIdea.campType;
+		
+		boolean defenseInMyBase = false;
 		if (!InfoUtils.euiListInBase().isEmpty()) {
+			defenseInMyBase = true;
+		}
+		if (campType != CampType.INSIDE && campType != CampType.FIRST_CHOKE
+				&& !InfoUtils.euiListInExpansion().isEmpty()) {
+			defenseInMyBase = true;
+		}
+		
+		if (defenseInMyBase) {
 			if (StrategyIdea.nearGroundEnemyPosition != Position.Unknown) {
 				return StrategyIdea.nearGroundEnemyPosition;
 			} else if (StrategyIdea.dropEnemyPosition != Position.Unknown) {
@@ -229,7 +239,6 @@ public class PositionFinder {
 			}
 		}
 		
-		CampType campType = StrategyIdea.campType;
 		if (campType == CampType.INSIDE) {
 			return baseInsidePosition();
 			
@@ -293,9 +302,11 @@ public class PositionFinder {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
 			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
 			StrategyIdea.mainSquadCenter = centerPosition;
+			StrategyIdea.mainSquadLeaderPosition = leader.getPosition();
 		} else {
 			StrategyIdea.mainSquadCoverRadius = 250;
 			StrategyIdea.mainSquadCenter = StrategyIdea.campPosition;
+			StrategyIdea.mainSquadLeaderPosition = StrategyIdea.campPosition;
 		}
 	}
 
@@ -670,12 +681,23 @@ public class PositionFinder {
 			return firstExpansionBackwardPosition;
 		}
 		
-		Chokepoint firstChoke = InfoUtils.myFirstChoke();
-		Chokepoint secondChoke = InfoUtils.mySecondChoke();
-		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
+//		Chokepoint firstChoke = InfoUtils.myFirstChoke();
+//		Chokepoint secondChoke = InfoUtils.mySecondChoke();
+//		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
+//		
+//		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
+//		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
+//		return firstExpansionBackwardPosition = new Position(x, y);
 		
-		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
-		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
+		
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		Position secondChokePosition = InfoUtils.mySecondChoke().getCenter();
+		
+		int x = (myBasePosition.getX() + secondChokePosition.getX()) / 2;
+		int y = (myBasePosition.getY() + secondChokePosition.getY()) / 2;
+		x = (x + secondChokePosition.getX()) / 2;
+		y = (y + secondChokePosition.getY()) / 2;
+		
 		return firstExpansionBackwardPosition = new Position(x, y);
 
 		//First Expansion에서 약간 물러난 위치 (prebot 1 - overwatch, circuit 맵에 맞지 않음)

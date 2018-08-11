@@ -109,7 +109,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			}
 			
 			if (Prebot.Broodwar.self().minerals() > 400) {
-				if (InfoUtils.enemyRace() == Race.Protoss) {
+				if (InfoUtils.enemyRace() == Race.Protoss && !StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					if (UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
 						setCommandCenterBlockAndSeedPosition();
 						System.out.println("normal 2nd commandcenter - over 400 minerals");

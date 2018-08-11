@@ -76,9 +76,14 @@ public enum EnemyStrategy {
 			, TimeMapForProtoss.PROTOSS_ROBOTICS_OB_DRAGOON()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.TANK)),
 	
-	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS, FacUp.VS)
+	PROTOSS_HARDCORE_ZEALOT(4, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS)
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_HARDCORE_ZEALOT()
+			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),
+	
+	PROTOSS_TWOGATE_TECH(3, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS)
+			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, TimeMapForProtoss.PROTOSS_TWOGATE_TECH()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),
 	
 	PROTOSS_STARGATE(2, 3, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS)

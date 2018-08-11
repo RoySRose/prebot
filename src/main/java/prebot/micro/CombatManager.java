@@ -14,6 +14,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -163,6 +164,11 @@ public class CombatManager extends GameManager {
 			}
 		}
 		
+		int gurillaFailFrame = VultureTravelManager.Instance().getGurillaFailFrame();
+		if (TimeUtils.elapsedFrames(gurillaFailFrame) < 2 * TimeUtils.SECOND) {
+			maxRatio = 0.0d;
+		}
+		
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();
@@ -230,6 +236,7 @@ public class CombatManager extends GameManager {
 
 	private boolean removeGuerilla(GuerillaSquad squad) {
 		if (squad.unitList.isEmpty()) {
+			VultureTravelManager.Instance().setGurillaFailFrame(TimeUtils.elapsedFrames());
 			return true;
 		}
 

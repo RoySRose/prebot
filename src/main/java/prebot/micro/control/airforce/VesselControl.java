@@ -13,6 +13,7 @@ import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.FleeOption;
 import prebot.micro.constant.MicroConfig;
@@ -84,7 +85,7 @@ public class VesselControl extends Control {
 				}
 			}
 
-			Position orderPosition = StrategyIdea.mainSquadCenter;
+			Position orderPosition = PositionUtils.randomPosition(StrategyIdea.mainSquadLeaderPosition, 500);
 			
 			if (invisibleEnemyUnit == null) {
 				closestDistToVessel = 100000;

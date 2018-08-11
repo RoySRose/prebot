@@ -76,11 +76,8 @@ public class CheckerSquad extends Squad {
 	@Override
 	public void execute() {
 		for (Unit unit : unitList) {
-			Set<UnitInfo> euiList = new HashSet<>();
-			if (!VultureTravelManager.Instance().checkerIgnoreModeEnabled(unit.getID())) {
-				euiList = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG|TargetFilter.INVISIBLE
-						, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
-			}
+			Set<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG|TargetFilter.INVISIBLE
+					, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
 			
 			vultureControl.controlIfUnitExist(new HashSet<>(Arrays.asList(unit)), euiList);
 		}
