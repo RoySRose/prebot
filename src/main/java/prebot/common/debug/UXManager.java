@@ -159,7 +159,7 @@ public class UXManager {
 			
 		} else if (uxOption == 3) {
 			drawEnemyBuildTimer();
-			
+			//drawCCtoScvCount();
 		} else if (uxOption == 4) {
 			drawSquadInfoOnMap(20, 30);
 			drawManagerTimeSpent(500, 220);
@@ -1719,6 +1719,16 @@ public class UXManager {
 			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
 				Prebot.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
 			}
+		}
+	}
+	
+	private void drawCCtoScvCount() {
+		
+		int y = 100;
+		for (Unit depot : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+			// update workerData with the new job
+			Prebot.Broodwar.drawTextScreen(500 , y,"depot.getID() : " + depot.getID() +  " cnt : " + WorkerData.depotWorkerCount.get(depot.getID()) );
+			y += 10;
 		}
 	}
 

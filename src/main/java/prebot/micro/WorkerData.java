@@ -6,11 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Region;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 
 public class WorkerData {
 
@@ -54,7 +58,7 @@ public class WorkerData {
 	//일꾼과 건설일꾼 배정
 	private Map<Integer, UnitType> workerBuildingTypeMap = new HashMap<Integer, UnitType>();
 	//CC에 배정된 일꾼 수
-	public Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
+	public static Map<Integer, Integer> depotWorkerCount = new HashMap<Integer, Integer>();
 	//Gas 에 배정된 일꾼 수
 	public Map<Integer, Integer> refineryWorkerCount = new HashMap<Integer, Integer>();
 	//작업중인 광물 ????
@@ -79,8 +83,6 @@ public class WorkerData {
 		
 	public WorkerData() 
 	{
-		// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
-		mineralAndMineralWorkerRatio = 1.5;
 		
 		for (Unit unit : Prebot.Broodwar.getAllUnits())
 		{
@@ -571,6 +573,15 @@ public class WorkerData {
 		// (근처 미네랄 수) * 1.5배 ~ 2배 정도가 적당
 		// 근처 미네랄 수가 8개 라면, 일꾼 8마리여도 좋지만, 12마리면 조금 더 채취가 빠르다. 16마리면 충분하다. 24마리면 너무 많은 숫자이다.
 		// 근처 미네랄 수가 0개 인 ResourceDepot은, 이미 충분한 수의 미네랄 일꾼이 꽉 차있는 것이다
+		Position basePosition = InfoUtils.myBase().getPosition();
+		Region baseRegion = BWTA.getRegion(basePosition);
+		Region depotRegion = BWTA.getRegion(depot.getPosition());
+		// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
+		if (depotRegion == baseRegion) {
+			mineralAndMineralWorkerRatio = 1.5;
+		}else{
+			mineralAndMineralWorkerRatio = 2;
+		}
 		if (assignedWorkers >= (int)(mineralsNearDepot * mineralAndMineralWorkerRatio))
 		{
 			return true;
