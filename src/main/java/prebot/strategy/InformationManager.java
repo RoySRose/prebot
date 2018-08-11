@@ -893,8 +893,9 @@ public class InformationManager extends GameManager {
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-			if (numberOfCC == 2) {
+			if (numberOfCC == 3) {
 				resultBase = secondStartPosition;
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			} else {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			}
