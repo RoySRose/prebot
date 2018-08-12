@@ -31,6 +31,7 @@ import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -893,15 +894,18 @@ public class InformationManager extends GameManager {
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-			if (numberOfCC == 3) {
+			if (numberOfCC == 2) {
+				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, true);
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
+			} else if (numberOfCC == 3) {
 				resultBase = secondStartPosition;
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
-			} else {
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
+			} else{
+				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
 			}
 
 			if (resultBase == null) {
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false);
+				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
 			}
 		}
 
@@ -971,11 +975,11 @@ public class InformationManager extends GameManager {
 	}
 
 	public BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation) {
-		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false);
+		return getCloseButFarFromEnemyLocation(bases, onlyStartLocation, false, false, false);
 	}
 
 	private BaseLocation getCloseButFarFromEnemyLocation(List<BaseLocation> bases, boolean onlyStartLocation,
-			boolean isMulti, boolean onlyGasMulti) {
+			boolean isMulti, boolean onlyGasMulti, boolean thirdPosition) {
 		BaseLocation resultBase = null;
 		BaseLocation mainBaseLocation = mainBaseLocations.get(selfPlayer);
 		BaseLocation enemyBaseLocation = mainBaseLocations.get(enemyPlayer);
@@ -985,9 +989,13 @@ public class InformationManager extends GameManager {
 		double firstExpansionToOccupied = 0;
 		double enemyBaseToOccupied = 0;
 		double closeFromMyExpansionButFarFromEnemy = 0;
+		double distanceToSecondExpansion = mainBaseLocation.getDistance(secondStartPosition);
 
 		double closestDistance = 1000000000;
+		double closestDistanceToSecondExp = 0;
 
+		FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start");
+		
 		for (BaseLocation base : bases) {
 			if (onlyStartLocation && !base.isStartLocation())
 				continue;
@@ -995,8 +1003,12 @@ public class InformationManager extends GameManager {
 				continue;
 			if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
 				continue;
+			
+			FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start :: 1");
 
 			if (isMulti) {
+				
+				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation isMulti True");
 
 				if (firstExpansionLocation.get(enemyPlayer) != null) {
 					if (base.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
@@ -1023,14 +1035,26 @@ public class InformationManager extends GameManager {
 					}
 				}
 			}
+			
 
 			firstExpansionToOccupied = firstExpansion.getGroundDistance(base); // 내 앞마당 ~ 내 점령지역 지상거리
 			enemyBaseToOccupied = enemyBaseLocation.getGroundDistance(base); // 적 베이스 ~ 내 점령지역 지상거리
 			closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
-				closestDistance = closeFromMyExpansionButFarFromEnemy;
-				resultBase = base;
+				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + closeFromMyExpansionButFarFromEnemy +" < " + closestDistance);
+				if(thirdPosition) {
+					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
+					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
+						closestDistanceToSecondExp = distanceToSecondExpansion;
+						closestDistance = closeFromMyExpansionButFarFromEnemy;
+						resultBase = base;
+					}
+				}else {
+					closestDistance = closeFromMyExpansionButFarFromEnemy;
+					resultBase = base;	
+				}
 			}
 		}
 

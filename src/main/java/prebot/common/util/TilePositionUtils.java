@@ -29,7 +29,7 @@ public class TilePositionUtils {
 	
 	public static boolean equals(TilePosition tilePosition1, TilePosition tilePosition2) {
 		if (tilePosition1 == null || tilePosition2 == null) {
-			System.out.println("tile position is null. yahokuku. tilePosition1=" + tilePosition1 + ", tilePosition2" + tilePosition2);
+//			System.out.println("tile position is null. yahokuku. tilePosition1=" + tilePosition1 + ", tilePosition2" + tilePosition2);
 			return false;
 		}
 		return tilePosition1.getX() == tilePosition2.getX() && tilePosition1.getY() == tilePosition2.getY();

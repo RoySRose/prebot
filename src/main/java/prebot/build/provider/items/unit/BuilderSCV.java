@@ -117,7 +117,8 @@ public class BuilderSCV extends DefaultBuildableItem {
 
 		for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (commandcenter.isTraining()) {
-				return false;
+//				return false;
+				continue;
 			}
 
 			BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();

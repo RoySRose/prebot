@@ -19,6 +19,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -239,7 +240,7 @@ public class ConstructionManager extends GameManager {
 			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
-//	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
@@ -252,7 +253,11 @@ public class ConstructionManager extends GameManager {
 				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
 				
 				
-				relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+				if(b.getType().equals(UnitType.Terran_Supply_Depot)||b.getType().equals(UnitType.Terran_Barracks)||b.getType().equals(UnitType.Terran_Academy)) {
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.NextSupplePoint);
+				}else {
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+				}
 				if (relocationTilePosition == TilePosition.None) {
 					System.out.println(" relocationTilePosition recalculate desiredPosition None");
 					continue;
