@@ -200,11 +200,11 @@ public class InitialBuildProvider {
 		List<Unit> cancelBuildings = new ArrayList<>();
 		
 		// 2팩 : 모든 스타포트를 취소한다.
-		if (nowStrategy == ExpansionOption.TWO_FACTORY) {
-			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, false);
-			removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, false);
-			cancelBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
-		}
+//		if (nowStrategy == ExpansionOption.TWO_FACTORY) {
+//			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, false);
+//			removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, false);
+//			cancelBuildings = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
+//		}
 		
 		// 1팩토리, 1스타포트, 2스타포트 : 2번째 팩토리를 취소한다.
 		if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
@@ -245,8 +245,8 @@ public class InitialBuildProvider {
 			}
 		}
 		
-		// 1스타포트 : 2번째 스타포트를 취소한다.
-		if (nowStrategy == ExpansionOption.ONE_STARPORT) {
+		// 2팩, 1스타포트 : 2번째 스타포트를 취소한다.
+		if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
 			Unit completeFirstStarport = null; // 첫번째 스타포트 (완성)
 			List<Unit> completeBuildings = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			if (completeBuildings.size() >= 1) {

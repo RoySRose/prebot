@@ -75,6 +75,7 @@ public class PositionFinder {
 		StrategyIdea.campType = getCampPositionType();
 		StrategyIdea.campPosition = campTypeToPosition();
 		StrategyIdea.mainPosition = getMainPosition();
+//		System.out.println(StrategyIdea.campType + " : " + PositionUtils.isValidGroundPosition(StrategyIdea.campPosition));
 
 		updateMainSquadCenter();
 		updateEnemyUnitPosition();
@@ -140,21 +141,25 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int SECOND_CHOKE_MARGIN = 4 * 4; // TODO 추후 상수로 변경
-				int FIRST_EXPANSION_MARGIN = 2 * 4; // TODO 추후 상수로 변경
+				int READY_TO_SUPPLY = 30 * 4;
+				int SECOND_CHOKE_MARGIN = 10 * 4;
+				int FIRST_EXPANSION_MARGIN = 2 * 4;
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-					SECOND_CHOKE_MARGIN = 1 * 4;
+					SECOND_CHOKE_MARGIN = 2 * 4;
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
 				// 병력이 쌓였다면 second choke에서 방어한다.
-				int noRetreatCount = 0;
 				if (StrategyIdea.campType == CampType.READY_TO) {
-					noRetreatCount = 15 * 4;
+					READY_TO_SUPPLY = 15 * 4;
+				} else if (StrategyIdea.campType == CampType.SECOND_CHOKE) {
+					SECOND_CHOKE_MARGIN = 0;
 				}
-				if (UnitUtils.myFactoryUnitSupplyCount() > 30 * 4 - noRetreatCount && UnitUtils.availableScanningCount() >= 1) {
+				
+				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
 					return CampType.READY_TO;
-				} if (myTankSupplyCount >= 8 * 4
+				}
+				else if (myTankSupplyCount >= 8 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount * 1.5 + SECOND_CHOKE_MARGIN) {
 					return CampType.SECOND_CHOKE;
 				}
@@ -222,19 +227,23 @@ public class PositionFinder {
 	private Position campTypeToPosition() {
 		CampType campType = StrategyIdea.campType;
 		
-		boolean defenseInMyBase = false;
+		List<Region> defenseMyRegion = new ArrayList<>();
+		
 		if (!InfoUtils.euiListInBase().isEmpty()) {
-			defenseInMyBase = true;
+			Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+			defenseMyRegion.add(myBaseRegion);
 		}
 		if (campType != CampType.INSIDE && campType != CampType.FIRST_CHOKE
 				&& !InfoUtils.euiListInExpansion().isEmpty()) {
-			defenseInMyBase = true;
+			Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+			defenseMyRegion.add(myExpansionRegion);
 		}
 		
-		if (defenseInMyBase) {
-			if (StrategyIdea.nearGroundEnemyPosition != Position.Unknown) {
+		if (!defenseMyRegion.isEmpty()) {
+			if (StrategyIdea.nearGroundEnemyPosition != Position.Unknown && defenseMyRegion.contains(BWTA.getRegion(StrategyIdea.nearGroundEnemyPosition))) {
 				return StrategyIdea.nearGroundEnemyPosition;
-			} else if (StrategyIdea.dropEnemyPosition != Position.Unknown) {
+				
+			} else if (StrategyIdea.dropEnemyPosition != Position.Unknown && defenseMyRegion.contains(BWTA.getRegion(StrategyIdea.dropEnemyPosition))) {
 				return StrategyIdea.dropEnemyPosition;
 			}
 		}

@@ -58,11 +58,10 @@ public class ComsatControl extends Control {
 					}
 				}
 				if (comsatMaxEnergy != null) {
-					GridCell cell = MapGrid.Instance().getCell(scanPosition);
-					int timeLastScan = cell.getTimeLastScan() + StrategyConfig.SCAN_DURATION;
-					
-					System.out.println("timeLastScan : " + scanPosition + " / " + cell.getCenter() + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
-					System.out.println("frames : " + TimeUtils.elapsedFrames());
+//					GridCell cell = MapGrid.Instance().getCell(scanPosition);
+//					int timeLastScan = cell.getTimeLastScan() + StrategyConfig.SCAN_DURATION;
+//					System.out.println("timeLastScan : " + scanPosition + " / " + cell.getCenter() + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
+//					System.out.println("frames : " + TimeUtils.elapsedFrames());
 					
 					MapGrid.Instance().scanAtPosition(scanPosition);
 					CommandUtils.useTechPosition(comsatMaxEnergy, TechType.Scanner_Sweep, scanPosition);

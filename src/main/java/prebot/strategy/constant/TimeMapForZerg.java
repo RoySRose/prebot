@@ -84,7 +84,7 @@ public class TimeMapForZerg {
 		return new BuildTimeMap();
 	}
 	public static BuildTimeMap ZERG_FAST_LURKER() {
-		return new BuildTimeMap().setFeature(Feature.DEFENSE_FRONT, Feature.DETECT_IMPORTANT);
+		return new BuildTimeMap().setFeature(Feature.DETECT_IMPORTANT);
 	}
 	public static BuildTimeMap ZERG_NO_LAIR_LING() {
 		return new BuildTimeMap().setFeature(Feature.NO_LAIR);

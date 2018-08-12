@@ -94,7 +94,9 @@ public class BuilderArmory extends DefaultBuildableItem {
 					return true;						
 				}
 			}
-		} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL || StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR) {
+		} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL
+				|| StrategyIdea.currentStrategy == EnemyStrategy.TERRAN_2STAR
+				|| StrategyIdea.currentStrategy == EnemyStrategy.ZERG_LAIR_MIXED) {
 			int armoryBuildStartFrame = CommonCode.UNKNOWN;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				armoryBuildStartFrame = EnemyBuildTimer.Instance().mutaliskInMyBaseFrame - UnitType.Terran_Goliath.buildTime() - UnitType.Terran_Armory.buildTime();
@@ -104,7 +106,9 @@ public class BuilderArmory extends DefaultBuildableItem {
 			if (armoryBuildStartFrame != CommonCode.UNKNOWN && TimeUtils.after(armoryBuildStartFrame)) {
 				return true;
 			}
-		} else if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_STARGATE || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DOUBLE_CARRIER) {
+			
+		} else if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_STARGATE
+				|| StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DOUBLE_CARRIER) {
 			boolean siegeModeTankDiscovered = UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Siege_Mode);
 			boolean vultureDiscovered = UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Vulture);
 			if (siegeModeTankDiscovered && vultureDiscovered) {
