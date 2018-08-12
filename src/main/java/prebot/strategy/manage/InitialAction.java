@@ -2,7 +2,6 @@ package prebot.strategy.manage;
 
 import bwapi.Race;
 import bwapi.UnitType;
-import bwta.BaseLocation;
 import prebot.common.util.InfoUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
@@ -27,21 +26,14 @@ public class InitialAction {
 	}
 
 	public void update() {
-		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
-		if(enemyBaseLocation == null && !InformationManager.Instance().isFirstScoutAlive()){
-			if (!assignedSecondScout) {
-				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
-				assignedSecondScout = true;
-				terminated = true;
-			}
-		}
-		
-		
+		setUpFirstScoutAndStrategy();
+		setUpSecondScout();
+	}
+
+	private void setUpFirstScoutAndStrategy() {
 		if (terminated || InfoUtils.enemyRace() == null) {
 			return;
 		}
-		
-		
 		
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
@@ -75,6 +67,17 @@ public class InitialAction {
 				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0)); // 서플 완성후 출발
 				assignedFirstScout = true;
 			}
+		}
+	}
+
+	private void setUpSecondScout() {
+		if (InfoUtils.enemyBase() != null || assignedSecondScout) {
+			return;
+		}
+		
+		if (!InformationManager.Instance().isFirstScoutAlive()) {
+			ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
+			assignedSecondScout = true;
 		}
 	}
 }

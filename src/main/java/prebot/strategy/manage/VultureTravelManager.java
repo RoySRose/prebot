@@ -143,6 +143,19 @@ public class VultureTravelManager {
 			if (MicroUtils.arrivedToPosition(checker, baseLocation.getPosition())) {
 				int nextIndex = (index + 1) % baseLocationsCheckerOrdered.size();
 				checkerSiteMap2.put(checker.getID(), nextIndex);
+			} else {
+				boolean isOccupied = false;
+				for (BaseLocation occupied : InfoUtils.enemyOccupiedBases()) {
+					if (baseLocation.getTilePosition().equals(occupied.getTilePosition())) {
+						isOccupied = true;
+						break;
+					}
+				}
+				
+				if (isOccupied) {
+					int nextIndex = (index + 1) % baseLocationsCheckerOrdered.size();
+					checkerSiteMap2.put(checker.getID(), nextIndex);
+				}
 			}
 		}
 		

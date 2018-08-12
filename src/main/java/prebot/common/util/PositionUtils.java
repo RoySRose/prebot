@@ -155,7 +155,7 @@ public class PositionUtils {
 
 		for (Position p : positionList) {
 			double dist = p.getDistance(position);
-			if (closestPosition == null || dist < closestDist) {
+			if (closestPosition == null && dist < closestDist) {
 				closestPosition = p;
 				closestDist = dist;
 			}

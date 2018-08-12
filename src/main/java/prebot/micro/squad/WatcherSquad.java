@@ -75,13 +75,13 @@ public class WatcherSquad extends Squad {
 			} else if (PositionFinder.Instance().otherPositionTimeUp(regroupLeader)) {
 				smallFightPredict = SmallFightPredict.BACK;
 				watcherFleeStartFrame = TimeUtils.elapsedFrames();
-				System.out.println("watcher flee - other position time up");
+//				System.out.println("watcher flee - other position time up");
 				
 			} else {
 				smallFightPredict = VultureFightPredictor.watcherPredictByUnitInfo(unitList, euiList);
 				if (smallFightPredict == SmallFightPredict.BACK) {
 					watcherFleeStartFrame = TimeUtils.elapsedFrames();
-					System.out.println("watcher flee - enemy");
+//					System.out.println("watcher flee - enemy");
 				}
 			}
 		}
