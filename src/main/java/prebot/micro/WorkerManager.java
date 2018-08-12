@@ -402,7 +402,7 @@ public class WorkerManager extends GameManager {
 			repairWraithWorkCnt = workerData.workerWraithRepairMap.size();
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
-			if (unit.getType().isBuilding() && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9 && repairWorkCnt < repairmax) {
+			if (unit.getType().isBuilding() && unit.getHitPoints() < unit.getType().maxHitPoints() && repairWorkCnt < repairmax) {
 				if (InformationManager.Instance().enemyRace == Race.Terran && unit.isFlying()) {
 					continue;
 				}
@@ -800,7 +800,7 @@ public class WorkerManager extends GameManager {
 				continue;
 			}
 			// if it is a scout worker
-			if (workerData.getWorkerJob(worker) == WorkerJob.Scout) {
+			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
 				return worker;
 			}
 		}
