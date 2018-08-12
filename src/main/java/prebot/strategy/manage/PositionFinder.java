@@ -268,9 +268,9 @@ public class PositionFinder {
 
 	/// 메인부대 위치 지점
 	private Position getMainPosition() {
-		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
+		if (TimeUtils.before(StrategyIdea.findRatFinishFrame)) {
 			if (InfoUtils.enemyBase() != null) {
-				StrategyIdea.letsFindRatFrame = CommonCode.NONE;
+				StrategyIdea.findRatFinishFrame = CommonCode.NONE;
 			}
 		}
 		
@@ -283,6 +283,7 @@ public class PositionFinder {
 			if (!enemyBaseDestroyed(enemyBase)) {
 				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
 					return enemyBase.getPosition();
+					
 				} else {
 					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
 					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
@@ -797,9 +798,7 @@ public class PositionFinder {
 				}
 			}
 		}
-		
-//		TilePosition center = TilePositionUtils.getCenterTilePosition();
-		StrategyIdea.letsFindRatFrame = TimeUtils.elapsedFrames();
+		StrategyIdea.findRatFinishFrame = TimeUtils.elapsedFrames() + 10 * TimeUtils.SECOND;
 		return new Position(2222, 2222);
 	}
 

@@ -1691,6 +1691,10 @@ public class UXManager {
 		}
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + enemyBasePosition);
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyFirstExpansion : " + enemyExpansionPosition);
+		
+		if (StrategyIdea.enemyBaseExpected != null) {
+			Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase (Expect) : " + StrategyIdea.enemyBaseExpected.getPosition());
+		}
 //		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseToBaseUnit.entrySet()) {
 //			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
 //		}

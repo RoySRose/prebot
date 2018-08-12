@@ -90,6 +90,7 @@ public class AirForceManager {
 	private int accumulatedAchievement = 0; // 누적된 총 성취 (레이쓰 숫자 조절. 조절되면 값 리셋)
 	private boolean airForceDefenseMode = false;
 	private int waitingEndFrame = 0;
+	private int offensePositionResetFrame = 0;
 
 	public List<Position> getTargetPositions() {
 		return targetPositions;
@@ -203,14 +204,17 @@ public class AirForceManager {
 			return;
 		}
 		
-
 		// base가 변경된 경우
 		boolean enemyBaseFirstCase = InfoUtils.enemyBase().equals(firstBase) && InfoUtils.enemyFirstExpansion().equals(secondBase);
 		boolean enemyExpansionFirstCase = InfoUtils.enemyFirstExpansion().equals(firstBase) && InfoUtils.enemyBase().equals(secondBase);
-		if (!enemyBaseFirstCase && !enemyExpansionFirstCase) {
+		if ((!enemyBaseFirstCase && !enemyExpansionFirstCase)
+				|| TimeUtils.elapsedFrames(offensePositionResetFrame) > 30 * TimeUtils.SECOND) {
+			System.out.println(TimeUtils.elapsedFrames(offensePositionResetFrame));
 			setOffensePositions();
 //			this.setRetreatPosition();
-		}	
+			
+			offensePositionResetFrame = TimeUtils.elapsedFrames();
+		}
 	}
 
 	private void setDefensePositions() {

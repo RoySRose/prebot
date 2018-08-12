@@ -628,8 +628,25 @@ public class InformationManager extends GameManager {
 
 		// 끝까지 상대 location 못 찾았을때
 		if (mainBaseLocations.get(enemyPlayer) == null && TimeUtils.after(4500)) {
+			BaseLocation expectBase = null;
 			if (StrategyIdea.enemyBaseExpected != null) {
-				mainBaseLocations.put(enemyPlayer, StrategyIdea.enemyBaseExpected);
+				expectBase = StrategyIdea.enemyBaseExpected;
+			} else {
+				BaseLocation myBase = InfoUtils.myBase();
+				for (BaseLocation startLocation : BWTA.getStartLocations()) {
+					if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
+						continue;
+					}
+					if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+						continue;
+					}
+					expectBase = startLocation;
+					break;
+				}
+			}
+			
+			if (expectBase != null) {
+				mainBaseLocations.put(enemyPlayer, expectBase);
 				mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
 			}
 		}

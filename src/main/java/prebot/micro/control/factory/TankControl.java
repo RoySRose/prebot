@@ -52,7 +52,7 @@ public class TankControl extends Control {
 	
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
+		if (TimeUtils.before(StrategyIdea.findRatFinishFrame)) {
 			findRat(unitList);
 			return;
 		}
