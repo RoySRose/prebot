@@ -84,7 +84,7 @@ public abstract class Control {
 		} else if (unit.getDistance(expansionPosition) < 150) {
 			return false;
 		}
-		if (campType == CampType.EXPANSION) {
+		if (campType == CampType.EXPANSION || campType == CampType.SECOND_CHOKE) {
 			return true;
 		}
 		
@@ -92,10 +92,6 @@ public abstract class Control {
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return false;
 		}
-		if (campType == CampType.SECOND_CHOKE) {
-			return true;
-		}
-		
 		// 세번째 지역 반경 OK
 		if (unit.getDistance(InfoUtils.myThirdRegion()) < 600) {
 			return false;

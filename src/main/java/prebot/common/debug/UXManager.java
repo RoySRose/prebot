@@ -308,11 +308,11 @@ public class UXManager {
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount);
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount + " / " + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Valkyrie Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount);
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount + " / " + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie));
 		y += 11;
 
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");

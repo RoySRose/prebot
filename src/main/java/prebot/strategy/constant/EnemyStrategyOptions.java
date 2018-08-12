@@ -164,7 +164,7 @@ public class EnemyStrategyOptions {
 				return baseTurretOk && expansionTurretOk;
 				
 			case VULTURE: // 충분한 벌처
-				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 5;
+				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;
 				
 			case TANK: // 충분한 탱크
 				return UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() >= 3;

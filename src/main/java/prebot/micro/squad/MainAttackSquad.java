@@ -77,6 +77,7 @@ public class MainAttackSquad extends Squad {
 		tankControl.setSaveUnitLevel(saveUnitLevel);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 
+//		System.out.println(euiList);
 		Set<UnitInfo> groundEuiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT);
 		if (!tankList.isEmpty()) {
 			tankControl.controlIfUnitExist(tankList, groundEuiList);

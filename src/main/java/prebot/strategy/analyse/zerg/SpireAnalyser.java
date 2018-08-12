@@ -29,6 +29,8 @@ public class SpireAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			if (buildFrame < lairBuildFrame + UnitType.Zerg_Lair.buildTime() + 25 * TimeUtils.SECOND) {
 				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SPIRE);
+			} else {
+				ClueManager.Instance().addClueInfo(ClueInfo.SPIRE);
 			}
 		}
 	}

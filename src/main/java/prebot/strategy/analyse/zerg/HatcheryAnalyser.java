@@ -21,6 +21,35 @@ public class HatcheryAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
+		analyseStartingHatch();
+		analyse3Hat();
+	}
+
+	private void analyse3Hat() {
+		if (ClueManager.Instance().containsClueInfo(ClueInfo.DOUBLE_HATCH_3HAT)) {
+			return;
+		}
+		
+		List<UnitInfo> found = found();
+		
+		if (found.size() == 3) {
+			int latestHatchFrame = 0;
+			for (UnitInfo eui : found) {
+				int buildFrame = buildStartFrameDefaultJustBefore(eui);
+				if (buildFrame > latestHatchFrame) {
+					latestHatchFrame = buildFrame;
+				}
+			}
+			
+			int thirdHathBuildFrame = EnemyStrategy.ZERG_3HAT.buildTimeMap.frameOfIndex(UnitType.Zerg_Hatchery, 1, 20);
+			if (latestHatchFrame < thirdHathBuildFrame) {
+				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_3HAT);
+			}
+		}
+		
+	}
+
+	private void analyseStartingHatch() {
 		if (ClueManager.Instance().containsClueType(ClueType.DOUBLE_HATCH)) {
 			return;
 		}

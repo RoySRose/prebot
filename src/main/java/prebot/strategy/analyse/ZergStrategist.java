@@ -3,6 +3,7 @@ package prebot.strategy.analyse;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -14,14 +15,20 @@ import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ZergStrategist extends Strategist {
 	
+	private int warithActivatedFrame = CommonCode.NONE;
+
 	public ZergStrategist() {
 		super(UnitType.Zerg_Lair);
 	}
 	
 	@Override
 	protected EnemyStrategy strategyPhase01() {
+		if (hasInfo(ClueInfo.DOUBLE_HATCH_3HAT)) {
+			return EnemyStrategy.ZERG_3HAT;
+		}
+		
 		if (hasInfo(ClueInfo.DOUBLE_HATCH_12HAT)) {
-			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR) && !hasInfo(ClueInfo.LAIR_2HAT_FAST)) {
+			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR) && !hasAnyInfo(ClueInfo.LAIR_2HAT_FAST, ClueInfo.LAIR_1HAT_FAST)) {
 				return EnemyStrategy.ZERG_3HAT;
 			} else {
 				return EnemyStrategy.ZERG_2HAT_GAS;
@@ -68,9 +75,13 @@ public class ZergStrategist extends Strategist {
 	
 	@Override
 	protected EnemyStrategy strategyPhase02() {
+		if (minimumFastWraithIfStarportExist()) {
+			StrategyIdea.wraithCount = 1;
+		}
+		
 		if (hasAnyInfo(ClueInfo.LAIR_INCOMPLETE, ClueInfo.LAIR_COMPLETE)) {
 			boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
-			boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START, ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, ClueInfo.FAST_HYDRA);
+			boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START, ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
 			boolean hydraThreeMany = hasInfo(ClueInfo.THREE_MANY_HYDRA);
 			boolean hydraFiveMany = hasInfo(ClueInfo.FIVE_MANY_HYDRA);
 			boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
@@ -136,6 +147,10 @@ public class ZergStrategist extends Strategist {
 		boolean spireExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Spire, UnitType.Zerg_Greater_Spire) > 0;
 		
 		if (enemyGroundUnitPower > enemyAirUnitPower) {
+			if (lateWraith()) {
+				StrategyIdea.wraithCount = 2;
+			}
+			
 			if (enemyAirUnitPower == 0 && !spireExist) {
 				return EnemyStrategy.ZERG_GROUND3;
 			} else if (enemyGroundUnitPower > enemyAirUnitPower * 1.5) {
@@ -157,5 +172,41 @@ public class ZergStrategist extends Strategist {
 				return EnemyStrategy.ZERG_AIR1;
 			}
 		}
+	}
+	
+	private boolean minimumFastWraithIfStarportExist() {
+		if (TimeUtils.elapsedFrames(warithActivatedFrame) < 4 * TimeUtils.SECOND) {
+			return false;
+		}
+		if (StrategyIdea.wraithCount > 0 || StrategyIdea.valkyrieCount > 0) {
+			return false;
+		}
+		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
+			return true;
+		}
+		warithActivatedFrame = TimeUtils.elapsedFrames();
+		System.out.println("fast wraith activated");
+		return true;
+	}
+
+	private boolean lateWraith() {
+		if (TimeUtils.elapsedFrames(warithActivatedFrame) < 4 * TimeUtils.SECOND) {
+			return false;
+		}
+		if (TimeUtils.beforeTime(10, 0)) {
+			return false;
+		}
+		if (StrategyIdea.wraithCount > 0) {
+			return false;
+		}
+		if (UnitUtils.activatedCommandCenterCount() < 2) {
+			return false;
+		}
+		if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) <= 5) {
+			return false;
+		}
+		warithActivatedFrame = TimeUtils.elapsedFrames();
+		System.out.println("late wraith activated");
+		return true;
 	}
 }

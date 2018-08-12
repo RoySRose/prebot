@@ -166,17 +166,17 @@ public enum EnemyStrategy {
 			, TimeMapForZerg.ZERG_FAST_MUTAL()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TURRET_OK, MissionType.ARMORY)),
 	
-	ZERG_FAST_LURKER(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
+	ZERG_FAST_LURKER(1, 2, 0, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_FAST_LURKER()
 			, Mission.missions(MissionType.EXPANSION, MissionType.COMSAT_OK, MissionType.TURRET_OK, MissionType.TANK)),
 	
-	ZERG_HYDRA_WAVE(1, 3, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM, FacUp.VS) // camp=F_CHOKE
+	ZERG_HYDRA_WAVE(1, 3, 0, Weight.TANK, UpgradeOrder.get(FacUp.TS, FacUp.VM) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
-	ZERG_NO_LAIR_LING(2, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS) // camp=F_CHOKE
+	ZERG_NO_LAIR_LING(3, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS) // camp=F_CHOKE
 			, MarineCount.EIGHT_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_LING()
 			, Mission.missions(MissionType.VULTURE)),
@@ -186,7 +186,7 @@ public enum EnemyStrategy {
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK)),
 	
-	ZERG_LAIR_MIXED(1, 3, 5, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS) // camp=F_CHOKE
+	ZERG_LAIR_MIXED(2, 1, 2, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.TS) // camp=F_CHOKE
 			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_LAIR_MIXED()
 			, Mission.missions(MissionType.EXPANSION, MissionType.TANK, MissionType.TURRET_OK)),
@@ -194,7 +194,7 @@ public enum EnemyStrategy {
 	
 	// PHASE3 : PHASE2 종료 ~
 	ZERG_GROUND3(1, 5, 1, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
-	ZERG_GROUND2(1, 5, 2, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
+	ZERG_GROUND2(1, 4, 2, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
 	ZERG_GROUND1(1, 5, 3, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.TS, FacUp.VS, FacUp.GR)),
 	ZERG_MIXED(1, 3, 5, Weight.TANK, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
 	ZERG_AIR1(1, 2, 6, Weight.GOLIATH, UpgradeOrder.get(FacUp.VM, FacUp.GR, FacUp.TS, FacUp.VS)),
