@@ -82,7 +82,7 @@ public enum EnemyStrategy {
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),
 	
 	PROTOSS_TWOGATE_TECH(3, 1, 0, Weight.VULTURE, UpgradeOrder.get(FacUp.VM, FacUp.VS, FacUp.TS)
-			, MarineCount.FOUR_MARINE, AddOnOption.VULTURE_FIRST, ExpansionOption.TWO_FACTORY
+			, MarineCount.FOUR_MARINE, AddOnOption.IMMEDIATELY, ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_TWOGATE_TECH()
 			, Mission.missions(MissionType.EXPANSION, MissionType.NO_ENEMY, MissionType.VULTURE)),
 	

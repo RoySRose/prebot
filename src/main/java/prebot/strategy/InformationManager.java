@@ -593,8 +593,10 @@ public class InformationManager extends GameManager {
 			// an unexplored base location holder
 			BaseLocation unexplored = null;
 
+			Region myRegion = BWTA.getRegion(mainBaseLocations.get(selfPlayer).getPosition());
 			for (BaseLocation startLocation : BWTA.getStartLocations()) {
-				if (existsPlayerBuildingInRegion(BWTA.getRegion(startLocation.getTilePosition()), enemyPlayer)) {
+				Region startLocationRegion = BWTA.getRegion(startLocation.getTilePosition());
+				if (myRegion != startLocationRegion && existsPlayerBuildingInRegion(startLocationRegion, enemyPlayer)) {
 					if (enemyStartLocationFound == false) {
 						enemyStartLocationFound = true;
 						mainBaseLocations.put(enemyPlayer, startLocation);

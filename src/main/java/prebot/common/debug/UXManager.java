@@ -1682,8 +1682,15 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.nearAirEnemyPosition);
 		
 		y += 10;
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + InfoUtils.enemyBase().getPosition());
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyFirstExpansion : " + InfoUtils.enemyFirstExpansion().getPosition());
+		Position enemyBasePosition = null;
+		Position enemyExpansionPosition = null;
+		if (InfoUtils.enemyBase() != null) {
+			enemyBasePosition = InfoUtils.enemyBase().getPosition();
+			enemyExpansionPosition = InfoUtils.enemyBase().getPosition();
+			
+		}
+		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + enemyBasePosition);
+		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyFirstExpansion : " + enemyExpansionPosition);
 //		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseToBaseUnit.entrySet()) {
 //			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
 //		}

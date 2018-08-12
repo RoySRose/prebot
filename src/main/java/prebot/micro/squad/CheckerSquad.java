@@ -77,7 +77,7 @@ public class CheckerSquad extends Squad {
 	public void execute() {
 		for (Unit unit : unitList) {
 			Set<UnitInfo> euiList = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG|TargetFilter.INVISIBLE
-					, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
+					, unit.getPosition(), unit.getType().sightRange(), true, false);
 			
 			vultureControl.controlIfUnitExist(new HashSet<>(Arrays.asList(unit)), euiList);
 		}

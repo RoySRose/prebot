@@ -135,7 +135,11 @@ public class ProtossStrategist extends Strategist {
 		if (hasAnyInfo(ClueInfo.NO_ASSIMILATOR, ClueInfo.ASSIMILATOR_LATE)) {
 			if (hasInfo(ClueInfo.NEXSUS_NOT_DOUBLE)) {
 				if (hasInfo(ClueInfo.ASSIMILATOR_LATE)) {
-					return EnemyStrategy.PROTOSS_TWOGATE_TECH;
+					if (hasAnyInfo(ClueInfo.GATE_FAST_ONE, ClueInfo.GATE_ONE)) {
+						return EnemyStrategy.PROTOSS_FAST_DRAGOON;
+					} else if (hasAnyInfo(ClueInfo.GATE_FAST_TWO)) {
+						return EnemyStrategy.PROTOSS_TWOGATE_TECH;
+					}
 				} else if (hasInfo(ClueInfo.NO_ASSIMILATOR)) {
 					return EnemyStrategy.PROTOSS_HARDCORE_ZEALOT;
 				}
