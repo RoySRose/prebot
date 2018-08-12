@@ -9,10 +9,10 @@ import java.util.List;
 
 public class GasCalculator {
 
-    static final int GAS_RATE = 1;
+    static final double GAS_INCREMENT_RATE = 0.204806;
 
-    private final Unit geyser;
-    private int realGas;
+    public final Unit geyser;
+    public int realGas;
 
     private boolean hasGasBuilding;
 
@@ -22,13 +22,15 @@ public class GasCalculator {
     public GasCalculator(Unit geyser) {
         this.geyser = geyser;
         this.hasGasBuilding = false;
+        
+        System.out.println("initialize with: " + geyser.getPosition() );
     }
 
     public int getGas() {
         if(hasGasBuilding) {
             return 0;
         }else{
-            return realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_RATE;
+            return (int) (realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
         }
     }
 
