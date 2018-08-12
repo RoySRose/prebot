@@ -8,6 +8,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
@@ -34,14 +35,16 @@ public class AirForceControl extends Control {
 			return;
 		}
 		
-		if (TimeUtils.before(StrategyIdea.letsFindRatFrame)) {
+		if (TimeUtils.before(StrategyIdea.findRatFinishFrame)) {
 			findRat(airunits);
 			return;
 		}
-//		else if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 4 && UnitUtils.enemyAirUnitPower() == 0) {
-//			findRat(airunits);
-//			return;
-//		}
+		else if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 3 && UnitUtils.enemyAirUnitPower() == 0) {
+			for (Unit airunit : airunits) {
+				CommandUtils.attackMove(airunit, StrategyIdea.mainPosition);
+			}
+			return;
+		}
 		
 		// 팀 단위로 wraithList가 세팅되어야 한다.
 		int memberId = airunits.iterator().next().getID();

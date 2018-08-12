@@ -795,7 +795,7 @@ public class UnitUtils {
 		availableScanningCount = 0;
 		List<Unit> comsatStations = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 		for (Unit comsatStation : comsatStations) {
-			availableScanningCount += comsatStation.getEnergy() / 50;
+			availableScanningCount += comsatStation.getEnergy() / 48; // 다크에게 컴셋 전 앞서 전진하게 위해 에너지를 2초 짧게 잡는다.
 		}
 		SpecificValueCache.put(ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
 		return availableScanningCount;
