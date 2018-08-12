@@ -89,7 +89,11 @@ public class UnitInfo {
 		this.lastPosition = lastPosition;
 	}
 
-	public void setType(UnitType type) {
+    public int getRemainingBuildTime() {
+        return remainingBuildTime;
+    }
+
+    public void setType(UnitType type) {
 		this.type = type;
 	}
 
