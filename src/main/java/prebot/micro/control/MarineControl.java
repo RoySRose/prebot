@@ -123,7 +123,7 @@ public class MarineControl extends Control {
 				}
 				CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
 			}
-		}else{
+		}else {
 			boolean rangeUnit = false;
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
@@ -168,7 +168,11 @@ public class MarineControl extends Control {
 					}
 
 				} else {
-					intoTheBunker(bunker, marine);
+					if(bunker.getLoadedUnits().size() >=  4){
+						CommandUtils.attackMove(marine, bunker.getPosition());
+					}else{
+						intoTheBunker(bunker, marine);
+					}
 				}
 				
 				
