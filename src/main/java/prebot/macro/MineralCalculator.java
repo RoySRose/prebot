@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MineralCalculator {
 
-    private List<EnemyMineral> mineralsList;
+    public List<EnemyMineral> mineralsList;
 
     public MineralCalculator(List<EnemyMineral> mineralsList) {
         this.mineralsList = mineralsList;

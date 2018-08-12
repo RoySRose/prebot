@@ -12,15 +12,20 @@ import java.util.List;
 
 public class WorkerCounter {
 
-    private int realWorkerCount;
-    private int lastCheckFrame;
-    private double workerTrainRate = 1;
+    public int realWorkerCount;
+    public int lastCheckFrame;
+    
+    //GAS_INCREMENT_RATE
+    
+    private double workerTrainRate;
 
     public WorkerCounter() {
+    	workerTrainRate = 0.00333333;
+    	lastCheckFrame = 0;
     }
 
     public void setWorkerCount(int realWorkerCount, MineralCalculator mineralCalculator) {
-        recalculateWorkerTrainRate(realWorkerCount);
+        //recalculateWorkerTrainRate(realWorkerCount);
 
         if(realWorkerCount > mineralCalculator.getMineralCount() * 2){
             realWorkerCount = mineralCalculator.getMineralCount() * 2;
@@ -33,13 +38,12 @@ public class WorkerCounter {
         return (int)(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
     }
 
-    private final void recalculateWorkerTrainRate(int realWorkerCount) {
-        int oldWorkerCount = this.realWorkerCount;
-        int newWorkerCount= realWorkerCount;
-        int term = Prebot.Broodwar.getFrameCount() - lastCheckFrame;
-        workerTrainRate = (newWorkerCount - oldWorkerCount) / term;
-    }
-
+//    private final void recalculateWorkerTrainRate(int realWorkerCount) {
+//        int oldWorkerCount = this.realWorkerCount;
+//        int newWorkerCount= realWorkerCount;
+//        int term = Prebot.Broodwar.getFrameCount() - lastCheckFrame;
+//        workerTrainRate = (newWorkerCount - oldWorkerCount) / term;
+//    }
 
     public void updateCount(UnitInfo unitInfo, MineralCalculator mineralCalculator, GasCalculator gasCalculator) {
         Unit enemyResourceDepot= unitInfo.getUnit();

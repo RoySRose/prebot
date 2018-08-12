@@ -11,7 +11,7 @@ import java.util.List;
 
 public class EnemyCommandInfo {
 
-    static final int MINERAL_INCREMENT_RATE = 1;
+    static final double MINERAL_INCREMENT_RATE = 0.04663;
 
     UnitInfo unitInfo;
     public int lastCheckFrame;
@@ -20,8 +20,8 @@ public class EnemyCommandInfo {
     boolean hasGas;
 
     public WorkerCounter workerCounter;
-    MineralCalculator mineralCalculator;
-    GasCalculator gasCalculator;
+    public MineralCalculator mineralCalculator;
+    public GasCalculator gasCalculator;
 
     public EnemyCommandInfo(UnitInfo unitInfo) {
 
@@ -65,7 +65,7 @@ public class EnemyCommandInfo {
     private List<EnemyMineral> getMineralPatchesNearDepot(Unit depot) {
         int radius = 320;
         ArrayList<EnemyMineral> mineralList = new ArrayList<>();
-        for (Unit unit : Prebot.Broodwar.getMinerals()) {
+        for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
             if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < radius) {
                 EnemyMineral newMineral = new EnemyMineral(unit);
                 mineralList.add(newMineral);
@@ -85,12 +85,14 @@ public class EnemyCommandInfo {
             lastFullCheckWorkerCount = workerCounter.getWorkerCount();
             mineralCalculator.updateFullVisibleResources(lastFullCheckFrame);
         }
-        workerCounter.updateCount(unitInfo, mineralCalculator, gasCalculator);
-
-        mineralCalculator.updateResources();
+        
         if (hasGas) {
             gasCalculator.updateResources();
         }
+        workerCounter.updateCount(unitInfo, mineralCalculator, gasCalculator);
+
+        mineralCalculator.updateResources();
+       
     }
 
     public int getMineral(){
@@ -109,7 +111,7 @@ public class EnemyCommandInfo {
             term = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
             appliedWorkerCount = (lastFullCheckWorkerCount * (workerCount)) / 2;
 
-            predictedIncrementMineral = appliedWorkerCount * term * MINERAL_INCREMENT_RATE;
+            predictedIncrementMineral = (int) (appliedWorkerCount * term * MINERAL_INCREMENT_RATE);
             predictionMinusMineral = mineralCalculator.getPredictionMinusMineral();
         }else{
 
@@ -120,7 +122,7 @@ public class EnemyCommandInfo {
 
             term = Prebot.Broodwar.getFrameCount() - enemyMineral.getLastCheckFrame();
 
-            predictedIncrementMineral = workerCount * term * MINERAL_INCREMENT_RATE;
+            predictedIncrementMineral = (int) (workerCount * term * MINERAL_INCREMENT_RATE);
         }
 
         return total + predictedIncrementMineral - predictionMinusMineral;

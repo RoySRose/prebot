@@ -1,10 +1,13 @@
 package prebot.common.main;
 
+import java.util.List;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
@@ -60,8 +63,69 @@ public class GameCommander {
 	{
 		StrategyManager.Instance().onEnd(isWinner);
 	}
-
+	Unit geyser= null;
+	boolean sout =false;
 	/// 경기 진행 중 매 프레임마다 발생하는 이벤트를 처리합니다
+	
+	
+	void temp() {
+		Unit depot = null;
+		for (Unit unit : Prebot.Broodwar.getAllUnits())
+        {
+            if ((unit.getType() == UnitType.Terran_Command_Center))
+            {
+            	depot = unit;
+            }
+        }
+//		if(depot!= null) {
+//			for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
+//	            if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < 320) {
+//	            	System.out.println("mineral: " + unit.getID() + ", " + unit.getResources());
+//	            }
+//	        }
+//		}
+		
+		
+		if(geyser==null) {
+			for (Unit unit : Prebot.Broodwar.getStaticGeysers()) {
+				System.out.println("unit: " + unit.getPosition());
+	            if (unit.getType() == UnitType.Resource_Vespene_Geyser && unit.getDistance(depot) < 320) {
+	            	geyser = unit;
+	            	System.out.println("geyser: " + geyser.getPosition());
+	            }
+	        }
+		}
+		
+		List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
+		
+			
+        for (Unit u : alreadyBuiltUnits) {
+        	//System.out.println("search " + u.getType());
+            if (u.getType().isRefinery() && u.exists()) {
+            	sout = true;
+            }
+        }
+        
+        if(!sout) {
+        	int cnt=0;
+        	for (Unit unit : Prebot.Broodwar.getAllUnits())
+	        {
+	            if ((unit.getType() == UnitType.Terran_SCV) && unit.isCompleted())
+	            {
+	            	cnt++;
+	            }
+	        }
+        	
+        	System.out.println("scv: " + cnt);
+        }
+        
+        if(Prebot.Broodwar.getFrameCount() % 10 == 0) {
+	        System.out.println("===============" + Prebot.Broodwar.getFrameCount());
+	        if(sout) {
+	        	System.out.println("gas: " + geyser.getID() + ", " + geyser.getResources());
+	        }
+        }
+	}
 	public void onFrame()
 	{
 
@@ -87,6 +151,9 @@ public class GameCommander {
 			WorkerManager.Instance().updateTimeCheck();
 			CombatManager.Instance().updateTimeCheck();
 			
+			AttackDecisionMaker.Instance().updateTimeCheck();
+			//temp();
+				
 			logObserver.observe();
 			BigWatch.record("... GAME COMMANDER ...");
 

@@ -4,6 +4,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.UnitCache;
 import prebot.strategy.InformationManager;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AttackDecisionMaker {
+public class AttackDecisionMaker extends GameManager {
 
     Decision decision;
 
