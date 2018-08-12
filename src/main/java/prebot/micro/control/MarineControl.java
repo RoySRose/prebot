@@ -92,7 +92,9 @@ public class MarineControl extends Control {
 					if(InformationManager.Instance().isBlockingEnterance()){
 						if(MicroUtils.isRangeUnit(decision.eui.getType())){
 							MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
-						}else{
+						}else if(decision.eui.getType().isBuilding()){
+                            MicroUtils.kiting(marine, decision.eui, kOption);
+                        }else{
 							if(kitingMarine == null || !kitingMarine.exists()){//마린 한마리만 왔다갔다 카이팅
 								kitingMarine = marine;
 							}else if(kitingMarine == marine){

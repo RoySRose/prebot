@@ -54,10 +54,6 @@ public class ScvScoutControl extends Control {
 		
 		//BaseLocation enemyFirstExpansionLocation = InfoUtils.enemyFirstExpansion();
 			
-		// 아군 지역에 적 건물이 잇을땐 패스(가스 러쉬시 우리 지역을 정찰 지역으로 보는경우가 있음.
-		if (enemyBaseLocation != null && enemyBaseLocation.getDistance(myBaseLocation.getPosition()) < 5 * UxConfig.TILE_SIZE)
-			enemyBaseLocation = null;
-		
 		
 		if (enemyBaseLocation == null) {
 			BaseLocation scoutBaseLocation; 
