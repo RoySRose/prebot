@@ -216,7 +216,7 @@ public class ConstructionPlaceFinder {
 				&& methodFix == false){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		} else {
-//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
+//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
 		}
 		
@@ -1381,6 +1381,7 @@ public class ConstructionPlaceFinder {
 			for(BaseLocation baseLocation : BWTA.getBaseLocations())
 			{
 				if(TilePositionUtils.equals(unit.getTilePosition(), baseLocation.getTilePosition())) {
+					System.out.println(" CommandCenter is on the baseLocation ==>> " + unit.getTilePosition());
 					for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
 					{
 						//팩토리 외 건물은 위아래가 비어있을 필요가 없음
