@@ -940,6 +940,41 @@ public class ConstructionPlaceFinder {
 		return closestGeyser;
 	}
 
+    public final Unit getRefineryNear(TilePosition seedPosition) {
+        if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
+            seedPosition = InfoUtils.myBase().getTilePosition();
+        }
+
+        Unit closestGeyser = null;
+        double minGeyserDistanceFromSeedPosition = 100000000;
+
+        // 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
+        for (Unit geyser : Prebot.Broodwar.getStaticGeysers()) {
+            // geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
+            // 반드시 geyser->getInitialPosition() 을 사용해야 한다
+
+            Position geyserPos = geyser.getInitialPosition();
+            TilePosition geyserTilePos = geyser.getInitialTilePosition();
+
+            // 이미 예약되어있는가
+            if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
+                continue;
+            }
+
+            // if it is not connected fron seedPosition, it is located in another island
+            if (!BWTA.isConnected(seedPosition, geyserTilePos)) {
+                continue;
+            }
+
+            double thisDistance = PositionUtils.getGroundDistance(geyserPos, seedPosition.toPosition());
+            if (thisDistance < minGeyserDistanceFromSeedPosition) {
+                minGeyserDistanceFromSeedPosition = thisDistance;
+                closestGeyser = geyser;
+            }
+        }
+        return closestGeyser;
+    }
+
 	/// 해당 위치가 BaseLocation 과 겹치는지 여부를 리턴합니다<br>
 	/// BaseLocation 에는 ResourceDepot 건물만 건설하고, 다른 건물은 건설하지 않기 위함입니다
 	public final boolean isOverlapsWithBaseLocation(TilePosition tile, UnitType type)
