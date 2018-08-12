@@ -133,7 +133,7 @@ public class EarlyDefenseSquad extends Squad {
 					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
 						scvCountForDefense += 1.0;
 					} else if (enemy.getType() == UnitType.Terran_SCV) {
-						scvCountForDefense += 1.5;
+						scvCountForDefense += 1.0;
 					} else if (enemy.getType() == UnitType.Protoss_Zealot) {
 						scvCountForDefense += 4;
 					} else if (enemy.getType() == UnitType.Zerg_Zergling) {
