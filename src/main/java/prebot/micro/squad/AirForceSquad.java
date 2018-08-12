@@ -70,7 +70,7 @@ public class AirForceSquad extends Squad {
 			if (StrategyIdea.mainSquadMode.isAttackMode) {
 				for (Unit unit : unitList) {
 					if (AirForceManager.Instance().isLeader(unit.getID())) {
-						UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true, unitTypes);
+						UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true);
 					}
 				}
 			}
@@ -78,11 +78,10 @@ public class AirForceSquad extends Squad {
 		} else {
 			for (Unit unit : unitList) {
 				if (AirForceManager.Instance().isLeader(unit.getID())) {
-					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true, unitTypes);
+					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.LARVA_LURKER_EGG, euis, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, false, true);
 				}
 			}
 		}
-		
 		return euis;
 	}
 	
