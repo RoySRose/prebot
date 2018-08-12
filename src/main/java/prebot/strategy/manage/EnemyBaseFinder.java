@@ -3,6 +3,7 @@ package prebot.strategy.manage;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
@@ -43,12 +44,20 @@ public class EnemyBaseFinder {
 		if (baseExpected != null) {
 			StrategyIdea.enemyBaseExpected = baseExpected;
 		} else {
-			if (TimeUtils.beforeTime(2, 20)) {
+			int scoutLimitFrames;
+			if (InfoUtils.enemyRace() == Race.Protoss) {
+				scoutLimitFrames = TimeUtils.timeToFrames(1, 40);
+			} else {
+				scoutLimitFrames = TimeUtils.timeToFrames(2, 0);
+			}
+			
+			if (TimeUtils.before(scoutLimitFrames)) {
 				BaseLocation expectedByScout = expectedByUnit();
 				if (expectedByScout != null) {
 					StrategyIdea.enemyBaseExpected = expectedByScout;
 				}
 			}
+			
 		}
 	}
 
@@ -69,7 +78,7 @@ public class EnemyBaseFinder {
 			fromPosition = InfoUtils.myBase().getPosition();
 		} else {
 			fromPosition = euiList.get(0).getLastPosition();
-			Prebot.Broodwar.sendText("hi");
+//			Prebot.Broodwar.sendText("hi");
 		}
 
 		BaseLocation closestBase = null;

@@ -10,7 +10,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Chokepoint;
-import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -65,20 +64,31 @@ public class TankControl extends Control {
 		List<Unit> tankModeList = new ArrayList<>();
 		List<Unit> siegeModeList = new ArrayList<>();
 		
-		int leaderId = CommonCode.NONE;
+		List<Integer> leaderGroupIds = new ArrayList<>();
 		if (StrategyIdea.mainSquadMode.isAttackMode && unitList.size() >= 3) {
+			int leaderGroupMaxSize = leaderGroupIds.size() / 3;
 			Unit leaderOfUnit = UnitUtils.leaderOfUnit(unitList);
 			if (leaderOfUnit != null) {
-//				System.out.println("leaderOfUnit: " + leaderOfUnit.getID());
-				boolean nearChoke = false;
+				
+				Position nearChokePosition = null;
 				Chokepoint nearestChoke = BWTA.getNearestChokepoint(leaderOfUnit.getPosition());
 				if (nearestChoke.getWidth() < 250) {
-					if (nearestChoke.getCenter().getDistance(leaderOfUnit.getPosition()) < 180) {
-						nearChoke = true;
-					}
+					nearChokePosition = nearestChoke.getCenter();
 				}
-				if (!nearChoke) {
-					leaderId = leaderOfUnit.getID();
+				if (nearChokePosition == null || nearChokePosition.getDistance(leaderOfUnit.getPosition()) > 180) {
+					leaderGroupIds.add(leaderOfUnit.getID());
+				}
+				for (Unit unit : unitList) {
+					if (leaderGroupMaxSize >= leaderGroupIds.size()) {
+						break;
+					}
+					if (unit.getID() == leaderOfUnit.getID() || unit.getDistance(leaderOfUnit) > 200) {
+						continue;
+					}
+					
+					if (nearChokePosition == null || nearChokePosition.getDistance(unit.getPosition()) > 180) {
+						leaderGroupIds.add(unit.getID());
+					}
 				}
 			}
 		}
@@ -94,11 +104,11 @@ public class TankControl extends Control {
 			}
 		}
 
-		executeSiegeMode(siegeModeList, euiList, leaderId);
+		executeSiegeMode(siegeModeList, euiList, leaderGroupIds);
 		executeTankMode(tankModeList, euiList);
 	}
 
-	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList, int leaderId) {
+	private void executeSiegeMode(List<Unit> siegeModeList, Collection<UnitInfo> euiList, List<Integer> leaderGroupIds) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 
 		for (Unit siege : siegeModeList) {
@@ -114,7 +124,7 @@ public class TankControl extends Control {
 				CommandUtils.holdPosition(siege);
 				
 			} else if (decision.type == DecisionType.CHANGE_MODE) {
-				if (siege.canUnsiege() && siege.getID() != leaderId) {
+				if (siege.canUnsiege() && !leaderGroupIds.contains(siege.getID())) {
 					CommandUtils.unsiege(siege);
 				}
 				
@@ -131,7 +141,7 @@ public class TankControl extends Control {
 						
 					} else {
 						if (distance > siegeModeSpreadRadius) {
-							if (siege.canUnsiege() && siege.getID() != leaderId) {
+							if (siege.canUnsiege() && !leaderGroupIds.contains(siege.getID())) {
 								CommandUtils.unsiege(siege);
 								TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
 							}
@@ -260,6 +270,9 @@ public class TankControl extends Control {
 			}
 			
 		} else {
+			if (eui.getType().isWorker()) {
+				return false;
+			}
 			if (MicroUtils.isMeleeUnit(eui.getType())) {
 				if (!hasEnoughBackUpUnitToSiege || Prebot.Broodwar.self().supplyUsed() > 380) {
 					return false;
