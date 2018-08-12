@@ -17,7 +17,9 @@ import prebot.common.debug.BigWatch;
 import prebot.common.debug.chat.ChatBot;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
+import prebot.macro.AttackDecisionMaker;
 import prebot.micro.CombatManager;
+import prebot.micro.DecisionMaker;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
@@ -48,6 +50,7 @@ public class GameCommander {
 		ConstructionPlaceFinder.Instance().setTilesToAvoidBaseLocation();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
+        AttackDecisionMaker.Instance().onStart();
 		CombatManager.Instance().onStart();
 		System.out.println("onStart() finished");
 	}
