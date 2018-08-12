@@ -2,7 +2,9 @@ package prebot.strategy.manage;
 
 import bwapi.Race;
 import bwapi.UnitType;
+import bwta.BaseLocation;
 import prebot.common.util.InfoUtils;
+import prebot.strategy.InformationManager;
 import prebot.strategy.action.impl.GasAdjustmentMechanic;
 import prebot.strategy.action.impl.ScvScoutAfterBuild;
 
@@ -19,15 +21,28 @@ public class InitialAction {
 
 	private boolean terminated = false;
 	private boolean assignedFirstScout = false;
+	private boolean assignedSecondScout = false;
 
 	private InitialAction() {
 	}
 
 	public void update() {
+		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
+		if(enemyBaseLocation == null && !InformationManager.Instance().isFirstScoutAlive()){
+			if (!assignedSecondScout) {
+				ActionManager.Instance().addAction(new ScvScoutAfterBuild(UnitType.Terran_Supply_Depot, 0));
+				assignedSecondScout = true;
+				terminated = true;
+			}
+		}
+		
+		
 		if (terminated || InfoUtils.enemyRace() == null) {
 			return;
 		}
-
+		
+		
+		
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			ActionManager.Instance().addAction(new GasAdjustmentMechanic());
 			if (!assignedFirstScout) {
