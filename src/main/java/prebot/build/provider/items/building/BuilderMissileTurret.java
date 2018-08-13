@@ -28,6 +28,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 	public BuilderMissileTurret(MetaType metaType) {
 		super(metaType);
 	}
+	public int add_turret = 0;
 
 	public final boolean buildCondition() {
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0) {
@@ -62,8 +63,6 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		}
 		
 		int max_turret = 1;
-		
-		int add_turret = 0;
 		
 		if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DARK_DROP
 			|| StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK
