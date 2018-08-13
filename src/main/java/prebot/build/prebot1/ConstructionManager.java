@@ -240,7 +240,7 @@ public class ConstructionManager extends GameManager {
 			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
-	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+//	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
@@ -252,17 +252,23 @@ public class ConstructionManager extends GameManager {
 //	        	System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
 				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
 				
+//				FileUtils.appendTextToFile("log.txt", "\n "+b.getType().toString() + "'s relocationTilePosition is not valid. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
+				
 				
 				if(b.getType().equals(UnitType.Terran_Supply_Depot)||b.getType().equals(UnitType.Terran_Barracks)||b.getType().equals(UnitType.Terran_Academy)) {
 					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.NextSupplePoint);
+				}else if(b.getType().equals(UnitType.Terran_Command_Center)) {
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.NextExpansionPoint);
 				}else {
 					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
 				}
 				if (relocationTilePosition == TilePosition.None) {
 					System.out.println(" relocationTilePosition recalculate desiredPosition None");
+//					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition None");
 					continue;
 				}else{
 					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
+//					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 				}
 			}
 

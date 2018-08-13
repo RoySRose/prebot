@@ -99,15 +99,15 @@ public class UpgradeSelector implements Selector<MetaType>{
 				if ((Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 2 && myFactoryUnitSupplyCount > 140)
 						|| (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) >= 3 && myFactoryUnitSupplyCount > 80)) {
 	
-					if (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 1 && armory.canUpgrade(UpgradeType.Terran_Vehicle_Plating)) {
-						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
-							//BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
-							metaType =  new MetaType(UpgradeType.Terran_Vehicle_Plating);
-						}
-					} else if (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 2 && armory.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)) {// 3단계
+					if (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 2 && armory.canUpgrade(UpgradeType.Terran_Vehicle_Weapons)) {// 3단계
 						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Weapons) == 0) {
 							//BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Weapons, false);
 							metaType =  new MetaType(UpgradeType.Terran_Vehicle_Weapons);
+						}
+					}else if (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 1 && armory.canUpgrade(UpgradeType.Terran_Vehicle_Plating)) {
+						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
+							//BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Terran_Vehicle_Plating, false);
+							metaType =  new MetaType(UpgradeType.Terran_Vehicle_Plating);
 						}
 					} else if (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 2 && armory.canUpgrade(UpgradeType.Terran_Vehicle_Plating)) {
 						if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Terran_Vehicle_Plating) == 0) {
