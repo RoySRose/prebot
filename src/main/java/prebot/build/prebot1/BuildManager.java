@@ -27,6 +27,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -635,8 +636,10 @@ public class BuildManager extends GameManager {
                 }
             }
 
+//	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before desiredPosition :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-
+//            FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition after desiredPosition :: "+ unitType + " :: " + desiredPosition);
+            
             if(desiredPosition == null) {
 //            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
@@ -649,6 +652,10 @@ public class BuildManager extends GameManager {
                 }
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.LastBuilingPoint) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
+                }
+                if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.NextExpansionPoint) {
+                	System.out.println("No Place for Command Center. wait or no construct");
+                	break;
                 }
             }else {
 //            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ desiredPosition + " :: " + seedPositionStrategy);

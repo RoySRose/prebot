@@ -894,6 +894,7 @@ public class InformationManager extends GameManager {
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC);
 			if (numberOfCC == 2) {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, true);
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
@@ -994,7 +995,7 @@ public class InformationManager extends GameManager {
 		double closestDistance = 1000000000;
 		double closestDistanceToSecondExp = 0;
 
-		FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start");
+//		FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start");
 		
 		for (BaseLocation base : bases) {
 			if (onlyStartLocation && !base.isStartLocation())
@@ -1004,11 +1005,11 @@ public class InformationManager extends GameManager {
 			if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
 				continue;
 			
-			FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start :: 1");
+//			FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation chk this base ::" + base.getTilePosition());
 
 			if (isMulti) {
 				
-				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation isMulti True");
+//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation isMulti True");
 
 				if (firstExpansionLocation.get(enemyPlayer) != null) {
 					if (base.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
@@ -1042,17 +1043,19 @@ public class InformationManager extends GameManager {
 			closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
-				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + closeFromMyExpansionButFarFromEnemy +" < " + closestDistance);
+//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + closeFromMyExpansionButFarFromEnemy +" < " + closestDistance);
 				if(thirdPosition) {
-					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
 					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
 					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
 						closestDistanceToSecondExp = distanceToSecondExpansion;
 						closestDistance = closeFromMyExpansionButFarFromEnemy;
+//						FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation set resultBase :: " + base.getTilePosition());
 						resultBase = base;
 					}
 				}else {
 					closestDistance = closeFromMyExpansionButFarFromEnemy;
+//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation set resultBase :: " + base.getTilePosition());
 					resultBase = base;	
 				}
 			}

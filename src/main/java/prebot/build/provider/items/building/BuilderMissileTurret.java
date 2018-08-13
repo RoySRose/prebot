@@ -20,6 +20,8 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderMissileTurret extends DefaultBuildableItem {
 
@@ -61,6 +63,20 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int max_turret = 1;
 		
+		int add_turret = 0;
+		
+		if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DARK_DROP
+			|| StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK
+			 || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_ROBOTICS_REAVER) {
+			add_turret = 1;
+		}
+		
+//		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Protoss_Dark_Templar)||UnitUtils.enemyCompleteUnitDiscovered(UnitType.Protoss_Shuttle)) {
+//			max_turret = 2;
+//		}
+//		
+		
+		
 		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Mutalisk)) {
 			max_turret = 3;
 		}
@@ -77,7 +93,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
-		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, max_turret)) {
+		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, max_turret+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());

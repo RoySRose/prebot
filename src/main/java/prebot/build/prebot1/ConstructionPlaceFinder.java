@@ -123,6 +123,7 @@ public class ConstructionPlaceFinder {
             case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
                 BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
                 if (nextExpansionLocation != null) {
+//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + seedPosition);
                     desiredPosition = getBuildLocationNear(buildingType, nextExpansionLocation.getTilePosition());
                 } else {
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition());
@@ -223,62 +224,6 @@ public class ConstructionPlaceFinder {
 		int buildingGapSpace = getBuildingSpaceGap(buildingType, desiredPosition, methodFix, spaceZero, constructionPlaceSearchMethod);
 
 		TilePosition buildPosition = TilePosition.None;
-		// ResourceDepot (Nexus, Command Center, Hatchery),
-		// Protoss_Pylon, Terran_Supply_Depot, 
-		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 
-		// buildingGapSpace을 다른 Config 값으로 설정하도록 한다
-		
-/*		
-//		getBuildingSpaceGap 에 같은 내용으로 값을 리턴하므로 주석처리
-		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
-		}
-		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
-			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
-			if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
-				buildingGapSpace=0;
-			}
-//			20180719. hkk. 저그전에 대비해서 첫서플과 두번째 서플은 건물들을 붙여지어야 함
-			if( (desiredPosition.getX() == BlockingEntrance.Instance().first_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().first_supple.getY())
-			|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())){
-				buildingGapSpace = 0;
-			}
-			if(methodFix == true){
-				buildingGapSpace=1;
-			}
-			if(spaceZero == true){
-				buildingGapSpace=0;
-			}
-		}
-		
-		else if (buildingType == UnitType.Terran_Missile_Turret) {
-			buildingGapSpace = BuildConfig.BUILDING_DEFENSE_TOWER_SPACING;
-			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-				if(desiredPosition == BlockingEntrance.Instance().entrance_turret1) {
-					buildingGapSpace = 0;
-					FileUtils.appendTextToFile("log.txt","\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
-				}
-			}
-			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
-				if(desiredPosition == BlockingEntrance.Instance().entrance_turret2) {
-					buildingGapSpace = 0;
-					FileUtils.appendTextToFile("log.txt","\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
-				}
-			}
-		}else if (buildingType == UnitType.Terran_Bunker) {
-			buildingGapSpace = 0;
-		}
-		
-//		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
-		if( (desiredPosition == BlockingEntrance.Instance().first_supple)
-			|| (desiredPosition == BlockingEntrance.Instance().second_supple)
-			|| (desiredPosition == BlockingEntrance.Instance().starport1)
-			|| (desiredPosition == BlockingEntrance.Instance().starport2)
-			|| (desiredPosition == BlockingEntrance.Instance().factory)
-			|| (desiredPosition == BlockingEntrance.Instance().barrack)){	
-			buildingGapSpace = 0;
-		}
-*/
 		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
 			while (buildingGapSpace >= 0) {
