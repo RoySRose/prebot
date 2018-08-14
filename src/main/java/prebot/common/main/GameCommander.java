@@ -66,8 +66,16 @@ public class GameCommander {
 	Unit geyser= null;
 	boolean sout =false;
 	/// 경기 진행 중 매 프레임마다 발생하는 이벤트를 처리합니다
-	
-	
+
+
+    void temp2() {
+
+        System.out.println("Zerg_Lair price : " + UnitType.Zerg_Lair.mineralPrice() + ", " + UnitType.Zerg_Lair.gasPrice());
+        System.out.println("Zerg_Egg price : " + UnitType.Zerg_Egg.mineralPrice() + ", " + UnitType.Zerg_Egg.gasPrice());
+        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Lurker_Egg.mineralPrice() + ", " + UnitType.Zerg_Lurker_Egg.gasPrice());
+        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Cocoon.mineralPrice() + ", " + UnitType.Zerg_Cocoon.gasPrice());
+
+    }
 	void temp() {
 		Unit depot = null;
 		for (Unit unit : Prebot.Broodwar.getAllUnits())
@@ -153,6 +161,7 @@ public class GameCommander {
 			
 			AttackDecisionMaker.Instance().updateTimeCheck();
 			//temp();
+            temp2();
 				
 			logObserver.observe();
 			BigWatch.record("... GAME COMMANDER ...");
