@@ -214,7 +214,7 @@ public class UXManager {
 	}
 
     private void drawExpectedResource() {
-	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyCommandInfoMap;
+	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyResourceDepotInfoMap;
 
 	    int y=10;
 	    if (enemyCommandInfoMap.size() == 0){
@@ -227,14 +227,21 @@ public class UXManager {
                 UnitInfo unitInfo = entry.getKey();
                 EnemyCommandInfo enemyCommandInfo = entry.getValue();
 
+                if(AttackDecisionMaker.Instance().skipResourceDepot.size() ==0){
+                    Prebot.Broodwar.drawTextScreen(10, y += 10, "skipped base : no skipped base");
+                }else {
+                    for (UnitInfo skip : AttackDecisionMaker.Instance().skipResourceDepot) {
+                        Prebot.Broodwar.drawTextScreen(10, y += 10, "skipped base : " + skip.getLastPosition());
+                    }
+                }
                 Prebot.Broodwar.drawTextScreen(10, y+=10, k++ + " base"  + unitInfo.getLastPosition() + ", " + enemyCommandInfo.mineralCalculator.getMineralCount());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "has gas: "  + enemyCommandInfo.gasCalculator.geyser.getPosition());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(real)   : " + enemyCommandInfo.mineralCalculator.getRealMineral());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(predict): " + enemyCommandInfo.getMineral());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.realGas);
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(predict)    : " + enemyCommandInfo.getGas());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "has gas: "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(real)   : " + enemyCommandInfo.mineralCalculator.getFullCheckMineral());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(r+p):   : " + enemyCommandInfo.getMineral());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(r+p)        : " + enemyCommandInfo.getGas());
                 Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt(real)    : " + enemyCommandInfo.workerCounter.realWorkerCount);
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt(predict) : " + enemyCommandInfo.workerCounter.getWorkerCount());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt(r+p)     : " + enemyCommandInfo.workerCounter.getWorkerCount(enemyCommandInfo.mineralCalculator.getMineralCount()));
                 Prebot.Broodwar.drawTextScreen(10, y+=10, "lastchk         : " + enemyCommandInfo.lastCheckFrame);
                 Prebot.Broodwar.drawTextScreen(10, y+=10, "fwrkcnt         : " + enemyCommandInfo.lastFullCheckWorkerCount);
                 Prebot.Broodwar.drawTextScreen(10, y+=10, "flastchk        : " + enemyCommandInfo.lastFullCheckFrame);
