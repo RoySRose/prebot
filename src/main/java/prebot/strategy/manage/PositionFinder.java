@@ -12,14 +12,12 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -141,7 +139,7 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int READY_TO_SUPPLY = 30 * 4;
+				int READY_TO_SUPPLY = 27 * 4;
 				int SECOND_CHOKE_MARGIN = 10 * 4;
 				int FIRST_EXPANSION_MARGIN = 2 * 4;
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
@@ -324,6 +322,20 @@ public class PositionFinder {
 		int sumOfTotalX = 0;
 		int sumOfTotalY = 0;
 		int totalCount = 0;
+
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		for (UnitInfo eui : euiList) {
+			if (!TargetFilter.excludeByFilter(eui, TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE|TargetFilter.SPIDER_MINE|TargetFilter.BUILDING|TargetFilter.WORKER)) {
+				sumOfTotalX += eui.getLastPosition().getX();
+				sumOfTotalY += eui.getLastPosition().getY();
+				totalCount++;
+			}
+		}
+
+		Set<UnitInfo> euiListNear = new HashSet<>();
+		euiListNear.addAll(InfoUtils.euiListInBase());
+		euiListNear.addAll(InfoUtils.euiListInExpansion());
+		euiListNear.addAll(InfoUtils.euiListInThirdRegion());
 		
 		int sumOfAirX = 0;
 		int sumOfAirY = 0;
@@ -336,89 +348,50 @@ public class PositionFinder {
 		int sumOfDropX = 0;
 		int sumOfDropY = 0;
 		int dropCount = 0;
-
-		Position myFirstExpansionPosition = InfoUtils.myFirstExpansion().getPosition();
-
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
-		List<UnitInfo> closeEuiList = new ArrayList<>();
-
-		double closestDistance = CommonCode.DOUBLE_MAX;
-		UnitInfo closestEui = null;
-		for (UnitInfo eui : euiList) {
-			if (eui.getType().isWorker() || eui.getType().isBuilding()) {
-				continue;
-			}
-			if (eui.getType().groundWeapon() == WeaponType.None && eui.getType().airWeapon() == WeaponType.None) {
-				continue;
-			}
-			if (eui.getType() == UnitType.Terran_Vulture_Spider_Mine) {
-				continue;
-			}
-			if (UnitUtils.ignorableEnemyUnitInfo(eui)) {
-				continue;
-			}
-			double distance = myFirstExpansionPosition.getDistance(eui.getLastPosition());
-			if (distance <= 1250) {
-				if (distance < closestDistance) {
-					closestEui = eui;
-					closestDistance = distance;
-				}
-				closeEuiList.add(eui);
-			}
-			sumOfTotalX += eui.getLastPosition().getX();
-			sumOfTotalY += eui.getLastPosition().getY();
-			totalCount++;
-		}
 		
-		for (UnitInfo eui : closeEuiList) {
-			Position euiPosition = eui.getLastPosition();
-			Position closestEuiPosition = closestEui.getLastPosition();
-			if (euiPosition.getDistance(closestEuiPosition) > 400) {
+		for (UnitInfo eui : euiListNear) {
+			if (!MicroUtils.combatEnemyType(eui.getType())) {
 				continue;
 			}
-			
-			if (eui.getType().isFlyer()) {
-				sumOfAirX += euiPosition.getX();
-				sumOfAirY += euiPosition.getY();
+			if (UnitUtils.unitInSight(eui) == null) {
+				continue;
+			}
+			if (eui.getType() == UnitType.Terran_Dropship || eui.getType() == UnitType.Protoss_Shuttle) {
+				sumOfDropX += eui.getLastPosition().getX();
+				sumOfDropY += eui.getLastPosition().getY();
+				dropCount++;
+				
+			} else if (eui.getType().isFlyer()) {
+				sumOfAirX += eui.getLastPosition().getX();
+				sumOfAirY += eui.getLastPosition().getY();
 				airCount++;
+				
 			} else {
-				sumOfGroundX += euiPosition.getX();
-				sumOfGroundY += euiPosition.getY();
+				sumOfGroundX += eui.getLastPosition().getX();
+				sumOfGroundY += eui.getLastPosition().getY();
 				groundCount++;
 			}
-			
-			if (eui.getType() == UnitType.Zerg_Overlord || eui.getType() == UnitType.Terran_Dropship || eui.getType() == UnitType.Protoss_Shuttle) {
-				sumOfDropX += euiPosition.getX();
-				sumOfDropY += euiPosition.getY();
-				dropCount++;
-			}
 		}
 		
 
-		Position totalEnemyCneterPosition;
-		Position nearGroundEnemyPosition;
-		Position nearAirEnemyPosition;
-		Position dropEnemyPosition;
+		Position totalEnemyCneterPosition = Position.Unknown;
+		Position nearGroundEnemyPosition = Position.Unknown;
+		Position nearAirEnemyPosition = Position.Unknown;
+		Position dropEnemyPosition = Position.Unknown;
+		
 		if (totalCount > 0) {
-			totalEnemyCneterPosition = new Position(sumOfTotalX / totalCount, sumOfTotalY / totalCount);
-		} else {
-			totalEnemyCneterPosition = Position.Unknown;
+			totalEnemyCneterPosition = new Position(sumOfTotalX / totalCount, sumOfTotalY / totalCount).makeValid();
 		}
 		if (groundCount > 0) {
 			nearGroundEnemyPosition = new Position(sumOfGroundX / groundCount, sumOfGroundY / groundCount).makeValid();
-		} else {
-			nearGroundEnemyPosition = Position.Unknown;
 		}
 		if (airCount > 0) {
 			nearAirEnemyPosition = new Position(sumOfAirX / airCount, sumOfAirY / airCount).makeValid();
-		} else {
-			nearAirEnemyPosition = Position.Unknown;
 		}
 		if (dropCount > 0) {
 			dropEnemyPosition = new Position(sumOfDropX / dropCount, sumOfDropY / dropCount).makeValid();
-		} else {
-			dropEnemyPosition = Position.Unknown;
 		}
+		
 		enemyGroundEffectivePostions[TimeUtils.elapsedFrames() % POSITION_EFFECTIVE_FRAME_SIZE] = nearGroundEnemyPosition;
 		enemyAirEffectivePostions[TimeUtils.elapsedFrames() % POSITION_EFFECTIVE_FRAME_SIZE] = nearAirEnemyPosition;
 
@@ -430,19 +403,18 @@ public class PositionFinder {
 		// 적 상태
 		EnemyUnitStatus enemyStatus;
 		
-		Region myRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
-		if (InfoUtils.euiListInMyRegion(myRegion).isEmpty()) {
+		if (!InfoUtils.euiListInBase().isEmpty()) {
+			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
+		} else {
 			if (StrategyIdea.nearGroundEnemyPosition != Position.Unknown
-					|| StrategyIdea.nearAirEnemyPosition != Position.Unknown) {
+					|| StrategyIdea.nearAirEnemyPosition != Position.Unknown
+					|| StrategyIdea.dropEnemyPosition != Position.Unknown) {
 				enemyStatus = EnemyUnitStatus.COMMING;	
 			} else {
 				enemyStatus = EnemyUnitStatus.SLEEPING;
 			}
-		} else {
-			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
 		}
 		StrategyIdea.enemyUnitStatus = enemyStatus;
-//		System.out.println(enemyStatus);
 	}
 	
 	private void updateWatcherPosition() {
@@ -749,13 +721,13 @@ public class PositionFinder {
 	}
 
 	private boolean enemyBaseDestroyed(BaseLocation enemyBase) {
-		if (!Prebot.Broodwar.isVisible(enemyBase.getTilePosition())) {
+		if (!Prebot.Broodwar.isExplored(enemyBase.getTilePosition())) {
 			return false;
 		}
 
-		List<Unit> enemyUnitList = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, enemyBase.getPosition(), 300,
+		Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.NO_FILTER, enemyBase.getPosition(), 300, false, false,
 				UnitType.Protoss_Nexus, UnitType.Terran_Command_Center, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive);
-		return enemyUnitList.isEmpty();
+		return euis.isEmpty();
 	}
 
 	// 쥐 함수
@@ -790,7 +762,7 @@ public class PositionFinder {
 		}
 		
 		// 제 3멀티 중에서 탐험되지 않은 지역
-		List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansionsSorted();
+		List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansions();
 		if (otherExpansions != null) {
 			for (BaseLocation otherExpansion : otherExpansions) {
 				if (!Prebot.Broodwar.isExplored(otherExpansion.getTilePosition())) {

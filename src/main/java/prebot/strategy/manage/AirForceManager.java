@@ -209,7 +209,6 @@ public class AirForceManager {
 		boolean enemyExpansionFirstCase = InfoUtils.enemyFirstExpansion().equals(firstBase) && InfoUtils.enemyBase().equals(secondBase);
 		if ((!enemyBaseFirstCase && !enemyExpansionFirstCase)
 				|| TimeUtils.elapsedFrames(offensePositionResetFrame) > 30 * TimeUtils.SECOND) {
-			System.out.println(TimeUtils.elapsedFrames(offensePositionResetFrame));
 			setOffensePositions();
 //			this.setRetreatPosition();
 			

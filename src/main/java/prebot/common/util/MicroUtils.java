@@ -360,7 +360,7 @@ public class MicroUtils {
 		if (!targetUnit.isDetected() && UnitUtils.availableScanningCount() == 0) {
 			catchTime -= TimeUtils.SECOND;
 		} else {
-			if (targetUnit.getType() == UnitType.Protoss_Dark_Templar) { // 다크를 죽여버린다.
+			if (targetUnit.getType() == UnitType.Zerg_Lurker || targetUnit.getType() == UnitType.Protoss_Dark_Templar) { // 다크를 죽여버린다.
 				cooltimeAttack = CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE;
 			}
 		}

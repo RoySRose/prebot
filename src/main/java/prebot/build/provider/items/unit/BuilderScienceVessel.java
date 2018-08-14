@@ -42,7 +42,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 	private int getMaxVesselCount() {
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
-				return 2;
+				return 3;
 			} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)) {
 				return 1;
 			}

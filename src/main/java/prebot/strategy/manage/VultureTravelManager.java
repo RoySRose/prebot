@@ -78,7 +78,7 @@ public class VultureTravelManager {
 		if (!travelSites.isEmpty()) {
 			return;
 		}
-		List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansionsSorted();
+		List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansions();
 		if (otherBases.isEmpty()) {
 			return;
 		}

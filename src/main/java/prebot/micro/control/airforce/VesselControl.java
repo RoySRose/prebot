@@ -106,7 +106,6 @@ public class VesselControl extends Control {
 				if (nearallies.size() > 2) {
 					if (invisibleEnemyUnit.getDistance(vessel) <= UnitType.Terran_Science_Vessel.sightRange() * 2 / 3) {
 						orderPosition = invisibleEnemyUnit.getPosition();// 움직이시오.
-						System.out.println(2);
 					}
 				}
 			}

@@ -30,13 +30,16 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
-import prebot.strategy.constant.StrategyConfig;
 
 public class ComsatControl extends Control {
+	private int scanUsedFrame = 0;
 	private int scanEnemySquadFrame = 10 * TimeUtils.MINUTE;
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		if (TimeUtils.elapsedFrames(scanUsedFrame) < 3 * TimeUtils.SECOND) {
+			return;
+		}
 		if (TimeUtils.executeRotation(0, 48)) {
 			return;
 		}
@@ -44,6 +47,7 @@ public class ComsatControl extends Control {
 		// 상대 클록 유닛
 		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
 		if (PositionUtils.isValidPosition(scanPosition)) {
+			System.out.println("scan for invisible time : " + TimeUtils.framesToTimeString(MapGrid.Instance().getCell(scanPosition).getTimeLastScan()));
 			if (!MapGrid.Instance().scanIsActiveAt(scanPosition)) {
 				Unit comsatMaxEnergy = null;
 				int maxEnergy = 50;
@@ -65,6 +69,7 @@ public class ComsatControl extends Control {
 					
 					MapGrid.Instance().scanAtPosition(scanPosition);
 					CommandUtils.useTechPosition(comsatMaxEnergy, TechType.Scanner_Sweep, scanPosition);
+					scanUsedFrame = TimeUtils.elapsedFrames();
 					return;
 				}
 			}
@@ -103,6 +108,7 @@ public class ComsatControl extends Control {
 			if (PositionUtils.isValidPosition(scanPositionForObservation)) {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
 				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
+				scanUsedFrame = TimeUtils.elapsedFrames();
 			}
 		}
 		
@@ -145,9 +151,12 @@ public class ComsatControl extends Control {
 				int weaponMaxRange = Prebot.Broodwar.self().weaponMaxRange(weaponType);
 				int weaponRangeMargin = 15; // 쉽게 스캔을 사용해 공격할 수 있도록 두는 여유값(조절필요)
 				if (!enemyUnit.isMoving()) {
-					weaponRangeMargin += 15;
+					weaponRangeMargin += 10;
 				}
 				int enemyUnitDistance = myAttackUnit.getDistance(enemyUnit);
+				
+//				System.out.println("1: " + enemyUnitDistance);
+//				System.out.println("2: " + (weaponMaxRange + weaponRangeMargin));
 				if (enemyUnitDistance < weaponMaxRange + weaponRangeMargin) {
 					myAttackUnitInWeaponRangeCount++;
 

@@ -27,7 +27,6 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -50,6 +49,8 @@ public class BuildManager extends GameManager {
 	public Boolean secondChokePointFull;
 	public Boolean fisrtSupplePointFull;
 	
+	private DesiredNotFoundLagProtector desiredNotFoundLagProtector = new DesiredNotFoundLagProtector();
+
 //	public boolean tank = false;
 	
 	/// static singleton 객체를 리턴합니다
@@ -73,7 +74,7 @@ public class BuildManager extends GameManager {
 		if (TimeUtils.executeRotation(4, LagObserver.managerRotationSize())) {
 			return;
 		}
-
+	
 		if (buildQueue.isEmpty()) {
 			return;
 		}
@@ -598,10 +599,17 @@ public class BuildManager extends GameManager {
 	// SeedPositionSpecified 이 아닌 경우에는 seedLocationStrategy 를 조금씩 바꿔가며 계속 찾아본다.<br>
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
+//		if (desiredNotFoundLagProtector.isSuspended(unitType)) {
+//			return null;
+//		}
 
         TilePosition desiredPosition = null;
 
-	    while(true) {
+        int count = 0;
+//		while (count < 15) {
+		while (true) {
+	    	count++;
+	    	
 //	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
                 if (mainBaseLocationFull) {
@@ -662,57 +670,8 @@ public class BuildManager extends GameManager {
             	break;
             }
         }
-//		// desiredPosition 을 찾을 수 없는 경우
-//		boolean findAnotherPlace = true;
-//		while (desiredPosition == TilePosition.None) {
-//
-//			switch (seedPositionStrategy) {
-//                case MainBaseLocation:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
-//                    break;
-//                case MainBaseBackYard:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
-//                    break;
-//                case FirstChokePoint:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
-//                    break;
-//                case FirstExpansionLocation:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
-//                    break;
-//                case SecondChokePoint:// 끝까지 상대 location 못 찾았을때
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
-//                    break;
-//                case NextExpansionPoint:
-//                    System.out.println("이런 일이 생기면 절대 안됨! 다음 멀티 포지션을 못 찾다니!! 이거 뜨면 Roy에게 알려줄것");
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
-//                    break;
-//                case NextSupplePoint:
-//                    System.out.println("이런 일은 딱 한번 말고는 생기면 안될거 같은데... 다음 서플 포지션은 항상 찾는다!! 이거 뜨면 Roy에게 알려줄것");
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-//                    break;
-//                case SecondMainBaseLocation:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.LastBuilingPoint;
-//                    break;
-//                case LastBuilingPoint:
-//                    seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.getLastBuilingFinalLocation;
-//                    break;
-//                case getLastBuilingFinalLocation:
-//                    break;
-//
-//                case SeedPositionSpecified:
-//                default:
-//                    findAnotherPlace = false;
-//                    break;
-//			}
-//
-//			// 다른 곳을 더 찾아본다
-//			if (findAnotherPlace) {
-//				desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-//			}
-//			// @@@@@@ 여기서 포기하면 됨? 다른 곳을 더 찾아보지 않고, 끝낸다
-//			else {
-//				break;
-//			}
+//		if (desiredPosition == null) {
+//			desiredNotFoundLagProtector.update(unitType);
 //		}
 
 		return desiredPosition;

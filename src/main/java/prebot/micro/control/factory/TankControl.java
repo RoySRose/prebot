@@ -233,7 +233,11 @@ public class TankControl extends Control {
 							}
 
 						} else {
-							CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
+							if (tank.getGroundWeaponCooldown() > 25) { // UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() = 37
+								tank.move(StrategyIdea.mainPosition);
+							} else {
+								CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
+							}
 						}
 					}
 				}

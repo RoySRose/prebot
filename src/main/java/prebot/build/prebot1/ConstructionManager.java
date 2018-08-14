@@ -19,7 +19,6 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -74,12 +73,18 @@ public class ConstructionManager extends GameManager {
 //		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: " + b.getDesiredPosition());
 	}
 
-	/// constructionQueue 에서 ConstructionTask 를 취소합니다
+	
 	public void cancelConstructionTask(UnitType type, TilePosition desiredPosition)
 	{
 		reservedMinerals -= type.mineralPrice();
 		reservedGas -= type.gasPrice();
 
+		cancelConstructionTaskDoNotReturnResources(type, desiredPosition);
+	}
+	
+	/// constructionQueue 에서 ConstructionTask 를 취소합니다
+	public void cancelConstructionTaskDoNotReturnResources(UnitType type, TilePosition desiredPosition)
+	{
 		ConstructionTask b = new ConstructionTask(type, desiredPosition);
 	    if (constructionQueue.contains(b))
 	    {
@@ -732,7 +737,7 @@ public class ConstructionManager extends GameManager {
 			if (cancelConstruction) {
 				cancelBuildingIds.remove(unit.getID());
 				unit.cancelConstruction();
-				cancelConstructionTask(unit.getType(), unit.getTilePosition());
+				cancelConstructionTaskDoNotReturnResources(unit.getType(), unit.getTilePosition());
 			}
 		}
 	}
