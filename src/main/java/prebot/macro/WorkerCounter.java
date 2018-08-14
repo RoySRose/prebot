@@ -34,8 +34,9 @@ public class WorkerCounter {
         this.realWorkerCount = realWorkerCount;
     }
 
-    public int getWorkerCount() {
-        return (int)(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
+    public int getWorkerCount(int maxWorker) {
+        int result=(int)(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
+        return result > maxWorker ? maxWorker : result ;
     }
 
 //    private final void recalculateWorkerTrainRate(int realWorkerCount) {
