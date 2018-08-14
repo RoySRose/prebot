@@ -12,6 +12,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -51,29 +52,21 @@ public class GundamControl extends Control {
 				CommandUtils.attackUnit(combatScv, euiWorker.getUnit());
 		}
 		
-		if(InformationManager.Instance().isBlockingEnterance() 
-				|| UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture).size() > 0){
-			return;
-		}else{
-			for (Unit worker : unitList) {
-				if (skipControl(worker)) {
-					continue;
-				}
-				UnitInfo eui = scvTargetMap.get(worker.getID());
-				
-				if (eui != null) {
-					CommandUtils.attackUnit(worker, eui.getUnit());
-				} else {
-					UnitInfo enemyUnitInfo = getClosestEnemyUnitFromWorker(enemyUnit, worker);
-					//Unit unitInSight = UnitUtils.unitInSight(closeBuildingInfo);
-					if (enemyUnitInfo != null) {
-						WorkerManager.Instance().setCombatWorker(worker);
-						CommandUtils.attackUnit(worker, enemyUnitInfo.getUnit());
-					} else {
-						WorkerManager.Instance().setCombatWorker(worker);
-						CommandUtils.attackMove(worker, StrategyIdea.campPosition);
-					}
-				}
+		for (Unit worker : unitList) {
+			if (skipControl(worker)) {
+				continue;
+			}
+			UnitInfo eui = scvTargetMap.get(worker.getID());
+			
+			if (eui != null) {
+				CommandUtils.attackUnit(worker, eui.getUnit());
+			} else {
+				UnitInfo enemyUnitInfo = getClosestEnemyUnitFromWorker(enemyUnit, worker);
+				//Unit unitInSight = UnitUtils.unitInSight(closeBuildingInfo);
+				if (enemyUnitInfo != null) {
+					WorkerManager.Instance().setCombatWorker(worker);
+					CommandUtils.attackUnit(worker, enemyUnitInfo.getUnit());
+				} 
 			}
 		}
 		

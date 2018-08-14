@@ -82,6 +82,7 @@ public class InformationManager extends GameManager {
 
 	// 입막시 방어 안전 위치
 	private Position safePosition;
+	private Position holdConPosition;
 
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
 	/// 처음에는 StartLocation 으로 지정. mainBaseLocation 내 모든 건물이 파괴될 경우 재지정<br>
@@ -166,6 +167,7 @@ public class InformationManager extends GameManager {
 		firstBarrack = null;
 
 		safePosition = null;
+		holdConPosition = null;
 		secondStartPosition = null;
 //		MainBaseSuppleLimit =0;
 
@@ -1603,6 +1605,10 @@ public class InformationManager extends GameManager {
 	public Position isSafePosition() {
 		return safePosition;
 	}
+	
+	public Position isHoldConPosition() {
+		return holdConPosition;
+	}
 
 //	public int getMainBaseSuppleLimit() {
 //		return MainBaseSuppleLimit;
@@ -2111,6 +2117,7 @@ public class InformationManager extends GameManager {
 				firstSupple = true;
 				if (safePosition == null) {
 					earlyDefenseSafePosition(UnitType.Terran_Marine, supple);
+					earlyDefenseHoldePosition(UnitType.Terran_Marine, supple);
 				}
 			} else if (supple.getTilePosition().equals(secondSupplePos)) {
 				secondSupple = true;
@@ -2141,10 +2148,33 @@ public class InformationManager extends GameManager {
 		final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
 
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
-		int moveCalcSize = (int) (unitType.topSpeed() * 30);
+		int moveCalcSize = (int) (unitType.topSpeed() * 15);
 		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
 				(int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
 		safePosition = new Position(supple.getPosition().getX() + fleeVector.getX(),
+				supple.getPosition().getY() + fleeVector.getY()); // 회피지점
+
+	}
+	
+	/* 입막시 마린 홀드컨트롤 지역 (다른 유닛 필요시 사용) */
+	public void earlyDefenseHoldePosition(UnitType unitType, Unit supple) {
+		Position firstCheokePoint = InformationManager.Instance()
+				.getFirstChokePoint(InformationManager.Instance().selfPlayer).getCenter();
+
+		int reverseX = firstCheokePoint.getX() - supple.getPosition().getX(); // 타겟과 반대로 가는 x양
+		int reverseY = firstCheokePoint.getY() - supple.getPosition().getY(); // 타겟과 반대로 가는 y양
+		final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
+
+		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
+		int moveCalcSize = (int) (unitType.topSpeed() * 40);
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+			moveCalcSize = (int) (unitType.topSpeed() * 40);
+		}else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+			 moveCalcSize = (int) (unitType.topSpeed() * 30);
+		}
+		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
+				(int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
+		holdConPosition = new Position(supple.getPosition().getX() + fleeVector.getX(),
 				supple.getPosition().getY() + fleeVector.getY()); // 회피지점
 
 	}

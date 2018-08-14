@@ -57,11 +57,12 @@ public class EarlyDefenseSquad extends Squad {
 		for (Unit unit : assignableUnitList) {
 			if (unit.getType() == UnitType.Terran_Marine && unit.isCompleted()) {
 				marineList.add(unit);
-			} else if (unit.getType() == UnitType.Terran_SCV && WorkerManager.Instance().getWorkerData().getWorkerJob(unit) != WorkerJob.Scout) {
+			} else if (unit.getType() == UnitType.Terran_SCV 
+					&& WorkerManager.Instance().getWorkerData().getWorkerJob(unit) != WorkerJob.Scout) {
 				scvList.add(unit);
 			}
 		}
-		if (StrategyIdea.enemyUnitStatus == EnemyUnitStatus.IN_MY_REGION && !InformationManager.Instance().isBlockingEnterance()) {
+		if (!InfoUtils.euiListInBase().isEmpty()) {
 			return defenseForScvAndMarine(marineList, scvList, euiList);
 		} else {
 			return marineList;
@@ -84,17 +85,15 @@ public class EarlyDefenseSquad extends Squad {
 		}
 		
 		// 얼마나 SCV 동원이 필요한지 체크
-		double scvCountForDefense = scvCountForDefense(enemyInSightList);
+		double scvCountForDefense = scvCountForDefense(enemyInSightList,marineList);
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
-		scvCountForDefense = (scvCountForDefense > workerData.getNumWorkers() -3) ? scvCountForDefense-3 : scvCountForDefense;
+		scvCountForDefense = (scvCountForDefense > workerData.getNumWorkers() -3) ? workerData.getNumWorkers() -3 : scvCountForDefense;
 		/*유닛이 줄었을때 필요일꾼 만큼만 스쿼드 유지 나머지는 idle*/
 		while(marineList.size() + unitList.size() > scvCountForDefense){
 			SquadData squadData = new SquadData();
 			Unit defenseScv = UnitUtils.getFarthestCombatWorkerToPosition(unitList, closeEnemyUnit.getPosition());
 			if (defenseScv == null) {
 				break;
-			}
-			for (Unit unit : unitList) {
 			}
 			
 			squadData.exclude(defenseScv);
@@ -103,14 +102,15 @@ public class EarlyDefenseSquad extends Squad {
 				
 		//List<Unit> myUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, closeEnemyUnit.getPosition(), REACT_RADIUS); 
 		//if (myUnitList.isEmpty() && !marineList.isEmpty()) {
-		if(!marineList.isEmpty()){
+		/*if(!marineList.isEmpty()){
 			return marineList;
-		}
+		}*/
 		
 		
 		
 		List<Unit> recruitScvList = new ArrayList<>();
-		while (unitList.size() + marineList.size()+ recruitScvList.size()< scvCountForDefense) {
+		recruitScvList = marineList;
+		while (unitList.size() + marineList.size() < scvCountForDefense) {
 			Unit defenseScv = UnitUtils.getClosestMineralWorkerToPosition(scvList, closeEnemyUnit.getPosition());
 			if (defenseScv == null) {
 				break;
@@ -122,14 +122,48 @@ public class EarlyDefenseSquad extends Squad {
 		return recruitScvList;
 	}
 
-	private double scvCountForDefense(List<Unit> enemyInSightList) {
+	private double scvCountForDefense(List<Unit> enemyInSightList,List<Unit> marineList) {
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = marineControl.getCompleteBunker(campRegion);
 		
 		double scvCountForDefense = 0.0;
 		for (Unit enemy : enemyInSightList) {
 			if (UnitUtils.isValidUnit(enemy)) {
+				System.out.println("InfoUtils.myBase().getPosition().getDistance(enemy.getUnit() : " + InfoUtils.myBase().getPosition().getDistance(enemy));
+				if(!enemy.getType().isWorker() 
+						&& !enemy.getType().isBuilding()
+						&& InfoUtils.myBase().getPosition().getDistance(enemy) > 300){
+					continue;
+				}
 				if (bunker == null) {
+					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
+						scvCountForDefense += 1.0;
+					} else if (enemy.getType() == UnitType.Terran_SCV) {
+						scvCountForDefense += 1.0;
+					} else if (enemy.getType() == UnitType.Protoss_Zealot) {
+						scvCountForDefense += 4;
+					} else if (enemy.getType() == UnitType.Zerg_Zergling) {
+						scvCountForDefense += 1;
+					}  else if (enemy.getType() == UnitType.Terran_Marine) {
+						scvCountForDefense += 2;
+					} else if (enemy.getType().isBuilding()) {
+						scvCountForDefense += 3;
+					} 
+				}else  if(bunker.getLoadedUnits().size() > 0 || marineList.size() >= 2){
+					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
+						scvCountForDefense += 1.0;
+					} else if (enemy.getType() == UnitType.Terran_SCV) {
+						scvCountForDefense += 1.0;
+					} else if (enemy.getType() == UnitType.Protoss_Zealot) {
+						scvCountForDefense += 2;
+					} else if (enemy.getType() == UnitType.Zerg_Zergling) {
+						scvCountForDefense += 1;
+					}  else if (enemy.getType() == UnitType.Terran_Marine) {
+						scvCountForDefense += 1;
+					} else if (enemy.getType().isBuilding()) {
+						scvCountForDefense += 3;
+					} 
+				}else{
 					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
 						scvCountForDefense += 1.0;
 					} else if (enemy.getType() == UnitType.Terran_SCV) {
@@ -140,20 +174,6 @@ public class EarlyDefenseSquad extends Squad {
 						scvCountForDefense += 2;
 					}  else if (enemy.getType() == UnitType.Terran_Marine) {
 						scvCountForDefense += 2;
-					} else if (enemy.getType().isBuilding()) {
-						scvCountForDefense += 3;
-					} 
-				}else  if(bunker.getLoadedUnits().size() > 0){
-					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
-						scvCountForDefense += 1.0;
-					} else if (enemy.getType() == UnitType.Terran_SCV) {
-						scvCountForDefense += 1.0;
-					} else if (enemy.getType() == UnitType.Protoss_Zealot) {
-						scvCountForDefense += 2;
-					} else if (enemy.getType() == UnitType.Zerg_Zergling) {
-						scvCountForDefense += 1;
-					}  else if (enemy.getType() == UnitType.Terran_Marine) {
-						scvCountForDefense += 1;
 					} else if (enemy.getType().isBuilding()) {
 						scvCountForDefense += 3;
 					} 
@@ -170,7 +190,7 @@ public class EarlyDefenseSquad extends Squad {
 		List<UnitInfo> enemyUnitsInRegion = InfoUtils.euiListInMyRegion(InfoUtils.myBase().getRegion());
 		if (enemyUnitsInRegion.size() >= 1) {
 			for (UnitInfo enemy : enemyUnitsInRegion) {
-					euiList.add(enemy);
+				euiList.add(enemy);
 			}
 		}
 		for (Unit unit : unitList) {
