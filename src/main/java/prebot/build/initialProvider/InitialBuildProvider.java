@@ -109,6 +109,8 @@ public class InitialBuildProvider {
     		return;
     	}
     	
+    	System.out.println("Strategy ==> " + StrategyIdea.currentStrategy + " :: Expansion ==> " + StrategyIdea.expansionOption);
+    	
 		if (adaptStrategyStatus == AdaptStrategyStatus.BEFORE) {
 			if (BuildManager.Instance().buildQueue.isEmpty()) {
 				nowStrategy = StrategyIdea.expansionOption;

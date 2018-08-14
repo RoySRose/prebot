@@ -14,6 +14,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -124,6 +125,21 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				setBlocking(true);
 				setTilePosition(mySecondChoke.getCenter().toTilePosition());
 				return true;
+			}
+		}
+		
+		
+		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
+		if(commandCenters.size() > 1) {
+			for (Unit commandCenter : commandCenters) {
+				if (validMineralCountNearDepot(commandCenter) > 6) {
+					if (noTurretNearPosition(commandCenter.getPosition(), 350, 300, turretCount, max_turret+add_turret)) {
+						setHighPriority(true);
+						setBlocking(true);
+						setTilePosition(myBase.getPosition().toTilePosition());
+						return true;
+					}
+				}
 			}
 		}
 		

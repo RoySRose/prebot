@@ -174,6 +174,23 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         }
         return false;
     }
+    
+    public int validMineralCountNearDepot(Unit commandCenter) {
+		if (!UnitUtils.isValidUnit(commandCenter)) {
+			return 0;
+		}
+
+		int mineralsNearDepot = 0;
+		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()) {
+			if (mineral.getType() != UnitType.Resource_Mineral_Field) {
+				continue;
+			}
+			if (mineral.getDistance(commandCenter) < 450 && mineral.getResources() > 200) {
+				mineralsNearDepot++;
+			}
+		}
+		return mineralsNearDepot;
+	}
 
 
 }

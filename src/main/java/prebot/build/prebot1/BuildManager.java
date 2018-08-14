@@ -687,7 +687,15 @@ public class BuildManager extends GameManager {
 	// return whether or not we meet resources, including building reserves
 	public boolean hasEnoughResources(MetaType type) {
 		// return whether or not we meet the resources
-		return (type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas());
+//		FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
+//		return (type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas());
+		if((type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas())) {
+			FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
+			return true;
+		}
+		
+		return false;
+			
 	}
 
 	// selects a unit of a given type
