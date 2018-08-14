@@ -115,6 +115,12 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
 					}
+				} else if (UnitUtils.myUnitDiscovered(UnitType.Terran_Starport)) {
+					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith)) {
+						setCommandCenterBlockAndSeedPosition();
+						System.out.println("normal 2nd commandcenter - over 400 minerals");
+						return true;
+					}
 				} else {
 					setCommandCenterBlockAndSeedPosition();
 					System.out.println("normal 2nd commandcenter - over 400 minerals");

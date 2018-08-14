@@ -55,7 +55,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		}
 		
 		int machineShopCountIncludeQueue = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Machine_Shop);
-		if (machineShopCountIncludeQueue > maxCountByCommandCenter) {
+		if (machineShopCountIncludeQueue >= maxCountByCommandCenter) {
 			return false;
 		}
 		

@@ -159,11 +159,9 @@ public class MainAttackSquad extends Squad {
 		}
 
 		UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50, true, false);
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			for (Unit unit : unitList) {
-				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
-					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
-				}
+		for (Unit unit : unitList) {
+			if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
+				UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
 			}
 		}
 	}	

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import bwapi.Pair;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
@@ -140,30 +141,28 @@ public class PositionFinder {
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
 				int READY_TO_SUPPLY = 27 * 4;
-				int SECOND_CHOKE_MARGIN = 8 * 4;
 				int FIRST_EXPANSION_MARGIN = 2 * 4;
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-					SECOND_CHOKE_MARGIN = 2 * 4;
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
 				// 병력이 쌓였다면 second choke에서 방어한다.
 				if (StrategyIdea.campType == CampType.READY_TO) {
 					READY_TO_SUPPLY = 15 * 4;
-				} else if (StrategyIdea.campType == CampType.SECOND_CHOKE) {
-					SECOND_CHOKE_MARGIN = 0;
 				}
+				
+				// ready to로 이동
 				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
 					return CampType.READY_TO;
 				}
-				else if (myTankSupplyCount >= 8 * 4
-						|| factorySupplyCount >= enemyGroundUnitSupplyCount * 1.5 + SECOND_CHOKE_MARGIN) {
+				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY - 5 * 4 && UnitUtils.availableScanningCount() >= 1) { // ready to로 이동하기 위해 잠시 집결하는 위치
 					return CampType.SECOND_CHOKE;
 				}
+				
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-				else if (myTankSupplyCount >= 4 * 4
-						|| factorySupplyCount >= enemyGroundUnitSupplyCount * 1.5 + FIRST_EXPANSION_MARGIN
-						|| firstExpansionOccupied()) {
+				if (firstExpansionOccupied()
+						|| myTankSupplyCount >= 4 * 4
+						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 					return CampType.EXPANSION;
 				}
 //				System.out.println("###########################################");
@@ -176,6 +175,7 @@ public class PositionFinder {
 					return CampType.INSIDE;
 				}
 			}
+			return CampType.FIRST_CHOKE;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
 			
@@ -192,9 +192,11 @@ public class PositionFinder {
 					return CampType.EXPANSION;
 				}
 			}
+			return CampType.FIRST_CHOKE;
+			
+		} else {
+			return CampType.SECOND_CHOKE;
 		}
-
-		return CampType.FIRST_CHOKE;
 		
 
 //		if (InfoUtils.enemyRace() == Race.Protoss) {
@@ -672,14 +674,17 @@ public class PositionFinder {
 		
 		
 		Position myBasePosition = InfoUtils.myBase().getPosition();
-		Position secondChokePosition = InfoUtils.mySecondChoke().getCenter();
+		Pair<Position, Position> secondChokeSides = InfoUtils.mySecondChoke().getSides();
 		
-		int x = (myBasePosition.getX() + secondChokePosition.getX()) / 2;
-		int y = (myBasePosition.getY() + secondChokePosition.getY()) / 2;
-		x = (x + secondChokePosition.getX()) / 2;
-		y = (y + secondChokePosition.getY()) / 2;
+		double firstDistance = myBasePosition.getDistance(secondChokeSides.first);
+		double secondDistance = myBasePosition.getDistance(secondChokeSides.second);
 		
-		return firstExpansionBackwardPosition = new Position(x, y);
+		Position positionBaseSided = firstDistance < secondDistance ? secondChokeSides.first : secondChokeSides.second;
+
+		double radian = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
+		Position expansionDefensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 250);
+		
+		return firstExpansionBackwardPosition = expansionDefensePosition;
 
 		//First Expansion에서 약간 물러난 위치 (prebot 1 - overwatch, circuit 맵에 맞지 않음)
 //		double distanceFromFirstChoke = firstChoke.getDistance(secondChoke);

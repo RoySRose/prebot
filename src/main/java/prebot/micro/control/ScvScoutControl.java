@@ -14,7 +14,6 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonConfig.UxConfig;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
@@ -60,7 +59,8 @@ public class ScvScoutControl extends Control {
 			if (StrategyIdea.enemyBaseExpected != null) {
 				scoutBaseLocation = StrategyIdea.enemyBaseExpected;
 			} else {
-				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
+				// scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
+				scoutBaseLocation = notExloredFarthestBaseLocation(scoutScv);
 				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			}
 			for (UnitInfo eui : euiList) {
@@ -174,6 +174,17 @@ public class ScvScoutControl extends Control {
 			});
 		}
 		return notExploredBase;
+	}
+	
+	/** 본진에서 먼 곳부터 정찰 (대각선 정찰) */
+	private BaseLocation notExloredFarthestBaseLocation(Unit scv) {
+		BaseLocation notExploredFarthestBase = BaseLocationUtils.getGroundFarthestBaseToPosition(BWTA.getStartLocations(), InfoUtils.myBase(), new BaseCondition() {
+			@Override
+			public boolean correspond(BaseLocation base) {
+				return !Prebot.Broodwar.isExplored(base.getTilePosition());
+			}
+		});
+		return notExploredFarthestBase;
 	}
 
 	private Position getScoutFleePositionFromEnemyRegionVertices(Unit scoutWorker) {

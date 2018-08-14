@@ -72,6 +72,32 @@ public class BaseLocationUtils {
 		return closestBase;
 	}
 	
+	/** baseList 중 position에 가장 가까운 base 리턴 */
+	public static BaseLocation getGroundFarthestBaseToPosition(List<BaseLocation> baseList, BaseLocation fromBase, BaseCondition baseCondition) {
+		if (baseList.size() == 0) {
+			return null;
+		}
+
+		BaseLocation farthestBase = null;
+		double farthestDistance = CommonCode.DOUBLE_MAX;
+
+		for (BaseLocation base : baseList) {
+			if (!baseCondition.correspond(base)) {
+				continue;
+			}
+			if (base.equals(fromBase)) {
+				farthestBase = base;
+				break;
+			}
+			double dist = (double) (base.getGroundDistance(fromBase)  + 0.5);
+			if (farthestBase == null || dist > farthestDistance) {
+				farthestBase = base;
+				farthestDistance = dist;
+			}
+		}
+		return farthestBase;
+	}
+	
 	public static HashSet<TilePosition> getBaseLocationTileHashSet() {
 		HashSet<TilePosition> baseTileSet = new HashSet<>();
 		for (BaseLocation base : BWTA.getBaseLocations()) {
