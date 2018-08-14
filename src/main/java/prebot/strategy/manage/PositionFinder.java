@@ -140,7 +140,7 @@ public class PositionFinder {
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
 				int READY_TO_SUPPLY = 27 * 4;
-				int SECOND_CHOKE_MARGIN = 10 * 4;
+				int SECOND_CHOKE_MARGIN = 8 * 4;
 				int FIRST_EXPANSION_MARGIN = 2 * 4;
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					SECOND_CHOKE_MARGIN = 2 * 4;
@@ -153,7 +153,6 @@ public class PositionFinder {
 				} else if (StrategyIdea.campType == CampType.SECOND_CHOKE) {
 					SECOND_CHOKE_MARGIN = 0;
 				}
-				
 				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
 					return CampType.READY_TO;
 				}
@@ -308,11 +307,11 @@ public class PositionFinder {
 		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (leader != null) {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
-			StrategyIdea.mainSquadCoverRadius = 250 + (int) (Math.log(squad.unitList.size()) * 50);
+			StrategyIdea.mainSquadCoverRadius = 255 + (int) (Math.log(squad.unitList.size()) * 55);
 			StrategyIdea.mainSquadCenter = centerPosition;
 			StrategyIdea.mainSquadLeaderPosition = leader.getPosition();
 		} else {
-			StrategyIdea.mainSquadCoverRadius = 250;
+			StrategyIdea.mainSquadCoverRadius = 255;
 			StrategyIdea.mainSquadCenter = StrategyIdea.campPosition;
 			StrategyIdea.mainSquadLeaderPosition = StrategyIdea.campPosition;
 		}

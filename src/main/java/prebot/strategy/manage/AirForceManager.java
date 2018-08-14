@@ -443,7 +443,7 @@ public class AirForceManager {
 					levelDown = true;
 				}
 			} else if (InfoUtils.enemyRace() == Race.Zerg) {
-				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
+				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 100 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
 				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 히드라 발견
 					levelDown = true;

@@ -126,7 +126,7 @@ public class InitialBuildProvider {
         		// 폭파하기
         		cancelConstructionAndRemoveFromBuildQueue();
         		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
-				// adaptStrategyStatus = AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
+				adaptStrategyStatus = AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
         		
         	} else {
             	if (nowStrategy == ExpansionOption.TWO_FACTORY) {
