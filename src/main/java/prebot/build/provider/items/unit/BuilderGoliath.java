@@ -1,11 +1,13 @@
 package prebot.build.provider.items.unit;
 
+import bwapi.Race;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 
 public class BuilderGoliath extends DefaultBuildableItem {
@@ -36,7 +38,11 @@ public class BuilderGoliath extends DefaultBuildableItem {
 	    	}
     		
     		// 병력이 거의 꽉찼을 때 골리앗 생산
-    		if (Prebot.Broodwar.self().supplyUsed() > 380) {
+    		int goliathSupply = 370;
+    		if (InfoUtils.enemyRace() == Race.Zerg) {
+    			goliathSupply = 350;
+    		}
+    		if (Prebot.Broodwar.self().supplyUsed() >= goliathSupply) {
     			return true;
     		}
     	}

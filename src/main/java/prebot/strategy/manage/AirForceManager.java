@@ -501,7 +501,7 @@ public class AirForceManager {
 			} else {
 				upAchievement = +180;
 			}
-		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 24) {
+		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 14) { //24) {
 			downAchievement = -60;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +600;	

@@ -6,6 +6,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.StarportUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
 public class BuilderWraith extends DefaultBuildableItem {
@@ -29,6 +30,9 @@ public class BuilderWraith extends DefaultBuildableItem {
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) < maxWraithCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
+				if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
+					setHighPriority(true);
+				}
 				return true;
 			}
 		}

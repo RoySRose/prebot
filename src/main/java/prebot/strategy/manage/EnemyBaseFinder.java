@@ -39,66 +39,16 @@ public class EnemyBaseFinder {
 			return;
 		}
 		
-		BaseLocation baseExpected = expectedByBuilding();
-
-		if (baseExpected != null) {
-			StrategyIdea.enemyBaseExpected = baseExpected;
-		} else {
-			int scoutLimitFrames;
-			if (InfoUtils.enemyRace() == Race.Protoss) {
-				scoutLimitFrames = TimeUtils.timeToFrames(1, 40);
-			} else {
-				scoutLimitFrames = TimeUtils.timeToFrames(2, 0);
-			}
-			
-			if (TimeUtils.before(scoutLimitFrames)) {
-				BaseLocation expectedByScout = expectedByUnit();
-				if (expectedByScout != null) {
-					StrategyIdea.enemyBaseExpected = expectedByScout;
-				}
-			}
-			
+		BaseLocation expectedByBuilding = expectedByBuilding();
+		if (expectedByBuilding != null) {
+			StrategyIdea.enemyBaseExpected = expectedByBuilding;
+			return;
 		}
-	}
-
-	private BaseLocation expectedByUnit() {
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL
-				, UnitType.Protoss_Probe, UnitType.Zerg_Drone, UnitType.Terran_SCV, UnitType.Zerg_Overlord
-				, UnitType.Zerg_Zergling, UnitType.Protoss_Zealot, UnitType.Terran_Marine);
 		
-		if (euiList.isEmpty()) {
-			return null;
+		BaseLocation expectedByScout = expectedByUnit();
+		if (expectedByScout != null) {
+			StrategyIdea.enemyBaseExpected = expectedByScout;
 		}
-
-		Position scoutPosition = euiList.get(0).getLastPosition();
-		RegionType regionType = PositionUtils.positionToRegionType(scoutPosition);
-
-		Position fromPosition;
-		if (regionType == RegionType.MY_BASE || regionType == RegionType.MY_FIRST_EXPANSION) {
-			fromPosition = InfoUtils.myBase().getPosition();
-		} else {
-			fromPosition = euiList.get(0).getLastPosition();
-//			Prebot.Broodwar.sendText("hi");
-		}
-
-		BaseLocation closestBase = null;
-		int minimumDistance = CommonCode.INT_MAX;
-		BaseLocation myBase = InfoUtils.myBase();
-		for (BaseLocation startLocation : BWTA.getStartLocations()) {
-			if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
-				continue;
-			}
-			if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
-				continue;
-			}
-
-			int groundDistance = PositionUtils.getGroundDistance(startLocation.getPosition(), fromPosition);
-			if (groundDistance < minimumDistance) {
-				closestBase = startLocation;
-				minimumDistance = groundDistance;
-			}
-		}
-		return closestBase;
 	}
 
 	private BaseLocation expectedByBuilding() {
@@ -124,6 +74,56 @@ public class EnemyBaseFinder {
 			}
 		}
 		return baseExpected;
+	}
+
+	private BaseLocation expectedByUnit() {
+		int scoutLimitFrames;
+		if (InfoUtils.enemyRace() == Race.Protoss) {
+			scoutLimitFrames = TimeUtils.timeToFrames(1, 40);
+		} else {
+			scoutLimitFrames = TimeUtils.timeToFrames(2, 0);
+		}
+		
+		if (TimeUtils.after(scoutLimitFrames)) {
+			return null;
+		}
+		
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL
+				, UnitType.Protoss_Probe, UnitType.Zerg_Drone, UnitType.Terran_SCV, UnitType.Zerg_Overlord
+				, UnitType.Zerg_Zergling, UnitType.Protoss_Zealot, UnitType.Terran_Marine);
+		
+		if (euiList.isEmpty()) {
+			return null;
+		}
+
+		Position scoutPosition = euiList.get(0).getLastPosition();
+		RegionType regionType = PositionUtils.positionToRegionType(scoutPosition);
+
+		
+		if (regionType != RegionType.MY_BASE && regionType != RegionType.MY_FIRST_EXPANSION) {
+//			Prebot.Broodwar.sendText("hi");
+			return null;
+		}
+
+		Position fromPosition = InfoUtils.myBase().getPosition();
+		BaseLocation closestBase = null;
+		int minimumDistance = CommonCode.INT_MAX;
+		BaseLocation myBase = InfoUtils.myBase();
+		for (BaseLocation startLocation : BWTA.getStartLocations()) {
+			if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
+				continue;
+			}
+			if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+				continue;
+			}
+
+			int groundDistance = PositionUtils.getGroundDistance(startLocation.getPosition(), fromPosition);
+			if (groundDistance < minimumDistance) {
+				closestBase = startLocation;
+				minimumDistance = groundDistance;
+			}
+		}
+		return closestBase;
 	}
 
 }

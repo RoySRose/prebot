@@ -49,7 +49,7 @@ public class BuildManager extends GameManager {
 	public Boolean secondChokePointFull;
 	public Boolean fisrtSupplePointFull;
 	
-	private DesiredNotFoundLagProtector desiredNotFoundLagProtector = new DesiredNotFoundLagProtector();
+	private BuildManagerFailureProtector failureProtector = new BuildManagerFailureProtector();
 
 //	public boolean tank = false;
 	
@@ -110,6 +110,10 @@ public class BuildManager extends GameManager {
 
 		// while there is still something left in the buildQueue
 		while (!buildQueue.isEmpty()) {
+			if (failureProtector.isSuspended(currentItem.metaType)) {
+				break;
+			}
+			
 			boolean isOkToRemoveQueue = true;
 
 			// seedPosition 을 도출한다
@@ -229,6 +233,7 @@ public class BuildManager extends GameManager {
 									System.out.println(" re calculate desiredPosition :: " + desiredPosition.getX() + ","+ desiredPosition.getY());
 									ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 								}else {
+									failureProtector.update(currentItem.metaType);
 									isOkToRemoveQueue = false;
 								}
 							}
@@ -599,10 +604,6 @@ public class BuildManager extends GameManager {
 	// SeedPositionSpecified 이 아닌 경우에는 seedLocationStrategy 를 조금씩 바꿔가며 계속 찾아본다.<br>
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
-//		if (desiredNotFoundLagProtector.isSuspended(unitType)) {
-//			return null;
-//		}
-
         TilePosition desiredPosition = null;
 
         int count = 0;
@@ -670,10 +671,6 @@ public class BuildManager extends GameManager {
             	break;
             }
         }
-//		if (desiredPosition == null) {
-//			desiredNotFoundLagProtector.update(unitType);
-//		}
-
 		return desiredPosition;
 	}
 
