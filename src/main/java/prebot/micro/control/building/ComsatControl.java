@@ -19,7 +19,6 @@ import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -37,7 +36,7 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (TimeUtils.elapsedFrames(scanUsedFrame) < 3 * TimeUtils.SECOND) {
+		if (TimeUtils.elapsedFrames(scanUsedFrame) < 2 * TimeUtils.SECOND) {
 			return;
 		}
 		if (TimeUtils.executeRotation(0, 48)) {
@@ -47,7 +46,6 @@ public class ComsatControl extends Control {
 		// 상대 클록 유닛
 		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
 		if (PositionUtils.isValidPosition(scanPosition)) {
-			System.out.println("scan for invisible time : " + TimeUtils.framesToTimeString(MapGrid.Instance().getCell(scanPosition).getTimeLastScan()));
 			if (!MapGrid.Instance().scanIsActiveAt(scanPosition)) {
 				Unit comsatMaxEnergy = null;
 				int maxEnergy = 50;
@@ -68,8 +66,9 @@ public class ComsatControl extends Control {
 //					System.out.println("frames : " + TimeUtils.elapsedFrames());
 					
 					MapGrid.Instance().scanAtPosition(scanPosition);
-					CommandUtils.useTechPosition(comsatMaxEnergy, TechType.Scanner_Sweep, scanPosition);
+					comsatMaxEnergy.useTech(TechType.Scanner_Sweep, scanPosition);
 					scanUsedFrame = TimeUtils.elapsedFrames();
+					System.out.println("scan for invisible. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 					return;
 				}
 			}
@@ -109,6 +108,7 @@ public class ComsatControl extends Control {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
 				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
 				scanUsedFrame = TimeUtils.elapsedFrames();
+				System.out.println("scan for search. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 			}
 		}
 		

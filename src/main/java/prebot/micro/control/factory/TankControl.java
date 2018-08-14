@@ -66,7 +66,7 @@ public class TankControl extends Control {
 		
 		List<Integer> leaderGroupIds = new ArrayList<>();
 		if (StrategyIdea.mainSquadMode.isAttackMode && unitList.size() >= 3) {
-			int leaderGroupMaxSize = leaderGroupIds.size() / 3;
+			int leaderGroupMaxSize = unitList.size() / 3;
 			Unit leaderOfUnit = UnitUtils.leaderOfUnit(unitList);
 			if (leaderOfUnit != null) {
 				
@@ -79,7 +79,7 @@ public class TankControl extends Control {
 					leaderGroupIds.add(leaderOfUnit.getID());
 				}
 				for (Unit unit : unitList) {
-					if (leaderGroupMaxSize >= leaderGroupIds.size()) {
+					if (leaderGroupIds.size() > leaderGroupMaxSize) {
 						break;
 					}
 					if (unit.getID() == leaderOfUnit.getID() || unit.getDistance(leaderOfUnit) > 200) {

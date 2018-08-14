@@ -65,22 +65,22 @@ public class AirForceControl extends Control {
 		Decision decision = null;
 		Decision decisionDetail = null;
 		
-		boolean applyDefenseModeFree = false;
+		boolean applyDefenseModeFlee = false;
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
 			if (airForceTeam.repairCenter == null) {
 				if (dangerousOutOfMyRegion(airForceTeam.leaderUnit)) {
 					if (StrategyIdea.mainSquadMode.isAttackMode) {
-						applyDefenseModeFree = StrategyIdea.mainSquadCenter.getDistance(airForceTeam.leaderUnit) > StrategyIdea.mainSquadCoverRadius + 250;
-						if (!applyDefenseModeFree) {
+						applyDefenseModeFlee = StrategyIdea.mainSquadCenter.getDistance(airForceTeam.leaderUnit) > StrategyIdea.mainSquadCoverRadius + 250;
+						if (!applyDefenseModeFlee) {
 							Set<UnitInfo> killerInRadius = UnitUtils.getCompleteEnemyInfosInRadiusForAir(airForceTeam.leaderUnit.getPosition(), 120, UnitUtils.wraithKillerUnitType());
-							applyDefenseModeFree = !killerInRadius.isEmpty();
+							applyDefenseModeFlee = !killerInRadius.isEmpty();
 						}
 						
 					} else {
-						applyDefenseModeFree = true;
+						applyDefenseModeFlee = true;
 					}
 				}
-				if (applyDefenseModeFree) {
+				if (applyDefenseModeFlee) {
 					decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
 
 					// apply airforce decision
@@ -91,7 +91,7 @@ public class AirForceControl extends Control {
 			}
 		}
 		
-		if (!applyDefenseModeFree) {
+		if (!applyDefenseModeFlee) {
 			if (!airForceTeam.retreating()) {
 				decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList, AirForceManager.Instance().getStrikeLevel());
 			} else {

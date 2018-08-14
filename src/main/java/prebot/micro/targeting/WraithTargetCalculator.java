@@ -104,7 +104,8 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 				}
 			}
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
-			if (enemyUnit.getType() == UnitType.Zerg_Overlord || enemyUnit.getType() == UnitType.Zerg_Queen) {
+			if (enemyUnit.getType() == UnitType.Zerg_Overlord || enemyUnit.getType() == UnitType.Zerg_Queen
+					|| enemyUnit.getType() == UnitType.Zerg_Guardian || enemyUnit.getType() == UnitType.Zerg_Cocoon) {
 				return 300;
 			}
 		}
