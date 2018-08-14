@@ -1364,6 +1364,7 @@ public class ConstructionPlaceFinder {
 				for(int y = 0;  y < 3 ; y++){
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
 					tilesToAvoid.add(t);
+					tilesToAvoidFac.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
 				}
 			}

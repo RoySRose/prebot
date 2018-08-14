@@ -70,7 +70,7 @@ public class ConstructionManager extends GameManager {
 		reservedGas += type.gasPrice();
 
 		constructionQueue.add(b); // C++ : constructionQueue.push_back(b);
-//		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: " + b.getDesiredPosition());
+		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: reservedMinerals :: " + reservedMinerals  + " :: reservedGas :: " + reservedGas );
 	}
 
 	

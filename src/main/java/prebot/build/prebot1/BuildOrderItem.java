@@ -30,6 +30,7 @@ public class BuildOrderItem {
 		NextExpansionPoint,    		///< 다음 멀티 위치
 		NextSupplePoint,    		///< 다음 서플 위치
 		LastBuilingPoint,			///< 최종 건물 위치
+		FreeSpaceUsing,				///< 남는 여백 활용
         //LastBuilingPoint2,			///< 최종 건물 위치
 		getLastBuilingFinalLocation ///< 완전 더이상 없다
 	};
