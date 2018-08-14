@@ -225,22 +225,24 @@ public class InitialBuildProvider {
 					}
 				}
 			}
-
-			// 컨스트럭션 큐에서 지운다.
-			boolean notFirstOne = completeFirstFactory == null; // 큐에서 첫번째 있는 팩토리를 폭파시키지 않는다.
-			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Factory, notFirstOne);
-			
-			// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
-			if (removedFromConstructionQueue == 0) {
-				notFirstOne = completeFirstFactory == null && incompleteFirstFactory == null;
-				removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Factory, notFirstOne);
-			}
 			
 			// 완성되지 않은 팩토리를 취소한다. (첫번째 팩토리면 취소하지 않는다.)
 			for (Unit incompleteFactory : incompleteFactories) {
 				if (incompleteFirstFactory == null // completeFirstFactory가 있는 경우
 						|| incompleteFirstFactory.getID() != incompleteFactory.getID()) {
 					cancelBuildings.add(incompleteFactory);
+				}
+			}
+
+			if (cancelBuildings.isEmpty()) {
+				// 컨스트럭션 큐에서 지운다.
+				boolean notFirstOne = completeFirstFactory == null; // 큐에서 첫번째 있는 팩토리를 폭파시키지 않는다.
+				removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Factory, notFirstOne);
+				
+				// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
+				if (removedFromConstructionQueue == 0) {
+					notFirstOne = completeFirstFactory == null && incompleteFirstFactory == null;
+					removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Factory, notFirstOne);
 				}
 			}
 		}
@@ -264,22 +266,24 @@ public class InitialBuildProvider {
 					}
 				}
 			}
-
-			// 컨스트럭션 큐에서 지운다.
-			boolean notFirstOne = completeFirstStarport == null; // 큐에서 첫번째 있는 스타포트 폭파시키지 않는다.
-			removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, notFirstOne);
-			
-			// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
-			if (removedFromConstructionQueue == 0) {
-				notFirstOne = completeFirstStarport == null && incompleteFirstStarport == null;
-				removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, notFirstOne);
-			}
 			
 			// 완성되지 않은 스타포트를 취소한다. (첫번째 스타포트면 취소하지 않는다.)
 			for (Unit incompleteStarport : incompleteStarports) {
 				if (incompleteFirstStarport == null // completeFirstFactory가 있는 경우
 						|| incompleteFirstStarport.getID() != incompleteStarport.getID()) {
 					cancelBuildings.add(incompleteStarport);
+				}
+			}
+
+			if (cancelBuildings.isEmpty()) {
+				// 컨스트럭션 큐에서 지운다.
+				boolean notFirstOne = completeFirstStarport == null; // 큐에서 첫번째 있는 스타포트 폭파시키지 않는다.
+				removedFromConstructionQueue = deleteFromConstructionQueue(UnitType.Terran_Starport, notFirstOne);
+				
+				// 지워지지 않았다면 빌드큐에서 지운다.(건설 시작전)
+				if (removedFromConstructionQueue == 0) {
+					notFirstOne = completeFirstStarport == null && incompleteFirstStarport == null;
+					removedFromBuildQueue = deleteFromBuildQueue(UnitType.Terran_Starport, notFirstOne);
 				}
 			}
 		}

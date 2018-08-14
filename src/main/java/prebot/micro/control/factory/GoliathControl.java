@@ -53,6 +53,11 @@ public class GoliathControl extends Control {
 					CommandUtils.move(unit, StrategyIdea.campPosition);
 					continue;
 				}
+			} else {
+				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius * 3 / 5) {
+					CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
+					continue;
+				}
 			}
 			
 			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
@@ -73,7 +78,11 @@ public class GoliathControl extends Control {
 						CommandUtils.attackMove(unit, randomPosition);
 					}
 				} else {
-					CommandUtils.attackMove(unit, StrategyIdea.mainPosition);
+					if (unit.getGroundWeaponCooldown() > 15) { // UnitType.Terran_Goliath.groundWeapon().damageCooldown() = 22
+						unit.move(StrategyIdea.mainPosition);
+					} else {
+						CommandUtils.attackMove(unit, StrategyIdea.mainPosition);
+					}
 				}
 			}
 		}

@@ -14,7 +14,10 @@ public class TargetFilter {
 	public static final int LARVA_LURKER_EGG = 4;
 	public static final int INCOMPLETE = 8;
 	public static final int UNFIGHTABLE = 16;
-	public static final int INVISIBLE = 32;
+	public static final int BUILDING = 32;
+	public static final int SPIDER_MINE = 64;
+	public static final int WORKER = 128;
+	public static final int INVISIBLE = 256;
 	
 	public static boolean excludeByFilter(UnitInfo eui, int targetFilter) {
 		Unit target = UnitUtils.unitInSight(eui);
@@ -41,6 +44,15 @@ public class TargetFilter {
 			if (TargetFilter.exclude(targetFilter, TargetFilter.UNFIGHTABLE) && !MicroUtils.combatEnemyType(target.getType())) {
 				return true;
 			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.BUILDING) && target.getType().isBuilding()) {
+				return true;
+			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.SPIDER_MINE) && target.getType() == UnitType.Terran_Vulture_Spider_Mine) {
+				return true;
+			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.WORKER) && target.getType().isWorker()) {
+				return true;
+			}
 			return !target.isVisible() || target.isStasised();
 			
 		} else {
@@ -60,6 +72,15 @@ public class TargetFilter {
 				return true;
 			}
 			if (TargetFilter.exclude(targetFilter, TargetFilter.UNFIGHTABLE) && !MicroUtils.combatEnemyType(eui.getType())) {
+				return true;
+			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.BUILDING) && eui.getType().isBuilding()) {
+				return true;
+			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.SPIDER_MINE) && eui.getType() == UnitType.Terran_Vulture_Spider_Mine) {
+				return true;
+			}
+			if (TargetFilter.exclude(targetFilter, TargetFilter.WORKER) && eui.getType().isWorker()) {
 				return true;
 			}
 			if (TargetFilter.exclude(targetFilter, TargetFilter.INVISIBLE)) {

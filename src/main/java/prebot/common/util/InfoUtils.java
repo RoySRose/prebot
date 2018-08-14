@@ -72,12 +72,8 @@ public class InfoUtils {
 		return InformationManager.Instance().getReadyToAttackPosition(Prebot.Broodwar.enemy());
 	}
 	
-	public static List<BaseLocation> myOtherExpansionsSorted() {
-		return InformationManager.Instance().getOtherExpansionLocations(Prebot.Broodwar.self());
-	}
-	
-	public static List<BaseLocation> enemyOtherExpansionsSorted() {
-		return InformationManager.Instance().getOtherExpansionLocations(Prebot.Broodwar.enemy());
+	public static List<BaseLocation> enemyOtherExpansions() {
+		return InformationManager.Instance().getOtherExpansionLocations();
 	}
 	
 	public static List<BaseLocation> myOccupiedBases() {

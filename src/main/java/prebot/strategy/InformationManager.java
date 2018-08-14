@@ -1,8 +1,6 @@
 package prebot.strategy;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,7 +29,6 @@ import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -111,14 +108,9 @@ public class InformationManager extends GameManager {
 	/// 해당 Player의 mainBaseLocation 에서 두번째로 가까운 (firstChokePoint가 아닌) ChokePoint<br>
 	/// 게임 맵에 따라서, secondChokePoint 는 일반 상식과 다른 지점이 될 수도 있습니다
 	private Map<Player, Chokepoint> secondChokePoint = new HashMap<Player, Chokepoint>();
-	private Map<Player, Chokepoint> thirdChokePointDonotUse = new HashMap<Player, Chokepoint>();
 
-	private List<Chokepoint> middleChokeList = new ArrayList<>();
-
-	public Position tighteningPoint = null;
-
-	// 나머지 멀티 location (가까운 순으로 sorting)
-	private Map<Player, List<BaseLocation>> otherExpansionLocations = new HashMap<Player, List<BaseLocation>>();
+	// 나머지 멀티 location
+	private List<BaseLocation> otherExpansionLocations = new ArrayList<BaseLocation>();
 
 	/// 센터 진출로
 	private Map<Player, Position> readyToAttackPosition = new HashMap<Player, Position>();
@@ -221,12 +213,6 @@ public class InformationManager extends GameManager {
 		thirdRegion.put(enemyPlayer, null);
 		secondChokePoint.put(selfPlayer, null);
 		secondChokePoint.put(enemyPlayer, null);
-		thirdChokePointDonotUse.put(selfPlayer, null);
-		thirdChokePointDonotUse.put(enemyPlayer, null);
-		tighteningPoint = null;
-
-		otherExpansionLocations.put(selfPlayer, new ArrayList<BaseLocation>());
-		otherExpansionLocations.put(enemyPlayer, new ArrayList<BaseLocation>());
 
 		readyToAttackPosition.put(selfPlayer, null);
 		readyToAttackPosition.put(enemyPlayer, null);
@@ -1196,7 +1182,6 @@ public class InformationManager extends GameManager {
 //					tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition()); //욱스가 주석 남기라고 함
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
-						thirdChokePointDonotUse.put(selfPlayer, secondChokePoint.get(selfPlayer));
 						secondChokePoint.put(selfPlayer, chokepoint);
 
 						double radian = MicroUtils.targetDirectionRadian(
@@ -1245,7 +1230,6 @@ public class InformationManager extends GameManager {
 					tempDistance += PositionUtils.getGroundDistance(Center, chokepoint.getPoint());
 					if (tempDistance < closestDistance && tempDistance > 0) {
 						closestDistance = tempDistance;
-						thirdChokePointDonotUse.put(enemyPlayer, secondChokePoint.get(enemyPlayer));
 						secondChokePoint.put(enemyPlayer, chokepoint);
 
 						double radian = MicroUtils.targetDirectionRadian(
@@ -1269,12 +1253,10 @@ public class InformationManager extends GameManager {
 //						tempDistance = BWTA.getGroundDistance(sourceBaseLocation.getTilePosition(), chokepoint.getCenter().toTilePosition()); //욱스가 주석 남기라고 함
 					if (tempDistanceForHunter < closestDistance && tempDistanceFromEnemy - tempDistanceFromSelf > 0) {
 						closestDistance = tempDistanceForHunter;
-						tighteningPoint = chokepoint.getCenter();
 					}
 				}
 				this.updateReadyToAttackPosition();
 				this.updateOtherExpansionLocation(enemySourceBaseLocation);
-
 				this.updateMySecondBaseLocation();
 			}
 			mainBaseLocationChanged.put(enemyPlayer, new Boolean(false));
@@ -1331,8 +1313,7 @@ public class InformationManager extends GameManager {
 			return;
 		}
 
-		otherExpansionLocations.get(selfPlayer).clear();
-		otherExpansionLocations.get(enemyPlayer).clear();
+		otherExpansionLocations.clear();
 		
 		Set<TilePosition> tileSet = new HashSet<>();
 		tileSet.add(myBase.getTilePosition());
@@ -1350,31 +1331,11 @@ public class InformationManager extends GameManager {
 				System.out.println(tileSet + " skiped(mineral)");
 				continue;
 			}
-			otherExpansionLocations.get(selfPlayer).add(base);
-			otherExpansionLocations.get(enemyPlayer).add(base);
+			otherExpansionLocations.add(base);
 		}
 
 //		System.out.println("tileSet: " + tileSet);
-//		System.out.println("otherExpansionLocations1: " + otherExpansionLocations.get(selfPlayer));
-//		System.out.println("otherExpansionLocations2: " + otherExpansionLocations.get(enemyPlayer));
-		
-		// System.out.println("updateOtherExpansionLocation -> " + islandCnt + " / " +
-		// mainBaseCnt);
-
-		Collections.sort(otherExpansionLocations.get(selfPlayer), new Comparator<BaseLocation>() {
-			@Override
-			public int compare(BaseLocation base1, BaseLocation base2) {
-				BaseLocation srcBase = myFirstExpansion;
-				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
-			}
-		});
-		Collections.sort(otherExpansionLocations.get(enemyPlayer), new Comparator<BaseLocation>() {
-			@Override
-			public int compare(BaseLocation base1, BaseLocation base2) {
-				BaseLocation srcBase = enemyFirstExpansion;
-				return (int) (srcBase.getGroundDistance(base1) - srcBase.getGroundDistance(base2));
-			}
-		});
+//		System.out.println("otherExpansionLocations: " + otherExpansionLocations);
 	}
 
 	public void updateReadyToAttackPosition() {
@@ -1596,8 +1557,8 @@ public class InformationManager extends GameManager {
 
 	/// 해당 Player (아군 or 적군) 의 Main BaseLocation과 First Expansion을 제외한 BaseLocation을
 	/// 가까운 순으로 정렬하여 리턴합니다
-	public List<BaseLocation> getOtherExpansionLocations(Player player) {
-		return otherExpansionLocations.get(player);
+	public List<BaseLocation> getOtherExpansionLocations() {
+		return otherExpansionLocations;
 	}
 
 	/// 센터 진출로 포지션을 리턴한다. 헌터에서 썼다가 결과는 책임못진다. insaneojw

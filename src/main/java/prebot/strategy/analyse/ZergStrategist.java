@@ -165,10 +165,10 @@ public class ZergStrategist extends Strategist {
 			}
 		} else {
 			if (enemyGroundUnitPower == 0 && !hydraDiscovered) {
-				StrategyIdea.valkyrieCount = Math.min(goliathCount / 3, 7);
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 4, 6);
 				return EnemyStrategy.ZERG_AIR2;
 			} else {
-				StrategyIdea.valkyrieCount = Math.min(goliathCount / 5, 5);
+				StrategyIdea.valkyrieCount = Math.min(goliathCount / 5, 4);
 				return EnemyStrategy.ZERG_AIR1;
 			}
 		}

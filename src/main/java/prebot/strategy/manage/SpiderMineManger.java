@@ -69,7 +69,7 @@ public class SpiderMineManger {
 			return false;
 		}
 
-		List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansionsSorted();
+		List<BaseLocation> otherBases = InfoUtils.enemyOtherExpansions();
 		Position myReadyToAttackPos = InformationManager.Instance().getReadyToAttackPosition(InformationManager.Instance().selfPlayer);
 		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
 		
