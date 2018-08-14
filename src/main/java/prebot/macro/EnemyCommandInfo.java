@@ -1,5 +1,6 @@
 package prebot.macro;
 
+import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.prebot1.ConstructionPlaceFinder;
@@ -26,7 +27,6 @@ public class EnemyCommandInfo {
     public EnemyCommandInfo(UnitInfo unitInfo) {
 
         this.unitInfo = unitInfo;
-        Unit unit = unitInfo.getUnit();
 
         if(unitInfo.isCompleted()) {
             this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
@@ -34,43 +34,48 @@ public class EnemyCommandInfo {
             this.lastCheckFrame = Prebot.Broodwar.getFrameCount() + unitInfo.getRemainingBuildTime();
         }
 
-        Unit geyser = getGeyser(unit);
+        Unit geyser = getGeyser(unitInfo.getLastPosition());
         if(geyser == null){
+            System.out.println("Initialize with NO GAS");
             hasGas = false;
+            gasCalculator = new NoGasCalculator();
         }else{
+            System.out.println("Initialize with YES GAS");
             hasGas = true;
-            gasCalculator = new GasCalculator(geyser);
+            gasCalculator = new DefaultGasCalculator(geyser);
         }
 
-        List<EnemyMineral> mineralList = getMineralPatchesNearDepot(unit);
+        System.out.println("Initializing Mineral");
+        List<EnemyMineral> mineralList = getMineralPatchesNearDepot(unitInfo.getLastPosition());
 
-        mineralCalculator = new MineralCalculator(mineralList);
-        workerCounter = new WorkerCounter();
+        this.mineralCalculator = new MineralCalculator(mineralList);
+        this.workerCounter = new WorkerCounter();
 
-        lastFullCheckWorkerCount=0;
-        lastFullCheckFrame =0;
+        this.lastFullCheckWorkerCount=0;
+        this.lastFullCheckFrame =0;
     }
 
-    private Unit getGeyser(Unit unit) {
+    private Unit getGeyser(Position unitPosition) {
         Unit gasUnit =null;
-        Unit findGeyser = ConstructionPlaceFinder.Instance().getRefineryNear(unit.getTilePosition());
+        Unit findGeyser = ConstructionPlaceFinder.Instance().getRefineryNear(unitPosition.toTilePosition());
         if (findGeyser != null) {
-            if (findGeyser.getTilePosition().getDistance(unit.getTilePosition()) * 32 <= 320) {
+            if (findGeyser.getTilePosition().getDistance(unitPosition.toTilePosition()) * 32 <= 320) {
                 gasUnit = findGeyser;
             }
         }
         return gasUnit;
     }
 
-    private List<EnemyMineral> getMineralPatchesNearDepot(Unit depot) {
+    public static List<EnemyMineral> getMineralPatchesNearDepot(Position depotPosition) {
         int radius = 320;
         ArrayList<EnemyMineral> mineralList = new ArrayList<>();
         for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
-            if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < radius) {
+            if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depotPosition) < radius) {
                 EnemyMineral newMineral = new EnemyMineral(unit);
                 mineralList.add(newMineral);
             }
         }
+        System.out.println("MineralCnt near Depot: " + mineralList.size());
         return mineralList;
     }
 
@@ -81,8 +86,15 @@ public class EnemyCommandInfo {
     public void updateInfo() {
 
         if(unitInfo.getUnit() != null && unitInfo.getUnit().isVisible() && mineralCalculator.allVisible()){
+
             lastFullCheckFrame = Prebot.Broodwar.getFrameCount();
-            lastFullCheckWorkerCount = workerCounter.getWorkerCount();
+
+            System.out.println("Full Vision at: " + lastFullCheckFrame);
+
+            lastFullCheckWorkerCount = workerCounter.getWorkerCount(mineralCalculator.getMineralCount());
+
+            System.out.println("Full Vision at: " + lastFullCheckWorkerCount);
+
             mineralCalculator.updateFullVisibleResources(lastFullCheckFrame);
         }
         
@@ -105,19 +117,24 @@ public class EnemyCommandInfo {
         int predictionMinusMineral =0;
 
         if(lastFullCheckWorkerCount > 0) {
-            total = mineralCalculator.getRealMineral();
+            total = mineralCalculator.getFullCheckMineral();
 
-            workerCount = workerCounter.getWorkerCount();
+            workerCount = workerCounter.getWorkerCount(mineralCalculator.getMineralCount());
             term = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
             appliedWorkerCount = (lastFullCheckWorkerCount * (workerCount)) / 2;
 
             predictedIncrementMineral = (int) (appliedWorkerCount * term * MINERAL_INCREMENT_RATE);
-            predictionMinusMineral = mineralCalculator.getPredictionMinusMineral();
+            //predictionMinusMineral = mineralCalculator.getPredictionMinusMineral();
         }else{
 
-            workerCount = workerCounter.getWorkerCount() * 2 /3;
+            //TODO 세분화 필요 + 미네랄 일부만 보였을때 최근 2건이 있다면 그거로 확인하는 로직이 필요할까? 좋을거 같기도..
+            workerCount = workerCounter.getWorkerCount(mineralCalculator.getMineralCount()) * 2 /3;
 
             EnemyMineral enemyMineral = mineralCalculator.getMaxLastCheckFrame();
+            if(enemyMineral.getLastCheckFrame() == 0){
+                System.out.println("Can't predict no mineral info for this command");
+                return 0;
+            }
             total = enemyMineral.getRealMineral() * mineralCalculator.getMineralCount();
 
             term = Prebot.Broodwar.getFrameCount() - enemyMineral.getLastCheckFrame();
@@ -125,7 +142,7 @@ public class EnemyCommandInfo {
             predictedIncrementMineral = (int) (workerCount * term * MINERAL_INCREMENT_RATE);
         }
 
-        return total + predictedIncrementMineral - predictionMinusMineral;
+        return total + predictedIncrementMineral;
     }
 
     public int getGas(){

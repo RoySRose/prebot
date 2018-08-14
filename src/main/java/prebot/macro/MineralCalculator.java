@@ -79,6 +79,13 @@ public class MineralCalculator {
 
     public void getPredictionWithNoFullVision() {
 
+    }
 
+    public int getFullCheckMineral() {
+        int mineralSum = 0;
+        for(EnemyMineral minerals : mineralsList) {
+            mineralSum += minerals.getFullCheckMineral();
+        }
+        return mineralSum;
     }
 }
