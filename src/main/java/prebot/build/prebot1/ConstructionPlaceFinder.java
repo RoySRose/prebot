@@ -56,6 +56,8 @@ public class ConstructionPlaceFinder {
 	private Set<TilePosition> tilesToAvoidAddonBuilding = new HashSet<TilePosition>();
 	//커맨드 센터 와 컴셋 건설지역
 	private Set<TilePosition> tilesToBaseLocationAvoid = new HashSet<TilePosition>();
+	private Set<TilePosition> tilesToAvoidComSat = new HashSet<TilePosition>();
+	
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -743,6 +745,15 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 					}
+					
+//					20180815. hkk. 커맨드 센터 일경우. new 커맨드 센터 본진이, old 커맨드 센터 컴셋 위치를 침범하면 안된다.
+					if(b.getType() == UnitType.Terran_Command_Center) {
+						if(x != position.getX() + 4 && x != position.getX() + 5 && x != position.getX() + 6) {
+							if(isTilesToAvoidComsat(x, y)) {
+								return false;
+							}
+						}
+					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
 //					20180719. hkk. 저그전 대비 배럭과 서플 가스 주변에 붙여짓기 필요
@@ -1132,6 +1143,28 @@ public class ConstructionPlaceFinder {
 		return false;
 	}
 	
+	public final boolean isTilesToAvoidComsat(int x, int y)
+	{
+//		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport1
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
+//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			return true;
+//		}
+		
+		for (TilePosition t : tilesToAvoidComSat) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	
 	public final boolean isTilesToAvoidAbsolute(int x, int y)
 	{
 		for (TilePosition t : tilesToAvoidAbsolute) {
@@ -1404,7 +1437,7 @@ public class ConstructionPlaceFinder {
 //					2018015. hkk. 컴셋 자리는 커맨드센터도 짓지 못하게끔 피해준다.
 					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition())) {
 //						System.out.println("comsat position of main command :: " + t);
-						tilesToAvoid.add(t);
+						tilesToAvoidComSat.add(t);
 					}
 					tilesToBaseLocationAvoid.add(t);
 //					tilesToAvoid.add(t);
