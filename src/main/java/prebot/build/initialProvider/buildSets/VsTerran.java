@@ -6,8 +6,7 @@ import bwapi.UnitType;
 /// 봇 프로그램 설정
 public class VsTerran extends BaseBuild {
 
-	public VsTerran(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos, TilePosition bunkerPos
-			, TilePosition starport1, TilePosition starport2) {
+	public VsTerran(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos, TilePosition starport1, TilePosition starport2) {
 
 		queueBuild(true, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV);
 		queueBuild(false, UnitType.Terran_Supply_Depot, firstSupplyPos);

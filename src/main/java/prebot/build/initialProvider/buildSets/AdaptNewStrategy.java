@@ -9,8 +9,7 @@ import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 /// 봇 프로그램 설정
 public class AdaptNewStrategy extends BaseBuild {
 
-	public void adapt(TilePosition firstSupplyPos, TilePosition barrackPos, TilePosition secondSupplyPos, TilePosition factoryPos
-			, TilePosition bunkerPos, TilePosition starport1, TilePosition starport2, ExpansionOption strategy) {
+	public void adapt(ExpansionOption strategy, TilePosition factoryPos, TilePosition starport1, TilePosition starport2) {
 		if (strategy == ExpansionOption.TWO_STARPORT) {
 			int starportCount = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Starport);
 			if (starportCount == 0) {

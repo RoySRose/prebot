@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
@@ -14,6 +15,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
@@ -85,7 +87,8 @@ public class VultureTravelManager {
 
 		baseLocationsCheckerOrdered = new ArrayList<>();
 		Set<BaseLocation> baseSet = new HashSet<>();
-		BaseLocation beforeBase = null; 
+		BaseLocation beforeBase = null;
+		TilePosition centerTilePosition = TilePositionUtils.getCenterTilePosition();
 		for (int i = 0; i < otherBases.size(); i++) {
 			if (beforeBase == null) {
 				beforeBase = InfoUtils.myFirstExpansion();
@@ -95,6 +98,12 @@ public class VultureTravelManager {
 					return !baseSet.contains(base);
 				}
 			});
+			
+			if (closeBase.getDistance(centerTilePosition.toPosition()) < 500) {
+				System.out.println("center base. " + closeBase);
+				continue;
+			}
+			
 			baseLocationsCheckerOrdered.add(closeBase);
 			beforeBase = closeBase;
 			baseSet.add(closeBase);

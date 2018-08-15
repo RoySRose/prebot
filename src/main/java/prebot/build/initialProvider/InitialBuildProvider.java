@@ -21,12 +21,10 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
@@ -59,7 +57,8 @@ public class InitialBuildProvider {
 	public TilePosition barrackPos = TilePosition.None;
 	public TilePosition secondSupplyPos = TilePosition.None;
 	public TilePosition factoryPos = TilePosition.None;
-	public TilePosition bunkerPos = TilePosition.None;
+	public TilePosition bunkerPos1 = TilePosition.None;
+	public TilePosition bunkerPos2 = TilePosition.None;
 	public TilePosition starport1 = TilePosition.None;
 	public TilePosition starport2 = TilePosition.None;
 	
@@ -77,16 +76,17 @@ public class InitialBuildProvider {
         barrackPos = BlockingEntrance.Instance().barrack;
         secondSupplyPos = BlockingEntrance.Instance().second_supple;
         factoryPos = BlockingEntrance.Instance().factory;
-        bunkerPos = BlockingEntrance.Instance().bunker;
+        bunkerPos1 = BlockingEntrance.Instance().bunker1;
+        bunkerPos2 = BlockingEntrance.Instance().bunker2;
         starport1 = BlockingEntrance.Instance().starport1;
         starport2 = BlockingEntrance.Instance().starport2;
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
-			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
+			new VsTerran(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, starport1, starport2);
 		} else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
+			new VsProtoss(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, starport1, starport2);
 		} else {
-			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2);
+			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos1, starport1, starport2);
 		}
 		
 		System.out.println("InitialBuildProvider onStart end");
@@ -101,7 +101,7 @@ public class InitialBuildProvider {
 			if (BuildManager.Instance().buildQueue.isEmpty()) {
 				nowStrategy = StrategyIdea.expansionOption;
 				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_STARPORT) {
-	        		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
+	        		new AdaptNewStrategy().adapt(nowStrategy, factoryPos, starport1, starport2);
 	        	}
 				adaptStrategyStatus = AdaptStrategyStatus.PROGRESSING;
 			}
@@ -113,7 +113,7 @@ public class InitialBuildProvider {
  
         		// 폭파하기
         		cancelConstructionAndRemoveFromBuildQueue();
-        		new AdaptNewStrategy().adapt(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos, starport1, starport2, nowStrategy);
+        		new AdaptNewStrategy().adapt(nowStrategy, factoryPos, starport1, starport2);
 				adaptStrategyStatus = AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
         		
         	} else {

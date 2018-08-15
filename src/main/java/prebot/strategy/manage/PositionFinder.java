@@ -626,7 +626,7 @@ public class PositionFinder {
 		Position basePosition = InfoUtils.myBase().getPosition();
 		Position bunkerPosition = null;
 		if (InfoUtils.enemyRace() == Race.Zerg) {
-			TilePosition bunker = BlockingEntrance.Instance().bunker;
+			TilePosition bunker = BlockingEntrance.Instance().bunker1;
 			if (bunker != null) {
 				bunkerPosition = bunker.toPosition();
 			}
@@ -728,19 +728,30 @@ public class PositionFinder {
 	}
 	
 	private Position expansionDefensePositionSiege() {
-		if (expansionDefensePositionSiege != null) {
-			return expansionDefensePositionSiege;
-		}
+//		if (expansionDefensePositionSiege != null) {
+//			return expansionDefensePositionSiege;
+//		}
 		Position myBasePosition = InfoUtils.myBase().getPosition();
-		Pair<Position, Position> secondChokeSides = InfoUtils.mySecondChoke().getSides();
+		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
 		
+		Pair<Position, Position> secondChokeSides = InfoUtils.mySecondChoke().getSides();
 		double firstDistance = myBasePosition.getDistance(secondChokeSides.first);
 		double secondDistance = myBasePosition.getDistance(secondChokeSides.second);
 		
 		Position positionBaseSided = firstDistance < secondDistance ? secondChokeSides.first : secondChokeSides.second;
-
-		double radian = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
-		Position defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 230);
+		
+		Position defensePosition = null;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			double radian1 = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
+			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 250);
+			
+			double radian2 = MicroUtils.targetDirectionRadian(defensePosition, firstChokePosition);
+			defensePosition = MicroUtils.getMovePosition(defensePosition, radian2, 60);
+			
+		} else {
+			double radian = MicroUtils.targetDirectionRadian(positionBaseSided, firstChokePosition);
+			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 130);
+		}
 		
 		return expansionDefensePositionSiege = defensePosition;
 	}

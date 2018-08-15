@@ -134,14 +134,14 @@ public class AirForceControl extends Control {
 				// 지나가면서 한대씩 때리기
 				else if (decision.type == DecisionType.ATTACK_POSITION) {
 					for (Unit airunit : airunits) {
-						airunit.rightClick(decisionDetail.eui.getUnit());
+						CommandUtils.fastestRightClick(airunit, decisionDetail.eui.getUnit());
 					}
 				}
 			}
 			// 뭉치기
 			else if (decisionDetail.type == DecisionType.UNITE) {
 				for (Unit airunit : airunits) {
-					airunit.rightClick(airForceTeam.leaderUnit.getPosition());
+					CommandUtils.fastestRightClick(airunit, airForceTeam.leaderUnit.getPosition());
 				}
 			}
 			// 전진 카이팅, 카이팅
@@ -156,20 +156,20 @@ public class AirForceControl extends Control {
 									CommandUtils.attackMove(airunit, randomPosition);
 								}
 							} else {
-								CommandUtils.rightClick(airunit, airForceTeam.leaderOrderPosition);
+								CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
 							}
 						}
 					}
 				} else {
 					for (Unit airunit : airunits) {
-						airunit.rightClick(airForceTeam.leaderOrderPosition);
+						CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
 					}
 				}
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) { // 도망
 			for (Unit airunit : airunits) {
-				airunit.rightClick(airForceTeam.leaderOrderPosition);
+				CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
 			}
 			
 		} else if (decision.type == DecisionType.CHANGE_MODE) { // 클로킹

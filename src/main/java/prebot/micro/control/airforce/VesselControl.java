@@ -139,7 +139,9 @@ public class VesselControl extends Control {
 			}
 
 			if (!fleeing) {
-				CommandUtils.move(vessel, orderPosition);
+				if (!MicroUtils.isBeingHealed(vessel)) {
+					CommandUtils.move(vessel, orderPosition);
+				}
 			}
 		}
 	}

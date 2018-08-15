@@ -27,7 +27,6 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -113,7 +112,13 @@ public class BuildManager extends GameManager {
 		// while there is still something left in the buildQueue
 		while (!buildQueue.isEmpty()) {
 			if (failureProtector.isSuspended(currentItem.metaType)) {
-				break;
+				if (!buildQueue.canSkipCurrentItem()) {
+					break;
+				}
+				
+				buildQueue.skipCurrentItem();
+				currentItem = buildQueue.getItem();
+				continue;
 			}
 			
 			boolean isOkToRemoveQueue = true;
