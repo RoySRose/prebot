@@ -103,8 +103,8 @@ public class WorkerManager extends GameManager {
 				
 				// 대상이 파괴되었거나, 수리가 다 끝난 경우
 				
-				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
-						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
+				if (repairTargetUnit == null || !repairTargetUnit.exists()
+					|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
 					
 				} else if(repairTargetUnit.getType() == UnitType.Terran_Wraith){
@@ -423,16 +423,15 @@ public class WorkerManager extends GameManager {
 						setRepairWorker(repairWorker, unit);
 					}
 				}
-			}
-			// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
+			}// 메카닉 유닛 (SCV, 시즈탱크, 레이쓰 등)의 경우 근처에 SCV가 있는 경우 수리. 일꾼 한명이 순서대로 수리
 			else if (unit.getType() == UnitType.Terran_Wraith && repairWraithWorkCnt < repairmax 
-						&& unit.getHitPoints() < unit.getType().maxHitPoints() && unit.isIdle() && !unit.isMoving()) {
+						&& unit.getHitPoints() < unit.getType().maxHitPoints()) {
 				
 					Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
-					if(repairWorker != null){
-						if(unit.getDistance(repairWorker) < 200 && repairWorker.getOrder() != bwapi.Order.Repair && !repairWorker.isRepairing()						){
-							setRepairWorker(repairWorker, unit);
-						}
+					if(repairWorker != null 
+							&& !repairWorker.isRepairing()
+							&& unit.getDistance(repairWorker) < 200){
+						setRepairWorker(repairWorker, unit);
 					}
 			}
 			else if ((unit.getType() == UnitType.Terran_Goliath 
@@ -477,7 +476,7 @@ public class WorkerManager extends GameManager {
 			if (worker == null || !worker.isCompleted()) {
 				continue;
 			}
-			if (worker.isCarryingMinerals() || worker.isCarryingGas()) {
+			if (worker.isCarryingMinerals() || worker.isGatheringGas()) {
 				continue;
 			}
 
@@ -487,7 +486,7 @@ public class WorkerManager extends GameManager {
 				
 				if (closestWorker == null || (dist < closestDist)) {
 					closestWorker = worker;
-					dist = closestDist;
+					closestDist = dist;
 				}
 			}
 		}
@@ -743,7 +742,7 @@ public class WorkerManager extends GameManager {
 				}
 
 				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance
-						&& unit.isCarryingMinerals() == false && unit.isCarryingGas() == false)) {
+						&& unit.isCarryingMinerals() == false && unit.isGatheringGas() == false)) {
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMovingWorker = unit;
 						closestMovingWorkerDistance = distance;
@@ -757,14 +756,16 @@ public class WorkerManager extends GameManager {
 			 * isGatheringGas false 처리 되어잇음에도 감...그래서 Gas 일꾼에서 안빼는걸로 변경)
 			 */
 			if (unit.isCompleted() && (workerData.getWorkerJob(unit) != WorkerJob.Move
-					&& workerData.getWorkerJob(unit) != WorkerJob.Idle && workerData.getWorkerJob(unit) != WorkerJob.Gas
+					&& workerData.getWorkerJob(unit) != WorkerJob.Idle 
+					&& workerData.getWorkerJob(unit) != WorkerJob.Gas
 					&& workerData.getWorkerJob(unit) != WorkerJob.Build
 					&& workerData.getWorkerJob(unit) != WorkerJob.Scout
 					&& workerData.getWorkerJob(unit) != WorkerJob.Combat)) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance
-						&& unit.isCarryingMinerals() == false && unit.isCarryingGas() == false)) {
+						&& unit.isCarryingMinerals() == false 
+						&& unit.isGatheringGas() == false)) {
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMiningWorker = unit;
 						closestMiningWorkerDistance = distance;

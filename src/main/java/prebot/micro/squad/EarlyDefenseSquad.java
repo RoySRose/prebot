@@ -129,7 +129,6 @@ public class EarlyDefenseSquad extends Squad {
 		double scvCountForDefense = 0.0;
 		for (Unit enemy : enemyInSightList) {
 			if (UnitUtils.isValidUnit(enemy)) {
-				System.out.println("InfoUtils.myBase().getPosition().getDistance(enemy.getUnit() : " + InfoUtils.myBase().getPosition().getDistance(enemy));
 				if(!enemy.getType().isWorker() 
 						&& !enemy.getType().isBuilding()
 						&& InfoUtils.myBase().getPosition().getDistance(enemy) > 300){
