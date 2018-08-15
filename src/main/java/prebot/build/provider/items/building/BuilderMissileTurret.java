@@ -102,7 +102,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		Position firstChokeMainHalf = new Position((myBase.getPosition().getX() + myFirstChoke.getX() * 2) / 3 - 60,
 				(myBase.getPosition().getY() + myFirstChoke.getY() * 2) / 3 - 60);
-		if (noTurretNearPosition(firstChokeMainHalf, 100, 100, turretCount, max_turret)) {
+		if (noTurretNearPosition(firstChokeMainHalf, 150, 100, turretCount, max_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(firstChokeMainHalf.toTilePosition());
@@ -112,7 +112,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
 				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
 		
-		if (noTurretNearPosition(firstChokeExpHalf, 100, 100, turretCount, max_turret)) {
+		if (noTurretNearPosition(firstChokeExpHalf, 150, 100, turretCount, max_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(firstChokeExpHalf.toTilePosition());
@@ -121,7 +121,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		// TODO COMPLETE, ALL 테스트에 따른 변경여부 결정
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1) {
-			if (noTurretNearPosition(mySecondChoke.getCenter(), 100, 100, turretCount, max_turret)) {
+			if (noTurretNearPosition(mySecondChoke.getCenter(), 150, 100, turretCount, max_turret)) {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(mySecondChoke.getCenter().toTilePosition());

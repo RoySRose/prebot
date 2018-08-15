@@ -1837,23 +1837,32 @@ public class UXManager {
 		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
 				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
 		
+		Position betweenChoke = new Position((myFirstChoke.getX() * 2 + myFirstChoke.getX()) / 3,
+				(mySecondChoke.getY() * 2 + mySecondChoke.getY()) / 3);
+		
 		Prebot.Broodwar.drawTextMap(firstChokeMainHalf.getX() + 20, firstChokeMainHalf.getY() + 10, "(" + (int) (firstChokeMainHalf.getX()) + ", " + (int) (firstChokeMainHalf.getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 100, Color.Red, false);
+		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150, Color.Red, false);
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 100 + turretCount * 15, Color.Red, false);
+		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150 + turretCount * 15, Color.Red, false);
 		
 		Prebot.Broodwar.drawTextMap(firstChokeExpHalf.getX() + 20, firstChokeExpHalf.getY() + 10, "(" + (int) (firstChokeExpHalf.getX()) + ", " + (int) (firstChokeExpHalf.getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 100, Color.Orange, false);
+		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 150, Color.Orange, false);
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 100 + turretCount * 15, Color.Orange, false);
+		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 150 + turretCount * 15, Color.Orange, false);
 		
 		Prebot.Broodwar.drawTextMap(mySecondChoke.getCenter().getX() + 20, mySecondChoke.getCenter().getY() + 10, "(" + (int) (mySecondChoke.getCenter().getX()) + ", " + (int) (mySecondChoke.getCenter().getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 100, Color.Cyan, false);
+		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150, Color.Cyan, false);
 		
-		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 100 + turretCount * 15, Color.Cyan, false);  
+		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150 + turretCount * 15, Color.Cyan, false);  
+		
+		Prebot.Broodwar.drawTextMap(betweenChoke.getX() + 20, betweenChoke.getY() + 10, "(" + (int) (betweenChoke.getX()) + ", " + (int) (betweenChoke.getY()) + ")");
+		
+		Prebot.Broodwar.drawCircleMap(betweenChoke, 150, Color.Green, false);
+		
+		Prebot.Broodwar.drawCircleMap(betweenChoke, 150 + turretCount * 15, Color.Green, false);  
 		
 //		radius1 + turretCount * 15
 		
