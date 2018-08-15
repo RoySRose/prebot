@@ -1110,7 +1110,7 @@ public class UXManager {
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Cyan, false);
 		}
 		
-		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation()();
+		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation();
 		for (TilePosition t : tilesToAvoidBase)
 		{
 			int x1 = t.getX() * 32 + 8;
