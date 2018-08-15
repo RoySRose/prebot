@@ -1110,6 +1110,17 @@ public class UXManager {
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Cyan, false);
 		}
 		
+		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation()();
+		for (TilePosition t : tilesToAvoidBase)
+		{
+			int x1 = t.getX() * 32 + 8;
+			int y1 = t.getY() * 32 + 8;
+			int x2 = (t.getX() + 1) * 32 - 8;
+			int y2 = (t.getY() + 1) * 32 - 8;
+
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Yellow, false);
+		}
+		
 	}
 
 	/// ConstructionQueue 를 Screen 에 표시합니다
