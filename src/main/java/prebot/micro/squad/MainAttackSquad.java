@@ -75,6 +75,7 @@ public class MainAttackSquad extends Squad {
 		int goliathSaveUnitLevel = Math.min(saveUnitLevel, 1);
 		
 		tankControl.setSaveUnitLevel(saveUnitLevel);
+		tankControl.setMainPosition(StrategyIdea.mainSquadMode.isAttackMode ? StrategyIdea.mainPosition : StrategyIdea.campPositionSiege);
 		goliathControl.setSaveUnitLevel(goliathSaveUnitLevel);
 
 //		System.out.println(euiList);
@@ -159,9 +160,11 @@ public class MainAttackSquad extends Squad {
 		}
 
 		UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50, true, false);
-		for (Unit unit : unitList) {
-			if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
-				UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
+		if (StrategyIdea.mainSquadMode.isAttackMode) {
+			for (Unit unit : unitList) {
+				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
+					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
+				}
 			}
 		}
 	}	

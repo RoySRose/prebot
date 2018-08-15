@@ -44,9 +44,15 @@ public class TankControl extends Control {
 	private int siegeModeSpreadRadius;
 	private int saveUnitLevel;
 	private Collection<UnitInfo> flyingEnemisInfos;
+	
+	private Position mainPosition;
 
 	public void setSaveUnitLevel(int saveUnitLevel) {
 		this.saveUnitLevel = saveUnitLevel;
+	}
+	
+	public void setMainPosition(Position mainPosition) {
+		this.mainPosition = mainPosition;
 	}
 	
 	@Override
@@ -72,7 +78,7 @@ public class TankControl extends Control {
 				
 				Position nearChokePosition = null;
 				Chokepoint nearestChoke = BWTA.getNearestChokepoint(leaderOfUnit.getPosition());
-				if (nearestChoke.getWidth() < 250) {
+				if (nearestChoke.getWidth() < this.siegeModeSpreadRadius / 2) {
 					nearChokePosition = nearestChoke.getCenter();
 				}
 				if (nearChokePosition == null || nearChokePosition.getDistance(leaderOfUnit.getPosition()) > 180) {
@@ -82,7 +88,7 @@ public class TankControl extends Control {
 					if (leaderGroupIds.size() > leaderGroupMaxSize) {
 						break;
 					}
-					if (unit.getID() == leaderOfUnit.getID() || unit.getDistance(leaderOfUnit) > 200) {
+					if (unit.getID() == leaderOfUnit.getID() || unit.getDistance(leaderOfUnit) > 220) {
 						continue;
 					}
 					
@@ -133,7 +139,7 @@ public class TankControl extends Control {
 					CommandUtils.unsiege(siege);
 					TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
 				} else {
-					int distance = siege.getDistance(StrategyIdea.mainPosition);
+					int distance = siege.getDistance(mainPosition);
 					if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
 						if (distance > Tank.SIEGE_MODE_MAX_RANGE) {
 							siege.unsiege();
@@ -155,13 +161,14 @@ public class TankControl extends Control {
 
 	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.NARROW);
+		FleeOption fOption = new FleeOption(StrategyIdea.campPositionSiege, false, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit tank : tankModeList) {
 			if (!StrategyIdea.mainSquadMode.isAttackMode) {
-				if (dangerousOutOfMyRegion(tank)) {
-					CommandUtils.move(tank, StrategyIdea.campPosition);
+				Position positionToSiege = TankPositionManager.Instance().getSiegeModePosition(tank.getID());
+				if (positionToSiege == null && dangerousOutOfMyRegion(tank)) {
+					CommandUtils.move(tank, mainPosition);
 					continue;
 				}
 			}
@@ -191,7 +198,7 @@ public class TankControl extends Control {
 //				}
 
 				if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
-					int distToOrder = tank.getDistance(StrategyIdea.mainPosition);
+					int distToOrder = tank.getDistance(mainPosition);
 					if (distToOrder <= Tank.SIEGE_MODE_MAX_RANGE
 							&& TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
 						if (tank.canSiege()) {
@@ -203,14 +210,14 @@ public class TankControl extends Control {
 							}
 						}
 					} else {
-						CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
+						CommandUtils.attackMove(tank, mainPosition);
 					}
 					
 				} else {
-					boolean arrived = MicroUtils.arrivedToPosition(tank, StrategyIdea.mainPosition);
+					boolean arrived = MicroUtils.arrivedToPosition(tank, mainPosition);
 					Position positionToSiege = TankPositionManager.Instance().getSiegeModePosition(tank.getID());
 					if (arrived && positionToSiege == null) {
-						positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(StrategyIdea.mainPosition, tank, siegeModeSpreadRadius);
+						positionToSiege = TankPositionManager.Instance().findPositionToSiegeAndReserve(mainPosition, tank, siegeModeSpreadRadius);
 					}
 
 					if (positionToSiege != null) {
@@ -234,9 +241,9 @@ public class TankControl extends Control {
 
 						} else {
 							if (tank.getGroundWeaponCooldown() > 25) { // UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() = 37
-								tank.move(StrategyIdea.mainPosition);
+								tank.move(mainPosition);
 							} else {
-								CommandUtils.attackMove(tank, StrategyIdea.mainPosition);
+								CommandUtils.attackMove(tank, mainPosition);
 							}
 						}
 					}

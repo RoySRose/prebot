@@ -83,6 +83,7 @@ public class StrategyIdea {
 	// [포지션 정보]
 	public static CampType campType = null; // 수비 포지션 타입
 	public static Position campPosition = null; // 수비 포지션
+	public static Position campPositionSiege = null; // 수비 포지션
 	public static Position mainPosition = null; // 메인스쿼드 목표 포지션
 	public static Position watcherPosition = null; // watcher 포지션
 	public static Position mainSquadCenter = null; // 메인스쿼드 유닛들의 센터 포지션

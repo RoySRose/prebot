@@ -126,7 +126,7 @@ public class ConstructionManager extends GameManager {
 	
 	public void update()
 	{
-		if (TimeUtils.executeRotation(5, LagObserver.managerRotationSize())) {
+		if (!TimeUtils.executeRotation(5, LagObserver.managerRotationSize())) {
 			return;
 		}
 

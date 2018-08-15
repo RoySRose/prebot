@@ -30,8 +30,10 @@ import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.micro.targeting.TargetFilter;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class UnitUtils {
 	
@@ -500,6 +502,26 @@ public class UnitUtils {
 		});
 	}
 	
+	public static Unit getClosestUnitToPositionNotInMyBase(Collection<Unit> unitList, Position position, final UnitType... unitTypes) {
+		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+			@Override
+			public boolean correspond(Unit unit) {
+				Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+				Region unitRegion = BWTA.getRegion(unit.getPosition());
+				if (baseRegion == unitRegion) {
+					return false;
+				}
+				
+				for (UnitType unitType : unitTypes) {
+					if (unitType == unit.getType()) {
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+	}
+	
 	public static Unit getClosestUnitToPositionNotStunned(Collection<Unit> unitList, Position position) {
 		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
 			@Override
@@ -660,20 +682,33 @@ public class UnitUtils {
 		if (InfoUtils.enemyBase() == null) {
 			return null;
 		}
-		boolean expansionOccupied = false;
-		List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
-		for (BaseLocation enemyBase : enemyBases) {
-			if (enemyBase.equals(InfoUtils.enemyFirstExpansion())) {
-				expansionOccupied = true;
-				break;
+		
+		Position goalPosition;
+		if (StrategyIdea.mainSquadMode.isAttackMode || StrategyIdea.campType == CampType.READY_TO) {
+			boolean expansionOccupied = false;
+			List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
+			for (BaseLocation enemyBase : enemyBases) {
+				if (enemyBase.equals(InfoUtils.enemyFirstExpansion())) {
+					expansionOccupied = true;
+					break;
+				}
 			}
+			if (expansionOccupied) {
+				goalPosition = InfoUtils.enemyFirstExpansion().getPosition();
+			} else {
+				goalPosition = InfoUtils.enemyBase().getPosition();
+			}
+			
+		} else {
+			goalPosition = InfoUtils.myReadyToPosition();
 		}
 
-		BaseLocation attackBase = expansionOccupied ? InfoUtils.enemyFirstExpansion() : InfoUtils.enemyBase();
-
-		Unit leader = UnitUtils.getClosestUnitToPosition(unitList, attackBase.getPosition(), UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		Unit leader = UnitUtils.getClosestUnitToPositionNotInMyBase(unitList, goalPosition, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		if (leader == null) {
-			leader = UnitUtils.getClosestUnitToPosition(unitList, attackBase.getPosition(), UnitType.Terran_Goliath);
+			leader = UnitUtils.getClosestUnitToPosition(unitList, goalPosition, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		}
+		if (leader == null) {
+			leader = UnitUtils.getClosestUnitToPosition(unitList, goalPosition, UnitType.Terran_Goliath);
 		}
 		return leader;
 	}

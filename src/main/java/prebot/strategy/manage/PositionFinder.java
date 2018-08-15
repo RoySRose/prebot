@@ -15,6 +15,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
@@ -59,7 +60,8 @@ public class PositionFinder {
 	private Map<Integer, Position> commandCenterInsidePositions = new HashMap<>();
 	
 	private Position basefirstChokeMiddlePosition = null;
-	private Position firstExpansionBackwardPosition = null;
+	private Position expansionDefensePosition = null;
+	private Position expansionDefensePositionSiege = null;
 	
 	private int watcherOtherPositionFrame = CommonCode.NONE;
 	private Position watcherOtherPosition = null;
@@ -73,6 +75,7 @@ public class PositionFinder {
 	public void update() {
 		StrategyIdea.campType = getCampPositionType();
 		StrategyIdea.campPosition = campTypeToPosition();
+		StrategyIdea.campPositionSiege = campTypeToSiegePositionForSiege();
 		StrategyIdea.mainPosition = getMainPosition();
 //		System.out.println(StrategyIdea.campType + " : " + PositionUtils.isValidGroundPosition(StrategyIdea.campPosition));
 
@@ -140,22 +143,29 @@ public class PositionFinder {
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
-				int READY_TO_SUPPLY = 27 * 4;
 				int FIRST_EXPANSION_MARGIN = 2 * 4;
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
-				// 병력이 쌓였다면 second choke에서 방어한다.
+				
+				int READY_TO_SUPPLY = 27 * 4;
 				if (StrategyIdea.campType == CampType.READY_TO) {
+					// READY TO 포지션에서 후퇴하지 않기 위함
 					READY_TO_SUPPLY = 15 * 4;
 				}
+				
+				// READY TO 포지션으로 나가기 전에 자리를 잡기 위함
+				int SECOND_CHOKE_SUPPLY = 12 * 4;
+//				if (InfoUtils.enemyRace() == Race.Zerg) {
+//					SECOND_CHOKE_SUPPLY = 12 * 4;
+//				}
 				
 				// ready to로 이동
 				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
 					return CampType.READY_TO;
 				}
-				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY - 5 * 4 && UnitUtils.availableScanningCount() >= 1) { // ready to로 이동하기 위해 잠시 집결하는 위치
+				if (UnitUtils.myFactoryUnitSupplyCount() > SECOND_CHOKE_SUPPLY && UnitUtils.availableScanningCount() >= 1) { // ready to로 이동하기 위해 잠시 집결하는 위치
 					return CampType.SECOND_CHOKE;
 				}
 				
@@ -226,6 +236,43 @@ public class PositionFinder {
 	private Position campTypeToPosition() {
 		CampType campType = StrategyIdea.campType;
 		
+		Position defensePosition = defensePosition(campType);
+		if (defensePosition != null) {
+			return defensePosition;
+		}
+		
+		if (campType == CampType.INSIDE) {
+			return baseInsidePosition();
+			
+		} else if (campType == CampType.FIRST_CHOKE) {
+			return firstChokeDefensePosition();
+			
+		} else if (campType == CampType.EXPANSION) {
+			return expansionDefensePosition();
+			
+		} else if (campType == CampType.SECOND_CHOKE) {
+			return InfoUtils.mySecondChoke().getCenter();
+			
+		} else { // if (campType == CampType.READY_TO) {
+			return InfoUtils.myReadyToPosition();
+		}
+	}
+	
+	private Position campTypeToSiegePositionForSiege() {
+		CampType campType = StrategyIdea.campType;
+		Position defensePosition = defensePosition(campType);
+		if (defensePosition != null) {
+			return defensePosition;
+		}
+
+		if (campType == CampType.EXPANSION) {
+			return expansionDefensePositionSiege();
+		} else {
+			return StrategyIdea.campPosition;
+		}
+	}
+
+	private Position defensePosition(CampType campType) {
 		List<Region> defenseMyRegion = new ArrayList<>();
 		
 		if (!InfoUtils.euiListInBase().isEmpty()) {
@@ -247,22 +294,7 @@ public class PositionFinder {
 			}
 		}
 		
-		if (campType == CampType.INSIDE) {
-			return baseInsidePosition();
-			
-		} else if (campType == CampType.FIRST_CHOKE) {
-			return firstChokeDefensePosition();
-			
-		} else if (campType == CampType.EXPANSION) {
-			return firstExpansionBackwardPosition();
-			
-		} else if (campType == CampType.SECOND_CHOKE) {
-			return InfoUtils.mySecondChoke().getCenter();
-			
-		} else { // if (campType == CampType.READY_TO) {
-			return InfoUtils.myReadyToPosition();
-			
-		}
+		return null;
 	}
 
 	/// 메인부대 위치 지점
@@ -648,43 +680,34 @@ public class PositionFinder {
 	}
 		
 	public Position baseFirstChokeMiddlePosition() {
-		if (this.basefirstChokeMiddlePosition != null) {
-			return basefirstChokeMiddlePosition;
-		}
-		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
-		Position myBasePosition = InfoUtils.myBase().getPosition();
-		double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
+		if (firstExpansionOccupied()) {
+			return InfoUtils.myFirstChoke().getCenter();
+			
+		} else {
+			if (this.basefirstChokeMiddlePosition != null) {
+				return basefirstChokeMiddlePosition;
+			}
+			Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
+			Position myBasePosition = InfoUtils.myBase().getPosition();
+			double radian = MicroUtils.targetDirectionRadian(firstChokePosition, myBasePosition);
 
-		return basefirstChokeMiddlePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 500);
+			return basefirstChokeMiddlePosition = MicroUtils.getMovePosition(firstChokePosition, radian, 500);
+		}
 	}
 
 	/// second choke보다 안쪽 포지션
-	private Position firstExpansionBackwardPosition() {
-		if (firstExpansionBackwardPosition != null) {
-			return firstExpansionBackwardPosition;
+	private Position expansionDefensePosition() {
+		if (expansionDefensePosition != null) {
+			return expansionDefensePosition;
 		}
 		
-//		Chokepoint firstChoke = InfoUtils.myFirstChoke();
-//		Chokepoint secondChoke = InfoUtils.mySecondChoke();
-//		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
-//		
-//		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
-//		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
-//		return firstExpansionBackwardPosition = new Position(x, y);
+		Chokepoint firstChoke = InfoUtils.myFirstChoke();
+		Chokepoint secondChoke = InfoUtils.mySecondChoke();
+		BaseLocation firstExpansion = InfoUtils.myFirstExpansion();
 		
-		
-		Position myBasePosition = InfoUtils.myBase().getPosition();
-		Pair<Position, Position> secondChokeSides = InfoUtils.mySecondChoke().getSides();
-		
-		double firstDistance = myBasePosition.getDistance(secondChokeSides.first);
-		double secondDistance = myBasePosition.getDistance(secondChokeSides.second);
-		
-		Position positionBaseSided = firstDistance < secondDistance ? secondChokeSides.first : secondChokeSides.second;
-
-		double radian = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
-		Position expansionDefensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 250);
-		
-		return firstExpansionBackwardPosition = expansionDefensePosition;
+		int x = (firstChoke.getX() + secondChoke.getX() + firstExpansion.getPosition().getX()) / 3;
+		int y = (firstChoke.getY() + secondChoke.getY() + firstExpansion.getPosition().getY()) / 3;
+		return expansionDefensePosition = new Position(x, y);
 
 		//First Expansion에서 약간 물러난 위치 (prebot 1 - overwatch, circuit 맵에 맞지 않음)
 //		double distanceFromFirstChoke = firstChoke.getDistance(secondChoke);
@@ -696,6 +719,24 @@ public class PositionFinder {
 //			int y = (firstChoke.getY() + firstExpansion.getY()) / 2;
 //			return new Position(x, y);
 //		}
+	}
+	
+	private Position expansionDefensePositionSiege() {
+		if (expansionDefensePositionSiege != null) {
+			return expansionDefensePositionSiege;
+		}
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		Pair<Position, Position> secondChokeSides = InfoUtils.mySecondChoke().getSides();
+		
+		double firstDistance = myBasePosition.getDistance(secondChokeSides.first);
+		double secondDistance = myBasePosition.getDistance(secondChokeSides.second);
+		
+		Position positionBaseSided = firstDistance < secondDistance ? secondChokeSides.first : secondChokeSides.second;
+
+		double radian = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
+		Position defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 230);
+		
+		return expansionDefensePositionSiege = defensePosition;
 	}
 	
 	/// First Choke Point 방어지역
@@ -724,7 +765,7 @@ public class PositionFinder {
 		}
 	}
 
-	private boolean enemyBaseDestroyed(BaseLocation enemyBase) {
+	public boolean enemyBaseDestroyed(BaseLocation enemyBase) {
 		if (!Prebot.Broodwar.isExplored(enemyBase.getTilePosition())) {
 			return false;
 		}
@@ -736,6 +777,13 @@ public class PositionFinder {
 
 	// 쥐 함수
 	private Position letsfindRatPosition() {
+		List<UnitInfo> enemyResourceDepots = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitType.Terran_Command_Center, UnitType.Protoss_Nexus
+				, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive);
+		
+		if (!enemyResourceDepots.isEmpty()) {
+			return enemyResourceDepots.get(0).getLastPosition();
+		}
+		
 		// 적 건물
 		for (UnitInfo eui : InfoUtils.enemyUnitInfoMap().values()) {
 			if (eui.getType().isBuilding() && PositionUtils.isValidPosition(eui.getLastPosition())) {
