@@ -409,11 +409,10 @@ public class WorkerManager extends GameManager {
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				if(repairWorker != null){
-					if (TimeUtils.beforeTime(7, 0)) {
+					if (TimeUtils.beforeTime(10, 0)) {
 						if(unit.getType() == UnitType.Terran_Bunker){
 							setRepairWorker(repairWorker, unit);
-						}else if(unit.getType() == UnitType.Terran_Missile_Turret 
-								&& BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(InfoUtils.myBase().getPosition())){
+						}else if(unit.getType() == UnitType.Terran_Missile_Turret){
 							setRepairWorker(repairWorker, unit);
 						}else if ((unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot )
 								&& unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {

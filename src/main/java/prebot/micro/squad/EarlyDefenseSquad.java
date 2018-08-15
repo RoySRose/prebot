@@ -133,6 +133,10 @@ public class EarlyDefenseSquad extends Squad {
 						&& !enemy.getType().isBuilding()
 						&& InfoUtils.myBase().getPosition().getDistance(enemy) > 300){
 					continue;
+				}else if(enemy.getType().isWorker() 
+						&& InformationManager.Instance().isBlockingEnterance()
+						&& InfoUtils.myBase().getPosition().getDistance(enemy) > 400){
+					continue;
 				}
 				if (bunker == null) {
 					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
