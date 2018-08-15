@@ -38,6 +38,10 @@ public abstract class Squad {
 	public Squad(SquadInfo squadInfo, Position targetPosition) {
 		this.squadName = squadInfo.squadName + targetPosition.toString();
 	}
+
+	public Squad(SquadInfo squadInfo, int unitID) {
+		this.squadName = squadInfo.squadName + unitID;
+	}
 	
 	public void setUnitType(UnitType... unitTypes) {
 		this.unitTypes = unitTypes;

@@ -579,7 +579,7 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
-	private static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
+	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
 		if (unitList.size() == 0) {
 			return null;
 		}

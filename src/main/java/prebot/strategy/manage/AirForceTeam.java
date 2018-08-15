@@ -13,6 +13,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Angles;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class AirForceTeam {
@@ -95,14 +96,20 @@ public class AirForceTeam {
 	public Position getTargetPosition() {
 		List<Position> targetPositions = AirForceManager.Instance().getTargetPositions();
 		if (targetPositions.isEmpty()) {
-			return null;
+			System.out.println("ERROR - airforceTeam targetposition is empty");
+			return StrategyIdea.mainSquadCenter;
 		}
 		
 		// AirForceManager의 targetPosition이 변경된 경우
 		if (currentTargetIndex >= AirForceManager.airForceTargetPositionSize) {
 			currentTargetIndex = 0;
 		}
-		return targetPositions.get(currentTargetIndex);
+		Position targetPosition = targetPositions.get(currentTargetIndex);
+		if (targetPosition == null) {
+			System.out.println("ERROR - index=" + currentTargetIndex + " / " + targetPositions);
+			return StrategyIdea.mainSquadCenter;
+		}
+		return targetPosition;
 	}
 
 	public void switchDriveAngle() {

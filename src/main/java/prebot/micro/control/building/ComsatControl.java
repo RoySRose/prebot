@@ -50,21 +50,12 @@ public class ComsatControl extends Control {
 				Unit comsatMaxEnergy = null;
 				int maxEnergy = 50;
 				for (Unit comsat : unitList) {
-//					if (TimeUtils.elapsedFrames(comsat.getLastCommandFrame()) < 5 * TimeUtils.SECOND) {
-//						continue;
-//					}
-					
 					if (comsat.getEnergy() >= maxEnergy && comsat.canUseTech(TechType.Scanner_Sweep, scanPosition)) {
 						maxEnergy = comsat.getEnergy();
 						comsatMaxEnergy = comsat;
 					}
 				}
 				if (comsatMaxEnergy != null) {
-//					GridCell cell = MapGrid.Instance().getCell(scanPosition);
-//					int timeLastScan = cell.getTimeLastScan() + StrategyConfig.SCAN_DURATION;
-//					System.out.println("timeLastScan : " + scanPosition + " / " + cell.getCenter() + " / " + timeLastScan + " / " + StrategyConfig.SCAN_DURATION);
-//					System.out.println("frames : " + TimeUtils.elapsedFrames());
-					
 					MapGrid.Instance().scanAtPosition(scanPosition);
 					comsatMaxEnergy.useTech(TechType.Scanner_Sweep, scanPosition);
 					scanUsedFrame = TimeUtils.elapsedFrames();
@@ -101,6 +92,7 @@ public class ComsatControl extends Control {
 				usableEnergy = comsatStation.getEnergy();
 			}
 		}
+		
 		if (comsatToUse != null) {
 			Position scanPositionForObservation = getScanPositionForObservation();
 
@@ -118,17 +110,19 @@ public class ComsatControl extends Control {
 	private Position scanPositionForInvisibleEnemy(Collection<UnitInfo> euiList) {
 		for (UnitInfo eui : euiList) {
 			Unit enemyUnit = eui.getUnit();
-			if (!UnitUtils.isValidUnit(enemyUnit) || !enemyUnit.isVisible()) {
+			if (!UnitUtils.isValidUnit(enemyUnit) && eui.getType() != UnitType.Terran_Vulture_Spider_Mine) {
+				continue;
+			}
+			if (!enemyUnit.isVisible() && eui.getType() != UnitType.Terran_Vulture_Spider_Mine) {
 				continue;
 			}
 			if (enemyUnit.isDetected() && enemyUnit.getOrder() != Order.Burrowing) {
 				continue;
 			}
-			
 			// 주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로 넘어간다
-			List<Unit> nearVessel = UnitUtils.getUnitsInRadius(PlayerRange.SELF, enemyUnit.getPosition(), UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
+			List<Unit> nearVessel = UnitUtils.getUnitsInRadius(PlayerRange.SELF, eui.getLastPosition(), UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
 			if (nearVessel != null) {
-				Unit neareasetVessel = UnitUtils.getClosestUnitToPositionNotStunned(nearVessel, enemyUnit.getPosition());
+				Unit neareasetVessel = UnitUtils.getClosestUnitToPositionNotStunned(nearVessel, eui.getLastPosition());
 				if (neareasetVessel != null) {
 					List<Unit> nearAllies = UnitUtils.getUnitsInRadius(PlayerRange.SELF, neareasetVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
 					if (nearAllies != null && nearAllies.size() > 2) {
@@ -143,7 +137,7 @@ public class ComsatControl extends Control {
 			Race enemyRace = InfoUtils.enemyRace();
 			int myAttackUnitInWeaponRangeCount = 0;
 			for (Unit myAttackUnit : myAttackUnits) {
-				WeaponType weaponType = MicroUtils.getWeapon(myAttackUnit, enemyUnit);
+				WeaponType weaponType = MicroUtils.getWeapon(myAttackUnit.getType(), eui.getType());
 				if (weaponType == WeaponType.None) {
 					continue;
 				}
@@ -153,7 +147,7 @@ public class ComsatControl extends Control {
 				if (!enemyUnit.isMoving()) {
 					weaponRangeMargin += 10;
 				}
-				int enemyUnitDistance = myAttackUnit.getDistance(enemyUnit);
+				int enemyUnitDistance = myAttackUnit.getDistance(eui.getLastPosition());
 				
 //				System.out.println("1: " + enemyUnitDistance);
 //				System.out.println("2: " + (weaponMaxRange + weaponRangeMargin));
@@ -162,15 +156,15 @@ public class ComsatControl extends Control {
 
 					if (enemyRace == Race.Protoss) {
 						if (myAttackUnitInWeaponRangeCount >= 3) {
-							return enemyUnit.getPosition();
+							return eui.getLastPosition();
 						}
 					} else if (enemyRace == Race.Terran) {
 						if (myAttackUnitInWeaponRangeCount >= 2) {
-							return enemyUnit.getPosition();
+							return eui.getLastPosition();
 						}
 					} else if (enemyRace == Race.Zerg) {
 						if (myAttackUnitInWeaponRangeCount >= 5 || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-							return enemyUnit.getPosition();
+							return eui.getLastPosition();
 						}
 					}
 				}

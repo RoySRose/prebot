@@ -9,6 +9,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -199,9 +200,8 @@ public class TankControl extends Control {
 
 				if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
 					int distToOrder = tank.getDistance(mainPosition);
-					if (distToOrder <= Tank.SIEGE_MODE_MAX_RANGE
-							&& TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
-						if (tank.canSiege()) {
+					if (distToOrder <= Tank.SIEGE_MODE_MAX_RANGE) {
+						if (tank.canSiege() && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
 							tank.siege();
 						} else {
 							if (MicroUtils.timeToRandomMove(tank)) {
