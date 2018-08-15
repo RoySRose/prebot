@@ -898,7 +898,10 @@ public class InformationManager extends GameManager {
 			if (resultBase == null) {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
 			}
+			
+			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation numberOfCC :: " + numberOfCC + " :: " + resultBase);
 		}
+		
 
 		getExpansionLocation = resultBase;
 		return resultBase;
