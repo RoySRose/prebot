@@ -1,5 +1,6 @@
 package prebot.build.prebot1;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,9 @@ public class ConstructionPlaceFinder {
 		NewMethod 		///< 예비
 	};
 	
-	
+//	20180815. hkk. for lastBuilding Location Debug
+	private ArrayList<TilePosition> lastBuilding = new ArrayList<TilePosition>(); 
+	private ArrayList<TilePosition> lastBuildingFinal = new ArrayList<TilePosition>(); 
 	
 //	public int maxSupplyCntX = 3;
 //	public int maxSupplyCntY = 4;
@@ -50,7 +53,9 @@ public class ConstructionPlaceFinder {
 	//서플라이 짓는 지역
 	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
 	//팩토리 건설 지역
-	private Set<TilePosition> tilesToAvoidFac = new HashSet<TilePosition>();
+	private Set<TilePosition> tilesToAvoidAddonBuilding = new HashSet<TilePosition>();
+	//커맨드 센터 와 컴셋 건설지역
+	private Set<TilePosition> baseLocationAvoid = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -146,11 +151,13 @@ public class ConstructionPlaceFinder {
 
             case SecondMainBaseLocation:
                 desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getSecondStartPosition().getTilePosition(), true);
+                System.out.println(" SecondMainBaseLocation ==>>>> " + desiredPosition);
                 if (desiredPosition == null) {
                     BuildManager.Instance().secondStartLocationFull = true;
                 }else{
                 	if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory) && BuildManager.Instance().fisrtSupplePointFull) {
                         desiredPosition = BlockingEntrance.Instance().getSupplyPosition(desiredPosition);
+                        System.out.println(" getSupplyPosition ==>>>> " + desiredPosition);
                     }
                     desiredPosition = getBuildLocationNear(buildingType, desiredPosition);
                 }
@@ -178,6 +185,7 @@ public class ConstructionPlaceFinder {
             case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
                 TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
                 desiredPosition = getBuildLocationNear(buildingType, lastBuilingFinalLocation);
+//                FileUtils.appendTextToFile("log.txt", "\n getLastBuilingFinalLocation ==>> "+ buildingType + " :: " + lastBuilingFinalLocation + " :: " + desiredPosition);
                 break;
 
             default:
@@ -213,8 +221,9 @@ public class ConstructionPlaceFinder {
 		// TODO 과제 : 건설 위치 탐색 방법은 ConstructionPlaceSearchMethod::SpiralMethod 로 하는데, 더 좋은 방법은 생각해볼 과제이다
 		int constructionPlaceSearchMethod = 0;
 
-		if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
-				&& methodFix == false){
+//		if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
+//				&& methodFix == false){
+		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		} else {
 //			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
@@ -253,7 +262,10 @@ public class ConstructionPlaceFinder {
 			buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
 
 		}
+		
+		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: " + buildingType + " :: " + desiredPosition);
 
+//		System.out.println("getBuildLocationNear :: " + buildingType + " :: " + desiredPosition);
 		if (TilePositionUtils.isValidTilePosition(buildPosition)) {
 			return buildPosition;
 		} else {
@@ -374,6 +386,7 @@ public class ConstructionPlaceFinder {
 		TilePosition resultPosition = TilePosition.None;
 		ConstructionTask b = new ConstructionTask(buildingType, desiredPosition);
 
+//		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: " + buildingType + " :: "+ desiredPosition + " :: " + constructionPlaceSearchMethod);
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
 		// 값을 찾아내라. = BaseLocation.isStartingLocation 을 체크해서 메인이면 저값. 나머진 다른값
@@ -385,7 +398,7 @@ public class ConstructionPlaceFinder {
 			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
 			
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-				maxRange = 20;
+				maxRange = 40;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
 					if(base.isStartLocation() && TilePositionUtils.equals(base.getTilePosition(), desiredPosition)) {
 						maxRange = 30;
@@ -422,7 +435,7 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
 				if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
-//					FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: spiralMaxLength ==>> "+ spiralMaxLength + " :: [" + currentX+" , "+currentY+"] ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
+//					FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: " + buildingType + " :: spiralMaxLength ==>> "+ spiralMaxLength + " :: [" + currentX+" , "+currentY+"] ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 					if (isPossiblePlace) {
 						resultPosition = new TilePosition(currentX, currentY);
@@ -609,6 +622,8 @@ public class ConstructionPlaceFinder {
 	public final boolean canBuildHereWithSpace(TilePosition position, final ConstructionTask b, int buildingGapSpace)
 	{
 		//if we can't build here, we of course can't build here with space
+		
+//		FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace start :: " + position);
 		if (!canBuildHere(position, b)) {
 //			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: canBuildHere false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 			return false;
@@ -722,6 +737,12 @@ public class ConstructionPlaceFinder {
 //						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 						return false;
 					}
+					
+					if(b.getType() != UnitType.Terran_Command_Center){
+						if(isTilesToAvoidBase(x, y)) {
+							return false;
+						}
+					}
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
 //					20180719. hkk. 저그전 대비 배럭과 서플 가스 주변에 붙여짓기 필요
@@ -737,7 +758,7 @@ public class ConstructionPlaceFinder {
 //					if (b.getType() == UnitType.Terran_Factory ||
 //						b.getType() == UnitType.Terran_Starport ||
 //						b.getType() == UnitType.Terran_Science_Facility) {
-//						if (isTilesToAvoidFac(x, y)) {
+//						if (isTilesToAvoidAddonBuilding(x, y)) {
 //							return false;
 //						}
 //					20180806. hkk. 1,2 번쨰 터렛은 지정
@@ -745,12 +766,12 @@ public class ConstructionPlaceFinder {
 					if (b.getType() == UnitType.Terran_Missile_Turret) {
 						if(!TilePositionUtils.equals(position, BlockingEntrance.Instance().entrance_turret1)
 							&&!TilePositionUtils.equals(position, BlockingEntrance.Instance().entrance_turret2)) {
-							if (isTilesToAvoidFac(x, y)) {
+							if (isTilesToAvoidAddonBuilding(x, y)) {
 								return false;
 							}
 						}
-					}else {
-						if (isTilesToAvoidFac(x, y)) {
+					}else if(b.getType() != UnitType.Factories && b.getType() != UnitType.Terran_Starport && b.getType() != UnitType.Terran_Science_Facility){
+						if (isTilesToAvoidAddonBuilding(x, y)) {
 //							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidFac false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
@@ -1069,7 +1090,7 @@ public class ConstructionPlaceFinder {
 		return false;
 	}
 	
-	public final boolean isTilesToAvoidFac(int x, int y)
+	public final boolean isTilesToAvoidAddonBuilding(int x, int y)
 	{
 //		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
@@ -1081,7 +1102,28 @@ public class ConstructionPlaceFinder {
 //			return true;
 //		}
 		
-		for (TilePosition t : tilesToAvoidFac) {
+		for (TilePosition t : tilesToAvoidAddonBuilding) {
+			if (t.getX() == x && t.getY() == y) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	public final boolean isTilesToAvoidBase(int x, int y)
+	{
+//		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport1
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
+//		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
+//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			return true;
+//		}
+		
+		for (TilePosition t : baseLocationAvoid) {
 			if (t.getX() == x && t.getY() == y) {
 				return true;
 			}
@@ -1151,7 +1193,7 @@ public class ConstructionPlaceFinder {
 							for (int l = gy0; l < gy2; l++) {
 								List<TilePosition> tileList = (List<TilePosition>) BWTA.getShortestPath(new TilePosition(i, j), new TilePosition(k, l));
 								for (TilePosition t : tileList) {
-									tilesToAvoid.add(t);									
+									tilesToAvoid.add(t);
 								}
 							}
 						}
@@ -1247,11 +1289,11 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidSupply;
 	}
 	
-	public Set<TilePosition> getTilesToAvoidFac() {
-		return tilesToAvoidFac;
+	public Set<TilePosition> getTilesToAvoidAddonBuilding() {
+		return tilesToAvoidAddonBuilding;
 	}
 	
-	public void setTilesToAvoidFac(Unit unit) {
+	public void setTilesToAvoidAddonBuilding(Unit unit) {
 		
 		int fromx = unit.getTilePosition().getX();
 //		int fromx = unit.getTilePosition().getX();
@@ -1277,7 +1319,7 @@ public class ConstructionPlaceFinder {
 				}
 				if(!isTilesToAvoidSupply(x, y)) {
 					TilePosition temp = new TilePosition(x,y);
-					tilesToAvoidFac.add(temp);
+					tilesToAvoidAddonBuilding.add(temp);
             	}
 			}
 		}
@@ -1300,60 +1342,60 @@ public class ConstructionPlaceFinder {
 //	}
 	}
 	
-	public void setTilesToAvoidAddon(Unit unit) {
-		
-		int fromx = unit.getTilePosition().getX()+4;
-		int fromy = unit.getTilePosition().getY()+1;
-		
-		for (int x = fromx; x < fromx + 2 && x < Prebot.Broodwar.mapWidth(); x++)
-		{
-			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-			for (int y = fromy ; y < fromy +  2&& y < Prebot.Broodwar.mapHeight(); y++)
-			{
-				TilePosition temp = new TilePosition(x,y);
-				tilesToAvoidAbsolute.add(temp);
-			}
-		}
-	}
+//	public void setTilesToAvoidAddon(Unit unit) {
+//		
+//		int fromx = unit.getTilePosition().getX()+4;
+//		int fromy = unit.getTilePosition().getY()+1;
+//		
+//		for (int x = fromx; x < fromx + 2 && x < Prebot.Broodwar.mapWidth(); x++)
+//		{
+//			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+//			for (int y = fromy ; y < fromy +  2&& y < Prebot.Broodwar.mapHeight(); y++)
+//			{
+//				TilePosition temp = new TilePosition(x,y);
+//				tilesToAvoidAbsolute.add(temp);
+//			}
+//		}
+//	}
 	
-	public void setTilesToAvoidCCAddon(Unit unit) {
-		
-		int fromx = unit.getTilePosition().getX()+4;
-		int fromy = unit.getTilePosition().getY();
-		
-		if(unit.getType() == UnitType.Terran_Command_Center) {
-		
-			for(BaseLocation baseLocation : BWTA.getBaseLocations())
-			{
-				if(TilePositionUtils.equals(unit.getTilePosition(), baseLocation.getTilePosition())) {
-					System.out.println(" CommandCenter is on the baseLocation ==>> " + unit.getTilePosition());
-					for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
-					{
-						//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-						for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
-						{
-							TilePosition temp = new TilePosition(x,y);
-							tilesToAvoidAbsolute.add(temp);
-						}
-					}
-				}
-			}
-		}else {
-		
-			for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
-			{
-				//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-				for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
-				{
-					TilePosition temp = new TilePosition(x,y);
-					tilesToAvoidAbsolute.add(temp);
-				}
-			}
-		}
-	}
+//	public void setTilesToAvoidAddonBuilding(Unit unit) {
+//		
+//		int fromx = unit.getTilePosition().getX()+4;
+//		int fromy = unit.getTilePosition().getY();
+//		
+//		if(unit.getType() == UnitType.Terran_Command_Center) {
+//		
+//			for(BaseLocation baseLocation : BWTA.getBaseLocations())
+//			{
+//				if(TilePositionUtils.equals(unit.getTilePosition(), baseLocation.getTilePosition())) {
+//					System.out.println(" CommandCenter is on the baseLocation ==>> " + unit.getTilePosition());
+//					for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
+//					{
+//						//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+//						for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+//						{
+//							TilePosition temp = new TilePosition(x,y);
+//							tilesToAvoidAbsolute.add(temp);
+//						}
+//					}
+//				}
+//			}
+//		}else {
+//		
+//			for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
+//			{
+//				//팩토리 외 건물은 위아래가 비어있을 필요가 없음
+//				for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+//				{
+//					TilePosition temp = new TilePosition(x,y);
+//					tilesToAvoidAbsolute.add(temp);
+//				}
+//			}
+//		}
+//	}
 	
 	
-	public void setTilesToAvoidCCAddon() {
+	public void setTilesToAvoidAddonBuilding() {
 		
 		for(BaseLocation baseLocation : BWTA.getBaseLocations())
 		{
@@ -1363,8 +1405,9 @@ public class ConstructionPlaceFinder {
 			for(int x = 0; x < 7 ; x++){
 				for(int y = 0;  y < 3 ; y++){
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
-					tilesToAvoid.add(t);
-					tilesToAvoidFac.add(t);
+					baseLocationAvoid.add(t);
+//					tilesToAvoid.add(t);
+//					tilesToAvoidAddonBuilding.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");
 				}
 			}
@@ -1476,5 +1519,66 @@ public class ConstructionPlaceFinder {
 				}
 			}
     	}
+	}
+	
+	public void debugBuildLocationSet() {
+//		System.out.println("start debugBuildLocationSet :: " + lastBuilding.size());
+		BaseLocation temp = InformationManager.Instance().getLastBuildingLocation();
+//		System.out.println("start debugBuildLocationSet :: " + temp.getTilePosition());
+		if(lastBuilding.size() == 0) {
+//			System.out.println("lastBuilding is null && add debugBuildLocationSet :: " + temp.getTilePosition());
+			lastBuilding.add(temp.getTilePosition());
+//			System.out.println("lastBuilding is null && add debugBuildLocationSet :: " + temp.getTilePosition());
+		}else {
+//			System.out.println("lastBuilding is not null && add debugBuildLocationSet :: " + temp.getTilePosition());
+			for(TilePosition lastBuildingP : lastBuilding) {
+				if(TilePositionUtils.equals(lastBuildingP, temp.getTilePosition())) {
+//					System.out.println("lastBuilding is exists :: break" + temp.getTilePosition());
+					break;
+				}
+				lastBuilding.add(temp.getTilePosition());
+//				System.out.println("add lastBuilding");
+			}
+		}
+		
+		TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
+		if( lastBuildingFinal.size() == 0) {
+			lastBuilding.add(lastBuilingFinalLocation);
+		}else {
+
+		
+			for(TilePosition lastBuildingFinalP : lastBuildingFinal) {
+				if(TilePositionUtils.equals(lastBuildingFinalP, lastBuilingFinalLocation)) {
+					break;
+				}
+				lastBuildingFinal.add(lastBuilingFinalLocation);
+//				System.out.println("add lastBuildingFinal");
+			}
+		}
+		
+		
+
+	}
+	
+	public void debugBuildLocationPrint() {
+//		System.out.println("print debugBuildLocationPrint ");
+		int a = 0, b = 0;
+		if(lastBuilding.size() != 0) {
+//			System.out.println("lastBuilding is not null :: " + lastBuilding);
+			for(TilePosition lastBuildingP : lastBuilding) {
+				
+				FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: "+ a +" of lastBuildingPosition :: " + lastBuildingP);
+//				System.out.println(" syso debugBuildLocation :: " + lastBuildingP);
+				a++;
+			}
+		}
+		
+		if(lastBuildingFinal.size() != 0) {
+//			System.out.println("lastBuildingFinal is not null :: " + lastBuildingFinal);
+			for(TilePosition lastBuildingFinalP : lastBuildingFinal) {
+				FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: " + b+ " of lastBuildingFinalPosition :: " + lastBuildingFinalP);
+				b++;
+			}
+		}
 	}
 }

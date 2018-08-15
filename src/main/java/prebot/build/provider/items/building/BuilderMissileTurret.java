@@ -16,13 +16,12 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderMissileTurret extends DefaultBuildableItem {
 
@@ -77,7 +76,8 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 //		
 		
 		
-		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Mutalisk)) {
+		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Mutalisk)
+			||UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Spire)) {
 			max_turret = 3;
 		}
 		
@@ -102,7 +102,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		Position firstChokeMainHalf = new Position((myBase.getPosition().getX() + myFirstChoke.getX() * 2) / 3 - 60,
 				(myBase.getPosition().getY() + myFirstChoke.getY() * 2) / 3 - 60);
-		if (noTurretNearPosition(firstChokeMainHalf, 180, 180, turretCount, max_turret)) {
+		if (noTurretNearPosition(firstChokeMainHalf, 100, 100, turretCount, max_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(firstChokeMainHalf.toTilePosition());
@@ -111,7 +111,8 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
 				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
-		if (noTurretNearPosition(firstChokeMainHalf, 210, 150, turretCount, max_turret)) {
+		
+		if (noTurretNearPosition(firstChokeExpHalf, 100, 100, turretCount, max_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(firstChokeExpHalf.toTilePosition());
@@ -136,7 +137,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 					if (noTurretNearPosition(commandCenter.getPosition(), 350, 300, turretCount, max_turret+add_turret)) {
 						setHighPriority(true);
 						setBlocking(true);
-						setTilePosition(myBase.getPosition().toTilePosition());
+						setTilePosition(commandCenter.getPosition().toTilePosition());
 						return true;
 					}
 				}
@@ -193,8 +194,10 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 	}
 
 	private boolean noTurretNearPosition(Position centerPosition, int radius1, int radius2, int turretCount, int maxTurretCnt) {
+		
 		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(PlayerRange.ALL, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
 		if( maxTurretCnt <= turretNearBase.size()) {
+//			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: centerPosition :: " + centerPosition.toTilePosition() + " is false!!!!!!!!");
 			return false;
 		}
 //		if (!turretNearBase.isEmpty()) {

@@ -27,6 +27,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -79,7 +80,7 @@ public class BuildManager extends GameManager {
 			return;
 		}
 
-		
+//		System.out.println("frame count debug ==>> " + Prebot.Broodwar.getFrameCount());
 		
 		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
 		checkBuildOrderQueueDeadlockAndInsert();
@@ -607,8 +608,8 @@ public class BuildManager extends GameManager {
         TilePosition desiredPosition = null;
 
         int count = 0;
-//		while (count < 15) {
-		while (true) {
+		while (count < 15) {
+//		while (true) {
 	    	count++;
 	    	
 //	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
@@ -690,7 +691,7 @@ public class BuildManager extends GameManager {
 //		FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
 //		return (type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas());
 		if((type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas())) {
-			FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
+//			FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
 			return true;
 		}
 		
