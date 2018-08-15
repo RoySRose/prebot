@@ -13,6 +13,7 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -54,22 +55,29 @@ public class EnemyBaseFinder {
 	private BaseLocation expectedByBuilding() {
 		BaseLocation baseExpected = null;
 		List<UnitInfo> enemyUnits = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		
+		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
 		for (UnitInfo eui : enemyUnits) {
-			if (eui.getType().isBuilding()) {
-				int minimumDistance = 999999;
-				for (BaseLocation startLocation : BWTA.getStartLocations()) {
-					if (startLocation.getTilePosition().equals(InfoUtils.myBase().getTilePosition())) {
-						continue;
-					}
-					if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
-						continue;
-					}
+			if (!eui.getType().isBuilding()) {
+				continue;
+			}
+			
+			int minimumDistance = 999999;
+			for (BaseLocation startLocation : BWTA.getStartLocations()) {
+				if (startLocation.getTilePosition().equals(InfoUtils.myBase().getTilePosition())) {
+					continue;
+				}
+				if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+					continue;
+				}
+				if (eui.getLastPosition().getDistance(centerPosition) < 500) {
+					continue;
+				}
 
-					int dist = PositionUtils.getGroundDistance(eui.getLastPosition(), startLocation.getPosition());
-					if (dist < minimumDistance) {
-						baseExpected = startLocation;
-						minimumDistance = dist;
-					}
+				int dist = PositionUtils.getGroundDistance(eui.getLastPosition(), startLocation.getPosition());
+				if (dist < minimumDistance) {
+					baseExpected = startLocation;
+					minimumDistance = dist;
 				}
 			}
 		}

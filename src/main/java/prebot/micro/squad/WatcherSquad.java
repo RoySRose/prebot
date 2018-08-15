@@ -99,8 +99,8 @@ public class WatcherSquad extends Squad {
 		}
 
 		Position avoidBunkerPosition = null;
-		if (TimeUtils.beforeTime(8, 0) && BlockingEntrance.Instance().bunker != null && !UnitUtils.myUnitDiscovered(UnitType.Terran_Bunker)) {
-			avoidBunkerPosition = BlockingEntrance.Instance().bunker.toPosition();
+		if (TimeUtils.beforeTime(8, 0) && BlockingEntrance.Instance().bunker1 != null && !UnitUtils.myUnitDiscovered(UnitType.Terran_Bunker)) {
+			avoidBunkerPosition = BlockingEntrance.Instance().bunker1.toPosition();
 		}
 		
 		vultureWatcher.setSaveUnitLevel(saveUnitLevel);

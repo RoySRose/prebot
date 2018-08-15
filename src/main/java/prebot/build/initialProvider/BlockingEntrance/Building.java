@@ -7,13 +7,14 @@ public enum Building {
     BARRACK(3),
     FACTORY(4),
     FACTORY2(5),
-    BUNKER(6),
-    ENTRANCE_TURRET1(7),
-    ENTRANCE_TURRET2(8),
-    SUPPLY_AREA(9),
-    STARPORT1(10),
-    STARPORT2(11),
-    BARRACK_LAND(12)
+    BUNKER1(6),
+    BUNKER2(7),
+    ENTRANCE_TURRET1(8),
+    ENTRANCE_TURRET2(9),
+    SUPPLY_AREA(10),
+    STARPORT1(11),
+    STARPORT2(12),
+    BARRACK_LAND(13)
     ;
 
     private final int value;

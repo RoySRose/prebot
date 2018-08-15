@@ -56,6 +56,44 @@ public class CommandUtils {
 		}
 	}
 
+	public static void fastestRightClick(Unit unit, Unit target) {
+		if (!UnitUtils.isValidUnit(unit)) {
+			return;
+		}
+		if (!UnitUtils.isValidUnit(target)) {
+			return;
+		}
+		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+			return;
+		}
+		UnitCommand currentCommand = unit.getLastCommand();
+		if (currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Unit) {
+			if (currentCommand.getTarget().getID() == target.getID()) {
+				return;
+			}
+		}
+		unit.rightClick(target);
+	}
+	
+	public static void fastestRightClick(Unit unit, Position position) {
+		if (!UnitUtils.isValidUnit(unit)) {
+			return;
+		}
+		if (!PositionUtils.isValidPosition(position)) {
+			return;
+		}
+		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+			return;
+		}
+		UnitCommand currentCommand = unit.getLastCommand();
+		if (currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Position) {
+			if (currentCommand.getTargetPosition().equals(position)) {
+				return;
+			}
+		}
+		unit.rightClick(position);
+	}
+
 	public static void repair(Unit unit, Unit target) {
 		if (validCommand(unit, target, UnitCommandType.Repair, true, false)) {
 			unit.repair(target);

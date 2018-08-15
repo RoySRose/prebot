@@ -17,7 +17,7 @@ public class ScvScoutAfterBuild extends Action {
 	private final UnitType buildingType;
 	private final int remainingFrames;
 
-	private int marginFrames = 10;
+	private int marginFrames = 5;
 	private boolean assigned = false;
 
 	public ScvScoutAfterBuild(UnitType buildingType, int remainingFrames) {
