@@ -148,6 +148,8 @@ public class UXManager {
 			// 미사일, 럴커의 보이지않는 공격등을 표시
 			// drawBulletsOnMap();
 			drawnextPoints();
+			
+			drawTurretMap();
 			// draw tile position of mouse cursor
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
@@ -174,7 +176,12 @@ public class UXManager {
 		} else if (uxOption == 6) {
 			drawBigWatch();
 			drawManagerTimeSpent(490, 210);
+		} else if (uxOption == 7) {
+			drawTurretMap();
 		}
+		
+		
+		
 
 		
 		drawUnitIdOnMap();
@@ -184,6 +191,17 @@ public class UXManager {
 		drawSquadUnitTagMap();
 		
 		clearDecisionListForUx();
+		
+		
+//		if (TimeUtils.executeRotation(1, 11)) {
+////			System.out.println("execute debugBuildLocationSet");
+//			ConstructionPlaceFinder.Instance().debugBuildLocationSet();
+//		}
+//		
+//		if (TimeUtils.executeRotation(1, 233)) {
+////			System.out.println("execute debugBuildLocationPrint");
+//			ConstructionPlaceFinder.Instance().debugBuildLocationPrint();
+//		}
 	}
 
 	private void drawDecision() {
@@ -1081,7 +1099,7 @@ public class UXManager {
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 		}
 		
-		Set<TilePosition> tilesToAvoidFac = ConstructionPlaceFinder.Instance().getTilesToAvoidFac();
+		Set<TilePosition> tilesToAvoidFac = ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding();
 		for (TilePosition t : tilesToAvoidFac)
 		{
 			int x1 = t.getX() * 32 + 8;
@@ -1146,6 +1164,8 @@ public class UXManager {
 	    TilePosition getLastBuildingLocation = InformationManager.Instance().getLastBuildingLocation;
 	    TilePosition getLastBuildingFinalLocation = InformationManager.Instance().getLastBuildingFinalLocation;
 	    
+	    
+	    
 		if(secondStartPosition!= null) {
 			Prebot.Broodwar.drawTextScreen(10, 120, "secondStartPosition: " + secondStartPosition.getTilePosition());
 			Prebot.Broodwar.drawTextMap(secondStartPosition.getPosition(), "secondStartPosition");
@@ -1176,6 +1196,9 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(10, 170, "secondChokePointFull: " + BuildManager.Instance().secondChokePointFull);
 		Prebot.Broodwar.drawTextScreen(10, 180, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
 		Prebot.Broodwar.drawTextScreen(10, 190, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
+		
+		Prebot.Broodwar.drawTextScreen(10, 200, "myMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition());
+		Prebot.Broodwar.drawTextScreen(10, 210, "enemyMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()).getTilePosition());
 
 	}
 	
@@ -1778,6 +1801,44 @@ public class UXManager {
 			Prebot.Broodwar.drawTextScreen(500 , y,"depot.getID() : " + depot.getID() +  " cnt : " + WorkerData.depotWorkerCount.get(depot.getID()) );
 			y += 10;
 		}
+	}
+	
+/// turret 건설 지점의 반경 표시
+	public void drawTurretMap() 
+	{
+		BaseLocation myBase = InfoUtils.myBase();
+		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
+		Chokepoint myFirstChoke = InfoUtils.myFirstChoke();
+		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
+		
+		int turretCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
+		
+		Position firstChokeMainHalf = new Position((myBase.getPosition().getX() + myFirstChoke.getX() * 2) / 3 - 60,
+				(myBase.getPosition().getY() + myFirstChoke.getY() * 2) / 3 - 60);
+		
+		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
+				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
+		
+		Prebot.Broodwar.drawTextMap(firstChokeMainHalf.getX() + 20, firstChokeMainHalf.getY() + 10, "(" + (int) (firstChokeMainHalf.getX()) + ", " + (int) (firstChokeMainHalf.getY()) + ")");
+		
+		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 100, Color.Red, false);
+		
+		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 100 + turretCount * 15, Color.Red, false);
+		
+		Prebot.Broodwar.drawTextMap(firstChokeExpHalf.getX() + 20, firstChokeExpHalf.getY() + 10, "(" + (int) (firstChokeExpHalf.getX()) + ", " + (int) (firstChokeExpHalf.getY()) + ")");
+		
+		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 100, Color.Orange, false);
+		
+		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 100 + turretCount * 15, Color.Orange, false);
+		
+		Prebot.Broodwar.drawTextMap(mySecondChoke.getCenter().getX() + 20, mySecondChoke.getCenter().getY() + 10, "(" + (int) (mySecondChoke.getCenter().getX()) + ", " + (int) (mySecondChoke.getCenter().getY()) + ")");
+		
+		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 100, Color.Cyan, false);
+		
+		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 100 + turretCount * 15, Color.Cyan, false);  
+		
+//		radius1 + turretCount * 15
+		
 	}
 
 }

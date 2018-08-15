@@ -29,6 +29,7 @@ import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -1031,9 +1032,9 @@ public class InformationManager extends GameManager {
 			closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
-//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + closeFromMyExpansionButFarFromEnemy +" < " + closestDistance);
+//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + (int)closeFromMyExpansionButFarFromEnemy +" < " + (int)closestDistance);
 				if(thirdPosition) {
-//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
 					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
 					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
 						closestDistanceToSecondExp = distanceToSecondExpansion;

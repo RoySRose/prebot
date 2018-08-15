@@ -300,13 +300,13 @@ public class BlockingEntrance {
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(10, 0));
 	    	
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT1),    new TilePosition(121, 0  ));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(101, 4  ));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(102, 4  ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT1),   new TilePosition(103, 119));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT2),   new TilePosition(104, 109));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT1),  new TilePosition(13, 119 ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT2),  new TilePosition(20, 119 ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.STARPORT1), new TilePosition(0, 0    ));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.STARPORT2), new TilePosition(0, 3    ));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.STARPORT2), new TilePosition(0, 4    ));
     	
     	
 //    	맵 : CIRCUITBREAKER
@@ -674,6 +674,7 @@ public class BlockingEntrance {
             yinc = true;
         }
         
+        System.out.println(" next supply position ==>> " + loc.toString());
 		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
 		return supply_pos;
 

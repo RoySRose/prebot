@@ -45,7 +45,7 @@ public class GameCommander {
 		BlockingEntrance.Instance().setBlockingEntrance();
 		BlockingEntrance.Instance().SetBlockingTilePosition();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
-		ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon();
+		ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
@@ -99,11 +99,11 @@ public class GameCommander {
 		
 //		if (unit.getPlayer() == InformationManager.Instance().selfPlayer) {
 //			if (unit.getType() == UnitType.Terran_Command_Center) {
-//				ConstructionPlaceFinder.Instance().setTilesToAvoidCCAddon(unit);
+//				ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding(unit);
 //			}
-//			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
-//				ConstructionPlaceFinder.Instance().setTilesToAvoidFac(unit);
-//			}
+			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+				ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding(unit);
+			}
 //			if ((unit.getType() == UnitType.Terran_Supply_Depot || unit.getType() == UnitType.Terran_Academy || unit.getType() == UnitType.Terran_Armory)) {
 //				ConstructionPlaceFinder.Instance().setTilesToAvoidSupply(unit);
 //			}

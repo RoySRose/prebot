@@ -19,6 +19,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -70,7 +71,7 @@ public class ConstructionManager extends GameManager {
 		reservedGas += type.gasPrice();
 
 		constructionQueue.add(b); // C++ : constructionQueue.push_back(b);
-		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: reservedMinerals :: " + reservedMinerals  + " :: reservedGas :: " + reservedGas );
+//		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: reservedMinerals :: " + reservedMinerals  + " :: reservedGas :: " + reservedGas );
 	}
 
 	
