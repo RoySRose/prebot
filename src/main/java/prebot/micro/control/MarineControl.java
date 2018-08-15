@@ -136,7 +136,17 @@ public class MarineControl extends Control {
 				if (skipControl(marine)) {
 					continue;
 				}
-				CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
+				
+				Decision decision = decisionMaker.makeDecision(marine, euiList);
+				if (decision.type == DecisionType.KITING_UNIT){
+					if(marineDangerousOutOfMyRegion(marine,decision.eui)){
+						CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
+					}
+					
+					MicroUtils.kiting(marine, decision.eui, kOption);
+				}else{
+					CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
+				}
 			}
 		}else {
 			boolean rangeUnit = false;
