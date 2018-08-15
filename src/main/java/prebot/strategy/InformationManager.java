@@ -26,6 +26,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.LagObserver;
+import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -1034,7 +1035,7 @@ public class InformationManager extends GameManager {
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
 //				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + (int)closeFromMyExpansionButFarFromEnemy +" < " + (int)closestDistance);
 				if(thirdPosition) {
-					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
 					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
 					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
 						closestDistanceToSecondExp = distanceToSecondExpansion;
@@ -1279,16 +1280,37 @@ public class InformationManager extends GameManager {
 
     public void updateMySecondBaseLocation() {
 
+    	boolean enemyRegion = false;
+    	
 	    if(secondStartPosition == null) {
             int closestDistance = 99999999;
             BaseLocation resultBase = null;
 
             for (BaseLocation baseLocation : BWTA.getStartLocations()) {
+            	
+            	enemyRegion = false;
+            	
                 if (baseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition()))
                     continue;
                 if (baseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
                     continue;
+                
+//            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
+            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, baseLocation.getPosition(), 350);
+            	for(Unit unit : enemyBuilding) {
+            		if(unit.getType().isResourceDepot()) {
+//            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: " + unit.getType());
+            			enemyRegion = true;
+            		}
+            			
+            	}
+            	
+            	if(enemyBuilding.size() > 5) {
+//            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
+            		enemyRegion = true;
+            	}
 
+            	if(enemyRegion) continue;
 
                 int enemyFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(enemyPlayer).getPosition(), baseLocation.getPosition());
                 int selfFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(selfPlayer).getPosition(), baseLocation.getPosition());

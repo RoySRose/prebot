@@ -28,6 +28,7 @@ import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -228,7 +229,11 @@ public class BuildManager extends GameManager {
 								if (desiredPosition != null)
 									System.out.println(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								
-								desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+								if(t.getUnitType() == UnitType.Terran_Supply_Depot || t.getUnitType() == UnitType.Terran_Academy || t.getUnitType() == UnitType.Terran_Armory) {
+									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.NextSupplePoint);
+								}else {
+									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+								}
 								
 								if (desiredPosition != TilePosition.None) {
 									System.out.println(" re calculate desiredPosition :: " + desiredPosition.getX() + ","+ desiredPosition.getY());
@@ -607,6 +612,7 @@ public class BuildManager extends GameManager {
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
         TilePosition desiredPosition = null;
 
+        
         int count = 0;
 		while (count < 15) {
 //		while (true) {
@@ -627,11 +633,13 @@ public class BuildManager extends GameManager {
                 }
             } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.NextSupplePoint) {
                 if (fisrtSupplePointFull) {
-                    if (mainBaseLocationFull) {
-                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
-                    } else {
-                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-                    }
+//                	20180815. hkk. 서플라이포인트가 Full 일 경우 작은 건물은 메인베이스가 Full 이더라도 지을수 있는 공간이 있을수 있으므로, 일단 찾아보고 null 이 나올경우 아래에서 처리
+                	seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+//                    if (mainBaseLocationFull) {
+//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+//                    } else {
+//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+//                    }
                 }
             }
 
@@ -651,6 +659,20 @@ public class BuildManager extends GameManager {
 //            FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition after desiredPosition :: "+ unitType + " :: " + desiredPosition);
             
             if(desiredPosition == null) {
+//            	20180815. hkk. seedPosition 이 지정되어 들어올경우 null이 나와도 SeedPositionStrategy 가 의미가 없으므로 1번만 찾는다.
+            	
+                if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
+//                	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null break :: " + unitType + " :: seedPosition :: "+ seedPosition);
+                	break;
+                }
+            	
+            	if(unitType == UnitType.Terran_Supply_Depot || unitType == UnitType.Terran_Academy || unitType == UnitType.Terran_Armory) {
+            		if(seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
+//            			20180815. hkk. 서플라이등의 건물이 supply area 가 아닌 메인베이스일경우 area가 full 이며, desiredP=null 인것은 메인베이스도 자리가 없다는 뜻 
+            			
+            			seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+            		}
+            	}
 //            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
                     System.out.println("Fixed seedPosition out");

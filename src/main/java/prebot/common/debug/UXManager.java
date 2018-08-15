@@ -120,6 +120,7 @@ public class UXManager {
 			drawGameInformationOnScreen(5, 5);
 //			drawUnitStatisticsOnScreen1(400, 15);
 			// drawUnitStatisticsOnScreen2(370, 50);
+//			System.out.println("1");
 			drawBWTAResultOnMap();
 //			drawMapGrid();
 			// 빌드오더큐 : 빌드 실행 전
@@ -132,6 +133,7 @@ public class UXManager {
 			// 건물 건설 장소 예약 지점
 			drawReservedBuildingTilesOnMap();
 			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
+//			System.out.println("2");
 			drawTilesToAvoidOnMap();
 //			drawLeaderUnitOnMap();
 			// drawUnitExtendedInformationOnMap();
@@ -141,15 +143,20 @@ public class UXManager {
 //			drawWorkerCountOnMap();
 			// 일꾼 자원채취 임무 상황
 			drawWorkerMiningStatusOnMap();
+//			System.out.println("3");
 			// 정찰
 //			drawScoutInformation(220, 330);
 			// 공격
 			drawUnitTargetOnMap();
+			
+//			System.out.println("4");
 			// 미사일, 럴커의 보이지않는 공격등을 표시
 			// drawBulletsOnMap();
 			drawnextPoints();
 			
+			
 			drawTurretMap();
+			
 			// draw tile position of mouse cursor
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
@@ -1099,15 +1106,15 @@ public class UXManager {
 			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 		}
 		
-		Set<TilePosition> tilesToAvoidFac = ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding();
-		for (TilePosition t : tilesToAvoidFac)
+		Set<TilePosition> tilesToAvoidAddonBuilding = ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding();
+		for (TilePosition t : tilesToAvoidAddonBuilding)
 		{
 			int x1 = t.getX() * 32 + 8;
 			int y1 = t.getY() * 32 + 8;
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Cyan, false);
+			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Black, false);
 		}
 		
 		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation();
