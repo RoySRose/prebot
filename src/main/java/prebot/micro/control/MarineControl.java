@@ -120,7 +120,8 @@ public class MarineControl extends Control {
 							}
 						}else{
 						//MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
-							MicroUtils.kiting(marine, decision.eui, kOption);
+							//MicroUtils.kiting(marine, decision.eui, kOption);
+							CommandUtils.attackMove(marine, StrategyIdea.mainSquadLeaderPosition);
 						}
 				} else {
 					if(campType != CampType.INSIDE  && campType != CampType.FIRST_CHOKE){
