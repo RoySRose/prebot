@@ -115,6 +115,12 @@ public class GameCommander {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitDestroy(unit);
 		InformationManager.Instance().onUnitDestroy(unit); 
+		if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+			ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuildingFree(unit);
+		}else if ((unit.getType() == UnitType.Terran_Machine_Shop || unit.getType() == UnitType.Terran_Control_Tower 
+				|| unit.getType() == UnitType.Terran_Covert_Ops || unit.getType() == UnitType.Terran_Physics_Lab)) {
+			ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuildingFree(unit);
+		}
 	}
 	
 	/// 유닛(건물/지상유닛/공중유닛)이 Morph 될 때 발생하는 이벤트를 처리합니다<br>
