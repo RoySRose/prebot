@@ -3,9 +3,9 @@ package prebot.build.provider.items.unit;
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.DefaultBuildableItem;
-import prebot.build.provider.StarportUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.main.Prebot;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
 public class BuilderValkyrie extends DefaultBuildableItem {
@@ -33,6 +33,9 @@ public class BuilderValkyrie extends DefaultBuildableItem {
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) < maxValkyrieCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie, null) == 0) {
+				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Valkyrie)) {
+					setHighPriority(true);
+				}
 				return true;
 			}
 		}

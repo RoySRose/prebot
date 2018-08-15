@@ -191,7 +191,7 @@ public class MapGrid extends GameManager {
 	/// 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록 등을 업데이트 합니다
 	public void update()
 	{
-		if (TimeUtils.executeRotation(2, LagObserver.managerRotationSize())) {
+		if (!TimeUtils.executeRotation(2, LagObserver.managerRotationSize())) {
 			return;
 		}
 		

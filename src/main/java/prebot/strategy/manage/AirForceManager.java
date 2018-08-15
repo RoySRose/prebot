@@ -23,6 +23,7 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.predictor.WraithFightPredictor;
 import prebot.strategy.StrategyIdea;
@@ -317,10 +318,17 @@ public class AirForceManager {
 	private List<Position> getMineralPositions() {
 		Position enemyBasePosition = InfoUtils.enemyBase().getPosition();
 		Position enemyFirstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
-
+		
+		int[] angles;
+		if (!PositionFinder.Instance().enemyBaseDestroyed(InfoUtils.enemyFirstExpansion())) {
+			angles = Angles.AIRFORCE_MINERAL_TARGET_ANGLE_1;
+		} else {
+			angles = Angles.AIRFORCE_MINERAL_TARGET_ANGLE_2;
+		}
+		
 		List<Position> positions = new ArrayList<>();
 		double radian = MicroUtils.targetDirectionRadian(enemyBasePosition, enemyFirstExpansionPosition);
-		for (int angle : Angles.AIRFORCE_MINERAL_TARGET_ANGLE) {
+		for (int angle : angles) {
 			double rotateAngle = MicroUtils.rotate(radian, angle);
 			Position mineralPosition = MicroUtils.getMovePosition(enemyFirstExpansionPosition, rotateAngle, 300);
 			if (mineralPosition.isValid()) {
@@ -673,7 +681,7 @@ public class AirForceManager {
 			
 			// repair 완료처리
 			if (airForceTeam.repairCenter != null) {
-				if (!UnitUtils.isValidUnit(airForceTeam.repairCenter)) {
+				if (!UnitUtils.isValidUnit(airForceTeam.repairCenter) || WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(airForceTeam.repairCenter) < 3) {
 					Unit repairCenter = UnitUtils.getClosestActivatedCommandCenter(airForceTeam.leaderUnit.getPosition());
 					if (repairCenter != null) {
 						airForceTeam.repairCenter = repairCenter;

@@ -313,7 +313,7 @@ public class BuildQueueProvider extends GameManager {
     }
 
 	public void update() {
-		if (TimeUtils.executeRotation(3, LagObserver.managerRotationSize())) {
+		if (!TimeUtils.executeRotation(3, LagObserver.managerRotationSize())) {
 			return;
 		}
 		

@@ -1718,6 +1718,9 @@ public class UXManager {
 
 	private void drawPositionInformation() {
 
+		if (StrategyIdea.mainSquadLeaderPosition != null) {
+			Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainSquadLeaderPosition, 0, -20), UxColor.CHAR_WHITE + "V");
+		}
 		if (StrategyIdea.campPosition.equals(StrategyIdea.mainPosition)) {
 			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_ORANGE + "camp & main");
 		} else {
@@ -1727,6 +1730,9 @@ public class UXManager {
 			if (StrategyIdea.mainPosition != null) {
 				Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainPosition, 0, -10), UxColor.CHAR_RED + "main");
 			}
+		}
+		if (StrategyIdea.campPositionSiege != null) {
+			Prebot.Broodwar.drawTextMap(StrategyIdea.campPositionSiege, UxColor.CHAR_YELLOW + "camp (siege)");
 		}
 		if (StrategyIdea.watcherPosition != null) {
 			Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.watcherPosition, 0, -20), UxColor.CHAR_BLUE + "watcherPos");

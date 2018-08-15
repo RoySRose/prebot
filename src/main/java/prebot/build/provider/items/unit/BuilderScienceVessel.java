@@ -5,6 +5,7 @@ import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
@@ -35,7 +36,15 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 		int maxVesselCount = getMaxVesselCount();
 		int allVesselCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel);
 
-		return allVesselCount <= maxVesselCount && activatedCommandCenterCount >= 2;
+		if (allVesselCount <= maxVesselCount && activatedCommandCenterCount >= 2) {
+			if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
+				setHighPriority(true);
+			}
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 
 	private int getMaxVesselCount() {

@@ -71,7 +71,7 @@ public class BuildManager extends GameManager {
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
 		
-		if (TimeUtils.executeRotation(4, LagObserver.managerRotationSize())) {
+		if (!TimeUtils.executeRotation(4, LagObserver.managerRotationSize())) {
 			return;
 		}
 	

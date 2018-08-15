@@ -79,7 +79,7 @@ public class EnemyBaseFinder {
 	private BaseLocation expectedByUnit() {
 		int scoutLimitFrames;
 		if (InfoUtils.enemyRace() == Race.Protoss) {
-			scoutLimitFrames = TimeUtils.timeToFrames(1, 40);
+			scoutLimitFrames = TimeUtils.timeToFrames(1, 25);
 		} else {
 			scoutLimitFrames = TimeUtils.timeToFrames(2, 0);
 		}

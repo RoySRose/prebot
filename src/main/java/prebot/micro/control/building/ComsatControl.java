@@ -36,10 +36,10 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (TimeUtils.elapsedFrames(scanUsedFrame) < 2 * TimeUtils.SECOND) {
+		if (TimeUtils.elapsedFrames(scanUsedFrame) < 3 * TimeUtils.SECOND) {
 			return;
 		}
-		if (TimeUtils.executeRotation(0, 48)) {
+		if (!TimeUtils.executeRotation(0, 24)) {
 			return;
 		}
 		

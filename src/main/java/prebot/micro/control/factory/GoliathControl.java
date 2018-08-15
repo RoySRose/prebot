@@ -50,7 +50,7 @@ public class GoliathControl extends Control {
 			
 			if (!StrategyIdea.mainSquadMode.isAttackMode) {
 				if (dangerousOutOfMyRegion(unit)) {
-					CommandUtils.move(unit, StrategyIdea.campPosition);
+					CommandUtils.move(unit, StrategyIdea.mainPosition);
 					continue;
 				}
 			} else {
