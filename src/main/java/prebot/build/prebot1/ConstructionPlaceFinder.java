@@ -55,7 +55,7 @@ public class ConstructionPlaceFinder {
 	//팩토리 건설 지역
 	private Set<TilePosition> tilesToAvoidAddonBuilding = new HashSet<TilePosition>();
 	//커맨드 센터 와 컴셋 건설지역
-	private Set<TilePosition> baseLocationAvoid = new HashSet<TilePosition>();
+	private Set<TilePosition> tilesToBaseLocationAvoid = new HashSet<TilePosition>();
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
 	
@@ -1123,7 +1123,7 @@ public class ConstructionPlaceFinder {
 //			return true;
 //		}
 		
-		for (TilePosition t : baseLocationAvoid) {
+		for (TilePosition t : tilesToBaseLocationAvoid) {
 			if (t.getX() == x && t.getY() == y) {
 				return true;
 			}
@@ -1293,19 +1293,14 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidAddonBuilding;
 	}
 	
+	public Set<TilePosition> getTilesToAvoidBaseLocation() {
+		return tilesToBaseLocationAvoid;
+	}
+	
 	public void setTilesToAvoidAddonBuilding(Unit unit) {
 		
 		int fromx = unit.getTilePosition().getX();
-//		int fromx = unit.getTilePosition().getX();
 		int fromy = unit.getTilePosition().getY();
-//		int fromy = unit.getTilePosition().getY();
-		
-		/*if(fromx<0){
-			fromx=0;
-		}
-		if(fromy<0){
-			fromy =0;
-		}*/
 		
 
 		for (int x = fromx; x > 0 && x < fromx + 6 && x < Prebot.Broodwar.mapWidth(); x++)
@@ -1323,79 +1318,10 @@ public class ConstructionPlaceFinder {
             	}
 			}
 		}
-		
-//		20180808. hkk. original source		
-//		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
-////	for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
-//        {
-////            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-//		for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-//        {
-//			if((x==fromx + 6 || x==fromx + 7) && y == fromy){
-//				continue;
-//			}
-//			if(!isTilesToAvoidSupply(x, y)) {
-//				TilePosition temp = new TilePosition(x,y);
-//				tilesToAvoidFac.add(temp);
-//        	}
-//		}
-//	}
 	}
 	
-//	public void setTilesToAvoidAddon(Unit unit) {
-//		
-//		int fromx = unit.getTilePosition().getX()+4;
-//		int fromy = unit.getTilePosition().getY()+1;
-//		
-//		for (int x = fromx; x < fromx + 2 && x < Prebot.Broodwar.mapWidth(); x++)
-//		{
-//			//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-//			for (int y = fromy ; y < fromy +  2&& y < Prebot.Broodwar.mapHeight(); y++)
-//			{
-//				TilePosition temp = new TilePosition(x,y);
-//				tilesToAvoidAbsolute.add(temp);
-//			}
-//		}
-//	}
 	
-//	public void setTilesToAvoidAddonBuilding(Unit unit) {
-//		
-//		int fromx = unit.getTilePosition().getX()+4;
-//		int fromy = unit.getTilePosition().getY();
-//		
-//		if(unit.getType() == UnitType.Terran_Command_Center) {
-//		
-//			for(BaseLocation baseLocation : BWTA.getBaseLocations())
-//			{
-//				if(TilePositionUtils.equals(unit.getTilePosition(), baseLocation.getTilePosition())) {
-//					System.out.println(" CommandCenter is on the baseLocation ==>> " + unit.getTilePosition());
-//					for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
-//					{
-//						//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-//						for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
-//						{
-//							TilePosition temp = new TilePosition(x,y);
-//							tilesToAvoidAbsolute.add(temp);
-//						}
-//					}
-//				}
-//			}
-//		}else {
-//		
-//			for (int x = fromx; x < fromx + 3 && x < Prebot.Broodwar.mapWidth(); x++)
-//			{
-//				//팩토리 외 건물은 위아래가 비어있을 필요가 없음
-//				for (int y = fromy ; y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
-//				{
-//					TilePosition temp = new TilePosition(x,y);
-//					tilesToAvoidAbsolute.add(temp);
-//				}
-//			}
-//		}
-//	}
-	
-	
-	public void setTilesToAvoidAddonBuilding() {
+	public void setTilesToAvoidBaseLocation() {
 		
 		for(BaseLocation baseLocation : BWTA.getBaseLocations())
 		{
@@ -1405,7 +1331,7 @@ public class ConstructionPlaceFinder {
 			for(int x = 0; x < 7 ; x++){
 				for(int y = 0;  y < 3 ; y++){
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
-					baseLocationAvoid.add(t);
+					tilesToBaseLocationAvoid.add(t);
 //					tilesToAvoid.add(t);
 //					tilesToAvoidAddonBuilding.add(t);
 					//System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");

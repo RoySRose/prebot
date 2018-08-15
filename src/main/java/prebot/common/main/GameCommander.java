@@ -45,7 +45,7 @@ public class GameCommander {
 		BlockingEntrance.Instance().setBlockingEntrance();
 		BlockingEntrance.Instance().SetBlockingTilePosition();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
-		ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding();
+		ConstructionPlaceFinder.Instance().setTilesToAvoidBaseLocation();
 		InitialBuildProvider.Instance().onStart();
 		StrategyManager.Instance().onStart();
 		CombatManager.Instance().onStart();
