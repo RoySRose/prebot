@@ -65,7 +65,7 @@ public class BuildingSquad extends Squad {
 		scienceFacilityControl.controlIfUnitExist(scienceFacilityList, Collections.emptySet());
 		
 		List<Unit> combatList = unitListMap.getOrDefault(UnitType.Terran_Comsat_Station, new ArrayList<Unit>());
-		List<UnitInfo> comsatEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE);
+		List<UnitInfo> comsatEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
 		comsatControl.controlIfUnitExist(combatList, comsatEuiList);
 	}
 	

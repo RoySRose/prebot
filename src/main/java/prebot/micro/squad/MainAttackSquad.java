@@ -13,6 +13,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -50,6 +51,12 @@ public class MainAttackSquad extends Squad {
 
 	@Override
 	public boolean want(Unit unit) {
+		if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+			Squad squad = CombatManager.Instance().squadData.getSquad(unit);
+			if (squad instanceof MultiDefenseSquad) {
+				return false;
+			}
+		}
 		return true;
 	}
 

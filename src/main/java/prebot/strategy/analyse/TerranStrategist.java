@@ -40,6 +40,9 @@ public class TerranStrategist extends Strategist {
 		if (hasAnyType(ClueType.MEDIC, ClueType.FIREBAT)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
+		if (hasType(ClueType.FAST_MARINE)) {
+			return EnemyStrategy.TERRAN_2BARRACKS;
+		}
 		
 		if (hasAnyInfo(ClueInfo.REFINERY_FAST, ClueInfo.REFINERY_LATE)) {
 			if (hasAnyInfo(ClueInfo.FACTORY_NOT_FOUND)) {
@@ -131,6 +134,10 @@ public class TerranStrategist extends Strategist {
 		}
 		
 		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.BIONIC)) {
+			return EnemyStrategy.TERRAN_BIONIC;
+		}
+
+		if (hasType(ClueType.FAST_MARINE)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		

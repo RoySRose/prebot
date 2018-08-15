@@ -24,6 +24,18 @@ public class PositionUtils {
 	public static boolean isValidPosition(Position position) {
 		return position != Position.None && position != Position.Invalid && position != Position.Unknown && position.isValid();
 	}
+	
+	public static boolean isAllValidPosition(Position position, Position...positions) {
+		if (!isValidPosition(position)) {
+			return false;
+		}
+		for (Position p : positions) {
+			if (!isValidPosition(p)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
     /// 유효한 tileposition이면 true
     public static boolean isValidTilePosition(TilePosition tilePosition) {

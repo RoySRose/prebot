@@ -32,6 +32,12 @@ import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AirForceManager {
 	
+	private boolean initialized = false;
+	
+	public boolean airForceManagerInitialized() {
+		return initialized;
+	}
+
 	public static class StrikeLevel {
 		public static final int CRITICAL_SPOT = 3; // 때리면 죽는 곳 공격 (터렛건설중인 SCV, 아모리 건설중인 SCV, 엔지니어링베이 건설중인 SCV)
 		public static final int SORE_SPOT = 2; // 때리면 아픈 곳 공격 (커맨드센터건설중인 SCV, 팩토리 건설중인 SCV, 뭔가 건설중인 SCV, 체력이 적은 SCV, 가까운 SCV, 탱크)
@@ -126,12 +132,20 @@ public class AirForceManager {
 		if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
 			return;
 		}
+		if (!initialized) {
+			System.out.println("AirForceManager first update started");
+		}
 		
 		defenseModeChange();
 		setTargetPosition();
 		changeAirForceTeamTargetPosition();
 		adjustStrikeLevel();
 		adjustWraithCount();
+		
+		if (!initialized) {
+			System.out.println("AirForceManager first update finished");
+			initialized = true;
+		}
 	}
 
 	private void defenseModeChange() {
@@ -278,7 +292,7 @@ public class AirForceManager {
 			int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
 			int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index + 1));
 
-			targetPositions.add(new Position(resultX, resultY));
+			targetPositions.add(new Position(resultX, resultY).makeValid());
 		}
 		targetPositions.add(secondBase.getPosition());
 
@@ -295,10 +309,10 @@ public class AirForceManager {
 			
 			targetPositions.add(base.getPosition());
 			
-			Position positionUp = new Position(base.getPosition().getX(), base.getPosition().getY() - 400);
-			Position positionDown = new Position(base.getPosition().getX(), base.getPosition().getY() + 400);
-			Position positionLeft = new Position(base.getPosition().getX() - 400, base.getPosition().getY());
-			Position positionRight = new Position(base.getPosition().getX() + 400, base.getPosition().getY());
+			Position positionUp = new Position(base.getPosition().getX(), base.getPosition().getY() - 300);
+			Position positionDown = new Position(base.getPosition().getX(), base.getPosition().getY() + 300);
+			Position positionLeft = new Position(base.getPosition().getX() - 300, base.getPosition().getY());
+			Position positionRight = new Position(base.getPosition().getX() + 300, base.getPosition().getY());
 			
 			if (PositionUtils.isValidPosition(positionUp)) {
 				targetPositions.add(positionUp);
@@ -311,6 +325,15 @@ public class AirForceManager {
 			}
 			if (PositionUtils.isValidPosition(positionRight)) {
 				targetPositions.add(positionRight);
+			}
+		}
+		
+		if (TimeUtils.afterTime(10, 0) && InfoUtils.enemyRace() == Race.Terran) {
+			if (PositionUtils.isValidPosition(StrategyIdea.nearGroundEnemyPosition)) {
+				targetPositions.add(StrategyIdea.nearGroundEnemyPosition);
+			}
+			if (PositionUtils.isValidPosition(StrategyIdea.totalEnemyCneterPosition)) {
+				targetPositions.add(StrategyIdea.totalEnemyCneterPosition);
 			}
 		}
 	}
@@ -330,11 +353,9 @@ public class AirForceManager {
 		double radian = MicroUtils.targetDirectionRadian(enemyBasePosition, enemyFirstExpansionPosition);
 		for (int angle : angles) {
 			double rotateAngle = MicroUtils.rotate(radian, angle);
-			Position mineralPosition = MicroUtils.getMovePosition(enemyFirstExpansionPosition, rotateAngle, 300);
-			if (mineralPosition.isValid()) {
+			Position mineralPosition = MicroUtils.getMovePosition(enemyFirstExpansionPosition, rotateAngle, 300).makeValid();
+			if (PositionUtils.isValidPosition(mineralPosition)) {
 				positions.add(mineralPosition);
-			} else {
-				positions.add(mineralPosition.makeValid());
 			}
 		}
 		return positions;
@@ -521,21 +542,22 @@ public class AirForceManager {
 		}
 
 		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
+		
+		// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
+		int maxWraitCount = Math.min(wraithCount + 4, 12);
+		int minWraitCount = Math.max(wraithCount - 4, 0);
+		
 		if (accumulatedAchievement <= downAchievement) {
-			StrategyIdea.wraithCount--;
-			accumulatedAchievement = 0;
-			
-			if (StrategyIdea.wraithCount < wraithCount - 5) {
-				StrategyIdea.wraithCount++;
-			}
-		} else if (accumulatedAchievement >= upAchievement) {
-			StrategyIdea.wraithCount++;
-			accumulatedAchievement = 0;
-			
-			// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
-			if (StrategyIdea.wraithCount > wraithCount + 5) {
+			if (StrategyIdea.wraithCount > minWraitCount) {
 				StrategyIdea.wraithCount--;
 			}
+			accumulatedAchievement = 0;
+			
+		} else if (accumulatedAchievement >= upAchievement) {
+			if (StrategyIdea.wraithCount < maxWraitCount) {
+				StrategyIdea.wraithCount++;
+			}
+			accumulatedAchievement = 0;
 		}
 		
 		

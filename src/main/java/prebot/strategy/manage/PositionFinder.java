@@ -13,6 +13,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -456,6 +457,24 @@ public class PositionFinder {
 		if (StrategyIdea.mainSquadMode.isAttackMode && InfoUtils.enemyRace() != Race.Terran) {
 			watcherPosition = StrategyIdea.mainPosition;
 		}
+		
+		// watcher 방어모드1
+		if (watcherPosition == Position.Unknown) {
+			if (PositionUtils.isValidGroundPosition(StrategyIdea.nearGroundEnemyPosition)) {
+				watcherPosition = StrategyIdea.nearGroundEnemyPosition;
+			}
+		}
+		
+		// watcher 방어모드2
+		if (watcherPosition == Position.Unknown) {
+			Set<UnitInfo> euiListInBase = InfoUtils.euiListInBase();
+			for (UnitInfo eui : euiListInBase) {
+				if (!eui.getType().isFlyer()) {
+					watcherPosition = eui.getLastPosition();
+					break;
+				}
+			}
+		}
 
 		// watcher 방어모드(특수)
 		if (watcherPosition == Position.Unknown) {
@@ -480,24 +499,6 @@ public class PositionFinder {
 			}
 		}
 		
-		// watcher 방어모드1
-		if (watcherPosition == Position.Unknown) {
-			if (PositionUtils.isValidGroundPosition(StrategyIdea.nearGroundEnemyPosition)) {
-				watcherPosition = StrategyIdea.nearGroundEnemyPosition;
-			}
-		}
-		
-		// watcher 방어모드2
-		if (watcherPosition == Position.Unknown) {
-			Set<UnitInfo> euiListInBase = InfoUtils.euiListInBase();
-			for (UnitInfo eui : euiListInBase) {
-				if (!eui.getType().isFlyer()) {
-					watcherPosition = eui.getLastPosition();
-					break;
-				}
-			}
-		}
-		
 		// watcher 특수 포지션
 		if (watcherPosition == Position.Unknown) {
 			if (InfoUtils.enemyBase() != null) {
@@ -513,7 +514,12 @@ public class PositionFinder {
 		// watcher 기본 포지션
 		if (watcherPosition == Position.Unknown) {
 			if (InfoUtils.enemyBase() != null) {
-				watcherPosition = InfoUtils.enemyBase().getPosition();
+				if (InfoUtils.enemyRace() == Race.Terran && Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 0) {
+					watcherPosition = InfoUtils.enemyThirdRegion().getCenter();
+				} else {
+					watcherPosition = InfoUtils.enemyBase().getPosition();
+				}
+					
 			} else {
 				watcherPosition = InfoUtils.mySecondChoke().getCenter();
 			}

@@ -40,7 +40,10 @@ public class AirForceSquad extends Squad {
 
 	@Override
 	public void execute() {
-		// airForceUnit 머지
+		if (!AirForceManager.Instance().airForceManagerInitialized()) {
+			return;
+		}
+
 		AirForceManager.Instance().updateAirForceTeam(unitList);
 		
 		List<Unit> leaderAirunits = new ArrayList<>();
