@@ -11,10 +11,14 @@ import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
+import prebot.macro.util.EnemyUnitCounter;
 import prebot.macro.util.MutableInt;
 import prebot.macro.util.UnitTypeList;
+import prebot.macro.util.ScoreBoard;
 import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.constant.EnemyStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +31,7 @@ public class AttackDecisionMaker extends GameManager {
 
     public Decision decision;
     Boolean foundEnemyMainBase;
+    public ScoreBoard scoreBoard;
 
     private static AttackDecisionMaker instance = new AttackDecisionMaker();
     public static AttackDecisionMaker Instance() {
@@ -48,25 +53,45 @@ public class AttackDecisionMaker extends GameManager {
         this.enemyGasToPredict = 0;
         this.predictedTotalEnemyAttackUnit = new HashMap<>();
         this.foundEnemyMainBase = false;
+        this.decision = Decision.DEFENCE;
+        this.scoreBoard = new ScoreBoard();
     }
 
     public void update() {
-        this.decision = Decision.DEFENCE;
 
         //removeDestroyedDepot(InformationManager.Instance().enemyRace);
         addFakeMainDepot(InformationManager.Instance().enemyRace);
         addNewResourceDepot(InformationManager.Instance().enemyRace);
         updateResources(InformationManager.Instance().enemyRace);
 
-        summaryResource();
+        if(checkPhase3()) {
+            summaryResource();
 
-//        predictEnemyUnit();
-        int myForcePoint = calculateMyForce();
-        int enemyForcePoint = calculateEnemyForce();
-        decision = makeDecision(myForcePoint, enemyForcePoint);
+            if (InformationManager.Instance().enemyRace == Race.Terran) {
+                predictEnemyUnitTerran();
+            } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+                predictEnemyUnitProtoss();
+            } else {
+                predictEnemyUnitZerg();
+            }
+
+            int myForcePoint = calculateMyForce();
+            int enemyForcePoint = calculateEnemyForce();
+            decision = makeDecision(myForcePoint, enemyForcePoint);
+        }else{
+            decision = Decision.DEFENCE;
+        }
     }
 
-	private int calculateMyForce() {
+    private boolean checkPhase3() {
+
+//        if(phase3 == ){
+//            return true;
+//        }
+        return false;
+    }
+
+    private int calculateMyForce() {
 
         int point=0;
 
@@ -83,13 +108,11 @@ public class AttackDecisionMaker extends GameManager {
 
         int point=0;
 
-        int vulture = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-        int tank = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-        int valkyrie = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie);
-        int goliath = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Goliath);
+        for (Map.Entry<UnitType, MutableInt> enemyUnit : predictedTotalEnemyAttackUnit.entrySet()){
+            point += (enemyUnit.getValue().get() * scoreBoard.getPoint(enemyUnit.getKey()));
+        }
 
         return point;
-        //내 유닛 수치화
     }
 
     private Decision makeDecision(int myForcePoint, int enemyForcePoint) {
@@ -102,16 +125,169 @@ public class AttackDecisionMaker extends GameManager {
         }
     }
 
-    private void predictEnemyUnit() {
+    private void predictEnemyUnitZerg() {
 
+        EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
 
-        //predictedTotalEnemy 에 실제 본 상대 유닛 들어가 있음.
-//        enemyMineralToPredict;
-//        enemyGasToPredict;
-        // 두개 자원을 가지고 상대의 추가 추정 유닛들을 찾아서 predictedTotalEnemy에 넣기
+//        ZERG_GROUND3 히드라, 럴커, 뮤탈 1 : 1 : 0
+//        ZERG_GROUND2 히드라, 럴커, 뮤탈 3 : 2 : 1
+//        ZERG_GROUND1 히드라, 럴커, 뮤탈 2 : 1 : 1
+//        ZERG_MIXED      히드라, 럴커, 뮤탈 1 : 0 : 2
+//        ZERG_AIR1        히드라, 럴커, 뮤탈 1 : 0 : 5
+//        ZERG_AIR2        히드라, 럴커, 뮤탈 1 : 0 : 9
+        EnemyUnitCounter enemyUnitCounter = new EnemyUnitCounter();
 
-        //predictedTotalEnemy 의 수치화
+        if(strategyToApply == EnemyStrategy.ZERG_GROUND3){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 0);
+        }else if(strategyToApply == EnemyStrategy.ZERG_GROUND2){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 3);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        }else if(strategyToApply == EnemyStrategy.ZERG_GROUND1){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        }else if(strategyToApply == EnemyStrategy.ZERG_MIXED){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 0);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 2);
+        }else if(strategyToApply == EnemyStrategy.ZERG_AIR1){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 0);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 5);
+        }else if(strategyToApply == EnemyStrategy.ZERG_AIR2){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 0);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 9);
+        }else {
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+        }
+
+        analyzeSet(enemyUnitCounter);
+
+        analyzeRemainMineral(UnitType.Zerg_Zergling);
     }
+
+    private void predictEnemyUnitProtoss() {
+        EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
+
+//        ZERG_GROUND3 히드라, 럴커, 뮤탈 1 : 1 : 0
+//        ZERG_GROUND2 히드라, 럴커, 뮤탈 3 : 2 : 1
+//        ZERG_GROUND1 히드라, 럴커, 뮤탈 2 : 1 : 1
+//        ZERG_MIXED      히드라, 럴커, 뮤탈 1 : 0 : 2
+//        ZERG_AIR1        히드라, 럴커, 뮤탈 1 : 0 : 5
+//        ZERG_AIR2        히드라, 럴커, 뮤탈 1 : 0 : 9
+        EnemyUnitCounter enemyUnitCounter = new EnemyUnitCounter();
+
+        if(strategyToApply == EnemyStrategy.PROTOSS_GROUND){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 0);
+        }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR1){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 3);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR2){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR3){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 0);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 2);
+        }else {
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+        }
+
+        analyzeSet(enemyUnitCounter);
+
+        analyzeRemainMineral(UnitType.Protoss_Zealot);
+    }
+
+    private void predictEnemyUnitTerran() {
+        EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
+
+//        ZERG_GROUND3 히드라, 럴커, 뮤탈 1 : 1 : 0
+//        ZERG_GROUND2 히드라, 럴커, 뮤탈 3 : 2 : 1
+//        ZERG_GROUND1 히드라, 럴커, 뮤탈 2 : 1 : 1
+//        ZERG_MIXED      히드라, 럴커, 뮤탈 1 : 0 : 2
+//        ZERG_AIR1        히드라, 럴커, 뮤탈 1 : 0 : 5
+//        ZERG_AIR2        히드라, 럴커, 뮤탈 1 : 0 : 9
+        EnemyUnitCounter enemyUnitCounter = new EnemyUnitCounter();
+
+        if(strategyToApply == EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 0);
+        }else if(strategyToApply == EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK){
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 3);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        }else {
+            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
+            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
+            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+        }
+
+        analyzeSet(enemyUnitCounter);
+        analyzeRemainMineral(UnitType.Terran_Vulture);
+    }
+
+    private void analyzeSet(EnemyUnitCounter enemyUnitCounter) {
+        int setCount=0;
+        while(true){
+            if(enemyMineralToPredict > enemyUnitCounter.getMineralSet() && enemyGasToPredict > enemyUnitCounter.getGasSet()){
+                setCount++;
+                enemyMineralToPredict -= enemyUnitCounter.getMineralSet();
+                enemyGasToPredict -= enemyUnitCounter.getGasSet();
+            }else{
+                break;
+            }
+        }
+        for (Map.Entry<UnitType, Integer> enemyUnit : enemyUnitCounter.getUnitTypes().entrySet()){
+            MutableInt count = predictedTotalEnemyAttackUnit.get(enemyUnit.getKey());
+            if (count == null) {
+                predictedTotalEnemyAttackUnit.put(enemyUnit.getKey(), new MutableInt(enemyUnit.getValue() * setCount));
+            }else {
+                count.increment(enemyUnit.getValue() * setCount);
+            }
+        }
+    }
+    private void analyzeRemainMineral(UnitType unitType) {
+        int baseUnitCount=0;
+
+        while(true){
+            if(enemyMineralToPredict > unitType.mineralPrice()){
+                baseUnitCount++;
+                enemyMineralToPredict -= unitType.mineralPrice();
+            }else{
+                break;
+            }
+        }
+
+        MutableInt count = predictedTotalEnemyAttackUnit.get(unitType);
+        int d = 1;
+        if(unitType == UnitType.Zerg_Zergling){
+            d = 2;
+        }
+        if (count == null) {
+
+            predictedTotalEnemyAttackUnit.put(unitType, new MutableInt(d * baseUnitCount));
+        }else {
+            count.increment(d * baseUnitCount);
+        }
+    }
+
+
 
     private void summaryResource() {
         int enemyMineralToCalculateCombatUnit = 200; //4workers
