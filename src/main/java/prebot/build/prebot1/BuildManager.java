@@ -71,6 +71,7 @@ public class BuildManager extends GameManager {
 
 	/// buildQueue 에 대해 Dead lock 이 있으면 제거하고, 가장 우선순위가 높은 BuildOrderItem 를 실행되도록 시도합니다
 	public void update() {
+//		System.out.println("buildManager LagObserver :: " + LagObserver.managerRotationSize());
 		
 		if (!TimeUtils.executeRotation(4, LagObserver.managerRotationSize())) {
 			return;
@@ -107,7 +108,7 @@ public class BuildManager extends GameManager {
 		//여기까지 날릴것
 		
 
-		//System.out.println("current HighestPriorityItem is " + currentItem.metaType.getName());
+//		System.out.println("current HighestPriorityItem is " + currentItem.metaType.getName());
 
 		// while there is still something left in the buildQueue
 		while (!buildQueue.isEmpty()) {
@@ -187,6 +188,7 @@ public class BuildManager extends GameManager {
 				 * " canMakeNow : " + canMake + std::endl; }
 				 */
 			}
+			
 
 			// if we can make the current item, create it
 			if (producer != null && canMake == true) {
@@ -223,7 +225,7 @@ public class BuildManager extends GameManager {
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
-								
+								System.out.println("desiredPosition is not null :: " + t.getUnitType());
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -244,8 +246,9 @@ public class BuildManager extends GameManager {
 									System.out.println(" re calculate desiredPosition :: " + desiredPosition.getX() + ","+ desiredPosition.getY());
 									ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 								}else {
+									System.out.println(" re calculate desiredPosition is null :: delete from quere");
 									failureProtector.update(currentItem.metaType);
-									isOkToRemoveQueue = false;
+									isOkToRemoveQueue = true;
 								}
 							}
 						}
@@ -639,12 +642,12 @@ public class BuildManager extends GameManager {
             } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.NextSupplePoint) {
                 if (fisrtSupplePointFull) {
 //                	20180815. hkk. 서플라이포인트가 Full 일 경우 작은 건물은 메인베이스가 Full 이더라도 지을수 있는 공간이 있을수 있으므로, 일단 찾아보고 null 이 나올경우 아래에서 처리
-                	seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-//                    if (mainBaseLocationFull) {
-//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
-//                    } else {
-//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-//                    }
+//                	seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+                    if (mainBaseLocationFull) {
+                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+                    } else {
+                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+                    }
                 }
             }
 
@@ -676,6 +679,8 @@ public class BuildManager extends GameManager {
 //            			20180815. hkk. 서플라이등의 건물이 supply area 가 아닌 메인베이스일경우 area가 full 이며, desiredP=null 인것은 메인베이스도 자리가 없다는 뜻 
             			
             			seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+            		}else if(seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation) {
+            			break;
             		}
             	}
 //            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);

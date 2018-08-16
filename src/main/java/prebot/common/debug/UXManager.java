@@ -57,6 +57,7 @@ import prebot.micro.WorkerManager;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TravelSite;
@@ -1837,14 +1838,14 @@ public class UXManager {
 		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
 				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
 		
-		Position betweenChoke = new Position((myFirstChoke.getX() * 2 + myFirstChoke.getX()) / 3,
-				(mySecondChoke.getY() * 2 + mySecondChoke.getY()) / 3);
-		
-		Prebot.Broodwar.drawTextMap(firstChokeMainHalf.getX() + 20, firstChokeMainHalf.getY() + 10, "(" + (int) (firstChokeMainHalf.getX()) + ", " + (int) (firstChokeMainHalf.getY()) + ")");
-		
-		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150, Color.Red, false);
-		
-		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150 + turretCount * 15, Color.Red, false);
+//		Position betweenChoke = new Position((myFirstChoke.getX() * 2 + myFirstChoke.getX()) / 3,
+//				(mySecondChoke.getY() * 2 + mySecondChoke.getY()) / 3);
+//		
+//		Prebot.Broodwar.drawTextMap(firstChokeMainHalf.getX() + 20, firstChokeMainHalf.getY() + 10, "(" + (int) (firstChokeMainHalf.getX()) + ", " + (int) (firstChokeMainHalf.getY()) + ")");
+//		
+//		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150, Color.Red, false);
+//		
+//		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150 + turretCount * 15, Color.Red, false);
 		
 		Prebot.Broodwar.drawTextMap(firstChokeExpHalf.getX() + 20, firstChokeExpHalf.getY() + 10, "(" + (int) (firstChokeExpHalf.getX()) + ", " + (int) (firstChokeExpHalf.getY()) + ")");
 		
@@ -1858,11 +1859,30 @@ public class UXManager {
 		
 		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150 + turretCount * 15, Color.Cyan, false);  
 		
-		Prebot.Broodwar.drawTextMap(betweenChoke.getX() + 20, betweenChoke.getY() + 10, "(" + (int) (betweenChoke.getX()) + ", " + (int) (betweenChoke.getY()) + ")");
+//		Prebot.Broodwar.drawTextMap(betweenChoke.getX() + 20, betweenChoke.getY() + 10, "(" + (int) (betweenChoke.getX()) + ", " + (int) (betweenChoke.getY()) + ")");
+//		
+//		Prebot.Broodwar.drawCircleMap(betweenChoke, 150, Color.Green, false);
+//		
+//		Prebot.Broodwar.drawCircleMap(betweenChoke, 150 + turretCount * 15, Color.Green, false);
 		
-		Prebot.Broodwar.drawCircleMap(betweenChoke, 150, Color.Green, false);
+		Position betweenChoke2 = Position.None;
 		
-		Prebot.Broodwar.drawCircleMap(betweenChoke, 150 + turretCount * 15, Color.Green, false);  
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
+			betweenChoke2 = new Position((firstChokeMainHalf.getX() * 4 + mySecondChoke.getX() * 7) / 11,
+			(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+		}else {
+			betweenChoke2 = new Position((firstChokeMainHalf.getX() * 3 + mySecondChoke.getX() * 4) / 7,
+			(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+		}
+		
+//		Position betweenChoke2 = new Position((firstChokeMainHalf.getX() * 4 + mySecondChoke.getX() * 7) / 11,
+//				(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+		
+		Prebot.Broodwar.drawTextMap(betweenChoke2.getX() + 20, betweenChoke2.getY() + 10, "(" + (int) (betweenChoke2.getX()) + ", " + (int) (betweenChoke2.getY()) + ")");
+		
+		Prebot.Broodwar.drawCircleMap(betweenChoke2, 120, Color.White, false);
+		
+		Prebot.Broodwar.drawCircleMap(betweenChoke2, 120 + turretCount * 15, Color.White, false);
 		
 //		radius1 + turretCount * 15
 		
