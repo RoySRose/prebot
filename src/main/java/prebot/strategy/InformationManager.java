@@ -615,30 +615,30 @@ public class InformationManager extends GameManager {
 				}
 				occupiedBaseLocations.get(enemyPlayer).add(unexplored);
 			}
-		}
 
-		// 끝까지 상대 location 못 찾았을때
-		if (mainBaseLocations.get(enemyPlayer) == null && TimeUtils.after(4500)) {
-			BaseLocation expectBase = null;
-			if (StrategyIdea.enemyBaseExpected != null) {
-				expectBase = StrategyIdea.enemyBaseExpected;
-			} else {
-				BaseLocation myBase = InfoUtils.myBase();
-				for (BaseLocation startLocation : BWTA.getStartLocations()) {
-					if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
-						continue;
+			// 끝까지 상대 location 못 찾았을때
+			if (TimeUtils.afterTime(4, 0)) {
+				BaseLocation expectBase = null;
+				if (StrategyIdea.enemyBaseExpected != null) {
+					expectBase = StrategyIdea.enemyBaseExpected;
+				} else {
+					BaseLocation myBase = InfoUtils.myBase();
+					for (BaseLocation startLocation : BWTA.getStartLocations()) {
+						if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
+							continue;
+						}
+						if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+							continue;
+						}
+						expectBase = startLocation;
+						break;
 					}
-					if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
-						continue;
-					}
-					expectBase = startLocation;
-					break;
 				}
-			}
-			
-			if (expectBase != null) {
-				mainBaseLocations.put(enemyPlayer, expectBase);
-				mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
+				
+				if (expectBase != null) {
+					mainBaseLocations.put(enemyPlayer, expectBase);
+					mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
+				}
 			}
 		}
 
@@ -666,18 +666,34 @@ public class InformationManager extends GameManager {
 			// 적 MainBaseLocation 업데이트 로직 버그 수정
 			// 적군의 빠른 앞마당 건물 건설 + 아군의 가장 마지막 정찰 방문의 경우,
 			// enemy의 mainBaseLocations를 방문안한 상태에서는 건물이 하나도 없다고 판단하여 mainBaseLocation 을 변경하는
-			// 현상이 발생해서
-			// enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.
-			if (Prebot.Broodwar.isExplored(mainBaseLocations.get(enemyPlayer).getTilePosition())) {
-
-				if (existsPlayerBuildingInRegion(BWTA.getRegion(mainBaseLocations.get(enemyPlayer).getTilePosition()),
-						enemyPlayer) == false) {
+			// 현상이 발생해서 enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.
+			TilePosition enemyBaseTile = mainBaseLocations.get(enemyPlayer).getTilePosition();
+			if (Prebot.Broodwar.isExplored(enemyBaseTile)) {
+				if (existsPlayerBuildingInRegion(BWTA.getRegion(enemyBaseTile), enemyPlayer) == false) {
+					System.out.println("not exist in enemy region. tile=" + enemyBaseTile);
+					
+					// 적이 차지한 곳 중에서 빌딩이 있는 지역을 enemyBase로 설정
+					BaseLocation enemyBaseLocation = null;
 					for (BaseLocation loaction : occupiedBaseLocations.get(enemyPlayer)) {
 						if (existsPlayerBuildingInRegion(BWTA.getRegion(loaction.getTilePosition()), enemyPlayer)) {
-							mainBaseLocations.put(enemyPlayer, loaction);
-							mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
+							enemyBaseLocation = loaction;
 							break;
 						}
+					}
+					
+					// 방문한 적이 없는 starting location으로 설정 (최초 정찰이 실패하여 적 지역 예측했을 때)
+					if (enemyBaseLocation == null) {
+						for (BaseLocation loaction : BWTA.getStartLocations()) {
+							if (!Prebot.Broodwar.isExplored(loaction.getTilePosition())) {
+								enemyBaseLocation = loaction;
+								break;
+							}
+						}
+					}
+
+					if (enemyBaseLocation != null) {
+						mainBaseLocations.put(enemyPlayer, enemyBaseLocation);
+						mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
 					}
 				}
 			}
@@ -1161,6 +1177,7 @@ public class InformationManager extends GameManager {
 
 			if (mainBaseLocations.get(selfPlayer) != null) {
 				BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
+				System.out.println("* my base changed" + sourceBaseLocation.getTilePosition());
 
 				firstChokePoint.put(selfPlayer, BWTA.getNearestChokepoint(sourceBaseLocation.getTilePosition()));
 
@@ -1209,6 +1226,7 @@ public class InformationManager extends GameManager {
 			if (mainBaseLocations.get(enemyPlayer) != null && mainBaseLocations.get(selfPlayer) != null) {
 				BaseLocation enemySourceBaseLocation = mainBaseLocations.get(enemyPlayer);
 				BaseLocation mySourceBaseLocation = mainBaseLocations.get(selfPlayer);
+				System.out.println("* enemy base changed" + enemySourceBaseLocation.getTilePosition());
 
 				firstChokePoint.put(enemyPlayer, BWTA.getNearestChokepoint(enemySourceBaseLocation.getTilePosition()));
 

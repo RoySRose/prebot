@@ -145,7 +145,7 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 
 			int totalVulture = UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Vulture);
 			int totalTank = UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-			int totalGoliath = UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Vulture);
+			int totalGoliath = UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Goliath);
 
 			vultureratio = StrategyIdea.factoryRatio.vulture;
 			tankratio = StrategyIdea.factoryRatio.tank;
@@ -154,6 +154,8 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 
 			UnitType selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, totalVulture, totalTank, totalGoliath);
 			if (PlayerUtils.enoughResource(selected.mineralPrice(), selected.gasPrice()) && Prebot.Broodwar.self().supplyUsed() <= 392) {
+//				System.out.println("vultureratio=" + vultureratio + ", tankratio" + tankratio + ", goliathratio=" + goliathratio + ", wgt=" + wgt
+//						+ ", totalVulture=" + totalVulture+ ", totalTank" + totalTank+ ", totalGoliath=" + totalGoliath + " => selected=" + selected);
 				unitType = selected;
 			}
 		}

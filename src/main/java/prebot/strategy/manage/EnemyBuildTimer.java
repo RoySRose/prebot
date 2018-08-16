@@ -76,10 +76,10 @@ public class EnemyBuildTimer {
 			boolean reaverTime = reaverInMyBaseFrame != CommonCode.UNKNOWN && (darkTemplarInMyBaseFrame == CommonCode.UNKNOWN || reaverInMyBaseFrame < darkTemplarInMyBaseFrame);
 
 			if (darktemplarTime) {
-				StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame - 10 * TimeUtils.SECOND;
+				StrategyIdea.turretNeedFrame = darkTemplarInMyBaseFrame - 8 * TimeUtils.SECOND;
 				
 			} else if (reaverTime) {
-				StrategyIdea.turretNeedFrame = reaverInMyBaseFrame - 10 * TimeUtils.SECOND;
+				StrategyIdea.turretNeedFrame = reaverInMyBaseFrame - 8 * TimeUtils.SECOND;
 			}
 			
 			if (darkTemplarInMyBaseFrame != CommonCode.UNKNOWN) {
@@ -105,9 +105,9 @@ public class EnemyBuildTimer {
 			boolean lurkTime = lurkerInMyBaseFrame != CommonCode.UNKNOWN && (mutaliskInMyBaseFrame == CommonCode.UNKNOWN || lurkerInMyBaseFrame < mutaliskInMyBaseFrame);
 
 			if (muteTime) {
-				StrategyIdea.turretNeedFrame = mutaliskInMyBaseFrame - 10 * TimeUtils.SECOND;
+				StrategyIdea.turretNeedFrame = mutaliskInMyBaseFrame - 8 * TimeUtils.SECOND;
 			} else if (lurkTime) {
-				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 10 * TimeUtils.SECOND;
+				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 8 * TimeUtils.SECOND;
 			}
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
 				StrategyIdea.turretNeedFrame += 3 * TimeUtils.MINUTE;
@@ -137,8 +137,8 @@ public class EnemyBuildTimer {
 			// TODO 테란전 터렛
 		} 
 		
-		StrategyIdea.turretBuildStartFrame = StrategyIdea.turretNeedFrame - UnitType.Terran_Missile_Turret.buildTime() - 10 * TimeUtils.SECOND;
-		StrategyIdea.engineeringBayBuildStartFrame = StrategyIdea.turretBuildStartFrame - UnitType.Terran_Engineering_Bay.buildTime() - 10 * TimeUtils.SECOND;
+		StrategyIdea.turretBuildStartFrame = StrategyIdea.turretNeedFrame - UnitType.Terran_Missile_Turret.buildTime() - 8 * TimeUtils.SECOND;
+		StrategyIdea.engineeringBayBuildStartFrame = StrategyIdea.turretBuildStartFrame - UnitType.Terran_Engineering_Bay.buildTime() - 8 * TimeUtils.SECOND;
 		
 	}
 

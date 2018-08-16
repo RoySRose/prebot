@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -25,7 +26,6 @@ import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.FleeOption;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.strategy.InformationManager;
-import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
 public class ScvScoutControl extends Control {
@@ -48,21 +48,19 @@ public class ScvScoutControl extends Control {
 	// 상대방 MainBaseLocation 위치를 모르는 상황이면, StartLocation 들에 대해 아군의 MainBaseLocation에서 가까운 것부터 순서대로 정찰
 	// 상대방 MainBaseLocation 위치를 아는 상황이면, 해당 BaseLocation 이 있는 Region의 가장자리를 따라 계속 이동함 (정찰 유닛이 죽을때까지)
 	private void moveScoutUnit(Unit scoutScv, Collection<UnitInfo> euiList) {
-		BaseLocation myBaseLocation = InfoUtils.myBase();
 		BaseLocation enemyBaseLocation = InfoUtils.enemyBase();
 		
 		//BaseLocation enemyFirstExpansionLocation = InfoUtils.enemyFirstExpansion();
 			
 		
 		if (enemyBaseLocation == null) {
-			BaseLocation scoutBaseLocation; 
-			if (StrategyIdea.enemyBaseExpected != null) {
-				scoutBaseLocation = StrategyIdea.enemyBaseExpected;
-			} else {
-				// scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
+			BaseLocation scoutBaseLocation;
+			if (InfoUtils.enemyRace() == Race.Terran) {
 				scoutBaseLocation = notExloredFarthestBaseLocation(scoutScv);
-				scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
+			} else {
+				scoutBaseLocation = notExloredBaseLocationNearScoutScv(scoutScv);
 			}
+			scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			for (UnitInfo eui : euiList) {
 				if (isCloseDangerousTarget(scoutScv, eui)) {
 					FleeOption fOption = new FleeOption(scoutBaseLocation.getPoint(), false, Angles.WIDE);

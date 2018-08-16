@@ -284,20 +284,24 @@ public class AirForceManager {
 		double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 
 		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && expansionFirst) {
-			targetPositions.addAll(getMineralPositions());
+			addAirForceTargetPositions(getMineralPositions());
 		}
 
-		targetPositions.add(firstBase.getPosition());
+		addAirForceTargetPositions(firstBase.getPosition());
 		for (int index = 0; index < AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE; index++) {
 			int resultX = firstBase.getPosition().getX() + (int) (vectorXSegment * (index + 1));
 			int resultY = firstBase.getPosition().getY() + (int) (vectorYSegment * (index + 1));
 
-			targetPositions.add(new Position(resultX, resultY).makeValid());
+			addAirForceTargetPositions(new Position(resultX, resultY).makeValid());
 		}
-		targetPositions.add(secondBase.getPosition());
+		addAirForceTargetPositions(secondBase.getPosition());
 
 		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
-			targetPositions.addAll(getMineralPositions());
+			addAirForceTargetPositions(getMineralPositions());
+		}
+		
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			addAirForceTargetPositions(baseSidePosition());
 		}
 		
 		List<BaseLocation> occupiedBases = InfoUtils.enemyOccupiedBases();
@@ -307,34 +311,20 @@ public class AirForceManager {
 				continue;
 			}
 			
-			targetPositions.add(base.getPosition());
+			addAirForceTargetPositions(base.getPosition());
 			
 			Position positionUp = new Position(base.getPosition().getX(), base.getPosition().getY() - 300);
 			Position positionDown = new Position(base.getPosition().getX(), base.getPosition().getY() + 300);
 			Position positionLeft = new Position(base.getPosition().getX() - 300, base.getPosition().getY());
 			Position positionRight = new Position(base.getPosition().getX() + 300, base.getPosition().getY());
 			
-			if (PositionUtils.isValidPosition(positionUp)) {
-				targetPositions.add(positionUp);
-			}
-			if (PositionUtils.isValidPosition(positionDown)) {
-				targetPositions.add(positionDown);
-			}
-			if (PositionUtils.isValidPosition(positionLeft)) {
-				targetPositions.add(positionLeft);
-			}
-			if (PositionUtils.isValidPosition(positionRight)) {
-				targetPositions.add(positionRight);
-			}
+			addAirForceTargetPositions(positionUp, positionDown, positionLeft, positionRight);
 		}
 		
 		if (TimeUtils.afterTime(10, 0) && InfoUtils.enemyRace() == Race.Terran) {
-			if (PositionUtils.isValidPosition(StrategyIdea.nearGroundEnemyPosition)) {
-				targetPositions.add(StrategyIdea.nearGroundEnemyPosition);
-			}
-			if (PositionUtils.isValidPosition(StrategyIdea.totalEnemyCneterPosition)) {
-				targetPositions.add(StrategyIdea.totalEnemyCneterPosition);
-			}
+			addAirForceTargetPositions(
+					StrategyIdea.nearGroundEnemyPosition,
+					StrategyIdea.totalEnemyCneterPosition);
 		}
 	}
 
@@ -359,6 +349,34 @@ public class AirForceManager {
 			}
 		}
 		return positions;
+	}
+	
+	private Position baseSidePosition() {
+		Position enemyBasePosition = InfoUtils.enemyBase().getPosition();
+		Position enemyFirstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
+		
+		double radian = MicroUtils.targetDirectionRadian(enemyBasePosition, enemyFirstExpansionPosition);
+		double radian90plus = MicroUtils.rotate(radian, +90);
+		double radian90minus = MicroUtils.rotate(radian, -90);
+		
+		Position position90plus = MicroUtils.getMovePosition(enemyBasePosition, radian90plus, 400);
+		Position position90minus = MicroUtils.getMovePosition(enemyBasePosition, radian90minus, 400);
+		
+		if (!PositionUtils.isValidPosition(position90plus)) {
+			return position90minus.makeValid();
+		}
+		if (!PositionUtils.isValidPosition(position90minus)) {
+			return position90plus.makeValid();
+		}
+		
+		double distance90plus = position90plus.getDistance(enemyFirstExpansionPosition);
+		double distance90minus = position90minus.getDistance(enemyFirstExpansionPosition);
+		
+		if (distance90plus < distance90minus) {
+			return position90plus;
+		} else {
+			return position90minus;
+		}
 	}
 
 	private void setRetreatPosition() {
@@ -544,8 +562,8 @@ public class AirForceManager {
 		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
 		
 		// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
-		int maxWraitCount = Math.min(wraithCount + 4, 12);
-		int minWraitCount = Math.max(wraithCount - 4, 0);
+		int maxWraitCount = Math.min(wraithCount + 2, 8);
+		int minWraitCount = Math.max(wraithCount - 2, 0);
 		
 		if (accumulatedAchievement <= downAchievement) {
 			if (StrategyIdea.wraithCount > minWraitCount) {
@@ -740,5 +758,21 @@ public class AirForceManager {
 
 	public AirForceTeam airForTeamOfUnit(int unitID) {
 		return airForceTeamMap.get(unitID);
+	}
+	
+	private void addAirForceTargetPositions(Position... positions) {
+		for (Position position : positions) {
+			if (PositionUtils.isValidPosition(position)) {
+				targetPositions.add(position);
+			}
+		}
+	}
+	
+	private void addAirForceTargetPositions(List<Position> positions) {
+		for (Position position : positions) {
+			if (PositionUtils.isValidPosition(position)) {
+				targetPositions.add(position);
+			}
+		}
 	}
 }
