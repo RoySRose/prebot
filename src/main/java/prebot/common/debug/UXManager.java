@@ -258,9 +258,12 @@ public class UXManager {
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "lastchk         : " + enemyCommandInfo.lastCheckFrame);
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "fwrkcnt         : " + enemyCommandInfo.lastFullCheckWorkerCount);
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "flastchk        : " + enemyCommandInfo.lastFullCheckFrame);
+                y+=10;
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "MineralToPredict: " + AttackDecisionMaker.Instance().enemyMineralToPredict);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "GasToPredict    : " + AttackDecisionMaker.Instance().enemyGasToPredict);
 
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "GasToPredict    : " + AttackDecisionMaker.Instance().decision);
                 //drawExpectedResourcedebug(x, y, enemyCommandInfo);
-                y+=15;
                 x+=220;
             }
 
