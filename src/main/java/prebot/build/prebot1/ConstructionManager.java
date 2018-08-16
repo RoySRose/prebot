@@ -12,6 +12,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.LagObserver;
@@ -273,6 +274,15 @@ public class ConstructionManager extends GameManager {
 //					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition None");
 					continue;
 				}else{
+					for (BaseLocation baseLocation : BWTA.getBaseLocations()) {
+						if(TilePositionUtils.equals(relocationTilePosition, baseLocation.getTilePosition())){
+							relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), relocationTilePosition, SeedPositionStrategy.NoLocation);
+							break;
+						}
+					}
+					
+					if (relocationTilePosition == TilePosition.None) continue;
+					
 					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 //					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 				}

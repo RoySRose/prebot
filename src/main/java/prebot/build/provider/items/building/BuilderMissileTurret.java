@@ -20,6 +20,8 @@ import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 
@@ -102,10 +104,30 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		Position firstChokeMainHalf = new Position((myBase.getPosition().getX() + myFirstChoke.getX() * 2) / 3 - 60,
 				(myBase.getPosition().getY() + myFirstChoke.getY() * 2) / 3 - 60);
-		if (noTurretNearPosition(firstChokeMainHalf, 150, 100, turretCount, max_turret)) {
+//		if (noTurretNearPosition(firstChokeMainHalf, 150, 100, turretCount, max_turret)) {
+//			setHighPriority(true);
+//			setBlocking(true);
+//			setTilePosition(firstChokeMainHalf.toTilePosition());
+//			return true;
+//		}
+		
+		Position betweenChoke = Position.None;
+		
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
+			betweenChoke = new Position((firstChokeMainHalf.getX() * 4 + mySecondChoke.getX() * 7) / 11,
+			(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+		}else {
+			betweenChoke = new Position((firstChokeMainHalf.getX() * 3 + mySecondChoke.getX() * 4) / 7,
+			(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+		}
+		
+//		Position betweenChoke = new Position((firstChokeMainHalf.getX() * 3 + mySecondChoke.getX() * 4) / 7,
+//				(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
+
+		if (noTurretNearPosition(betweenChoke, 120, 120, turretCount, max_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
-			setTilePosition(firstChokeMainHalf.toTilePosition());
+			setTilePosition(betweenChoke.toTilePosition());
 			return true;
 		}
 		
@@ -118,7 +140,10 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			setTilePosition(firstChokeExpHalf.toTilePosition());
 			return true;
 		}
-
+		
+		
+		
+		
 		// TODO COMPLETE, ALL 테스트에 따른 변경여부 결정
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1) {
 			if (noTurretNearPosition(mySecondChoke.getCenter(), 150, 100, turretCount, max_turret)) {

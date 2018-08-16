@@ -127,13 +127,15 @@ public class ConstructionPlaceFinder {
                 break;
 
             case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start");
                 BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
                 if (nextExpansionLocation != null) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + seedPosition);
+//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + nextExpansionLocation.getTilePosition());
                     desiredPosition = getBuildLocationNear(buildingType, nextExpansionLocation.getTilePosition());
                 } else {
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition());
                 }
+//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> " + buildingType + " :: " + desiredPosition);
                 break;
 
             case NextSupplePoint:
@@ -153,7 +155,7 @@ public class ConstructionPlaceFinder {
             case SecondMainBaseLocation:
             	
             	if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory) && BuildManager.Instance().fisrtSupplePointFull) {
-                    desiredPosition = BlockingEntrance.Instance().getSupplyPosition(desiredPosition);
+                    desiredPosition = BlockingEntrance.Instance().getSupplyPosition(InformationManager.Instance().secondStartPosition.getTilePosition());
                     desiredPosition = getBuildLocationNear(buildingType, desiredPosition);
 //                    System.out.println(" getSupplyPosition ==>>>> " + desiredPosition);
                 }else {
@@ -669,14 +671,18 @@ public class ConstructionPlaceFinder {
 			}
 		} else {
 			//make sure we leave space for add-ons. These types of units can have addon:
-			if (b.getType() == UnitType.Terran_Command_Center ||
+			if (b.getType() == UnitType.Terran_Science_Facility ||
 				b.getType() == UnitType.Terran_Factory ||
-				b.getType() == UnitType.Terran_Starport ||
-				b.getType() == UnitType.Terran_Science_Facility) {
+				b.getType() == UnitType.Terran_Starport
+				) {
+//				width += 3;
 				width += 3;
 				canAddonBuilding = true;
 //				buildingGapSpace = 0;
 //				horizontalOnly = true;
+			}else if(b.getType() == UnitType.Terran_Command_Center) {
+				width += 2;
+				canAddonBuilding = true;
 			}
 	
 //			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
