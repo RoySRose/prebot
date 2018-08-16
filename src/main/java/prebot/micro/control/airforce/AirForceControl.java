@@ -58,10 +58,7 @@ public class AirForceControl extends Control {
 			}
 			return;
 		}
-		
-//		if (skipControl(airForceTeam.leaderUnit)) {
-//			return;
-//		}
+
 		
 		DecisionMaker decisionMaker = new DecisionMaker(new WraithTargetCalculator());
 
@@ -134,14 +131,14 @@ public class AirForceControl extends Control {
 				// 지나가면서 한대씩 때리기
 				else if (decision.type == DecisionType.ATTACK_POSITION) {
 					for (Unit airunit : airunits) {
-						CommandUtils.fastestRightClick(airunit, decisionDetail.eui.getUnit());
+						airforceRightClick(airunit, decisionDetail.eui.getUnit());
 					}
 				}
 			}
 			// 뭉치기
 			else if (decisionDetail.type == DecisionType.UNITE) {
 				for (Unit airunit : airunits) {
-					CommandUtils.fastestRightClick(airunit, airForceTeam.leaderUnit.getPosition());
+					airforceRightClick(airunit, airForceTeam.leaderUnit.getPosition());
 				}
 			}
 			// 전진 카이팅, 카이팅
@@ -156,20 +153,20 @@ public class AirForceControl extends Control {
 									CommandUtils.attackMove(airunit, randomPosition);
 								}
 							} else {
-								CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
+								airforceRightClick(airunit, airForceTeam.leaderOrderPosition);
 							}
 						}
 					}
 				} else {
 					for (Unit airunit : airunits) {
-						CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
+						airforceRightClick(airunit, airForceTeam.leaderOrderPosition);
 					}
 				}
 			}
 
 		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) { // 도망
 			for (Unit airunit : airunits) {
-				CommandUtils.fastestRightClick(airunit, airForceTeam.leaderOrderPosition);
+				airforceRightClick(airunit, airForceTeam.leaderOrderPosition);
 			}
 			
 		} else if (decision.type == DecisionType.CHANGE_MODE) { // 클로킹
@@ -305,5 +302,17 @@ public class AirForceControl extends Control {
 
 	private boolean wraithKitingType(UnitInfo eui) {
 		return eui.getType().airWeapon() != WeaponType.None && eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange();
+	}
+	
+	private void airforceRightClick(Unit airunit, Position position) {
+		airunit.rightClick(position);
+//		CommandUtils.fastestRightClick(airunit, position);
+//		CommandUtils.rightClick(airunit, position);
+	}
+	
+	private void airforceRightClick(Unit airunit, Unit target) {
+		airunit.rightClick(target);
+//		CommandUtils.fastestRightClick(airunit, target);
+//		CommandUtils.rightClick(airunit, target);
 	}
 }

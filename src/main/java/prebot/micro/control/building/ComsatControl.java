@@ -132,7 +132,7 @@ public class ComsatControl extends Control {
 			}
 			
 			List<Unit> myAttackUnits = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
-					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith);
+					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 			
 			Race enemyRace = InfoUtils.enemyRace();
 			int myAttackUnitInWeaponRangeCount = 0;

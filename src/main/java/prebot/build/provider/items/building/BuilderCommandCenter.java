@@ -116,7 +116,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 						return true;
 					}
 				} else if (UnitUtils.myUnitDiscovered(UnitType.Terran_Starport)) {
-					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith)) {
+					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Valkyrie) || Prebot.Broodwar.self().minerals() > 600) {
 						setCommandCenterBlockAndSeedPosition();
 						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;

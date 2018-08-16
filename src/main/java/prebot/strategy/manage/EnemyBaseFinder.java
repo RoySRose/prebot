@@ -87,7 +87,9 @@ public class EnemyBaseFinder {
 	private BaseLocation expectedByUnit() {
 		int scoutLimitFrames;
 		if (InfoUtils.enemyRace() == Race.Protoss) {
-			scoutLimitFrames = TimeUtils.timeToFrames(1, 25);
+			scoutLimitFrames = TimeUtils.timeToFrames(1, 25); // 9파일런 서치 한번에 왔을때 약 1분 20초
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			scoutLimitFrames = TimeUtils.timeToFrames(2, 35); // 9드론 서치 한번에 왔을때 약 2분 30초
 		} else {
 			scoutLimitFrames = TimeUtils.timeToFrames(2, 0);
 		}
