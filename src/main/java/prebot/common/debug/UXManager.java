@@ -193,6 +193,7 @@ public class UXManager {
             drawExpectedResource();
         }
 
+		drawMineralIdOnMap();
 		drawUnitIdOnMap();
 		drawPositionInformation();
 		drawTimer();
@@ -216,14 +217,23 @@ public class UXManager {
     private void drawExpectedResource() {
 	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyResourceDepotInfoMap;
 
-	    int y=10;
+	    int y=0;
+	    Prebot.Broodwar.drawTextScreen(10, y+=10, "this mymineral  : " + Prebot.Broodwar.self().gatheredMinerals());
+	    Prebot.Broodwar.drawTextScreen(10, y+=10, "total enemy cnt : " + enemyCommandInfoMap.size());
+        Prebot.Broodwar.drawTextScreen(10, y+=10, "mygas           : " + Prebot.Broodwar.self().gatheredGas());
+        Prebot.Broodwar.drawTextScreen(10, y+=10, "mywrkcnt(real)  : " + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV));
+        
+        
 	    if (enemyCommandInfoMap.size() == 0){
             Prebot.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
         }else{
 
 	        int k =1;
+	        int x=10;
+	        Prebot.Broodwar.drawTextScreen(x, y+=10, "frame ==== " + Prebot.Broodwar.getFrameCount());
             for (Map.Entry<UnitInfo, EnemyCommandInfo> entry : enemyCommandInfoMap.entrySet())
             {
+            	y=60;
                 UnitInfo unitInfo = entry.getKey();
                 EnemyCommandInfo enemyCommandInfo = entry.getValue();
 
@@ -234,28 +244,32 @@ public class UXManager {
                         Prebot.Broodwar.drawTextScreen(10, y += 10, "skipped base : " + skip.getLastPosition());
                     }
                 }
-                Prebot.Broodwar.drawTextScreen(10, y+=10, k++ + " base"  + unitInfo.getLastPosition() + ", " + enemyCommandInfo.mineralCalculator.getMineralCount());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "has gas: "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(real)   : " + enemyCommandInfo.mineralCalculator.getFullCheckMineral());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral(r+p):   : " + enemyCommandInfo.getMineral());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas(r+p)        : " + enemyCommandInfo.getGas());
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt(real)    : " + enemyCommandInfo.workerCounter.realWorkerCount);
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt(r+p)     : " + enemyCommandInfo.workerCounter.getWorkerCount(enemyCommandInfo.mineralCalculator.getMineralCount()));
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "lastchk         : " + enemyCommandInfo.lastCheckFrame);
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "fwrkcnt         : " + enemyCommandInfo.lastFullCheckWorkerCount);
-                Prebot.Broodwar.drawTextScreen(10, y+=10, "flastchk        : " + enemyCommandInfo.lastFullCheckFrame);
+                
+                Prebot.Broodwar.drawTextScreen(x, y+=10, k++ + " base"  + unitInfo.getLastPosition() + ", " + enemyCommandInfo.mineralCalculator.getMineralCount());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "isMainBase      : "  + enemyCommandInfo.isMainBase);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "has gas         : "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(real)   : " + enemyCommandInfo.mineralCalculator.getFullCheckMineral());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(r+p):   : " + enemyCommandInfo.uxmineral);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(r+p)        : " + enemyCommandInfo.gasCalculator.getGas());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "fullWorkerFrame : " + enemyCommandInfo.fullWorkerFrame);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(real)    : " + enemyCommandInfo.workerCounter.realWorkerCount);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(r+p)     : " + enemyCommandInfo.workerCounter.getWorkerCount());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "lastchk         : " + enemyCommandInfo.lastCheckFrame);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "fwrkcnt         : " + enemyCommandInfo.lastFullCheckWorkerCount);
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "flastchk        : " + enemyCommandInfo.lastFullCheckFrame);
 
-                drawExpectedResourcedebug(y, enemyCommandInfo);
+                //drawExpectedResourcedebug(x, y, enemyCommandInfo);
                 y+=15;
+                x+=220;
             }
 
         }
     }
     
-    private void drawExpectedResourcedebug(int y, EnemyCommandInfo enemyCommandInfo) {
+    private void drawExpectedResourcedebug(int x, int y, EnemyCommandInfo enemyCommandInfo) {
     	for(EnemyMineral enemyMineral: enemyCommandInfo.mineralCalculator.mineralsList) {
-    		Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral debug   : " + enemyMineral.getMineralUnit() + ", " + enemyMineral.getRealMineral());
+    		Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral debug   : " + enemyMineral.getMineralUnit().getID() + ", " + enemyMineral.getRealMineral());
     	}
     }
 
@@ -1269,7 +1283,12 @@ public class UXManager {
 	}
 	
 	
-	
+	public void drawMineralIdOnMap() {
+        for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
+		
+			Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
+		}
+	}
 	/// Unit 의 Id 를 Map 에 표시합니다
 	public void drawUnitIdOnMap() {
 		for (Unit unit : Prebot.Broodwar.self().getUnits())

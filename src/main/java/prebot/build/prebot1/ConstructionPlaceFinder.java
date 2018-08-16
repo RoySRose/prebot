@@ -940,7 +940,7 @@ public class ConstructionPlaceFinder {
 		return closestGeyser;
 	}
 
-    public final Unit getRefineryNear(TilePosition seedPosition) {
+    public final Unit getGeyserNear(TilePosition seedPosition) {
         if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
             seedPosition = InfoUtils.myBase().getTilePosition();
         }
@@ -972,6 +972,7 @@ public class ConstructionPlaceFinder {
                 closestGeyser = geyser;
             }
         }
+        System.out.println("closestGeyser: " + closestGeyser);
         return closestGeyser;
     }
 

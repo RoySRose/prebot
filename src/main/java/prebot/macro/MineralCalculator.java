@@ -76,7 +76,7 @@ public class MineralCalculator {
         }
         return enemyMineral;
     }
-
+    
     public void getPredictionWithNoFullVision() {
 
     }

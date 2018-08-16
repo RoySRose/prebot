@@ -37,6 +37,10 @@ public class UnitInfo {
 		return type;
 	}
 
+	public int completFrame() {
+		return remainingBuildTime + updateFrame;
+	}
+	
 	public boolean isCompleted() {
 		return completed || (remainingBuildTime < Prebot.Broodwar.getFrameCount() - updateFrame);
 	}

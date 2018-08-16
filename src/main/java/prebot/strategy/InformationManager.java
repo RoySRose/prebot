@@ -39,6 +39,7 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.MapTools;
 import prebot.common.util.internal.UnitCache;
+import prebot.macro.AttackDecisionMaker;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.MapSpecificInformation.GameMap;
@@ -485,6 +486,7 @@ public class InformationManager extends GameManager {
 		}
 
 		unitData.get(unit.getPlayer()).removeUnit(unit);
+		AttackDecisionMaker.Instance().removeDestroyedDepot(unit);
 	}
 
 	/// 해당 Player (아군 or 적군) 의 position 주위의 유닛 목록을 unitInfo 에 저장합니다

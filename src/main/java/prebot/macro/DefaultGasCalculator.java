@@ -1,6 +1,7 @@
 package prebot.macro;
 
 
+import bwapi.Position;
 import bwapi.Unit;
 import prebot.build.constant.BuildConfig;
 import prebot.common.main.Prebot;
@@ -22,16 +23,18 @@ public class DefaultGasCalculator implements GasCalculator{
     public DefaultGasCalculator(Unit geyser) {
         this.geyser = geyser;
         this.hasGasBuilding = false;
-        
-        System.out.println("initialize with: " + geyser.getPosition() );
     }
 
+    public Position getGeyserPoint() {
+        return geyser.getInitialPosition();
+    }
+    
     public int getRealGas() {
         return realGas;
     }
 
     public int getGas() {
-        if(hasGasBuilding) {
+        if(!hasGasBuilding) {
             return 0;
         }else{
             return (int) (realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
