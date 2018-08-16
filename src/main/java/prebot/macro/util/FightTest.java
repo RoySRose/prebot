@@ -2,7 +2,6 @@ package prebot.macro.util;
 
 
 import bwapi.UnitType;
-import org.junit.Test;
 import prebot.macro.Decision;
 
 import java.util.HashMap;
@@ -39,7 +38,6 @@ public class FightTest {
             return "Lost";
         }
     }
-    @Test
     public void fight(){
 
         int myForcePoint = calculateForce(myUnit);

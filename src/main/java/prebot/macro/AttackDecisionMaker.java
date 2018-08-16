@@ -176,35 +176,33 @@ public class AttackDecisionMaker extends GameManager {
     private void predictEnemyUnitProtoss() {
         EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
 
-//        ZERG_GROUND3 히드라, 럴커, 뮤탈 1 : 1 : 0
-//        ZERG_GROUND2 히드라, 럴커, 뮤탈 3 : 2 : 1
-//        ZERG_GROUND1 히드라, 럴커, 뮤탈 2 : 1 : 1
-//        ZERG_MIXED      히드라, 럴커, 뮤탈 1 : 0 : 2
-//        ZERG_AIR1        히드라, 럴커, 뮤탈 1 : 0 : 5
-//        ZERG_AIR2        히드라, 럴커, 뮤탈 1 : 0 : 9
         EnemyUnitCounter enemyUnitCounter = new EnemyUnitCounter();
 
         if(strategyToApply == EnemyStrategy.PROTOSS_GROUND){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Dragoon, 5);
+            enemyUnitCounter.add(UnitType.Protoss_Dark_Templar, 1);
+            enemyUnitCounter.add(UnitType.Protoss_Arbiter, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Carrier, 0);
         }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR1){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 3);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 2);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        	enemyUnitCounter.add(UnitType.Protoss_Dragoon, 8);
+            enemyUnitCounter.add(UnitType.Protoss_Dark_Templar, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Arbiter, 1);
+            enemyUnitCounter.add(UnitType.Protoss_Carrier, 0);
         }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR2){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        	enemyUnitCounter.add(UnitType.Protoss_Dragoon, 4);
+            enemyUnitCounter.add(UnitType.Protoss_Dark_Templar, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Arbiter, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Carrier, 1);
         }else if(strategyToApply == EnemyStrategy.PROTOSS_PROTOSS_AIR3){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 0);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 2);
+        	enemyUnitCounter.add(UnitType.Protoss_Dragoon, 1);
+            enemyUnitCounter.add(UnitType.Protoss_Dark_Templar, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Arbiter, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Carrier, 1);
         }else {
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
-            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+        	enemyUnitCounter.add(UnitType.Protoss_Dragoon, 5);
+            enemyUnitCounter.add(UnitType.Protoss_Dark_Templar, 1);
+            enemyUnitCounter.add(UnitType.Protoss_Arbiter, 0);
+            enemyUnitCounter.add(UnitType.Protoss_Carrier, 0);
         }
 
         analyzeSet(enemyUnitCounter);
@@ -215,26 +213,24 @@ public class AttackDecisionMaker extends GameManager {
     private void predictEnemyUnitTerran() {
         EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
 
-//        ZERG_GROUND3 히드라, 럴커, 뮤탈 1 : 1 : 0
-//        ZERG_GROUND2 히드라, 럴커, 뮤탈 3 : 2 : 1
-//        ZERG_GROUND1 히드라, 럴커, 뮤탈 2 : 1 : 1
-//        ZERG_MIXED      히드라, 럴커, 뮤탈 1 : 0 : 2
-//        ZERG_AIR1        히드라, 럴커, 뮤탈 1 : 0 : 5
-//        ZERG_AIR2        히드라, 럴커, 뮤탈 1 : 0 : 9
         EnemyUnitCounter enemyUnitCounter = new EnemyUnitCounter();
 
         if(strategyToApply == EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 0);
+            enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 5);
+            enemyUnitCounter.add(UnitType.Terran_Goliath, 1);
+            enemyUnitCounter.add(UnitType.Terran_Wraith, 0);
         }else if(strategyToApply == EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK){
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 3);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 2);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        	enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 5);
+            enemyUnitCounter.add(UnitType.Terran_Goliath, 1);
+            enemyUnitCounter.add(UnitType.Terran_Wraith, 1);
+        }else if(strategyToApply == EnemyStrategy.TERRAN_MECHANIC_GOL_GOL_TANK){
+        	enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 3);
+            enemyUnitCounter.add(UnitType.Terran_Goliath, 0);
+            enemyUnitCounter.add(UnitType.Terran_Wraith, 5);
         }else {
-            enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
-            enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
-            enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
+        	enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 5);
+            enemyUnitCounter.add(UnitType.Terran_Goliath, 1);
+            enemyUnitCounter.add(UnitType.Terran_Wraith, 1);
             System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
         }
 
