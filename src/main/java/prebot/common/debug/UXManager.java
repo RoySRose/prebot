@@ -49,6 +49,8 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.macro.AttackDecisionMaker;
+import prebot.macro.EnemyCommandInfo;
 import prebot.micro.CombatManager;
 import prebot.micro.Decision;
 import prebot.micro.Minerals;
@@ -186,12 +188,10 @@ public class UXManager {
 			drawManagerTimeSpent(490, 210);
 		} else if (uxOption == 7) {
 			drawTurretMap();
-		}
-		
-		
-		
+        }else if (uxOption == 8) {
+            drawExpectedResource();
+        }
 
-		
 		drawUnitIdOnMap();
 		drawPositionInformation();
 		drawTimer();
@@ -211,6 +211,35 @@ public class UXManager {
 //			ConstructionPlaceFinder.Instance().debugBuildLocationPrint();
 //		}
 	}
+
+    private void drawExpectedResource() {
+	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyCommandInfoMap;
+
+	    int y=10;
+	    if (enemyCommandInfoMap.size() == 0){
+            Prebot.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
+        }else{
+
+	        int k =1;
+            for (Map.Entry<UnitInfo, EnemyCommandInfo> entry : enemyCommandInfoMap.entrySet())
+            {
+                UnitInfo unitInfo = entry.getKey();
+                EnemyCommandInfo enemyCommandInfo = entry.getValue();
+
+                Prebot.Broodwar.drawTextScreen(10, y+=10, k++ + " base"  + unitInfo.getLastPosition());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "mineral: " + enemyCommandInfo.getMineral());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "gas    : " + enemyCommandInfo.getGas());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "wrkcnt : " + enemyCommandInfo.workerCounter.getWorkerCount());
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "lastchk: " + enemyCommandInfo.lastCheckFrame);
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "fwrkcnt: " + enemyCommandInfo.lastFullCheckWorkerCount);
+                Prebot.Broodwar.drawTextScreen(10, y+=10, "flastchk: " + enemyCommandInfo.lastFullCheckFrame);
+
+
+                y+=15;
+            }
+
+        }
+    }
 
 	private void drawDecision() {
 		for (Integer unitId : decisionListForUx.keySet()) {
