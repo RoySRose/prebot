@@ -73,6 +73,11 @@ public class PositionUtils {
 		}
 	}
 
+	/// 중앙
+	public static Position center(Position position1, Position position2) {
+		return new Position((position1.getX() + position2.getX())/2, (position1.getY() + position2.getY())/2);
+	}
+		
 	/// 두 position이 같은 region이면 true
 	public static boolean isSameRegion(Position position1, Position position2) {
 		return BWTA.getRegion(position1) == BWTA.getRegion(position2);
@@ -186,5 +191,12 @@ public class PositionUtils {
 			return Position.None;
 		}
 		return new Position(position.getX() + x, position.getY() + y).makeValid();
+	}
+
+	public static boolean equals(Position position1, Position position2) {
+		if (position1 == null || position2 == null) {
+			return false;
+		}
+		return position1.getX() == position2.getX() && position1.getY() == position2.getY();
 	}
 }

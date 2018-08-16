@@ -38,7 +38,7 @@ public class GameCommander {
 	public static GameCommander Instance() {
 		return instance;
 	}
-	
+	boolean once = false;
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onStart() 
 	{
@@ -69,11 +69,35 @@ public class GameCommander {
 
 
     void temp2() {
-
-        System.out.println("Zerg_Lair price : " + UnitType.Zerg_Lair.mineralPrice() + ", " + UnitType.Zerg_Lair.gasPrice());
-        System.out.println("Zerg_Egg price : " + UnitType.Zerg_Egg.mineralPrice() + ", " + UnitType.Zerg_Egg.gasPrice());
-        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Lurker_Egg.mineralPrice() + ", " + UnitType.Zerg_Lurker_Egg.gasPrice());
-        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Cocoon.mineralPrice() + ", " + UnitType.Zerg_Cocoon.gasPrice());
+    	
+    	int f = Prebot.Broodwar.getFrameCount();
+    	
+    	if(!once && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) == 18 ) {
+    		System.out.println("scv meet " +  Prebot.Broodwar.getFrameCount());
+    		once = true;
+    	}
+    	if(f>3000 && f < 5000) {
+	    	if(f % 10 == 0) {
+		    	System.out.print("frame== " +  Prebot.Broodwar.getFrameCount() +", ");
+		    	System.out.println("mineral: " +  Prebot.Broodwar.self().gatheredMinerals());
+	    	}
+    	}else {
+    		if(f % 1000 == 0) {
+		    	System.out.print("frame== " +  Prebot.Broodwar.getFrameCount() +", ");
+		    	System.out.println("mineral: " +  Prebot.Broodwar.self().gatheredMinerals());
+	    	}
+    	}
+    	
+    		
+    		
+    		
+//        System.out.println("Zerg_Lair price : " + UnitType.Zerg_Lair.mineralPrice() + ", " + UnitType.Zerg_Lair.gasPrice());
+//        System.out.println("Zerg_Egg price : " + UnitType.Zerg_Egg.mineralPrice() + ", " + UnitType.Zerg_Egg.gasPrice());
+//        System.out.println("Zerg_Lurke price : " + UnitType.Zerg_Lurker.mineralPrice() + ", " + UnitType.Zerg_Lurker.gasPrice());
+//        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Lurker_Egg.mineralPrice() + ", " + UnitType.Zerg_Lurker_Egg.gasPrice());
+//        System.out.println("Zerg_Cocoon price : " + UnitType.Zerg_Cocoon.mineralPrice() + ", " + UnitType.Zerg_Cocoon.gasPrice());
+//        System.out.println("Zerg_Scourge price : " + UnitType.Zerg_Scourge.mineralPrice() + ", " + UnitType.Zerg_Scourge.gasPrice());
+//        System.out.println("Zerg_Zergling price : " + UnitType.Zerg_Zergling.mineralPrice() + ", " + UnitType.Zerg_Zergling.gasPrice());
 
     }
 	void temp() {
@@ -161,7 +185,7 @@ public class GameCommander {
 			
 			AttackDecisionMaker.Instance().updateTimeCheck();
 			//temp();
-            temp2();
+            //temp2();
 				
 			logObserver.observe();
 			BigWatch.record("... GAME COMMANDER ...");

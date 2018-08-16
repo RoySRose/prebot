@@ -1,5 +1,7 @@
 package prebot.macro;
 
+import bwapi.Position;
+
 public class NoGasCalculator implements GasCalculator{
 
     public NoGasCalculator() {
@@ -17,6 +19,10 @@ public class NoGasCalculator implements GasCalculator{
     }
 
     public void updateResources() {
+    }
+    
+    public Position getGeyserPoint() {
+        return Position.None;
     }
 
     public boolean isVisible() {
