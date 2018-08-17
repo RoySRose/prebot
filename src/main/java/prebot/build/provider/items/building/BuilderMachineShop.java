@@ -63,9 +63,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 			if(StrategyIdea.addOnOption == AddOnOption.VULTURE_FIRST) {
-//				FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop AddOnOption.VULTURE_FIRST");
 				if (UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture)) {
-//					FileUtils.appendTextToFile("log.txt", "\n BuilderMachineShop have vulture & not have machineShop:: return true");
 					for (Unit factory : factories) {
 						if (factory.getAddon() != null || !factory.canBuildAddon()) {
 							continue;
@@ -134,11 +132,6 @@ public class BuilderMachineShop extends DefaultBuildableItem {
     
     @Override
     public boolean checkInitialBuild(){
-    	
-//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) < 2) {
-//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Machine_Shop ==>>> override true");
-//    	}
-    	
 		return true;
     }
 

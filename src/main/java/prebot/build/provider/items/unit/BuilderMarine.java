@@ -36,12 +36,10 @@ public class BuilderMarine extends DefaultBuildableItem {
 		}
 
     	if(!liftChecker) {
-//    		FileUtils.appendTextToFile("log.txt", "\n BuilderMarine liftChecker is false;");
     		return false;
     	}
 
     	int nowMarine = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
-//    	FileUtils.appendTextToFile("log.txt", "\n BuilderMarine :: nowMarine :: " + nowMarine);
     	
 //    	마린이 2마리가 생산된 상태에서 팩토리가 없다면 팩토리 먼저
     	if(nowMarine == 2 && UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) == 0) {
@@ -50,11 +48,9 @@ public class BuilderMarine extends DefaultBuildableItem {
     	
         if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Marine, null)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Marine, null) > 0) {
-//        	FileUtils.appendTextToFile("log.txt", "\n BuilderMarine :: quere marine > 0");
         	return false;
         }
 	        
-//        FileUtils.appendTextToFile("log.txt", "\n BuilderMarine :: marineCount :: " + StrategyIdea.marineCount + " & nowMarine :: " + nowMarine);
 		if(nowMarine < StrategyIdea.marineCount) {
 			setHighPriority(true);
        		return true;
@@ -66,11 +62,6 @@ public class BuilderMarine extends DefaultBuildableItem {
     
     @Override
     public boolean checkInitialBuild(){
-    	
-//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine) < 5) {
-//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Marine ==>>> override true");
-//    	}
-    	
 		return true;
     }
 }
