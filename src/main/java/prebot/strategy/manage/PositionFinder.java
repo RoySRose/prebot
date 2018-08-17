@@ -342,7 +342,7 @@ public class PositionFinder {
 		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (leader != null) {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
-			StrategyIdea.mainSquadCoverRadius = 255 + (int) (Math.log(squad.unitList.size()) * 55);
+			StrategyIdea.mainSquadCoverRadius = 200 + (int) (Math.log(squad.unitList.size()) * 60);
 			StrategyIdea.mainSquadCenter = centerPosition;
 			StrategyIdea.mainSquadLeaderPosition = leader.getPosition();
 		} else {
@@ -395,7 +395,7 @@ public class PositionFinder {
 				sumOfDropY += eui.getLastPosition().getY();
 				dropCount++;
 				
-			} else if (eui.getType().isFlyer()) {
+			} else if (eui.getType().isFlyer() &&  eui.getType() != UnitType.Zerg_Overlord) {
 				sumOfAirX += eui.getLastPosition().getX();
 				sumOfAirY += eui.getLastPosition().getY();
 				airCount++;

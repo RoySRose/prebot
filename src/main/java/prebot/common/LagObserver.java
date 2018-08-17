@@ -22,7 +22,7 @@ public class LagObserver {
 	
 	
 	private static int groupMaxSize = 48; // max : 2초 딜레이
-	private static int groupMinSize = 1;
+	private static int groupMinSize = 4;
 	
 	private static final int OBSERVER_CAPACITY = 15 * 24; // 15초간 delay가 없어서 groupsize를 낮춘다.
 	private static long[] observedTime = new long[OBSERVER_CAPACITY];

@@ -1,6 +1,8 @@
 package prebot.micro.control;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import bwapi.Position;
 import bwapi.Unit;
@@ -18,6 +20,8 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public abstract class Control {
+	
+	private Map<Integer, Integer> unitOutOfRegionMap = new HashMap<>();
 	
 	// TODO 추후 모든 컨트롤 적용 필요
 	public void controlIfUnitExist(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
@@ -73,7 +77,7 @@ public abstract class Control {
 		}
 		CampType campType = StrategyIdea.campType;
 		if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
-			return true;
+			return outOfRegionLongTime(unit);
 		}
 		
 		// 앞마당 지역, 또는 앞마당 반경이내 OK
@@ -85,14 +89,14 @@ public abstract class Control {
 			return false;
 		}
 		if (campType == CampType.EXPANSION) {
-			return true;
+			return outOfRegionLongTime(unit);
 		}
 		// 세번째 지역까지 OK
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return false;
 		}
 		if (campType == CampType.SECOND_CHOKE) {
-			return true;
+			return outOfRegionLongTime(unit);
 		}
 		// 세번째 지역 반경 OK
 		if (unit.getDistance(InfoUtils.myThirdRegion()) < 600) {
@@ -102,6 +106,16 @@ public abstract class Control {
 			return false;
 		}
 
-		return true;
+		return outOfRegionLongTime(unit);
+	}
+
+	private boolean outOfRegionLongTime(Unit unit) {
+		Integer outFrame = unitOutOfRegionMap.get(unit.getID());
+		if (outFrame == null || TimeUtils.elapsedFrames(outFrame) > 10 * TimeUtils.SECOND) { // 이력이없거나 오래된 정보는 새로만든다.
+			unitOutOfRegionMap.put(unit.getID(), TimeUtils.elapsedFrames());
+			return false;
+		} else {
+			return TimeUtils.elapsedFrames(outFrame) > 2 * TimeUtils.SECOND;
+		}
 	}
 }

@@ -100,7 +100,7 @@ public class VultureTravelManager {
 			});
 			
 			if (closeBase.getDistance(centerTilePosition.toPosition()) < 500) {
-				System.out.println("center base. " + closeBase);
+				System.out.println("center base. " + closeBase.getPosition());
 				continue;
 			}
 			

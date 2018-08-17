@@ -8,6 +8,8 @@ import java.util.Set;
 
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.common.LagObserver;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
@@ -55,6 +57,10 @@ public class AirForceSquad extends Squad {
 		
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행한다.
 		for (Unit leaderAirunit : leaderAirunits) {
+			if (!TimeUtils.executeUnitRotation(leaderAirunit, LagObserver.groupsize())) {
+				continue;
+			}
+			
 			AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfUnit(leaderAirunit.getID());
 			Set<UnitInfo> euis = findEnemiesForTeam(airForceTeam.memberList);
 			airForceControl.controlIfUnitExist(airForceTeam.memberList, euis);

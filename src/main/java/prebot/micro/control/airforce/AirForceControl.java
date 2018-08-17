@@ -121,11 +121,7 @@ public class AirForceControl extends Control {
 				// ATTACK_UNIT, KITING_UNIT 동일
 				if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
 					for (Unit airunit : airunits) {
-						if (airunit.getType() == UnitType.Terran_Wraith) {
-							CommandUtils.attackUnit(airunit, decisionDetail.eui.getUnit());
-						} else if (airunit.getType() == UnitType.Terran_Valkyrie) {
-							CommandUtils.attackMove(airunit, decisionDetail.eui.getLastPosition());
-						}
+						CommandUtils.attackUnit(airunit, decisionDetail.eui.getUnit());
 					}
 				}
 				// 지나가면서 한대씩 때리기
@@ -169,23 +165,24 @@ public class AirForceControl extends Control {
 				airforceRightClick(airunit, airForceTeam.leaderOrderPosition);
 			}
 			
-		} else if (decision.type == DecisionType.CHANGE_MODE) { // 클로킹
-			if (airForceTeam.cloakingMode) {
-				airForceTeam.decloak();
-				for (Unit airunit : airunits) {
-					if (airunit.getType() == UnitType.Terran_Wraith) {
-						airunit.decloak();
-					}
-				}
-			} else {
-				airForceTeam.cloak();
-				for (Unit airunit : airunits) {
-					if (airunit.getType() == UnitType.Terran_Wraith) {
-						airunit.cloak();
-					}
-				}
-			}
 		}
+//		else if (decision.type == DecisionType.CHANGE_MODE) { // 클로킹
+//			if (airForceTeam.cloakingMode) {
+//				airForceTeam.decloak();
+//				for (Unit airunit : airunits) {
+//					if (airunit.getType() == UnitType.Terran_Wraith) {
+//						airunit.decloak();
+//					}
+//				}
+//			} else {
+//				airForceTeam.cloak();
+//				for (Unit airunit : airunits) {
+//					if (airunit.getType() == UnitType.Terran_Wraith) {
+//						airunit.cloak();
+//					}
+//				}
+//			}
+//		}
 	}
 
 	// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)

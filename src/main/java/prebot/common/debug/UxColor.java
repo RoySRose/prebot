@@ -8,6 +8,7 @@ import prebot.micro.squad.CheckerSquad;
 import prebot.micro.squad.EarlyDefenseSquad;
 import prebot.micro.squad.GuerillaSquad;
 import prebot.micro.squad.MainAttackSquad;
+import prebot.micro.squad.MultiDefenseSquad;
 import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
@@ -39,6 +40,7 @@ public class UxColor {
 		SQUAD_COLOR.put(ScvScoutSquad.class, Color.Black);
 		SQUAD_COLOR.put(SpecialSquad.class, Color.Purple);
 		SQUAD_COLOR.put(GuerillaSquad.class, Color.Cyan);
+		SQUAD_COLOR.put(MultiDefenseSquad.class, Color.Teal);
 		
 	    COLOR_TO_CHARACTER.put(Color.Red, CHAR_RED);
 	    COLOR_TO_CHARACTER.put(Color.Blue, CHAR_BLUE);

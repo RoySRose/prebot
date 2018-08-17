@@ -56,7 +56,7 @@ public abstract class Strategist {
 				return true;
 			}	
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
-			if (TimeUtils.afterTime(4, 0)) {
+			if (TimeUtils.afterTime(3, 45)) {
 				return true;
 			}	
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
