@@ -167,7 +167,6 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
                 setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
                 //this.setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
                 //System.out.println("return supply true");
-                //FileUtils.appendTextToFile("log.txt", "\n return supply true ==>>> ");
                 return true;
             }
         }
