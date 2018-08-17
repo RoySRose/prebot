@@ -3,6 +3,7 @@ package prebot.build.provider.items.building;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -95,7 +96,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
-		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, max_turret+add_turret)) {
+		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, max_turret+add_turret+1)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());
@@ -220,14 +221,34 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 	private boolean noTurretNearPosition(Position centerPosition, int radius1, int radius2, int turretCount, int maxTurretCnt) {
 		
-		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(PlayerRange.ALL, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
+		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(PlayerRange.SELF, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
 		if( maxTurretCnt <= turretNearBase.size()) {
-//			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: centerPosition :: " + centerPosition.toTilePosition() + " is false!!!!!!!!");
 			return false;
 		}
 //		if (!turretNearBase.isEmpty()) {
 //			return false;
 //		}
+		
+		Race enemyRace = Prebot.Broodwar.enemy().getRace();
+		
+		int radiusP = 0;
+		
+		if(enemyRace == Race.Zerg) {
+			radiusP = UnitType.Zerg_Lurker.groundWeapon().maxRange();
+		}else {
+			radiusP = 80;
+		}
+		
+		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, centerPosition, radiusP);
+		for(Unit unit : nearInvisibleUnit) {
+			if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker) {
+				if(UnitUtils.availableScanningCount() == 0) {
+					return false;
+				}
+				
+			}
+		}
+		
 
 		int buildQueueCountNear = BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
 		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);

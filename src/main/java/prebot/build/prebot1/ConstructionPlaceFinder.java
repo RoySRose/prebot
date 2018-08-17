@@ -16,11 +16,13 @@ import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
+import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
+import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation.GameMap;
 
@@ -242,6 +244,7 @@ public class ConstructionPlaceFinder {
 			while (buildingGapSpace >= 0) {
 //				FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 turret while ==>> "+ buildingType + " :: " + desiredPosition + " :: buildingGapSpace => " +buildingGapSpace);
 				buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
+				
 				if (TilePositionUtils.isValidTilePosition(buildPosition)) {
 					return buildPosition;
 				}
@@ -671,9 +674,9 @@ public class ConstructionPlaceFinder {
 			}
 		} else {
 			//make sure we leave space for add-ons. These types of units can have addon:
-			if (b.getType() == UnitType.Terran_Science_Facility ||
-				b.getType() == UnitType.Terran_Factory ||
-				b.getType() == UnitType.Terran_Starport
+			if (b.getType() == UnitType.Terran_Starport ||
+				b.getType() == UnitType.Terran_Factory
+//				b.getType() == UnitType.Terran_Starport 
 				) {
 //				width += 3;
 				width += 3;
@@ -787,7 +790,8 @@ public class ConstructionPlaceFinder {
 								return false;
 							}
 						}
-					}else if(b.getType() != UnitType.Factories && b.getType() != UnitType.Terran_Starport && b.getType() != UnitType.Terran_Science_Facility){
+//					}else if(b.getType() != UnitType.Factories && b.getType() != UnitType.Terran_Starport && b.getType() != UnitType.Terran_Science_Facility){
+					}else if(b.getType() != UnitType.Factories && b.getType() != UnitType.Terran_Starport){
 						if (isTilesToAvoidAddonBuilding(x, y)) {
 //							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidFac false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
@@ -1621,4 +1625,31 @@ public class ConstructionPlaceFinder {
 			}
 		}
 	}
+	
+//	public boolean turretInvisibleUnitCheck(Position centerPosition) {
+//	
+//		Race enemyRace = Prebot.Broodwar.enemy().getRace();
+//		
+//		int radiusP = 0;
+//		
+//		if(enemyRace == Race.Zerg) {
+//			radiusP = UnitType.Zerg_Lurker.groundWeapon().maxRange();
+//		}else {
+//			radiusP = 80;
+//		}
+//		
+//		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, centerPosition, radiusP);
+//		for(Unit unit : nearInvisibleUnit) {
+//			if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker) {
+//				FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: there is invisible unit in turret radius :: " + radiusP);
+//				if(UnitUtils.availableScanningCount() == 0) {
+//					FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: But can't use comsat :: don't construct turret");
+//					return false;
+//				}
+//				
+//			}
+//		}
+//		
+//		return true;
+//	}
 }

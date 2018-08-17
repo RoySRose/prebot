@@ -101,7 +101,8 @@ public class GameCommander {
 //			if (unit.getType() == UnitType.Terran_Command_Center) {
 //				ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding(unit);
 //			}
-			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+//			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+			if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport)) {
 				ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuilding(unit);
 			}
 //			if ((unit.getType() == UnitType.Terran_Supply_Depot || unit.getType() == UnitType.Terran_Academy || unit.getType() == UnitType.Terran_Armory)) {
@@ -115,7 +116,8 @@ public class GameCommander {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitDestroy(unit);
 		InformationManager.Instance().onUnitDestroy(unit); 
-		if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+//		if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport || unit.getType() == UnitType.Terran_Science_Facility)) {
+		if ((unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport)) {
 			ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuildingFree(unit);
 		}else if ((unit.getType() == UnitType.Terran_Machine_Shop || unit.getType() == UnitType.Terran_Control_Tower 
 				|| unit.getType() == UnitType.Terran_Covert_Ops || unit.getType() == UnitType.Terran_Physics_Lab)) {

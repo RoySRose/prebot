@@ -27,6 +27,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -225,7 +226,7 @@ public class BuildManager extends GameManager {
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
-								System.out.println("desiredPosition is not null :: " + t.getUnitType());
+								System.out.println("desiredPosition is not null :: " + t.getUnitType() + " :: " + desiredPosition);
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -299,6 +300,7 @@ public class BuildManager extends GameManager {
 		// get the type of unit that builds this
 		UnitType producerType = t.whatBuilds();
 		
+		Unit tempProducer = null;
 
 
 		// make a set of all candidate producers
@@ -462,11 +464,39 @@ public class BuildManager extends GameManager {
 					}
 				}
 			}
+			
+//			if(t.getUnitType() == UnitType.Terran_Vulture || t.getUnitType() == UnitType.Terran_Goliath) {
+////				FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture");
+//				
+////				20180818. hkk. 배정된 팩토리에 머신샵이 있을경우 일단 임시생산자로 지정. 다시 루프를 돌려 생산자가 머신샵이 없을 경우 그걸로 배정. 끝까지 돌렸으나 머신샵 없는 생산자가 없을 경우 그냥 배정.
+//				if(tempProducer == null) {
+//					FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture initset :: " + unit.getType() + " ::  addon :: " + unit.getAddon());
+//					tempProducer = unit;
+//				}
+//				
+//				if(tempProducer.getAddon() != null && unit.getAddon() == null) {
+//					FileUtils.appendTextToFile("log.txt", "\n getProducer of vulture :: factory that has addon to change non-addon");
+//					tempProducer = unit;
+//				}
+//				
+//				if(tempProducer.getAddon() != null) {
+//					FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture continue :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
+//					continue;
+//				}
+//				
+//				FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture set this tempProducer :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
+//				candidateProducers.add(tempProducer); // C++ :
+//				
+//			}else {
+//				candidateProducers.add(unit); // C++ :
+//			}
+			candidateProducers.add(unit); // C++ :
+			
 
 			//test 용 날릴것. hkk
 //			if(tank) System.out.println("add candidateProducers ==> " + unit.getType() + " : " + unit.getID());
 			// if we haven't cut it, add it to the set of candidates
-			candidateProducers.add(unit); // C++ :
+			
 											// candidateProducers.insert(unit);
 			
 
@@ -642,12 +672,12 @@ public class BuildManager extends GameManager {
             } else if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.NextSupplePoint) {
                 if (fisrtSupplePointFull) {
 //                	20180815. hkk. 서플라이포인트가 Full 일 경우 작은 건물은 메인베이스가 Full 이더라도 지을수 있는 공간이 있을수 있으므로, 일단 찾아보고 null 이 나올경우 아래에서 처리
-//                	seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-                    if (mainBaseLocationFull) {
-                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
-                    } else {
-                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
-                    }
+                	seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+//                    if (mainBaseLocationFull) {
+//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondMainBaseLocation;
+//                    } else {
+//                        seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+//                    }
                 }
             }
 

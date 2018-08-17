@@ -72,11 +72,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
     
     @Override
     public boolean checkInitialBuild(){
-    	
-//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) < 2) {
-//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Machine_Shop ==>>> override true");
-//    	}
-    	
+  	
 		return true;
     }
 
