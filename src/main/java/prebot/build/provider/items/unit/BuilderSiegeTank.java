@@ -29,7 +29,7 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
     	}
 
         if(factoryUnitSelector.getSelected().equals(metaType.getUnitType())) {
-
+//        	FileUtils.appendTextToFile("log.txt", "\n BuilderSiegeTank || SiegeTank selected");
 //        	if(RespondToStrategy.Instance().once_tank) {
 //        		setBlocking(true);
 //        		RespondToStrategy.Instance().once_tank = false;

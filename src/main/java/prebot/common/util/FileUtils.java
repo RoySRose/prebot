@@ -16,10 +16,10 @@ public class FileUtils {
 	/// 로그 유틸
 	public static void appendTextToFile(final String logFile, final String msg) {
 		
-		if(Prebot.Broodwar.getFrameCount() % 37 != 1) {
+		if(Prebot.Broodwar.getFrameCount() % 71 != 1) {
 			return;
 		}
-//		
+		
 		try {
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(logFile), true));
 			bos.write(msg.getBytes());

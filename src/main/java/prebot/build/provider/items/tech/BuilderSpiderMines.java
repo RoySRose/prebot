@@ -19,6 +19,11 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
+//    	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
+//    	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || buildCondition || metaType =>" + metaType.toString());
+
+    	
+    	
 		if (researchSelector.getSelected() == null) {
 			return false;
 		}
@@ -35,6 +40,22 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 			return false;
 		}
 
+//    	if(researchSelector.getSelected() != null){
+//	    	if(researchSelector.getSelected().isTech()) {
+//		    	if(researchSelector.getSelected().getTechType() == metaType.getTechType()) {
+//		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
+//		    	//if(researchSelector.getSelected().equals(metaType)) {
+//		//        	FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || researchSelector => " + researchSelector.getSelected().getTechType() + " || metaType => " + metaType.getTechType());
+//			        	if (researchSelector.currentResearched <= 2) {
+//			//        		FileUtils.appendTextToFile("log.txt", "\n BuilderSpiderMines || block & high");
+//			        		setBlocking(true);
+//			        		setHighPriority(true);
+//			        	}
+//			            return true;
+//		    		}
+//		        }
+//	    	}
+//    	}
     	if (researchSelector.currentResearched <= 2) {
 			setBlocking(true);
 			setHighPriority(true);

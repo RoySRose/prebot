@@ -102,8 +102,8 @@ public class ConstructionManager extends GameManager {
 				
 				if (b.getType() == UnitType.Terran_Command_Center ||
 					b.getType() == UnitType.Terran_Factory ||
-					b.getType() == UnitType.Terran_Starport )
-//					b.getType() == UnitType.Terran_Science_Facility)
+					b.getType() == UnitType.Terran_Starport ||
+					b.getType() == UnitType.Terran_Science_Facility)
 				{
 					width += 2;
 				}
@@ -309,8 +309,8 @@ public class ConstructionManager extends GameManager {
 			
 			if (b.getType() == UnitType.Terran_Command_Center ||
 					b.getType() == UnitType.Terran_Factory ||
-					b.getType() == UnitType.Terran_Starport)
-//					b.getType() == UnitType.Terran_Science_Facility)
+					b.getType() == UnitType.Terran_Starport ||
+					b.getType() == UnitType.Terran_Science_Facility)
 				{
 					width += 2;
 			}
@@ -379,8 +379,8 @@ public class ConstructionManager extends GameManager {
 				
 				if (b.getType() == UnitType.Terran_Command_Center ||
 						b.getType() == UnitType.Terran_Factory ||
-						b.getType() == UnitType.Terran_Starport)
-//						b.getType() == UnitType.Terran_Science_Facility)
+						b.getType() == UnitType.Terran_Starport ||
+						b.getType() == UnitType.Terran_Science_Facility)
 					{
 						width += 2;
 				}
@@ -435,8 +435,8 @@ public class ConstructionManager extends GameManager {
 						
 						if (b.getType() == UnitType.Terran_Command_Center ||
 								b.getType() == UnitType.Terran_Factory ||
-								b.getType() == UnitType.Terran_Starport )
-//								b.getType() == UnitType.Terran_Science_Facility)
+								b.getType() == UnitType.Terran_Starport ||
+								b.getType() == UnitType.Terran_Science_Facility)
 							{
 								width += 2;
 						}
@@ -513,8 +513,8 @@ public class ConstructionManager extends GameManager {
 					
 					if (b.getType() == UnitType.Terran_Command_Center ||
 							b.getType() == UnitType.Terran_Factory ||
-							b.getType() == UnitType.Terran_Starport )
-//							b.getType() == UnitType.Terran_Science_Facility)
+							b.getType() == UnitType.Terran_Starport ||
+							b.getType() == UnitType.Terran_Science_Facility)
 						{
 							width += 2;
 					}

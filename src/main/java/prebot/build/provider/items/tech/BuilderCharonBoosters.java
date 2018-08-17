@@ -21,6 +21,9 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
+//    	FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
+//    	FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || buildCondition || metaType =>" + metaType.toString());
+
     	//if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
     	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
     		return false;
@@ -41,8 +44,23 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
 		if (Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
 			return false;
 		}
-
+    	
+//    	if(researchSelector.getSelected() != null){
+//	    	if(researchSelector.getSelected().isUpgrade()) {
+//		    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType() && Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType()) == false) {
+//			    	//if(researchSelector.getSelected().equals(metaType)) {
+//			        	//FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || researchSelector => " + researchSelector.getSelected().getUpgradeType() + " || metaType => " + metaType.getUpgradeType());
+//			        	if (researchSelector.currentResearched <= 2) {
+//			        		//FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || block & high");
+//			        		setBlocking(true);
+//			        		setHighPriority(true);
+//			        	}
+//			            return true;
+//		        }
+//	    	}
+//    	}
     	if (researchSelector.currentResearched <= 2) {
+    		//FileUtils.appendTextToFile("log.txt", "\n BuilderCharonBoosters || block & high");
     		setBlocking(true);
     		setHighPriority(true);
     	}
