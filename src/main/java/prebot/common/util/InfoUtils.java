@@ -1,5 +1,6 @@
 package prebot.common.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,7 +169,11 @@ public class InfoUtils {
 	}
 	
 	public static List<UnitInfo> euiListInMyRegion(Region myRegion) {
-		return InformationManager.Instance().getEuiListInMyRegion(myRegion);
+		List<UnitInfo> euiListInMyRegion = InformationManager.Instance().getEuiListInMyRegion(myRegion);
+		if (euiListInMyRegion == null) {
+			euiListInMyRegion = new ArrayList<>();
+		}
+		return euiListInMyRegion;
 	}
 	
 	public static Set<UnitInfo> euiListInBase() {

@@ -3,8 +3,10 @@ package prebot.micro.control.factory;
 import java.util.Collection;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
@@ -38,6 +40,11 @@ public class GoliathControl extends Control {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
+		
+		int coverRadius = StrategyIdea.mainSquadCoverRadius * 3 / 5;
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			coverRadius = StrategyIdea.mainSquadCoverRadius;
+		}
 
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -54,7 +61,7 @@ public class GoliathControl extends Control {
 					continue;
 				}
 			} else {
-				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius * 3 / 5) {
+				if (unit.getDistance(StrategyIdea.mainSquadCenter) > coverRadius) {
 					CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
 					continue;
 				}

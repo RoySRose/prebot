@@ -163,10 +163,6 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateTankDefenseSquad() {
-		if (InfoUtils.enemyRace() != Race.Terran) {
-			return;
-		}
-
 		// exclude invalid unit & remove invalid squad
 		int defenseTankCount = 0;
 		Set<Integer> defenseTankIdSet = new HashSet<>();
@@ -191,9 +187,9 @@ public class CombatManager extends GameManager {
 			}
 		}
 		
-		if (!StrategyIdea.mainSquadMode.isAttackMode) {
-			return;
-		}
+//		if (!StrategyIdea.mainSquadMode.isAttackMode) {
+//			return;
+//		}
 		
 		List<Unit> tanks = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		if (tanks.size() / 5 < defenseTankCount) { // 방어 탱크는 전체탱크의 20%를 넘을 수 없다.
@@ -221,8 +217,26 @@ public class CombatManager extends GameManager {
 		Region expansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		for (Unit commandCenter : commandCenters) {
 			Region centerRegion = BWTA.getRegion(commandCenter.getPosition());
-			if (centerRegion == baseRegion || centerRegion == expansionRegion) {
-				continue;
+//			if (centerRegion == baseRegion) {
+//				continue;
+//			}
+//			if (centerRegion == expansionRegion) {
+//				continue;
+//			}
+			
+			Race enemyRace = InfoUtils.enemyRace();
+			if (enemyRace == Race.Zerg) {
+				if (centerRegion == baseRegion) {
+					continue;
+				}
+			} else if (enemyRace == Race.Protoss) {
+				if (centerRegion != baseRegion && centerRegion != expansionRegion) {
+					continue;
+				}
+			} else if (enemyRace == Race.Terran) {
+				if (centerRegion == expansionRegion) {
+					continue;
+				}
 			}
 			
 			String squadName = SquadInfo.MULTI_DEFENSE_.squadName + commandCenter.getID();
@@ -234,14 +248,13 @@ public class CombatManager extends GameManager {
 			}
 		}
 		
-		// assig units
+		// assign units
 		List<Squad> updatedSquadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName);
 		for (Squad defenseSquad : updatedSquadList) {
 			MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
 			if (squad.alreadyDefenseUnitAssigned()) {
 				continue;
 			}
-			
 			if (squad.unitList.size() >= 2) {
 				continue;
 			}

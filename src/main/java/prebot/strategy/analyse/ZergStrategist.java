@@ -28,7 +28,7 @@ public class ZergStrategist extends Strategist {
 		}
 		
 		if (hasInfo(ClueInfo.DOUBLE_HATCH_12HAT)) {
-			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR) && !hasAnyInfo(ClueInfo.LAIR_2HAT_FAST, ClueInfo.LAIR_1HAT_FAST)) {
+			if (hasAnyInfo(ClueInfo.NO_EXTRACTOR) && !hasAnyInfo(ClueInfo.LAIR_2HAT_FAST, ClueInfo.LAIR_1HAT_FAST)) {
 				return EnemyStrategy.ZERG_3HAT;
 			} else {
 				return EnemyStrategy.ZERG_2HAT_GAS;
@@ -79,18 +79,18 @@ public class ZergStrategist extends Strategist {
 			StrategyIdea.wraithCount = 1;
 		}
 		
+
+		boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
+		boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START, ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
+		boolean hydraFiveMany = hasInfo(ClueInfo.FIVE_MANY_HYDRA);
+		boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
+		
 		if (hasAnyInfo(ClueInfo.LAIR_INCOMPLETE, ClueInfo.LAIR_COMPLETE)) {
-			boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
-			boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START, ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
-			boolean hydraThreeMany = hasInfo(ClueInfo.THREE_MANY_HYDRA);
-			boolean hydraFiveMany = hasInfo(ClueInfo.FIVE_MANY_HYDRA);
-			boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
-			
 			if (spireTech && hydraTech) {
 				return EnemyStrategy.ZERG_LAIR_MIXED;
 			} else if (lurkerFound) {
 				return EnemyStrategy.ZERG_FAST_LURKER;
-			} else if (hydraThreeMany || hydraFiveMany) {
+			} else if (hydraFiveMany) {
 				return EnemyStrategy.ZERG_HYDRA_WAVE;
 			} else if (hydraTech) {
 				return EnemyStrategy.ZERG_FAST_LURKER;
@@ -101,15 +101,15 @@ public class ZergStrategist extends Strategist {
 			}
 			
 		} else if (hasAnyInfo(ClueInfo.NO_LAIR)) {
-			if (hasType(ClueType.SPIRE)) {
+			if (spireTech) {
 				return fastMutaliskByTime(); // no lair, no mute
-			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA)) {
+			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA) || hasInfo(ClueInfo.THREE_MANY_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;
 			} else {
 				return EnemyStrategy.ZERG_NO_LAIR_LING;
 			}
 		} else {
-			if (hasType(ClueType.SPIRE)) {
+			if (spireTech) {
 				return fastMutaliskByTime(); // no lair, no mute
 			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;

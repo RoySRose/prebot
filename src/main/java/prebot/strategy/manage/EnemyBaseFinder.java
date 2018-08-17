@@ -21,6 +21,8 @@ import prebot.strategy.UnitInfo;
 
 public class EnemyBaseFinder {
 
+	private boolean finished = false;
+	
 	private static EnemyBaseFinder instance = new EnemyBaseFinder();
 
 	public static EnemyBaseFinder Instance() {
@@ -28,9 +30,13 @@ public class EnemyBaseFinder {
 	}
 
 	public void update() {
-		// 끝까지 상대 location 못 찾았을때
+		if (finished) {
+			return;
+		}
+		
 		if (InfoUtils.enemyBase() != null) {
 			StrategyIdea.enemyBaseExpected = null;
+			finished = true;
 			return;
 		}
 		if (StrategyIdea.enemyBaseExpected != null && Prebot.Broodwar.isExplored(StrategyIdea.enemyBaseExpected.getTilePosition())) {

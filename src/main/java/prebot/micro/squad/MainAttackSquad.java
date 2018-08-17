@@ -146,16 +146,27 @@ public class MainAttackSquad extends Squad {
 	@Override
 	public void findEnemies() {
 		euiList.clear();
+
+		UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50, true, false);
 		
-		if (StrategyIdea.campType == CampType.INSIDE) {
-			euiList.addAll(InfoUtils.euiListInBase());
-		} else if (StrategyIdea.campType == CampType.FIRST_CHOKE || StrategyIdea.campType == CampType.EXPANSION) {
-			euiList.addAll(InfoUtils.euiListInBase());
-			euiList.addAll(InfoUtils.euiListInExpansion());
+		if (!StrategyIdea.mainSquadMode.isAttackMode) {
+			if (StrategyIdea.campType == CampType.INSIDE) {
+				euiList.addAll(InfoUtils.euiListInBase());
+			} else if (StrategyIdea.campType == CampType.FIRST_CHOKE || StrategyIdea.campType == CampType.EXPANSION) {
+				euiList.addAll(InfoUtils.euiListInBase());
+				euiList.addAll(InfoUtils.euiListInExpansion());
+			} else {
+				euiList.addAll(InfoUtils.euiListInBase());
+				euiList.addAll(InfoUtils.euiListInExpansion());
+				euiList.addAll(InfoUtils.euiListInThirdRegion());
+			}
+			
 		} else {
-			euiList.addAll(InfoUtils.euiListInBase());
-			euiList.addAll(InfoUtils.euiListInExpansion());
-			euiList.addAll(InfoUtils.euiListInThirdRegion());
+			for (Unit unit : unitList) {
+				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
+					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
+				}
+			}
 		}
 		
 		if (TimeUtils.beforeTime(8, 0)) {
@@ -165,14 +176,6 @@ public class MainAttackSquad extends Squad {
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		}
-
-		UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, StrategyIdea.mainSquadCenter, StrategyIdea.mainSquadCoverRadius + 50, true, false);
-		if (StrategyIdea.mainSquadMode.isAttackMode) {
-			for (Unit unit : unitList) {
-				if (unit.getDistance(StrategyIdea.mainSquadCenter) > StrategyIdea.mainSquadCoverRadius + 50) {
-					UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE|TargetFilter.LARVA_LURKER_EGG, euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS, true, false);
-				}
-			}
-		}
+		
 	}	
 }
