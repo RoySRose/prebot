@@ -23,6 +23,7 @@ public class BuildCondition {
         this.highPriority = false;
         this.seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.NoLocation;
         this.tilePosition = TilePosition.None;*/
+        //FileUtils.appendTextToFile("log.txt", "\n test log of BuildCondition ==>>> " + tilePosition.toString());
     }
 
     public BuildCondition(boolean blocking, boolean highPriority, BuildOrderItem.SeedPositionStrategy seedPositionStrategy, TilePosition tilePostition) {
