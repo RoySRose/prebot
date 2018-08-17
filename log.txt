@@ -1,0 +1,363 @@
+
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: [5, 23] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [5, 23]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [5, 23]
+ getDesiredPosition before desiredPosition :: Terran_Barracks :: [1, 24] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Barracks :: [1, 24]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Barracks :: [1, 24]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 4]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Refinery :: [7, 4]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: [8, 23] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [8, 23]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [8, 23]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: [12, 17] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [12, 17]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [12, 17]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [10, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [10, 0]
+ getDesiredPosition before desiredPosition :: Terran_Engineering_Bay :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Engineering_Bay :: [11, 13]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Engineering_Bay :: [11, 13]
+ getDesiredPosition before desiredPosition :: Terran_Academy :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Academy :: [13, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Academy :: [13, 0]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [11, 23] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [11, 23]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [11, 23]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [16, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [16, 0]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [9, 10] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [8, 13]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [8, 13]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [8, 13]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [9, 10] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [11, 13]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [11, 13]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [19, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [19, 0]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [9, 10] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [13, 6]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [13, 6]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [8, 33] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [4, 37]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [4, 37]
+ set command center to 1 turret position :: [11, 23]
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: [11, 23] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [11, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [11, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [11, 32]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [14, 13]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [14, 13]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [22, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [22, 0]
+ set command center to :: FirstExpansionLocation
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: FirstExpansionLocation
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [7, 34]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [7, 34]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [18, 34] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [18, 34]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [18, 34]
+ getDesiredPosition before desiredPosition :: Terran_Armory :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Armory :: [25, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Armory :: [25, 0]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [28, 0]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [28, 0]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [1, 17]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [1, 17]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: [9, 40] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [9, 40]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Refinery :: [9, 40]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [15, 9]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [15, 9]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [10, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [10, 2]
+ getDesiredPosition before desiredPosition :: Terran_Starport :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Starport :: null
+ getDesiredPosition desiredPosition is null break :: Terran_Starport :: seedPosition :: null
+ getDesiredPosition before desiredPosition :: Terran_Starport :: null :: SecondChokePoint
+ getDesiredPosition after desiredPosition :: Terran_Starport :: [23, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [23, 32]
+ getDesiredPosition before desiredPosition :: Terran_Starport :: null :: SecondChokePoint
+ getDesiredPosition after desiredPosition :: Terran_Starport :: [21, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [21, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [21, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [21, 32]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [13, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [13, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [21, 32]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Starport :: [21, 32]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondChokePoint
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [33, 19]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [33, 19]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [16, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [16, 2]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondChokePoint
+ getDesiredPosition after desiredPosition :: Terran_Factory :: null
+ getDesiredPosition desiredPosition is null break :: Terran_Factory :: seedPosition :: null
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [12, 114]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [12, 114]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [19, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [19, 2]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [22, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [22, 2]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [25, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [22, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [25, 2]
+ getDesiredPosition before desiredPosition :: Terran_Science_Facility :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Science_Facility :: [2, 113]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Science_Facility :: [2, 113]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [22, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [22, 2]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: NextSupplePoint
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: null
+ getDesiredPosition desiredPosition is null break :: Terran_Supply_Depot :: seedPosition :: null
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [3, 5]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [3, 5]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 2 :: 2
+ getNextExpansionLocation numberOfCC :: 2 :: [14, 63]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [14, 63]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [14, 63]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [14, 63]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [14, 63]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [8, 16]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [8, 16]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [16, 64] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [20, 68]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [20, 68]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [16, 64] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [20, 60]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [20, 60]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: [7, 64] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 64]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Refinery :: [7, 64]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [3, 2]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [3, 2]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [16, 6]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [16, 6]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [15, 118]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [15, 118]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [15, 110]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [15, 110]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [7, 109]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [7, 109]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 3 :: 3
+ getNextExpansionLocation numberOfCC :: 3 :: [7, 118]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [7, 118]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [7, 118]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [7, 118]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [7, 118]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [7, 118]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [9, 119] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [4, 114]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [4, 114]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [4, 114]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [3, 8]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [3, 8]
+ getDesiredPosition before desiredPosition :: Terran_Supply_Depot :: null :: MainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Supply_Depot :: [3, 11]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Supply_Depot :: [3, 11]
+ getDesiredPosition before desiredPosition :: Terran_Missile_Turret :: [9, 119] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Missile_Turret :: [4, 111]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Missile_Turret :: [4, 111]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: [7, 113] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [7, 113]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Refinery :: [7, 113]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 4 :: 4
+ getNextExpansionLocation numberOfCC :: 4 :: [7, 92]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [7, 92]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [7, 92]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [7, 92]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [7, 92]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 5 :: 5
+ getNextExpansionLocation numberOfCC :: 5 :: [62, 119]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [62, 119]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [62, 119]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [62, 119]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [62, 119]
+ getDesiredPosition before desiredPosition :: Terran_Factory :: null :: SecondMainBaseLocation
+ getDesiredPosition after desiredPosition :: Terran_Factory :: [12, 106]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [12, 106]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Factory :: [12, 106]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [62, 119]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 5 :: 5
+ getNextExpansionLocation numberOfCC :: 5 :: [62, 5]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [62, 5]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [62, 5]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [62, 5]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [62, 5]
+ getDesiredPosition before desiredPosition :: Terran_Refinery :: [9, 87] :: SeedPositionSpecified
+ getDesiredPosition after desiredPosition :: Terran_Refinery :: [9, 87]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Refinery :: [9, 87]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 5 :: 5
+ getNextExpansionLocation numberOfCC :: 5 :: [62, 5]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [62, 5]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [62, 5]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [62, 5]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [62, 5]
+ set command center to :: NextExpansionPoint
+ getDesiredPosition before desiredPosition :: Terran_Command_Center :: null :: NextExpansionPoint
+ getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start
+ getNextExpansionLocation CommandCenter cnt :: 6 :: 6
+ getNextExpansionLocation numberOfCC :: 6 :: [35, 15]
+ getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> Terran_Command_Center :: [35, 15]
+ getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> Terran_Command_Center :: [35, 15]
+ getDesiredPosition after desiredPosition :: Terran_Command_Center :: [35, 15]
+ assignWorkersToUnassignedBuildings relocationTilePosition :: Terran_Command_Center :: [35, 15]
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192
+ Builder MissileTurret :: But can't use comsat :: don't construct turret
+ Builder MissileTurret :: there is invisible unit in turret radius :: 192

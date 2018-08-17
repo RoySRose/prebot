@@ -104,11 +104,6 @@ public class BuilderRefinery extends DefaultBuildableItem {
     
     @Override
     public boolean checkInitialBuild(){
-    	
-//    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Refinery) < 4) {
-//    		FileUtils.appendTextToFile("log.txt", "\n checkInitialBuild of Terran_Refinery ==>>> override true");
-//    	}
-    	
 		return true;
     }
 

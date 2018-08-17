@@ -3,8 +3,10 @@ package prebot.build.provider.items.building;
 import java.util.List;
 
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.prebot1.ConstructionManager;
@@ -12,8 +14,10 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -213,20 +217,30 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	
 
 	private void setCommandCenterBlockAndSeedPosition() {
-		SeedPositionStrategy seedPosition = null;
+		SeedPositionStrategy seedPosition = SeedPositionStrategy.NoLocation;
+		TilePosition seedTilePosition = TilePosition.None;
 
 		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
     	if (allCommandCenterCount <= 1) {
     		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
-    			seedPosition = SeedPositionStrategy.MainBaseLocation;
+//    			seedPosition = SeedPositionStrategy.MainBaseLocation;
+    			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
+    				seedTilePosition = BlockingEntrance.Instance().entrance_turret1;
+    			}else {
+    				seedPosition = SeedPositionStrategy.MainBaseLocation;
+    			}
     		} else {
     			seedPosition = SeedPositionStrategy.FirstExpansionLocation;
     		}
     	} else if (allCommandCenterCount >= 2) {
     		seedPosition = SeedPositionStrategy.NextExpansionPoint;
     	}
-    	
-    	setSeedPositionStrategy(seedPosition);
+    	if(TilePositionUtils.isValidTilePosition(seedTilePosition)){
+//    		System.out.println("set command center to 1 turret position");
+    		setTilePosition(seedTilePosition);
+    	}else {
+    		setSeedPositionStrategy(seedPosition);
+    	}
     	setBlocking(true);
 	}
 }

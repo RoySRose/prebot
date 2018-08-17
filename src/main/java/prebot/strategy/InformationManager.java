@@ -900,7 +900,9 @@ public class InformationManager extends GameManager {
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC);
+//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center));
+//			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center);
+//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) +" + "+ Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center));
 			if (numberOfCC == 2) {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, true);
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
@@ -922,6 +924,7 @@ public class InformationManager extends GameManager {
 		getExpansionLocation = resultBase;
 		return resultBase;
 	}
+
 
     public BaseLocation getLastBuildingLocation() {
         BaseLocation closeButFarFromEnemyLocation = getCloseButFarFromEnemyLocation(occupiedByCCBaseLocations.get(selfPlayer), false);
@@ -1392,7 +1395,10 @@ public class InformationManager extends GameManager {
 //                    FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: set resultBase :: " + resultBase.getTilePosition());
                 }
             }
-            secondStartPosition = resultBase;
+            if(!TilePositionUtils.equals(secondStartPosition.getTilePosition(), resultBase.getTilePosition())) {
+            	secondStartPosition = resultBase;
+            	BuildManager.Instance().secondStartLocationFull = false;
+            }
         }
     }
 

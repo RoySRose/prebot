@@ -310,7 +310,7 @@ public class InitialBuildProvider {
 //                checkItem = tempbuildQueue.getItem();
 
                 if(checkItem.metaType.isUnit() && checkItem.metaType.getUnitType() == unitType){
-//                    FileUtils.appendTextToFile("log.txt", "\n delete unit ::  unitType : " + checkItem.metaType.getUnitType() + " to " + cnt);
+
                     tempbuildQueue.removeCurrentItem();
                     cnt++;
 //                    debugingFromQueue(" deleteFromQueueCnt "+ cnt + " :: " + unitType.toString());
