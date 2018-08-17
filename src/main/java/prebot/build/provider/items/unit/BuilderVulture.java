@@ -27,7 +27,6 @@ public class BuilderVulture extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-    	//FileUtils.appendTextToFile("log.txt", "\n BuilderVulture ==>>> " + metaType.getName());
     	
     	if(StrategyIdea.addOnOption == AddOnOption.IMMEDIATELY && !UnitUtils.myUnitDiscovered(UnitType.Terran_Machine_Shop)){
 			return false;

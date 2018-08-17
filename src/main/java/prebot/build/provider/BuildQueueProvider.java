@@ -70,7 +70,6 @@ public class BuildQueueProvider extends GameManager {
 	private Map<UpgradeType, Integer> upgradeStartMap = new HashMap<>();
 	
 	public void startUpgrade(UpgradeType upgradeType) {
-//		FileUtils.appendTextToFile("log.txt", "\n set startUpgrade Frame:: " + upgradeType + " :: " + TimeUtils.elapsedFrames());
 		upgradeStartMap.put(upgradeType, TimeUtils.elapsedFrames());
 	}
 	

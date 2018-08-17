@@ -18,9 +18,6 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
-//    	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || buildCondition || researchSelector => " + researchSelector.getSelected().toString());
-//    	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || buildCondition || metaType =>" + metaType.toString());
-
         //if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
     	
 		if (researchSelector.getSelected() == null) {
@@ -38,24 +35,7 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
 		if (Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
 			return false;
 		}
-    	
-//    	if(researchSelector.getSelected() != null){
-//	    	if(researchSelector.getSelected().isUpgrade()) {
-//		    	if(researchSelector.getSelected().getUpgradeType() == metaType.getUpgradeType()) {
-//		    		if(BuildManager.Instance().buildQueue.getItemCount(researchSelector.getSelected(), null) == 0) {
-//		    	//if(researchSelector.getSelected().equals(metaType)) {
-//		//        	FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || researchSelector => " + researchSelector.getSelected().getUpgradeType() + " || metaType => " + metaType.getUpgradeType());
-//			        	if (researchSelector.currentResearched <= 2) {
-//			//        		FileUtils.appendTextToFile("log.txt", "\n BuilderIonThrusters || block & high");
-//			        		setBlocking(true);
-//			        		setHighPriority(true);
-//			        	}
-//			        	System.out.println(" research return true ==> ion_thrusters");
-//			            return true;
-//		    		}
-//		        }
-//	    	}
-//    	}
+
     	if (researchSelector.currentResearched <= 2) {
     		setBlocking(true);
     		setHighPriority(true);

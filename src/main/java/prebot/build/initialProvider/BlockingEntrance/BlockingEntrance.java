@@ -91,7 +91,7 @@ public class BlockingEntrance {
     }
 
     public void SetBlockingTilePosition() {
-//    	FileUtils.appendTextToFile("log.txt", "\n SetBlockingTilePosition start ==>> ");
+
 //		서킷브레이커만 4X4
 		if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
 			maxSupplyCntX = 7;
@@ -201,7 +201,7 @@ public class BlockingEntrance {
     	
     	
 //    	기존 프리봇1 에서 입구 터렛 위치 추가
-//    	FileUtils.appendTextToFile("log.txt", "\n setBlockingEntrance start ==>> ");
+
     	
 //    	맵 : Over_wath
     	if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.OVERWATCH) {
@@ -613,7 +613,7 @@ public class BlockingEntrance {
 //        }
 		Location loc = Location.START;
 
-//		FileUtils.appendTextToFile("log.txt", "\n TilePos of getSupplyPosition start ==>> " + tilepos);
+
 		
         if(tilepos.getX() < SMALL
                 && tilepos.getY() < SMALL){
