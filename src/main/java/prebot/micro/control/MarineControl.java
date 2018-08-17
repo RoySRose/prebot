@@ -166,6 +166,7 @@ public class MarineControl extends Control {
 						continue;
 					}
 					
+					
 					if (enemyInSight != null) {
 						if(MicroUtils.isRangeUnit(enemyInSight.getType())){
 							rangeUnit = true;
@@ -173,19 +174,20 @@ public class MarineControl extends Control {
 						if(rangeUnit && !enemyInSight.getType().isWorker()){
 							intoTheBunker(bunker, marine);
 							continue;
-						}
-						
-						if(enemyInSight.getType().isWorker() || enemyInSight.getType() == UnitType.Zerg_Overlord){
+						}else if(enemyInSight.getType().isWorker() || enemyInSight.getType() == UnitType.Zerg_Overlord){
 							outOfTheBunker(marine, bunker, decision.eui, kOption);
 							continue;
-						}
-						
-						if(enemyInSight.isInWeaponRange(marine) || marine.isInWeaponRange(enemyInSight) || enemyInSight.isInWeaponRange(bunker) || bunker.isInWeaponRange(enemyInSight)) {
+						}else if(enemyInSight.isInWeaponRange(marine) || marine.isInWeaponRange(enemyInSight) || enemyInSight.isInWeaponRange(bunker) || bunker.isInWeaponRange(enemyInSight)) {
 							intoTheBunker(bunker, marine);
 						} else {
-							if(bunker.getLoadedUnits().size() > (unitList.size() / 2) ){
+							if(!enemyInSight.getType().isWorker() && enemyInSight.getType() != UnitType.Zerg_Overlord
+									&& marine.getDistance(bunker) > 200){
+								intoTheBunker(bunker, marine);
+							}
+							if(bunker.getLoadedUnits().size() > Math.round((unitList.size() / 2))){
 								outOfTheBunker(marine, bunker, decision.eui, kOption);
 							}else {
+								//MicroUtils.BlockingKiting(marine, decision.eui, kOption, bunker.getPosition());
 								MicroUtils.kiting(marine, decision.eui, kOption);
 							}
 						}
