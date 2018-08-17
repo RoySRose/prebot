@@ -240,7 +240,7 @@ public class AirForceControl extends Control {
 				
 			} else {
 				airDrivingPosition = airDrivingPosition(airForceTeam, airForceTeam.getTargetPosition(), airForceTeam.driveAngle);
-				if (airForceTeam.leaderUnit.getPosition().getDistance(airForceTeam.getTargetPosition()) < 100) {
+				if (airForceTeam.leaderUnit.getPosition().getDistance(airForceTeam.getTargetPosition()) < 150) {
 					airForceTeam.changeTargetIndex();
 				}
 			}

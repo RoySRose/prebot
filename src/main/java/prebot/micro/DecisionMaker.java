@@ -176,17 +176,23 @@ public class DecisionMaker {
 		UnitInfo bestTargetInfo = null;
 		
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
-			if (!euiListAirWeapon.isEmpty()) {
-				if (airForceTeam.cloakable()) {
-					return Decision.change(airForceTeam.leaderUnit);
-				}
-				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
-			} else {
-				if (airForceTeam.uncloakable()) {
-					return Decision.change(airForceTeam.leaderUnit);
-				}
-				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
-			}
+//			if (!euiListAirWeapon.isEmpty()) {
+//				if (airForceTeam.cloakable()) {
+//					return Decision.change(airForceTeam.leaderUnit);
+//				}
+//				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
+//			} else {
+//				if (airForceTeam.uncloakable()) {
+//					return Decision.change(airForceTeam.leaderUnit);
+//				}
+//				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
+//			}
+			
+			List<UnitInfo> euisEnemiesAndFeeds = new ArrayList<>();
+			euisEnemiesAndFeeds.addAll(euiListAirWeapon);
+			euisEnemiesAndFeeds.addAll(euiListFeed);
+			bestTargetInfo = getBestTargetInfo(airForceTeam, euisEnemiesAndFeeds, euiListAirDefenseBuilding);
+			
 		} else {
 			if (!euiListAirWeapon.isEmpty()) {
 				boolean detectUnitExist = !euiListDetector.isEmpty() || airForceTeam.damagedEffectiveFrame > 10; // 10 hitpoints reduced
@@ -265,9 +271,11 @@ public class DecisionMaker {
 			if (!inWeaponRange && protectedByBuilding) { // 건물에 의해 보호받는 빌딩은 제외. 공격범위내에 있으면 예외
 				continue;
 			}
-
+			
 			WraithTargetCalculator wraithTargetCalculator = (WraithTargetCalculator) targetScoreCalculator;
 			wraithTargetCalculator.setStrikeLevel(strikeLevel);
+			wraithTargetCalculator.setAirForceDefenseMode(AirForceManager.Instance().isAirForceDefenseMode());
+			
 			int score = wraithTargetCalculator.calculate(airForceTeam.leaderUnit, eui);
 			if (score > highestFeedScore) {
 				bestTargetInfo = eui;

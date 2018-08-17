@@ -27,7 +27,7 @@ public class MultiDefenseSquad extends Squad {
 	}
 	
 	public boolean alreadyDefenseUnitAssigned() {
-		return TimeUtils.elapsedFrames(defenseUnitAssignedFrame) < 4 * TimeUtils.MINUTE;
+		return TimeUtils.elapsedFrames(defenseUnitAssignedFrame) < 3 * TimeUtils.MINUTE;
 	}
 	
 	public MultiDefenseSquad(Unit commandCenter) {

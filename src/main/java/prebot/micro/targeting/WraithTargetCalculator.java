@@ -16,6 +16,9 @@ import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceManager.StrikeLevel;
 
 public class WraithTargetCalculator extends TargetScoreCalculator {
+
+	private int strikeLevel;
+	private boolean airForceDefenseMode;
 	
 	public WraithTargetCalculator() {
 		this.strikeLevel = AirForceManager.Instance().getStrikeLevel();
@@ -25,8 +28,10 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 		this.strikeLevel = strikeLevel;
 	}
 
-	private int strikeLevel;
-	
+	public void setAirForceDefenseMode(boolean airForceDefenseMode) {
+		this.airForceDefenseMode = airForceDefenseMode;
+	}
+
 	private static final Map<UnitType, Integer> TYPE_SCORE = new HashMap<>();
 	static {
 		TYPE_SCORE.put(UnitType.Zerg_Spore_Colony, 100);
@@ -48,6 +53,10 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 
 	@Override
 	public int calculate(Unit unit, UnitInfo eui) {
+		if (airForceDefenseMode) {
+			return getDistanceScore(unit, eui.getLastPosition());
+		}
+		
 		Unit unitInSight = UnitUtils.unitInSight(eui);
 		if (unitInSight == null) {
 			return CommonCode.NONE;

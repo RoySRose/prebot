@@ -151,16 +151,18 @@ public class PositionFinder {
 				
 				
 				int READY_TO_SUPPLY = 27 * 4;
-				if (StrategyIdea.campType == CampType.READY_TO) {
-					// READY TO 포지션에서 후퇴하지 않기 위함
-					READY_TO_SUPPLY = 15 * 4;
+				if (StrategyIdea.campType == CampType.READY_TO) { // 후퇴방지
+					READY_TO_SUPPLY = READY_TO_SUPPLY - 12 * 4;
 				}
 				
 				// READY TO 포지션으로 나가기 전에 자리를 잡기 위함
 				int SECOND_CHOKE_SUPPLY = 12 * 4;
-//				if (InfoUtils.enemyRace() == Race.Zerg) {
-//					SECOND_CHOKE_SUPPLY = 12 * 4;
-//				}
+				if (InfoUtils.enemyRace() == Race.Zerg) {
+					SECOND_CHOKE_SUPPLY = 8 * 4;
+				}
+				if (StrategyIdea.campType == CampType.SECOND_CHOKE) { // 후퇴방지
+					SECOND_CHOKE_SUPPLY = SECOND_CHOKE_SUPPLY - 4 * 4;
+				}
 				
 				// ready to로 이동
 				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
@@ -172,7 +174,7 @@ public class PositionFinder {
 				
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 				if (firstExpansionOccupied()
-						|| myTankSupplyCount >= 4 * 4
+						|| myTankSupplyCount >= 2 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 					return CampType.EXPANSION;
 				}

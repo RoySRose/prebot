@@ -4,7 +4,7 @@ import prebot.common.main.Prebot;
 
 public class LagObserver {
 
-	private static int groupsize = 1; // 1 ... 24
+	private static int groupsize = 3; // 1 ... 24
 	public static int groupsize() {
 		return groupsize;
 	}
@@ -22,7 +22,7 @@ public class LagObserver {
 	
 	
 	private static int groupMaxSize = 48; // max : 2초 딜레이
-	private static int groupMinSize = 4;
+	private static int groupMinSize = 3;
 	
 	private static final int OBSERVER_CAPACITY = 15 * 24; // 15초간 delay가 없어서 groupsize를 낮춘다.
 	private static long[] observedTime = new long[OBSERVER_CAPACITY];
@@ -56,7 +56,7 @@ public class LagObserver {
 				if (Prebot.Broodwar.self().supplyUsed() > 300) {
 					groupMinSize = 6;
 				} else {
-					groupMinSize = 1;
+					groupMinSize = 3;
 				}
 				
 				if (groupsize > groupMinSize) {

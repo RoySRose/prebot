@@ -15,6 +15,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.LagObserver;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -56,6 +57,7 @@ public class SpiderMineManger {
 	
 	private boolean initialized = false;
 	private boolean secondInitialized = false;
+	private int mineInNextExpansionFrame = CommonCode.UNKNOWN;
 	
 	private SpiderMineManger() {}
 	
@@ -98,8 +100,8 @@ public class SpiderMineManger {
 //			GOOD_POSITIONS.add(myReadyToAttackPos);
 //			GOOD_POSITIONS.add(mySecondChoke.getCenter());
 			
-			GOOD_POSITIONS.add(enemyReadyToAttackPos);
-			GOOD_POSITIONS.add(enemySecondChoke.getCenter());
+//			GOOD_POSITIONS.add(enemyReadyToAttackPos);
+//			GOOD_POSITIONS.add(enemySecondChoke.getCenter());
 			GOOD_POSITIONS.add(enemyFirstExpansion.getPosition());
 			
 			return true;
@@ -209,8 +211,21 @@ public class SpiderMineManger {
 			}
 		}
 		
+		
 		// 급해서 본진에 박은 마인 제거
 		if (TimeUtils.afterTime(9, 0)) {
+			// 다음 확장지역의 스파이더 마인
+			if (TimeUtils.elapsedFrames(mineInNextExpansionFrame) > 20 * TimeUtils.SECOND) {
+				BaseLocation nextExpansion = InformationManager.Instance().getNextExpansionLocation();
+				if (nextExpansion != null) {
+					List<Unit> spiderMines = UnitUtils.getUnitsInRadius(PlayerRange.SELF, nextExpansion.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
+					for (Unit mine : spiderMines) {
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() - 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
+					}
+				}
+				mineInNextExpansionFrame = TimeUtils.elapsedFrames();
+			}
+			
 			if (LagObserver.groupsize() <= 10) {
 				if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
 					if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {

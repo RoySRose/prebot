@@ -122,11 +122,19 @@ public class ZergStrategist extends Strategist {
 //		System.out.println(EnemyBuildTimer.Instance().mutaliskInMyBaseFrame + " / " + TimeUtils.timeToFrames(5, 30));
 		if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame == CommonCode.UNKNOWN) {
 			System.out.println("mutaliskInMyBaseFrame is unknown.");
-			return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lair)) {
+				return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+			} else {
+				return EnemyStrategy.ZERG_FAST_MUTAL;
+			}
 		}
-		
+
 		if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame < TimeUtils.timeToFrames(6, 20)) {
-			return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lair)) {
+				return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
+			} else {
+				return EnemyStrategy.ZERG_FAST_MUTAL;
+			}
 		} else {
 			return EnemyStrategy.ZERG_FAST_MUTAL;
 		}

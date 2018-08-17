@@ -14,7 +14,6 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -87,26 +86,28 @@ public class VultureTravelManager {
 
 		baseLocationsCheckerOrdered = new ArrayList<>();
 		Set<BaseLocation> baseSet = new HashSet<>();
+		
 		BaseLocation beforeBase = null;
+		BaseLocation closeBase = null;
 		TilePosition centerTilePosition = TilePositionUtils.getCenterTilePosition();
 		for (int i = 0; i < otherBases.size(); i++) {
 			if (beforeBase == null) {
 				beforeBase = InfoUtils.myFirstExpansion();
 			}
-			BaseLocation closeBase = BaseLocationUtils.getGroundClosestBaseToPosition(otherBases, beforeBase, new BaseCondition() {
+			closeBase = BaseLocationUtils.getGroundClosestBaseToPosition(otherBases, beforeBase, new BaseCondition() {
 				@Override public boolean correspond(BaseLocation base) {
 					return !baseSet.contains(base);
 				}
 			});
 			
-			if (closeBase.getDistance(centerTilePosition.toPosition()) < 500) {
-				System.out.println("center base. " + closeBase.getPosition());
-				continue;
-			}
-			
-			baseLocationsCheckerOrdered.add(closeBase);
 			beforeBase = closeBase;
 			baseSet.add(closeBase);
+			
+			if (closeBase.getDistance(centerTilePosition.toPosition()) < 500) {
+				System.out.println("center base. " + closeBase.getPosition());
+			} else {
+				baseLocationsCheckerOrdered.add(closeBase);
+			}
 		}
 		System.out.println("baseLocationsCheckerOrdered initiated (size=" + baseLocationsCheckerOrdered.size()+ ")");
 		
@@ -149,10 +150,12 @@ public class VultureTravelManager {
 				index = 0;
 			}
 			BaseLocation baseLocation = baseLocationsCheckerOrdered.get(index);
-			if (MicroUtils.arrivedToPosition(checker, baseLocation.getPosition())) {
+			
+			int distance = checker.getDistance(baseLocation.getPosition());
+			if (distance < 250) {
 				int nextIndex = (index + 1) % baseLocationsCheckerOrdered.size();
 				checkerSiteMap2.put(checker.getID(), nextIndex);
-			} else {
+			} else if (distance < 800) {
 				boolean isOccupied = false;
 				for (BaseLocation occupied : InfoUtils.enemyOccupiedBases()) {
 					if (baseLocation.getTilePosition().equals(occupied.getTilePosition())) {

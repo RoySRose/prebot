@@ -9,7 +9,6 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
@@ -33,6 +32,7 @@ import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder.CampType;
 import prebot.strategy.manage.TankPositionManager;
 
 public class TankControl extends Control {
@@ -66,6 +66,12 @@ public class TankControl extends Control {
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
+		if (StrategyIdea.campType == CampType.INSIDE
+				|| StrategyIdea.campType == CampType.FIRST_CHOKE
+				|| StrategyIdea.campType == CampType.EXPANSION) {
+			siegeModeSpreadRadius = siegeModeSpreadRadius * 3 / 4;
+		}
+		
 		this.flyingEnemisInfos = MicroUtils.filterFlyingTargetInfos(euiList);
 		
 		List<Unit> tankModeList = new ArrayList<>();
@@ -79,7 +85,7 @@ public class TankControl extends Control {
 				
 				Position nearChokePosition = null;
 				Chokepoint nearestChoke = BWTA.getNearestChokepoint(leaderOfUnit.getPosition());
-				if (nearestChoke.getWidth() < this.siegeModeSpreadRadius / 2) {
+				if (nearestChoke.getWidth() < 250) {
 					nearChokePosition = nearestChoke.getCenter();
 				}
 				if (nearChokePosition == null || nearChokePosition.getDistance(leaderOfUnit.getPosition()) > 180) {

@@ -163,7 +163,7 @@ public class AirForceManager {
 		int powerOfEnemies = WraithFightPredictor.powerOfEnemies(airEuiList);
 		
 		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
-			powerOfEnemies += 250;
+			powerOfEnemies += 200;
 		}
 		// System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
 		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
@@ -300,7 +300,7 @@ public class AirForceManager {
 			addAirForceTargetPositions(getMineralPositions());
 		}
 		
-		if (InfoUtils.enemyRace() == Race.Terran) {
+		if (InfoUtils.enemyRace() == Race.Terran || TimeUtils.afterTime(8, 0)) {
 			addAirForceTargetPositions(baseSidePosition());
 		}
 		
@@ -321,7 +321,7 @@ public class AirForceManager {
 			addAirForceTargetPositions(positionUp, positionDown, positionLeft, positionRight);
 		}
 		
-		if (TimeUtils.afterTime(10, 0) && InfoUtils.enemyRace() == Race.Terran) {
+		if (TimeUtils.afterTime(8, 0) && InfoUtils.enemyRace() == Race.Terran) {
 			addAirForceTargetPositions(
 					StrategyIdea.nearGroundEnemyPosition,
 					StrategyIdea.totalEnemyCneterPosition);
@@ -511,7 +511,7 @@ public class AirForceManager {
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
 			if (achievementEffectiveFrame <= -100) { // defense 모드로 변경
 				levelDown = true;
-			} else if (achievementEffectiveFrame >= 150) {
+			} else if (achievementEffectiveFrame >= 150 + airunitCount * 20) {
 				levelUp = true;
 			}
 		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
@@ -562,7 +562,7 @@ public class AirForceManager {
 		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
 		
 		// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
-		int maxWraitCount = Math.min(wraithCount + 2, 8);
+		int maxWraitCount = Math.min(wraithCount + 2, 10);
 		int minWraitCount = Math.max(wraithCount - 2, 0);
 		
 		if (accumulatedAchievement <= downAchievement) {
