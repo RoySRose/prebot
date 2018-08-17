@@ -699,7 +699,7 @@ public class BuildManager extends GameManager {
             if(desiredPosition == null) {
 //            	20180815. hkk. seedPosition 이 지정되어 들어올경우 null이 나와도 SeedPositionStrategy 가 의미가 없으므로 1번만 찾는다.
             	
-                if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
+                if (TilePositionUtils.isValidTilePosition(seedPosition)) {
 //                	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null break :: " + unitType + " :: seedPosition :: "+ seedPosition);
                 	break;
                 }

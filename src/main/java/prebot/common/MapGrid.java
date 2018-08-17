@@ -17,6 +17,17 @@ import prebot.strategy.constant.StrategyConfig;
 
 /// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
 public class MapGrid extends GameManager {
+	
+	private GridCell lastScanGridCell = null;
+	
+	public boolean scanAbnormalTime() {
+		if (lastScanGridCell == null) {
+			return false;
+		}
+		
+		int timeLastScan = lastScanGridCell.timeLastScan;
+		return TimeUtils.elapsedFrames(timeLastScan) < LagObserver.managerRotationSize() + 10;
+	}
 
 	/// 지도를 바둑판처럼 Cell 들로 나누기 위해서 정의한 하나의 Cell
 	public class GridCell
@@ -349,6 +360,8 @@ public class MapGrid extends GameManager {
 	public void scanAtPosition(Position pos) {
 		GridCell cell = getCell(pos);
 		cell.timeLastScan = Prebot.Broodwar.getFrameCount();
+		
+		this.lastScanGridCell = cell;
 	}
 	
 	public boolean scanIsActiveAt(Position pos) {

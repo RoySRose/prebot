@@ -535,21 +535,21 @@ public class AirForceManager {
 		int downAchievement;
 		int upAchievement;
 		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount < 6) {
-			downAchievement = -100;
+			downAchievement = -80;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +150;	
 			} else {
 				upAchievement = +120;
 			}
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
-			downAchievement = -80;
+			downAchievement = -60;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +300;	
 			} else {
 				upAchievement = +180;
 			}
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 14) { //24) {
-			downAchievement = -60;
+			downAchievement = -40;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +600;	
 			} else {
@@ -559,7 +559,7 @@ public class AirForceManager {
 			return;
 		}
 
-		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
+		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
 		
 		// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
 		int maxWraitCount = Math.min(wraithCount + 2, 10);

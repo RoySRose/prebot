@@ -174,7 +174,7 @@ public class PositionFinder {
 				
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 				if (firstExpansionOccupied()
-						|| myTankSupplyCount >= 2 * 4
+						|| myTankSupplyCount >= 3 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 					return CampType.EXPANSION;
 				}
@@ -183,11 +183,11 @@ public class PositionFinder {
 //				System.out.println("factorySupplyCount : " + factorySupplyCount + " / " + "enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN : " + (enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN));
 			}
 			
-			if (InfoUtils.enemyRace() == Race.Zerg) {
-				if (!firstExpansionOccupied()) {
-					return CampType.INSIDE;
-				}
-			}
+//			if (InfoUtils.enemyRace() == Race.Zerg) {
+//				if (!firstExpansionOccupied()) {
+//					return CampType.EXPANSION;
+//				}
+//			}
 			return CampType.FIRST_CHOKE;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {

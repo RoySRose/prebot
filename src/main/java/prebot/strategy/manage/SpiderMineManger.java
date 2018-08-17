@@ -190,16 +190,16 @@ public class SpiderMineManger {
 		if (InfoUtils.enemyRace() != Race.Terran) {
 			List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
 			for (Unit siegeTank : siegeList) {
-				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST - 50, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
 					}
 				}
 			}
-			int mineRemoveDist = MINE_REMOVE_TANK_DIST;
+			int mineRemoveDist = MINE_REMOVE_TANK_DIST - 50;
 			if (TimeUtils.beforeTime(9, 0)) {
-				mineRemoveDist = MINE_REMOVE_TANK_DIST / 2;
+				mineRemoveDist = MINE_REMOVE_TANK_DIST - 100;
 			}
 			for (Unit siegeTank : siegeList) {
 				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
