@@ -9,6 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
@@ -17,12 +18,16 @@ import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -397,6 +402,10 @@ public class WorkerManager extends GameManager {
 			if (!unit.isCompleted()) {
 				continue;
 			}
+			//일정 거리 이상은 수리하러 안감 - (base - 센터 거리 기준)
+			if(isReapirZone(unit)){
+				continue;
+			}
 			
 			repairWorkCnt = workerData.workerRepairMap.size();
 			repairWraithWorkCnt = workerData.workerWraithRepairMap.size();
@@ -404,7 +413,7 @@ public class WorkerManager extends GameManager {
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.getHitPoints() < unit.getType().maxHitPoints()
 					&& repairWorkCnt < repairmax) {
-				if (InformationManager.Instance().enemyRace == Race.Terran && unit.isFlying()) {
+				if (unit.isFlying()) {
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
@@ -414,7 +423,9 @@ public class WorkerManager extends GameManager {
 								|| unit.getType() == UnitType.Terran_Missile_Turret
 								|| unit.getType() == UnitType.Terran_Comsat_Station){
 							setRepairWorker(repairWorker, unit);
-						}else if ((unit.getType() == UnitType.Terran_Barracks || unit.getType() == UnitType.Terran_Supply_Depot )
+						}else if ((unit.getType() == UnitType.Terran_Barracks 
+								|| unit.getType() == UnitType.Terran_Supply_Depot
+								|| unit.getType() == UnitType.Terran_Command_Center)
 								&& unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
 							setRepairWorker(repairWorker, unit);
 						}
@@ -1234,6 +1245,17 @@ public class WorkerManager extends GameManager {
 	
 	public boolean scvIsOutOfBase() {
 		return scvIsOut;
+	}
+	
+	//일정 범위 안의 유닛만 수리
+	public boolean isReapirZone(Unit unit) {
+		Position myBase = InfoUtils.myBase().getPosition();
+		double maxReparitDistance = myBase.getDistance(TilePositionUtils.getCenterTilePosition().toPosition()); 
+		if(myBase.getDistance(unit) > maxReparitDistance){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 }
