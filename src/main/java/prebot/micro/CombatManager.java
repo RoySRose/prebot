@@ -38,6 +38,7 @@ import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
+import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
@@ -255,11 +256,16 @@ public class CombatManager extends GameManager {
 			if (squad.alreadyDefenseUnitAssigned()) {
 				continue;
 			}
-			if (squad.unitList.size() >= 2) {
+			if (squad.unitList.size() >= 3) {
 				continue;
 			}
 			
 			Unit comandCenter = squad.getCommandCenter();
+			Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, comandCenter.getPosition(), UnitType.Terran_Command_Center.sightRange(), true, true);
+			if (!euis.isEmpty()) {
+				continue;
+			}
+			
 			Unit closestTank = UnitUtils.getClosestUnitToPosition(tanks, comandCenter.getPosition(), new UnitCondition() {
 				@Override
 				public boolean correspond(Unit unit) {

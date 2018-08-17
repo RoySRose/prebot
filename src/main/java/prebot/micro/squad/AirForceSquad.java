@@ -54,10 +54,11 @@ public class AirForceSquad extends Squad {
 				leaderAirunits.add(airunit);
 			}
 		}
+		int airForceGroupSize = Math.max(Math.max(unitList.size(), 5), LagObserver.groupsize());
 		
 		// 리더유닛이 먼저 실행되면 member 유닛들은 그 후 같은 명령을 실행한다.
 		for (Unit leaderAirunit : leaderAirunits) {
-			if (!TimeUtils.executeUnitRotation(leaderAirunit, LagObserver.groupsize())) {
+			if (!TimeUtils.executeUnitRotation(leaderAirunit, airForceGroupSize)) {
 				continue;
 			}
 			
