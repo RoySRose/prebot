@@ -20,16 +20,20 @@ public class EnemyCommandInfo {
 //    static final double MINERAL_INCREMENT_RATE_Line1 = 0.04663;
 //    static final double MINERAL_INCREMENT_RATE_Line2 = 0.037514;
 
-	static final double MINERAL_INCREMENT_RATE_Line1 =0.04763;
-    static final double MINERAL_INCREMENT_RATE_Line2 = 0.036922;
+//	static final double MINERAL_INCREMENT_RATE_Line1 =0.04763;
+//    static final double MINERAL_INCREMENT_RATE_Line2 = 0.036922;
 
+	static final double MINERAL_INCREMENT_RATE_Line1 =0.04734;
+//    static final double MINERAL_INCREMENT_RATE_Line2 = 0.03926;
+    static final double MINERAL_INCREMENT_RATE_Line2 = 0.034924;
     
     UnitInfo unitInfo;
     public int lastCheckFrame;
     public int lastFullCheckFrame;
     public int fullWorkerFrame;
+    public int halfWorkerFrame;
     
-    public double lastFullCheckWorkerCount;
+    public int lastFullCheckWorkerCount;
     boolean hasGas;
 
     public int uxmineral=0;
@@ -70,9 +74,14 @@ public class EnemyCommandInfo {
 
         this.maxMineral = mineralCalculator.getMineralCount()*1500;
        
-        this.lastFullCheckWorkerCount=0;
+        if(isMainBase) {
+        	this.lastFullCheckWorkerCount=4;
+        }else {
+        	this.lastFullCheckWorkerCount=0;
+        }
         this.lastFullCheckFrame =0;
         this.fullWorkerFrame =0;
+        this.halfWorkerFrame =0;
         
     }
 
@@ -113,7 +122,7 @@ public class EnemyCommandInfo {
             
             workerCounter.updateCount(unitInfo, mineralCalculator, gasCalculator);
             
-            lastFullCheckWorkerCount = workerCounter.getWorkerCount();
+            lastFullCheckWorkerCount = workerCounter.getRealWorkerCount();
 
             mineralCalculator.updateFullVisibleResources(lastFullCheckFrame);
         }
@@ -143,105 +152,143 @@ public class EnemyCommandInfo {
         double workerCount;
         int term1;
         int term2 = 0;
+        int term3 =0;
         double appliedWorkerCount;
         double appliedWorkerCount2 = 0;
+        double appliedWorkerCount3 = 0;
         int predictedIncrementMineral;
 
-        workerCount = workerCounter.getWorkerCount();
-        if(fullWorkerFrame == 0 && workerCount == workerCounter.maxWorker) {
+        workerCount = workerCounter.getWorkerCount(lastFullCheckFrame);
+        if(fullWorkerFrame == 0 && workerCount == mineralCalculator.getMineralCount()*2  && Prebot.Broodwar.getFrameCount()>7000) {
         	fullWorkerFrame = Prebot.Broodwar.getFrameCount();
         	 System.out.println("update fullWorkerFrame: " + fullWorkerFrame+", " + workerCount);
         }
         
+        if(halfWorkerFrame == 0 && workerCount > mineralCalculator.getMineralCount() && Prebot.Broodwar.getFrameCount()>3800) {
+        	halfWorkerFrame = Prebot.Broodwar.getFrameCount();
+        	 System.out.println("update halfWorkerFrame: " + halfWorkerFrame+", " + workerCount);
+        }
+        
+        EnemyMineral enemyMineral = mineralCalculator.getMaxLastCheckFrame();
+
         //System.out.println("fullWorkerFrame: " + fullWorkerFrame);
-        if(lastFullCheckFrame > 0) {
-            total = mineralCalculator.getFullCheckMineral();
+//        if(lastFullCheckFrame == 0) {
+//        
+//        }
+        
+        total = mineralCalculator.getFullCheckMineral();
 
-            if(fullWorkerFrame > 0) {
-            	if(fullWorkerFrame > lastFullCheckFrame) {
-	            	term1 = fullWorkerFrame - lastFullCheckFrame;
-	            	term2 = Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
-            	}else {
-            		term1 = 0;
-	            	term2 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
-            	}
-            	
-                appliedWorkerCount = (lastFullCheckWorkerCount + (workerCount)) / 2;
-                appliedWorkerCount2 = workerCount;
-       
-                int firstTermIncremental = 0;
-                int secondTermIncremental = 0;
-                if(appliedWorkerCount <= mineralCalculator.getMineralCount()) {
-                	firstTermIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
-                }else {
-                	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
-                	firstTermIncremental += (int) ((appliedWorkerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
-                }
-                
-                secondTermIncremental += (int) (mineralCalculator.getMineralCount() * term2 * MINERAL_INCREMENT_RATE_Line1);
-            	secondTermIncremental += (int) ((appliedWorkerCount2-mineralCalculator.getMineralCount())  * term2 * MINERAL_INCREMENT_RATE_Line2);
-                
-                predictedIncrementMineral = firstTermIncremental + secondTermIncremental;
-            }else {
-	            term1 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
-	            appliedWorkerCount = (lastFullCheckWorkerCount + (workerCount)) / 2;
-	   
-	            int firstTermIncremental = 0;
-	            if(appliedWorkerCount <= mineralCalculator.getMineralCount()) {
-                	firstTermIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
-                }else {
-                	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
-                	firstTermIncremental += (int) ((appliedWorkerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
-                }
-	            
-	            predictedIncrementMineral = firstTermIncremental;
-            }
-//	        System.out.println("worker : " + appliedWorkerCount + ", term1: " + term1 + ", predictedIncrementMineral: " + predictedIncrementMineral + ", " + lastFullCheckWorkerCount);
-//	        System.out.println("worker2: " + appliedWorkerCount2 + ", term1: " + term2 + ", predictedIncrementMineral: " + predictedIncrementMineral + ", " + lastFullCheckWorkerCount);
-            //predictionMinusMineral = mineralCalculator.getPredictionMinusMineral();
-        }else{
+        if(fullWorkerFrame > 0) {
+        	if(halfWorkerFrame > lastFullCheckFrame) {
+            	term1 = halfWorkerFrame - lastFullCheckFrame;
+      			term2 =	fullWorkerFrame - halfWorkerFrame;
+            	term3 = Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
+            	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
+                appliedWorkerCount2 = (workerCounter.halfWorker + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
+        	}else if (fullWorkerFrame > lastFullCheckFrame){
+        		term1 = 0;
+            	term2 = fullWorkerFrame - lastFullCheckFrame;
+            	term3 =	Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
+            	appliedWorkerCount = 0;
+                appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
+        	}else {
+        		term1 = 0;
+        		term2 = 0;
+            	term3 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+            	appliedWorkerCount = 0;
+                appliedWorkerCount2 = 0;
+        	}
+        	
+            int firstSetIncremental = 0;
+            int secondSetIncremental = 0;
+            
+            firstSetIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+            firstSetIncremental += (int) (workerCounter.halfWorker * (term2+term3) * MINERAL_INCREMENT_RATE_Line1);
+            
+            secondSetIncremental += (int) (appliedWorkerCount2 * term2 * MINERAL_INCREMENT_RATE_Line2);
+            secondSetIncremental += (int) (workerCounter.halfWorker * term3 * MINERAL_INCREMENT_RATE_Line2);
+            
+//                if(appliedWorkerCount <= mineralCalculator.getMineralCount()) {
+//                	firstTermIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+//                }else {
+//                	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
+//                	firstTermIncremental += (int) ((appliedWorkerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
+//                }
+//                
+//                secondTermIncremental += (int) (mineralCalculator.getMineralCount() * term2 * MINERAL_INCREMENT_RATE_Line1);
+//            	secondTermIncremental += (int) ((appliedWorkerCount2-mineralCalculator.getMineralCount())  * term2 * MINERAL_INCREMENT_RATE_Line2);
+            
+            predictedIncrementMineral = firstSetIncremental + secondSetIncremental;
+            
+        }else if(halfWorkerFrame > 0) {
+        	
+        	if(halfWorkerFrame > lastFullCheckFrame) {
+            	term1 = halfWorkerFrame - lastFullCheckFrame;
+      			term2 =	Prebot.Broodwar.getFrameCount() - halfWorkerFrame;
+            	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
+                appliedWorkerCount2 = (workerCounter.halfWorker + workerCount) / 2 - workerCounter.halfWorker;
+        	}else {
+        		term1 = 0;
+            	term2 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+            	appliedWorkerCount = 0;
+                appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCount) / 2 - workerCounter.halfWorker;
+        	}
+        	
+            int firstSetIncremental = 0;
+            int secondSetIncremental = 0;
+            
+            firstSetIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+            firstSetIncremental += (int) (workerCounter.halfWorker * (term2) * MINERAL_INCREMENT_RATE_Line1);
+            
+            secondSetIncremental += (int) (appliedWorkerCount2 * term2 * MINERAL_INCREMENT_RATE_Line2);
+            
+            predictedIncrementMineral = firstSetIncremental + secondSetIncremental;
+            
+            
+//	            term1 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+//	            appliedWorkerCount = (lastFullCheckWorkerCount + (workerCount)) / 2;
+//	   
+//	            int firstTermIncremental = 0;
+//	            if(appliedWorkerCount <= mineralCalculator.getMineralCount()) {
+//                	firstTermIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+//                }else {
+//                	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
+//                	firstTermIncremental += (int) ((appliedWorkerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
+//                }
+//	            
+//	            predictedIncrementMineral = firstTermIncremental;
+        }else {
+        	//(if(enemyMineral.getLastCheckFrame() == 0)
+        	term1 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+        	appliedWorkerCount = (lastFullCheckWorkerCount + workerCount) / 2;
 
+        	int firstSetIncremental = 0;
+            
+            firstSetIncremental += (int) (appliedWorkerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+            
+            predictedIncrementMineral = firstSetIncremental;
+        }
+        //|| (enemyMineral.getLastCheckFrame() == 0)
             //TODO 세분화 필요 + 미네랄 일부만 보였을때 최근 2건이 있다면 그거로 확인하는 로직이 필요할까? 좋을거 같기도..
             //workerCount = workerCount;
 
-            EnemyMineral enemyMineral = mineralCalculator.getMaxLastCheckFrame();
-            if(enemyMineral.getLastCheckFrame() == 0){//모든 미네랄을 한번도 못 봤고.
-                uxmineral =0;
-                int completedTime =0;
-                //이게 상대 본진이고 내가 멀티가 없으면 내꺼로 추정, 그게 아니면 추정 불가
-                if(isMainBase) {
-                	completedTime = 0;
-                }else {
-                	completedTime = unitInfo.completFrame();
-                }
-                
-            	int term = Prebot.Broodwar.getFrameCount() - completedTime;
-            	int firstTermIncremental = 0;
-                if(workerCount <= mineralCalculator.getMineralCount()) {
-                	firstTermIncremental += (int) (workerCount * term * MINERAL_INCREMENT_RATE_Line1);
-                }else {
-                	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term * MINERAL_INCREMENT_RATE_Line1);
-                	firstTermIncremental += (int) ((workerCount-mineralCalculator.getMineralCount()) * term * MINERAL_INCREMENT_RATE_Line2);
-                }
-                
-            	return firstTermIncremental;
-            }
-            total = enemyMineral.getRealMineral() * mineralCalculator.getMineralCount();
-             
-            term1 = Prebot.Broodwar.getFrameCount() - enemyMineral.getLastCheckFrame();
-
-            int firstTermIncremental = 0;
-            if(workerCount <= mineralCalculator.getMineralCount()) {
-            	firstTermIncremental += (int) (workerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
-            }else {
-            	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
-            	firstTermIncremental += (int) ((workerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
-            }
             
-            predictedIncrementMineral = firstTermIncremental;
-        }
+            
+//            total = enemyMineral.getRealMineral() * mineralCalculator.getMineralCount();
+//             
+//            term1 = Prebot.Broodwar.getFrameCount() - enemyMineral.getLastCheckFrame();
+//
+//            int firstTermIncremental = 0;
+//            if(workerCount <= mineralCalculator.getMineralCount()) {
+//            	firstTermIncremental += (int) (workerCount * term1 * MINERAL_INCREMENT_RATE_Line1);
+//            }else {
+//            	firstTermIncremental += (int) (mineralCalculator.getMineralCount() * term1 * MINERAL_INCREMENT_RATE_Line1);
+//            	firstTermIncremental += (int) ((workerCount-mineralCalculator.getMineralCount()) * term1 * MINERAL_INCREMENT_RATE_Line2);
+//            }
+//            
+//            predictedIncrementMineral = firstTermIncremental;
 
-        return uxmineral = total + predictedIncrementMineral > maxMineral ? maxMineral : total + predictedIncrementMineral;
+    	return uxmineral = total + predictedIncrementMineral > maxMineral ? maxMineral : total + predictedIncrementMineral;
     }
 
     public int getGas(){

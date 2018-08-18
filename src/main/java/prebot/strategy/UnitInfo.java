@@ -129,11 +129,13 @@ public class UnitInfo {
         return true;
     }
 
-	@Override
-	public String toString() {
+//	@Override
+//	public String toString() {
+//		return "UnitInfo [unitID=" + unitID + ", type=" + type + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
+//	}
+	public String getStr() {
 		return "UnitInfo [unitID=" + unitID + ", type=" + type + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
 	}
-
 	
 //		const bool operator == (BWAPI::Unit unit) const
 //		{

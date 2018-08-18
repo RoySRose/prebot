@@ -50,7 +50,6 @@ public class DefaultGasCalculator implements GasCalculator{
         List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
         for (Unit u : alreadyBuiltUnits) {
             if (u.getType().isRefinery() && u.exists()) {
-                System.out.println("now have building!");
                 return true;
             }
         }

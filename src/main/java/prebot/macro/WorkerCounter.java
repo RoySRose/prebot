@@ -18,6 +18,7 @@ public class WorkerCounter {
     public int realWorkerCount;
     public int lastCheckFrame;
     public int maxWorker;
+    public int halfWorker;
     public int lastFullCheckFrame;
     public int fullCheckStartFrame;
     private UnitInfo depotInfo;
@@ -36,8 +37,9 @@ public class WorkerCounter {
     	this.lastCheckFrame = 0;
     	this.lastFullCheckFrame = 0;
     	this.maxWorker = maxMineral*2;
+    	this.halfWorker = maxMineral;
     	this.fullCheckStartFrame =0;
-    	this.realWorkerCount = 0;
+    	this.realWorkerCount = 4;
     	this.depotInfo = depotInfo;
     }
 
@@ -48,14 +50,24 @@ public class WorkerCounter {
             realWorkerCount = maxWorker;
         }
         
+        if(realWorkerCount < 7) {
+        	return;
+        }
+        
         this.realWorkerCount = realWorkerCount;
     }
 
+    public int getRealWorkerCount() {
+        
+        return realWorkerCount;
+    }
+
+    
     public void setLastFullCheckFrame(int lastFullCheckFrame) {
     	this.lastFullCheckFrame = lastFullCheckFrame;
     }
     
-    public double getWorkerCount() {
+    public double getWorkerCount(int lastFullCheckFrame) {
     	if(!depotInfo.isCompleted()) {
     		return 0;
     	}
@@ -72,6 +84,10 @@ public class WorkerCounter {
     		result=(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
     	}else {
     		result=((Prebot.Broodwar.getFrameCount() - depotInfo.completFrame()) * workerTrainRate);
+    	}
+    	
+    	if(lastCheckFrame == 0) {
+    		result *= 0.9;
     	}
         
         return result > maxWorker ? maxWorker : result ;
