@@ -53,7 +53,7 @@ import prebot.common.util.UnitUtils;
 import prebot.macro.AttackDecisionMaker;
 import prebot.macro.EnemyCommandInfo;
 import prebot.macro.EnemyMineral;
-import prebot.macro.util.MutableInt;
+import prebot.macro.util.MutableFloat;
 import prebot.micro.CombatManager;
 import prebot.micro.Decision;
 import prebot.micro.Minerals;
@@ -193,6 +193,7 @@ public class UXManager {
 			drawTurretMap();
         }else if (uxOption == 8) {
             drawExpectedResource();
+            drawExpectedResource2();
         }
 
 		drawMineralIdOnMap();
@@ -216,6 +217,17 @@ public class UXManager {
 //		}
 	}
 
+	
+	private void drawExpectedResource2() {
+		 int m=190;
+        Prebot.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
+        int l=10;
+        for (Entry<UnitType, MutableFloat> enenmy : AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.entrySet()){
+        	float cnt = enenmy.getValue().get();
+           	UnitType unitType = enenmy.getKey();
+           	Prebot.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
+        }
+	}
     private void drawExpectedResource() {
 	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyResourceDepotInfoMap;
 
@@ -225,23 +237,6 @@ public class UXManager {
         Prebot.Broodwar.drawTextScreen(10, y+=10, "mygas           : " + Prebot.Broodwar.self().gatheredGas());
         Prebot.Broodwar.drawTextScreen(10, y+=10, "mywrkcnt(real)  : " + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV));
         Prebot.Broodwar.drawTextScreen(10, y+=10, "frame ==== " + Prebot.Broodwar.getFrameCount());
-        
-        int m=190;
-        int l=0;
-        Prebot.Broodwar.drawTextScreen(m, l+=10, "EnemyPredictedUnitLIst");
-        int row =0;
-//        for (Entry<UnitType, MutableInt> enenmy : AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.entrySet()){
-//       	 int cnt = enenmy.getValue().get();
-//            if(cnt > 0) {
-//           	UnitType unitType = enenmy.getKey();
-//           	Prebot.Broodwar.drawTextScreen(m+=20, l, unitType.toString().substring(7, 14)+":"+cnt);
-//           	row++;
-//            }
-//            if(row % 5 == 0) {
-//            	m=190;
-//    			l+=10;
-//            }
-//        }
         
 	    if (enemyCommandInfoMap.size() == 0){
             Prebot.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
@@ -275,18 +270,11 @@ public class UXManager {
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(r+p)     : " + ((int)enemyCommandInfo.workerCounter.getWorkerCount(enemyCommandInfo.lastFullCheckFrame)));
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "fwrkcnt         : " + ((int)enemyCommandInfo.lastFullCheckWorkerCount));
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "last full check : " + enemyCommandInfo.lastFullCheckFrame);
-               //drawExpectedResourcedebug(x, y, enemyCommandInfo);
-                x+=220;
+                x+=140;
             }
 
         }
 	    drawCalculation(10, y);
-    }
-    
-    private void drawExpectedResourcedebug(int x, int y, EnemyCommandInfo enemyCommandInfo) {
-    	for(EnemyMineral enemyMineral: enemyCommandInfo.mineralCalculator.mineralsList) {
-    		Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral debug   : " + enemyMineral.getMineralUnit().getID() + ", " + enemyMineral.getRealMineral());
-    	}
     }
     
     private void drawCalculation(int x, int y) {
@@ -294,6 +282,8 @@ public class UXManager {
     	 Prebot.Broodwar.drawTextScreen(x, y+=10, "Decision : " + AttackDecisionMaker.Instance().decision + ", phase3: " +  StrategyAnalyseManager.Instance().getPhase() +", strategy" + StrategyIdea.currentStrategy.name());
     	 Prebot.Broodwar.drawTextScreen(x, y+=10, "MineralToPredict: " + AttackDecisionMaker.Instance().UXMineralToPredict);
          Prebot.Broodwar.drawTextScreen(x, y+=10, "GasToPredict    : " + AttackDecisionMaker.Instance().UXGasToPredict);
+         Prebot.Broodwar.drawTextScreen(x, y+=10, "MineralMinus:   : " + AttackDecisionMaker.Instance().UXMinusMineralToPredict);
+         Prebot.Broodwar.drawTextScreen(x, y+=10, "GasMinus        : " + AttackDecisionMaker.Instance().UXMinusGasToPredict);
          
          Prebot.Broodwar.drawTextScreen(x, y+=10, "my point        : " + AttackDecisionMaker.Instance().tempMypoint);
          Prebot.Broodwar.drawTextScreen(x, y+=10, "enemy point     : " + AttackDecisionMaker.Instance().tempEnemypoint);
