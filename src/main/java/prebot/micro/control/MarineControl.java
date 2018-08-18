@@ -30,6 +30,7 @@ import prebot.micro.DecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
@@ -38,7 +39,7 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MarineControl extends Control {
-	private static final int NEAR_BASE_DISTANCE = 120;
+	private static final int NEAR_BASE_DISTANCE = 100;
 	private static Unit kitingMarine = null; //마린 한마리만 카이팅
 	
 	@Override
@@ -121,11 +122,25 @@ public class MarineControl extends Control {
 						}else{
 						//MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
 							//MicroUtils.kiting(marine, decision.eui, kOption);
-							CommandUtils.attackMove(marine, StrategyIdea.mainSquadLeaderPosition);
+							if (MicroUtils.arrivedToPosition(marine,StrategyIdea.mainSquadLeaderPosition)) {
+								if (MicroUtils.timeToRandomMove(marine)) {
+									Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+									CommandUtils.attackMove(marine, randomPosition);
+								}
+							}else{
+								CommandUtils.attackMove(marine, StrategyIdea.mainSquadLeaderPosition);
+							}
 						}
 				} else {
 					if(campType != CampType.INSIDE  && campType != CampType.FIRST_CHOKE){
-						CommandUtils.attackMove(marine, StrategyIdea.mainSquadLeaderPosition);
+						if (MicroUtils.arrivedToPosition(marine,StrategyIdea.mainSquadLeaderPosition)) {
+							if (MicroUtils.timeToRandomMove(marine)) {
+								Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+								CommandUtils.attackMove(marine, randomPosition);
+							}
+						}else{
+							CommandUtils.attackMove(marine, StrategyIdea.mainSquadLeaderPosition);
+						}
 					}else{
 						CommandUtils.attackMove(marine, StrategyIdea.campPosition);
 					}
