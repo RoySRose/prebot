@@ -30,9 +30,20 @@ public class MineralCalculator {
 
     public boolean allVisible() {
         for(EnemyMineral minerals : mineralsList) {
-            if(!minerals.getMineralUnit().isVisible()){
-                return false;
-            }
+        	
+        	if(minerals.getMineralUnit().getResources() == 0) {
+        		return true;
+        	}
+        	if(Prebot.Broodwar.isVisible(minerals.getMineralUnit().getInitialPosition().getX()/32, minerals.getMineralUnit().getInitialPosition().getY()/32)){
+        		return true;
+        	}else {
+        		return false;
+        	}
+            //if(!minerals.getMineralUnit().isVisible() && minerals.getMineralUnit().getResources() > 0){
+//        	if(!minerals.getMineralUnit().isVisible()) {
+//            	System.out.println("visible is false : " +  minerals.getMineralUnit().getID() + ", " + minerals.getMineralUnit().getResources());
+//                return false;
+//            }
         }
         return true;
     }
