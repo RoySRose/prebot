@@ -41,7 +41,7 @@ public class EarlyDefenseSquad extends Squad {
 	@Override
 	public boolean want(Unit unit) {
 		if (unit.getType() == UnitType.Terran_SCV) {
-			if (InfoUtils.euiListInBase().isEmpty()) {
+			if (euiList.isEmpty()) {
 				return false;
 			} else {
 				return unit.getHitPoints() > 16;
@@ -63,7 +63,7 @@ public class EarlyDefenseSquad extends Squad {
 				scvList.add(unit);
 			}
 		}
-		if (!InfoUtils.euiListInBase().isEmpty()) {
+		if (!euiList.isEmpty()) {
 			return defenseForScvAndMarine(marineList, scvList, euiList);
 		} else {
 			return marineList;
@@ -120,7 +120,6 @@ public class EarlyDefenseSquad extends Squad {
 		List<Unit> recruitScvList = new ArrayList<>();
 		List<Unit> recruitMarineList = marineList;
 		while (unitList.size() + recruitScvList.size() < scvCountForDefense) {
-			
 			if(marineList.size() < scvCountForDefense){
 				Unit defenseScv = UnitUtils.getClosestMineralWorkerToPosition(scvList, closeEnemyUnit.getPosition());
 				if (defenseScv == null) {

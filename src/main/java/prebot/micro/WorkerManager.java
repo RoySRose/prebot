@@ -577,7 +577,7 @@ public class WorkerManager extends GameManager {
 		// 중에서
 		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
 		// 둘째로 가까운 곳을 찾는다
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (unit == null)
 				continue;
 
@@ -597,7 +597,7 @@ public class WorkerManager extends GameManager {
 		// 모든 ResourceDepot 이 다 일꾼수가 꽉 차있거나, 완성된 ResourceDepot 이 하나도 없고 건설중이라면,
 		// ResourceDepot 주위에 미네랄이 남아있는 곳 중에서 가까운 곳이 선택되도록 한다
 		if (closestDepot == null) {
-			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 				if (unit == null)
 					continue;
 
@@ -614,7 +614,7 @@ public class WorkerManager extends GameManager {
 		}
 		// 모든 ResourceDepot 주위에 미네랄이 하나도 없다면, 일꾼에게 가장 가까운 곳을 선택한다
 		if (closestDepot == null) {
-			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 				if (unit == null)
 					continue;
 				if (unit.getType().isResourceDepot()) {
