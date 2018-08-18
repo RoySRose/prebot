@@ -97,7 +97,7 @@ public class EnemyCommandInfo {
     }
 
     public static List<EnemyMineral> getMineralPatchesNearDepot(Position depotPosition) {
-        int radius = 320;
+        int radius = 280;
         ArrayList<EnemyMineral> mineralList = new ArrayList<>();
         
         for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {

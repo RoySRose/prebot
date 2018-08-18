@@ -31,11 +31,8 @@ public class MineralCalculator {
     public boolean allVisible() {
         for(EnemyMineral minerals : mineralsList) {
         	
-        	if(minerals.getMineralUnit().getResources() == 0) {
-        		return true;
-        	}
         	if(Prebot.Broodwar.isVisible(minerals.getMineralUnit().getInitialPosition().getX()/32, minerals.getMineralUnit().getInitialPosition().getY()/32)){
-        		return true;
+        	
         	}else {
         		return false;
         	}

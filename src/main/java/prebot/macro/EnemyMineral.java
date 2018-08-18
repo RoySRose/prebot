@@ -42,24 +42,15 @@ public class EnemyMineral {
         if(mineralUnit.isVisible() || Prebot.Broodwar.isVisible(mineralUnit.getInitialPosition().getX()/32, mineralUnit.getInitialPosition().getY()/32)){
             this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
             this.realMineral = 1500 - mineralUnit.getResources();
-        }
-        if(Prebot.Broodwar.isVisible(mineralUnit.getInitialPosition().getX()/32, mineralUnit.getInitialPosition().getY()/32)) {
-        	if(!mineralUnit.isVisible()) {
-        		this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
-            	this.realMineral = 1500;
-            }
-        }
-        if(mineralUnit.getResources() < 8) {
-        	this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
-        	this.realMineral = 1500;
-        }
+        } 
     }
 
     public void updateFullVisibleResources(int lastFullCheckFrame) {
         this.lastFullCheckFrame = lastFullCheckFrame;
         if(mineralUnit.isVisible()) {
         	this.lastFullCheckMineral = 1500 - mineralUnit.getResources();
-        }else {
+        }
+        else {
         	this.lastFullCheckMineral = 1500;
         	this.realMineral = 1500;
         }
