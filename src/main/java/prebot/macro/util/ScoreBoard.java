@@ -15,7 +15,15 @@ public class ScoreBoard {
 
     public ScoreBoard() {
         scoreMap = new HashMap<>();
-
+        
+        scoreMap.put(UnitType.Terran_Goliath ,100);
+        scoreMap.put(UnitType.Terran_Siege_Tank_Siege_Mode ,250);
+        scoreMap.put(UnitType.Terran_Siege_Tank_Tank_Mode ,250);
+        scoreMap.put(UnitType.Terran_Vulture ,70);
+        scoreMap.put(UnitType.Terran_Science_Vessel ,100);
+        scoreMap.put(UnitType.Terran_Valkyrie ,100);
+        scoreMap.put(UnitType.Terran_Wraith ,25);
+        
         if (InformationManager.Instance().enemyRace == Race.Terran) {
             scoreMap.put(UnitType.Terran_Firebat ,1);
             scoreMap.put(UnitType.Terran_Ghost ,10);
@@ -29,7 +37,7 @@ public class ScoreBoard {
             scoreMap.put(UnitType.Terran_Battlecruiser ,500);
             scoreMap.put(UnitType.Terran_Dropship ,0);
             scoreMap.put(UnitType.Terran_Science_Vessel ,20);
-            scoreMap.put(UnitType.Terran_Valkyrie ,10);
+            scoreMap.put(UnitType.Terran_Valkyrie ,100);
             scoreMap.put(UnitType.Terran_Wraith ,25);
             scoreMap.put(UnitType.Terran_Academy ,0);
             scoreMap.put(UnitType.Terran_Armory ,0);
