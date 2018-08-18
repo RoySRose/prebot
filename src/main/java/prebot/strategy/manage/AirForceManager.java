@@ -132,7 +132,7 @@ public class AirForceManager {
 			return;
 		}
 		if (!initialized) {
-			System.out.println("AirForceManager first update started");
+//			System.out.println("AirForceManager first update started");
 		}
 		
 		defenseModeChange();
@@ -142,7 +142,7 @@ public class AirForceManager {
 		adjustWraithCount();
 		
 		if (!initialized) {
-			System.out.println("AirForceManager first update finished");
+//			System.out.println("AirForceManager first update finished");
 			initialized = true;
 		}
 	}
@@ -162,7 +162,7 @@ public class AirForceManager {
 		int powerOfEnemies = WraithFightPredictor.powerOfEnemies(airEuiList);
 		
 		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
-			powerOfEnemies += 200;
+			powerOfEnemies += 250;
 		}
 		// System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
 		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
@@ -299,7 +299,7 @@ public class AirForceManager {
 			addAirForceTargetPositions(getMineralPositions());
 		}
 		
-		if (InfoUtils.enemyRace() == Race.Terran || TimeUtils.afterTime(8, 0)) {
+		if (InfoUtils.enemyRace() == Race.Terran) {
 			addAirForceTargetPositions(baseSidePosition());
 		}
 		
@@ -522,7 +522,7 @@ public class AirForceManager {
 		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
 			if (achievementEffectiveFrame <= -100) { // defense 모드로 변경
 				levelDown = true;
-			} else if (achievementEffectiveFrame >= 150 + airunitCount * 20) {
+			} else if (achievementEffectiveFrame >= 150) {
 				levelUp = true;
 			}
 		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
@@ -551,21 +551,21 @@ public class AirForceManager {
 		int downAchievement;
 		int upAchievement;
 		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount < 6) {
-			downAchievement = -80;
+			downAchievement = -100;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +150;	
 			} else {
 				upAchievement = +120;
 			}
 		} else if (StrategyIdea.wraithCount >= 6 && StrategyIdea.wraithCount < 12) {
-			downAchievement = -60;
+			downAchievement = -80;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +300;	
 			} else {
 				upAchievement = +180;
 			}
 		} else if (StrategyIdea.wraithCount >= 12 && StrategyIdea.wraithCount < 14) { //24) {
-			downAchievement = -40;
+			downAchievement = -60;
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				upAchievement = +600;	
 			} else {
@@ -579,10 +579,10 @@ public class AirForceManager {
 			upAchievement *= 2;
 		}
 
-		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
+		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);
 		
 		// 실제 레이쓰 수와 유지 수가 너무 큰 차이가 나지 않도록 한다.
-		int maxWraitCount = Math.min(wraithCount + 2, 10);
+		int maxWraitCount = Math.min(wraithCount + 2, 8);
 		int minWraitCount = Math.max(wraithCount - 2, 0);
 		
 		if (accumulatedAchievement <= downAchievement) {

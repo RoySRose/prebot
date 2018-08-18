@@ -3,10 +3,8 @@ package prebot.build.provider.items.building;
 import java.util.List;
 
 import bwapi.Race;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.prebot1.ConstructionManager;
@@ -14,10 +12,8 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
-import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -98,7 +94,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)
 						&& !StrategyIdea.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 					setCommandCenterBlockAndSeedPosition();
-					System.out.println("fast 2nd commandcenter - for double (vs protoss)");
+//					System.out.println("fast 2nd commandcenter - for double (vs protoss)");
 					return true;
 				}
 				
@@ -107,7 +103,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				List<Unit> tankWraiths = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (!bunkers.isEmpty() && tankWraiths.size() >= 4) {
 					setCommandCenterBlockAndSeedPosition();
-					System.out.println("fast 2nd commandcenter - bunker defense (vs terran)");
+//					System.out.println("fast 2nd commandcenter - bunker defense (vs terran)");
 					return true;
 				}
 			}
@@ -116,18 +112,18 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				if (InfoUtils.enemyRace() == Race.Protoss && !StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
 					if (UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
 						setCommandCenterBlockAndSeedPosition();
-						System.out.println("normal 2nd commandcenter - over 400 minerals");
+//						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
 					}
 				} else if (UnitUtils.myUnitDiscovered(UnitType.Terran_Starport)) {
 					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Valkyrie) || Prebot.Broodwar.self().minerals() > 600) {
 						setCommandCenterBlockAndSeedPosition();
-						System.out.println("normal 2nd commandcenter - over 400 minerals");
+//						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
 					}
 				} else {
 					setCommandCenterBlockAndSeedPosition();
-					System.out.println("normal 2nd commandcenter - over 400 minerals");
+//					System.out.println("normal 2nd commandcenter - over 400 minerals");
 					return true;
 				}
 			}
@@ -141,28 +137,28 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 30 * 4) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("normal next commandcenter - over 30 mechanics & over 600 minerals");
+//				System.out.println("normal next commandcenter - over 30 mechanics & over 600 minerals");
 				return true;
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
 			if (isAttackMode && StrategyIdea.mainSquadMode != MainSquadMode.SPEED_ATTCK && Prebot.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("attack and next commandcenter - attack & over 250 minerals");
+//				System.out.println("attack and next commandcenter - attack & over 250 minerals");
 				return true;
 			}
 			
 			// READY TO POSITION 까지 나왔는데 아직 커맨드가 2개이면 250 넘었을 때 멀티
 			if (StrategyIdea.campType == CampType.READY_TO && allCommandCenterCount == 2 && Prebot.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("ready to commandcenter - only 2 center & over 250 minerals");
+//				System.out.println("ready to commandcenter - only 2 center & over 250 minerals");
 				return true;
 			}
 			
 			// 800 넘으면 멀티하기
 			if (Prebot.Broodwar.self().minerals() > 800) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("minerals next commandcenter - over 800 minerals");
+//				System.out.println("minerals next commandcenter - over 800 minerals");
 				return true;
 			}
 			
@@ -196,16 +192,16 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 //			System.out.println("minerals lefted only " + leftMinerals);
 			if (leftMinerals < 8000 && isAttackMode) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
+//				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;
 			}
 			if (leftMinerals < 4000) {
 				setCommandCenterBlockAndSeedPosition();
-				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
+//				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;
 			}
 			if (factoryUnitCount > 40 * 4) {
-				System.out.println("next commandcenter - over 40 mechanics");
+//				System.out.println("next commandcenter - over 40 mechanics");
 				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
@@ -217,30 +213,20 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	
 
 	private void setCommandCenterBlockAndSeedPosition() {
-		SeedPositionStrategy seedPosition = SeedPositionStrategy.NoLocation;
-		TilePosition seedTilePosition = TilePosition.None;
+		SeedPositionStrategy seedPosition = null;
 
 		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
     	if (allCommandCenterCount <= 1) {
     		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
-//    			seedPosition = SeedPositionStrategy.MainBaseLocation;
-    			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
-    				seedTilePosition = BlockingEntrance.Instance().entrance_turret1;
-    			}else {
-    				seedPosition = SeedPositionStrategy.MainBaseLocation;
-    			}
+    			seedPosition = SeedPositionStrategy.MainBaseLocation;
     		} else {
     			seedPosition = SeedPositionStrategy.FirstExpansionLocation;
     		}
     	} else if (allCommandCenterCount >= 2) {
     		seedPosition = SeedPositionStrategy.NextExpansionPoint;
     	}
-    	if(TilePositionUtils.isValidTilePosition(seedTilePosition)){
-//    		System.out.println("set command center to 1 turret position");
-    		setTilePosition(seedTilePosition);
-    	}else {
-    		setSeedPositionStrategy(seedPosition);
-    	}
+    	
+    	setSeedPositionStrategy(seedPosition);
     	setBlocking(true);
 	}
 }
