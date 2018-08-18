@@ -18,11 +18,11 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.PositionUtils;
+import prebot.common.util.MicroUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
@@ -34,11 +34,13 @@ import prebot.micro.squad.EarlyDefenseSquad;
 import prebot.micro.squad.GuerillaSquad;
 import prebot.micro.squad.MainAttackSquad;
 import prebot.micro.squad.MultiDefenseSquad;
+import prebot.micro.squad.MultiDefenseSquad.DefenseType;
 import prebot.micro.squad.ScvScoutSquad;
 import prebot.micro.squad.SpecialSquad;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.micro.targeting.TargetFilter;
+import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
@@ -164,25 +166,38 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateTankDefenseSquad() {
-		// exclude invalid unit & remove invalid squad
+		if (InfoUtils.enemyBase() == null) {
+			return;
+		}
+		
 		int defenseTankCount = 0;
 		Set<Integer> defenseTankIdSet = new HashSet<>();
 		List<Squad> squadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName);
 		for (Squad defenseSquad : squadList) {
 			if (defenseSquad instanceof MultiDefenseSquad) {
-				Unit commandCenter = ((MultiDefenseSquad) defenseSquad).getCommandCenter();
-				if (!UnitUtils.isValidUnit(commandCenter)) {
-					squadData.removeSquad(defenseSquad.getSquadName());
+				MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
+				if (squad.getType() == DefenseType.CENTER_DEFENSE) {
+					Unit commandCenter = squad.getCommandCenter();
+					if (!UnitUtils.isValidUnit(commandCenter)) {
+						squadData.removeSquad(defenseSquad.getSquadName());
+						continue;
+					}
+					
+				} else if (squad.getType() == DefenseType.REGION_OCCUPY) {
+					if (squad.tankFull()) {
+						squadData.removeSquad(defenseSquad.getSquadName()); // 공격으로 전환
+						continue;
+					}
 				}
+				
 				for (Unit invalidUnit : defenseSquad.invalidUnitList()) {
 					squadData.exclude(invalidUnit);
 				}
-				
 				defenseTankCount += defenseSquad.unitList.size();
-				
 				for (Unit unit : defenseSquad.unitList) {
 					defenseTankIdSet.add(unit.getID());
 				}
+				
 			} else {
 				System.out.println("Not a defenseSquad: " + defenseSquad.getSquadName());
 			}
@@ -192,22 +207,27 @@ public class CombatManager extends GameManager {
 //			return;
 //		}
 		
-		List<Unit> tanks = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-		if (tanks.size() / 5 < defenseTankCount) { // 방어 탱크는 전체탱크의 20%를 넘을 수 없다.
+		int tankCount = 0;
+		Squad mainSquad = squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		for (Unit unit : mainSquad.unitList) {
+			if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+				tankCount++;
+			}
+		}
+		if (tankCount <= 4) {
 			return;
 		}
-		
-		// leader가 readyToPosition을 지나쳤어야 한다. (이동 경로를 확보하기 위함)
-		Position leaderPosition = StrategyIdea.mainSquadLeaderPosition;
-		Position myReadyTo = InfoUtils.myReadyToPosition();
-		Position enemyReadyTo = InfoUtils.enemyReadyToPosition();
-		if (!PositionUtils.isAllValidPosition(leaderPosition, myReadyTo, enemyReadyTo)) {
-			return;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (defenseTankCount > tankCount * 0.4) {
+				return;
+			}
+		} else {
+			if (defenseTankCount > tankCount * 0.2) {
+				return;
+			}
 		}
-		double enemyToLeader = enemyReadyTo.getDistance(leaderPosition);
-		double enemyToReadyTo = enemyReadyTo.getDistance(myReadyTo);
 		
-		if (enemyToLeader > enemyToReadyTo) {
+		if (!StrategyIdea.mainSquadCrossBridge) {
 			return;
 		}
 		
@@ -216,27 +236,26 @@ public class CombatManager extends GameManager {
 
 		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		Region expansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+		
 		for (Unit commandCenter : commandCenters) {
 			Region centerRegion = BWTA.getRegion(commandCenter.getPosition());
-//			if (centerRegion == baseRegion) {
-//				continue;
-//			}
-//			if (centerRegion == expansionRegion) {
-//				continue;
-//			}
-			
 			Race enemyRace = InfoUtils.enemyRace();
 			if (enemyRace == Race.Zerg) {
+				// 본진빼고 배치
 				if (centerRegion == baseRegion) {
 					continue;
 				}
 			} else if (enemyRace == Race.Protoss) {
+				// 본진과 expansion만 배치
 				if (centerRegion != baseRegion && centerRegion != expansionRegion) {
 					continue;
 				}
 			} else if (enemyRace == Race.Terran) {
-				if (centerRegion == expansionRegion) {
-					continue;
+				// 본진과 expansion 빼고 배치. 드랍십 발견하며 배치
+				if (!UnitUtils.enemyUnitDiscovered(UnitType.Terran_Dropship)) {
+					if (centerRegion == baseRegion || centerRegion == expansionRegion) {
+						continue;
+					}
 				}
 			}
 			
@@ -249,24 +268,56 @@ public class CombatManager extends GameManager {
 			}
 		}
 		
+		
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			Region enemyRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
+			Set<Region> occupiedRegions = InformationManager.Instance().getOccupiedRegions(Prebot.Broodwar.self());
+			
+			for (BaseLocation base : BWTA.getStartLocations()) {
+				Region region = BWTA.getRegion(base.getPosition());
+				if (region == baseRegion || enemyRegion == baseRegion) {
+					continue;
+				}
+				if (occupiedRegions.contains(region)) {
+					String squadName = SquadInfo.MULTI_DEFENSE_.squadName + base.getPosition();
+					Squad regionDefenseSquad = squadData.getSquad(squadName);
+					
+					if (regionDefenseSquad == null) {
+						Position regionPosition = region.getCenter();
+						Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+						
+						double radian = MicroUtils.targetDirectionRadian(regionPosition, centerPosition);
+						Position movePosition = MicroUtils.getMovePosition(centerPosition, radian, 1000);
+						
+						Region defenseRegion = BWTA.getRegion(movePosition.makeValid());
+						regionDefenseSquad = new MultiDefenseSquad(defenseRegion, base.getPosition());
+						squadData.addSquad(regionDefenseSquad);
+					}
+				}
+			}
+		}
+		
 		// assign units
+		List<Unit> tankList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		List<Squad> updatedSquadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName);
 		for (Squad defenseSquad : updatedSquadList) {
 			MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
 			if (squad.alreadyDefenseUnitAssigned()) {
 				continue;
 			}
-			if (squad.unitList.size() >= 3) {
+			if (squad.tankFull()) {
 				continue;
 			}
-			
-			Unit comandCenter = squad.getCommandCenter();
-			Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, comandCenter.getPosition(), UnitType.Terran_Command_Center.sightRange(), true, true);
-			if (!euis.isEmpty()) {
-				continue;
+
+			if (InfoUtils.enemyRace() != Race.Terran && squad.getType() == DefenseType.CENTER_DEFENSE) {
+				Unit comandCenter = squad.getCommandCenter();
+				Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.UNFIGHTABLE, comandCenter.getPosition(), UnitType.Terran_Command_Center.sightRange(), true, true);
+				if (!euis.isEmpty()) {
+					continue;
+				}
 			}
 			
-			Unit closestTank = UnitUtils.getClosestUnitToPosition(tanks, comandCenter.getPosition(), new UnitCondition() {
+			Unit closestTank = UnitUtils.getClosestUnitToPosition(tankList, InfoUtils.myBase().getPosition(), new UnitCondition() {
 				@Override
 				public boolean correspond(Unit unit) {
 					return !defenseTankIdSet.contains(unit.getID());
@@ -279,21 +330,21 @@ public class CombatManager extends GameManager {
 
 	private void updateGuerillaSquad() {
 		
-		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
 		if (StrategyIdea.nearGroundEnemyPosition != null) {
 			maxRatio = 0.0d;
 		} else {
-			if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadMode == MainSquadMode.ATTCK) {
-				maxRatio = MainSquadMode.NORMAL.maxGuerillaVultureRatio;
+			if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadCrossBridge) {
+				maxRatio = 0.8;
 			}
 		}
 		
 		int gurillaFailFrame = VultureTravelManager.Instance().getGurillaFailFrame();
-		if (TimeUtils.elapsedFrames(gurillaFailFrame) < 2 * TimeUtils.SECOND) {
+		if (TimeUtils.elapsedFrames(gurillaFailFrame) < 10 * TimeUtils.SECOND) {
 			maxRatio = 0.0d;
 		}
 		
+		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();

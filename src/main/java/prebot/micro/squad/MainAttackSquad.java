@@ -133,11 +133,15 @@ public class MainAttackSquad extends Squad {
 		
 		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) { // strategy manager 판단
 			saveUnitLevel = 0;
-		} else if (InformationManager.Instance().enemyRace != Race.Terran) { // combat manager 자체 판단
-			if (Prebot.Broodwar.self().supplyUsed() >= 380) { // || pushLine) {
-				saveUnitLevel = 0;
-			} else if (AttackExpansionManager.Instance().pushSiegeLine) {
-				saveUnitLevel = 0;
+		} else { // combat manager 자체 판단
+			if (InformationManager.Instance().enemyRace != Race.Terran) {
+				if (Prebot.Broodwar.self().supplyUsed() >= 380) { // || pushLine) {
+					saveUnitLevel = 0;
+				}
+			} else {
+//				if (AttackExpansionManager.Instance().pushSiegeLine) {
+//					saveUnitLevel = 0;
+//				}
 			}
 		}
 		return saveUnitLevel;
@@ -176,6 +180,9 @@ public class MainAttackSquad extends Squad {
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, building.getPosition(), building.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 			}
 		}
-		
+
+//		System.out.println("###");
+//		System.out.println(unitList);
+//		System.out.println(euiList);
 	}	
 }

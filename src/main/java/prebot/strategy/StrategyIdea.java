@@ -89,6 +89,7 @@ public class StrategyIdea {
 	public static Position mainSquadCenter = null; // 메인스쿼드 유닛들의 센터 포지션
 	public static Position mainSquadLeaderPosition = null; // 메인스쿼드 유닛들의 리더 포지션
 	public static int mainSquadCoverRadius = 0; // 메인스쿼드가 차지한 지역
+	public static boolean mainSquadCrossBridge = false;
 
 	public static BaseLocation enemyBaseExpected = null; // 적base 예상 지점
 	public static int findRatFinishFrame = CommonCode.NONE;

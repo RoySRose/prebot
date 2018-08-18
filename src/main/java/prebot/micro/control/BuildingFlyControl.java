@@ -1,5 +1,9 @@
 package prebot.micro.control;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
@@ -9,6 +13,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
@@ -18,11 +23,6 @@ import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public abstract class BuildingFlyControl extends Control{
 
@@ -111,21 +111,17 @@ public abstract class BuildingFlyControl extends Control{
         List<Unit> attackUnit = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
         attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode));
         attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Goliath));
-        List<UnitInfo> enemyUnit = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL);
-        List<UnitInfo> dangerous_targets = new ArrayList<>();
-
-        for(UnitInfo dangerous_target : enemyUnit){
-            if(dangerous_target.getType().airWeapon() != null){
-                dangerous_targets.add(dangerous_target);
-            }
-        }
-
+        List<UnitInfo> enemyUnit = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE,
+        		UnitType.Terran_Marine, UnitType.Terran_Goliath, UnitType.Terran_Wraith, UnitType.Terran_Valkyrie, UnitType.Terran_Battlecruiser, UnitType.Terran_Missile_Turret,
+        		UnitType.Protoss_Dragoon, UnitType.Protoss_Archon, UnitType.Protoss_Corsair, UnitType.Protoss_Scout, UnitType.Protoss_Carrier, UnitType.Protoss_Photon_Cannon,
+        		UnitType.Zerg_Hydralisk, UnitType.Zerg_Mutalisk, UnitType.Zerg_Devourer, UnitType.Zerg_Spore_Colony);
+        
         Unit leader = UnitUtils.leaderOfUnit(attackUnit);
 
         Position goalPos = null;
 
-        UnitInfo mostDangerousUnit = getMostDangerTarget(dangerous_targets, unit);
-        UnitInfo mostDangerousBuilding = getMostDangerBulding(dangerous_targets, unit);
+        UnitInfo mostDangerousUnit = getMostDangerTarget(enemyUnit, unit);
+        UnitInfo mostDangerousBuilding = getMostDangerBulding(enemyUnit, unit);
 
         boolean fleeing = calculateFlee(leader, mostDangerousUnit, mostDangerousBuilding, unit);
         goalPos = calculatePosition(fleeing, leader, mostDangerousUnit, mostDangerousBuilding, unit);

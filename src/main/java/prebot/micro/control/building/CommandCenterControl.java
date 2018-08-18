@@ -79,7 +79,7 @@ public class CommandCenterControl extends BuildingFlyControl {
     			return commandCenter;
     		}
     		Region expansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
-    		if (centerRegion == expansionRegion) {
+    		if (centerRegion == expansionRegion || centerRegion == InfoUtils.myThirdRegion()) {
     			return commandCenter;
     		}
     	}

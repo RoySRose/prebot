@@ -2,8 +2,6 @@ package prebot.build.provider.items.building;
 
 import bwapi.Race;
 import bwapi.UnitType;
-import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
@@ -83,7 +81,8 @@ public class BuilderBunker extends DefaultBuildableItem {
 				}
 				
 			} else {
-				if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
+//				if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE) {
+				if (UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Vulture)) {
 					setBlocking(true);
 					setHighPriority(true);
 					setTilePosition(BlockingEntrance.Instance().bunker2);
