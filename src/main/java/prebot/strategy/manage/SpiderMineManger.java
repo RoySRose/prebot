@@ -15,7 +15,6 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.LagObserver;
-import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -57,7 +56,6 @@ public class SpiderMineManger {
 	
 	private boolean initialized = false;
 	private boolean secondInitialized = false;
-	private int mineInNextExpansionFrame = CommonCode.UNKNOWN;
 	
 	private SpiderMineManger() {}
 	
@@ -93,15 +91,15 @@ public class SpiderMineManger {
 					}
 				}
 			}
-			System.out.println("good position      : " + GOOD_POSITIONS);
-			System.out.println("late good position : " + GOOD_POSITIONS_LATE);
+//			System.out.println("good position      : " + GOOD_POSITIONS);
+//			System.out.println("late good position : " + GOOD_POSITIONS_LATE);
 			
 			// 공격준비지역
 //			GOOD_POSITIONS.add(myReadyToAttackPos);
 //			GOOD_POSITIONS.add(mySecondChoke.getCenter());
 			
-//			GOOD_POSITIONS.add(enemyReadyToAttackPos);
-//			GOOD_POSITIONS.add(enemySecondChoke.getCenter());
+			GOOD_POSITIONS.add(enemyReadyToAttackPos);
+			GOOD_POSITIONS.add(enemySecondChoke.getCenter());
 			GOOD_POSITIONS.add(enemyFirstExpansion.getPosition());
 			
 			return true;
@@ -190,16 +188,16 @@ public class SpiderMineManger {
 		if (InfoUtils.enemyRace() != Race.Terran) {
 			List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
 			for (Unit siegeTank : siegeList) {
-				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST - 50, UnitType.Terran_Vulture_Spider_Mine);
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
 					}
 				}
 			}
-			int mineRemoveDist = MINE_REMOVE_TANK_DIST - 50;
+			int mineRemoveDist = MINE_REMOVE_TANK_DIST;
 			if (TimeUtils.beforeTime(9, 0)) {
-				mineRemoveDist = MINE_REMOVE_TANK_DIST - 100;
+				mineRemoveDist = MINE_REMOVE_TANK_DIST / 2;
 			}
 			for (Unit siegeTank : siegeList) {
 				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
