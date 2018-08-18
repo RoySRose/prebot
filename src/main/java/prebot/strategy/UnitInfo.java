@@ -129,11 +129,8 @@ public class UnitInfo {
         return true;
     }
 
-//	@Override
-//	public String toString() {
-//		return "UnitInfo [unitID=" + unitID + ", type=" + type + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
-//	}
-	public String getStr() {
+	@Override
+	public String toString() {
 		return "UnitInfo [unitID=" + unitID + ", type=" + type + ", lastHealth=" + lastHealth + "." + lastShields + ", unit=" + unit + ", lastPosition=" + lastPosition + ", completed=" + completed + ", updateFrame=" + updateFrame + "]";
 	}
 	
