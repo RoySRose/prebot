@@ -13,6 +13,7 @@ import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.LagObserver;
 import prebot.common.MapGrid;
+import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -24,6 +25,7 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig;
+import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -662,7 +664,7 @@ public class WorkerManager extends GameManager {
 			return false;
 		}
 
-		for (Unit enemy : MapGrid.Instance().getUnitsNear(depot.getPosition(), 300, false, true, null)) {
+		for (Unit enemy : UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, depot.getPosition(), 200)) {
 			if (enemy.getType().canAttack()) {
 				return true;
 			}
