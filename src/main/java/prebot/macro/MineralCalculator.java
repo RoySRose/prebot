@@ -13,14 +13,6 @@ public class MineralCalculator {
         this.mineralsList = mineralsList;
     }
 
-    public int getPredictionMinusMineral() {
-        int mineralSum = 0;
-        for(EnemyMineral minerals : mineralsList) {
-            mineralSum += minerals.getPredictionMinusMineral();
-        }
-        return mineralSum;
-    }
-
     public int getRealMineral() {
 
         int mineralSum = 0;

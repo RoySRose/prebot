@@ -4,6 +4,7 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
@@ -17,11 +18,14 @@ import prebot.macro.util.UnitTypeList;
 import prebot.macro.util.ScoreBoard;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.manage.StrategyAnalyseManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +50,12 @@ public class AttackDecisionMaker extends GameManager {
 
     public Map<UnitType, MutableInt> predictedTotalEnemyAttackUnit;
 
+    public int tempMypoint=0;
+    public int tempEnemypoint=0;
+    public boolean tempPhase=false;
+    public int UXMineralToPredict;
+    public int UXGasToPredict;
+    
     public void onStart() {
         this.enemyResourceDepotInfoMap = new HashMap<>();
         this.skipResourceDepot = new ArrayList<>();
@@ -59,12 +69,15 @@ public class AttackDecisionMaker extends GameManager {
 
     public void update() {
 
+    	predictedTotalEnemyAttackUnit.clear();
+    	enemyMineralToPredict=0;
+    	enemyGasToPredict=0;
         //removeDestroyedDepot(InformationManager.Instance().enemyRace);
         addFakeMainDepot(InformationManager.Instance().enemyRace);
         addNewResourceDepot(InformationManager.Instance().enemyRace);
         updateResources(InformationManager.Instance().enemyRace);
 
-        if(checkPhase3()) {
+        if(tempPhase = checkPhase3()) {
             summaryResource();
 
             if (InformationManager.Instance().enemyRace == Race.Terran) {
@@ -85,10 +98,10 @@ public class AttackDecisionMaker extends GameManager {
 
     private boolean checkPhase3() {
 
-//        if(phase3 == ){
+//        if(StrategyAnalyseManager.Instance().getPhase() == 3){
 //            return true;
 //        }
-        return false;
+        return true;
     }
 
     private int calculateMyForce() {
@@ -100,7 +113,13 @@ public class AttackDecisionMaker extends GameManager {
         int valkyrie = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie);
         int goliath = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Goliath);
 
-        return point;
+        point += vulture * scoreBoard.getPoint(UnitType.Terran_Vulture);
+        point += tank * scoreBoard.getPoint(UnitType.Terran_Siege_Tank_Tank_Mode);
+        point += valkyrie * scoreBoard.getPoint(UnitType.Terran_Valkyrie);
+        point += goliath * scoreBoard.getPoint(UnitType.Terran_Goliath);
+        
+        tempMypoint=0;
+        return tempMypoint=point;
         //내 유닛 수치화
     }
 
@@ -111,8 +130,8 @@ public class AttackDecisionMaker extends GameManager {
         for (Map.Entry<UnitType, MutableInt> enemyUnit : predictedTotalEnemyAttackUnit.entrySet()){
             point += (enemyUnit.getValue().get() * scoreBoard.getPoint(enemyUnit.getKey()));
         }
-
-        return point;
+        tempEnemypoint=0;
+        return tempEnemypoint=point;
     }
 
     private Decision makeDecision(int myForcePoint, int enemyForcePoint) {
@@ -165,7 +184,7 @@ public class AttackDecisionMaker extends GameManager {
             enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
             enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
             enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
-            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+            //System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
         }
 
         analyzeSet(enemyUnitCounter);
@@ -231,7 +250,7 @@ public class AttackDecisionMaker extends GameManager {
         	enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 5);
             enemyUnitCounter.add(UnitType.Terran_Goliath, 1);
             enemyUnitCounter.add(UnitType.Terran_Wraith, 1);
-            System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
+            //System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
         }
 
         analyzeSet(enemyUnitCounter);
@@ -241,7 +260,7 @@ public class AttackDecisionMaker extends GameManager {
     private void analyzeSet(EnemyUnitCounter enemyUnitCounter) {
         int setCount=0;
         while(true){
-            if(enemyMineralToPredict > enemyUnitCounter.getMineralSet() && enemyGasToPredict > enemyUnitCounter.getGasSet()){
+            if(enemyMineralToPredict >= enemyUnitCounter.getMineralSet() && enemyGasToPredict >= enemyUnitCounter.getGasSet()){
                 setCount++;
                 enemyMineralToPredict -= enemyUnitCounter.getMineralSet();
                 enemyGasToPredict -= enemyUnitCounter.getGasSet();
@@ -262,7 +281,7 @@ public class AttackDecisionMaker extends GameManager {
         int baseUnitCount=0;
 
         while(true){
-            if(enemyMineralToPredict > unitType.mineralPrice()){
+            if(enemyMineralToPredict >= unitType.mineralPrice()){
                 baseUnitCount++;
                 enemyMineralToPredict -= unitType.mineralPrice();
             }else{
@@ -308,94 +327,98 @@ public class AttackDecisionMaker extends GameManager {
 		        EnemyCommandInfo enemyCommandInfo = enemyResourceDepot.getValue();
 		        enemyMineralToCalculateCombatUnit += enemyCommandInfo.getMineral();
 		        enemyGasToCalculateCombatUnit += enemyCommandInfo.getGas();
+		        enemyMineralToCalculateCombatUnit += 50;
 		    }
         }
-
-
-        //killedUnit + unitCount
-        for(UnitType enemyUnitType : UnitTypeList.getAllType()){
-
-            //confirmedUnit
-            int unitCount = UnitCache.getCurrentCache().enemyAllCount(enemyUnitType);
-            int killedUnitCount = Prebot.Broodwar.self().killedUnitCount(enemyUnitType);
-
-            if(!enemyUnitType.isBuilding() && !enemyUnitType.isWorker() && enemyUnitType != UnitType.Zerg_Overlord) {
-
-                MutableInt count = predictedTotalEnemyAttackUnit.get(enemyUnitType);
-                if (count == null) {
-                    predictedTotalEnemyAttackUnit.put(enemyUnitType, new MutableInt(unitCount));
-                }else {
-                    count.increment(unitCount);
-                }
-            }
-
-            killedUnitCount += unitCount;
-
-            if (InformationManager.Instance().enemyRace == Race.Terran) {
-
-            } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-            	if(enemyUnitType == UnitType.Protoss_Archon){
-                	enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
-                	enemyGasToCalculateCombatUnit -= 300*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Protoss_Dark_Archon){
-                	enemyMineralToCalculateCombatUnit -= 300*killedUnitCount;
-                	enemyGasToCalculateCombatUnit -= 200*killedUnitCount;
-                }
-
-            } else {
-            	if(enemyUnitType == UnitType.Zerg_Lair){
-     	            enemyMineralToCalculateCombatUnit -= 300*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Hive){
-                	enemyMineralToCalculateCombatUnit -= 450*killedUnitCount;
-     	            enemyGasToCalculateCombatUnit -= 100*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Greater_Spire){
-                    enemyMineralToCalculateCombatUnit -= 200*killedUnitCount;
-                    enemyGasToCalculateCombatUnit -= 150*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Zerg_Spore_Colony){
-                    enemyMineralToCalculateCombatUnit -= 75*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Egg){
-                	enemyMineralToCalculateCombatUnit -= 50*killedUnitCount;
-                	enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
-                	enemyGasToCalculateCombatUnit += 1*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Lurker_Egg){
-                	enemyMineralToCalculateCombatUnit -= 125*killedUnitCount;
-                	enemyGasToCalculateCombatUnit -= 125*killedUnitCount;
-                	enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
-                	enemyGasToCalculateCombatUnit += 1*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Lurker){
-                	enemyMineralToCalculateCombatUnit -= 75*killedUnitCount;
-                	enemyGasToCalculateCombatUnit -= 25*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Guardian || enemyUnitType == UnitType.Zerg_Devourer){
-                	enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
-                	enemyGasToCalculateCombatUnit -= 100*killedUnitCount;
-                }
-                if(enemyUnitType == UnitType.Zerg_Cocoon){
-                    enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
-                    enemyGasToCalculateCombatUnit -= 80*killedUnitCount;
-                    enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
-                    enemyGasToCalculateCombatUnit += 1*killedUnitCount;
-                }
-                if(enemyUnitType.isBuilding()){
-                    enemyMineralToCalculateCombatUnit -= 50*killedUnitCount;
-                }
-            }
-            
-            if(enemyUnitType == UnitType.Zerg_Zergling || enemyUnitType == UnitType.Zerg_Scourge || enemyUnitType == UnitType.Zerg_Nydus_Canal){
-            	enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()/2*killedUnitCount;
-	            enemyGasToCalculateCombatUnit -= enemyUnitType.gasPrice()/2*killedUnitCount;
-            }else {
-	            enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()*killedUnitCount;
-	            enemyGasToCalculateCombatUnit -= enemyUnitType.gasPrice()*killedUnitCount;
-            }
-        }
+//
+//
+//        //killedUnit + unitCount
+//        for(UnitType enemyUnitType : UnitTypeList.getAllType()){
+//
+//            //confirmedUnit
+//            int unitCount = UnitCache.getCurrentCache().enemyAllCount(enemyUnitType);
+//            int killedUnitCount = Prebot.Broodwar.self().killedUnitCount(enemyUnitType);
+//
+//            if(!enemyUnitType.isBuilding() && !enemyUnitType.isWorker() && enemyUnitType != UnitType.Zerg_Overlord) {
+//
+//                MutableInt count = predictedTotalEnemyAttackUnit.get(enemyUnitType);
+//                if (count == null) {
+//                    predictedTotalEnemyAttackUnit.put(enemyUnitType, new MutableInt(unitCount));
+//                }else {
+//                    count.increment(unitCount);
+//                }
+//            }
+//
+//            killedUnitCount += unitCount;
+//
+//            if (InformationManager.Instance().enemyRace == Race.Terran) {
+//
+//            } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+//            	if(enemyUnitType == UnitType.Protoss_Archon){
+//                	enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit -= 300*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Protoss_Dark_Archon){
+//                	enemyMineralToCalculateCombatUnit -= 300*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit -= 200*killedUnitCount;
+//                }
+//
+//            } else {
+//            	if(enemyUnitType == UnitType.Zerg_Lair){
+//     	            enemyMineralToCalculateCombatUnit -= 300*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Hive){
+//                	enemyMineralToCalculateCombatUnit -= 450*killedUnitCount;
+//     	            enemyGasToCalculateCombatUnit -= 100*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Greater_Spire){
+//                    enemyMineralToCalculateCombatUnit -= 200*killedUnitCount;
+//                    enemyGasToCalculateCombatUnit -= 150*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Zerg_Spore_Colony){
+//                    enemyMineralToCalculateCombatUnit -= 75*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Egg){
+//                	enemyMineralToCalculateCombatUnit -= 50*killedUnitCount;
+//                	enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit += 1*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Lurker_Egg){
+//                	enemyMineralToCalculateCombatUnit -= 125*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit -= 125*killedUnitCount;
+//                	enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit += 1*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Lurker){
+//                	enemyMineralToCalculateCombatUnit -= 75*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit -= 25*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Guardian || enemyUnitType == UnitType.Zerg_Devourer){
+//                	enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
+//                	enemyGasToCalculateCombatUnit -= 100*killedUnitCount;
+//                }
+//                if(enemyUnitType == UnitType.Zerg_Cocoon){
+//                    enemyMineralToCalculateCombatUnit -= 100*killedUnitCount;
+//                    enemyGasToCalculateCombatUnit -= 80*killedUnitCount;
+//                    enemyMineralToCalculateCombatUnit += 1*killedUnitCount;
+//                    enemyGasToCalculateCombatUnit += 1*killedUnitCount;
+//                }
+//                if(enemyUnitType.isBuilding()){
+//                    enemyMineralToCalculateCombatUnit -= 50*killedUnitCount;
+//                }
+//            }
+//            
+//            if(enemyUnitType == UnitType.Zerg_Zergling || enemyUnitType == UnitType.Zerg_Scourge || enemyUnitType == UnitType.Zerg_Nydus_Canal){
+//            	enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()/2*killedUnitCount;
+//	            enemyGasToCalculateCombatUnit -= enemyUnitType.gasPrice()/2*killedUnitCount;
+//            }else {
+//	            enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()*killedUnitCount;
+//	            enemyGasToCalculateCombatUnit -= enemyUnitType.gasPrice()*killedUnitCount;
+//            }
+//        }
+        UXMineralToPredict=enemyMineralToCalculateCombatUnit;
+        UXGasToPredict=enemyGasToCalculateCombatUnit;
+        
         enemyMineralToPredict = enemyMineralToCalculateCombatUnit;
         enemyGasToPredict = enemyGasToCalculateCombatUnit;
     }
@@ -440,7 +463,25 @@ public class AttackDecisionMaker extends GameManager {
     
     private void addNewResourceDepot(Race race) {
 
-        List<UnitInfo> enemyResourceDepot = UnitCache.getCurrentCache().enemyAllUnitInfos(InformationManager.Instance().getBasicResourceDepotBuildingType(race));
+        //List<UnitInfo> enemyResourceDepot = UnitCache.getCurrentCache().enemyAllUnitInfos(InformationManager.Instance().getBasicResourceDepotBuildingType(race));
+        UnitData unitData = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer);
+        List<UnitInfo> enemyResourceDepot = new ArrayList<>();
+        
+        Iterator<Integer> it = null;
+		if (unitData != null) {
+			it = unitData.getUnitAndUnitInfoMap().keySet().iterator();
+
+			while (it.hasNext()) {
+				final UnitInfo ui = unitData.getUnitAndUnitInfoMap().get(it.next());
+				if (ui.getType() == InformationManager.Instance().getBasicResourceDepotBuildingType(race)) {
+
+					enemyResourceDepot.add(ui);
+				}
+			}
+		}
+        
+        
+        
         List<Position> resourceDepotPosition = new ArrayList<>();
         
         for(UnitInfo unitInfo : enemyResourceDepot){
@@ -455,7 +496,8 @@ public class AttackDecisionMaker extends GameManager {
                 	
                 	//TODO 여기서 판단해서. 정말 본진을 찾은건지... 아니면 멀티를 찾은건지 구분하고. 본진을 찾았으면 그냥 진행하면 되겠지? 멀티를 찾고. 본진 못 찾았다면. 파악됬다고 하더라도 공격하면 안된다. 처리하자.
                 	
-                	System.out.println("add : " + unitInfo.getLastPosition());
+                	System.out.println("add : " + unitInfo + ", " + unitInfo.getLastPosition());
+                	System.out.println("add : " + unitInfo.getStr());
                 	
                 	BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
                     
@@ -494,7 +536,6 @@ public class AttackDecisionMaker extends GameManager {
     }
 
     private EnemyCommandInfo removefake(UnitInfo unitInfo) {
-    	
     	EnemyCommandInfo preserve=null;
     	for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
 
@@ -507,9 +548,12 @@ public class AttackDecisionMaker extends GameManager {
         	   enemyResourceDepotInfoMap.remove(enemyResourceDepot.getKey());
            }
         }
-    	if(preserve == null) {
-    		System.out.println("should not happen in removing false");
-    	}
+    	
+//    	EnemyCommandInfo preserve= enemyResourceDepotInfoMap.get(unitInfo);
+//    	enemyResourceDepotInfoMap.remove(unitInfo);
+//    	if(preserve == null) {
+//    		System.out.println("should not happen in removing false");
+//    	}
     	return preserve;
 	}
 

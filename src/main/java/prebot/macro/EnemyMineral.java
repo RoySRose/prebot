@@ -16,6 +16,10 @@ public class EnemyMineral {
 
     public EnemyMineral(Unit mineralUnit) {
         this.mineralUnit = mineralUnit;
+        this.realMineral = 0;
+        this.lastFullCheckFrame = 0;
+        this.lastFullCheckMineral = 0;
+        this.lastCheckFrame = 0;
     }
 
     public Unit getMineralUnit() {
@@ -44,10 +48,6 @@ public class EnemyMineral {
     public void updateFullVisibleResources(int lastFullCheckFrame) {
         this.lastFullCheckFrame = lastFullCheckFrame;
         this.lastFullCheckMineral = 1500 - mineralUnit.getResources();
-    }
-
-    public int getPredictionMinusMineral() {
-        return lastFullCheckMineral - mineralUnit.getResources();
     }
 
     public int getFullCheckMineral() {
