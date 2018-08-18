@@ -81,7 +81,7 @@ public abstract class Strategist {
 					return false;
 				}
 			}
-			System.out.println("MISSION COMPLETE");
+//			System.out.println("MISSION COMPLETE");
 			return true;
 			
 		} else {
@@ -93,7 +93,7 @@ public abstract class Strategist {
 			if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
 				return false;
 			}
-			System.out.println("DEFAULT MISSION COMPLETE");
+//			System.out.println("DEFAULT MISSION COMPLETE");
 			return true;
 			
 		}

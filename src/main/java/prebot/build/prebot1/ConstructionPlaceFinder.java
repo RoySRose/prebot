@@ -972,7 +972,6 @@ public class ConstructionPlaceFinder {
                 closestGeyser = geyser;
             }
         }
-        System.out.println("closestGeyser: " + closestGeyser);
         return closestGeyser;
     }
 
