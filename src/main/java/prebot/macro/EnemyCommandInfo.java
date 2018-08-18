@@ -155,46 +155,56 @@ public class EnemyCommandInfo {
         int term3 =0;
         double appliedWorkerCount;
         double appliedWorkerCount2 = 0;
-        double appliedWorkerCount3 = 0;
         int predictedIncrementMineral;
 
+        
         workerCount = workerCounter.getWorkerCount(lastFullCheckFrame);
+        if(workerCount < mineralCalculator.getMineralCount()*2) {
+        	fullWorkerFrame =0;
+        }
+        if(workerCount < mineralCalculator.getMineralCount()) {
+        	halfWorkerFrame =0;
+        }
+        
         if(fullWorkerFrame == 0 && workerCount == mineralCalculator.getMineralCount()*2  && Prebot.Broodwar.getFrameCount()>7000) {
         	fullWorkerFrame = Prebot.Broodwar.getFrameCount();
-        	 System.out.println("update fullWorkerFrame: " + fullWorkerFrame+", " + workerCount);
+        	 //System.out.println("update fullWorkerFrame: " + fullWorkerFrame+", " + workerCount);
         }
         
         if(halfWorkerFrame == 0 && workerCount > mineralCalculator.getMineralCount() && Prebot.Broodwar.getFrameCount()>3800) {
         	halfWorkerFrame = Prebot.Broodwar.getFrameCount();
-        	 System.out.println("update halfWorkerFrame: " + halfWorkerFrame+", " + workerCount);
+        	 //System.out.println("update halfWorkerFrame: " + halfWorkerFrame+", " + workerCount);
         }
         
         EnemyMineral enemyMineral = mineralCalculator.getMaxLastCheckFrame();
-
-        //System.out.println("fullWorkerFrame: " + fullWorkerFrame);
-//        if(lastFullCheckFrame == 0) {
-//        
-//        }
         
         total = mineralCalculator.getFullCheckMineral();
 
+        int lastCheckedFrame=0;
+        if(lastFullCheckFrame==0) {
+        	lastCheckedFrame = lastCheckFrame;
+        }else {
+        	lastCheckedFrame = lastFullCheckFrame;
+        }
+        
+        
         if(fullWorkerFrame > 0) {
-        	if(halfWorkerFrame > lastFullCheckFrame) {
-            	term1 = halfWorkerFrame - lastFullCheckFrame;
+        	if(halfWorkerFrame > lastCheckedFrame) {
+            	term1 = halfWorkerFrame - lastCheckedFrame;
       			term2 =	fullWorkerFrame - halfWorkerFrame;
             	term3 = Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
             	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
                 appliedWorkerCount2 = (workerCounter.halfWorker + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
-        	}else if (fullWorkerFrame > lastFullCheckFrame){
+        	}else if (fullWorkerFrame > lastCheckedFrame){
         		term1 = 0;
-            	term2 = fullWorkerFrame - lastFullCheckFrame;
+            	term2 = fullWorkerFrame - lastCheckedFrame;
             	term3 =	Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
         	}else {
         		term1 = 0;
         		term2 = 0;
-            	term3 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+            	term3 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = 0;
         	}
@@ -222,14 +232,14 @@ public class EnemyCommandInfo {
             
         }else if(halfWorkerFrame > 0) {
         	
-        	if(halfWorkerFrame > lastFullCheckFrame) {
-            	term1 = halfWorkerFrame - lastFullCheckFrame;
+        	if(halfWorkerFrame > lastCheckedFrame) {
+            	term1 = halfWorkerFrame - lastCheckedFrame;
       			term2 =	Prebot.Broodwar.getFrameCount() - halfWorkerFrame;
             	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
                 appliedWorkerCount2 = (workerCounter.halfWorker + workerCount) / 2 - workerCounter.halfWorker;
         	}else {
         		term1 = 0;
-            	term2 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+            	term2 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCount) / 2 - workerCounter.halfWorker;
         	}
@@ -245,7 +255,7 @@ public class EnemyCommandInfo {
             predictedIncrementMineral = firstSetIncremental + secondSetIncremental;
             
             
-//	            term1 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+//	            term1 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
 //	            appliedWorkerCount = (lastFullCheckWorkerCount + (workerCount)) / 2;
 //	   
 //	            int firstTermIncremental = 0;
@@ -259,7 +269,7 @@ public class EnemyCommandInfo {
 //	            predictedIncrementMineral = firstTermIncremental;
         }else {
         	//(if(enemyMineral.getLastCheckFrame() == 0)
-        	term1 = Prebot.Broodwar.getFrameCount() - lastFullCheckFrame;
+        	term1 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
         	appliedWorkerCount = (lastFullCheckWorkerCount + workerCount) / 2;
 
         	int firstSetIncremental = 0;
@@ -288,7 +298,7 @@ public class EnemyCommandInfo {
 //            
 //            predictedIncrementMineral = firstTermIncremental;
 
-    	return uxmineral = total + predictedIncrementMineral > maxMineral ? maxMineral : total + predictedIncrementMineral;
+    	return uxmineral = (total + predictedIncrementMineral) > maxMineral ? maxMineral : (total + predictedIncrementMineral);
     }
 
     public int getGas(){

@@ -3,8 +3,11 @@ package prebot.macro;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import prebot.build.constant.BuildConfig;
 import prebot.common.main.Prebot;
+import prebot.common.util.internal.UnitCache;
+import prebot.strategy.UnitInfo;
 
 import java.util.List;
 
@@ -14,6 +17,8 @@ public class DefaultGasCalculator implements GasCalculator{
 
     public final Unit geyser;
     public int realGas;
+    
+    public int gasDepletedFrame;
 
     private boolean hasGasBuilding;
 
@@ -23,6 +28,7 @@ public class DefaultGasCalculator implements GasCalculator{
     public DefaultGasCalculator(Unit geyser) {
         this.geyser = geyser;
         this.hasGasBuilding = false;
+        this.gasDepletedFrame = 0;
     }
 
     public Position getGeyserPoint() {
@@ -37,7 +43,15 @@ public class DefaultGasCalculator implements GasCalculator{
         if(!hasGasBuilding) {
             return 0;
         }else{
-            return (int) (realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
+        	int predictedGas = (int) (realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
+        	if(realGas <= 5000 && predictedGas > 5000) {
+        		gasDepletedFrame = Prebot.Broodwar.getFrameCount();
+        	}
+        	
+        	if(gasDepletedFrame>0) {
+    			predictedGas = (int) (5000 + (Prebot.Broodwar.getFrameCount() - gasDepletedFrame) * GAS_INCREMENT_RATE/4);
+        	}
+        	return predictedGas;
         }
     }
 
@@ -53,14 +67,14 @@ public class DefaultGasCalculator implements GasCalculator{
                 return true;
             }
         }
+        
+        List<UnitInfo> enemy = UnitCache.getCurrentCache().enemyAllUnitInfos(UnitType.AllUnits);
 
-//        List<UnitInfo> enemyGasBuilding = UnitCache.getCurrentCache().enemyAllUnitInfos(InformationManager.Instance().getRefineryBuildingType(InformationManager.Instance().enemyRace));
-//
-//        for (UnitInfo unitInfo : enemyGasBuilding) {
-//            if(geyser.getDistance(unitInfo.getUnit()) < 320){
-//                return true;
-//            }
-//        }
+        for (UnitInfo unitInfo : enemy) {
+        	if(unitInfo.getType().gasPrice() > 0) {
+        		return true;
+        	}
+        }
         return false;
     }
 
