@@ -190,11 +190,11 @@ public class TargetPriority {
 		
 		// 시즈 vs 테란
 		inputPriority = PRIORITY_MAX;
-		siegeModePriorityMap.put(UnitType.Terran_Vulture_Spider_Mine, 		inputPriority);
-		siegeModePriorityMap.put(UnitType.Terran_Siege_Tank_Siege_Mode,		inputPriority -= PRIORITY_GAP);
+		siegeModePriorityMap.put(UnitType.Terran_Siege_Tank_Siege_Mode,		inputPriority);
 		siegeModePriorityMap.put(UnitType.Terran_Siege_Tank_Tank_Mode,		inputPriority -= PRIORITY_GAP);
 		siegeModePriorityMap.put(UnitType.Terran_Goliath,					inputPriority -= PRIORITY_GAP);
 		siegeModePriorityMap.put(UnitType.Terran_Vulture,					inputPriority -= PRIORITY_GAP);
+		siegeModePriorityMap.put(UnitType.Terran_Vulture_Spider_Mine, 		inputPriority -= PRIORITY_GAP);
 		siegeModePriorityMap.put(UnitType.Terran_Ghost,						inputPriority -= PRIORITY_GAP);
 		siegeModePriorityMap.put(UnitType.Terran_Marine,					inputPriority -= PRIORITY_GAP);
 		siegeModePriorityMap.put(UnitType.Terran_Medic,						inputPriority -= PRIORITY_GAP);

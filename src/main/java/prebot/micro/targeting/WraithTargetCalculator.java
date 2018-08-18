@@ -137,17 +137,20 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 				}
 				return 240;
 			}
+			if (enemyUnit.getType() == UnitType.Terran_Dropship) {
+				return 230;
+			}
 			if (enemyUnit.getType() == UnitType.Terran_Missile_Turret && !enemyUnit.isCompleted()) {
 				return 220;
 			}
 			if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				return 230;
+				return 210;
 			}
 			if (enemyUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-				return 220;
+				return 200;
 			}
 			if (enemyUnit.getType().isBuilding() && enemyUnit.getHitPoints() < 250) {
-				return 220;
+				return 190;
 			}
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			if (enemyUnit.getType().isWorker()) {
@@ -162,7 +165,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	private int possibleHighestScore(Unit enemyUnit) {
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			if (enemyUnit.getType() == UnitType.Terran_Supply_Depot) {
-				return 210;
+				return 180;
 			}
 		} else if (InfoUtils.enemyRace() == Race.Zerg) {
 			if (enemyUnit.getType() == UnitType.Zerg_Lurker) {

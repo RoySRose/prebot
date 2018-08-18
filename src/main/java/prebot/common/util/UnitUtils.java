@@ -447,11 +447,26 @@ public class UnitUtils {
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui) {
 		int ignoreSeconds;
 		if (eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_SIEGE_TANK_SECONDS;
+//			TilePosition tilePosition = eui.getLastPosition().toTilePosition();
+//			TilePosition t1 = new TilePosition(tilePosition.getX()-2, tilePosition.getY()).makeValid();
+//			TilePosition t2 = new TilePosition(tilePosition.getX()+2, tilePosition.getY()).makeValid();
+//			TilePosition t3 = new TilePosition(tilePosition.getX(), tilePosition.getY()-2).makeValid();
+//			TilePosition t4 = new TilePosition(tilePosition.getX(), tilePosition.getY()+2).makeValid();
+//			if (Prebot.Broodwar.isVisible(t1) && Prebot.Broodwar.isVisible(t2) && Prebot.Broodwar.isVisible(t3) && Prebot.Broodwar.isVisible(t4)) {
+//				ignoreSeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
+//			} else {
+				ignoreSeconds = StrategyConfig.IGNORE_ENEMY_SIEGE_TANK_SECONDS;
+//			}
 		} else {
 			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}
-		return ignorableEnemyUnitInfo(eui, ignoreSeconds);
+		boolean ignorable = ignorableEnemyUnitInfo(eui, ignoreSeconds);
+//		if (ignorable) {
+//			if (eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
+//				System.out.println("ignorable : " + eui);
+//			}
+//		}
+		return ignorable;
 	}
 	
 	public static boolean ignorableEnemyUnitInfo(UnitInfo eui, int ignoreSeconds) {

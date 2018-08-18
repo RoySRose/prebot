@@ -157,7 +157,7 @@ public class TerranStrategist extends Strategist {
 		int marineCount = InfoUtils.enemyNumUnits(UnitType.Terran_Marine);
 		int vultureCount = InfoUtils.enemyNumUnits(UnitType.Terran_Vulture);
 		int goliathCount = InfoUtils.enemyNumUnits(UnitType.Terran_Goliath);
-//		int tankCount = InfoUtils.enemyNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		int tankCount = InfoUtils.enemyNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		
 		int airUnitPoint = UnitUtils.enemyAirUnitPower();
 		if (airUnitPoint ==  0) {
@@ -178,7 +178,12 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_MECHANIC_VULTURE_TANK;
 			
 		} else {
-			return EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK;
+			int groundPoint = marineCount + vultureCount + goliathCount + tankCount;
+			if (airUnitPoint > groundPoint) {
+				return EnemyStrategy.TERRAN_MECHANIC_GOL_GOL_TANK;
+			} else {
+				return EnemyStrategy.TERRAN_MECHANIC_GOLIATH_TANK;
+			}
 		}
 	}
 }

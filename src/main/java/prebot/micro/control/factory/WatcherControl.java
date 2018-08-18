@@ -5,11 +5,15 @@ import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.Region;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
@@ -56,13 +60,35 @@ public class WatcherControl extends Control {
 		
 		Position fleePosition = StrategyIdea.mainSquadCenter;
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
-		if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
-			List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
-			Unit closeTurret = UnitUtils.getClosestUnitToPosition(turretList, StrategyIdea.mainSquadCenter);
-			if (closeTurret != null) {
-				fleePosition = closeTurret.getPosition();
-				coverRadius = 50;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			int tankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+			if (tankCount >= 3 && StrategyIdea.mainSquadCrossBridge) {
+//				int watcherBackEnoughDistance = (int) (StrategyIdea.mainSquadCoverRadius * 1.5);
+//				double radian = MicroUtils.targetDirectionRadian(fleePosition, InfoUtils.myBase().getPosition());
+//				fleePosition = MicroUtils.getMovePosition(fleePosition, radian, watcherBackEnoughDistance);
+				
+				List<Unit> centers = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+				Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+				Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
+				for (Unit center : centers) {
+					Region centerRegion = BWTA.getRegion(center.getPosition());
+					if (centerRegion != myBaseRegion
+							|| centerRegion != myExpansionRegion) {
+						fleePosition = center.getPosition();
+						break;
+					}
+				}
 			}
+			
+		} else {
+			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
+				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
+				Unit closeTurret = UnitUtils.getClosestUnitToPosition(turretList, StrategyIdea.mainSquadCenter);
+				if (closeTurret != null) {
+					fleePosition = closeTurret.getPosition();
+					coverRadius = 50;
+				}
+			}	
 		}
 		
 		if (regroupLeader != null) {

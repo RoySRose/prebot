@@ -20,7 +20,6 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -555,30 +554,25 @@ public class ConstructionManager extends GameManager {
 //					if(WorkerManager.Instance().getWorkerData().getWorkerId(b.getConstructionWorker())){
 //						b.setConstructionWorker(null);
 //					}
+				
+				Unit workerToAssign = null;
+				
 				if (b.getConstructionWorker() == null || b.getConstructionWorker().exists() == false || b.getConstructionWorker().getHitPoints() <= 0 ){
-			
-					//System.out.println("checkForDeadTerranBuilders - chooseConstuctionWorkerClosest for " + b.getType() + " to worker near " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
-					/*
-					 * 1.3 초반 질럿 저글링 러쉬일땐 벙커 셔플 배럭빼고 중단된건물은 다시 안짓는걸로 추가
-					 */
-//						if(( CombatManager.Instance().FastZerglingsInOurBase >0) 
-//								&& !(b.getBuildingUnit().getType() == UnitType.Terran_Bunker || b.getBuildingUnit().getType() == UnitType.Terran_Barracks 
-//								|| b.getBuildingUnit().getType() == UnitType.Terran_Supply_Depot || b.getBuildingUnit().getType() == UnitType.Terran_Factory)){
-//							continue;
-//						} 
 					// grab a worker unit from WorkerManager which is closest to this final position	
-					Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
-
-					if (workerToAssign != null)
-					{
-						//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
-
-						b.setConstructionWorker(workerToAssign);								
-						CommandUtils.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
+					workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), b.getFinalPosition(), true, b.getLastConstructionWorkerID());
+					if (workerToAssign != null) {
+						b.setConstructionWorker(workerToAssign);
 						b.setBuildCommandGiven(true);
 						b.setLastBuildCommandGivenFrame(Prebot.Broodwar.getFrameCount());
 						b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 					}
+				} else {
+					workerToAssign = b.getConstructionWorker();
+				}
+				
+				if (workerToAssign != null) {
+					//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
+					CommandUtils.rightClick(b.getConstructionWorker(), b.getBuildingUnit());
 				}
 			}
 		}

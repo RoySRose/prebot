@@ -24,11 +24,13 @@ import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
@@ -193,11 +195,11 @@ public class PositionFinder {
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
 			
 			// 병력이 쌓였다면 second choke에서 방어한다.
-			if (myTankSupplyCount >= 5 * 4 && InfoUtils.myReadyToPosition() != null) {
+			if (myTankSupplyCount >= 3 * 4 && InfoUtils.myReadyToPosition() != null) {
 				return CampType.READY_TO;
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
-			if (myTankSupplyCount >= 3 * 4 || firstExpansionOccupied()) {
+			if (myTankSupplyCount >= 2 * 4 || firstExpansionOccupied()) {
 				int tankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (tankCount >= 1) {
 					return CampType.SECOND_CHOKE;
@@ -352,6 +354,18 @@ public class PositionFinder {
 			StrategyIdea.mainSquadCenter = StrategyIdea.campPosition;
 			StrategyIdea.mainSquadLeaderPosition = StrategyIdea.campPosition;
 		}
+		
+		// readyToPosition을 지나쳤는지 여부
+		Position leaderPosition = StrategyIdea.mainSquadLeaderPosition;
+		Position myReadyTo = InfoUtils.myReadyToPosition();
+		Position enemyReadyTo = InfoUtils.enemyReadyToPosition();
+		if (!PositionUtils.isAllValidPosition(leaderPosition, myReadyTo, enemyReadyTo)) {
+			return;
+		}
+		
+		double enemyToLeader = enemyReadyTo.getDistance(leaderPosition);
+		double enemyToReadyTo = enemyReadyTo.getDistance(myReadyTo);
+		StrategyIdea.mainSquadCrossBridge = enemyToLeader < enemyToReadyTo + 150;
 	}
 
 	private void updateEnemyUnitPosition() {
@@ -361,7 +375,7 @@ public class PositionFinder {
 
 		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
 		for (UnitInfo eui : euiList) {
-			if (!TargetFilter.excludeByFilter(eui, TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE|TargetFilter.SPIDER_MINE|TargetFilter.BUILDING|TargetFilter.WORKER)) {
+			if (!TargetFilter.excludeByFilter(eui, TargetFilter.LARVA_LURKER_EGG|TargetFilter.UNFIGHTABLE|TargetFilter.SPIDER_MINE|TargetFilter.BUILDING)) {
 				sumOfTotalX += eui.getLastPosition().getX();
 				sumOfTotalY += eui.getLastPosition().getY();
 				totalCount++;
@@ -372,6 +386,8 @@ public class PositionFinder {
 		euiListNear.addAll(InfoUtils.euiListInBase());
 		euiListNear.addAll(InfoUtils.euiListInExpansion());
 		euiListNear.addAll(InfoUtils.euiListInThirdRegion());
+		euiListNear.addAll(UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.GROUND_UNIT|TargetFilter.INVISIBLE|TargetFilter.UNFIGHTABLE,
+				InfoUtils.myBase().getPosition(), 450, true, true));
 		
 		int sumOfAirX = 0;
 		int sumOfAirY = 0;
@@ -392,12 +408,16 @@ public class PositionFinder {
 			if (UnitUtils.unitInSight(eui) == null) {
 				continue;
 			}
+			if (eui.getType() == UnitType.Zerg_Overlord) {
+				continue;
+			}
+			
 			if (eui.getType() == UnitType.Terran_Dropship || eui.getType() == UnitType.Protoss_Shuttle) {
 				sumOfDropX += eui.getLastPosition().getX();
 				sumOfDropY += eui.getLastPosition().getY();
 				dropCount++;
 				
-			} else if (eui.getType().isFlyer() &&  eui.getType() != UnitType.Zerg_Overlord) {
+			} else if (eui.getType().isFlyer()) {
 				sumOfAirX += eui.getLastPosition().getX();
 				sumOfAirY += eui.getLastPosition().getY();
 				airCount++;
@@ -561,7 +581,6 @@ public class PositionFinder {
 				return watcherOtherPosition;
 			}
 		}
-		return Position.Unknown;
 		
 //		boolean canGoOtherPosition = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) >= 10;
 //		
@@ -577,33 +596,28 @@ public class PositionFinder {
 //			}	
 //		}
 //		
-//		if (canGoOtherPosition) {
-//			// 2. 내 first expansion과 가까운 적 멀티 (시야가 밝혀지지 않은)
-//			List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
-//			if (!enemyOccupiedBases.isEmpty()) {
-//				BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.myFirstExpansion(), new BaseCondition() {
-//					@Override public boolean correspond(BaseLocation base) {
-//						if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
-//							return false;
-//						}
-//						if (Prebot.Broodwar.isVisible(base.getTilePosition())) {
-//							return false;
-//						}
-//						List<UnitInfo> enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, base.getPosition(), 500, true, false);
-//						if (enemyUnitInfosInRadius.isEmpty()) {
-//							return false;
-//						}
-//						return true;
+		// 2. 내 first expansion과 가까운 적 멀티 (시야가 밝혀지지 않은)
+		List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
+		if (!enemyOccupiedBases.isEmpty()) {
+			BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.enemyFirstExpansion(), new BaseCondition() {
+				@Override public boolean correspond(BaseLocation base) {
+					if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
+						return false;
+					}
+//					Set<UnitInfo> enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, base.getPosition(), 500, true, false);
+//					if (enemyUnitInfosInRadius.isEmpty()) {
+//						return false;
 //					}
-//				});
-//				if (enemyOccupied != null) {
-//					watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
-//					watcherOtherPosition = enemyOccupied.getPosition();
-//					return watcherOtherPosition;
-//				}
-//			}
-//		}
-//		return Position.Unknown;
+					return true;
+				}
+			});
+			if (enemyOccupied != null) {
+				watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
+				watcherOtherPosition = enemyOccupied.getPosition();
+				return watcherOtherPosition;
+			}
+		}
+		return Position.Unknown;
 	}
 	
 	/// 첫번째 확장기지를 차지하였는지 여부

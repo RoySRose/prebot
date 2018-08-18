@@ -36,7 +36,7 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		if (TimeUtils.elapsedFrames(scanUsedFrame) < 3 * TimeUtils.SECOND) {
+		if (TimeUtils.elapsedFrames(scanUsedFrame) < 4 * TimeUtils.SECOND) {
 			return;
 		}
 		if (!TimeUtils.executeRotation(0, 24)) {
@@ -220,11 +220,16 @@ public class ComsatControl extends Control {
 			}
 		}
 		
-		if (StrategyIdea.totalEnemyCneterPosition != null && scanEnemySquadFrame < oldestLastCheckTime) {
-			if (!Prebot.Broodwar.isVisible(StrategyIdea.totalEnemyCneterPosition.toTilePosition())) {
-				scanEnemySquadFrame = TimeUtils.elapsedFrames();
-				return StrategyIdea.totalEnemyCneterPosition;	
-			}
+		if (StrategyIdea.totalEnemyCneterPosition != null
+				&& StrategyIdea.mainSquadLeaderPosition != null
+				&& scanEnemySquadFrame < oldestLastCheckTime) {
+			
+			double radian = MicroUtils.targetDirectionRadian(StrategyIdea.mainSquadLeaderPosition, StrategyIdea.totalEnemyCneterPosition);
+			Position squadFrontPosition = MicroUtils.getMovePosition(StrategyIdea.mainSquadLeaderPosition, radian, 700).makeValid();
+			
+//			if (!Prebot.Broodwar.isVisible(squadFrontPosition.toTilePosition())) {}
+			scanEnemySquadFrame = TimeUtils.elapsedFrames();
+			return squadFrontPosition;	
 		}
 		
 		return oldestCheckPosition;

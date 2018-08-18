@@ -28,7 +28,6 @@ import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.predictor.WraithFightPredictor;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AirForceManager {
 	
@@ -322,9 +321,23 @@ public class AirForceManager {
 		}
 		
 		if (TimeUtils.afterTime(8, 0) && InfoUtils.enemyRace() == Race.Terran) {
-			addAirForceTargetPositions(
-					StrategyIdea.nearGroundEnemyPosition,
-					StrategyIdea.totalEnemyCneterPosition);
+			Position position = InfoUtils.myBase().getPosition();
+			UnitInfo closeTankInfo = null;
+			double closestDistance = CommonCode.DOUBLE_MAX;
+			
+			List<UnitInfo> tankInfoList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
+			for (UnitInfo eui : tankInfoList) {
+				double distance = eui.getLastPosition().getDistance(position);
+				
+				if (distance < closestDistance) {
+					closeTankInfo = eui;
+					closestDistance = distance;
+				}
+			}
+			
+			if (closeTankInfo != null) {
+				addAirForceTargetPositions(closeTankInfo.getLastPosition());
+			}
 		}
 	}
 
@@ -484,9 +497,7 @@ public class AirForceManager {
 			if (InfoUtils.enemyRace() == Race.Terran) {
 				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
-				} else if (!StrategyIdea.buildTimeMap.featureEnabled(Feature.MECHANIC)) { // 메카닉이 아님
-					levelDown = true;
-				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Goliath, UnitType.Terran_Armory)) { // 골리앗 발견, 완성된 아모리 발견
+				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Goliath, UnitType.Terran_Armory, UnitType.Terran_Medic)) { // 골리앗 발견, 완성된 아모리 발견
 					levelDown = true;
 				}
 			} else if (InfoUtils.enemyRace() == Race.Zerg) {
@@ -532,6 +543,11 @@ public class AirForceManager {
 
 	private void adjustWraithCount() {
 		// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
+		boolean suppress = false;
+		if (InfoUtils.enemyRace() == Race.Terran && !StrategyIdea.mainSquadMode.isAttackMode) {
+			suppress = true;
+		}
+		
 		int downAchievement;
 		int upAchievement;
 		if (StrategyIdea.wraithCount > 0 && StrategyIdea.wraithCount < 6) {
@@ -557,6 +573,10 @@ public class AirForceManager {
 			}
 		} else {
 			return;
+		}
+		
+		if (suppress) {
+			upAchievement *= 2;
 		}
 
 		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);

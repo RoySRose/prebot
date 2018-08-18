@@ -211,8 +211,6 @@ public class SpiderMineManger {
 			}
 		}
 		
-		
-		// 급해서 본진에 박은 마인 제거
 		if (TimeUtils.afterTime(9, 0)) {
 			// 다음 확장지역의 스파이더 마인
 			if (TimeUtils.elapsedFrames(mineInNextExpansionFrame) > 20 * TimeUtils.SECOND) {
@@ -220,12 +218,35 @@ public class SpiderMineManger {
 				if (nextExpansion != null) {
 					List<Unit> spiderMines = UnitUtils.getUnitsInRadius(PlayerRange.SELF, nextExpansion.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
 					for (Unit mine : spiderMines) {
-						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() - 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
 					}
 				}
+				
+				List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansions();
+				for (BaseLocation base : otherExpansions) {
+					boolean centerExist = false;
+					List<Unit> centerList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Command_Center);
+					for (Unit center : centerList) {
+						if (center.getDistance(base.getPosition()) < 500) {
+							centerExist = true;
+							break;
+						}
+					}
+					
+					if (centerExist) {
+						List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
+						for (Unit mine : nearMineList) {
+							if (mineRemoveMap.get(mine.getID()) == null) {
+								mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND));
+							}
+						}
+					}
+				}
+				
 				mineInNextExpansionFrame = TimeUtils.elapsedFrames();
 			}
-			
+
+			// 급해서 본진에 박은 마인 제거
 			if (LagObserver.groupsize() <= 10) {
 				if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
 					if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
@@ -293,9 +314,9 @@ public class SpiderMineManger {
 				if (vulture.getDistance(InfoUtils.enemyFirstExpansion()) < 800 || vulture.getDistance(InfoUtils.enemyThirdRegion()) < 500) {
 					defaultMineNumber = false;
 					mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition * 3, 10);
-				} else if (vulture.getDistance(InfoUtils.myThirdRegion()) < 500) {
+				} else if (vulture.getDistance(InfoUtils.myThirdRegion()) < 800) {
 					defaultMineNumber = false;
-					mineNumberPerPosition = Math.max(StrategyIdea.spiderMineNumberPerPosition, 1);
+					mineNumberPerPosition = 0; //Math.max(StrategyIdea.spiderMineNumberPerPosition, 1);
 				}
 			}
 			

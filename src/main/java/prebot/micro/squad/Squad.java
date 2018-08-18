@@ -39,8 +39,8 @@ public abstract class Squad {
 		this.squadName = squadInfo.squadName + targetPosition.toString();
 	}
 
-	public Squad(SquadInfo squadInfo, int unitID) {
-		this.squadName = squadInfo.squadName + unitID;
+	public Squad(SquadInfo squadInfo, Unit unit) {
+		this.squadName = squadInfo.squadName + unit.getID();
 	}
 	
 	public void setUnitType(UnitType... unitTypes) {
@@ -110,7 +110,7 @@ public abstract class Squad {
 					continue;
 				}
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
-			}	
+			}
 		} else {
 			for (Unit unit : unitList) {
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());

@@ -7,7 +7,7 @@ public class StrategyConfig {
 	public static final int APPROX_DISTANCE_320 = 320;
 	
 	public static final int SCAN_DURATION = 240; // approximate time that a comsat scan provides vision
-	public static final int IGNORE_ENEMY_UNITINFO_SECONDS = 15;
+	public static final int IGNORE_ENEMY_UNITINFO_SECONDS = 12;
 	public static final int IGNORE_ENEMY_SIEGE_TANK_SECONDS = 300;
 	
 	// 기본 전략
