@@ -12,6 +12,13 @@ import prebot.common.main.Prebot;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
+import prebot.macro.scorecalculator.GoliathScoreCalculator;
+import prebot.macro.scorecalculator.ScienceVesselScoreCalculator;
+import prebot.macro.scorecalculator.ScoreCalculator;
+import prebot.macro.scorecalculator.TankScoreCalculator;
+import prebot.macro.scorecalculator.ValkyrieScoreCalculator;
+import prebot.macro.scorecalculator.VultureScoreCalculator;
+import prebot.macro.scorecalculator.WraithScoreCalculator;
 import prebot.macro.util.EnemyUnitCounter;
 import prebot.macro.util.MutableFloat;
 import prebot.macro.util.UnitTypeList;
@@ -108,20 +115,30 @@ public class AttackDecisionMaker extends GameManager {
 
     private int calculateMyForce() {
 
-        int point=0;
+    	float point=0;
 
-        int vulture = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-        int tank = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-        int valkyrie = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie);
-        int goliath = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Goliath);
-
-        point += vulture * scoreBoard.getPoint(UnitType.Terran_Vulture);
-        point += tank * scoreBoard.getPoint(UnitType.Terran_Siege_Tank_Tank_Mode);
-        point += valkyrie * scoreBoard.getPoint(UnitType.Terran_Valkyrie);
-        point += goliath * scoreBoard.getPoint(UnitType.Terran_Goliath);
+        List<ScoreCalculator> scoreCalculatorList = new ArrayList<>();
+        
+        ScoreCalculator vultureScoreCalculator = new VultureScoreCalculator(scoreBoard, UnitType.Terran_Vulture);
+        ScoreCalculator tankScoreCalculator = new TankScoreCalculator(scoreBoard, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+        ScoreCalculator valkyrieScoreCalculator = new ValkyrieScoreCalculator(scoreBoard, UnitType.Terran_Valkyrie);
+        ScoreCalculator goliathScoreCalculator = new GoliathScoreCalculator(scoreBoard, UnitType.Terran_Goliath);
+        ScoreCalculator wraithScoreCalculator = new WraithScoreCalculator(scoreBoard, UnitType.Terran_Wraith);
+        ScoreCalculator scienceVesselScoreCalculator = new ScienceVesselScoreCalculator(scoreBoard, UnitType.Terran_Science_Vessel);
+        
+        scoreCalculatorList.add(vultureScoreCalculator);
+        scoreCalculatorList.add(tankScoreCalculator);
+        scoreCalculatorList.add(valkyrieScoreCalculator);
+        scoreCalculatorList.add(goliathScoreCalculator);
+        scoreCalculatorList.add(wraithScoreCalculator);
+        scoreCalculatorList.add(scienceVesselScoreCalculator);
+        
+        for(ScoreCalculator scoreCalculator : scoreCalculatorList) {
+        	point += scoreCalculator.getPoint();
+        }
         
         tempMypoint=0;
-        return tempMypoint=point;
+        return tempMypoint=(int) point;
         //내 유닛 수치화
     }
 
@@ -129,8 +146,9 @@ public class AttackDecisionMaker extends GameManager {
 
         int point=0;
 
-        if(Prebot.Broodwar.getFrameCount() % 500 ==0)
-        System.out.println(predictedTotalEnemyAttackUnit);
+        if(Prebot.Broodwar.getFrameCount() % 500 ==0) {
+//        System.out.println(predictedTotalEnemyAttackUnit);
+        }
         for (Map.Entry<UnitType, MutableFloat> enemyUnit : predictedTotalEnemyAttackUnit.entrySet()){
             point += (enemyUnit.getValue().get() * scoreBoard.getPoint(enemyUnit.getKey()));
         }
@@ -140,12 +158,20 @@ public class AttackDecisionMaker extends GameManager {
 
     private Decision makeDecision(int myForcePoint, int enemyForcePoint) {
 
-        //상대가 다크나, 마인이 있는데 공격 판단하면 안된다. 어덯게 할지?
-        if(myForcePoint > enemyForcePoint){
-            return Decision.FULL_ATTACK;
-        }else{
-            return Decision.DEFENCE;
-        }
+    	//상대가 다크나, 마인이 있는데 공격 판단하면 안된다. 어덯게 할지?
+    	
+    	if(myForcePoint > 1200) {
+	        if(myForcePoint > enemyForcePoint){
+	        	if(decision == Decision.DEFENCE) {
+	        		Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
+	        	}
+	            return Decision.FULL_ATTACK;
+	        }
+    	}
+    	if(decision == Decision.FULL_ATTACK) {
+    		Prebot.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
+    	}
+        return Decision.DEFENCE;
     }
 
     private void predictEnemyUnitZerg() {
@@ -188,7 +214,6 @@ public class AttackDecisionMaker extends GameManager {
             enemyUnitCounter.add(UnitType.Zerg_Hydralisk, 2);
             enemyUnitCounter.add(UnitType.Zerg_Lurker, 1);
             enemyUnitCounter.add(UnitType.Zerg_Mutalisk, 1);
-            //System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
         }
 
         analyzeSet(enemyUnitCounter);
@@ -254,7 +279,6 @@ public class AttackDecisionMaker extends GameManager {
         	enemyUnitCounter.add(UnitType.Terran_Siege_Tank_Tank_Mode, 5);
             enemyUnitCounter.add(UnitType.Terran_Goliath, 1);
             enemyUnitCounter.add(UnitType.Terran_Wraith, 1);
-            //System.out.println("this should not happen@@@@@@@@@@@@@@@@@@");
         }
 
 //        if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
@@ -366,14 +390,16 @@ public class AttackDecisionMaker extends GameManager {
             int unitCount = UnitCache.getCurrentCache().enemyAllCount(enemyUnitType);
             int killedUnitCount = Prebot.Broodwar.self().killedUnitCount(enemyUnitType);
 
-            if(!enemyUnitType.isBuilding() && !enemyUnitType.isWorker() && enemyUnitType != UnitType.Zerg_Overlord && unitCount>0) {
+            if(!enemyUnitType.isBuilding() && !enemyUnitType.isWorker() && unitCount>0) {
 
-                MutableFloat count = predictedTotalEnemyAttackUnit.get(enemyUnitType);
-                if (count == null) {
-                    predictedTotalEnemyAttackUnit.put(enemyUnitType, new MutableFloat(unitCount));
-                }else {
-                    count.increment(unitCount);
-                }
+            	if(enemyUnitType.canAttack()) {
+	                MutableFloat count = predictedTotalEnemyAttackUnit.get(enemyUnitType);
+	                if (count == null) {
+	                    predictedTotalEnemyAttackUnit.put(enemyUnitType, new MutableFloat(unitCount));
+	                }else {
+	                    count.increment(unitCount);
+	                }
+            	}
             }
 
             killedUnitCount += unitCount;
@@ -442,7 +468,7 @@ public class AttackDecisionMaker extends GameManager {
             }else {
             	if(Prebot.Broodwar.getFrameCount() % 1000 ==0)
             	if(killedUnitCount > 0 ) {
-            		System.out.println(enemyUnitType +": " + killedUnitCount);
+//            		System.out.println(enemyUnitType +": " + killedUnitCount);
             	}
             	
 	            enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()*killedUnitCount;
@@ -460,13 +486,13 @@ public class AttackDecisionMaker extends GameManager {
         	enemyGasToCalculateCombatUnit = 0;
         }
         
-        UXMineralToPredict=enemyMineralToCalculateCombatUnit;
-        UXGasToPredict=enemyGasToCalculateCombatUnit;
+        UXMineralToPredict=(int) (enemyMineralToCalculateCombatUnit*0.75);
+        UXGasToPredict=(int) (enemyGasToCalculateCombatUnit*0.75);
         
         
         
-        enemyMineralToPredict = enemyMineralToCalculateCombatUnit;
-        enemyGasToPredict = enemyGasToCalculateCombatUnit;
+        enemyMineralToPredict = (int) (enemyMineralToCalculateCombatUnit*0.75);
+        enemyGasToPredict = (int) (enemyGasToCalculateCombatUnit*0.75);
     }
 
 
@@ -549,6 +575,7 @@ public class AttackDecisionMaker extends GameManager {
                 	
                 	BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
                     
+                	if(enemyBaseLocation !=null)
                 	isMainBase = PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition());
                     
                 	selectedUnitInfo = unitInfo;
