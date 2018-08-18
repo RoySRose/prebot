@@ -67,11 +67,11 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int max_turret = 1;
 		
-		if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DARK_DROP
-			|| StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK
-			 || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_ROBOTICS_REAVER) {
-			add_turret = 1;
-		}
+//		if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DARK_DROP
+//			|| StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK
+//			 || StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_ROBOTICS_REAVER) {
+//			add_turret = 1;
+//		}
 		
 //		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Protoss_Dark_Templar)||UnitUtils.enemyCompleteUnitDiscovered(UnitType.Protoss_Shuttle)) {
 //			max_turret = 2;
@@ -80,8 +80,9 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		
 		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Mutalisk)
-			||UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Spire)) {
-			max_turret = 3;
+			||UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Spire)) {
+//			max_turret = 2;
+			add_turret = 1;
 		}
 		
 		
@@ -92,11 +93,12 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		Chokepoint myFirstChoke = InfoUtils.myFirstChoke();
 		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
 
-		int turretCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
+//		int turretCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
+		int turretCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret);
 
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
-		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, max_turret+add_turret+1)) {
+		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, 2+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());
@@ -125,7 +127,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 //		Position betweenChoke = new Position((firstChokeMainHalf.getX() * 3 + mySecondChoke.getX() * 4) / 7,
 //				(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
 
-		if (noTurretNearPosition(betweenChoke, 120, 120, turretCount, max_turret)) {
+		if (noTurretNearPosition(betweenChoke, 120, 120, turretCount, 1+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(betweenChoke.toTilePosition());
@@ -135,7 +137,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		Position firstChokeExpHalf = new Position((myFirstExpansion.getPosition().getX() * 2 + myFirstChoke.getX()) / 3,
 				(myFirstExpansion.getPosition().getY() * 2 + myFirstChoke.getY()) / 3);
 		
-		if (noTurretNearPosition(firstChokeExpHalf, 150, 100, turretCount, max_turret)) {
+		if (noTurretNearPosition(firstChokeExpHalf, 150, 100, turretCount, 1+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(firstChokeExpHalf.toTilePosition());
@@ -147,7 +149,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		// TODO COMPLETE, ALL 테스트에 따른 변경여부 결정
 		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1) {
-			if (noTurretNearPosition(mySecondChoke.getCenter(), 150, 100, turretCount, max_turret)) {
+			if (noTurretNearPosition(mySecondChoke.getCenter(), 150, 100, turretCount, 1+add_turret)) {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(mySecondChoke.getCenter().toTilePosition());
@@ -160,7 +162,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		if(commandCenters.size() > 1) {
 			for (Unit commandCenter : commandCenters) {
 				if (validMineralCountNearDepot(commandCenter) > 6) {
-					if (noTurretNearPosition(commandCenter.getPosition(), 350, 300, turretCount, max_turret+add_turret)) {
+					if (noTurretNearPosition(commandCenter.getPosition(), 350, 300, turretCount, 1+add_turret)) {
 						setHighPriority(true);
 						setBlocking(true);
 						setTilePosition(commandCenter.getPosition().toTilePosition());
@@ -251,7 +253,8 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 
 		int buildQueueCountNear = BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
-		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
+//		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
+		int constructionCountNear = 0;
 		return buildQueueCountNear + constructionCountNear == 0;
 	}
 	
