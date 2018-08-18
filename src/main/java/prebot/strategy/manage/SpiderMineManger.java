@@ -15,6 +15,7 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.LagObserver;
+import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
@@ -56,6 +57,7 @@ public class SpiderMineManger {
 	
 	private boolean initialized = false;
 	private boolean secondInitialized = false;
+	private int mineInNextExpansionFrame = CommonCode.UNKNOWN;
 	
 	private SpiderMineManger() {}
 	
