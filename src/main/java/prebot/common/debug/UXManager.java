@@ -29,7 +29,6 @@ import bwta.Chokepoint;
 import bwta.Polygon;
 import bwta.Region;
 import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
@@ -1041,7 +1040,7 @@ public class UXManager {
 	/// BuildOrderQueue 를 Screen 에 표시합니다
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
 		char initialFinishedColor;
-		AdaptStrategyStatus adaptStrategyStatus = InitialBuildProvider.Instance().getAdaptStrategyStatus();
+		InitialBuildProvider.AdaptStrategyStatus adaptStrategyStatus = InitialBuildProvider.Instance().getAdaptStrategyStatus();
 		if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.COMPLETE) {
 			initialFinishedColor = UxColor.CHAR_WHITE;
 		} else if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.PROGRESSING) {

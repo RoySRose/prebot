@@ -15,8 +15,6 @@ import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Common;
-import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.targeting.TargetPriority;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -60,13 +58,13 @@ public class MicroDecisionMakerPrebot1 {
 					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode) {
 						if (saveUnitLevel <= 1 && mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode && mechanicUnit.canSiege()) {
 							if (MicroUtils.exposedByEnemy(mechanicUnit, flyingEnemiesInfo)) { // 적에게 노출되는 포지션이면 안전거리를 잰다.
-								safeDistance += (Common.BACKOFF_DIST_SIEGE_TANK * 2 / 3);
+								safeDistance += (MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK * 2 / 3);
 							} else { // 공격 사정거리를 재어 들어간다.
 								safeDistance = MicroConfig.Tank.SIEGE_MODE_SIGHT + 30; // 320 + 30
 							}
 
 						} else {
-							safeDistance += Common.BACKOFF_DIST_SIEGE_TANK;
+							safeDistance += MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK;
 							if (mechanicUnit.getType() != UnitType.Terran_Siege_Tank_Tank_Mode) {
 								safeDistance += 50;
 							}
@@ -75,15 +73,15 @@ public class MicroDecisionMakerPrebot1 {
 					} else if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Bunker) {
 						// 탱크는 시즈각을 재야하기 때문에 후퇴하면 안됨
 						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-							safeDistance += (Common.BACKOFF_DIST_DEF_TOWER / 3);
+							safeDistance += (MicroConfig.Common.BACKOFF_DIST_DEF_TOWER / 3);
 						} else {
-							safeDistance += Common.BACKOFF_DIST_DEF_TOWER;
+							safeDistance += MicroConfig.Common.BACKOFF_DIST_DEF_TOWER;
 						}
 					} else {
 						if (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-							safeDistance += (Common.BACKOFF_DIST_RANGE_ENEMY * 2 / 3);
+							safeDistance += (MicroConfig.Common.BACKOFF_DIST_RANGE_ENEMY * 2 / 3);
 						} else {
-							safeDistance += Common.BACKOFF_DIST_RANGE_ENEMY;
+							safeDistance += MicroConfig.Common.BACKOFF_DIST_RANGE_ENEMY;
 						}
 					}
 

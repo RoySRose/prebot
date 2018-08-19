@@ -151,7 +151,7 @@ public class SpiderMineManger {
 		StrategyIdea.watcherMinePositionLevel = mLevel;
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
 		StrategyIdea.spiderMineNumberPerGoodPosition = vultureCount < 15 ? 1 : 2;
-		int checkerCount = Math.min(vultureCount / 8, Vulture.CHECKER_MAX_COUNT);
+		int checkerCount = Math.min(vultureCount / 8, MicroConfig.Vulture.CHECKER_MAX_COUNT);
 		if (UnitUtils.getUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Wraith) >= 5 && checkerCount == 0) {
 			checkerCount = 1;
 		}

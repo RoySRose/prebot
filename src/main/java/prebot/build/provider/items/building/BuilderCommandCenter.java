@@ -213,7 +213,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	
 
 	private void setCommandCenterBlockAndSeedPosition() {
-		SeedPositionStrategy seedPosition = null;
+		BuildOrderItem.SeedPositionStrategy seedPosition = null;
 
 		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
     	if (allCommandCenterCount <= 1) {

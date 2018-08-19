@@ -10,7 +10,6 @@ import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
 import prebot.common.constant.CommonConfig;
-import prebot.common.constant.CommonConfig.Config;
 import prebot.common.debug.BigWatch;
 import prebot.common.debug.UXManager;
 
@@ -36,11 +35,11 @@ public class Prebot extends DefaultBWListener {
 		if (Broodwar.isReplay()) {
 			return;
 		}
-		if(Config.EnableCompleteMapInformation){
+		if(CommonConfig.Config.EnableCompleteMapInformation){
 			Broodwar.enableFlag(Enum.CompleteMapInformation.getValue());
 		}
 
-		if(Config.EnableUserInput){
+		if(CommonConfig.Config.EnableUserInput){
 			Broodwar.enableFlag(Enum.UserInput.getValue());
 		}
 		Broodwar.setCommandOptimizationLevel(1);
