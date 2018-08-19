@@ -16,9 +16,8 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
 import prebot.micro.MicroDecisionMaker;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.Control;
 import prebot.micro.targeting.WraithTargetCalculator;
 import prebot.strategy.StrategyIdea;
@@ -87,7 +86,7 @@ public class AirForceControl extends Control {
 
 					// apply airforce decision
 					Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
-					Position airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+					Position airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, MicroConfig.Angles.AIR_FORCE_FREE);
 					airForceTeam.leaderOrderPosition = airDrivingPosition;
 				}
 			}
@@ -195,12 +194,12 @@ public class AirForceControl extends Control {
 				if (decisionDetail.type == MicroDecision.MicroDecisionType.KITING_UNIT) { // 카이팅 후퇴
 					if (AirForceManager.Instance().isAirForceDefenseMode()) {
 						Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
-						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, MicroConfig.Angles.AIR_FORCE_FREE);
 						
 					} else {
 						// airDrivingPosition = airDrivingPosition(airForceTeam, AirForceManager.Instance().getRetreatPosition(), airForceTeam.driveAngle); // kiting flee
 						Position airFleePosition = airFeePosition(airForceTeam, decision.eui);
-						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
+						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, MicroConfig.Angles.AIR_FORCE_FREE);
 					}
 					
 				} else {

@@ -79,7 +79,7 @@ public class ScoutDefenseSquad extends Squad {
 	@Override
 	public void execute() {
 		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(StrategyIdea.campPosition, false, MicroConfig.Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
 		for (Unit unit : unitList) {

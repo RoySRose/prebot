@@ -207,7 +207,7 @@ public class ComsatControl extends Control {
 				for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
 					
 					Position scanPosotion = islands.getPosition();
-					GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+					MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
 					if (cell == null) {
 						continue;
 					}
@@ -232,7 +232,7 @@ public class ComsatControl extends Control {
 				continue;
 			}
 			Position scanPosotion = scanTilePosition.toPosition();
-			GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+			MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
 			
 			
 			int lastScanTime = TimeUtils.elapsedFrames(cell.getTimeLastScan());

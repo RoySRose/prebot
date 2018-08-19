@@ -13,7 +13,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
 import prebot.micro.WorkerData;
-import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.GundamControl;
@@ -54,7 +53,7 @@ public class EarlyDefenseSquad extends Squad {
 			if (unit.getType() == UnitType.Terran_Marine && unit.isCompleted()) {
 				marineList.add(unit);
 			} else if (unit.getType() == UnitType.Terran_SCV 
-					&& WorkerManager.Instance().getWorkerData().getWorkerJob(unit) != WorkerJob.Scout) {
+					&& WorkerManager.Instance().getWorkerData().getWorkerJob(unit) != WorkerData.WorkerJob.Scout) {
 				scvList.add(unit);
 			}
 		}

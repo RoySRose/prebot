@@ -38,7 +38,7 @@ public class GoliathControl extends Control {
 		}
 		
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, MicroConfig.Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 		
 		int coverRadius = StrategyIdea.mainSquadCoverRadius * 3 / 5;

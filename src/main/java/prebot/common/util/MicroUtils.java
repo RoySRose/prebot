@@ -19,12 +19,8 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
 import prebot.micro.MirrorBugFixed;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Angles;
-import prebot.micro.constant.MicroConfig.Flee;
-import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
@@ -50,7 +46,7 @@ public class MicroUtils {
 		double fleeRadian = oppositeDirectionRadian(startPosition, targetPosition);
 		int riskRadius = getRiskRadius(UnitType.Terran_Wraith);
 //		for (int moveDistance = WRAITH_MOVE_DISTANCE_48_FRAMES; moveDistance > 10; moveDistance = (int) (moveDistance * 0.7)) {
-		return airLowestRiskPosition(startPosition, Angles.AIR_FORCE_FREE, fleeRadian, WRAITH_MOVE_DISTANCE_24_FRAMES * 2, riskRadius);
+		return airLowestRiskPosition(startPosition, MicroConfig.Angles.AIR_FORCE_FREE, fleeRadian, WRAITH_MOVE_DISTANCE_24_FRAMES * 2, riskRadius);
 	}
 	
 	private static Position airLowestRiskPosition(Position startPosition, int[] angles, double standRadian, int moveDistance, int riskRadius) {
@@ -123,7 +119,7 @@ public class MicroUtils {
 		// 목표지점까지의 세부각도를 찾는다.
 		double realMoveRadian = minimumDistanceRadian;
 		double adjustedRadian = 0.0d;
-		for (int angle : Angles.AIR_FORCE_DRIVE_DETAIL) {
+		for (int angle : MicroConfig.Angles.AIR_FORCE_DRIVE_DETAIL) {
 			adjustedRadian = rotate(minimumDistanceRadian, angle);
 			candiPosition = getMovePosition(startPosition, adjustedRadian, WRAITH_MOVE_DISTANCE_12_FRAMES);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
@@ -208,7 +204,7 @@ public class MicroUtils {
 		
 		double minimumDistance = CommonCode.DOUBLE_MAX;
 		
-		for (int angle : Angles.AIR_FORCE_DRIVE) {
+		for (int angle : MicroConfig.Angles.AIR_FORCE_DRIVE) {
 			moveRadian = rotate(radianToMovePosition, angle);
 			candiPosition = getMovePosition(startPosition, moveRadian, WRAITH_MOVE_DISTANCE_48_FRAMES);
 			if (!PositionUtils.isValidPosition(candiPosition)) {
@@ -258,10 +254,10 @@ public class MicroUtils {
 		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
 			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
-			kOption.fOption.angles = Angles.WIDE;
+			kOption.fOption.angles = MicroConfig.Angles.WIDE;
 		} else if (groundUnitFreeKiting(rangedUnit)) {
 			kOption.fOption.united = false;
-			kOption.fOption.angles = Angles.WIDE;
+			kOption.fOption.angles = MicroConfig.Angles.WIDE;
 		}
 		if (!targetUnit.isDetected()) {
 			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
@@ -318,7 +314,7 @@ public class MicroUtils {
 		//if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
 			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
-			kOption.fOption.angles = Angles.WIDE;
+			kOption.fOption.angles = MicroConfig.Angles.WIDE;
 		//} 		
 		if (timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack)) {
 			CommandUtils.attackUnit(rangedUnit, targetUnit);
@@ -329,7 +325,7 @@ public class MicroUtils {
 	}
 	
 	
-	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, CoolTimeAttack cooltimeAttack) {
+	private static boolean timeToAttack(Unit rangedUnit, Unit targetUnit, KitingOption.CoolTimeAttack cooltimeAttack) {
 
 		// attackUnit, target 각각의 지상/공중 무기를 선택
 		WeaponType attackUnitWeapon = targetUnit.isFlying() ? rangedUnit.getType().airWeapon() : rangedUnit.getType().groundWeapon();

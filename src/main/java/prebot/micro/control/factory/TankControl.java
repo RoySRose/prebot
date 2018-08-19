@@ -164,7 +164,7 @@ public class TankControl extends Control {
 
 	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(StrategyIdea.campPositionSiege, false, Angles.NARROW);
+		FleeOption fOption = new FleeOption(StrategyIdea.campPositionSiege, false, MicroConfig.Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit tank : tankModeList) {
@@ -278,7 +278,7 @@ public class TankControl extends Control {
 				return true;
 			} else if (saveUnitLevel == 1 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_SIGHT + 80.0) {
 				return true;
-			} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK + 10) {
+			} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK + 10) {
 				return true;
 			}
 			

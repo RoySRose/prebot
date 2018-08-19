@@ -541,7 +541,7 @@ public class RespondToStrategy {
 //   						}
 //					}
 // 					
-// 					if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.THE_HUNTERS){
+// 					if(InformationManager.Instance().getMapSpecificInformation().getMap() != MapSpecificInformation.GameMap.THE_HUNTERS){
 //						if (tempChokePoint != null) {
 //							List<Unit> turretInRegion = Prebot.Broodwar.getUnitsInRadius(tempChokePoint.getCenter(),150+turretcnt*15);
 ////							MyBotModule.Broodwar.drawCircleMap(tempChokePoint.getCenter(),150+turretcnt*15, Color.Blue);

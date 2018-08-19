@@ -21,7 +21,6 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
-import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 건설위치 탐색을 위한 class
 public class ConstructionPlaceFinder {
@@ -1539,7 +1538,7 @@ public class ConstructionPlaceFinder {
 		
 //		System.out.println("setTilesToAvoidSupply start()");
 		
-		if(InformationManager.Instance().getMapSpecificInformation().getMap() != GameMap.UNKNOWN) {
+		if(InformationManager.Instance().getMapSpecificInformation().getMap() != MapSpecificInformation.GameMap.UNKNOWN) {
 			
 //			System.out.println("setTilesToAvoidSupply map is not UNKNOWN");
 			

@@ -11,18 +11,15 @@ import bwta.Region;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
-import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
-import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecisionMakerPrebot1;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.SpiderMineManger;
-import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class VultureControl extends Control {
@@ -35,7 +32,7 @@ public class VultureControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, MicroConfig.Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 		
 		for (Unit unit : unitList) {

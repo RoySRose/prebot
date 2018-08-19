@@ -22,7 +22,7 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.predictor.WraithFightPredictor;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -345,9 +345,9 @@ public class AirForceManager {
 		
 		int[] angles;
 		if (!PositionFinder.Instance().enemyBaseDestroyed(InfoUtils.enemyFirstExpansion())) {
-			angles = Angles.AIRFORCE_MINERAL_TARGET_ANGLE_1;
+			angles = MicroConfig.Angles.AIRFORCE_MINERAL_TARGET_ANGLE_1;
 		} else {
-			angles = Angles.AIRFORCE_MINERAL_TARGET_ANGLE_2;
+			angles = MicroConfig.Angles.AIRFORCE_MINERAL_TARGET_ANGLE_2;
 		}
 		
 		List<Position> positions = new ArrayList<>();

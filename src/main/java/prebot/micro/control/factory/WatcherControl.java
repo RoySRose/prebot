@@ -97,10 +97,10 @@ public class WatcherControl extends Control {
 	}
 
 	private void fight(Collection<Unit> unitList, Collection<UnitInfo> euiList, Position fleePosition, int coverRadius) {
-		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(fleePosition, false, MicroConfig.Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
-		FleeOption fOptionMainBattle = new FleeOption(fleePosition, true, Angles.WIDE);
+		FleeOption fOptionMainBattle = new FleeOption(fleePosition, true, MicroConfig.Angles.WIDE);
 		KitingOption kOptionMainBattle = new KitingOption(fOptionMainBattle, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 		
 		List<Unit> otherMechanics = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);

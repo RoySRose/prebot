@@ -1,7 +1,7 @@
 package prebot.micro;
 
 import bwapi.Position;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig;
 
 public class FleeOption {
 
@@ -16,6 +16,6 @@ public class FleeOption {
 	}
 	
 	public static FleeOption defaultOption() {
-		return new FleeOption(Position.None, true, Angles.WIDE);
+		return new FleeOption(Position.None, true, MicroConfig.Angles.WIDE);
 	}
 }

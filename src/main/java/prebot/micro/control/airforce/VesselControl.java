@@ -31,7 +31,7 @@ public class VesselControl extends Control {
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		// TODO Auto-generated method stub
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, MicroConfig.Angles.WIDE);
 
 		for (Unit vessel : unitList) {
 			if (skipControl(vessel)) {

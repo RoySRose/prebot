@@ -1,3 +1,4 @@
+
 package prebot.strategy.manage;
 
 import java.util.List;
@@ -8,8 +9,6 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
@@ -116,7 +115,7 @@ public class EnemyBaseFinder {
 		CommonCode.RegionType regionType = PositionUtils.positionToRegionType(scoutPosition);
 
 		
-		if (regionType != RegionType.MY_BASE && regionType != RegionType.MY_FIRST_EXPANSION) {
+		if (regionType != CommonCode.RegionType.MY_BASE && regionType != CommonCode.RegionType.MY_FIRST_EXPANSION) {
 //			Prebot.Broodwar.sendText("hi");
 			return null;
 		}

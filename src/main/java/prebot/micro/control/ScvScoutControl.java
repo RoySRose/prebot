@@ -23,9 +23,8 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions;
-import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.FleeOption;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 
@@ -64,7 +63,7 @@ public class ScvScoutControl extends Control {
 			scoutBaseMap.put(scoutScv.getID(), scoutBaseLocation);
 			for (UnitInfo eui : euiList) {
 				if (isCloseDangerousTarget(scoutScv, eui)) {
-					FleeOption fOption = new FleeOption(scoutBaseLocation.getPoint(), false, Angles.WIDE);
+					FleeOption fOption = new FleeOption(scoutBaseLocation.getPoint(), false, MicroConfig.Angles.WIDE);
 					MicroUtils.fleeScout(scoutScv, eui.getLastPosition(), fOption);
 					return;
 				}else{
