@@ -40,9 +40,9 @@ public class InitialBuildProvider {
 		return instance;
 	}
 	
-	private AdaptStrategyStatus adaptStrategyStatus = AdaptStrategyStatus.BEFORE;
+	private InitialBuildProvider.AdaptStrategyStatus adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.BEFORE;
 
-	public AdaptStrategyStatus getAdaptStrategyStatus() {
+	public InitialBuildProvider.AdaptStrategyStatus getAdaptStrategyStatus() {
 		return adaptStrategyStatus;
 	}
 	
@@ -93,50 +93,50 @@ public class InitialBuildProvider {
 	}
 
     public void updateInitialBuild(){
-    	if (InitialBuildProvider.Instance().getAdaptStrategyStatus() == AdaptStrategyStatus.COMPLETE) {
+    	if (InitialBuildProvider.Instance().getAdaptStrategyStatus() == InitialBuildProvider.AdaptStrategyStatus.COMPLETE) {
     		return;
     	}
     	
-		if (adaptStrategyStatus == AdaptStrategyStatus.BEFORE) {
+		if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.BEFORE) {
 			if (BuildManager.Instance().buildQueue.isEmpty()) {
 				nowStrategy = StrategyIdea.expansionOption;
 				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_STARPORT) {
 	        		new AdaptNewStrategy().adapt(nowStrategy, factoryPos, starport1, starport2);
 	        	}
-				adaptStrategyStatus = AdaptStrategyStatus.PROGRESSING;
+				adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.PROGRESSING;
 			}
 
 		
-		} else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
+		} else if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.PROGRESSING) {
         	if (nowStrategy != StrategyIdea.expansionOption) {
         		nowStrategy = StrategyIdea.expansionOption;
  
         		// 폭파하기
         		cancelConstructionAndRemoveFromBuildQueue();
         		new AdaptNewStrategy().adapt(nowStrategy, factoryPos, starport1, starport2);
-				adaptStrategyStatus = AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
+				adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
         		
         	} else {
             	if (nowStrategy == ExpansionOption.TWO_FACTORY) {
             		List<Unit> factoryList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
             		if (factoryList.size() == 2) {
-            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             	} else if (nowStrategy == ExpansionOption.TWO_STARPORT) {
             		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 2) {
-            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             	} else if (nowStrategy == ExpansionOption.ONE_STARPORT) {
             		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 1) {
-            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             		
             	} else if (nowStrategy == ExpansionOption.ONE_FACTORY) {
             		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
             		if (starportList.size() == 2) {
-            			adaptStrategyStatus = AdaptStrategyStatus.COMPLETE;
+            			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             	}
         	}

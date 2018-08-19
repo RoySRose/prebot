@@ -153,7 +153,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     public boolean checkInitialBuild(){
-		return InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.BEFORE;
+		return InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.BEFORE;
     }
 
     private final boolean supplySpaceAvailable(){
