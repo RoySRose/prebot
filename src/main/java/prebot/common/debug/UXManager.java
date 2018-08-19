@@ -265,7 +265,8 @@ public class UXManager {
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "isMainBase      : "  + enemyCommandInfo.isMainBase);
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "has gas         : "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(real)   : " + ((int)enemyCommandInfo.mineralCalculator.getFullCheckMineral()+(int)50));
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(r+p):   : " + ((int)enemyCommandInfo.uxmineral+(int)50)); Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(r+p):   : " + ((int)enemyCommandInfo.uxmineral+(int)50));
+                Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(r+p)        : " + enemyCommandInfo.gasCalculator.getGas());
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "fullWorkerFrame : " + enemyCommandInfo.fullWorkerFrame);
                 Prebot.Broodwar.drawTextScreen(x, y+=10, "halfWorkerFrame : " + enemyCommandInfo.halfWorkerFrame);

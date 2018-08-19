@@ -115,7 +115,6 @@ public class ComsatControl extends Control {
 				MapGrid.Instance().scanAtPosition(scanPositionForObservation);
 				comsatToUse.useTech(TechType.Scanner_Sweep, scanPositionForObservation);
 				scanUsedFrame = TimeUtils.elapsedFrames();
-				System.out.println("scan for search. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 			}
 		}
 		
@@ -255,7 +254,7 @@ public class ComsatControl extends Control {
 			double radian = MicroUtils.targetDirectionRadian(StrategyIdea.mainSquadLeaderPosition, StrategyIdea.totalEnemyCneterPosition);
 			Position squadFrontPosition = MicroUtils.getMovePosition(StrategyIdea.mainSquadLeaderPosition, radian, 700).makeValid();
 			
-//			if (!Prebot.Broodwar.isVisible(squadFrontPosition.toTilePosition())) {}
+//			if (!Prebot.Broodwar.isVisibleenemyCommandInfo(squadFrontPosition.toTilePosition())) {}
 			scanEnemySquadFrame = TimeUtils.elapsedFrames();
 			return squadFrontPosition;	
 		}
@@ -276,6 +275,12 @@ public class ComsatControl extends Control {
 		int earlist = CommonCode.INT_MAX;
 		
 		for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
+			
+			EnemyCommandInfo enemyCommandInfo = enemyResourceDepot.getValue();
+					 
+			if(enemyCommandInfo.mineralCalculator.getMineralCount()*1500 <= enemyCommandInfo.mineralCalculator.getFullCheckMineral()) {
+				continue;
+			}
 			
 	        int lastFullCheckFrame= enemyResourceDepot.getValue().getLastFullCheckFrame();
 	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 2500) {
