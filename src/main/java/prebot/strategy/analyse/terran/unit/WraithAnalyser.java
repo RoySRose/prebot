@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -24,25 +23,25 @@ public class WraithAnalyser extends UnitAnalyser {
 				int lastFoundFrame = lastUnitFoundFrame(found, 3);
 				int wraithInMyRegionFrame = wraithInMyRegionFrame(3);
 				if (lastFoundFrame < wraithInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_THREE_WRAITH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_THREE_WRAITH);
 				}
 			}
 			if (found.size() >= 2) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 2);
 				int wraithInMyRegionFrame = wraithInMyRegionFrame(2);
 				if (lastFoundFrame < wraithInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_TWO_WRAITH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_TWO_WRAITH);
 				}
 			} else {
 				int lastFoundFrame = lastUnitFoundFrame(found, 1);
 				int wraithInMyRegionFrame = wraithInMyRegionFrame(1);
 				if (lastFoundFrame < wraithInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_ONE_WRAITH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_ONE_WRAITH);
 				}
 			}
 			
-			if (!ClueManager.Instance().containsClueType(ClueType.FAST_WRAITH)) {
-				ClueManager.Instance().addClueInfo(ClueInfo.WRAITH_FOUND);
+			if (!ClueManager.Instance().containsClueType(Clue.ClueType.FAST_WRAITH)) {
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.WRAITH_FOUND);
 			}
 		}
 	}

@@ -4,7 +4,6 @@ import java.util.List;
 
 import bwapi.Position;
 import bwapi.Race;
-import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -14,8 +13,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
@@ -50,7 +48,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		if (!StrategyIdea.EXOK) {
 			
-//			List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
+//			List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
 			// 첫번째 터렛이 없고, 입막 터렛 위치가 지정되어있을경우
 //			noTurretNearPosition
 			if (TilePositionUtils.isValidTilePosition(BlockingEntrance.Instance().entrance_turret1)) {
@@ -203,7 +201,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 //			}
 		}
 		
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
 		if(commandCenters.size() > 1) {
 			for (Unit commandCenter : commandCenters) {
 				if(!TilePositionUtils.equals(myBase.getTilePosition(), commandCenter.getTilePosition())
@@ -228,7 +226,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int buildQueueCountNear = BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius1 + turretCount * 15);
 		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius1 + turretCount * 15);
-		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(PlayerRange.SELF, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
+		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
 		
 		if(maxTurretCnt <= buildQueueCountNear + constructionCountNear + turretNearBase.size()) {
 //			System.out.println(" there is turret quere exists :: " + maxTurretCnt + " :: " + (buildQueueCountNear + constructionCountNear));
@@ -254,7 +252,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			radiusP = 80;
 		}
 		
-		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, centerPosition, radiusP);
+		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, centerPosition, radiusP);
 		for(Unit unit : nearInvisibleUnit) {
 			if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker) {
 				if(UnitUtils.availableScanningCount() == 0) {

@@ -60,7 +60,7 @@ public class EnemyBaseFinder {
 
 	private BaseLocation expectedByBuilding() {
 		BaseLocation baseExpected = null;
-		List<UnitInfo> enemyUnits = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL);
+		List<UnitInfo> enemyUnits = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL);
 		
 		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
 		for (UnitInfo eui : enemyUnits) {
@@ -104,7 +104,7 @@ public class EnemyBaseFinder {
 			return null;
 		}
 		
-		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL
+		List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL
 				, UnitType.Protoss_Probe, UnitType.Zerg_Drone, UnitType.Terran_SCV, UnitType.Zerg_Overlord
 				, UnitType.Zerg_Zergling, UnitType.Protoss_Zealot, UnitType.Terran_Marine);
 		

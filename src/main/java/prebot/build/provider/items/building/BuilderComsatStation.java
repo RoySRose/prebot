@@ -10,7 +10,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.PlayerUtils;
@@ -41,7 +41,7 @@ public class BuilderComsatStation extends DefaultBuildableItem {
     	}
     	
     	HashSet<TilePosition> baseLocationTiles = BaseLocationUtils.getBaseLocationTileHashSet();
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandCenter : commandCenters) {
 			if (!commandCenter.canBuildAddon()) {
 				continue;

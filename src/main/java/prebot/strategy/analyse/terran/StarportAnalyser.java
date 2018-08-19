@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -32,18 +32,18 @@ public class StarportAnalyser extends UnitAnalyser {
 			int twoFacSecondFacFrame = EnemyStrategy.TERRAN_2STAR.buildTimeMap.frameOfIndex(UnitType.Terran_Starport, 1, 20);
 			
 			if (firstBuildFrame < twoFacSecondFacFrame && secondBuildFrame < twoFacSecondFacFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_FAST_TWO);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARPORT_FAST_TWO);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_TWO);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARPORT_TWO);
 			}
 		
 		} else if (found.size() == 1) { // 스타포트 1개
 			int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_2STAR.buildTimeMap.frame(UnitType.Terran_Starport, 15);
 			if (firstBuildFrame < mechanicFirstBarrackFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_FAST_ONE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARPORT_FAST_ONE);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARPORT_ONE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARPORT_ONE);
 			}
 		}
 	}

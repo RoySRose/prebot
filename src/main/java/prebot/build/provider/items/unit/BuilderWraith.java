@@ -42,7 +42,7 @@ public class BuilderWraith extends DefaultBuildableItem {
 //        if(starportUnitSelector.getSelected().equals(metaType.getUnitType())) {
 //            return true;
 //        }else{
-//		List<Unit> starport = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+//		List<Unit> starport = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 //		if (BuildConditionChecker.Instance().starportUnit.isTraining() == false && (Prebot.Broodwar.getFrameCount() - BuildConditionChecker.Instance().WraithTime > 2400 || BuildConditionChecker.Instance().wraithcnt < 1)) { // TODO && wraithcnt <= needwraith){
 //			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
 //				BuildConditionChecker.Instance().WraithTime = Prebot.Broodwar.getFrameCount();

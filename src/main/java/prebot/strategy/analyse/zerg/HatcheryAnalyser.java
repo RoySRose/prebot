@@ -5,8 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -26,7 +25,7 @@ public class HatcheryAnalyser extends UnitAnalyser {
 	}
 
 	private void analyse3Hat() {
-		if (ClueManager.Instance().containsClueInfo(ClueInfo.DOUBLE_HATCH_3HAT)) {
+		if (ClueManager.Instance().containsClueInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT)) {
 			return;
 		}
 		
@@ -43,14 +42,14 @@ public class HatcheryAnalyser extends UnitAnalyser {
 			
 			int thirdHathBuildFrame = EnemyStrategy.ZERG_3HAT.buildTimeMap.frameOfIndex(UnitType.Zerg_Hatchery, 1, 20);
 			if (latestHatchFrame < thirdHathBuildFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_3HAT);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT);
 			}
 		}
 		
 	}
 
 	private void analyseStartingHatch() {
-		if (ClueManager.Instance().containsClueType(ClueType.DOUBLE_HATCH)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.DOUBLE_HATCH)) {
 			return;
 		}
 		
@@ -63,26 +62,26 @@ public class HatcheryAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			
 			if (buildFrame < doubleFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_12HAT);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_12HAT);
 			} else if (buildFrame < overPoolFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_OVERPOOL);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_OVERPOOL);
 			} else if (buildFrame < nineDroneFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_9DRONE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_9DRONE);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_LATE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_LATE);
 			}
 			
 		} else {
 			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
 			if (expansionLastCheckFrame > nineDroneFrame) { // 더블 타이밍 지남
-				ClueManager.Instance().addClueInfo(ClueInfo.DOUBLE_HATCH_LATE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.DOUBLE_HATCH_LATE);
 			}
 
 			found = found(RegionType.ENEMY_BASE);
 			if (found.size() >= 2) {
 				int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				if (buildFrame < nineDroneFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.TWIN_HATCH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.TWIN_HATCH);
 				}
 			}
 		}

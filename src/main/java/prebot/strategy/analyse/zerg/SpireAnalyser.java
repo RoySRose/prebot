@@ -5,8 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
@@ -19,7 +18,7 @@ public class SpireAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		if (ClueManager.Instance().containsClueType(ClueType.SPIRE)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.SPIRE)) {
 			return;
 		}
 		
@@ -28,9 +27,9 @@ public class SpireAnalyser extends UnitAnalyser {
 			int lairBuildFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			if (buildFrame < lairBuildFrame + UnitType.Zerg_Lair.buildTime() + 25 * TimeUtils.SECOND) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SPIRE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_SPIRE);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.SPIRE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.SPIRE);
 			}
 		}
 	}

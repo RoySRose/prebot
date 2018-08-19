@@ -22,6 +22,6 @@ public class KitingOption {
 	}
 	
 	public static KitingOption defaultOption() {
-		return new KitingOption(FleeOption.defaultOption(), CoolTimeAttack.COOLTIME_ALWAYS);
+		return new KitingOption(FleeOption.defaultOption(), KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 	}
 }

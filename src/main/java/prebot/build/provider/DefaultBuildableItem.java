@@ -6,13 +6,11 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 //import prebot.common.util.UnitUtils;
 import prebot.common.util.UnitUtils;
 
@@ -166,7 +164,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     	if (!metaType.isUnit() || metaType.getUnitType().isBuilding()) {
     		return true;
     	}
-        List<Unit> producerList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, producerOfUnit);
+        List<Unit> producerList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, producerOfUnit);
 		for (Unit producer : producerList) {
 			if (!producer.isTraining() && !producer.isConstructing() && !producer.isResearching() && !producer.isUpgrading()) {
                 return true;

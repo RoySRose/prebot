@@ -6,7 +6,7 @@ import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
@@ -35,7 +35,7 @@ public class HydraliskAnalyser extends UnitAnalyser {
 				int fiveHydraliskInMyRegionFrame = hydradenExpect + UnitType.Zerg_Hydralisk_Den.buildTime()
 					+ UnitType.Zerg_Hydralisk.buildTime() * 5 + baseToBaseFrame(UnitType.Zerg_Hydralisk) + 30 * TimeUtils.SECOND;
 				if (lastUnitFoundFrame < fiveHydraliskInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FIVE_MANY_HYDRA);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FIVE_MANY_HYDRA);
 				}
 				
 			} else if (found.size() >= 3) {
@@ -43,14 +43,14 @@ public class HydraliskAnalyser extends UnitAnalyser {
 				int threeHydraliskInMyRegionFrame = hydradenExpect + UnitType.Zerg_Hydralisk_Den.buildTime()
 					+ UnitType.Zerg_Hydralisk.buildTime() + baseToBaseFrame(UnitType.Zerg_Hydralisk) + 30 * TimeUtils.SECOND;
 				if (lastUnitFoundFrame < threeHydraliskInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.THREE_MANY_HYDRA);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.THREE_MANY_HYDRA);
 				}
 			} else {
 				int lastUnitFoundFrame = lastUnitFoundFrame(found, found.size());
 				int hydraliskInMyRegionFrame = hydradenExpect + UnitType.Zerg_Hydralisk_Den.buildTime()
 					+ UnitType.Zerg_Hydralisk.buildTime() + baseToBaseFrame(UnitType.Zerg_Hydralisk) + 15 * TimeUtils.SECOND;
 				if (lastUnitFoundFrame < hydraliskInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_HYDRA);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_HYDRA);
 				}
 			}
 		}

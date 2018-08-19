@@ -55,7 +55,7 @@ import prebot.macro.EnemyCommandInfo;
 import prebot.macro.EnemyMineral;
 import prebot.macro.util.MutableFloat;
 import prebot.micro.CombatManager;
-import prebot.micro.Decision;
+import prebot.micro.MicroDecision;
 import prebot.micro.Minerals;
 import prebot.micro.WorkerData;
 import prebot.micro.WorkerManager;
@@ -105,7 +105,7 @@ public class UXManager {
 	
 	private UnitType factorySelected = UnitType.None;
 	
-	private Map<Integer, Decision> decisionListForUx = new HashMap<>();
+	private Map<Integer, MicroDecision> decisionListForUx = new HashMap<>();
 	private static UXManager instance = new UXManager();
 	
 	/// static singleton 객체를 리턴합니다
@@ -297,7 +297,7 @@ public class UXManager {
 	private void drawDecision() {
 		for (Integer unitId : decisionListForUx.keySet()) {
 			Unit unit = Prebot.Broodwar.getUnit(unitId);
-			Decision decision = decisionListForUx.get(unitId);
+			MicroDecision decision = decisionListForUx.get(unitId);
 			Prebot.Broodwar.drawTextMap(unit.getPosition(), UxColor.CHAR_YELLOW + decision.toString());
 			if (decision.eui != null) {
 				Prebot.Broodwar.drawLineMap(unit.getPosition(), decision.eui.getLastPosition(), Color.Yellow);
@@ -305,7 +305,7 @@ public class UXManager {
 		}
 	}
 	
-	public void addDecisionListForUx(Unit unit, Decision decision) {
+	public void addDecisionListForUx(Unit unit, MicroDecision decision) {
 		decisionListForUx.put(unit.getID(), decision);
 	}
 	
@@ -414,9 +414,9 @@ public class UXManager {
 		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + history);
 		y += 11;
 		
-		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Vulture);
-		int tankCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
+		int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Vulture);
+		int tankCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		int goliathCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Goliath);
 		
 		UnitType selected = BuildQueueProvider.Instance().getFactoryUnitSelector().getSelected();
 		if (selected != UnitType.None) {
@@ -429,11 +429,11 @@ public class UXManager {
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount + " / " + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
 		y += 11;
 		
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Valkyrie Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount + " / " + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie));
+		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie));
 		y += 11;
 
 		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
@@ -1603,7 +1603,7 @@ public class UXManager {
 		
 		y += 15;
 		Prebot.Broodwar.drawTextScreen(x, y, "" + "*" + "SCV");
-		Prebot.Broodwar.drawTextScreen(x +120, y, "" + UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_SCV));
+		Prebot.Broodwar.drawTextScreen(x +120, y, "" + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV));
 		y += 10;
 		for (Squad squad : CombatManager.Instance().squadData.getSquadMap().values()) {
 			Color squadColor = UxColor.SQUAD_COLOR.get(squad.getClass());
@@ -1745,7 +1745,7 @@ public class UXManager {
 	}
 	
 	private void drawEnemyAirDefenseRange() {
-		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
+		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
 		for (UnitInfo eui : airDefenseEuiList) {
 			if (eui.getType() == UnitType.Terran_Bunker) {
 				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96, Color.White);
@@ -1753,7 +1753,7 @@ public class UXManager {
 				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
 			}
 		}
-		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());
+		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());
 		for (UnitInfo eui : wraithKillerEuiList) {
 			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.Grey);
 		}
@@ -1901,7 +1901,7 @@ public class UXManager {
 	private void drawCCtoScvCount() {
 		
 		int y = 100;
-		for (Unit depot : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+		for (Unit depot : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			// update workerData with the new job
 			Prebot.Broodwar.drawTextScreen(500 , y,"depot.getID() : " + depot.getID() +  " cnt : " + WorkerData.depotWorkerCount.get(depot.getID()) );
 			y += 10;

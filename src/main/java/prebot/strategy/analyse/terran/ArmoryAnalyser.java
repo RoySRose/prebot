@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,7 +21,7 @@ public class ArmoryAnalyser extends UnitAnalyser {
 	}
 
 	private void fastArmory() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_ARMORY)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_ARMORY)) {
 			return;
 		}
 		
@@ -35,9 +34,9 @@ public class ArmoryAnalyser extends UnitAnalyser {
 		int armoryFrame = EnemyStrategy.TERRAN_1FAC_DOUBLE_ARMORY.buildTimeMap.frame(UnitType.Terran_Armory, 10);
 		
 		if (buildFrame < armoryFrame) {
-			ClueManager.Instance().addClueInfo(ClueInfo.ACADEMY_FAST);
+			ClueManager.Instance().addClueInfo(Clue.ClueInfo.ACADEMY_FAST);
 		} else {
-			ClueManager.Instance().addClueInfo(ClueInfo.ACADEMY_FOUND);
+			ClueManager.Instance().addClueInfo(Clue.ClueInfo.ACADEMY_FOUND);
 		}
 	}
 }

@@ -25,18 +25,18 @@ import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.AirForceManager.StrikeLevel;
 import prebot.strategy.manage.AirForceTeam;
 
-public class DecisionMaker {
+public class MicroDecisionMaker {
 	
 	private static final int BACKOFF_DIST = 64;
 	private static final int TOO_TOO_FAR_DISTANCE = 450;
 	
 	private TargetScoreCalculator targetScoreCalculator;
 
-	public DecisionMaker(TargetScoreCalculator targetScoreCalculator) {
+	public MicroDecisionMaker(TargetScoreCalculator targetScoreCalculator) {
 		this.targetScoreCalculator = targetScoreCalculator;
 	}
 
-	public Decision makeDecisionForSiegeMode(Unit myUnit, Collection<UnitInfo> euiList) {
+	public MicroDecision makeDecisionForSiegeMode(Unit myUnit, Collection<UnitInfo> euiList) {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		
@@ -87,30 +87,30 @@ public class DecisionMaker {
 			}
 		}
 
-		Decision decision;
+		MicroDecision decision;
 		if (bestTargetUnitInfo != null) {
 			if (targetInRangeButOutOfSight || highestScore <= 0) {
-				decision = Decision.stop(myUnit);
+				decision = MicroDecision.stop(myUnit);
 			} else {
-				decision = Decision.attackUnit(myUnit, bestTargetUnitInfo);
+				decision = MicroDecision.attackUnit(myUnit, bestTargetUnitInfo);
 			}
 		} else {
 			if (closeUndetectedEnemy != null || tooCloseTarget != null) {
-				decision = Decision.change(myUnit);
+				decision = MicroDecision.change(myUnit);
 			} else if (tooFarTarget != null) {
 				if (closestTooFarTargetDistance > TOO_TOO_FAR_DISTANCE) {
-					decision = Decision.change(myUnit);
+					decision = MicroDecision.change(myUnit);
 				} else {
-					decision = Decision.hold(myUnit);
+					decision = MicroDecision.hold(myUnit);
 				}
 			} else {
-				decision = Decision.attackPosition(myUnit);
+				decision = MicroDecision.attackPosition(myUnit);
 			}
 		}
 		return decision;
 	}
 
-	public Decision makeDecisionForAirForce(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, int strikeLevel) {
+	public MicroDecision makeDecisionForAirForce(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, int strikeLevel) {
 		int airunitMemorySeconds = 3;
 		if (strikeLevel < StrikeLevel.SORE_SPOT) {
 			airunitMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
@@ -161,18 +161,18 @@ public class DecisionMaker {
 				if (enemyUnit.getType() == UnitType.Terran_Bunker) {
 					int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
 					if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
-						return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+						return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 					}
 				} else {
 					if (enemyUnit.isInWeaponRange(airForceTeam.leaderUnit)) {
-						return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+						return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 					}
 				}
 			}
 		}
 		
 		if (airForceTeam.repairCenter != null) {
-			return Decision.attackPosition(airForceTeam.leaderUnit);
+			return MicroDecision.attackPosition(airForceTeam.leaderUnit);
 		}
 
 		UnitInfo bestTargetInfo = null;
@@ -187,12 +187,12 @@ public class DecisionMaker {
 			} else {
 				if (!euiListAirWeapon.isEmpty()) {
 					if (airForceTeam.cloakable()) {
-						return Decision.change(airForceTeam.leaderUnit);
+						return MicroDecision.change(airForceTeam.leaderUnit);
 					}
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 				} else {
 					if (airForceTeam.uncloakable()) {
-						return Decision.change(airForceTeam.leaderUnit);
+						return MicroDecision.change(airForceTeam.leaderUnit);
 					}
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
 				}
@@ -214,7 +214,7 @@ public class DecisionMaker {
 					if (euiListDetector.isEmpty() && !cloakingBonus && airForceTeam.cloakable()) {
 						SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
 						if (cloakingFightPredict == SmallFightPredict.ATTACK) {
-							return Decision.change(airForceTeam.leaderUnit);
+							return MicroDecision.change(airForceTeam.leaderUnit);
 						}
 					}
 					
@@ -222,13 +222,13 @@ public class DecisionMaker {
 						Unit unitInSight = UnitUtils.unitInSight(eui);
 						if (unitInSight != null) {
 							if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
-								return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+								return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 							} else {
 								// isInWeaponRange는 제외해도 괜찮다.
 								int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
 								int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
 								if (enemyUnitDistance < weaponMaxRange) {
-									return Decision.fleeFromUnit(airForceTeam.leaderUnit, eui);
+									return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 								}
 							}
 						}
@@ -244,12 +244,12 @@ public class DecisionMaker {
 		if (bestTargetInfo != null) {
 			boolean bestTargetProtectedByBuilding = protectedByBuilding(bestTargetInfo, euiListAirDefenseBuilding);
 			if (bestTargetProtectedByBuilding) {
-				return Decision.attackUnit(airForceTeam.leaderUnit, bestTargetInfo);
+				return MicroDecision.attackUnit(airForceTeam.leaderUnit, bestTargetInfo);
 			} else {
-				return Decision.kitingUnit(airForceTeam.leaderUnit, bestTargetInfo);
+				return MicroDecision.kitingUnit(airForceTeam.leaderUnit, bestTargetInfo);
 			}
 		} else {
-			return Decision.attackPosition(airForceTeam.leaderUnit);
+			return MicroDecision.attackPosition(airForceTeam.leaderUnit);
 		}
 	}
 	
@@ -301,7 +301,7 @@ public class DecisionMaker {
 		return false;
 	}
 	
-	public Decision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, boolean movingAttack) {
+	public MicroDecision makeDecisionForAirForceMovingDetail(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, boolean movingAttack) {
 		boolean allUnitCoolTimeReady = true;
 		for (Unit airunit : airForceTeam.memberList) {
 			if (airunit.getGroundWeaponCooldown() > 0) {
@@ -354,7 +354,7 @@ public class DecisionMaker {
 				}
 			}
 			if (targetInfo != null) {
-				return Decision.attackUnit(airForceTeam.leaderUnit, targetInfo); // 유닛 공격
+				return MicroDecision.attackUnit(airForceTeam.leaderUnit, targetInfo); // 유닛 공격
 			}
 		}
 		
@@ -372,21 +372,21 @@ public class DecisionMaker {
 			averageDistance = sumOfDistance / (memberSize - 1);
 		}
 		if (averageDistance > 5) {
-			return Decision.unite(airForceTeam.leaderUnit); // 뭉치기
+			return MicroDecision.unite(airForceTeam.leaderUnit); // 뭉치기
 		} else {
 			if (allUnitCoolTimeReady) {
-				return Decision.attackPosition(airForceTeam.leaderUnit); // 이동
+				return MicroDecision.attackPosition(airForceTeam.leaderUnit); // 이동
 			} else {
-				return Decision.kitingUnit(airForceTeam.leaderUnit, null); // 카이팅 eui 정보는 decision에 저장된게 있다.
+				return MicroDecision.kitingUnit(airForceTeam.leaderUnit, null); // 카이팅 eui 정보는 decision에 저장된게 있다.
 			}
 		}
 	}
 
-	public Decision makeDecision(Unit myUnit, Collection<UnitInfo> euiList) {
+	public MicroDecision makeDecision(Unit myUnit, Collection<UnitInfo> euiList) {
 		return makeDecision(myUnit, euiList, false);
 	}
 	
-	public Decision makeDecision(Unit myUnit, Collection<UnitInfo> euiList, boolean overwhelm) {
+	public MicroDecision makeDecision(Unit myUnit, Collection<UnitInfo> euiList, boolean overwhelm) {
 		UnitInfo bestTargetUnitInfo = null;
 		int highestScore = 0;
 		for (UnitInfo eui : euiList) {
@@ -394,7 +394,7 @@ public class DecisionMaker {
 				continue;
 			}
 			if (!overwhelm && isCloseDangerousTarget(myUnit, eui)) {
-				return Decision.fleeFromUnit(myUnit, eui);
+				return MicroDecision.fleeFromUnit(myUnit, eui);
 			}
 			int score = targetScoreCalculator.calculate(myUnit, eui);
 			if (score > highestScore) {
@@ -403,11 +403,11 @@ public class DecisionMaker {
 			}
 		}
 
-		Decision decision;
+		MicroDecision decision;
 		if (bestTargetUnitInfo != null) {
-			decision = Decision.kitingUnit(myUnit, bestTargetUnitInfo);
+			decision = MicroDecision.kitingUnit(myUnit, bestTargetUnitInfo);
 		} else {
-			decision = Decision.attackPosition(myUnit);
+			decision = MicroDecision.attackPosition(myUnit);
 		}
 		return decision;
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.UnitInfo;
@@ -60,7 +60,7 @@ public class DefaultTargetCalculator extends TargetScoreCalculator {
 	private int getSpecialScore(Unit enemyUnit) {
 		int specialScore = 0;
 		if (enemyUnit.getType().groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE) {
-			List<Unit> nearSiegeMode = UnitUtils.getUnitsInRadius(PlayerRange.SELF, enemyUnit.getPosition(), Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
+			List<Unit> nearSiegeMode = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, enemyUnit.getPosition(), Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
 			if (!nearSiegeMode.isEmpty()) {
 				return 100;
 			}

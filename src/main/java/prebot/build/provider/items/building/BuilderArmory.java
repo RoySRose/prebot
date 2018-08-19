@@ -82,12 +82,12 @@ public class BuilderArmory extends DefaultBuildableItem {
 		
 		// 발키리용 아머리 타이밍
 		if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_VERY_FAST_MUTAL) {
-			int compelteStarportCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+			int compelteStarportCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			if (compelteStarportCount > 0) {
 				return true;
 			}
 			
-			List<Unit> incompleteStartports = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
+			List<Unit> incompleteStartports = UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
 			for (Unit starport : incompleteStartports) {
 				int remainBuildSeconds = TimeUtils.remainBuildSeconds(starport);
 				if (remainBuildSeconds != CommonCode.UNKNOWN && remainBuildSeconds + UnitType.Terran_Control_Tower.buildTime() < UnitType.Terran_Armory.buildTime()) {

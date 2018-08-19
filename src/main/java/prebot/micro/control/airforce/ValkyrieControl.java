@@ -7,9 +7,9 @@ import bwapi.Unit;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMaker;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
@@ -25,10 +25,10 @@ public class ValkyrieControl extends Control {
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		
-		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
+		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new DefaultTargetCalculator());
 		
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
+		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -50,14 +50,14 @@ public class ValkyrieControl extends Control {
 				}
 			}
 			
-			Decision decision = decisionMaker.makeDecision(unit, euiList);
-			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+			MicroDecision decision = decisionMaker.makeDecision(unit, euiList);
+			if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 
-			} else if (decision.type == DecisionType.KITING_UNIT) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				MicroUtils.kiting(unit, decision.eui, kOption);
 
-			} else if (decision.type == DecisionType.ATTACK_POSITION) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) {
 				if (MicroUtils.arrivedToPosition(unit, StrategyIdea.mainSquadCenter)) {
 					if (MicroUtils.timeToRandomMove(unit)) {
 						Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);

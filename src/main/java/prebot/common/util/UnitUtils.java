@@ -19,11 +19,10 @@ import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.RegionType;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.SpecificValueCache;
 import prebot.common.util.internal.SpecificValueCache.ValueType;
@@ -62,16 +61,16 @@ public class UnitUtils {
 	public static List<Unit> getUnitList(UnitType... unitTypes) {
 		Set<Unit> unitSet = new HashSet<>();
 		for (UnitType unitType : unitTypes) {
-			unitSet.addAll(getUnitList(UnitFindRange.ALL, unitType));
+			unitSet.addAll(getUnitList(CommonCode.UnitFindRange.ALL, unitType));
 		}
 		return new ArrayList<>(unitSet);
 	}
 
-	public static List<Unit> getUnitList(UnitFindRange unitFindRange) {
+	public static List<Unit> getUnitList(CommonCode.UnitFindRange unitFindRange) {
 		return getUnitList(unitFindRange, UnitType.AllUnits);
 	}
 	
-	public static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType... unitTypes) {
+	public static List<Unit> getUnitList(CommonCode.UnitFindRange unitFindRange, UnitType... unitTypes) {
 		Set<Unit> unitSet = new HashSet<>();
 		for (UnitType unitType : unitTypes) {
 			unitSet.addAll(getUnitList(unitFindRange, unitType));
@@ -81,7 +80,7 @@ public class UnitUtils {
 	
 	/** 실제보유, 컨스트럭션큐, 빌드큐 포함 존재 여부 */
 	public static boolean hasUnitOrWillBe(UnitType... unitTypes) {
-		if (getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes) > 0) {
+		if (getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes) > 0) {
 			return true;
 		}
 		for (UnitType unitType : unitTypes) {
@@ -93,14 +92,14 @@ public class UnitUtils {
 	}
 	
 	public static int hasUnitOrWillBeCount(UnitType... unitTypes) {
-		int unitCount = getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes);
+		int unitCount = getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, unitTypes);
 		for (UnitType unitType : unitTypes) {
 			unitCount += BuildManager.Instance().buildQueue.getItemCount(unitType);
 		}
 		return unitCount;
 	}
 	
-	private static List<Unit> getUnitList(UnitFindRange unitFindRange, UnitType unitType) {
+	private static List<Unit> getUnitList(CommonCode.UnitFindRange unitFindRange, UnitType unitType) {
 		switch (unitFindRange) {
 		case COMPLETE:
 			return UnitCache.getCurrentCache().completeUnits(unitType);
@@ -117,12 +116,12 @@ public class UnitUtils {
 	public static int getUnitCount(UnitType... unitTypes) {
 		int unitCount = 0;
 		for (UnitType unitType : unitTypes) {
-			unitCount += getUnitCount(UnitFindRange.ALL, unitType);
+			unitCount += getUnitCount(CommonCode.UnitFindRange.ALL, unitType);
 		}
 		return unitCount;
 	}
 	
-	public static int getUnitCount(UnitFindRange unitFindRange, UnitType... unitTypes) {
+	public static int getUnitCount(CommonCode.UnitFindRange unitFindRange, UnitType... unitTypes) {
 		int unitCount = 0;
 		for (UnitType unitType : unitTypes) {
 			unitCount += getUnitCount(unitFindRange, unitType);
@@ -130,7 +129,7 @@ public class UnitUtils {
 		return unitCount;
 	}
 	
-	private static int getUnitCount(UnitFindRange unitFindRange, UnitType unitType) {
+	private static int getUnitCount(CommonCode.UnitFindRange unitFindRange, UnitType unitType) {
 		switch (unitFindRange) {
 		case COMPLETE:
 			return UnitCache.getCurrentCache().completeCount(unitType);
@@ -152,22 +151,22 @@ public class UnitUtils {
 	
 	/** 유닛 보유 여부 */
 	@Deprecated
-	public static boolean hasUnit(UnitFindRange unitFindRange, UnitType unitType) {
+	public static boolean hasUnit(CommonCode.UnitFindRange unitFindRange, UnitType unitType) {
 		return getUnitCount(unitFindRange, unitType) > 0;
 	}
 	
 	/** 유닛 N개이상 보유 여부 */
 	@Deprecated
-	public static boolean hasUnit(UnitFindRange unitFindRange, int count, UnitType unitType) {
+	public static boolean hasUnit(CommonCode.UnitFindRange unitFindRange, int count, UnitType unitType) {
 		return getUnitCount(unitFindRange, unitType) >= count;
 	}
 
 	/** 적 유닛 리스트 */
-	public static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange) {
+	public static List<UnitInfo> getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange enemyUnitFindRange) {
 		return getEnemyUnitInfoList(enemyUnitFindRange, UnitType.AllUnits);
 	}
 	
-	public static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
+	public static List<UnitInfo> getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
 		Set<UnitInfo> unitSet = new HashSet<>();
 		for (UnitType unitType : unitTypes) {
 			unitSet.addAll(getEnemyUnitInfoList(enemyUnitFindRange, unitType));
@@ -175,7 +174,7 @@ public class UnitUtils {
 		return new ArrayList<>(unitSet);
 	}
 	
-	private static List<UnitInfo> getEnemyUnitInfoList(EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
+	private static List<UnitInfo> getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
 		switch (enemyUnitFindRange) {
 		case VISIBLE:
 			return UnitCache.getCurrentCache().enemyVisibleUnitInfos(unitType);
@@ -187,7 +186,7 @@ public class UnitUtils {
 	}
 
 	/** 적 유닛  수 */
-	public static int getEnemyUnitInfoCount(EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
+	public static int getEnemyUnitInfoCount(CommonCode.EnemyUnitFindRange enemyUnitFindRange, UnitType... unitTypes) {
 		int unitCount = 0;
 		for (UnitType unitType : unitTypes) {
 			unitCount += getEnemyUnitInfoCount(enemyUnitFindRange, unitType);
@@ -195,7 +194,7 @@ public class UnitUtils {
 		return unitCount;
 	}
 	
-	private static int getEnemyUnitInfoCount(EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
+	private static int getEnemyUnitInfoCount(CommonCode.EnemyUnitFindRange enemyUnitFindRange, UnitType unitType) {
 		switch (enemyUnitFindRange) {
 		case VISIBLE:
 			return UnitCache.getCurrentCache().enemyVisibleCount(unitType);
@@ -252,7 +251,7 @@ public class UnitUtils {
 		if (unitTypes.length == 0) {
 			values = InfoUtils.enemyUnitInfoMap().values();
 		} else {
-			values = getEnemyUnitInfoList(EnemyUnitFindRange.ALL, unitTypes);
+			values = getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL, unitTypes);
 		}
 		
 		for (UnitInfo eui : values) {
@@ -342,7 +341,7 @@ public class UnitUtils {
 	}
 	
 	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange) {
-		return getUnitsInRegion(regionType, playerRange, new UnitCondition() {
+		return getUnitsInRegion(regionType, playerRange, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return true;
@@ -351,7 +350,7 @@ public class UnitUtils {
 	}
 	
 	public static List<Unit> myBuildingsInMainSquadRegion() {
-		List<Unit> totalBuildings = UnitUtils.getUnitList(UnitFindRange.ALL
+		List<Unit> totalBuildings = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL
 				, UnitType.Terran_Command_Center, UnitType.Terran_Supply_Depot, UnitType.Terran_Barracks, UnitType.Terran_Factory, UnitType.Terran_Starport
 				, UnitType.Terran_Armory, UnitType.Terran_Academy, UnitType.Terran_Bunker, UnitType.Terran_Missile_Turret);
 		
@@ -373,7 +372,7 @@ public class UnitUtils {
 		return buildingsInRegion;
 	}
 	
-	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange, UnitCondition unitCondition) {
+	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
 		if (playerRange == PlayerRange.SELF) {
 			totalUnits = Prebot.Broodwar.self().getUnits();
@@ -575,7 +574,7 @@ public class UnitUtils {
 	}
 	
 	public static Unit getClosestActivatedCommandCenter(Position position) {
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		return getClosestUnitToPosition(commandCenters, position, new UnitCondition() {
 			@Override
 			public boolean correspond(Unit commandCenter) {
@@ -594,7 +593,7 @@ public class UnitUtils {
 	}
 
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
-	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
+	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, IConditions.UnitCondition unitCondition) {
 		if (unitList.size() == 0) {
 			return null;
 		}
@@ -619,7 +618,7 @@ public class UnitUtils {
 	}
 	
 	/** unitList 중 position에 조건(unitCondition)에 부합하는 가장 가까운 유닛 리턴 */
-	private static Unit getFarthestUnitToPosition(Collection<Unit> unitList, Position position, UnitCondition unitCondition) {
+	private static Unit getFarthestUnitToPosition(Collection<Unit> unitList, Position position, IConditions.UnitCondition unitCondition) {
 		if (unitList.size() == 0) {
 			return null;
 		}
@@ -801,58 +800,58 @@ public class UnitUtils {
 	}
 
 	public static int myWraithUnitSupplyCount() {
-		int totalSupplyCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
+		int totalSupplyCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
 		return totalSupplyCount * 4; // 인구수 기준이므로
 	}
 	
 	public static int myFactoryUnitSupplyCount() {
-		Integer factorySupplyCount = SpecificValueCache.get(ValueType.FACTORY_SUPPLY_COUNT, Integer.class);
+		Integer factorySupplyCount = SpecificValueCache.get(SpecificValueCache.ValueType.FACTORY_SUPPLY_COUNT, Integer.class);
 		if (factorySupplyCount != null) {
 			return factorySupplyCount;
 		}
-		int factoryUnitCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE
+		int factoryUnitCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE
 				, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 		
 		
 		factorySupplyCount = factoryUnitCount * 4; // 인구수 기준이므로;
-		SpecificValueCache.put(ValueType.FACTORY_SUPPLY_COUNT, factorySupplyCount);
+		SpecificValueCache.put(SpecificValueCache.ValueType.FACTORY_SUPPLY_COUNT, factorySupplyCount);
 		return factorySupplyCount;
 	}
 	
 	public static int activatedCommandCenterCount() {
-		Integer activatedCommandCount = SpecificValueCache.get(ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
+		Integer activatedCommandCount = SpecificValueCache.get(SpecificValueCache.ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
 		if (activatedCommandCount != null) {
 //			System.out.println("cacahed data " + activatedCommandCount);
 			return activatedCommandCount;
 		}
 		activatedCommandCount = 0;
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandCenter : commandCenters) {
 			if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6) {
 				activatedCommandCount++;
 			}
 		}
 		
-		SpecificValueCache.put(ValueType.ACTIVATED_COMMAND_COUNT, activatedCommandCount);
+		SpecificValueCache.put(SpecificValueCache.ValueType.ACTIVATED_COMMAND_COUNT, activatedCommandCount);
 		return activatedCommandCount;
 	}
 	
 	public static int availableScanningCount() {
-		Integer availableScanningCount = SpecificValueCache.get(ValueType.AVAILABLE_SCANNING_COUNT, Integer.class);
+		Integer availableScanningCount = SpecificValueCache.get(SpecificValueCache.ValueType.AVAILABLE_SCANNING_COUNT, Integer.class);
 		if (availableScanningCount != null) {
 			return availableScanningCount;
 		}
 		availableScanningCount = 0;
-		List<Unit> comsatStations = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		List<Unit> comsatStations = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 		for (Unit comsatStation : comsatStations) {
 			availableScanningCount += comsatStation.getEnergy() / 48; // 다크에게 컴셋 전 앞서 전진하게 위해 에너지를 2초 짧게 잡는다.
 		}
-		SpecificValueCache.put(ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
+		SpecificValueCache.put(SpecificValueCache.ValueType.AVAILABLE_SCANNING_COUNT, availableScanningCount);
 		return availableScanningCount;
 	}
 	
 	public static int enemyGroundUnitPower() {
-		Integer enemyGroundUnitPower = SpecificValueCache.get(ValueType.ENEMY_GROUND_UNIT_POWER, Integer.class);
+		Integer enemyGroundUnitPower = SpecificValueCache.get(SpecificValueCache.ValueType.ENEMY_GROUND_UNIT_POWER, Integer.class);
 		if (enemyGroundUnitPower != null) {
 			return enemyGroundUnitPower;
 		}
@@ -883,12 +882,12 @@ public class UnitUtils {
 			enemyGroundUnitPower = (marineCount * 1) + (vultureCount * 1) + (goliathCount * 2) + (tankCount * 3);
 		}
 		
-		SpecificValueCache.put(ValueType.ENEMY_GROUND_UNIT_POWER, enemyGroundUnitPower);
+		SpecificValueCache.put(SpecificValueCache.ValueType.ENEMY_GROUND_UNIT_POWER, enemyGroundUnitPower);
 		return enemyGroundUnitPower;
 	}
 	
 	public static int enemyAirUnitPower() {
-		Integer enemyAirUnitPower = SpecificValueCache.get(ValueType.ENEMY_AIR_UNIT_POWER, Integer.class);
+		Integer enemyAirUnitPower = SpecificValueCache.get(SpecificValueCache.ValueType.ENEMY_AIR_UNIT_POWER, Integer.class);
 		if (enemyAirUnitPower != null) {
 			return enemyAirUnitPower;
 		}
@@ -915,7 +914,7 @@ public class UnitUtils {
 			enemyAirUnitPower = wraithCount + (battleCount * 4);
 		}
 		
-		SpecificValueCache.put(ValueType.ENEMY_AIR_UNIT_POWER, enemyAirUnitPower);
+		SpecificValueCache.put(SpecificValueCache.ValueType.ENEMY_AIR_UNIT_POWER, enemyAirUnitPower);
 		return enemyAirUnitPower;
 	}
 

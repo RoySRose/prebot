@@ -6,7 +6,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.LagObserver;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -103,7 +103,7 @@ public class StrategyManager extends GameManager {
 	private void expansionOkay() {
 		boolean expansionOkay = false;
 		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
-		List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandCenter : commandCenterList) {
 			if (commandCenter.isLifted()) {
 				continue;

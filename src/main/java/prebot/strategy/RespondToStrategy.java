@@ -1,27 +1,5 @@
 package prebot.strategy;
 
-import java.util.List;
-
-import bwapi.Position;
-import bwapi.Race;
-import bwapi.TechType;
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwta.BaseLocation;
-import bwta.Chokepoint;
-import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
-import prebot.build.prebot1.BuildOrderQueue;
-import prebot.build.prebot1.ConstructionManager;
-import prebot.build.provider.BuildQueueProvider;
-import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
-import prebot.common.util.UnitUtils;
-import prebot.strategy.MapSpecificInformation.GameMap;
-import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
-
 /// 봇 프로그램 설정
 public class RespondToStrategy {
 	

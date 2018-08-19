@@ -7,8 +7,7 @@ import bwapi.UnitType;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -29,7 +28,7 @@ public class LairAnalyser extends UnitAnalyser {
 	}
 
 	private void fastLair() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_LAIR)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_LAIR)) {
 			return;
 		}
 
@@ -42,19 +41,19 @@ public class LairAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 
 			if (buildFrame < oneHatFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_1HAT_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_1HAT_FAST);
 			} else if (buildFrame < twoHatFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_2HAT_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_2HAT_FAST);
 			} else if (buildFrame < threeHatFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_3HAT_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_3HAT_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_3HAT_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_3HAT_FAST);
 			}
 		}
 	}
 
 	private void lairStatus() {
-		if (ClueManager.Instance().containsClueInfo(ClueInfo.LAIR_COMPLETE)) {
+		if (ClueManager.Instance().containsClueInfo(Clue.ClueInfo.LAIR_COMPLETE)) {
 			return;
 		}
 		
@@ -63,13 +62,13 @@ public class LairAnalyser extends UnitAnalyser {
 			UnitInfo lairInfo = found.get(0);
 			Unit lairInSight = UnitUtils.unitInSight(lairInfo);
 			if (lairInSight != null && lairInSight.isCompleted()) {
-				ClueManager.Instance().addClueInfo(ClueInfo.LAIR_COMPLETE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_COMPLETE);
 			} else {
 				int updateFrame = found.get(0).getUpdateFrame();
 				if (TimeUtils.after(updateFrame + UnitType.Zerg_Lair.buildTime())) {
-					ClueManager.Instance().addClueInfo(ClueInfo.LAIR_COMPLETE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_COMPLETE);
 				} else {
-					ClueManager.Instance().addClueInfo(ClueInfo.LAIR_INCOMPLETE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.LAIR_INCOMPLETE);
 				}				
 			}
 			
@@ -79,7 +78,7 @@ public class LairAnalyser extends UnitAnalyser {
 			int baseLastExpansionCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
 			
 			if (baseLastBaseCheckFrame > lairExpect && baseLastExpansionCheckFrame > lairExpect) {
-				ClueManager.Instance().addClueInfo(ClueInfo.NO_LAIR);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_LAIR);
 			}
 		}
 	}

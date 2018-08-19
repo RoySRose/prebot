@@ -9,27 +9,20 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
-import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.LagObserver;
-import prebot.common.MapGrid;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder.CampType;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -134,7 +127,7 @@ public class WorkerManager extends GameManager {
 	}
 
 	public void handleGasWorkers() {
-		for (Unit scv : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_SCV)) {
+		for (Unit scv : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV)) {
 			if (scv.isGatheringGas() && !scv.isCarryingGas()) {
 				if (workerData.getWorkerJob(scv) != WorkerJob.Gas) {
 					workerData.setWorkerJob(scv, WorkerJob.Idle, (Unit) null);
@@ -142,7 +135,7 @@ public class WorkerManager extends GameManager {
 			}
 		}
 
-		for (Unit refinery : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Refinery)) {
+		for (Unit refinery : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Refinery)) {
 			// refinery 가 건설 completed 되었으면,
 			// get the number of workers currently assigned to it
 			int numAssigned = workerData.getNumAssignedWorkers(refinery);
@@ -186,7 +179,7 @@ public class WorkerManager extends GameManager {
 			return StrategyIdea.gasAdjustmentWorkerCount;
 
 		} else {
-			int workerCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_SCV).size();
+			int workerCount = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV).size();
 			if (workerCount >= 30) {
 				int gasunbalance = Prebot.Broodwar.self().gas() - Prebot.Broodwar.self().minerals();
 				if (gasunbalance > 2000) {
@@ -202,7 +195,7 @@ public class WorkerManager extends GameManager {
 				return 0;
 
 			} else {
-				int refineryCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Refinery).size();
+				int refineryCount = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Refinery).size();
 				int workersPerRefinery = (int) (workerCount - 7) / (refineryCount * 3);
 
 				if (workersPerRefinery > MicroConfig.WORKERS_PER_REFINERY) {
@@ -577,7 +570,7 @@ public class WorkerManager extends GameManager {
 		// 중에서
 		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
 		// 둘째로 가까운 곳을 찾는다
-		for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+		for (Unit unit : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (unit == null)
 				continue;
 
@@ -597,7 +590,7 @@ public class WorkerManager extends GameManager {
 		// 모든 ResourceDepot 이 다 일꾼수가 꽉 차있거나, 완성된 ResourceDepot 이 하나도 없고 건설중이라면,
 		// ResourceDepot 주위에 미네랄이 남아있는 곳 중에서 가까운 곳이 선택되도록 한다
 		if (closestDepot == null) {
-			for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+			for (Unit unit : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 				if (unit == null)
 					continue;
 
@@ -614,7 +607,7 @@ public class WorkerManager extends GameManager {
 		}
 		// 모든 ResourceDepot 주위에 미네랄이 하나도 없다면, 일꾼에게 가장 가까운 곳을 선택한다
 		if (closestDepot == null) {
-			for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+			for (Unit unit : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 				if (unit == null)
 					continue;
 				if (unit.getType().isResourceDepot()) {
@@ -664,7 +657,7 @@ public class WorkerManager extends GameManager {
 			return false;
 		}
 
-		for (Unit enemy : UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, depot.getPosition(), 200)) {
+		for (Unit enemy : UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, depot.getPosition(), 200)) {
 			if (enemy.getType().canAttack()) {
 				return true;
 			}
@@ -1101,7 +1094,7 @@ public class WorkerManager extends GameManager {
 	 * 초기 미네랄 패스 위해 정보 (초기1회)
 	 */
 	public void defaltMineralInfo(){
-		for (Unit depot : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+		for (Unit depot : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			mineralPath(depot);
 		}
 	}

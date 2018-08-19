@@ -6,7 +6,7 @@ import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.manage.AttackExpansionManager;
@@ -39,7 +39,7 @@ public class UpgradeSelector implements Selector<MetaType>{
     private void executeUpgrade() {
 
 		Unit armory = null;
-		for (Unit unit : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Armory)) {
+		for (Unit unit : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Armory)) {
 			if (unit.getType() == UnitType.Terran_Armory) {
 				armory = unit;
 			}

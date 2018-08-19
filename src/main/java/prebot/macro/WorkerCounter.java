@@ -1,17 +1,15 @@
 package prebot.macro;
 
 
-import bwapi.Position;
+import java.util.List;
+
 import bwapi.Race;
 import bwapi.Unit;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
-import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
-
-import java.util.List;
 
 public class WorkerCounter {
 

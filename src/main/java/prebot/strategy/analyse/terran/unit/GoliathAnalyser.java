@@ -4,9 +4,8 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 
@@ -24,25 +23,25 @@ public class GoliathAnalyser extends UnitAnalyser {
 				int lastFoundFrame = lastUnitFoundFrame(found, 3);
 				int goliathInMyRegionFrame = goliathInMyRegionFrame(3);
 				if (lastFoundFrame < goliathInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_THREE_GOLIATH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_THREE_GOLIATH);
 				}
 			}
 			if (found.size() >= 2) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 2);
 				int goliathInMyRegionFrame = goliathInMyRegionFrame(2);
 				if (lastFoundFrame < goliathInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_TWO_GOLIATH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_TWO_GOLIATH);
 				}
 			} else {
 				int lastFoundFrame = lastUnitFoundFrame(found, 1);
 				int goliathInMyRegionFrame = goliathInMyRegionFrame(1);
 				if (lastFoundFrame < goliathInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_ONE_GOLIATH);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_ONE_GOLIATH);
 				}
 			}
 			
-			if (!ClueManager.Instance().containsClueType(ClueType.FAST_GOLIATH)) {
-				ClueManager.Instance().addClueInfo(ClueInfo.GOLIATH_FOUND);
+			if (!ClueManager.Instance().containsClueType(Clue.ClueType.FAST_GOLIATH)) {
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.GOLIATH_FOUND);
 			}
 		}
 	}

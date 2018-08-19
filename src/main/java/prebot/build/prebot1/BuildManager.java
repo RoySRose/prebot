@@ -19,15 +19,13 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.LagObserver;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -306,7 +304,7 @@ public class BuildManager extends GameManager {
 		// make a set of all candidate producers
 		List<Unit> candidateProducers = new ArrayList<Unit>();
 //		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
-		List<Unit> selectPorducer = UnitUtils.getUnitList(UnitFindRange.COMPLETE);
+		List<Unit> selectPorducer = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE);
 		for (Unit unit : selectPorducer) {
 			
 			//test용 날릴것. hkk

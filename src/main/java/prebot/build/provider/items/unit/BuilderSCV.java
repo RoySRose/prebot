@@ -12,7 +12,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -43,7 +43,7 @@ public class BuilderSCV extends DefaultBuildableItem {
 		// return false;
 		// }
 
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 		if (!StrategyIdea.EXOK) {
 			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 				Unit secondCommandCenter = null;
@@ -99,8 +99,8 @@ public class BuilderSCV extends DefaultBuildableItem {
 
 		int maxworkerCount = tot_mineral_self * 2 + 8 * Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 		int workerCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_SCV); // workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
-		// List CommandCenter = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
-		for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+		// List CommandCenter = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		for (Unit commandcenter : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (commandcenter.isTraining()) {
 				workerCount += commandcenter.getTrainingQueue().size();
 			}
@@ -115,7 +115,7 @@ public class BuilderSCV extends DefaultBuildableItem {
 			return false;
 		}
 
-		for (Unit commandcenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+		for (Unit commandcenter : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (commandcenter.isTraining()) {
 //				return false;
 				continue;

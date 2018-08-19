@@ -5,7 +5,7 @@ import java.util.Collection;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
@@ -47,17 +47,17 @@ public class BarracksControl extends BuildingFlyControl {
                 
             } else {
             	if (StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
-            		if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
+            		if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
     					flyCondition.setBuildingFly(BuildingFly.UP);
     				}
                     
     			} else if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK) {
-    				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
+    				if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
     					flyCondition.setBuildingFly(BuildingFly.UP);
     				}
 
     			} else {
-    				if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1) {
+    				if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 1) {
     					flyCondition.setBuildingFly(BuildingFly.UP);
     				}
                 }	

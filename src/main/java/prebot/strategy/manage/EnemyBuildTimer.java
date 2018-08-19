@@ -271,7 +271,7 @@ public class EnemyBuildTimer {
 			return;
 		}
 		
-		List<UnitInfo> buildingInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, buildingType);
+		List<UnitInfo> buildingInfos = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.VISIBLE, buildingType);
 		if (!buildingInfos.isEmpty()) {
 			if (buildingInfos.get(0).isCompleted()) {
 				// 완성된 건물 발견. 막 완성되었다고 가정한 시간과 전략별 시간 중 빠른 값 선택
@@ -345,7 +345,7 @@ public class EnemyBuildTimer {
 		if (isCertainBuildTime(buildingType)) {
 			return;
 		}
-		if (UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, flagUnitType).isEmpty()) {
+		if (UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.VISIBLE, flagUnitType).isEmpty()) {
 			return;
 		}
 

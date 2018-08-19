@@ -9,18 +9,16 @@ import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
-import bwta.Region;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMakerPrebot1;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
@@ -61,13 +59,13 @@ public class WatcherControl extends Control {
 		Position fleePosition = StrategyIdea.mainSquadCenter;
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (InfoUtils.enemyRace() == Race.Terran) {
-			int tankCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+			int tankCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 //			if (tankCount >= 3 && StrategyIdea.mainSquadCrossBridge) {
 ////				int watcherBackEnoughDistance = (int) (StrategyIdea.mainSquadCoverRadius * 1.5);
 ////				double radian = MicroUtils.targetDirectionRadian(fleePosition, InfoUtils.myBase().getPosition());
 ////				fleePosition = MicroUtils.getMovePosition(fleePosition, radian, watcherBackEnoughDistance);
 //				
-//				List<Unit> centers = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+//				List<Unit> centers = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 //				Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 //				Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 //				for (Unit center : centers) {
@@ -82,7 +80,7 @@ public class WatcherControl extends Control {
 			
 		} else {
 			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
-				List<Unit> turretList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
+				List<Unit> turretList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Missile_Turret);
 				Unit closeTurret = UnitUtils.getClosestUnitToPosition(turretList, StrategyIdea.mainSquadCenter);
 				if (closeTurret != null) {
 					fleePosition = closeTurret.getPosition();
@@ -100,12 +98,12 @@ public class WatcherControl extends Control {
 
 	private void fight(Collection<Unit> unitList, Collection<UnitInfo> euiList, Position fleePosition, int coverRadius) {
 		FleeOption fOption = new FleeOption(fleePosition, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.KEEP_SAFE_DISTANCE);
+		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE);
 		
 		FleeOption fOptionMainBattle = new FleeOption(fleePosition, true, Angles.WIDE);
-		KitingOption kOptionMainBattle = new KitingOption(fOptionMainBattle, CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
+		KitingOption kOptionMainBattle = new KitingOption(fOptionMainBattle, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE);
 		
-		List<Unit> otherMechanics = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
+		List<Unit> otherMechanics = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 		
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -113,12 +111,12 @@ public class WatcherControl extends Control {
 			}
 			
 //			Decision decision = decisionMaker.makeDecision(unit, euiList, smallFightPredict == SmallFightPredict.OVERWHELM);
-			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
+			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
 			
-			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+			if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
 				
-			} else if (decision.type == DecisionType.KITING_UNIT) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				if (spiderMineOrderIssue(unit)) {
 					continue;
 				}
@@ -144,7 +142,7 @@ public class WatcherControl extends Control {
 					MicroUtils.kiting(unit, decision.eui, kOption);
 				}
 				
-			} else if (decision.type == DecisionType.ATTACK_POSITION) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) {
 				if (spiderMineOrderIssue(unit)) {
 					continue;
 				}

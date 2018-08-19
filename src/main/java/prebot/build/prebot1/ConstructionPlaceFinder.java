@@ -15,15 +15,12 @@ import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
-import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
-import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
+import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.MapSpecificInformation.GameMap;
 
 /// 건설위치 탐색을 위한 class
@@ -410,7 +407,7 @@ public class ConstructionPlaceFinder {
 			// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
 			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
 			
-			if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+			if(InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
 				maxRange = 23;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
 					if(base.isStartLocation() && TilePositionUtils.equals(base.getTilePosition(), desiredPosition)) {
@@ -418,7 +415,7 @@ public class ConstructionPlaceFinder {
 						break;
 					}
 				}
-			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
 				maxRange = 25;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
 					if(base.isStartLocation() && TilePositionUtils.equals(base.getTilePosition(), desiredPosition)) {
@@ -1689,7 +1686,7 @@ public class ConstructionPlaceFinder {
 //			radiusP = 80;
 //		}
 //		
-//		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, centerPosition, radiusP);
+//		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, centerPosition, radiusP);
 //		for(Unit unit : nearInvisibleUnit) {
 //			if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker) {
 //				FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: there is invisible unit in turret radius :: " + radiusP);

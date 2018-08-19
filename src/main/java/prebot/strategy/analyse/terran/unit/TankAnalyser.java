@@ -3,12 +3,11 @@ package prebot.strategy.analyse.terran.unit;
 import java.util.List;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,30 +21,30 @@ public class TankAnalyser extends UnitAnalyser {
 	@Override
 	public void analyse() {
 		// 시즈탱크는 부득이하게 UnitUtils, TimeUtils를 써야겠다.
-		List<UnitInfo> enemyTanks = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL,
+		List<UnitInfo> enemyTanks = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL,
 				UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		
 		if (!enemyTanks.isEmpty()) {
 			if (enemyTanks.size() >= 3) {
 				int tankInMyRegionFrame = tankInMyRegionFrame(3) + 15 * TimeUtils.SECOND;
 				if (TimeUtils.before((tankInMyRegionFrame))) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_THREE_TANK);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_THREE_TANK);
 				}
 			}
 			if (enemyTanks.size() >= 2) {
 				int tankInMyRegionFrame = tankInMyRegionFrame(2);
 				if (TimeUtils.before((tankInMyRegionFrame))) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_TWO_TANK);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_TWO_TANK);
 				}
 			} else if (enemyTanks.size() >= 1) {
 				int tankInMyRegionFrame = tankInMyRegionFrame(1);
 				if (TimeUtils.before((tankInMyRegionFrame))) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_ONE_TANK);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_ONE_TANK);
 				}
 			}
 			
-			if (!ClueManager.Instance().containsClueType(ClueType.FAST_TANK)) {
-				ClueManager.Instance().addClueInfo(ClueInfo.TANK_FOUND);
+			if (!ClueManager.Instance().containsClueType(Clue.ClueType.FAST_TANK)) {
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.TANK_FOUND);
 			}
 		}
 	}

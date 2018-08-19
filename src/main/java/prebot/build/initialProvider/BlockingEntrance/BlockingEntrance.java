@@ -93,10 +93,10 @@ public class BlockingEntrance {
     public void SetBlockingTilePosition() {
 
 //		서킷브레이커만 4X4
-		if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
 			maxSupplyCntX = 7;
 			maxSupplyCntY = 2;
-	    }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+	    }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
 	    	maxSupplyCntX = 2;
 			maxSupplyCntY = 7;
 	    }
@@ -115,9 +115,9 @@ public class BlockingEntrance {
 
       //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
 //        mapName = Map.CIRCUITBREAKER;
-        if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+        if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
         	mapName = Map.FIGHTING_SPIRITS;
-        }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+        }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
         	mapName = Map.CIRCUITBREAKER;
         }else {
         	mapName = Map.UNKNOWN;

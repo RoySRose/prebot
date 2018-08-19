@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -24,7 +24,7 @@ public class ReaverAnalyser extends UnitAnalyser {
 					+ UnitType.Protoss_Robotics_Support_Bay.buildTime() + UnitType.Protoss_Reaver.buildTime();
 			int reaverInMyRegionFrame = reaverFrame + baseToBaseFrame(UnitType.Protoss_Shuttle);
 			if (minimumUpdateFrame < reaverInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_REAVER);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_REAVER);
 			}
 		}
 	}

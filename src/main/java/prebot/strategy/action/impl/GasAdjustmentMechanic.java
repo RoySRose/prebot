@@ -1,7 +1,7 @@
 package prebot.strategy.action.impl;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -32,7 +32,7 @@ public class GasAdjustmentMechanic extends Action {
 		StrategyIdea.gasAdjustment = true;
 
 		int adjustGasWorkerCount = 0;
-		int workerCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_SCV);
+		int workerCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV);
 		if (workerCount > 8) {
 			adjustGasWorkerCount = 3;
 			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Factory)) {
@@ -41,7 +41,7 @@ public class GasAdjustmentMechanic extends Action {
 				}
 			} else {
 				if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
-					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
+					if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
 						if (Prebot.Broodwar.self().gas() <= 250) {
 							adjustGasWorkerCount = 2;
 						} else {
@@ -51,7 +51,7 @@ public class GasAdjustmentMechanic extends Action {
 						gasAjustmentFinshed = true;
 					}
 				} else {
-					if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
+					if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
 						if (Prebot.Broodwar.self().gas() <= 100) {
 							adjustGasWorkerCount = 3;
 						} else {

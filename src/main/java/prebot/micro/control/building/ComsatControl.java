@@ -70,14 +70,14 @@ public class ComsatControl extends Control {
 		
 		Unit comsatToUse = null;
 		int usableEnergy = 150;
-		int comsatCnt = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		int comsatCnt = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 		if(comsatCnt > 1){
 			usableEnergy = 135;
 		}
 		if(comsatCnt > 2){
 			
 			if(comsatCnt < 6) {
-				usableEnergy -= 20 * (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station) - 2);
+				usableEnergy -= 20 * (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station) - 2);
 			}else {
 				usableEnergy -= 20 * 3;
 			}
@@ -87,7 +87,7 @@ public class ComsatControl extends Control {
 		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
 			usableEnergy += 50;
 			
-			if(UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) > 0){
+			if(UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) > 0){
 				usableEnergy -= 25;
 			}
 			
@@ -134,18 +134,18 @@ public class ComsatControl extends Control {
 				continue;
 			}
 			// 주위에 베슬이 있는지 확인하고 베슬이 여기로 오는 로직인지도 확인한 후에 오게 되면 패스 아니면 스캔으로 넘어간다
-			List<Unit> nearVessel = UnitUtils.getUnitsInRadius(PlayerRange.SELF, eui.getLastPosition(), UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
+			List<Unit> nearVessel = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, eui.getLastPosition(), UnitType.Terran_Science_Vessel.sightRange() * 2, UnitType.Terran_Science_Vessel);
 			if (nearVessel != null) {
 				Unit neareasetVessel = UnitUtils.getClosestUnitToPositionNotStunned(nearVessel, eui.getLastPosition());
 				if (neareasetVessel != null) {
-					List<Unit> nearAllies = UnitUtils.getUnitsInRadius(PlayerRange.SELF, neareasetVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
+					List<Unit> nearAllies = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, neareasetVessel.getPosition(), UnitType.Terran_Science_Vessel.sightRange());
 					if (nearAllies != null && nearAllies.size() > 2) {
 						continue;// 베슬이 올것으로 예상됨
 					}
 				}
 			}
 			
-			List<Unit> myAttackUnits = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
+			List<Unit> myAttackUnits = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
 					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 			
 			Race enemyRace = InfoUtils.enemyRace();

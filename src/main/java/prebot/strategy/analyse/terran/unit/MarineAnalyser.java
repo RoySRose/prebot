@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -30,20 +30,20 @@ public class MarineAnalyser extends UnitAnalyser {
 				int lastFoundFrame = lastUnitFoundFrame(found, 6);
 				int marineInMyRegionFrame = marineInMyRegionFrame(6);
 				if (lastFoundFrame < marineInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_SIX_MARINE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_SIX_MARINE);
 				}
 			}
 			if (found.size() >= 4) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 4);
 				int marineInMyRegionFrame = marineInMyRegionFrame(4);
 				if (lastFoundFrame < marineInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_FOUR_MARINE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_FOUR_MARINE);
 				}
 			} else if (found.size() >= 2) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 2);
 				int marineInMyRegionFrame = marineInMyRegionFrame(2);
 				if (lastFoundFrame < marineInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_TWO_MARINE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_TWO_MARINE);
 				}
 			}
 		}

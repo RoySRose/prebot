@@ -56,7 +56,7 @@ public abstract class UnitAnalyser {
 		}
 		
 		
-		List<UnitInfo> unitInfos = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, unitType);
+		List<UnitInfo> unitInfos = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.VISIBLE, unitType);
 		if (unitInfos.isEmpty()) {
 			return;
 		}

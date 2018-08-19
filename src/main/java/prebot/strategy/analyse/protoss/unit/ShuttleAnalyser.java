@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -18,7 +17,7 @@ public class ShuttleAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_SHUTTLE)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_SHUTTLE)) {
 			return;
 		}
 		
@@ -29,9 +28,9 @@ public class ShuttleAnalyser extends UnitAnalyser {
 					+ UnitType.Protoss_Robotics_Facility.buildTime() + UnitType.Protoss_Shuttle.buildTime();
 			int reaverInMyRegionFrame = reaverFrame + baseToBaseFrame(UnitType.Protoss_Shuttle);
 			if (minimumUpdateFrame < reaverInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SHUTTLE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_SHUTTLE);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.SHUTTLE_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.SHUTTLE_FOUND);
 			}
 		}
 	}

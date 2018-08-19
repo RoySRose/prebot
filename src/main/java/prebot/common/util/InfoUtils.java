@@ -86,7 +86,7 @@ public class InfoUtils {
 	}
 	
 	public static boolean enemyFirstExpansionOccupied() {
-		Boolean enemyFirstExpansionOccupied = SpecificValueCache.get(ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, Boolean.class);
+		Boolean enemyFirstExpansionOccupied = SpecificValueCache.get(SpecificValueCache.ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, Boolean.class);
 		if (enemyFirstExpansionOccupied != null) {
 			return enemyFirstExpansionOccupied;
 		}
@@ -100,7 +100,7 @@ public class InfoUtils {
 				}
 			}
 		}
-		SpecificValueCache.put(ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, enemyFirstExpansionOccupied);
+		SpecificValueCache.put(SpecificValueCache.ValueType.ENEMY_FIRST_EXPANSION_OCCUPIED, enemyFirstExpansionOccupied);
 		return enemyFirstExpansionOccupied;
 	}
 	

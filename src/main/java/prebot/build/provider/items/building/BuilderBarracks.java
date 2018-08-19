@@ -8,9 +8,8 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 
 public class BuilderBarracks extends DefaultBuildableItem {
@@ -58,7 +57,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
 			return true;
 
 		} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 1) {
-			List<Unit> barracksList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
+			List<Unit> barracksList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
 
 			for (Unit unit : barracksList) {
 				if (unit.getHitPoints() < UnitType.Terran_Barracks.maxHitPoints() / 3) {

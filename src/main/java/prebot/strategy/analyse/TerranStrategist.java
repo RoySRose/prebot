@@ -5,7 +5,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
@@ -17,48 +16,48 @@ public class TerranStrategist extends Strategist {
 
 	@Override
 	protected EnemyStrategy strategyPhase01() {
-		if (hasInfo(ClueInfo.COMMAND_FASTEST_DOUBLE)) {
+		if (hasInfo(Clue.ClueInfo.COMMAND_FASTEST_DOUBLE)) {
 			return EnemyStrategy.TERRAN_NO_BARRACKS_DOUBLE;
-		} else if (hasInfo(ClueInfo.COMMAND_FAST_DOUBLE)) {
+		} else if (hasInfo(Clue.ClueInfo.COMMAND_FAST_DOUBLE)) {
 			return EnemyStrategy.TERRAN_1BARRACKS_DOUBLE;
 		}
 
-		if (hasInfo(ClueInfo.BARRACK_FASTEST_TWO)) {
+		if (hasInfo(Clue.ClueInfo.BARRACK_FASTEST_TWO)) {
 			return EnemyStrategy.TERRAN_BBS;
 			
-		} else if (hasInfo(ClueInfo.BARRACK_FAST_TWO)) {
+		} else if (hasInfo(Clue.ClueInfo.BARRACK_FAST_TWO)) {
 			return EnemyStrategy.TERRAN_2BARRACKS;
 			
-		} else if (hasAllInfo(ClueInfo.BARRACK_NOT_FOUND, ClueInfo.NO_REFINERY)) {
+		} else if (hasAllInfo(Clue.ClueInfo.BARRACK_NOT_FOUND, Clue.ClueInfo.NO_REFINERY)) {
 			return EnemyStrategy.TERRAN_BBS;
 		}
 		
-		if (hasInfo(ClueInfo.ACADEMY_FAST)) {
+		if (hasInfo(Clue.ClueInfo.ACADEMY_FAST)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasAnyType(ClueType.MEDIC, ClueType.FIREBAT)) {
+		if (hasAnyType(Clue.ClueType.MEDIC, Clue.ClueType.FIREBAT)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
-		if (hasType(ClueType.FAST_MARINE)) {
+		if (hasType(Clue.ClueType.FAST_MARINE)) {
 			return EnemyStrategy.TERRAN_2BARRACKS;
 		}
 		
-		if (hasAnyInfo(ClueInfo.REFINERY_FAST, ClueInfo.REFINERY_LATE)) {
-			if (hasAnyInfo(ClueInfo.FACTORY_NOT_FOUND)) {
+		if (hasAnyInfo(Clue.ClueInfo.REFINERY_FAST, Clue.ClueInfo.REFINERY_LATE)) {
+			if (hasAnyInfo(Clue.ClueInfo.FACTORY_NOT_FOUND)) {
 				return EnemyStrategy.TERRAN_BIONIC;
 			} else {
 				return EnemyStrategy.TERRAN_MECHANIC; 
 			}
-		} else if (hasInfo(ClueInfo.NO_REFINERY)) {
+		} else if (hasInfo(Clue.ClueInfo.NO_REFINERY)) {
 			return EnemyStrategy.TERRAN_1BARRACKS_DOUBLE;
 		}
 
-		if (hasAnyInfo(ClueInfo.FAST_SIX_MARINE, ClueInfo.FAST_FOUR_MARINE)) {
+		if (hasAnyInfo(Clue.ClueInfo.FAST_SIX_MARINE, Clue.ClueInfo.FAST_FOUR_MARINE)) {
 			return EnemyStrategy.TERRAN_2BARRACKS;
 		}
 		
-		if (hasInfo(ClueInfo.BARRACK_TWO)) {
+		if (hasInfo(Clue.ClueInfo.BARRACK_TWO)) {
 			return EnemyStrategy.TERRAN_2BARRACKS;
 		}
 		
@@ -67,38 +66,38 @@ public class TerranStrategist extends Strategist {
 
 	@Override
 	protected EnemyStrategy strategyPhase02() {
-		if (hasInfo(ClueInfo.STARPORT_FAST_TWO)) {
+		if (hasInfo(Clue.ClueInfo.STARPORT_FAST_TWO)) {
 			return EnemyStrategy.TERRAN_2STAR;
-		} else if (hasInfo(ClueInfo.STARPORT_FAST_ONE)) {
+		} else if (hasInfo(Clue.ClueInfo.STARPORT_FAST_ONE)) {
 			return EnemyStrategy.TERRAN_1FAC_1STAR;
 		}
 		
-		if (hasAnyInfo(ClueInfo.FAST_THREE_WRAITH, ClueInfo.FAST_TWO_WRAITH)) {
+		if (hasAnyInfo(Clue.ClueInfo.FAST_THREE_WRAITH, Clue.ClueInfo.FAST_TWO_WRAITH)) {
 			return EnemyStrategy.TERRAN_2STAR;
-		} else if (hasAnyInfo(ClueInfo.FAST_ONE_WRAITH)) {
-			if (hasInfo(ClueInfo.STARPORT_TWO)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.FAST_ONE_WRAITH)) {
+			if (hasInfo(Clue.ClueInfo.STARPORT_TWO)) {
 				return EnemyStrategy.TERRAN_2STAR;
 			} else {
 				return EnemyStrategy.TERRAN_1FAC_1STAR;
 			}
 		}
 		
-		if (hasInfo(ClueInfo.FAST_THREE_TANK)) {
+		if (hasInfo(Clue.ClueInfo.FAST_THREE_TANK)) {
 			return EnemyStrategy.TERRAN_2FAC; // TODO 탱크를 이용한 빠른 지상병력 공격 예상
-		} else if (hasAnyInfo(ClueInfo.FAST_TWO_TANK, ClueInfo.FAST_ONE_TANK)) {
-			if (hasType(ClueType.FAST_VULTURE)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.FAST_TWO_TANK, Clue.ClueInfo.FAST_ONE_TANK)) {
+			if (hasType(Clue.ClueType.FAST_VULTURE)) {
 				return EnemyStrategy.TERRAN_2FAC; // TODO 탱크를 이용한 빠른 지상병력 공격 예상
 			}
 		}
 		
-		if (hasInfo(ClueInfo.FACTORY_FAST_TWO)) {
+		if (hasInfo(Clue.ClueInfo.FACTORY_FAST_TWO)) {
 			return EnemyStrategy.TERRAN_2FAC;
 		}
 		
-		if (hasInfo(ClueInfo.COMMAND_FAC_DOUBLE)) {
-			if (hasAnyType(ClueType.FAST_STARPORT, ClueType.FAST_WRAITH)) {
+		if (hasInfo(Clue.ClueInfo.COMMAND_FAC_DOUBLE)) {
+			if (hasAnyType(Clue.ClueType.FAST_STARPORT, Clue.ClueType.FAST_WRAITH)) {
 				return EnemyStrategy.TERRAN_1FAC_DOUBLE_1STAR;	
-			} else if (hasAnyType(ClueType.FAST_ARMORY, ClueType.FAST_GOLIATH)) {
+			} else if (hasAnyType(Clue.ClueType.FAST_ARMORY, Clue.ClueType.FAST_GOLIATH)) {
 				return EnemyStrategy.TERRAN_1FAC_DOUBLE_ARMORY;
 			} else {
 				return EnemyStrategy.TERRAN_1FAC_DOUBLE;
@@ -106,10 +105,10 @@ public class TerranStrategist extends Strategist {
 		}
 		
 		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
-			if (hasInfo(ClueInfo.FACTORY_TWO)) {
+			if (hasInfo(Clue.ClueInfo.FACTORY_TWO)) {
 				return EnemyStrategy.TERRAN_DOUBLE_MECHANIC;
 				
-			} else if (hasInfo(ClueInfo.BARRACK_TWO)) {
+			} else if (hasInfo(Clue.ClueInfo.BARRACK_TWO)) {
 				return EnemyStrategy.TERRAN_DOUBLE_BIONIC;
 				
 			} else {
@@ -117,19 +116,19 @@ public class TerranStrategist extends Strategist {
 			}
 		}
 		
-		if (hasInfo(ClueInfo.STARPORT_TWO)) {
+		if (hasInfo(Clue.ClueInfo.STARPORT_TWO)) {
 			return EnemyStrategy.TERRAN_2STAR;
 		}
 		
-		if (hasInfo(ClueInfo.ACADEMY_FAST)) {
+		if (hasInfo(Clue.ClueInfo.ACADEMY_FAST)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasInfo(ClueInfo.FACTORY_FAST_ONE)) {
+		if (hasInfo(Clue.ClueInfo.FACTORY_FAST_ONE)) {
 			return EnemyStrategy.TERRAN_1FAC_DOUBLE;
 		}
 		
-		if (hasInfo(ClueInfo.STARPORT_ONE)) {
+		if (hasInfo(Clue.ClueInfo.STARPORT_ONE)) {
 			return EnemyStrategy.TERRAN_1FAC_1STAR;
 		}
 		
@@ -137,15 +136,15 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 
-		if (hasAnyInfo(ClueInfo.FAST_FOUR_MARINE, ClueInfo.FAST_SIX_MARINE)) {
+		if (hasAnyInfo(Clue.ClueInfo.FAST_FOUR_MARINE, Clue.ClueInfo.FAST_SIX_MARINE)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasInfo(ClueInfo.FACTORY_NOT_FOUND)) { // *
+		if (hasInfo(Clue.ClueInfo.FACTORY_NOT_FOUND)) { // *
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		
-		if (hasAnyInfo(ClueInfo.BARRACK_FASTEST_TWO, ClueInfo.BARRACK_FAST_TWO)) {
+		if (hasAnyInfo(Clue.ClueInfo.BARRACK_FASTEST_TWO, Clue.ClueInfo.BARRACK_FAST_TWO)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		

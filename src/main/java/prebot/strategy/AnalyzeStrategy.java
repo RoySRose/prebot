@@ -141,7 +141,7 @@ public class AnalyzeStrategy {
 //							// 어시밀레이터나 코어전에 2게이트라면 질럿 푸시
 //							TilePosition center = TilePositionUtils.getCenterTilePosition();
 //
-//							List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE, UnitType.Protoss_Gateway, UnitType.Protoss_Pylon);
+//							List<UnitInfo> euiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.VISIBLE, UnitType.Protoss_Gateway, UnitType.Protoss_Pylon);
 //							for (UnitInfo gatewayOrPlyon : euiList) {
 //								if (center.getDistance(gatewayOrPlyon.getLastPosition().toTilePosition()) < 600) {
 //									RespondToStrategy.Instance().center_gateway = true;

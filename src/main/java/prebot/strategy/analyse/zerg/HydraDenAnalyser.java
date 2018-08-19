@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
@@ -18,7 +17,7 @@ public class HydraDenAnalyser extends UnitAnalyser {
 
 	@Override
 	public void analyse() {
-		if (ClueManager.Instance().containsClueType(ClueType.HYDRADEN)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.HYDRADEN)) {
 			return;
 		}
 		
@@ -27,11 +26,11 @@ public class HydraDenAnalyser extends UnitAnalyser {
 			int lairBuildFrame = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair);
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			if (buildFrame < lairBuildFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.HYDRADEN_BEFORE_LAIR_START);
 			} else if (buildFrame < lairBuildFrame + UnitType.Zerg_Lair.buildTime()) {
-				ClueManager.Instance().addClueInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.HYDRADEN);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.HYDRADEN);
 			}
 		}
 	}

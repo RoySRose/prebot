@@ -2,14 +2,12 @@ package prebot.strategy.analyse;
 
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -23,49 +21,49 @@ public class ZergStrategist extends Strategist {
 	
 	@Override
 	protected EnemyStrategy strategyPhase01() {
-		if (hasInfo(ClueInfo.DOUBLE_HATCH_3HAT)) {
+		if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT)) {
 			return EnemyStrategy.ZERG_3HAT;
 		}
 		
-		if (hasInfo(ClueInfo.DOUBLE_HATCH_12HAT)) {
-			if (hasAnyInfo(ClueInfo.NO_EXTRACTOR) && !hasAnyInfo(ClueInfo.LAIR_2HAT_FAST, ClueInfo.LAIR_1HAT_FAST)) {
+		if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_12HAT)) {
+			if (hasAnyInfo(Clue.ClueInfo.NO_EXTRACTOR) && !hasAnyInfo(Clue.ClueInfo.LAIR_2HAT_FAST, Clue.ClueInfo.LAIR_1HAT_FAST)) {
 				return EnemyStrategy.ZERG_3HAT;
 			} else {
 				return EnemyStrategy.ZERG_2HAT_GAS;
 			}
-		} else if (hasInfo(ClueInfo.TWIN_HATCH)) {
+		} else if (hasInfo(Clue.ClueInfo.TWIN_HATCH)) {
 			return EnemyStrategy.ZERG_TWIN_HAT; // twin은 좋지 않은 빌드이다.
 		}
 		
-		if (hasInfo(ClueInfo.POOL_5DRONE)) {
+		if (hasInfo(Clue.ClueInfo.POOL_5DRONE)) {
 			return EnemyStrategy.ZERG_5DRONE;
 			
-		} else if (hasAnyInfo(ClueInfo.POOL_9DRONE, ClueInfo.POOL_9DRONE_UNDER)) {
-			if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.POOL_9DRONE, Clue.ClueInfo.POOL_9DRONE_UNDER)) {
+			if (hasAnyInfo(Clue.ClueInfo.EXTRACTOR_9DRONE, Clue.ClueInfo.EXTRACTOR_OVERPOOL)) {
 				return EnemyStrategy.ZERG_9DRONE_GAS;
 			} else {
 				return EnemyStrategy.ZERG_9DRONE;
 			}
 			
-		} else if (hasAnyInfo(ClueInfo.POOL_OVERPOOL, ClueInfo.POOL_OVERPOOL_UNDER)) {
-			if (hasAnyInfo(ClueInfo.EXTRACTOR_9DRONE, ClueInfo.EXTRACTOR_OVERPOOL)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.POOL_OVERPOOL, Clue.ClueInfo.POOL_OVERPOOL_UNDER)) {
+			if (hasAnyInfo(Clue.ClueInfo.EXTRACTOR_9DRONE, Clue.ClueInfo.EXTRACTOR_OVERPOOL)) {
 				return EnemyStrategy.ZERG_OVERPOOL_GAS;
 			} else {
 				return EnemyStrategy.ZERG_OVERPOOL;
 			}
 			
-		} else if (hasAnyInfo(ClueInfo.POOL_2HAT, ClueInfo.LATE_POOL)) {
-			if (hasAnyInfo(ClueInfo.EXTRACTOR_LATE, ClueInfo.NO_EXTRACTOR)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.POOL_2HAT, Clue.ClueInfo.LATE_POOL)) {
+			if (hasAnyInfo(Clue.ClueInfo.EXTRACTOR_LATE, Clue.ClueInfo.NO_EXTRACTOR)) {
 				return EnemyStrategy.ZERG_3HAT;
 			} else {
 				return EnemyStrategy.ZERG_2HAT_GAS;
 			}
 		}
 		
-		if (hasType(ClueType.DOUBLE_HATCH)) {
-			if (hasInfo(ClueInfo.DOUBLE_HATCH_OVERPOOL)) {
+		if (hasType(Clue.ClueType.DOUBLE_HATCH)) {
+			if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_OVERPOOL)) {
 				return EnemyStrategy.ZERG_OVERPOOL;
-			} else if (hasInfo(ClueInfo.DOUBLE_HATCH_9DRONE)) {
+			} else if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_9DRONE)) {
 				return EnemyStrategy.ZERG_9DRONE;
 			}
 		}
@@ -80,12 +78,12 @@ public class ZergStrategist extends Strategist {
 		}
 		
 
-		boolean spireTech = hasAnyInfo(ClueInfo.FAST_SPIRE, ClueInfo.SPIRE, ClueInfo.FAST_MUTAL);
-		boolean hydraTech = hasAnyInfo(ClueInfo.HYDRADEN_BEFORE_LAIR_START, ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, ClueInfo.HYDRADEN, ClueInfo.FAST_HYDRA);
-		boolean hydraFiveMany = hasInfo(ClueInfo.FIVE_MANY_HYDRA);
-		boolean lurkerFound = hasAnyInfo(ClueInfo.FAST_LURKER);
+		boolean spireTech = hasAnyInfo(Clue.ClueInfo.FAST_SPIRE, Clue.ClueInfo.SPIRE, Clue.ClueInfo.FAST_MUTAL);
+		boolean hydraTech = hasAnyInfo(Clue.ClueInfo.HYDRADEN_BEFORE_LAIR_START, Clue.ClueInfo.HYDRADEN_BEFORE_LAIR_COMPLETE, Clue.ClueInfo.HYDRADEN, Clue.ClueInfo.FAST_HYDRA);
+		boolean hydraFiveMany = hasInfo(Clue.ClueInfo.FIVE_MANY_HYDRA);
+		boolean lurkerFound = hasAnyInfo(Clue.ClueInfo.FAST_LURKER);
 		
-		if (hasAnyInfo(ClueInfo.LAIR_INCOMPLETE, ClueInfo.LAIR_COMPLETE)) {
+		if (hasAnyInfo(Clue.ClueInfo.LAIR_INCOMPLETE, Clue.ClueInfo.LAIR_COMPLETE)) {
 			if (spireTech && hydraTech) {
 				return EnemyStrategy.ZERG_LAIR_MIXED;
 			} else if (lurkerFound) {
@@ -100,10 +98,10 @@ public class ZergStrategist extends Strategist {
 				return fastMutaliskByTime();
 			}
 			
-		} else if (hasAnyInfo(ClueInfo.NO_LAIR)) {
+		} else if (hasAnyInfo(Clue.ClueInfo.NO_LAIR)) {
 			if (spireTech) {
 				return fastMutaliskByTime(); // no lair, no mute
-			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA) || hasInfo(ClueInfo.THREE_MANY_HYDRA)) {
+			} else if (hasAnyType(Clue.ClueType.HYDRADEN, Clue.ClueType.FAST_HYDRA) || hasInfo(Clue.ClueInfo.THREE_MANY_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;
 			} else {
 				return EnemyStrategy.ZERG_NO_LAIR_LING;
@@ -111,7 +109,7 @@ public class ZergStrategist extends Strategist {
 		} else {
 			if (spireTech) {
 				return fastMutaliskByTime(); // no lair, no mute
-			} else if (hasAnyType(ClueType.HYDRADEN, ClueType.FAST_HYDRA)) {
+			} else if (hasAnyType(Clue.ClueType.HYDRADEN, Clue.ClueType.FAST_HYDRA)) {
 				return EnemyStrategy.ZERG_NO_LAIR_HYDRA;
 			}
 			return fastMutaliskByTime();
@@ -149,7 +147,7 @@ public class ZergStrategist extends Strategist {
 //		int zerglingCount = InfoUtils.enemyNumUnits(UnitType.Zerg_Zergling);
 		int enemyGroundUnitPower = UnitUtils.enemyGroundUnitPower();
 		int enemyAirUnitPower = UnitUtils.enemyAirUnitPower();
-		int goliathCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Goliath);
+		int goliathCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Goliath);
 
 		boolean hydraDiscovered = UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Hydralisk, UnitType.Zerg_Lurker, UnitType.Zerg_Hydralisk_Den);
 		boolean spireExist = InfoUtils.enemyNumUnits(UnitType.Zerg_Spire, UnitType.Zerg_Greater_Spire) > 0;
@@ -210,7 +208,7 @@ public class ZergStrategist extends Strategist {
 		if (UnitUtils.activatedCommandCenterCount() < 2) {
 			return false;
 		}
-		if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) <= 5) {
+		if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) <= 5) {
 			return false;
 		}
 		warithActivatedFrame = TimeUtils.elapsedFrames();

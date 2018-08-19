@@ -1,32 +1,25 @@
 package prebot.micro.control;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.swing.plaf.synth.SynthSpinnerUI;
 
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
-import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.LagObserver;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
-import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMaker;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
@@ -57,9 +50,9 @@ public class MarineControl extends Control {
 		if (bunker != null) {
 			fleePosition = bunker.getPosition();
 		}
-		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
+		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(fleePosition, true, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
+		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 		
 		// TODO 초반 저글링 디펜스가 필요한 경우 일꾼 사이로 위치 고정
 		if (bunker == null && inCompleteBunker == null) {
@@ -75,7 +68,7 @@ public class MarineControl extends Control {
 				holdConPosition = (InformationManager.Instance().isHoldConPosition() == null) ? InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint() : holdConPosition;
 				Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getCenter();
 				
-				Decision decision = decisionMaker.makeDecision(marine, euiList);
+				MicroDecision decision = decisionMaker.makeDecision(marine, euiList);
 				
 				if(marineDangerousOutOfMyRegion(marine,decision.eui)){
 					Position randomPosition = PositionUtils.randomPosition(safePosition, 5);
@@ -85,14 +78,14 @@ public class MarineControl extends Control {
 				/*while(marine.getDistance(safePosition) < 30) { // TODO 추후 변경
 					CommandUtils.attackMove(marine, safePosition);
 				} */
-				if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+				if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 					//if(InformationManager.Instance().isBlockingEnterance()){
 					if(decision.eui.getUnit().getDistance(safePosition) > 30){
 						CommandUtils.attackMove(marine, safePosition);
 					}else{
 						MicroUtils.flee(marine, decision.eui.getLastPosition(), fOption);
 					}
-				} else if (decision.type == DecisionType.KITING_UNIT) {
+				} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 					//if(InformationManager.Instance().isBlockingEnterance()){
 					// 베이스 지역 OK
 						if((campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE)
@@ -153,8 +146,8 @@ public class MarineControl extends Control {
 					continue;
 				}
 				
-				Decision decision = decisionMaker.makeDecision(marine, euiList);
-				if (decision.type == DecisionType.KITING_UNIT){
+				MicroDecision decision = decisionMaker.makeDecision(marine, euiList);
+				if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT){
 					if(marineDangerousOutOfMyRegion(marine,decision.eui)){
 						CommandUtils.attackMove(marine, inCompleteBunker.getPosition());
 					}
@@ -172,8 +165,8 @@ public class MarineControl extends Control {
 				}
 				
 				
-				Decision decision = decisionMaker.makeDecision(marine, euiList);
-				if (decision.type == DecisionType.KITING_UNIT) {
+				MicroDecision decision = decisionMaker.makeDecision(marine, euiList);
+				if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 					Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
 				
 					if(marineDangerousOutOfMyRegion(marine,decision.eui)){
@@ -225,7 +218,7 @@ public class MarineControl extends Control {
 
 	public Unit getCompleteBunker(Region campRegion) {
 		Unit bunkerInRegion = null;
-		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
+		for (Unit bunker : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
 				bunkerInRegion = bunker;
 				break;
 		}
@@ -234,7 +227,7 @@ public class MarineControl extends Control {
 
 	private Unit getIncompleteBunker(Region campRegion) { 
 		Unit bunkerInRegion = null;
-		for (Unit bunker : UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker)) {
+		for (Unit bunker : UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker)) {
 			/*if (bunker.getRemainingBuildTime() > 3 * TimeUtils.SECOND) {
 				continue;
 			}*/

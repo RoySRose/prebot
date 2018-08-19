@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -23,7 +23,7 @@ public class DragoonAnalyser extends UnitAnalyser {
 			int dragoonFrame = EnemyStrategy.PROTOSS_1GATE_CORE.buildTimeMap.frame(UnitType.Protoss_Cybernetics_Core, 10) + UnitType.Protoss_Dragoon.buildTime();
 			int dragoonFrameInMyRegionFrame = dragoonFrame + baseToBaseFrame(UnitType.Protoss_Dragoon);
 			if (minimumUpdateFrame < dragoonFrameInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_DRAGOON);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_DRAGOON);
 			}
 		}
 	}

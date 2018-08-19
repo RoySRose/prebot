@@ -118,23 +118,23 @@ public class InitialBuildProvider {
         		
         	} else {
             	if (nowStrategy == ExpansionOption.TWO_FACTORY) {
-            		List<Unit> factoryList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+            		List<Unit> factoryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
             		if (factoryList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             	} else if (nowStrategy == ExpansionOption.TWO_STARPORT) {
-            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+            		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             	} else if (nowStrategy == ExpansionOption.ONE_STARPORT) {
-            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+            		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 1) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             		
             	} else if (nowStrategy == ExpansionOption.ONE_FACTORY) {
-            		List<Unit> starportList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+            		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
             		if (starportList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
@@ -160,12 +160,12 @@ public class InitialBuildProvider {
 		// 1팩토리, 1스타포트, 2스타포트 : 2번째 팩토리를 취소한다.
 		if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
 			Unit completeFirstFactory = null; // 첫번째 팩토리 (완성)
-			List<Unit> completeFactories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+			List<Unit> completeFactories = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 			if (completeFactories.size() >= 1) {
 				completeFirstFactory = completeFactories.get(0);
 			}
 			
-			List<Unit> incompleteFactories = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Factory);
+			List<Unit> incompleteFactories = UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Factory);
 			Unit incompleteFirstFactory = null; // 첫번째 팩토리 (미완성 - 완성된 팩토리가 없는 경우)
 			if (completeFirstFactory == null) {
 				int minimumRemainingBuildTime = CommonCode.INT_MAX;
@@ -201,12 +201,12 @@ public class InitialBuildProvider {
 		// 2팩, 1스타포트 : 2번째 스타포트를 취소한다.
 		if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
 			Unit completeFirstStarport = null; // 첫번째 스타포트 (완성)
-			List<Unit> completeBuildings = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+			List<Unit> completeBuildings = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			if (completeBuildings.size() >= 1) {
 				completeFirstStarport = completeBuildings.get(0);
 			}
 			
-			List<Unit> incompleteStarports = UnitUtils.getUnitList(UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
+			List<Unit> incompleteStarports = UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Starport);
 			Unit incompleteFirstStarport = null; // 두번째 스타포트 (미완성 - 완성된 스타포트가 없는 경우)
 			if (completeFirstStarport == null) {
 				int minimumRemainingBuildTime = CommonCode.INT_MAX;

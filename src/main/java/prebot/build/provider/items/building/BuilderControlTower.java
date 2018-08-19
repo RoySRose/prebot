@@ -6,7 +6,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -41,7 +41,7 @@ public class BuilderControlTower extends DefaultBuildableItem {
 //		}
 		
 		if (addControlTower) {
-			List<Unit> starport = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Starport);
+			List<Unit> starport = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			for (Unit unit : starport) {
 				if (unit.canBuildAddon()) {
 					return true;

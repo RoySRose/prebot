@@ -6,8 +6,8 @@ import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
-import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -34,7 +34,7 @@ public class MutaliskAnalyser extends UnitAnalyser {
 			int mutalInMyRegionFrame = spireBuildExpect + UnitType.Zerg_Spire.buildTime()
 					+ UnitType.Zerg_Mutalisk.buildTime() + baseToBaseFrame(UnitType.Zerg_Mutalisk) + 15 * TimeUtils.SECOND;
 			if (minimumUpdateFrame < mutalInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_MUTAL);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_MUTAL);
 			}
 		}
 	}
