@@ -308,6 +308,10 @@ public class MarineControl extends Control {
 		// 앞마당 지역, 또는 앞마당 반경이내 OK
 		Position expansionPosition = InfoUtils.myFirstExpansion().getPosition();
 		Region expansionRegion = BWTA.getRegion(expansionPosition);
+		if (marine.getPosition().getDistance(expansionPosition) < 80) {
+ 			return true;
+		}
+		
 		if (unitRegion == expansionRegion) {
 			return false;
 		} else if (marine.getDistance(expansionPosition) < 100) {
