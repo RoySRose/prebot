@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -18,8 +17,6 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.MicroUtils;
-import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
@@ -283,14 +280,7 @@ public class CombatManager extends GameManager {
 					Squad regionDefenseSquad = squadData.getSquad(squadName);
 					
 					if (regionDefenseSquad == null) {
-						Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
-						Position regionPosition = region.getCenter();
-						
-						double radian = MicroUtils.targetDirectionRadian(centerPosition, regionPosition);
-						Position movePosition = MicroUtils.getMovePosition(centerPosition, radian, 1000);
-						
-						Region defenseRegion = BWTA.getRegion(movePosition.makeValid());
-						regionDefenseSquad = new MultiDefenseSquad(defenseRegion, base.getPosition());
+						regionDefenseSquad = new MultiDefenseSquad(base.getPosition());
 						squadData.addSquad(regionDefenseSquad);
 					}
 				}

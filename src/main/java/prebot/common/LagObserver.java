@@ -54,7 +54,7 @@ public class LagObserver {
 				}
 			} else {
 				if (Prebot.Broodwar.self().supplyUsed() > 300) {
-					groupMinSize = 6;
+					groupMinSize = 8;
 				} else {
 					groupMinSize = 3;
 				}

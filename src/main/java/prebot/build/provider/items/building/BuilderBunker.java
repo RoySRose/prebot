@@ -40,26 +40,29 @@ public class BuilderBunker extends DefaultBuildableItem {
 		}
 
 		if (InfoUtils.enemyRace() == Race.Protoss) {
-			int waitingBlockSeconds = 8;
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
-				waitingBlockSeconds = 5;
-			}
-			boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
-			if (entranceBlocked) {
-				entranceOpenFrame = CommonCode.UNKNOWN;
-				bunkerBuildLeftSecond = CommonCode.UNKNOWN;
-			} else {
-				if (entranceOpenFrame == CommonCode.UNKNOWN) {
-					entranceOpenFrame = TimeUtils.elapsedFrames();
+			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_INIT
+					|| StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+				int waitingBlockSeconds = 8;
+				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+					waitingBlockSeconds = 5;
 				}
-				
-				int leftSeconds = Math.max(waitingBlockSeconds - TimeUtils.elapsedSeconds(entranceOpenFrame), 0);
-				if (bunkerBuildLeftSecond == CommonCode.UNKNOWN || leftSeconds < bunkerBuildLeftSecond) {
-					bunkerBuildLeftSecond = leftSeconds;
-					if (bunkerBuildLeftSecond == 0) {
-						Prebot.Broodwar.sendText("Bunker.");
-					} else {
-						Prebot.Broodwar.sendText("" + bunkerBuildLeftSecond);
+				boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
+				if (entranceBlocked) {
+					entranceOpenFrame = CommonCode.UNKNOWN;
+					bunkerBuildLeftSecond = CommonCode.UNKNOWN;
+				} else {
+					if (entranceOpenFrame == CommonCode.UNKNOWN) {
+						entranceOpenFrame = TimeUtils.elapsedFrames();
+					}
+					
+					int leftSeconds = Math.max(waitingBlockSeconds - TimeUtils.elapsedSeconds(entranceOpenFrame), 0);
+					if (bunkerBuildLeftSecond == CommonCode.UNKNOWN || leftSeconds < bunkerBuildLeftSecond) {
+						bunkerBuildLeftSecond = leftSeconds;
+						if (bunkerBuildLeftSecond == 0) {
+							Prebot.Broodwar.sendText("Bunker.");
+						} else {
+							Prebot.Broodwar.sendText("" + bunkerBuildLeftSecond);
+						}
 					}
 				}
 			}
