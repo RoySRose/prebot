@@ -112,6 +112,11 @@ public class EnemyCommandInfo {
     public void setLastCheckFrame(int lastCheckFrame) {
         this.lastCheckFrame = lastCheckFrame;
     }
+    
+    public int getLastFullCheckFrame() {
+        return lastFullCheckFrame;
+    }
+    
 
     public void updateInfo() {
 
