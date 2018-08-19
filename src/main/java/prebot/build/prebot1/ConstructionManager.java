@@ -75,18 +75,19 @@ public class ConstructionManager extends GameManager {
 	}
 
 	
-	public void cancelConstructionTask(UnitType type, TilePosition desiredPosition)
+	public void cancelConstructionTask(ConstructionTask b)
 	{
-		reservedMinerals -= type.mineralPrice();
-		reservedGas -= type.gasPrice();
+		reservedMinerals -= b.getType().mineralPrice();
+		reservedGas -= b.getType().gasPrice();
 
-		cancelConstructionTaskDoNotReturnResources(type, desiredPosition);
+		cancelConstructionTaskDoNotReturnResources(b);
 	}
 	
 	/// constructionQueue 에서 ConstructionTask 를 취소합니다
 	public void cancelConstructionTaskDoNotReturnResources(UnitType type, TilePosition desiredPosition)
 	{
 		ConstructionTask b = new ConstructionTask(type, desiredPosition);
+		b.setFinalPosition(desiredPosition);
 	    if (constructionQueue.contains(b))
 	    {
 	    	//System.out.println("Cancel Construction " + b.getType() + " at " + b.getDesiredPosition().getX() + "," + b.getDesiredPosition().getY());
@@ -102,15 +103,47 @@ public class ConstructionManager extends GameManager {
 				if (b.getType() == UnitType.Terran_Command_Center ||
 					b.getType() == UnitType.Terran_Factory ||
 					b.getType() == UnitType.Terran_Starport )
-//					b.getType() == UnitType.Terran_Science_Facility)
+//						b.getType() == UnitType.Terran_Science_Facility)
 				{
 					width += 2;
 				}
+//				FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
 				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
 			}
 	        constructionQueue.remove(b);
 	    }
 	}
+	
+
+	/// constructionQueue 에서 ConstructionTask 를 취소합니다
+		public void cancelConstructionTaskDoNotReturnResources(ConstructionTask b)
+		{
+//			ConstructionTask b = new ConstructionTask(type, desiredPosition);
+		    if (constructionQueue.contains(b))
+		    {
+		    	//System.out.println("Cancel Construction " + b.getType() + " at " + b.getDesiredPosition().getX() + "," + b.getDesiredPosition().getY());
+
+				if (b.getConstructionWorker() != null) {
+					WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
+				}
+				if (b.getFinalPosition() != null) {
+					
+					int width = b.getType().tileWidth();
+					int height = b.getType().tileHeight();
+					
+					if (b.getType() == UnitType.Terran_Command_Center ||
+						b.getType() == UnitType.Terran_Factory ||
+						b.getType() == UnitType.Terran_Starport )
+//						b.getType() == UnitType.Terran_Science_Facility)
+					{
+						width += 2;
+					}
+//					FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
+					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+				}
+		        constructionQueue.remove(b);
+		    }
+		}
 
 	/// constructionQueue 에서 건설 상태가 UnderConstruction 인 ConstructionTask 여러개를 삭제합니다<br>
 	/// 건설을 시작했었던 ConstructionTask 이기 때문에 _reservedMinerals, _reservedGas 는 건드리지 않는다
@@ -716,7 +749,9 @@ public class ConstructionManager extends GameManager {
 		for (ConstructionTask i : toCancel)
 		{
 			System.out.println("cacnel type=" + i.getType() + ", desiredPosition=" + i.getDesiredPosition());
-			cancelConstructionTask(i.getType(), i.getDesiredPosition());
+//			FileUtils.appendTextToFile("log.txt", "\n cacnel type= "+ i.getType() + ", desiredPosition=" + i.getDesiredPosition() + " :: " + Prebot.Broodwar.getFrameCount());
+//			cancelConstructionTask(i.getType(), i.getDesiredPosition());
+			cancelConstructionTask(i);
 		}
 	}
 

@@ -718,7 +718,7 @@ public class PositionFinder {
 	}
 
 	/// second choke보다 안쪽 포지션
-	private Position expansionDefensePosition() {
+	public Position expansionDefensePosition() {
 		if (expansionDefensePosition != null) {
 			return expansionDefensePosition;
 		}
@@ -743,7 +743,7 @@ public class PositionFinder {
 //		}
 	}
 	
-	private Position expansionDefensePositionSiege() {
+	public Position expansionDefensePositionSiege() {
 		if (expansionDefensePositionSiege != null) {
 			return expansionDefensePositionSiege;
 		}
@@ -773,7 +773,7 @@ public class PositionFinder {
 	}
 	
 	/// First Choke Point 방어지역
-	private Position firstChokeDefensePosition() {
+	public Position firstChokeDefensePosition() {
 		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
 		Position firstChokeDefensePosition = firstChokePosition;
 		double radian = 0;

@@ -405,7 +405,7 @@ public class ConstructionPlaceFinder {
 			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
 			
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
-				maxRange = 40;
+				maxRange = 23;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
 					if(base.isStartLocation() && TilePositionUtils.equals(base.getTilePosition(), desiredPosition)) {
 						maxRange = 30;
@@ -866,9 +866,12 @@ public class ConstructionPlaceFinder {
 	/// 지도상의 여러 가스 광산 (Resource_Vespene_Geyser) 중 예약되어있지 않은 곳(isReservedTile), 다른 섬이 아닌 곳, 이미 Refinery 가 지어져있지않은 곳 중<br> 
 	/// seedPosition 과 가장 가까운 곳을 리턴합니다
 	public final TilePosition getRefineryPositionNear(TilePosition seedPosition) {
+		
 		if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
 			seedPosition = InfoUtils.myBase().getTilePosition();
 		}
+		
+		FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
 
 		//TODO BASICBOT 1.1 버젼의 가스 처리다.. 확인해 봐야함.
 //		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
@@ -905,17 +908,20 @@ public class ConstructionPlaceFinder {
 		for (Unit geyser : Prebot.Broodwar.getStaticGeysers()) {
 			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
 			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
+			FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
 
 			Position geyserPos = geyser.getInitialPosition();
 			TilePosition geyserTilePos = geyser.getInitialTilePosition();
 
 			// 이미 예약되어있는가
 			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
+				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
 				continue;
 			}
 
 			// if it is not connected fron seedPosition, it is located in another island
 			if (!BWTA.isConnected(seedPosition, geyserTilePos)) {
+				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos not connected :: " + geyserTilePos + " :: " + seedPosition);
 				continue;
 			}
 
@@ -924,6 +930,7 @@ public class ConstructionPlaceFinder {
 			List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
 			for (Unit u : alreadyBuiltUnits) {
 				if (u.getType().isRefinery() && u.exists()) {
+					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
 					refineryAlreadyBuilt = true;
 					break;
 				}
@@ -934,6 +941,7 @@ public class ConstructionPlaceFinder {
 				if (thisDistance < minGeyserDistanceFromSeedPosition) {
 					minGeyserDistanceFromSeedPosition = thisDistance;
 					closestGeyser = geyser.getInitialTilePosition();
+					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear set closestGeyser :: " + closestGeyser);
 				}
 			}
 		}
