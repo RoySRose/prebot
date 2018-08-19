@@ -22,6 +22,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.FleeOption;
 import prebot.micro.constant.MicroConfig.Angles;
@@ -156,7 +157,7 @@ public class ScvScoutControl extends Control {
 		}
 		
 		BaseLocation nearestBase = BaseLocationUtils.getClosestBaseToPosition(BWTA.getStartLocations(), scoutScv.getPosition());
-		BaseLocation notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new BaseCondition() {
+		BaseLocation notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
 				return !Prebot.Broodwar.isExplored(base.getTilePosition()) && !otherScvScoutBaseList.contains(base);
@@ -164,7 +165,7 @@ public class ScvScoutControl extends Control {
 		});
 		
 		if (notExploredBase == null) {
-			notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new BaseCondition() {
+			notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new IConditions.BaseCondition() {
 				@Override
 				public boolean correspond(BaseLocation base) {
 					return !Prebot.Broodwar.isExplored(base.getTilePosition());
@@ -176,7 +177,7 @@ public class ScvScoutControl extends Control {
 	
 	/** 본진에서 먼 곳부터 정찰 (대각선 정찰) */
 	private BaseLocation notExloredFarthestBaseLocation(Unit scv) {
-		BaseLocation notExploredFarthestBase = BaseLocationUtils.getGroundFarthestBaseToPosition(BWTA.getStartLocations(), InfoUtils.myBase(), new BaseCondition() {
+		BaseLocation notExploredFarthestBase = BaseLocationUtils.getGroundFarthestBaseToPosition(BWTA.getStartLocations(), InfoUtils.myBase(), new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
 				return !Prebot.Broodwar.isExplored(base.getTilePosition());

@@ -15,9 +15,8 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.SpecificValueCache;
-import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.micro.CombatManager;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.squad.Squad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
@@ -197,7 +196,7 @@ public class InfoUtils {
 	}
 	
 	
-	public static int squadUnitSize(SquadInfo squadInfo) {
+	public static int squadUnitSize(MicroConfig.SquadInfo squadInfo) {
 		Squad squad = CombatManager.Instance().squadData.getSquad(squadInfo.squadName);
 		if (squad != null && squad.unitList != null) {
 			return squad.unitList.size();

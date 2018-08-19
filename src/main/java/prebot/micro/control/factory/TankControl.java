@@ -18,20 +18,17 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
-import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.constant.MicroConfig.Common;
-import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.manage.PositionFinder;
 import prebot.strategy.manage.TankPositionManager;
 
 public class TankControl extends Control {
@@ -65,9 +62,9 @@ public class TankControl extends Control {
 		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
-		if (StrategyIdea.campType == CampType.INSIDE
-				|| StrategyIdea.campType == CampType.FIRST_CHOKE
-				|| StrategyIdea.campType == CampType.EXPANSION) {
+		if (StrategyIdea.campType == PositionFinder.CampType.INSIDE
+				|| StrategyIdea.campType == PositionFinder.CampType.FIRST_CHOKE
+				|| StrategyIdea.campType == PositionFinder.CampType.EXPANSION) {
 			siegeModeSpreadRadius = siegeModeSpreadRadius * 3 / 4;
 		}
 		
@@ -147,7 +144,7 @@ public class TankControl extends Control {
 				} else {
 					int distance = siege.getDistance(mainPosition);
 					if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
-						if (distance > Tank.SIEGE_MODE_MAX_RANGE) {
+						if (distance > MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 							siege.unsiege();
 						}
 						
@@ -205,7 +202,7 @@ public class TankControl extends Control {
 
 				if (InfoUtils.enemyRace() == Race.Terran) { // 테란전용 go
 					int distToOrder = tank.getDistance(mainPosition);
-					if (distToOrder <= Tank.SIEGE_MODE_MAX_RANGE) {
+					if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 						if (tank.canSiege() && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
 							tank.siege();
 						} else {
@@ -277,11 +274,11 @@ public class TankControl extends Control {
 				distanceToTarget = tank.getDistance(eui.getLastPosition());
 			}
 
-			if (saveUnitLevel == 0 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + 5) {
+			if (saveUnitLevel == 0 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 				return true;
-			} else if (saveUnitLevel == 1 && distanceToTarget <= Tank.SIEGE_MODE_SIGHT + 80.0) {
+			} else if (saveUnitLevel == 1 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_SIGHT + 80.0) {
 				return true;
-			} else if (saveUnitLevel == 2 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK + 10) {
+			} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK + 10) {
 				return true;
 			}
 			
@@ -298,16 +295,16 @@ public class TankControl extends Control {
 			int distanceToTarget = tank.getDistance(eui.getLastPosition());
 			int siegeModeDistance;
 			if (eui.getType().isBuilding()) {
-				siegeModeDistance = Tank.SIEGE_MODE_SIGHT;
+				siegeModeDistance = MicroConfig.Tank.SIEGE_MODE_SIGHT;
 			} else {
-				siegeModeDistance = Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE;
+				siegeModeDistance = MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + SIEGE_MODE_RANGE_MARGIN_DISTANCE;
 			}
 			
 			if (distanceToTarget <= siegeModeDistance) { // TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), false)
 				return true;
 			} else {
 				if (!eui.getType().isBuilding()) {
-					List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, tank.getPosition(), Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
+					List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, tank.getPosition(), MicroConfig.Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
 					for (Unit siegeModeTank : siegeModeTanks) {
 						if (tank.getID() == siegeModeTank.getID()) {
 							continue;

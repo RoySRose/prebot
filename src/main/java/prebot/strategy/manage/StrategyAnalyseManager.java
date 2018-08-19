@@ -63,7 +63,7 @@ import prebot.strategy.analyse.zerg.unit.LurkerAnalyser;
 import prebot.strategy.analyse.zerg.unit.MutaliskAnalyser;
 import prebot.strategy.analyse.zerg.unit.ZerglingAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class StrategyAnalyseManager {
 	
@@ -137,13 +137,13 @@ public class StrategyAnalyseManager {
 		// air unit count
 		if (currentStrategy.expansionOption != null) {
 			StrategyIdea.expansionOption = currentStrategy.expansionOption;
-			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+			if (currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
 				StrategyIdea.wraithCount = 4;
 				StrategyIdea.valkyrieCount = 0;
-			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_STARPORT) {
+			} else if (currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 				StrategyIdea.wraithCount = 0;
 				StrategyIdea.valkyrieCount = 2;
-			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_FACTORY || currentStrategy.expansionOption == ExpansionOption.TWO_FACTORY) {
+			} else if (currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY || currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY) {
 				StrategyIdea.wraithCount = 0;
 				StrategyIdea.valkyrieCount = 0;
 			}
@@ -239,12 +239,12 @@ public class StrategyAnalyseManager {
 		}
 	}
 	
-	public int lastCheckFrame(LastCheckLocation lastCheckLocation) {
-		if (lastCheckLocation == LastCheckLocation.BASE) {
+	public int lastCheckFrame(StrategyAnalyseManager.LastCheckLocation lastCheckLocation) {
+		if (lastCheckLocation == StrategyAnalyseManager.LastCheckLocation.BASE) {
 			return StrategyAnalyseManager.Instance().lastCheckFrameBase;
-		} else if (lastCheckLocation == LastCheckLocation.FIRST_EXPANSION) {
+		} else if (lastCheckLocation == StrategyAnalyseManager.LastCheckLocation.FIRST_EXPANSION) {
 			return StrategyAnalyseManager.Instance().lastCheckFrameFirstExpansion;
-		} else if (lastCheckLocation == LastCheckLocation.GAS) {
+		} else if (lastCheckLocation == StrategyAnalyseManager.LastCheckLocation.GAS) {
 			return StrategyAnalyseManager.Instance().lastCheckFrameGas;
 		} else {
 			return CommonCode.NONE;

@@ -236,9 +236,9 @@ public class BuildManager extends GameManager {
 									System.out.println(" desiredPosition " + desiredPosition.getX() + ","+ desiredPosition.getY());
 								
 								if(t.getUnitType() == UnitType.Terran_Supply_Depot || t.getUnitType() == UnitType.Terran_Academy || t.getUnitType() == UnitType.Terran_Armory) {
-									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.NextSupplePoint);
+									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 								}else {
-									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+									desiredPosition = getDesiredPosition(t.getUnitType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 								}
 								
 								if (desiredPosition != TilePosition.None) {

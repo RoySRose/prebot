@@ -14,6 +14,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Common;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.micro.targeting.TargetPriority;
@@ -61,7 +62,7 @@ public class MicroDecisionMakerPrebot1 {
 							if (MicroUtils.exposedByEnemy(mechanicUnit, flyingEnemiesInfo)) { // 적에게 노출되는 포지션이면 안전거리를 잰다.
 								safeDistance += (Common.BACKOFF_DIST_SIEGE_TANK * 2 / 3);
 							} else { // 공격 사정거리를 재어 들어간다.
-								safeDistance = Tank.SIEGE_MODE_SIGHT + 30; // 320 + 30
+								safeDistance = MicroConfig.Tank.SIEGE_MODE_SIGHT + 30; // 320 + 30
 							}
 
 						} else {
@@ -113,8 +114,8 @@ public class MicroDecisionMakerPrebot1 {
 				hitPointScore = 50 - enemy.getHitPoints() / 10;
 
 				// 시즈에 붙어있는 밀리유닛 : +200점
-				if (enemyUnitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE) {
-					List<Unit> nearSiege = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, enemyPosition, Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
+				if (enemyUnitType.groundWeapon().maxRange() <= MicroConfig.Tank.SIEGE_MODE_MIN_RANGE) {
+					List<Unit> nearSiege = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, enemyPosition, MicroConfig.Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
 					if (!nearSiege.isEmpty()) {
 						specialScore += 100;
 					}
@@ -171,10 +172,10 @@ public class MicroDecisionMakerPrebot1 {
 				if (bestTargetInfo == null && !enemyInfo.getType().isBuilding()) {
 					if (!Prebot.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
 						int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
-						if (saveUnitLevel == 0 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + 5) {
+						if (saveUnitLevel == 0 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 							bestTargetInfo = enemyInfo;
 							targetOutOfSight = true;
-						} else if (saveUnitLevel >= 1 && distanceToTarget <= (Tank.SIEGE_MODE_MAX_RANGE + (int) Common.BACKOFF_DIST_SIEGE_TANK)) {
+						} else if (saveUnitLevel >= 1 && distanceToTarget <= (MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + (int) Common.BACKOFF_DIST_SIEGE_TANK)) {
 							bestTargetInfo = enemyInfo;
 							targetOutOfSight = true;
 						} else {
@@ -194,15 +195,15 @@ public class MicroDecisionMakerPrebot1 {
 			int hitPointScore = 0; // HP 점수 : 최고점수 50점. HP가 많을 수록 점수 낮음.
 			int specialScore = 0; // 특별 점수 : 탱크앞에 붙어있는 밀리유닛 +100점
 			
-			List<Unit> unitsInSplash = enemy.getUnitsInRadius(Tank.SIEGE_MODE_OUTER_SPLASH_RAD);
+			List<Unit> unitsInSplash = enemy.getUnitsInRadius(MicroConfig.Tank.SIEGE_MODE_OUTER_SPLASH_RAD);
 	        for (Unit unitInSplash : unitsInSplash) {
         		int splashUnitDistance = enemy.getDistance(unitInSplash.getPosition());
 	        	int priorityInSpash = TargetPriority.getPriority(mechanicUnit, unitInSplash);
-		        if (splashUnitDistance <= Tank.SIEGE_MODE_INNER_SPLASH_RAD) {
+		        if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_INNER_SPLASH_RAD) {
 		        	priorityInSpash = (int) (priorityInSpash * 0.8);
-		        } else if (splashUnitDistance <= Tank.SIEGE_MODE_MEDIAN_SPLASH_RAD) {
+		        } else if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_MEDIAN_SPLASH_RAD) {
 		        	priorityInSpash = (int) (priorityInSpash * 0.4);
-		        } else if (splashUnitDistance <= Tank.SIEGE_MODE_OUTER_SPLASH_RAD) {
+		        } else if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_OUTER_SPLASH_RAD) {
 		        	priorityInSpash = (int) (priorityInSpash * 0.2);
 		        }
 		        
@@ -220,9 +221,9 @@ public class MicroDecisionMakerPrebot1 {
 
 	    	int distanceToTarget = mechanicUnit.getDistance(enemy.getPosition());
 			if (!mechanicUnit.isInWeaponRange(enemy)) { // 시즈 범위안에 타겟이 없을 경우 skip
-				if (distanceToTarget < Tank.SIEGE_MODE_MIN_RANGE) {
+				if (distanceToTarget < MicroConfig.Tank.SIEGE_MODE_MIN_RANGE) {
 					existTooCloseTarget = true;
-		        } else if (distanceToTarget > Tank.SIEGE_MODE_MAX_RANGE) {
+		        } else if (distanceToTarget > MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 		        	existTooFarTarget = true;
 		        	if (closestTooFarTarget == null || distanceToTarget < closestTooFarTargetDistance) {
 		        		closestTooFarTarget = enemy;
@@ -262,14 +263,14 @@ public class MicroDecisionMakerPrebot1 {
 			} else if (existTooCloseTarget) {
 				return MicroDecision.change(mechanicUnit);
 			} else if (existTooFarTarget) {
-				if (mechanicUnit.getDistance(StrategyIdea.mainPosition) < Tank.SIEGE_MODE_MAX_RANGE + 50) {
+				if (mechanicUnit.getDistance(StrategyIdea.mainPosition) < MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 50) {
 					return MicroDecision.doNothing(mechanicUnit);
 				}
 				for (Unit tank : tanks) { // target이 가까운 동료 시즈포격에서 자유롭지 못하다면 상태유지
 					int distanceToTarget = tank.getDistance(closestTooFarTarget);
-					if (saveUnitLevel <= 1 && tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < Tank.SIEGE_LINK_DISTANCE) {
+					if (saveUnitLevel <= 1 && tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < MicroConfig.Tank.SIEGE_LINK_DISTANCE) {
 						return MicroDecision.doNothing(mechanicUnit);
-					} else if (saveUnitLevel == 2 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK) {
+					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK) {
 						return MicroDecision.doNothing(mechanicUnit);
 					}
 				}

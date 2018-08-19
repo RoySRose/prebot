@@ -3,9 +3,8 @@ package prebot.strategy.analyse;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class ProtossStrategist extends Strategist {
 	
@@ -89,7 +88,7 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE) || hasAnyInfo(Clue.ClueInfo.NEXSUS_FAST_DOUBLE, Clue.ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE) || hasAnyInfo(Clue.ClueInfo.NEXSUS_FAST_DOUBLE, Clue.ClueInfo.NEXSUS_FASTEST_DOUBLE)) {
 			if (hasInfo(Clue.ClueInfo.FAST_FLEET_BEACON)) {
 				return EnemyStrategy.PROTOSS_DOUBLE_CARRIER;
 			} else if (hasAnyInfo(Clue.ClueInfo.STARGATE_DOUBLE_FAST)) {
@@ -101,7 +100,7 @@ public class ProtossStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
 			if (hasType(Clue.ClueType.FAST_CORE)) {
 				return EnemyStrategy.PROTOSS_TWOGATE_TECH;
 			} else {

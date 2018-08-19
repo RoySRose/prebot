@@ -17,8 +17,6 @@ import bwta.BaseLocation;
 import prebot.common.MapGrid;
 import prebot.common.MapGrid.GridCell;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -31,7 +29,7 @@ import prebot.micro.control.Control;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class ComsatControl extends Control {
 	private int scanUsedFrame = 0;
@@ -84,7 +82,7 @@ public class ComsatControl extends Control {
 		}
 		
 		
-		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DETECT_IMPORTANT)) {
 			usableEnergy += 50;
 			
 			if(UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) > 0){

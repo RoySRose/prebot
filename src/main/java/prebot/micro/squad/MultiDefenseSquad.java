@@ -14,7 +14,6 @@ import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.TankControl;
 import prebot.micro.targeting.TargetFilter;
 
@@ -26,12 +25,12 @@ public class MultiDefenseSquad extends Squad {
 	
 	private TankControl tankControl = new TankControl();
 	
-	private DefenseType type;
+	private MultiDefenseSquad.DefenseType type;
 	private Unit commandCenter = null;
 	private Position defensePosition = null;
 	private int defenseUnitAssignedFrame = CommonCode.UNKNOWN;
 	
-	public DefenseType getType() {
+	public MultiDefenseSquad.DefenseType getType() {
 		return type;
 	}
 
@@ -44,7 +43,7 @@ public class MultiDefenseSquad extends Squad {
 	}
 	
 	public boolean alreadyDefenseUnitAssigned() {
-		if (type == DefenseType.CENTER_DEFENSE) {
+		if (type == MultiDefenseSquad.DefenseType.CENTER_DEFENSE) {
 			return TimeUtils.elapsedFrames(defenseUnitAssignedFrame) < 2 * TimeUtils.MINUTE;
 		} else {
 			return TimeUtils.elapsedFrames(defenseUnitAssignedFrame) < 30 * TimeUtils.SECOND;
@@ -53,7 +52,7 @@ public class MultiDefenseSquad extends Squad {
 	
 	public boolean tankFull() {
 		int max = 8;
-		if (type == DefenseType.CENTER_DEFENSE) {
+		if (type == MultiDefenseSquad.DefenseType.CENTER_DEFENSE) {
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				max = 3;
 			} else if (InfoUtils.enemyRace() == Race.Terran) {
@@ -66,22 +65,22 @@ public class MultiDefenseSquad extends Squad {
 	}
 	
 	public MultiDefenseSquad(Position basePosition) {
-		super(SquadInfo.MULTI_DEFENSE_, basePosition);
+		super(MicroConfig.SquadInfo.MULTI_DEFENSE_, basePosition);
 		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Vulture);
 		
 		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
 		double radian = MicroUtils.targetDirectionRadian(centerPosition, basePosition);
 		Position defensePosition = MicroUtils.getMovePosition(centerPosition, radian, 1000).makeValid();
 		
-		this.type = DefenseType.REGION_OCCUPY;
+		this.type = MultiDefenseSquad.DefenseType.REGION_OCCUPY;
 		this.defensePosition = defensePosition;
 	}
 	
 	public MultiDefenseSquad(Unit commandCenter) {
-		super(SquadInfo.MULTI_DEFENSE_, commandCenter);
+		super(MicroConfig.SquadInfo.MULTI_DEFENSE_, commandCenter);
 		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Vulture);
 		
-		this.type = DefenseType.CENTER_DEFENSE;
+		this.type = MultiDefenseSquad.DefenseType.CENTER_DEFENSE;
 		this.commandCenter = commandCenter;
 	}
 
@@ -98,13 +97,13 @@ public class MultiDefenseSquad extends Squad {
 	@Override
 	public void execute() {
 		Position defensePosition = null;
-		if (type == DefenseType.CENTER_DEFENSE) {
+		if (type == MultiDefenseSquad.DefenseType.CENTER_DEFENSE) {
 			if (!UnitUtils.isValidUnit(commandCenter)) {
 				System.out.println("invalid commandCetner. " + getSquadName());
 				return;
 			}
 			defensePosition = commandCenter.getPosition();
-		} else if (type == DefenseType.REGION_OCCUPY) {
+		} else if (type == MultiDefenseSquad.DefenseType.REGION_OCCUPY) {
 //			if (!UnitUtils.isValidUnit(commandCenter)) {
 //				System.out.println("region is null. " + getSquadName());
 //				return;
@@ -132,9 +131,9 @@ public class MultiDefenseSquad extends Squad {
 	}
 	
 	private Position getTargetPosition() {
-		if (type == DefenseType.CENTER_DEFENSE) {
+		if (type == MultiDefenseSquad.DefenseType.CENTER_DEFENSE) {
 			return commandCenter.getPosition();
-		} else if (type == DefenseType.REGION_OCCUPY) {
+		} else if (type == MultiDefenseSquad.DefenseType.REGION_OCCUPY) {
 			return this.defensePosition;
 		}
 		return null;

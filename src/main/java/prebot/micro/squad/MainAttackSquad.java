@@ -15,8 +15,6 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.ValkyrieControl;
 import prebot.micro.control.factory.GoliathControl;
 import prebot.micro.control.factory.TankControl;
@@ -24,7 +22,7 @@ import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.manage.PositionFinder;
 
 public class MainAttackSquad extends Squad {
 
@@ -44,7 +42,7 @@ public class MainAttackSquad extends Squad {
 	private ValkyrieControl valkyrieControl = new ValkyrieControl();
 	
 	public MainAttackSquad() {
-		super(SquadInfo.MAIN_ATTACK);
+		super(MicroConfig.SquadInfo.MAIN_ATTACK);
 		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath, UnitType.Terran_Valkyrie);
 	}
 
@@ -130,7 +128,7 @@ public class MainAttackSquad extends Squad {
 			}
 		}
 		
-		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) { // strategy manager 판단
+		if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY) { // strategy manager 판단
 			saveUnitLevel = 0;
 		} else { // combat manager 자체 판단
 			if (InformationManager.Instance().enemyRace != Race.Terran) {
@@ -158,9 +156,9 @@ public class MainAttackSquad extends Squad {
 		}
 		
 		if (!StrategyIdea.mainSquadMode.isAttackMode || InfoUtils.enemyRace() == Race.Terran) {
-			if (StrategyIdea.campType == CampType.INSIDE) {
+			if (StrategyIdea.campType == PositionFinder.CampType.INSIDE) {
 				euiList.addAll(InfoUtils.euiListInBase());
-			} else if (StrategyIdea.campType == CampType.FIRST_CHOKE || StrategyIdea.campType == CampType.EXPANSION) {
+			} else if (StrategyIdea.campType == PositionFinder.CampType.FIRST_CHOKE || StrategyIdea.campType == PositionFinder.CampType.EXPANSION) {
 				euiList.addAll(InfoUtils.euiListInBase());
 				euiList.addAll(InfoUtils.euiListInExpansion());
 			} else {

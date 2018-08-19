@@ -15,7 +15,7 @@ import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderFactory extends DefaultBuildableItem {
 
@@ -41,18 +41,18 @@ public class BuilderFactory extends DefaultBuildableItem {
     	}
 
 		if (TimeUtils.beforeTime(8, 0) && !PlayerUtils.enoughResource(800, 0)) {
-			if (StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT || StrategyIdea.expansionOption == ExpansionOption.ONE_STARPORT) {
+			if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT || StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (commandCenterList.size() < 2) {
 					return false;
 				}
-	    	} else if (StrategyIdea.expansionOption == ExpansionOption.TWO_FACTORY) {
+	    	} else if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY) {
 	    		List<Unit> facotryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Factory);
 				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (facotryList.size() >= 2 && commandCenterList.size() < 2) {
 					return false;
 				}
-	    	} else if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
+	    	} else if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY) {
 	    		List<Unit> facotryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Factory);
 				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (facotryList.size() >= 1 && commandCenterList.size() < 2) {

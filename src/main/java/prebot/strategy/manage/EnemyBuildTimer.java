@@ -11,7 +11,6 @@ import bwapi.Race;
 import bwapi.TechType;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -19,8 +18,7 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
-import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class EnemyBuildTimer {
 
@@ -109,14 +107,14 @@ public class EnemyBuildTimer {
 			} else if (lurkTime) {
 				StrategyIdea.turretNeedFrame = lurkerInMyBaseFrame - 8 * TimeUtils.SECOND;
 			}
-			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR)) {
 				StrategyIdea.turretNeedFrame += 3 * TimeUtils.MINUTE;
 			}
 			
 			if (lurkerInMyBaseFrame != CommonCode.UNKNOWN) {
 				StrategyIdea.academyFrame = lurkerInMyBaseFrame - UnitType.Terran_Academy.buildTime() - UnitType.Terran_Comsat_Station.buildTime() - 10 * TimeUtils.SECOND;
 				
-				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.NO_LAIR)) {
+				if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR)) {
 					StrategyIdea.academyFrame += 3 * TimeUtils.MINUTE;
 				} else if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_MUTAL) {
 					StrategyIdea.academyFrame += 4 * TimeUtils.MINUTE;
@@ -301,10 +299,10 @@ public class EnemyBuildTimer {
 			// 미발견. 전략별 시간 선택. 전략별 시간 이후 적 본진, 앞마당, 가스가 모두 정찰 되었다면 최후 정찰시간을 이후로 최소값을 증가시킨다.
 			if (buildFrameByStrategy != CommonCode.UNKNOWN) {
 
-				int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
+				int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.GAS);
 				if (!avoidRashExpectation(buildingType)) {
-					int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
-					int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+					int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.BASE);
+					int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.FIRST_EXPANSION);
 					
 					if (baseLastCheckFrame > buildFrameByStrategy && gasLastCheckFrame > buildFrameByStrategy && expansionLastCheckFrame > buildFrameByStrategy) {
 						int minimumFrame = baseLastCheckFrame < gasLastCheckFrame ? baseLastCheckFrame : gasLastCheckFrame;

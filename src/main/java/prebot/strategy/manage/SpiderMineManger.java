@@ -23,14 +23,14 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.BaseCondition;
+import prebot.common.util.internal.IConditions;
 import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class SpiderMineManger {
 	
@@ -137,16 +137,16 @@ public class SpiderMineManger {
 		int mineCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
 
 		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
-		if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+		if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT)) {
 			mineNumPerPosition += 2;
 		} else if (mineCount > MAX_MINE_COUNT) {
 			mineNumPerPosition = 1;
 		}
 
-		MinePositionLevel mLevel = MinePositionLevel.NOT_MY_OCCUPIED;
-		if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)
-				|| StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
-			mLevel = MinePositionLevel.ANYWHERE;
+		SpiderMineManger.MinePositionLevel mLevel = SpiderMineManger.MinePositionLevel.NOT_MY_OCCUPIED;
+		if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_DROP)
+				|| StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DETECT_IMPORTANT)) {
+			mLevel = SpiderMineManger.MinePositionLevel.ANYWHERE;
 		}
 		StrategyIdea.watcherMinePositionLevel = mLevel;
 		StrategyIdea.spiderMineNumberPerPosition = mineNumPerPosition;
@@ -246,7 +246,7 @@ public class SpiderMineManger {
 
 			// 급해서 본진에 박은 마인 제거
 			if (LagObserver.groupsize() <= 10) {
-				if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
+				if (StrategyIdea.watcherMinePositionLevel == SpiderMineManger.MinePositionLevel.NOT_MY_OCCUPIED) {
 					if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
 						List<Unit> spiderMineList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
 						
@@ -297,7 +297,7 @@ public class SpiderMineManger {
 			return null;
 		}
 		
-		if (MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
+		if (SpiderMineManger.MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
 			Position position = positionToMineOnlyGoodPosition(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
 			if (position != null) {
 				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
@@ -328,7 +328,7 @@ public class SpiderMineManger {
 					}
 				}
 				if (vultureInMyOccupied) {
-					if (MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
+					if (SpiderMineManger.MinePositionLevel.NOT_MY_OCCUPIED.equals(minePositionLevel)) {
 						return null;
 					} else {
 						mineNumberPerPosition = Math.min(StrategyIdea.spiderMineNumberPerPosition, 2); // 자신의 진영이라면 최대 2개
@@ -456,7 +456,7 @@ public class SpiderMineManger {
 		BaseLocation enemyBase = InfoUtils.enemyBase();
 		BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
 		
-		return BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getBaseLocations(), myFirstExpansion, new BaseCondition() {
+		return BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getBaseLocations(), myFirstExpansion, new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
 				return !nextExpansionBases.contains(base) && !base.equals(myBase) && !base.equals(myFirstExpansion)

@@ -11,11 +11,11 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
+import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class AttackExpansionManager {
 	
@@ -140,12 +140,12 @@ public class AttackExpansionManager {
 		int totPoint = myFactoryUnitPoint + expansionPoint + unitPoint;
 		
 		boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
-		boolean fastAttack = StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK;
-		boolean noMercyAttack = StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY;
+		boolean fastAttack = StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.SPEED_ATTCK;
+		boolean noMercyAttack = StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY;
 
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int plus = 0;
-			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.BIONIC)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.BIONIC)) {
 				plus = 2;
 			}
 
@@ -213,7 +213,7 @@ public class AttackExpansionManager {
 				combatStartCase = 2;
 			}
 
-			if (!isAttackMode && StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)
+			if (!isAttackMode && StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)
 					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
 				isAttackMode = true;
 				fastAttack = true;
@@ -292,11 +292,11 @@ public class AttackExpansionManager {
 			}
 			
 			if (noMercyAttack) {
-				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
+				StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.NO_MERCY;
 			} else if (fastAttack) {
-				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
+				StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.SPEED_ATTCK;
 			} else {
-				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+				StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.ATTCK;
 			}
 
 		} else {
@@ -304,7 +304,7 @@ public class AttackExpansionManager {
 				StrategyIdea.retreatFrame = TimeUtils.elapsedFrames();
 			}
 			
-			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
+			StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.NORMAL;
 		}
 	}
 

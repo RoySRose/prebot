@@ -8,7 +8,6 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.DropshipControl;
 import prebot.micro.control.airforce.VesselControl;
 import prebot.strategy.UnitInfo;
@@ -19,7 +18,7 @@ public class SpecialSquad extends Squad {
 	private VesselControl vesselControl = new VesselControl();
 
 	public SpecialSquad() {
-		super(SquadInfo.SPECIAL);
+		super(MicroConfig.SquadInfo.SPECIAL);
 		setUnitType(UnitType.Terran_Science_Vessel, UnitType.Terran_Dropship);
 	}
 

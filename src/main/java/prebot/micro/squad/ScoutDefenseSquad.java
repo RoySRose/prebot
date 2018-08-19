@@ -14,14 +14,12 @@ import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
-import prebot.micro.MicroDecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecisionMaker;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -32,7 +30,7 @@ public class ScoutDefenseSquad extends Squad {
 	private static final int REACT_RADIUS = 50;
 
 	public ScoutDefenseSquad() {
-		super(SquadInfo.IDLE);
+		super(MicroConfig.SquadInfo.IDLE);
 		setUnitType(UnitType.Terran_SCV);
 	}
 

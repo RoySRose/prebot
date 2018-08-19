@@ -18,7 +18,7 @@ import prebot.micro.control.FlyCondition;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.manage.PositionFinder;
 
 public class CommandCenterControl extends BuildingFlyControl {
 
@@ -53,7 +53,7 @@ public class CommandCenterControl extends BuildingFlyControl {
             BaseLocation correctLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().selfPlayer);
 
             if (checkCC.isLifted() == false) {
-            	if (StrategyIdea.campType != CampType.INSIDE && StrategyIdea.campType != CampType.FIRST_CHOKE) {
+            	if (StrategyIdea.campType != PositionFinder.CampType.INSIDE && StrategyIdea.campType != PositionFinder.CampType.FIRST_CHOKE) {
             		if (checkCC.getTilePosition().getX() != correctLocation.getTilePosition().getX() || checkCC.getTilePosition().getY() != correctLocation.getTilePosition().getY()) {
                         buildingFlyMap.get(checkCC).setBuildingFly(BuildingFly.UP);
                     }

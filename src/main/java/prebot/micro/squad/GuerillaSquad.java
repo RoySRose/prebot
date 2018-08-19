@@ -8,7 +8,6 @@ import bwapi.UnitType;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.factory.VultureControl;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.manage.VultureTravelManager;
@@ -22,7 +21,7 @@ public class GuerillaSquad extends Squad {
 	}
 
 	public GuerillaSquad(Position position) {
-		super(SquadInfo.GUERILLA_, position);
+		super(MicroConfig.SquadInfo.GUERILLA_, position);
 		this.targetPosition = position;
 		setUnitType(UnitType.Terran_Vulture);
 	}

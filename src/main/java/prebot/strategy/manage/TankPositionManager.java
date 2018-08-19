@@ -15,7 +15,6 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -24,7 +23,7 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.PositionReserveInfo;
 import prebot.micro.PositionSiegeInfo;
-import prebot.micro.constant.MicroConfig.FleeAngle;
+import prebot.micro.constant.MicroConfig;
 
 public class TankPositionManager {
 	
@@ -81,8 +80,8 @@ public class TankPositionManager {
 		
 		int seigeNumLimit = 1;
 		
-		Integer[] randomSortedAngles = new Integer[FleeAngle.EIGHT_360_ANGLE.length];
-		System.arraycopy(FleeAngle.EIGHT_360_ANGLE, 0, randomSortedAngles, 0, FleeAngle.EIGHT_360_ANGLE.length);
+		Integer[] randomSortedAngles = new Integer[MicroConfig.FleeAngle.EIGHT_360_ANGLE.length];
+		System.arraycopy(MicroConfig.FleeAngle.EIGHT_360_ANGLE, 0, randomSortedAngles, 0, MicroConfig.FleeAngle.EIGHT_360_ANGLE.length);
 		Arrays.sort(randomSortedAngles, new Comparator<Integer>() {
 			Random random = new Random();
 			@Override public int compare(Integer int1, Integer int2) {

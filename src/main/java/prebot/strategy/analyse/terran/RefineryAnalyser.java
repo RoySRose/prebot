@@ -3,14 +3,13 @@ package prebot.strategy.analyse.terran;
 import java.util.List;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.constant.CommonCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.StrategyAnalyseManager;
-import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class RefineryAnalyser extends UnitAnalyser {
 
@@ -24,7 +23,7 @@ public class RefineryAnalyser extends UnitAnalyser {
 	}
 
 	private void fastRefinery() {
-		List<UnitInfo> found = found(RegionType.ENEMY_BASE);
+		List<UnitInfo> found = found(CommonCode.RegionType.ENEMY_BASE);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Refinery, 25);
@@ -34,7 +33,7 @@ public class RefineryAnalyser extends UnitAnalyser {
 				ClueManager.Instance().addClueInfo(Clue.ClueInfo.REFINERY_LATE);
 			}
 		} else {
-			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
+			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.GAS);
 			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Refinery, 25);
 			if (gasLastCheckFrame > mechanicGasFrame) {
 				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_REFINERY);

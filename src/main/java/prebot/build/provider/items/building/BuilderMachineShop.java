@@ -14,7 +14,7 @@ import prebot.common.main.Prebot;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderMachineShop extends DefaultBuildableItem {
 	
@@ -64,7 +64,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		List<Unit> factories = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
-			if(StrategyIdea.addOnOption == AddOnOption.VULTURE_FIRST) {
+			if(StrategyIdea.addOnOption == EnemyStrategyOptions.AddOnOption.VULTURE_FIRST) {
 				if (UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture)) {
 					for (Unit factory : factories) {
 						if (factory.getAddon() != null || !factory.canBuildAddon()) {

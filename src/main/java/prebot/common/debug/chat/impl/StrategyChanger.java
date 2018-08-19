@@ -5,7 +5,7 @@ import prebot.common.debug.chat.ChatExecuter;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class StrategyChanger extends ChatExecuter {
 	
@@ -45,10 +45,10 @@ public class StrategyChanger extends ChatExecuter {
 		// air unit count
 		if (currentStrategy.expansionOption != null) {
 			StrategyIdea.expansionOption = currentStrategy.expansionOption;
-			if (currentStrategy.expansionOption == ExpansionOption.TWO_STARPORT) {
+			if (currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
 				StrategyIdea.wraithCount = 4;
 				StrategyIdea.valkyrieCount = 0;
-			} else if (currentStrategy.expansionOption == ExpansionOption.ONE_STARPORT) {
+			} else if (currentStrategy.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 				StrategyIdea.wraithCount = 0;
 				StrategyIdea.valkyrieCount = 2;
 			} else {

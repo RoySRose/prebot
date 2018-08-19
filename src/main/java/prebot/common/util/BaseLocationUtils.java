@@ -14,7 +14,7 @@ import prebot.common.util.internal.IConditions.BaseCondition;
 public class BaseLocationUtils {
 
 	public static BaseLocation getClosestBaseToPosition(List<BaseLocation> baseList, Position position) {
-		return getClosestBaseToPosition(baseList, position, new BaseCondition() {
+		return getClosestBaseToPosition(baseList, position, new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
 				return true;

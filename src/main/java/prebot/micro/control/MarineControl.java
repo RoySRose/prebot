@@ -17,18 +17,17 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
-import prebot.micro.MicroDecisionMaker;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecisionMaker;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public class MarineControl extends Control {
@@ -88,7 +87,7 @@ public class MarineControl extends Control {
 				} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 					//if(InformationManager.Instance().isBlockingEnterance()){
 					// 베이스 지역 OK
-						if((campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE)
+						if((campType == PositionFinder.CampType.INSIDE || campType == PositionFinder.CampType.FIRST_CHOKE)
 								&& decision.eui.getUnit().getDistance(safePosition) > 30){
 							if(MicroUtils.isRangeUnit(decision.eui.getType()) && !decision.eui.getType().isWorker()){
 								//MicroUtils.BlockingKiting(marine, decision.eui, kOption, safePosition);
@@ -125,7 +124,7 @@ public class MarineControl extends Control {
 							}
 						}
 				} else {
-					if(campType != CampType.INSIDE  && campType != CampType.FIRST_CHOKE){
+					if(campType != PositionFinder.CampType.INSIDE  && campType != PositionFinder.CampType.FIRST_CHOKE){
 						if (MicroUtils.arrivedToPosition(marine,StrategyIdea.mainSquadLeaderPosition)) {
 							if (MicroUtils.timeToRandomMove(marine)) {
 								Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
@@ -280,7 +279,7 @@ public class MarineControl extends Control {
 		
 		CampType campType = StrategyIdea.campType;
 		// 베이스 지역 OK
-		if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
+		if (campType == PositionFinder.CampType.INSIDE || campType == PositionFinder.CampType.FIRST_CHOKE) {
 			Position firstCheokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer).getPoint();
 			
 			if(eui != null && !MicroUtils.isRangeUnit(eui.getType())){
@@ -311,7 +310,7 @@ public class MarineControl extends Control {
 			return false;
 		}
 		/*
-		if (campType == CampType.EXPANSION) {
+		if (campType == PositionFinder.CampType.EXPANSION) {
 			return true;
 		}
 		 */
@@ -322,7 +321,7 @@ public class MarineControl extends Control {
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return true;
 		}
-		if (campType == CampType.SECOND_CHOKE) {
+		if (campType == PositionFinder.CampType.SECOND_CHOKE) {
 			return true;
 		}
 		// 세번째 지역 반경 OK

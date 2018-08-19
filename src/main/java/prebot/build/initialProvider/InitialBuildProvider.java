@@ -20,11 +20,11 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionTask;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
@@ -100,7 +100,7 @@ public class InitialBuildProvider {
 		if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.BEFORE) {
 			if (BuildManager.Instance().buildQueue.isEmpty()) {
 				nowStrategy = StrategyIdea.expansionOption;
-				if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_STARPORT) {
+				if (nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY || nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT || nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 	        		new AdaptNewStrategy().adapt(nowStrategy, factoryPos, starport1, starport2);
 	        	}
 				adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.PROGRESSING;
@@ -117,23 +117,23 @@ public class InitialBuildProvider {
 				adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE; // 2번은 취소하지 않도록
         		
         	} else {
-            	if (nowStrategy == ExpansionOption.TWO_FACTORY) {
+            	if (nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY) {
             		List<Unit> factoryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
             		if (factoryList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
-            	} else if (nowStrategy == ExpansionOption.TWO_STARPORT) {
+            	} else if (nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
             		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
-            	} else if (nowStrategy == ExpansionOption.ONE_STARPORT) {
+            	} else if (nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
             		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
             		if (starportList.size() == 1) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
             		}
             		
-            	} else if (nowStrategy == ExpansionOption.ONE_FACTORY) {
+            	} else if (nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY) {
             		List<Unit> starportList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
             		if (starportList.size() == 2) {
             			adaptStrategyStatus = InitialBuildProvider.AdaptStrategyStatus.COMPLETE;
@@ -158,7 +158,7 @@ public class InitialBuildProvider {
 		List<Unit> cancelBuildings = new ArrayList<>();
 	
 		// 1팩토리, 1스타포트, 2스타포트 : 2번째 팩토리를 취소한다.
-		if (nowStrategy == ExpansionOption.TWO_STARPORT || nowStrategy == ExpansionOption.ONE_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
+		if (nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT || nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY || nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 			Unit completeFirstFactory = null; // 첫번째 팩토리 (완성)
 			List<Unit> completeFactories = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 			if (completeFactories.size() >= 1) {
@@ -199,7 +199,7 @@ public class InitialBuildProvider {
 		}
 		
 		// 2팩, 1스타포트 : 2번째 스타포트를 취소한다.
-		if (nowStrategy == ExpansionOption.TWO_FACTORY || nowStrategy == ExpansionOption.ONE_STARPORT) {
+		if (nowStrategy == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY || nowStrategy == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
 			Unit completeFirstStarport = null; // 첫번째 스타포트 (완성)
 			List<Unit> completeBuildings = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Starport);
 			if (completeBuildings.size() >= 1) {

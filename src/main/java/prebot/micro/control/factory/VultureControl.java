@@ -88,7 +88,7 @@ public class VultureControl extends Control {
 		
 		Position positionToMine = SpiderMineManger.Instance().getPositionReserved(vulture);
 		if (positionToMine == null) {
-			positionToMine = SpiderMineManger.Instance().reserveSpiderMine(vulture, MinePositionLevel.ONLY_GOOD_POSITION);
+			positionToMine = SpiderMineManger.Instance().reserveSpiderMine(vulture, SpiderMineManger.MinePositionLevel.ONLY_GOOD_POSITION);
 		}
 		if (positionToMine != null) {
 			CommandUtils.useTechPosition(vulture, TechType.Spider_Mines, positionToMine);

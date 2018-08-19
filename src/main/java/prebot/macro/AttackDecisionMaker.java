@@ -36,7 +36,7 @@ import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class AttackDecisionMaker extends GameManager {
 
@@ -264,7 +264,7 @@ public class AttackDecisionMaker extends GameManager {
 			return myTankSupplyCount >= 4 * 4;
 			
 		} else if (InfoUtils.enemyRace() == Race.Protoss) {
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)) {
 				return true;
 			}
 		}

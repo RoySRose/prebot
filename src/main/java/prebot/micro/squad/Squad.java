@@ -12,7 +12,7 @@ import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.strategy.UnitInfo;
 
 public abstract class Squad {
@@ -31,15 +31,15 @@ public abstract class Squad {
 	// private List<Unit> unitOldBies = new ArrayList<>();
 	// private List<Unit> unitNewBies = new ArrayList<>();
 
-	public Squad(SquadInfo squadInfo) {
+	public Squad(MicroConfig.SquadInfo squadInfo) {
 		this.squadName = squadInfo.squadName;
 	}
 
-	public Squad(SquadInfo squadInfo, Position targetPosition) {
+	public Squad(MicroConfig.SquadInfo squadInfo, Position targetPosition) {
 		this.squadName = squadInfo.squadName + "P" + targetPosition.toString();
 	}
 
-	public Squad(SquadInfo squadInfo, Unit unit) {
+	public Squad(MicroConfig.SquadInfo squadInfo, Unit unit) {
 		this.squadName = squadInfo.squadName + "U" + unit.getID();
 	}
 	

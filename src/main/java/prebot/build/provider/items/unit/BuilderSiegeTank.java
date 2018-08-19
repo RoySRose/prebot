@@ -7,7 +7,7 @@ import prebot.common.MetaType;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio.Weight;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderSiegeTank extends DefaultBuildableItem {
 
@@ -35,7 +35,7 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
 //        		RespondToStrategy.Instance().once_tank = false;
 //        	}
         	if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)
-        			&& StrategyIdea.factoryRatio.weight == Weight.TANK) {
+        			&& StrategyIdea.factoryRatio.weight == EnemyStrategyOptions.FactoryRatio.Weight.TANK) {
         		setHighPriority(true);
         	}
         	return true;

@@ -110,7 +110,7 @@ public class WatcherControl extends Control {
 				continue;
 			}
 			
-//			Decision decision = decisionMaker.makeDecision(unit, euiList, smallFightPredict == SmallFightPredict.OVERWHELM);
+//			Decision decision = decisionMaker.makeDecision(unit, euiList, smallFightPredict == StrategyCode.SmallFightPredict.OVERWHELM);
 			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
 			
 			if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
