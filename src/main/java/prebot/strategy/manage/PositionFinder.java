@@ -85,7 +85,7 @@ public class PositionFinder {
 	}
 
 	/// 주둔지
-	private CampType getCampPositionType() {
+	private PositionFinder.CampType getCampPositionType() {
 		int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		int factorySupplyCount = UnitUtils.myFactoryUnitSupplyCount();
 		
@@ -236,7 +236,7 @@ public class PositionFinder {
 	}
 
 	private Position campTypeToPosition() {
-		CampType campType = StrategyIdea.campType;
+		PositionFinder.CampType campType = StrategyIdea.campType;
 		
 		Position defensePosition = defensePosition(campType);
 		if (defensePosition != null) {
@@ -261,7 +261,7 @@ public class PositionFinder {
 	}
 	
 	private Position campTypeToSiegePositionForSiege() {
-		CampType campType = StrategyIdea.campType;
+		PositionFinder.CampType campType = StrategyIdea.campType;
 		Position defensePosition = defensePosition(campType);
 		if (defensePosition != null) {
 			return defensePosition;

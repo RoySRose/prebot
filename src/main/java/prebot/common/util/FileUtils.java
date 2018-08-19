@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import prebot.common.constant.CommonConfig.FileConfig;
+import prebot.common.constant.CommonConfig;
 import prebot.common.main.Prebot;
 
 public class FileUtils {
@@ -71,7 +71,7 @@ public class FileUtils {
 		String enemyName = Prebot.Broodwar.enemy().getName();
 		enemyName = enemyName.replace(" ", "_");
 
-		String enemyResultsFile = FileConfig.READ_DIRECTORY + enemyName + ".txt";
+		String enemyResultsFile = CommonConfig.FileConfig.READ_DIRECTORY + enemyName + ".txt";
 
 		// int wins = 0;
 		// int losses = 0;
@@ -102,7 +102,7 @@ public class FileUtils {
 		String enemyName = Prebot.Broodwar.enemy().getName();
 		enemyName = enemyName.replace(" ", "_");
 
-		String enemyResultsFile = FileConfig.WRITE_DIRECTORY + enemyName + ".txt";
+		String enemyResultsFile = CommonConfig.FileConfig.WRITE_DIRECTORY + enemyName + ".txt";
 
 		String ss = null;
 

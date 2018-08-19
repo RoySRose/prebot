@@ -18,7 +18,6 @@ import prebot.common.util.TimeUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.PositionFinder;
-import prebot.strategy.manage.PositionFinder.CampType;
 
 public abstract class Control {
 	
@@ -76,7 +75,7 @@ public abstract class Control {
 		if (unitRegion == baseRegion) {
 			return false;
 		}
-		CampType campType = StrategyIdea.campType;
+		PositionFinder.CampType campType = StrategyIdea.campType;
 		if (campType == PositionFinder.CampType.INSIDE || campType == PositionFinder.CampType.FIRST_CHOKE) {
 			return outOfRegionLongTime(unit);
 		}

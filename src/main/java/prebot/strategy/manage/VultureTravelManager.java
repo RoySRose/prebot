@@ -18,8 +18,7 @@ import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions;
-import prebot.common.util.internal.IConditions.BaseCondition;
-import prebot.micro.constant.MicroConfig.Vulture;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.strategy.TravelSite;
@@ -185,7 +184,7 @@ public class VultureTravelManager {
 		String ignoreExpiredSquadName = null;
 		for (String squadName : guerillaIgnoreMap.keySet()) {
 			Integer startTime = guerillaIgnoreMap.get(squadName);
-			if (startTime != null && TimeUtils.elapsedFrames(startTime) > Vulture.GEURILLA_IGNORE_FRAME) {
+			if (startTime != null && TimeUtils.elapsedFrames(startTime) > MicroConfig.Vulture.GEURILLA_IGNORE_FRAME) {
 				ignoreExpiredSquadName = squadName;
 				break;
 			}
@@ -203,7 +202,7 @@ public class VultureTravelManager {
 				removeList.add(checkerId);
 			} else {
 				int retiredTime = checkerRetiredTimeMap.get(checkerId);
-				if (TimeUtils.elapsedFrames(retiredTime) > Vulture.CHECKER_RETIRE_FRAME) {
+				if (TimeUtils.elapsedFrames(retiredTime) > MicroConfig.Vulture.CHECKER_RETIRE_FRAME) {
 					removeList.add(checkerId);
 				}
 			}
@@ -246,11 +245,11 @@ public class VultureTravelManager {
 		TravelSite bestTravelSite = null;
 
 		for (TravelSite travelSite : travelSites) {
-			if (assignableVultures.size() < Vulture.GEURILLA_FREE_VULTURE_COUNT && TimeUtils.elapsedFrames(travelSite.guerillaExamFrame) < Vulture.GEURILLA_INTERVAL_FRAME) {
+			if (assignableVultures.size() < MicroConfig.Vulture.GEURILLA_FREE_VULTURE_COUNT && TimeUtils.elapsedFrames(travelSite.guerillaExamFrame) < MicroConfig.Vulture.GEURILLA_INTERVAL_FRAME) {
 				continue;
 			}
 
-			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(travelSite.baseLocation.getPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) { // 적군이 존재하지 않음
 				continue;
 			}

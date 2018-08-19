@@ -15,8 +15,6 @@ import prebot.macro.AttackDecisionMaker;
 import prebot.macro.Decision;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.constant.EnemyStrategyOptions;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
 import prebot.strategy.manage.DefenseTowerTimer;
@@ -40,12 +38,6 @@ public class StrategyManager extends GameManager {
 	public static StrategyManager Instance() {
 		return instance;
 	}
-
-	public EnemyStrategy currentStrategy = null;
-	public EnemyStrategyException currentStrategyException = null;
-	public EnemyStrategy lastStrategy = null;
-	public EnemyStrategyException lastStrategyException = null;
-
 
 	/// 경기가 시작될 때 일회적으로 전략 초기 세팅 관련 로직을 실행합니다
 	public void onStart() {

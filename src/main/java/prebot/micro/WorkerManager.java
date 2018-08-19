@@ -77,16 +77,16 @@ public class WorkerManager extends GameManager {
 			if (worker.isIdle()) {
 				// workerData 에서 Build / Move / Scout 로 임무지정한 경우, worker 는 즉 임무
 				// 수행 도중 (임무 완료 전) 에 일시적으로 isIdle 상태가 될 수 있다
-				if ((workerData.getWorkerJob(worker) != WorkerJob.Build)
-						&& (workerData.getWorkerJob(worker) != WorkerJob.Move)
-						&& (workerData.getWorkerJob(worker) != WorkerJob.Scout)) {
+				if ((workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build)
+						&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move)
+						&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout)) {
 
 					workerData.setWorkerJob(worker, WorkerJob.Idle, (Unit) null);
 				}
 			}
 
 			// if its job is gas
-			if (workerData.getWorkerJob(worker) == WorkerJob.Gas) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Gas) {
 				Unit refinery = workerData.getWorkerResource(worker);
 
 				// if the refinery doesn't exist anymore (파괴되었을 경우)
@@ -97,7 +97,7 @@ public class WorkerManager extends GameManager {
 			}
 
 			// if its job is repair
-			if (workerData.getWorkerJob(worker) == WorkerJob.Repair) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Repair) {
 				Unit repairTargetUnit = workerData.getWorkerRepairUnit(worker);
 
 				
@@ -119,7 +119,7 @@ public class WorkerManager extends GameManager {
 				BaseLocation expansionBase = InfoUtils.myFirstExpansion();
 				double compareDistance = BlockingEntrance.Instance().second_supple.toPosition().getDistance(expansionBase.getPosition());
 				double scvDistance = worker.getPosition().getDistance(expansionBase.getPosition());
-				if ( compareDistance > scvDistance + 100 && workerData.getWorkerJob(worker) != WorkerJob.Combat) {
+				if ( compareDistance > scvDistance + 100 && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Combat) {
 					scvIsOut = true;
 				}
 			}
@@ -129,7 +129,7 @@ public class WorkerManager extends GameManager {
 	public void handleGasWorkers() {
 		for (Unit scv : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV)) {
 			if (scv.isGatheringGas() && !scv.isCarryingGas()) {
-				if (workerData.getWorkerJob(scv) != WorkerJob.Gas) {
+				if (workerData.getWorkerJob(scv) != WorkerData.WorkerJob.Gas) {
 					workerData.setWorkerJob(scv, WorkerJob.Idle, (Unit) null);
 				}
 			}
@@ -142,22 +142,22 @@ public class WorkerManager extends GameManager {
 
 			// if it's less than we want it to be, fill 'er up
 			// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-			WorkerJob preJob = WorkerJob.Minerals;
-			WorkerJob postJob = WorkerJob.Gas;
+			WorkerJob preJob = WorkerData.WorkerJob.Minerals;
+			WorkerJob postJob = WorkerData.WorkerJob.Gas;
 			int numInsufficient = getAdjustedWorkersPerRefinery() - numAssigned;
 			if (numInsufficient < 0) { // 가스조절이 필요
 				numInsufficient *= -1;
-				preJob = WorkerJob.Gas;
-				postJob = WorkerJob.Minerals;
+				preJob = WorkerData.WorkerJob.Gas;
+				postJob = WorkerData.WorkerJob.Minerals;
 			}
 			for (int i = 0; i < numInsufficient; ++i) {
 				Unit jobChangeWorker = chooseWorkerToChangeGatherJob(preJob, refinery); // mineral
 																						// to
 																						// gas
 				if (jobChangeWorker != null) {
-					if (postJob == WorkerJob.Gas) {
+					if (postJob == WorkerData.WorkerJob.Gas) {
 						workerData.setWorkerJob(jobChangeWorker, postJob, refinery);
-					} else if (postJob == WorkerJob.Minerals) {
+					} else if (postJob == WorkerData.WorkerJob.Minerals) {
 						Unit resourceDepot = getClosestResourceDepotFromWorker(jobChangeWorker);
 						workerData.setWorkerJob(jobChangeWorker, postJob, resourceDepot);
 					}
@@ -254,8 +254,8 @@ public class WorkerManager extends GameManager {
 				if (worker == null)
 					continue;
 				// if worker's job is idle
-				if (workerData.getWorkerJob(worker) == WorkerJob.Idle
-						|| workerData.getWorkerJob(worker) == WorkerJob.Default) {
+				if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle
+						|| workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default) {
 					// send it to the nearest mineral patch
 					setMineralWorker(worker);
 					k++;
@@ -269,8 +269,8 @@ public class WorkerManager extends GameManager {
 				if (worker == null)
 					continue;
 				// if worker's job is idle
-				if (workerData.getWorkerJob(worker) == WorkerJob.Idle
-						|| workerData.getWorkerJob(worker) == WorkerJob.Default) {
+				if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle
+						|| workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Default) {
 					// send it to the nearest mineral patch
 					setMineralWorker(worker);
 				}
@@ -280,10 +280,10 @@ public class WorkerManager extends GameManager {
 
 	private void handleMineralWorkers() {
 		for (Unit worker : workerData.getWorkers()) {
-			if (workerData.getWorkerJob(worker) == WorkerJob.Scout) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout) {
 				continue;
 			}
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
 				continue;
 			}
 			if (!worker.isCompleted()) {
@@ -358,7 +358,7 @@ public class WorkerManager extends GameManager {
 			if (worker == null)
 				continue;
 			// if it is a move worker
-			if (workerData.getWorkerJob(worker) == WorkerJob.Move) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Move) {
 				WorkerMoveData data = workerData.getWorkerMoveData(worker);
 
 				// 목적지에 도착한 경우 이동 명령을 해제한다
@@ -486,7 +486,7 @@ public class WorkerManager extends GameManager {
 			}
 
 			WorkerJob workerJob = workerData.getWorkerJob(worker);
-			if (workerJob == WorkerJob.Minerals || workerJob == WorkerJob.Idle || workerJob == WorkerJob.Move) {
+			if (workerJob == WorkerData.WorkerJob.Minerals || workerJob == WorkerData.WorkerJob.Idle || workerJob == WorkerData.WorkerJob.Move) {
 				double dist = worker.getDistance(unit);
 				
 				if (closestWorker == null || (dist < closestDist)) {
@@ -687,7 +687,7 @@ public class WorkerManager extends GameManager {
 			if (unit == null)
 				continue;
 
-			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerJob.Minerals
+			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals
 					&& !unit.isCarryingMinerals()) {
 				double distance = unit.getDistance(refinery);
 				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false)) {
@@ -736,8 +736,8 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// Move / Idle Worker
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerJob.Move
-					|| workerData.getWorkerJob(unit) == WorkerJob.Idle)) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move
+					|| workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle)) {
 
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
@@ -760,12 +760,12 @@ public class WorkerManager extends GameManager {
 			 * se-min.park 가스가 미네랄보다 건설예정 위치에 가까울경우 gas 들고 있는 일꾼이 추출됨(로직에서
 			 * isGatheringGas false 처리 되어잇음에도 감...그래서 Gas 일꾼에서 안빼는걸로 변경)
 			 */
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) != WorkerJob.Move
-					&& workerData.getWorkerJob(unit) != WorkerJob.Idle 
-					&& workerData.getWorkerJob(unit) != WorkerJob.Gas
-					&& workerData.getWorkerJob(unit) != WorkerJob.Build
-					&& workerData.getWorkerJob(unit) != WorkerJob.Scout
-					&& workerData.getWorkerJob(unit) != WorkerJob.Combat)) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move
+					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle 
+					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Gas
+					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build
+					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Scout
+					&& workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Combat)) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance
@@ -803,7 +803,7 @@ public class WorkerManager extends GameManager {
 				continue;
 			}
 			// if it is a scout worker
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
 				return worker;
 			}
 		}
@@ -833,7 +833,7 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// only consider it if it's a mineral worker
-			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerJob.Minerals) {
+			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
 				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false
@@ -864,8 +864,8 @@ public class WorkerManager extends GameManager {
 				continue;
 
 			// only consider it if it's a mineral worker or idle worker
-			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerJob.Minerals
-					|| workerData.getWorkerJob(unit) == WorkerJob.Idle) && !unit.isCarryingMinerals()) {
+			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals
+					|| workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle) && !unit.isCarryingMinerals()) {
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(p);
 				if (closestWorker == null || distance < closestDistance) {
@@ -918,7 +918,7 @@ public class WorkerManager extends GameManager {
 			if (worker == null)
 				continue;
 
-			if (workerData.getWorkerJob(worker) == WorkerJob.Combat) {
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
 				setMineralWorker(worker);
 			}
 		}
@@ -995,7 +995,7 @@ public class WorkerManager extends GameManager {
 	// 으로 이동하게 된다
 	public void rebalanceWorkers() {
 		for (Unit worker : workerData.getWorkers()) {
-			if (workerData.getWorkerJob(worker) != WorkerJob.Minerals) {
+			if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Minerals) {
 				continue;
 			}
 
@@ -1034,29 +1034,29 @@ public class WorkerManager extends GameManager {
 		if (worker == null)
 			return false;
 
-		return workerData.getWorkerJob(worker) == WorkerJob.Minerals
-				|| workerData.getWorkerJob(worker) == WorkerJob.Idle;
+		return workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals
+				|| workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle;
 	}
 
 	public boolean isCombatWorker(Unit worker) {
 		if (worker == null)
 			return false;
 
-		return workerData.getWorkerJob(worker) == WorkerJob.Combat || workerData.getWorkerJob(worker) == WorkerJob.Idle;
+		return workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat || workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Idle;
 	}
 
 	public boolean isScoutWorker(Unit worker) {
 		if (worker == null)
 			return false;
 
-		return (workerData.getWorkerJob(worker) == WorkerJob.Scout);
+		return (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Scout);
 	}
 
 	public boolean isConstructionWorker(Unit worker) {
 		if (worker == null)
 			return false;
 
-		return (workerData.getWorkerJob(worker) == WorkerJob.Build);
+		return (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build);
 	}
 
 	public int getNumMineralWorkers() {

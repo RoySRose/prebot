@@ -19,7 +19,6 @@ import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.SpecificValueCache;
@@ -327,7 +326,7 @@ public class UnitUtils {
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static void addUnitsInRadius(Collection<Unit> units, PlayerRange playerRange, Position position, int radius) {
+	public static void addUnitsInRadius(Collection<Unit> units, CommonCode.PlayerRange playerRange, Position position, int radius) {
 		Player player = PlayerUtils.getPlayerByRange(playerRange);
 		for (Unit unit : Prebot.Broodwar.getUnitsInRadius(position, radius)) {
 			if (player != null && player != unit.getPlayer()) {
@@ -337,7 +336,7 @@ public class UnitUtils {
 		}
 	}
 	
-	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, PlayerRange playerRange) {
+	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, CommonCode.PlayerRange playerRange) {
 		return getUnitsInRegion(regionType, playerRange, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -369,7 +368,7 @@ public class UnitUtils {
 		return buildingsInRegion;
 	}
 	
-	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
+	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, CommonCode.PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
 		if (playerRange == CommonCode.PlayerRange.SELF) {
 			totalUnits = Prebot.Broodwar.self().getUnits();
