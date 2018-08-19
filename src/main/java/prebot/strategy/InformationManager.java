@@ -67,7 +67,7 @@ public class InformationManager extends GameManager {
 	private boolean firstVultureAlive;
 	private Unit firstVulture;
 
-	private Unit myfirstGas;
+	public Unit myfirstGas;
 //	private Unit enemyFirstGas;
 	private Unit gasRushEnemyRefi;
 	private boolean gasRushed;
@@ -298,6 +298,7 @@ public class InformationManager extends GameManager {
 			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 				if (unit.getType() == UnitType.Terran_Refinery && unit.isCompleted() && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
+//						FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: we have Refinery :: not danger gas rush");
 						checkGasRush = false;// 가스 러쉬 위험 끝
 					}
 				}
@@ -305,8 +306,10 @@ public class InformationManager extends GameManager {
 			for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
 				if (unit.getType() == getRefineryBuildingType(enemyRace) && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
+//						FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRsuhed is true :: "+ Prebot.Broodwar.getFrameCount() + " :: " + unit.getType());
 						gasRushed = true;// 가스 러쉬 당함
 						gasRushEnemyRefi = unit;
+//						FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRushEnemyRefi :: "+ Prebot.Broodwar.getFrameCount() + " :: "+ gasRushEnemyRefi.getType());
 						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) > 0) {
 
 							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -334,6 +337,7 @@ public class InformationManager extends GameManager {
 			if (gasRushed == true && gasRushEnemyRefi != null) {
 				if (gasRushEnemyRefi == null || gasRushEnemyRefi.getHitPoints() <= 0
 						|| gasRushEnemyRefi.isTargetable() == false) {
+//					FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: gas rush end"+ Prebot.Broodwar.getFrameCount());
 					gasRushed = false;// 가스 러쉬 위험 끝
 //					System.out.println("gas rush finished");
 //					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){

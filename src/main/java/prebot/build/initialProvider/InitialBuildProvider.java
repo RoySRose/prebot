@@ -278,7 +278,8 @@ public class InitialBuildProvider {
     	
     	int count = 0;
     	for (ConstructionTask constructionTask : removeFromQueue) {
-    		ConstructionManager.Instance().cancelConstructionTask(constructionTask.getType(), constructionTask.getDesiredPosition());
+//    		ConstructionManager.Instance().cancelConstructionTask(constructionTask.getType(), constructionTask.getDesiredPosition());
+    		ConstructionManager.Instance().cancelConstructionTask(constructionTask);
     		count++;
     	}
     	return count;

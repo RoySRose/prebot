@@ -35,15 +35,21 @@ public class BuilderRefinery extends DefaultBuildableItem {
 		if (constructionCount > 0) {
 			return false;
 		}
+		
+//		FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: check gasrush :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().isGasRushed());
     	
 		if (!InformationManager.Instance().isGasRushed() && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Refinery) == 0) {
+			
 			int barrackCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks);
 			int suppleCompleteCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
 			int scvCompleteCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV);
 			
 			if (barrackCount > 0 && suppleCompleteCount > 0 && scvCompleteCount > 10) {
+				
+//				FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: no gasrush :: no refinery :: immediately :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().myfirstGas.getTilePosition());
 				setBlocking(true);
 				setHighPriority(true);
+//				setTilePosition(InformationManager.Instance().myfirstGas.getTilePosition());
 				setSeedPositionStrategy(BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				return true;
 			}
@@ -66,17 +72,26 @@ public class BuilderRefinery extends DefaultBuildableItem {
 					continue;
 				if (unitsAround.getType() == UnitType.Terran_Refinery || unitsAround.getType() == UnitType.Zerg_Extractor
 						|| unitsAround.getType() == UnitType.Protoss_Assimilator) {
+//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: already built :: " + unitsAround.getTilePosition());
 					refineryAlreadyBuilt = true;
 					break;
 				}
 				if (unitsAround.getType() == UnitType.Resource_Vespene_Geyser) {
+//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: find gas :: " + unitsAround.getTilePosition());
 					geyserAround = unitsAround;
 				}
 			}
+//			
+//			if(ConstructionPlaceFinder.Instance().isReservedTile(geyserAround.getTilePosition().getX(),geyserAround.getTilePosition().getY())) {
+//				System.out.println("isReservedTile :: true :: " + geyserAround.getTilePosition());
+//			}
 
 			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE && geyserAround != null) {
+//				FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: aaa :: " + geyserAround.getTilePosition());
 				if (InformationManager.Instance().getMyfirstGas() != null) {
+//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: bbb :: " + geyserAround.getTilePosition());
 					if (geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())) {
+//						FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: ccc :: " + geyserAround.getTilePosition());
 						continue;
 					}
 				}
@@ -90,6 +105,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 					}
 					if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 9) {
 						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
+//							FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: set BuildQuere :: " + findGeyser);
 							setTilePosition(findGeyser);
 							return true;
 						}

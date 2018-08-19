@@ -1076,12 +1076,17 @@ public class BuildManager extends GameManager {
 					}
 
 					// Refinery 건물의 경우, Refinery 가 건설되지 않은 Geyser가 있는 경우에만 가능
+//					if (!isDeadlockCase && unitType == InformationManager.Instance().getRefineryBuildingType()) {
 					if (!isDeadlockCase && unitType == InformationManager.Instance().getRefineryBuildingType()) {
+						
+//						FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: refinery lock check");
 						boolean hasAvailableGeyser = true;
 
 						// Refinery가 지어질 수 있는 장소를 찾아본다
 						TilePosition testLocation = getDesiredPosition(unitType, currentItem.seedLocation,
 								currentItem.seedLocationStrategy);
+						
+//						FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: getDesiredPosition :: " + testLocation);
 
 						// Refinery 를 지으려는 장소를 찾을 수 없으면 dead lock
 						if (testLocation == TilePosition.None || testLocation == TilePosition.Invalid
