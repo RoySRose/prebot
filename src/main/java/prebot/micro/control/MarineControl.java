@@ -50,7 +50,7 @@ public class MarineControl extends Control {
 			fleePosition = bunker.getPosition();
 		}
 		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new DefaultTargetCalculator());
-		FleeOption fOption = new FleeOption(fleePosition, true, Angles.WIDE);
+		FleeOption fOption = new FleeOption(fleePosition, true, MicroConfig.Angles.WIDE);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 		
 		// TODO 초반 저글링 디펜스가 필요한 경우 일꾼 사이로 위치 고정

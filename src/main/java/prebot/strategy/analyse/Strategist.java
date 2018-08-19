@@ -96,7 +96,7 @@ public abstract class Strategist {
 		}
 	}
 
-	public boolean hasInfo(ClueInfo info) {
+	public boolean hasInfo(Clue.ClueInfo info) {
 		return ClueManager.Instance().containsClueInfo(info);
 	}
 	
@@ -105,7 +105,7 @@ public abstract class Strategist {
 	}
 	
 	public boolean hasAnyInfo(Clue.ClueInfo... infos) {
-		for (ClueInfo info : infos) {
+		for (Clue.ClueInfo info : infos) {
 			if (hasInfo(info)) {
 				return true;
 			}
@@ -114,7 +114,7 @@ public abstract class Strategist {
 	}
 	
 	public boolean hasAllInfo(Clue.ClueInfo... infos) {
-		for (ClueInfo info : infos) {
+		for (Clue.ClueInfo info : infos) {
 			if (!hasInfo(info)) {
 				return false;
 			}

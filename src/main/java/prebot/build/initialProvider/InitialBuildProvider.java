@@ -25,7 +25,6 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 /// 봇 프로그램 설정
 public class InitialBuildProvider {
@@ -50,7 +49,7 @@ public class InitialBuildProvider {
 	
 	public int orderMarine  = 0;
 	
-	public ExpansionOption nowStrategy, bfStrategy;
+	public EnemyStrategyOptions.ExpansionOption nowStrategy, bfStrategy;
 	public EnemyStrategy dbgNowStg, dbgBfStg;
 
 	public TilePosition firstSupplyPos = TilePosition.None;

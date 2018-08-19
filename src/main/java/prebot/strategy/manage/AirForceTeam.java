@@ -12,7 +12,7 @@ import bwapi.Unit;
 import prebot.common.main.Prebot;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.Angles;
+import prebot.micro.constant.MicroConfig;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
@@ -52,7 +52,7 @@ public class AirForceTeam {
 		this.directionReservse = false; // 타깃포지션 변경 역방향 여부
 		this.leaderOrderPosition = null;
 		this.fleeEui = null;
-		this.driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
+		this.driveAngle = MicroConfig.Angles.AIR_FORCE_DRIVE_LEFT;
 		this.cloakingMode = false;
 		this.repairCenter = null;
 	}
@@ -113,10 +113,10 @@ public class AirForceTeam {
 	}
 
 	public void switchDriveAngle() {
-		if (driveAngle == Angles.AIR_FORCE_DRIVE_LEFT) {
-			driveAngle = Angles.AIR_FORCE_DRIVE_RIGHT;
+		if (driveAngle == MicroConfig.Angles.AIR_FORCE_DRIVE_LEFT) {
+			driveAngle = MicroConfig.Angles.AIR_FORCE_DRIVE_RIGHT;
 		} else {
-			driveAngle = Angles.AIR_FORCE_DRIVE_LEFT;
+			driveAngle = MicroConfig.Angles.AIR_FORCE_DRIVE_LEFT;
 		}
 	}
 

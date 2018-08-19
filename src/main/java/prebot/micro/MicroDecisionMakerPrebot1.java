@@ -175,7 +175,7 @@ public class MicroDecisionMakerPrebot1 {
 						if (saveUnitLevel == 0 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 							bestTargetInfo = enemyInfo;
 							targetOutOfSight = true;
-						} else if (saveUnitLevel >= 1 && distanceToTarget <= (MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + (int) Common.BACKOFF_DIST_SIEGE_TANK)) {
+						} else if (saveUnitLevel >= 1 && distanceToTarget <= (MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + (int) MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK)) {
 							bestTargetInfo = enemyInfo;
 							targetOutOfSight = true;
 						} else {
@@ -270,7 +270,7 @@ public class MicroDecisionMakerPrebot1 {
 					int distanceToTarget = tank.getDistance(closestTooFarTarget);
 					if (saveUnitLevel <= 1 && tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < MicroConfig.Tank.SIEGE_LINK_DISTANCE) {
 						return MicroDecision.doNothing(mechanicUnit);
-					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK) {
+					} else if (saveUnitLevel == 2 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + MicroConfig.Common.BACKOFF_DIST_SIEGE_TANK) {
 						return MicroDecision.doNothing(mechanicUnit);
 					}
 				}

@@ -1946,14 +1946,14 @@ public class InformationManager extends GameManager {
 
 	public void updateMapSpecificInformation() {
 		// name으로 map 판단
-		GameMap gameMap = GameMap.UNKNOWN;
+		GameMap gameMap = MapSpecificInformation.GameMap.UNKNOWN;
 		String mapName = Prebot.Broodwar.mapFileName().toUpperCase();
 		if (mapName.matches(".*CIRCUIT.*")) {
-			gameMap = GameMap.CIRCUITBREAKER;
+			gameMap = MapSpecificInformation.GameMap.CIRCUITBREAKER;
 		} else if (mapName.matches(".*SPIRIT.*")) {
-			gameMap = GameMap.FIGHTING_SPIRITS;
+			gameMap = MapSpecificInformation.GameMap.FIGHTING_SPIRITS;
 		} else {
-			gameMap = GameMap.UNKNOWN;
+			gameMap = MapSpecificInformation.GameMap.UNKNOWN;
 		}
 
 		List<BaseLocation> startingBase = new ArrayList<>();

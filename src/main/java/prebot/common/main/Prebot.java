@@ -9,6 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.Flag.Enum;
 import bwta.BWTA;
+import prebot.common.constant.CommonConfig;
 import prebot.common.constant.CommonConfig.Config;
 import prebot.common.debug.BigWatch;
 import prebot.common.debug.UXManager;
@@ -43,8 +44,8 @@ public class Prebot extends DefaultBWListener {
 			Broodwar.enableFlag(Enum.UserInput.getValue());
 		}
 		Broodwar.setCommandOptimizationLevel(1);
-		Broodwar.setLocalSpeed(Config.SetLocalSpeed);
-		Broodwar.setFrameSkip(Config.SetFrameSkip);
+		Broodwar.setLocalSpeed(CommonConfig.Config.SetLocalSpeed);
+		Broodwar.setFrameSkip(CommonConfig.Config.SetFrameSkip);
 
 		System.out.println("Map analyzing started");
 		BWTA.readMap();

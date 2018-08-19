@@ -5,7 +5,6 @@ import java.util.Set;
 
 import bwapi.UnitType;
 import prebot.strategy.analyse.Clue;
-import prebot.strategy.analyse.Clue.ClueInfo;
 
 public class ClueManager {
 	
@@ -15,19 +14,19 @@ public class ClueManager {
 		return instance;
 	}
 
-	private Set<ClueInfo> clueInfoSet = new HashSet<>();
+	private Set<Clue.ClueInfo> clueInfoSet = new HashSet<>();
 	
-	public Set<ClueInfo> getClueInfoList() {
+	public Set<Clue.ClueInfo> getClueInfoList() {
 		return clueInfoSet;
 	}
 	
-	public void addClueInfo(ClueInfo info) {
+	public void addClueInfo(Clue.ClueInfo info) {
 		if (containsClueInfo(info)) {
 			return;
 		}
 		
-		ClueInfo removeInfo = null;
-		for (ClueInfo clueInfo : clueInfoSet) {
+		Clue.ClueInfo removeInfo = null;
+		for (Clue.ClueInfo clueInfo : clueInfoSet) {
 			if (clueInfo.type == info.type) {
 				removeInfo = clueInfo;
 				break;
@@ -40,7 +39,7 @@ public class ClueManager {
 	}
 	
 	public boolean containsClueType(Clue.ClueType type) {
-		for (ClueInfo clueInfo : clueInfoSet) {
+		for (Clue.ClueInfo clueInfo : clueInfoSet) {
 			if (clueInfo.type == type) {
 				return true;
 			}
@@ -48,7 +47,7 @@ public class ClueManager {
 		return false;
 	}
 	
-	public boolean containsClueInfo(ClueInfo info) {
+	public boolean containsClueInfo(Clue.ClueInfo info) {
 		return clueInfoSet.contains(info);
 	}
 	

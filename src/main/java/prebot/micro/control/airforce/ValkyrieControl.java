@@ -27,7 +27,7 @@ public class ValkyrieControl extends Control {
 		
 		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new DefaultTargetCalculator());
 		
-		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, Angles.NARROW);
+		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, true, MicroConfig.Angles.NARROW);
 		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit unit : unitList) {
