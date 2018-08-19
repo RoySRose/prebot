@@ -17,7 +17,9 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode.PlayerRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -43,25 +45,49 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			return false;
 		}
 
-		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret);
-		int constructionCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, null);
+//		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Missile_Turret);
+//		int constructionCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Missile_Turret, null);
 
-		// 첫번째 터렛이 없고, 입막 터렛 위치가 지정되어있을경우
-		if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret) && BlockingEntrance.Instance().entrance_turret1 != TilePosition.None
-				&& buildQueueCount + constructionCount == 0) {
-			setHighPriority(true);
-			setBlocking(true);
-			setTilePosition(BlockingEntrance.Instance().entrance_turret1);
-			return true;
-		}
-		
-		if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret) == 1) {
-			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None && buildQueueCount + constructionCount == 0) {
-				setHighPriority(true);
-				setBlocking(true);
-				setTilePosition(BlockingEntrance.Instance().entrance_turret2);
-				return true;
+		if (!StrategyIdea.EXOK) {
+			
+//			List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
+			// 첫번째 터렛이 없고, 입막 터렛 위치가 지정되어있을경우
+//			noTurretNearPosition
+			if (TilePositionUtils.isValidTilePosition(BlockingEntrance.Instance().entrance_turret1)) {
+				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret1.toPosition(), 30, 30, 0, 1)) {
+					setHighPriority(true);
+					setBlocking(true);
+					setTilePosition(BlockingEntrance.Instance().entrance_turret1);
+					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret1 :: " + BlockingEntrance.Instance().entrance_turret1);
+					return true;
+				}
 			}
+			
+			if (TilePositionUtils.isValidTilePosition(BlockingEntrance.Instance().entrance_turret2)) {
+				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret2.toPosition(), 30, 30, 0, 1)) {
+					setHighPriority(true);
+					setBlocking(true);
+					setTilePosition(BlockingEntrance.Instance().entrance_turret2);
+					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret2 :: " + BlockingEntrance.Instance().entrance_turret2);
+					return true;
+				}
+			}
+//			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret) && BlockingEntrance.Instance().entrance_turret1 != TilePosition.None
+//					&& buildQueueCount + constructionCount == 0) {
+//				setHighPriority(true);
+//				setBlocking(true);
+//				setTilePosition(BlockingEntrance.Instance().entrance_turret1);
+//				return true;
+//			}
+			
+//			if(Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret) == 1) {
+//				if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None && buildQueueCount + constructionCount == 0) {
+//					setHighPriority(true);
+//					setBlocking(true);
+//					setTilePosition(BlockingEntrance.Instance().entrance_turret2);
+//					return true;
+//				}
+//			}
 		}
 		
 //		if(StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_DARK_DROP
@@ -76,8 +102,11 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 //		
 		int baseTurret = 1;
 		
+		int otherCommandTurret = 1;
+		
 		if(Prebot.Broodwar.enemy().getRace()== Race.Protoss) {
 			baseTurret = 2;
+//			otherCommandTurret = 1;
 		}
 		
 		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Mutalisk)
@@ -91,7 +120,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		
 		BaseLocation myBase = InfoUtils.myBase();
-//		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
+		BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
 		Chokepoint myFirstChoke = InfoUtils.myFirstChoke();
 		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
 
@@ -100,19 +129,22 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
-		if (noTurretNearPosition(myBase.getPosition(), 350, 300, turretCount, baseTurret)) {
+//		System.out.println(" turret postion check start");
+		if (noTurretNearPosition(myBase.getPosition(), 250, 200, turretCount, baseTurret+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());
+			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct myBase :: " + myBase.getPosition().toTilePosition());
 			return true;
 		}
 		
 		Position mutalDef = PositionFinder.Instance().expansionDefensePositionSiege();
 		
-		if (noTurretNearPosition(mutalDef, 100, 120, turretCount, 1+add_turret)) {
+		if (noTurretNearPosition(mutalDef, 120, 120, turretCount, 1+add_turret)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(mutalDef.toTilePosition());
+			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mutalDef :: " + mutalDef.toTilePosition());
 			return true;
 		}
 
@@ -142,6 +174,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(betweenChoke.toTilePosition());
+			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct betweenChoke :: " + betweenChoke.toTilePosition());
 			return true;
 		}
 		
@@ -159,87 +192,35 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		if (StrategyIdea.EXOK) {
 			// TODO COMPLETE, ALL 테스트에 따른 변경여부 결정
-			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1) {
-				if (noTurretNearPosition(mySecondChoke.getCenter(), 150, 100, turretCount, 1+add_turret)) {
+//			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) > 1) {
+				if (noTurretNearPosition(mySecondChoke.getCenter(), 250, 100, turretCount, 1+add_turret)) {
 					setHighPriority(true);
 					setBlocking(true);
 					setTilePosition(mySecondChoke.getCenter().toTilePosition());
+					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mySecondChoke :: " + mySecondChoke.getCenter().toTilePosition());
 					return true;
 				}
-			}
+//			}
 		}
-		
 		
 		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Command_Center);
 		if(commandCenters.size() > 1) {
 			for (Unit commandCenter : commandCenters) {
-				int mineralsNearDepot = 0;
-				Unit baseMineral = null;
-				for (Unit mineral : Prebot.Broodwar.neutral().getUnits()) {
-					if (mineral.getDistance(commandCenter) < 450 && mineral.getResources() > 200) {
-						baseMineral = mineral;
-						break;
-					}
-				}
-				if(baseMineral != null) {
+				if(!TilePositionUtils.equals(myBase.getTilePosition(), commandCenter.getTilePosition())
+					&& !TilePositionUtils.equals(myFirstExpansion.getTilePosition(), commandCenter.getTilePosition())) {
+//					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: not main base :: " + commandCenter.getTilePosition());
 					if (validMineralCountNearDepot(commandCenter) > 6) {
-						if (noTurretNearPosition(commandCenter.getPosition(), 250, 200, turretCount, 1+add_turret)) {
+						if (noTurretNearPosition(commandCenter.getPosition(), 250, 150, turretCount, otherCommandTurret+add_turret)) {
 							setHighPriority(true);
 							setBlocking(true);
 							setTilePosition(commandCenter.getPosition().toTilePosition());
+							FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct near command :: " + commandCenter.getTilePosition());
 							return true;
 						}
 					}
 				}
 			}
 		}
-		
-		
-		
-		
-//		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) > 0 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret) < 10) {
-//			int build_turret_cnt = 0;
-//			int turretcnt =  Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
-//			//지역 멀티
-//			
-//			if (myBase != null) {
-//				
-//				List<Unit> turretInRegion = Prebot.Broodwar.getUnitsInRadius(myBase.getPosition(), 600+turretcnt*10);
-//				build_turret_cnt = 0;
-//				for(Unit unit: turretInRegion){
-//					if (unit.getType() == UnitType.Terran_Missile_Turret) {
-//						build_turret_cnt++;
-//					}
-//				}
-//
-//				if (build_turret_cnt < max_turret_to_mutal) {
-//					if (BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, myBase.getPosition().toTilePosition(), 300) < 1
-//							&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret,	myBase.getPosition().toTilePosition(), 300) == 0) {
-//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, myBase.getPosition().toTilePosition(),true);
-//					}
-//				}
-//			}
-//			if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) > 1){
-//				if (myFirstExpansion != null) {
-//					
-//					List<Unit> turretInRegion = Prebot.Broodwar.getUnitsInRadius(myFirstExpansion.getPosition(), 600+turretcnt*10);
-//					build_turret_cnt = 0;
-//					for(Unit unit: turretInRegion){
-//						if (unit.getType() == UnitType.Terran_Missile_Turret) {
-//							build_turret_cnt++;
-//						}
-//					}
-//
-//					if (build_turret_cnt < max_turret_to_mutal) {
-//						if (BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, myFirstExpansion.getPosition().toTilePosition(), 300) < 1
-//								&& ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret,	myFirstExpansion.getPosition().toTilePosition(), 300) == 0) {
-//							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Missile_Turret, myFirstExpansion.getPosition().toTilePosition(),true);
-//						}
-//					}
-//				}
-//			}
-//		}
-		
 		return false;
 	}
 
@@ -247,15 +228,18 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int buildQueueCountNear = BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius1 + turretCount * 15);
 		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius1 + turretCount * 15);
-		
-		if(maxTurretCnt <= buildQueueCountNear + constructionCountNear) {
-			return false;
-		}
-		
 		List<Unit> turretNearBase = UnitUtils.getUnitsInRadius(PlayerRange.SELF, centerPosition, radius1 + turretCount * 15, UnitType.Terran_Missile_Turret);
-		if( maxTurretCnt <= turretNearBase.size()) {
+		
+		if(maxTurretCnt <= buildQueueCountNear + constructionCountNear + turretNearBase.size()) {
+//			System.out.println(" there is turret quere exists :: " + maxTurretCnt + " :: " + (buildQueueCountNear + constructionCountNear));
 			return false;
 		}
+		
+		
+//		if( maxTurretCnt <= turretNearBase.size()) {
+////			System.out.println(" there is real turret exists :: " + maxTurretCnt + " :: " + (buildQueueCountNear + constructionCountNear));
+//			return false;
+//		}
 //		if (!turretNearBase.isEmpty()) {
 //			return false;
 //		}

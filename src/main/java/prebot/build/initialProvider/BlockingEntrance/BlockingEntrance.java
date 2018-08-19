@@ -192,8 +192,8 @@ public class BlockingEntrance {
         
         loc_t = loc;
         
-        System.out.println("this map & location ==>>>>  " + mapName + " : " + loc);
-        System.out.println("xinc ==> " + xinc + " // yinc ==> " + yinc);
+//        System.out.println("this map & location ==>>>>  " + mapName + " : " + loc);
+//        System.out.println("xinc ==> " + xinc + " // yinc ==> " + yinc);
         
     }
 
@@ -302,7 +302,7 @@ public class BlockingEntrance {
 	    	
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT1),    new TilePosition(121, 0  ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(102, 4  ));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT1),   new TilePosition(103, 119));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT1),   new TilePosition(106, 106));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT2),   new TilePosition(104, 109));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT1),  new TilePosition(13, 119 ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT2),  new TilePosition(20, 119 ));
@@ -527,7 +527,7 @@ public class BlockingEntrance {
     		
     	}else {
     		
-    		System.out.println("맵 ==>> UNKNOWN");
+//    		System.out.println("맵 ==>> UNKNOWN");
     		
     		
     		postitionStorage.put(combine(Map.UNKNOWN, Location.One, Building.SUPPLY_AREA), TilePosition.None);         
@@ -666,7 +666,7 @@ public class BlockingEntrance {
             yinc = true;
         }
         
-        System.out.println(" next supply position ==>> " + loc.toString());
+//        System.out.println(" next supply position ==>> " + loc.toString());
 		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
 		return supply_pos;
 
@@ -693,13 +693,13 @@ public class BlockingEntrance {
 		if(a == 1) {
 			TilePosition turret_pos = postitionStorage.get(combine(mapName, loc_t, Building.ENTRANCE_TURRET1));
 			if(turret_pos != TilePosition.None){
-				System.out.println("turret 1 position not None :: " + turret_pos );
+//				System.out.println("turret 1 position not None :: " + turret_pos );
 				return turret_pos;
 			}
 		}else if(a == 2) {
 			TilePosition turret_pos = postitionStorage.get(combine(mapName, loc_t, Building.ENTRANCE_TURRET2));
 			if(turret_pos != TilePosition.None){
-				System.out.println("turret 2 position not None :: " + turret_pos );
+//				System.out.println("turret 2 position not None :: " + turret_pos );
 				return turret_pos;
 			}
 		}
