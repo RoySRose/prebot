@@ -3,6 +3,7 @@ package prebot.micro.control.building;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import bwapi.Order;
 import bwapi.Position;
@@ -24,6 +25,8 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.macro.AttackDecisionMaker;
+import prebot.macro.EnemyCommandInfo;
 import prebot.micro.control.Control;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -66,20 +69,32 @@ public class ComsatControl extends Control {
 		}
 		
 		Unit comsatToUse = null;
-		int usableEnergy = 75;
-		
-		if (TimeUtils.afterTime(16, 0)) {
-			usableEnergy = 195;
-		} else if (TimeUtils.afterTime(13, 0)) {
-			usableEnergy = 180;
-		} else {
-			if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
-				usableEnergy = 150;
-			} else if (TimeUtils.afterTime(10, 0)) {
-				usableEnergy = 130;
-			} else if (TimeUtils.afterTime(7, 0)) {
-				usableEnergy = 80;
+		int usableEnergy = 150;
+		int comsatCnt = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		if(comsatCnt > 1){
+			usableEnergy = 135;
+		}
+		if(comsatCnt > 2){
+			
+			if(comsatCnt < 6) {
+				usableEnergy -= 20 * (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station) - 2);
+			}else {
+				usableEnergy -= 20 * 3;
 			}
+		}
+		
+		
+		if (UnitUtils.invisibleEnemyDiscovered() || StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT)) {
+			usableEnergy += 50;
+			
+			if(UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) > 0){
+				usableEnergy -= 25;
+			}
+			
+		}
+		
+		if(usableEnergy > 195) {
+			usableEnergy = 195;
 		}
 		
 		for (Unit comsatStation : unitList) {
@@ -193,12 +208,27 @@ public class ComsatControl extends Control {
 		if (TimeUtils.afterTime(14, 0)) {
 			if (InformationManager.Instance().getIslandBaseLocations() != null) {
 				for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
-					scanTilePositionCandidate.add(islands.getTilePosition());
+					
+					Position scanPosotion = islands.getPosition();
+					GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+					if (cell == null) {
+						continue;
+					}
+					if(TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 12000) {
+						scanTilePositionCandidate.add(islands.getTilePosition());
+					}
 				}
 			}
 		}
 
-		Position oldestCheckPosition = null;
+		
+		Position oldestCheckPosition = CheckForResourceInfoNeeded();
+		
+		if(oldestCheckPosition != Position.None) {
+			System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+			
+			return oldestCheckPosition;
+		}
 		int oldestLastCheckTime = CommonCode.INT_MAX;
 		for (TilePosition scanTilePosition : scanTilePositionCandidate) {
 			if (Prebot.Broodwar.isVisible(scanTilePosition)) {
@@ -206,9 +236,7 @@ public class ComsatControl extends Control {
 			}
 			Position scanPosotion = scanTilePosition.toPosition();
 			GridCell cell = MapGrid.Instance().getCell(scanPosotion);
-			if (cell == null) {
-				continue;
-			}
+			
 			
 			int lastScanTime = TimeUtils.elapsedFrames(cell.getTimeLastScan());
 			int lastVisitTime = TimeUtils.elapsedFrames(cell.getTimeLastVisited());
@@ -233,6 +261,33 @@ public class ComsatControl extends Control {
 		}
 		
 		return oldestCheckPosition;
+	}
+
+	private Position CheckForResourceInfoNeeded() {
+		
+		Map<UnitInfo, EnemyCommandInfo> enemyResourceDepotInfoMap = AttackDecisionMaker.Instance().enemyResourceDepotInfoMap;
+		Position scanPosition = Position.None;
+				
+		if(enemyResourceDepotInfoMap.size() == 0) {
+			return Position.None;
+		}
+		
+		
+		int earlist = CommonCode.INT_MAX;
+		
+		for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
+			
+	        int lastFullCheckFrame= enemyResourceDepot.getValue().getLastFullCheckFrame();
+	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 2500) {
+	        	if(lastFullCheckFrame < earlist) {
+	        		scanPosition = enemyResourceDepot.getKey().getLastPosition();
+	        		earlist = lastFullCheckFrame;
+	        	}
+	        }
+	        
+	    }
+		
+		return scanPosition;
 	}
 	
 }
