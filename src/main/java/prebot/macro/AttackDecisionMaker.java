@@ -65,6 +65,7 @@ public class AttackDecisionMaker extends GameManager {
     public int UXMinusMineralToPredict;
     public int UXMinusGasToPredict;
 	private boolean pushSiege=false;
+	private boolean attackByFullSupply=false;
     
     public void onStart() {
         this.enemyResourceDepotInfoMap = new HashMap<>();
@@ -169,12 +170,17 @@ public class AttackDecisionMaker extends GameManager {
 					Prebot.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.NO_MERCY_ATTACK;
+    			
     		} else if (decision == Decision.FULL_ATTACK) {
     			if (decision != Decision.FULL_ATTACK) {
 					Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.FULL_ATTACK;
     		}
+    	}
+    	
+    	if (attackByFullSupply()) {
+    		return Decision.FULL_ATTACK;
     	}
     	
     	if (quickAttack()) {
@@ -185,21 +191,22 @@ public class AttackDecisionMaker extends GameManager {
 		}
         return Decision.DEFENCE;
     }
-    
-    private Decision attackType(int myForcePoint, int enemyForcePoint) {
-    	if (InfoUtils.enemyRace() == Race.Protoss) {
-    		if (pushSiege(myForcePoint, enemyForcePoint)) {
+
+	private Decision attackType(int myForcePoint, int enemyForcePoint) {
+    	if (InfoUtils.enemyRace() == Race.Terran) {
+    		if (myForcePoint > enemyForcePoint * 2.0 && attackByFullSupply()) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
-    	} else if (InfoUtils.enemyRace() == Race.Terran) {
+    		
+    	} else if (InfoUtils.enemyRace() == Race.Protoss) {
     		if (myForcePoint > enemyForcePoint * 2.0) {
-    			
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
+    		
     	} else if (InfoUtils.enemyRace() == Race.Zerg) {
     		if (myForcePoint > enemyForcePoint * 1.5) {
     			return Decision.NO_MERCY_ATTACK;
@@ -213,10 +220,19 @@ public class AttackDecisionMaker extends GameManager {
 	private boolean pushSiege(int myForcePoint, int enemyForcePoint) {
 		if (Prebot.Broodwar.self().supplyUsed() < 320) {
 			pushSiege = false;
-		} else if (Prebot.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 1.5) {
+		} else if (Prebot.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 2.0) {
 			pushSiege = true;
 		}
 		return pushSiege;
+	}
+    
+    private boolean attackByFullSupply() {
+		if (Prebot.Broodwar.self().supplyUsed() < 320) {
+			attackByFullSupply = false;
+		} else if (Prebot.Broodwar.self().supplyUsed() > 380) {
+			attackByFullSupply = true;
+		}
+		return attackByFullSupply;
 	}
 
 	private int attackPoint() {
