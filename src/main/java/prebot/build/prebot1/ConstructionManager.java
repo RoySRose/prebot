@@ -770,7 +770,7 @@ public class ConstructionManager extends GameManager {
 			boolean cancelConstruction = false;
 			if (cancelBuildingIds.contains(unit.getID())) {
 				cancelConstruction = true;
-			} else if (unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100 && unit.getHitPoints() < unit.getType().maxHitPoints() * 0.1) {
+			} else if (unit.isConstructing() && unit.isUnderAttack() && unit.getHitPoints() < 100 || unit.getHitPoints() < unit.getType().maxHitPoints() * 0.1) {
 				cancelConstruction = true;
 			}
 
