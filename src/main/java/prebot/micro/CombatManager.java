@@ -23,6 +23,7 @@ import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.UnitCondition;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
@@ -173,39 +174,42 @@ public class CombatManager extends GameManager {
 		int defenseTankCount = 0;
 		Set<Integer> defenseTankIdSet = new HashSet<>();
 		List<Squad> squadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName);
+		
+		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) {
+			for (Squad defenseSquad : squadList) {
+				squadData.removeSquad(defenseSquad.getSquadName());
+			}
+			return;
+		}
+		
 		for (Squad defenseSquad : squadList) {
-			if (defenseSquad instanceof MultiDefenseSquad) {
-				MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
-				if (squad.getType() == DefenseType.CENTER_DEFENSE) {
-					Unit commandCenter = squad.getCommandCenter();
-					if (!UnitUtils.isValidUnit(commandCenter)) {
-						squadData.removeSquad(defenseSquad.getSquadName());
-						continue;
-					}
-					
-				} else if (squad.getType() == DefenseType.REGION_OCCUPY) {
-					if (squad.tankFull()) {
-						squadData.removeSquad(defenseSquad.getSquadName()); // 공격으로 전환
-						continue;
-					}
+			MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
+			if (squad.getType() == DefenseType.CENTER_DEFENSE) {
+				Unit commandCenter = squad.getCommandCenter();
+				if (!UnitUtils.isValidUnit(commandCenter)) {
+					squadData.removeSquad(defenseSquad.getSquadName());
+					continue;
 				}
 				
-				for (Unit invalidUnit : defenseSquad.invalidUnitList()) {
-					squadData.exclude(invalidUnit);
+			} else if (squad.getType() == DefenseType.REGION_OCCUPY) {
+				if (squad.tankFull()) {
+					squadData.removeSquad(defenseSquad.getSquadName()); // 공격으로 전환
+					continue;
 				}
-				defenseTankCount += defenseSquad.unitList.size();
-				for (Unit unit : defenseSquad.unitList) {
-					defenseTankIdSet.add(unit.getID());
-				}
-				
-			} else {
-				System.out.println("Not a defenseSquad: " + defenseSquad.getSquadName());
+			}
+			
+			for (Unit invalidUnit : defenseSquad.invalidUnitList()) {
+				squadData.exclude(invalidUnit);
+			}
+			defenseTankCount += defenseSquad.unitList.size();
+			for (Unit unit : defenseSquad.unitList) {
+				defenseTankIdSet.add(unit.getID());
 			}
 		}
 		
-//		if (!StrategyIdea.mainSquadMode.isAttackMode) {
-//			return;
-//		}
+		if (!StrategyIdea.mainSquadCrossBridge) {
+			return;
+		}
 		
 		int tankCount = 0;
 		Squad mainSquad = squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
@@ -225,10 +229,6 @@ public class CombatManager extends GameManager {
 			if (defenseTankCount > tankCount * 0.2) {
 				return;
 			}
-		}
-		
-		if (!StrategyIdea.mainSquadCrossBridge) {
-			return;
 		}
 		
 		// create defense squad
@@ -259,7 +259,7 @@ public class CombatManager extends GameManager {
 				}
 			}
 			
-			String squadName = SquadInfo.MULTI_DEFENSE_.squadName + commandCenter.getID();
+			String squadName = SquadInfo.MULTI_DEFENSE_.squadName + "U" + commandCenter.getID();
 			Squad defenseSquad = squadData.getSquad(squadName);
 			// 게릴라 스쿼드 생성(포지션 별)
 			if (defenseSquad == null) {
@@ -279,14 +279,14 @@ public class CombatManager extends GameManager {
 					continue;
 				}
 				if (occupiedRegions.contains(region)) {
-					String squadName = SquadInfo.MULTI_DEFENSE_.squadName + base.getPosition();
+					String squadName = SquadInfo.MULTI_DEFENSE_.squadName + "P" + base.getPosition();
 					Squad regionDefenseSquad = squadData.getSquad(squadName);
 					
 					if (regionDefenseSquad == null) {
-						Position regionPosition = region.getCenter();
 						Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+						Position regionPosition = region.getCenter();
 						
-						double radian = MicroUtils.targetDirectionRadian(regionPosition, centerPosition);
+						double radian = MicroUtils.targetDirectionRadian(centerPosition, regionPosition);
 						Position movePosition = MicroUtils.getMovePosition(centerPosition, radian, 1000);
 						
 						Region defenseRegion = BWTA.getRegion(movePosition.makeValid());
@@ -298,8 +298,17 @@ public class CombatManager extends GameManager {
 		}
 		
 		// assign units
+		List<Squad> commandSquadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName + "U");
+		if (assign(commandSquadList, defenseTankIdSet)) {
+			return;
+		}
+		List<Squad> regionSquadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName + "P");
+		assign(regionSquadList, defenseTankIdSet);
+	}
+	
+	private boolean assign(List<Squad> updatedSquadList, Set<Integer> defenseTankIdSet) {
 		List<Unit> tankList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-		List<Squad> updatedSquadList = squadData.getSquadList(SquadInfo.MULTI_DEFENSE_.squadName);
+		
 		for (Squad defenseSquad : updatedSquadList) {
 			MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
 			if (squad.alreadyDefenseUnitAssigned()) {
@@ -325,7 +334,9 @@ public class CombatManager extends GameManager {
 			});
 			squadData.assign(closestTank, squad);
 			squad.setDefenseUnitAssignedFrame(TimeUtils.elapsedFrames());
+			return true;
 		}
+		return false;
 	}
 
 	private void updateGuerillaSquad() {
@@ -335,7 +346,7 @@ public class CombatManager extends GameManager {
 			maxRatio = 0.0d;
 		} else {
 			if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadCrossBridge) {
-				maxRatio = 0.8;
+				maxRatio = 0.5;
 			}
 		}
 		
@@ -390,7 +401,7 @@ public class CombatManager extends GameManager {
 			return;
 		}
 		
-		String squadName = SquadInfo.GUERILLA_.squadName + bestGuerillaSite.getPosition().toString();
+		String squadName = SquadInfo.GUERILLA_.squadName + "P" + bestGuerillaSite.getPosition().toString();
 		Squad guerillaSquad = squadData.getSquad(squadName);
 		// 게릴라 스쿼드 생성(포지션 별)
 		if (guerillaSquad == null) {

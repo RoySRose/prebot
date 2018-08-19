@@ -57,7 +57,7 @@ public class MultiDefenseSquad extends Squad {
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				max = 3;
 			} else if (InfoUtils.enemyRace() == Race.Terran) {
-				max = 2;
+				max = 1;
 			} else if (InfoUtils.enemyRace() == Race.Protoss) {
 				max = 0;
 			}
@@ -111,7 +111,7 @@ public class MultiDefenseSquad extends Squad {
 		euiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
 
 		tankControl.setMainPosition(defensePosition);
-		tankControl.setSaveUnitLevel(1);
+		tankControl.setSaveUnitLevel(2);
 		tankControl.controlIfUnitExist(unitList, euiList);
 	}
 
@@ -123,7 +123,7 @@ public class MultiDefenseSquad extends Squad {
 			if (!TimeUtils.executeUnitRotation(tank, LagObserver.groupsize())) {
 				continue;
 			}
-			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, tank.getPosition(), UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange());
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, tank.getPosition(), 100);
 		}
 	}
 	

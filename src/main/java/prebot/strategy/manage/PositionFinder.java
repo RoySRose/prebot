@@ -28,6 +28,7 @@ import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions.BaseCondition;
@@ -324,7 +325,9 @@ public class PositionFinder {
 					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
 					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
 					// 안전한 위치까지 바로 전진하도록 한다.
-					
+					if (InfoUtils.enemyRace() == Race.Terran && UnitUtils.myFactoryUnitSupplyCount() < 10 * 4) {
+						return InfoUtils.enemyReadyToPosition();
+					}
 					BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
 					if (enemyFirstExpansion != null && InfoUtils.enemyFirstExpansionOccupied()) {
 						return enemyFirstExpansion.getPosition();
@@ -387,7 +390,7 @@ public class PositionFinder {
 		euiListNear.addAll(InfoUtils.euiListInExpansion());
 		euiListNear.addAll(InfoUtils.euiListInThirdRegion());
 		euiListNear.addAll(UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.GROUND_UNIT|TargetFilter.INVISIBLE|TargetFilter.UNFIGHTABLE,
-				InfoUtils.myBase().getPosition(), 450, true, true));
+				InfoUtils.myBase().getPosition(), 550, true, true));
 		
 		int sumOfAirX = 0;
 		int sumOfAirY = 0;
@@ -537,7 +540,7 @@ public class PositionFinder {
 		if (watcherPosition == Position.Unknown) {
 			if (InfoUtils.enemyBase() != null) {
 				if (InfoUtils.enemyRace() == Race.Terran && Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 0) {
-					watcherPosition = InfoUtils.enemyThirdRegion().getCenter();
+					watcherPosition = InfoUtils.enemyReadyToPosition();
 				} else {
 					watcherPosition = InfoUtils.enemyBase().getPosition();
 				}
@@ -560,7 +563,11 @@ public class PositionFinder {
 		if (!myOccupiedBases.isEmpty()) {
 			BaseLocation myOccupiedNeedDefense = null;
 			Set<UnitInfo> enemyUnitInfosInRadius = new HashSet<>();
+			Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
 			for (BaseLocation occupiedBase : myOccupiedBases) {
+				if (occupiedBase.getPosition().getDistance(centerPosition) < 500) {
+					continue;
+				}
 				enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, occupiedBase.getPosition(), 500, true, false);
 				if (enemyUnitInfosInRadius.isEmpty()) {
 					continue;
@@ -597,26 +604,33 @@ public class PositionFinder {
 //		}
 //		
 		// 2. 내 first expansion과 가까운 적 멀티 (시야가 밝혀지지 않은)
-		List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
-		if (!enemyOccupiedBases.isEmpty()) {
-			BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.enemyFirstExpansion(), new BaseCondition() {
-				@Override public boolean correspond(BaseLocation base) {
-					if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
-						return false;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
+			if (!enemyOccupiedBases.isEmpty()) {
+				Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+				BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.enemyFirstExpansion(), new BaseCondition() {
+					@Override public boolean correspond(BaseLocation base) {
+						if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
+							return false;
+						}
+						if (base.getPosition().getDistance(centerPosition) < 500) {
+							return false;
+						}
+//						Set<UnitInfo> enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, base.getPosition(), 500, true, false);
+//						if (enemyUnitInfosInRadius.isEmpty()) {
+//							return false;
+//						}
+						return true;
 					}
-//					Set<UnitInfo> enemyUnitInfosInRadius = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, base.getPosition(), 500, true, false);
-//					if (enemyUnitInfosInRadius.isEmpty()) {
-//						return false;
-//					}
-					return true;
+				});
+				if (enemyOccupied != null) {
+					watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
+					watcherOtherPosition = enemyOccupied.getPosition();
+					return watcherOtherPosition;
 				}
-			});
-			if (enemyOccupied != null) {
-				watcherOtherPositionFrame = TimeUtils.elapsedFrames();	
-				watcherOtherPosition = enemyOccupied.getPosition();
-				return watcherOtherPosition;
 			}
 		}
+		
 		return Position.Unknown;
 	}
 	
@@ -865,7 +879,7 @@ public class PositionFinder {
 		}
 		
 		// 일정시간 경과 후퇴
-		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 30) {
+		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 90) {
 			System.out.println("time's up");
 			watcherOtherPosition = null;
 			return true;

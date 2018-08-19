@@ -137,7 +137,7 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 
-		if (hasType(ClueType.FAST_MARINE)) {
+		if (hasAnyInfo(ClueInfo.FAST_FOUR_MARINE, ClueInfo.FAST_SIX_MARINE)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 		

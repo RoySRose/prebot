@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig.Tank;
@@ -176,22 +178,25 @@ public class DecisionMaker {
 		UnitInfo bestTargetInfo = null;
 		
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
-//			if (!euiListAirWeapon.isEmpty()) {
-//				if (airForceTeam.cloakable()) {
-//					return Decision.change(airForceTeam.leaderUnit);
-//				}
-//				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
-//			} else {
-//				if (airForceTeam.uncloakable()) {
-//					return Decision.change(airForceTeam.leaderUnit);
-//				}
-//				bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
-//			}
 			
-			List<UnitInfo> euisEnemiesAndFeeds = new ArrayList<>();
-			euisEnemiesAndFeeds.addAll(euiListAirWeapon);
-			euisEnemiesAndFeeds.addAll(euiListFeed);
-			bestTargetInfo = getBestTargetInfo(airForceTeam, euisEnemiesAndFeeds, euiListAirDefenseBuilding);
+			if (InfoUtils.enemyRace() == Race.Zerg) {
+				List<UnitInfo> euisEnemiesAndFeeds = new ArrayList<>();
+				euisEnemiesAndFeeds.addAll(euiListAirWeapon);
+				euisEnemiesAndFeeds.addAll(euiListFeed);
+				bestTargetInfo = getBestTargetInfo(airForceTeam, euisEnemiesAndFeeds, euiListAirDefenseBuilding);				
+			} else {
+				if (!euiListAirWeapon.isEmpty()) {
+					if (airForceTeam.cloakable()) {
+						return Decision.change(airForceTeam.leaderUnit);
+					}
+					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
+				} else {
+					if (airForceTeam.uncloakable()) {
+						return Decision.change(airForceTeam.leaderUnit);
+					}
+					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding);
+				}
+			}
 			
 		} else {
 			if (!euiListAirWeapon.isEmpty()) {

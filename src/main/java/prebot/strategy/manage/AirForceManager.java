@@ -250,9 +250,9 @@ public class AirForceManager {
 	}
 
 	private void setDefensivePosition() {
-//		if (StrategyIdea.enemyAirSquadPosition != Position.Unknown) {
-//			targetPositions.add(StrategyIdea.enemyAirSquadPosition);
-//		}
+		if (StrategyIdea.nearAirEnemyPosition != Position.Unknown) {
+			targetPositions.add(StrategyIdea.nearAirEnemyPosition);
+		}
 //		if (StrategyIdea.enemyGroundSquadPosition != Position.Unknown) {
 //			targetPositions.add(StrategyIdea.enemyGroundSquadPosition);
 //		}
@@ -576,7 +576,7 @@ public class AirForceManager {
 		}
 		
 		if (suppress) {
-			upAchievement *= 2;
+			upAchievement *= 5;
 		}
 
 		int wraithCount = UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Wraith);

@@ -2,7 +2,6 @@ package prebot.strategy;
 
 import java.util.List;
 
-import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -12,13 +11,14 @@ import prebot.common.main.GameManager;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.macro.AttackDecisionMaker;
+import prebot.macro.Decision;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
 import prebot.strategy.manage.AirForceManager;
-import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.DefenseTowerTimer;
 import prebot.strategy.manage.EnemyBaseFinder;
 import prebot.strategy.manage.InitialAction;
@@ -80,39 +80,23 @@ public class StrategyManager extends GameManager {
 		EnemyBaseFinder.Instance().update();
 		
 		expansionOkay();
-//		temporaryAttackTimer();
-		AttackExpansionManager.Instance().executeCombat();
+		changeMainSquadMode();
 	}
 
 	/// 테스트용 임시 공격 타이밍
-	private void temporaryAttackTimer() {
-		if (!StrategyIdea.mainSquadMode.isAttackMode) {
+	private void changeMainSquadMode() {
+		if (AttackDecisionMaker.Instance().decision == Decision.NO_MERCY_ATTACK) {
+			StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
+			
+		} else if (AttackDecisionMaker.Instance().decision == Decision.FULL_ATTACK) {
 			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
 				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
-				
 			} else {
-				if (InfoUtils.enemyRace() == Race.Terran) {
-					if (TimeUtils.after(10 * TimeUtils.MINUTE)) {
-						if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode) >= 4) {
-							StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
-							
-							if (!AirForceManager.Instance().isAirForceDefenseMode()) {
-								AirForceManager.Instance().setAirForceDefenseMode(true);
-							}
-						}
-					}
-				} else {
-					if (TimeUtils.after(15 * TimeUtils.MINUTE)) {
-						StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
-					}
-				}
-				
+				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
 			}
 			
 		} else {
-			if (TimeUtils.after(18 * TimeUtils.MINUTE)) {
-				StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
-			}
+			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
 		}
 	}
 
