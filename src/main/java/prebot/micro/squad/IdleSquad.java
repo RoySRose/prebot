@@ -3,11 +3,11 @@ package prebot.micro.squad;
 import java.util.List;
 
 import bwapi.Unit;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 
 public class IdleSquad extends Squad {
 	public IdleSquad() {
-		super(SquadInfo.IDLE);
+		super(MicroConfig.SquadInfo.IDLE);
 	}
 
 	@Override

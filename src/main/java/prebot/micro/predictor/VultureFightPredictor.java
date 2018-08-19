@@ -14,7 +14,7 @@ import prebot.common.util.UnitUtils;
 import prebot.common.util.UpgradeUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyCode;
 
 /** @author insaneojw
  *  */
@@ -82,17 +82,17 @@ public class VultureFightPredictor {
 //		return getResult(vulturePower, enemyPower);
 //	}
 	
-	public static SmallFightPredict watcherPredictByUnitInfo(Collection<Unit> vultures, Collection<UnitInfo> euiList) {
+	public static StrategyCode.SmallFightPredict watcherPredictByUnitInfo(Collection<Unit> vultures, Collection<UnitInfo> euiList) {
 		int vulturePower = powerOfWatchers(vultures);
 		int enemyPower = powerOfEnemiesByUnitInfo(euiList);
 //		System.out.println("vulturePower : " + vulturePower + " / " +  " enemyPower : " + enemyPower + "(" + euiList.size() + ")");
 		
 		if (vulturePower > enemyPower * 1.5) {
-			return SmallFightPredict.OVERWHELM;
+			return StrategyCode.SmallFightPredict.OVERWHELM;
 		} else if (vulturePower > enemyPower) {
-			return SmallFightPredict.ATTACK;
+			return StrategyCode.SmallFightPredict.ATTACK;
 		} else {
-			return SmallFightPredict.BACK;
+			return StrategyCode.SmallFightPredict.BACK;
 		}
 	}
 

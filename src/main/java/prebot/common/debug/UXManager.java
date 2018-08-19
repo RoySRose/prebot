@@ -3,7 +3,6 @@ package prebot.common.debug;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +40,7 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.constant.CommonConfig.UxConfig;
+import prebot.common.constant.CommonConfig;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
@@ -52,7 +49,6 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.macro.AttackDecisionMaker;
 import prebot.macro.EnemyCommandInfo;
-import prebot.macro.EnemyMineral;
 import prebot.macro.util.MutableFloat;
 import prebot.micro.CombatManager;
 import prebot.micro.MicroDecision;
@@ -68,9 +64,8 @@ import prebot.strategy.StrategyManager;
 import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyCode;
 import prebot.strategy.manage.AirForceManager;
-import prebot.strategy.manage.AirForceTeam;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 import prebot.strategy.manage.StrategyAnalyseManager;
@@ -166,7 +161,7 @@ public class UXManager {
 			// draw tile position of mouse cursor
 			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
 			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / UxConfig.TILE_SIZE) + ", " + (int) (mouseY / UxConfig.TILE_SIZE) + ")");
+			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / CommonConfig.UxConfig.TILE_SIZE) + ", " + (int) (mouseY / CommonConfig.UxConfig.TILE_SIZE) + ")");
 			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
 			//미네랄PATH
 		} else if (uxOption == 2) {
@@ -982,10 +977,10 @@ public class UXManager {
 
 			// OccupiedBaseLocation 을 원으로 표시
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * UxConfig.TILE_SIZE, Color.Blue);	
+				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Blue);	
 			}
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * UxConfig.TILE_SIZE, Color.Red);	
+				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Red);	
 			}
 
 			// ChokePoint, BaseLocation 을 텍스트로 표시
@@ -1455,7 +1450,7 @@ public class UXManager {
 //							currentScoutTargetDistance = PositionUtils.getGroundDistance(scoutUnit.getPosition(), scoutMoveTo);
 //						}
 //	
-//						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / UxConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / UxConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
+//						Prebot.Broodwar.drawTextScreen(x, y + 20, "Target = (" + scoutMoveTo.getX() / CommonConfig.UxConfig.TILE_SIZE + ", " + scoutMoveTo.getY() / CommonConfig.UxConfig.TILE_SIZE + ") Distance = " + currentScoutTargetDistance);
 //					}
 //					/*
 //					else if (currentScoutStatus == ScoutManager.ScoutStatus.MoveAroundEnemyBaseLocation.ordinal()) {
@@ -1563,7 +1558,7 @@ public class UXManager {
 			}
 			String squadName = squad.getSquadName();
 			
-			SmallFightPredict smallFightPredict = null;
+			StrategyCode.SmallFightPredict smallFightPredict = null;
 			if (squad instanceof WatcherSquad) {
 				smallFightPredict = ((WatcherSquad) squad).getSmallFightPredict();
 			}
@@ -1575,7 +1570,7 @@ public class UXManager {
 			for (Unit unit : squad.unitList) {
 				Prebot.Broodwar.drawCircleMap(unit.getPosition(), 10, color);
 				Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 30, squadName);
-				if (smallFightPredict != null && smallFightPredict == SmallFightPredict.BACK) {
+				if (smallFightPredict != null && smallFightPredict == StrategyCode.SmallFightPredict.BACK) {
 					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + smallFightPredict.toString());
 				}
 			}

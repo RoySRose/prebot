@@ -6,6 +6,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Tank;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
@@ -28,15 +29,15 @@ public class TankTargetCalculator extends TargetScoreCalculator {
 		int hitPointScore = 0; // HP 점수 : 최고점수 50점. HP가 많을 수록 점수 낮음.
 		int specialScore = 0; // 특별 점수 : 탱크앞에 붙어있는 밀리유닛 +100점
 		
-		List<Unit> unitsInSplash = enemy.getUnitsInRadius(Tank.SIEGE_MODE_OUTER_SPLASH_RAD);
+		List<Unit> unitsInSplash = enemy.getUnitsInRadius(MicroConfig.Tank.SIEGE_MODE_OUTER_SPLASH_RAD);
         for (Unit unitInSplash : unitsInSplash) {
     		int splashUnitDistance = enemy.getDistance(unitInSplash.getPosition());
         	int priorityInSpash = TargetPriority.getPriority(mechanicUnit, unitInSplash);
-	        if (splashUnitDistance <= Tank.SIEGE_MODE_INNER_SPLASH_RAD) {
+	        if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_INNER_SPLASH_RAD) {
 	        	priorityInSpash = (int) (priorityInSpash * 0.8);
-	        } else if (splashUnitDistance <= Tank.SIEGE_MODE_MEDIAN_SPLASH_RAD) {
+	        } else if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_MEDIAN_SPLASH_RAD) {
 	        	priorityInSpash = (int) (priorityInSpash * 0.4);
-	        } else if (splashUnitDistance <= Tank.SIEGE_MODE_OUTER_SPLASH_RAD) {
+	        } else if (splashUnitDistance <= MicroConfig.Tank.SIEGE_MODE_OUTER_SPLASH_RAD) {
 	        	priorityInSpash = (int) (priorityInSpash * 0.2);
 	        }
 	        

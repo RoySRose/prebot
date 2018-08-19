@@ -17,6 +17,7 @@ import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder;
 import prebot.strategy.manage.PositionFinder.CampType;
 
 public abstract class Control {
@@ -76,7 +77,7 @@ public abstract class Control {
 			return false;
 		}
 		CampType campType = StrategyIdea.campType;
-		if (campType == CampType.INSIDE || campType == CampType.FIRST_CHOKE) {
+		if (campType == PositionFinder.CampType.INSIDE || campType == PositionFinder.CampType.FIRST_CHOKE) {
 			return outOfRegionLongTime(unit);
 		}
 		
@@ -88,14 +89,14 @@ public abstract class Control {
 		} else if (unit.getDistance(expansionPosition) < 150) {
 			return false;
 		}
-		if (campType == CampType.EXPANSION) {
+		if (campType == PositionFinder.CampType.EXPANSION) {
 			return outOfRegionLongTime(unit);
 		}
 		// 세번째 지역까지 OK
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return false;
 		}
-		if (campType == CampType.SECOND_CHOKE) {
+		if (campType == PositionFinder.CampType.SECOND_CHOKE) {
 			return outOfRegionLongTime(unit);
 		}
 		// 세번째 지역 반경 OK

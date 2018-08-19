@@ -13,7 +13,6 @@ import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 import prebot.strategy.manage.StrategyAnalyseManager;
-import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class LairAnalyser extends UnitAnalyser {
 
@@ -74,8 +73,8 @@ public class LairAnalyser extends UnitAnalyser {
 			
 		} else {
 			int lairExpect = EnemyBuildTimer.Instance().getBuildStartFrameExpect(UnitType.Zerg_Lair) + 5 * TimeUtils.SECOND;
-			int baseLastBaseCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
-			int baseLastExpansionCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+			int baseLastBaseCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.BASE);
+			int baseLastExpansionCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.FIRST_EXPANSION);
 			
 			if (baseLastBaseCheckFrame > lairExpect && baseLastExpansionCheckFrame > lairExpect) {
 				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_LAIR);

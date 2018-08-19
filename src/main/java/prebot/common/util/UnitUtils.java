@@ -20,19 +20,16 @@ import bwta.Region;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.main.Prebot;
 import prebot.common.util.internal.IConditions;
-import prebot.common.util.internal.IConditions.UnitCondition;
 import prebot.common.util.internal.SpecificValueCache;
-import prebot.common.util.internal.SpecificValueCache.ValueType;
 import prebot.common.util.internal.UnitCache;
 import prebot.micro.WorkerManager;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyConfig;
-import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.manage.PositionFinder;
 
 public class UnitUtils {
 	
@@ -295,18 +292,18 @@ public class UnitUtils {
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius) {
+	public static List<Unit> getUnitsInRadius(CommonCode.PlayerRange playerRange, Position position, int radius) {
 		return getUnitsInRadius(playerRange, position, radius, UnitType.AllUnits);
 	}
 	
 	/** position 근처의 유닛리스트를 리턴 */
-	public static List<Unit> getUnitsInRadius(PlayerRange playerRange, Position position, int radius, UnitType... unitTypes) {
+	public static List<Unit> getUnitsInRadius(CommonCode.PlayerRange playerRange, Position position, int radius, UnitType... unitTypes) {
 		Player player = null;
-		if (playerRange == PlayerRange.SELF) {
+		if (playerRange == CommonCode.PlayerRange.SELF) {
 			player = Prebot.Broodwar.self();
-		} else if (playerRange == PlayerRange.ENEMY) {
+		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
 			player = Prebot.Broodwar.enemy();
-		} else if (playerRange == PlayerRange.NEUTRAL) {
+		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
 			player = Prebot.Broodwar.neutral();
 		}
 		
@@ -340,7 +337,7 @@ public class UnitUtils {
 		}
 	}
 	
-	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange) {
+	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, PlayerRange playerRange) {
 		return getUnitsInRegion(regionType, playerRange, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
@@ -355,9 +352,9 @@ public class UnitUtils {
 				, UnitType.Terran_Armory, UnitType.Terran_Academy, UnitType.Terran_Bunker, UnitType.Terran_Missile_Turret);
 		
 		List<Unit> buildingsInRegion = new ArrayList<>();
-		Region baseRegion = PositionUtils.regionTypeToRegion(RegionType.MY_BASE);
-		Region expansionRegion = PositionUtils.regionTypeToRegion(RegionType.MY_FIRST_EXPANSION);
-		Region thirdRegion = PositionUtils.regionTypeToRegion(RegionType.MY_THIRD_REGION);
+		Region baseRegion = PositionUtils.regionTypeToRegion(CommonCode.RegionType.MY_BASE);
+		Region expansionRegion = PositionUtils.regionTypeToRegion(CommonCode.RegionType.MY_FIRST_EXPANSION);
+		Region thirdRegion = PositionUtils.regionTypeToRegion(CommonCode.RegionType.MY_THIRD_REGION);
 		
 	    for (Unit unit : totalBuildings) {
 	    	if (UnitUtils.isValidUnit(unit)) {
@@ -372,13 +369,13 @@ public class UnitUtils {
 		return buildingsInRegion;
 	}
 	
-	public static List<Unit> getUnitsInRegion(RegionType regionType, PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
+	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
-		if (playerRange == PlayerRange.SELF) {
+		if (playerRange == CommonCode.PlayerRange.SELF) {
 			totalUnits = Prebot.Broodwar.self().getUnits();
-		} else if (playerRange == PlayerRange.ENEMY) {
+		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
 			totalUnits = Prebot.Broodwar.enemy().getUnits();
-		} else if (playerRange == PlayerRange.NEUTRAL) {
+		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
 			totalUnits = Prebot.Broodwar.neutral().getUnits();
 		} else {
 			totalUnits = Prebot.Broodwar.getAllUnits();
@@ -493,7 +490,7 @@ public class UnitUtils {
 
 	/** unitList 중 position에 가장 가까운 유닛 리턴 */
 	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return true;
@@ -503,7 +500,7 @@ public class UnitUtils {
 
 	/** unitList 중 position에 가장 가까운 유닛타입 유닛 리턴 */
 	public static Unit getClosestUnitToPosition(Collection<Unit> unitList, Position position, final UnitType... unitTypes) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				for (UnitType unitType : unitTypes) {
@@ -517,7 +514,7 @@ public class UnitUtils {
 	}
 	
 	public static Unit getClosestUnitToPositionNotInMyBase(Collection<Unit> unitList, Position position, final UnitType... unitTypes) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
@@ -537,7 +534,7 @@ public class UnitUtils {
 	}
 	
 	public static Unit getClosestUnitToPositionNotStunned(Collection<Unit> unitList, Position position) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return !unit.isStasised() && !unit.isLockedDown();
@@ -547,7 +544,7 @@ public class UnitUtils {
 	
 	/** unitList 중 position에 가장 가까운 미네랄 일꾼 리턴 */
 	public static Unit getClosestMineralWorkerToPosition(Collection<Unit> unitList, Position position) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return unit.getType().isWorker() && WorkerManager.Instance().isMineralWorker(unit) && !unit.isCarryingMinerals();
@@ -556,7 +553,7 @@ public class UnitUtils {
 	}
 
 	public static Unit getClosestCombatWorkerToPosition(Collection<Unit> unitList, Position position) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return unit.getType().isWorker() && WorkerManager.Instance().isCombatWorker(unit);
@@ -565,7 +562,7 @@ public class UnitUtils {
 	}
 	
 	public static Unit getClosestUnitToPositionNotInSet(Collection<Unit> unitList, Position position, Set<Integer> unitIds) {
-		return getClosestUnitToPosition(unitList, position, new UnitCondition() {
+		return getClosestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return !unitIds.contains(unit.getID());
@@ -575,7 +572,7 @@ public class UnitUtils {
 	
 	public static Unit getClosestActivatedCommandCenter(Position position) {
 		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
-		return getClosestUnitToPosition(commandCenters, position, new UnitCondition() {
+		return getClosestUnitToPosition(commandCenters, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit commandCenter) {
 				return WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 6;
@@ -584,7 +581,7 @@ public class UnitUtils {
 	}
 	
 	public static Unit getFarthestCombatWorkerToPosition(Collection<Unit> unitList, Position position) {
-		return getFarthestUnitToPosition(unitList, position, new UnitCondition() {
+		return getFarthestUnitToPosition(unitList, position, new IConditions.UnitCondition() {
 			@Override
 			public boolean correspond(Unit unit) {
 				return unit.getType().isWorker() && WorkerManager.Instance().isCombatWorker(unit);
@@ -698,7 +695,7 @@ public class UnitUtils {
 		}
 		
 		Position goalPosition;
-		if (StrategyIdea.mainSquadMode.isAttackMode || StrategyIdea.campType == CampType.READY_TO) {
+		if (StrategyIdea.mainSquadMode.isAttackMode || StrategyIdea.campType == PositionFinder.CampType.READY_TO) {
 			boolean expansionOccupied = false;
 			List<BaseLocation> enemyBases = InfoUtils.enemyOccupiedBases();
 			for (BaseLocation enemyBase : enemyBases) {

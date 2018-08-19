@@ -82,9 +82,9 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 
 	private int caculateForFeed(Unit unit, Unit enemyUnit) {
 		int targetScore = criticalHighestScore(enemyUnit);
-		if (targetScore == CommonCode.NONE && strikeLevel < StrikeLevel.CRITICAL_SPOT) {
+		if (targetScore == CommonCode.NONE && strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT) {
 			targetScore = soreHighestScore(enemyUnit);
-			if (targetScore == CommonCode.NONE && strikeLevel < StrikeLevel.SORE_SPOT) {
+			if (targetScore == CommonCode.NONE && strikeLevel < AirForceManager.StrikeLevel.SORE_SPOT) {
 				targetScore = possibleHighestScore(enemyUnit);
 			}
 		}

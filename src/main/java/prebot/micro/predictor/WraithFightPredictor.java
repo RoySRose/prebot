@@ -9,7 +9,7 @@ import bwapi.UnitType;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyCode;
 
 public class WraithFightPredictor {
 
@@ -35,7 +35,7 @@ public class WraithFightPredictor {
 		WRAITH_TARGET.put(UnitType.Terran_Missile_Turret, 800);
 	}
 	
-	public static SmallFightPredict airForcePredictByUnitInfo(Collection<Unit> wraithList, Collection<UnitInfo> euiList, boolean cloakingBonus, boolean mainSquadBonus) {
+	public static StrategyCode.SmallFightPredict airForcePredictByUnitInfo(Collection<Unit> wraithList, Collection<UnitInfo> euiList, boolean cloakingBonus, boolean mainSquadBonus) {
 		int wraithPower = powerOfAirForce(wraithList, cloakingBonus);
 		if (mainSquadBonus) {
 			wraithPower += 1000;
@@ -45,9 +45,9 @@ public class WraithFightPredictor {
 //		System.out.println(wraithPower + "(" + wraithList.size() + ")" + " / " + enemyPower + "(" + euiList.size() + ")");
 		
 		if (wraithPower > enemyPower) {
-			return SmallFightPredict.ATTACK;
+			return StrategyCode.SmallFightPredict.ATTACK;
 		} else {
-			return SmallFightPredict.BACK;
+			return StrategyCode.SmallFightPredict.BACK;
 		}
 	}
 

@@ -12,7 +12,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderStarport extends DefaultBuildableItem {
 
@@ -32,11 +32,11 @@ public class BuilderStarport extends DefaultBuildableItem {
 
 		if (needStarportToTrainWraith()) {
 			if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 0) {
-				if(StrategyIdea.expansionOption == ExpansionOption.ONE_STARPORT || StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
+				if(StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT || StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
 					setTilePosition(BlockingEntrance.Instance().starport1);
 				}
 			} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) == 1) {
-				if(StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT) {
+				if(StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
 					setTilePosition(BlockingEntrance.Instance().starport2);
 				}
 			}

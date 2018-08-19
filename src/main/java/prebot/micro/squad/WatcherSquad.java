@@ -16,21 +16,20 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.factory.WatcherControl;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyCode;
 import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.PositionFinder;
 
 public class WatcherSquad extends Squad {
 	
 //	private static final int MAX_REGROUP_POSITION_SIZE = 3;
-	private SmallFightPredict smallFightPredict = SmallFightPredict.ATTACK;
+	private StrategyCode.SmallFightPredict smallFightPredict = StrategyCode.SmallFightPredict.ATTACK;
 	private int watcherFleeStartFrame = 0;
 
 //	private Position otherWatcherPosition;
@@ -38,14 +37,14 @@ public class WatcherSquad extends Squad {
 //	private int regroupPositionIndex = 0;
 //	private int otherWatcherPositionIndex = 0;
 	
-	public SmallFightPredict getSmallFightPredict() {
+	public StrategyCode.SmallFightPredict getSmallFightPredict() {
 		return smallFightPredict;
 	}
 
 	private WatcherControl vultureWatcher = new WatcherControl();
 	
 	public WatcherSquad() {
-		super(SquadInfo.WATCHER);
+		super(MicroConfig.SquadInfo.WATCHER);
 		setUnitType(UnitType.Terran_Vulture);
 	}
 
@@ -78,19 +77,19 @@ public class WatcherSquad extends Squad {
 		Unit regroupLeader = UnitUtils.getClosestUnitToPosition(unitList, StrategyIdea.watcherPosition);
 		
 		if (StrategyIdea.initiated) {
-			smallFightPredict = SmallFightPredict.ATTACK;
+			smallFightPredict = StrategyCode.SmallFightPredict.ATTACK;
 		} else {
 			if (TimeUtils.elapsedSeconds(watcherFleeStartFrame) <= watcherFleeSeconds) {
-				smallFightPredict = SmallFightPredict.BACK;
+				smallFightPredict = StrategyCode.SmallFightPredict.BACK;
 				
 			} else if (PositionFinder.Instance().otherPositionTimeUp(regroupLeader)) {
-				smallFightPredict = SmallFightPredict.BACK;
+				smallFightPredict = StrategyCode.SmallFightPredict.BACK;
 				watcherFleeStartFrame = TimeUtils.elapsedFrames();
 //				System.out.println("watcher flee - other position time up");
 				
 			} else {
 				smallFightPredict = VultureFightPredictor.watcherPredictByUnitInfo(unitList, euiList);
-				if (smallFightPredict == SmallFightPredict.BACK) {
+				if (smallFightPredict == StrategyCode.SmallFightPredict.BACK) {
 					watcherFleeStartFrame = TimeUtils.elapsedFrames();
 //					System.out.println("watcher flee - enemy");
 				}
@@ -98,14 +97,14 @@ public class WatcherSquad extends Squad {
 		}
 		
 		int saveUnitLevel = 1;
-		if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) {
+		if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY) {
 			saveUnitLevel = 0;
-		} else if (smallFightPredict == SmallFightPredict.OVERWHELM) {
+		} else if (smallFightPredict == StrategyCode.SmallFightPredict.OVERWHELM) {
 			saveUnitLevel = 0;
 		} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 			saveUnitLevel = 0;
 		}
-		if (smallFightPredict != SmallFightPredict.BACK) {
+		if (smallFightPredict != StrategyCode.SmallFightPredict.BACK) {
 			regroupLeader = null;
 		}
 

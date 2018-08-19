@@ -17,6 +17,7 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.IConditions.BaseCondition;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
@@ -94,7 +95,7 @@ public class VultureTravelManager {
 			if (beforeBase == null) {
 				beforeBase = InfoUtils.myFirstExpansion();
 			}
-			closeBase = BaseLocationUtils.getGroundClosestBaseToPosition(otherBases, beforeBase, new BaseCondition() {
+			closeBase = BaseLocationUtils.getGroundClosestBaseToPosition(otherBases, beforeBase, new IConditions.BaseCondition() {
 				@Override public boolean correspond(BaseLocation base) {
 					return !baseSet.contains(base);
 				}

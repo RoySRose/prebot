@@ -8,7 +8,7 @@ import bwapi.UnitType;
 import bwta.Chokepoint;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.ScvScoutControl;
 import prebot.strategy.StrategyIdea;
 
@@ -17,7 +17,7 @@ public class ScvScoutSquad extends Squad {
 	private ScvScoutControl scvScoutControl = new ScvScoutControl();
 
 	public ScvScoutSquad() {
-		super(SquadInfo.SCV_SCOUT);
+		super(MicroConfig.SquadInfo.SCV_SCOUT);
 		setUnitType(UnitType.Terran_SCV);
 	}
 

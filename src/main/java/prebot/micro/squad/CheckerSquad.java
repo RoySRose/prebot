@@ -13,7 +13,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.factory.VultureControl;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
@@ -24,7 +24,7 @@ public class CheckerSquad extends Squad {
 	private VultureControl vultureControl = new VultureControl();
 
 	public CheckerSquad() {
-		super(SquadInfo.CHECKER);
+		super(MicroConfig.SquadInfo.CHECKER);
 		setUnitType(UnitType.Terran_Vulture);
 	}
 

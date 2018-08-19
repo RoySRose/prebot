@@ -49,7 +49,7 @@ public class BuildOrderItem {
 		this.blocking = blocking;
 		this.producerID = producerID;
 		this.seedLocation = TilePosition.None;
-		this.seedLocationStrategy = SeedPositionStrategy.MainBaseLocation;
+		this.seedLocationStrategy = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
 	}
 	
 	public BuildOrderItem(MetaType metaType, int priority, boolean blocking)
@@ -73,7 +73,7 @@ public class BuildOrderItem {
 		this.blocking = blocking;
 		this.producerID = producerID;
 		this.seedLocation = seedLocation;
-		this.seedLocationStrategy = SeedPositionStrategy.SeedPositionSpecified;
+		this.seedLocationStrategy = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
 	}
 
 	public BuildOrderItem(MetaType metaType, TilePosition seedLocation){
@@ -85,7 +85,7 @@ public class BuildOrderItem {
 	}
 
 	/// 건설 위치를 seedPositionStrategy 를 이용해서 찾는다. 못찾을 경우, 다른 SeedPositionStrategy 로 계속 찾는다
-	public BuildOrderItem(MetaType metaType, SeedPositionStrategy seedPositionStrategy, int priority, boolean blocking, int producerID)
+	public BuildOrderItem(MetaType metaType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy, int priority, boolean blocking, int producerID)
 	{
 		this.metaType = metaType;
 		this.priority = priority;
@@ -95,11 +95,11 @@ public class BuildOrderItem {
 		this.seedLocationStrategy = seedPositionStrategy;
 	}
 
-	public BuildOrderItem(MetaType metaType, SeedPositionStrategy seedPositionStrategy) {
+	public BuildOrderItem(MetaType metaType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
 		this(metaType, seedPositionStrategy, 0, true, -1);
 	}
 
-	public BuildOrderItem(MetaType metaType, SeedPositionStrategy seedPositionStrategy, int priority) {
+	public BuildOrderItem(MetaType metaType, BuildOrderItem.SeedPositionStrategy seedPositionStrategy, int priority) {
 		this(metaType, seedPositionStrategy, priority, true, -1);
 	}
 	

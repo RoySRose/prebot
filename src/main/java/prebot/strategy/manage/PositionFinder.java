@@ -20,8 +20,6 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
@@ -30,18 +28,17 @@ import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.common.util.internal.IConditions.BaseCondition;
+import prebot.common.util.internal.IConditions;
 import prebot.micro.CombatManager;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.Squad;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
-import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
+import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.constant.StrategyCode;
 
 /**
  * 각종 Position을 찾는다.
@@ -123,8 +120,8 @@ public class PositionFinder {
 				firstExpansionDetectingOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
-					RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
-					if (regionType == RegionType.MY_FIRST_EXPANSION || regionType == RegionType.MY_THIRD_REGION) {
+					CommonCode.RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+					if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION || regionType == CommonCode.RegionType.MY_THIRD_REGION) {
 						firstExpansionDetectingOk = true;
 						break;
 					}
@@ -147,13 +144,13 @@ public class PositionFinder {
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
 				int FIRST_EXPANSION_MARGIN = 2 * 4;
-				if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
+				if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE)) {
 					FIRST_EXPANSION_MARGIN = 0;
 				}
 				
 				
 				int READY_TO_SUPPLY = 27 * 4;
-				if (StrategyIdea.campType == CampType.READY_TO) { // 후퇴방지
+				if (StrategyIdea.campType == PositionFinder.CampType.READY_TO) { // 후퇴방지
 					READY_TO_SUPPLY = READY_TO_SUPPLY - 12 * 4;
 				}
 				
@@ -162,23 +159,23 @@ public class PositionFinder {
 				if (InfoUtils.enemyRace() == Race.Zerg) {
 					SECOND_CHOKE_SUPPLY = 8 * 4;
 				}
-				if (StrategyIdea.campType == CampType.SECOND_CHOKE) { // 후퇴방지
+				if (StrategyIdea.campType == PositionFinder.CampType.SECOND_CHOKE) { // 후퇴방지
 					SECOND_CHOKE_SUPPLY = SECOND_CHOKE_SUPPLY - 4 * 4;
 				}
 				
 				// ready to로 이동
 				if (UnitUtils.myFactoryUnitSupplyCount() > READY_TO_SUPPLY && UnitUtils.availableScanningCount() >= 1) {
-					return CampType.READY_TO;
+					return PositionFinder.CampType.READY_TO;
 				}
 				if (UnitUtils.myFactoryUnitSupplyCount() > SECOND_CHOKE_SUPPLY && UnitUtils.availableScanningCount() >= 1) { // ready to로 이동하기 위해 잠시 집결하는 위치
-					return CampType.SECOND_CHOKE;
+					return PositionFinder.CampType.SECOND_CHOKE;
 				}
 				
 				// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 				if (firstExpansionOccupied()
 						|| myTankSupplyCount >= 3 * 4
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
-					return CampType.EXPANSION;
+					return PositionFinder.CampType.EXPANSION;
 				}
 //				System.out.println("###########################################");
 //				System.out.println("myTankSupplyCount : " + myTankSupplyCount);
@@ -187,30 +184,30 @@ public class PositionFinder {
 			
 //			if (InfoUtils.enemyRace() == Race.Zerg) {
 //				if (!firstExpansionOccupied()) {
-//					return CampType.EXPANSION;
+//					return PositionFinder.CampType.EXPANSION;
 //				}
 //			}
-			return CampType.FIRST_CHOKE;
+			return PositionFinder.CampType.FIRST_CHOKE;
 			
 		} else if (InfoUtils.enemyRace() == Race.Terran) {
 			
 			// 병력이 쌓였다면 second choke에서 방어한다.
 			if (myTankSupplyCount >= 3 * 4 && InfoUtils.myReadyToPosition() != null) {
-				return CampType.READY_TO;
+				return PositionFinder.CampType.READY_TO;
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
 			if (myTankSupplyCount >= 2 * 4 || firstExpansionOccupied()) {
 				int tankCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (tankCount >= 1) {
-					return CampType.SECOND_CHOKE;
+					return PositionFinder.CampType.SECOND_CHOKE;
 				} else {
-					return CampType.EXPANSION;
+					return PositionFinder.CampType.EXPANSION;
 				}
 			}
-			return CampType.FIRST_CHOKE;
+			return PositionFinder.CampType.FIRST_CHOKE;
 			
 		} else {
-			return CampType.SECOND_CHOKE;
+			return PositionFinder.CampType.SECOND_CHOKE;
 		}
 		
 
@@ -246,19 +243,19 @@ public class PositionFinder {
 			return defensePosition;
 		}
 		
-		if (campType == CampType.INSIDE) {
+		if (campType == PositionFinder.CampType.INSIDE) {
 			return baseInsidePosition();
 			
-		} else if (campType == CampType.FIRST_CHOKE) {
+		} else if (campType == PositionFinder.CampType.FIRST_CHOKE) {
 			return firstChokeDefensePosition();
 			
-		} else if (campType == CampType.EXPANSION) {
+		} else if (campType == PositionFinder.CampType.EXPANSION) {
 			return expansionDefensePosition();
 			
-		} else if (campType == CampType.SECOND_CHOKE) {
+		} else if (campType == PositionFinder.CampType.SECOND_CHOKE) {
 			return InfoUtils.mySecondChoke().getCenter();
 			
-		} else { // if (campType == CampType.READY_TO) {
+		} else { // if (campType == PositionFinder.CampType.READY_TO) {
 			return InfoUtils.myReadyToPosition();
 		}
 	}
@@ -270,7 +267,7 @@ public class PositionFinder {
 			return defensePosition;
 		}
 
-		if (campType == CampType.EXPANSION) {
+		if (campType == PositionFinder.CampType.EXPANSION) {
 			return expansionDefensePositionSiege();
 		} else {
 			return StrategyIdea.campPosition;
@@ -284,7 +281,7 @@ public class PositionFinder {
 			Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 			defenseMyRegion.add(myBaseRegion);
 		}
-		if (campType != CampType.INSIDE && campType != CampType.FIRST_CHOKE
+		if (campType != PositionFinder.CampType.INSIDE && campType != PositionFinder.CampType.FIRST_CHOKE
 				&& !InfoUtils.euiListInExpansion().isEmpty()) {
 			Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 			defenseMyRegion.add(myExpansionRegion);
@@ -317,7 +314,7 @@ public class PositionFinder {
 			}
 			
 			if (!enemyBaseDestroyed(enemyBase)) {
-				if (StrategyIdea.mainSquadMode == MainSquadMode.SPEED_ATTCK) {
+				if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.SPEED_ATTCK) {
 					return enemyBase.getPosition();
 					
 				} else {
@@ -344,7 +341,7 @@ public class PositionFinder {
 	}
 
 	private void updateMainSquadCenter() {
-		Squad squad = CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		Squad squad = CombatManager.Instance().squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
 		Unit leader = UnitUtils.leaderOfUnit(squad.unitList);
 		if (leader != null) {
 			Position centerPosition = UnitUtils.centerPositionOfUnit(squad.unitList, leader.getPosition(), 800);
@@ -459,17 +456,17 @@ public class PositionFinder {
 		StrategyIdea.dropEnemyPosition = dropEnemyPosition;
 		
 		// 적 상태
-		EnemyUnitStatus enemyStatus;
+		StrategyCode.EnemyUnitStatus enemyStatus;
 		
 		if (!InfoUtils.euiListInBase().isEmpty()) {
-			enemyStatus = EnemyUnitStatus.IN_MY_REGION;
+			enemyStatus = StrategyCode.EnemyUnitStatus.IN_MY_REGION;
 		} else {
 			if (StrategyIdea.nearGroundEnemyPosition != Position.Unknown
 					|| StrategyIdea.nearAirEnemyPosition != Position.Unknown
 					|| StrategyIdea.dropEnemyPosition != Position.Unknown) {
-				enemyStatus = EnemyUnitStatus.COMMING;	
+				enemyStatus = StrategyCode.EnemyUnitStatus.COMMING;	
 			} else {
-				enemyStatus = EnemyUnitStatus.SLEEPING;
+				enemyStatus = StrategyCode.EnemyUnitStatus.SLEEPING;
 			}
 		}
 		StrategyIdea.enemyUnitStatus = enemyStatus;
@@ -502,7 +499,7 @@ public class PositionFinder {
 
 		// watcher 방어모드(특수)
 		if (watcherPosition == Position.Unknown) {
-			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_DROP)) {
+			if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_DROP)) {
 				// 드롭인 경우 본진과 세컨초크를 왓다리갓다리 한다.
 				int nSeconds = 12 * TimeUtils.SECOND;
 				int zeroToNSeconds = Prebot.Broodwar.getFrameCount() % nSeconds;
@@ -512,10 +509,10 @@ public class PositionFinder {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
 				}
 				
-			} else if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
+			} else if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT)) {
 				
 				// 앞라인 방어인 경우 second choke (단, 딕텍팅을 대비하는 경우라면, 시간에 맞추어서 secondChoke로 변경)
-				if (!StrategyIdea.buildTimeMap.featureEnabled(Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
+				if (!StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DETECT_IMPORTANT) || TimeUtils.after(StrategyIdea.turretBuildStartFrame)) {
 					watcherPosition = InfoUtils.mySecondChoke().getCenter();
 				} else if (InfoUtils.enemyBase() != null) {
 					watcherPosition = InfoUtils.enemyBase().getPosition();
@@ -572,7 +569,7 @@ public class PositionFinder {
 					continue;
 				}
 				// 만약 이길수 있다면
-				Squad watcherSquad = CombatManager.Instance().squadData.getSquadMap().get(SquadInfo.WATCHER.squadName);
+				Squad watcherSquad = CombatManager.Instance().squadData.getSquadMap().get(MicroConfig.SquadInfo.WATCHER.squadName);
 				int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(enemyUnitInfosInRadius);
 				int watcherPower = VultureFightPredictor.powerOfWatchers(watcherSquad.unitList);
 				if (watcherPower > enemyPower) {
@@ -607,7 +604,7 @@ public class PositionFinder {
 			List<BaseLocation> enemyOccupiedBases = InfoUtils.enemyOccupiedBases();
 			if (!enemyOccupiedBases.isEmpty()) {
 				Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
-				BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.enemyFirstExpansion(), new BaseCondition() {
+				BaseLocation enemyOccupied = BaseLocationUtils.getGroundClosestBaseToPosition(enemyOccupiedBases, InfoUtils.enemyFirstExpansion(), new IConditions.BaseCondition() {
 					@Override public boolean correspond(BaseLocation base) {
 						if (base.equals(InfoUtils.enemyBase()) || base.equals(InfoUtils.enemyFirstExpansion())) {
 							return false;
@@ -638,8 +635,8 @@ public class PositionFinder {
 		List<Unit> commandCenterOrDefenseTowerList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL,
 				UnitType.Terran_Command_Center, UnitType.Terran_Missile_Turret, UnitType.Terran_Bunker);
 		for (Unit bunkerOrTurret : commandCenterOrDefenseTowerList) {
-			RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
-			if (towerRegionType == RegionType.MY_FIRST_EXPANSION || towerRegionType == RegionType.MY_THIRD_REGION) {
+			CommonCode.RegionType towerRegionType = PositionUtils.positionToRegionType(bunkerOrTurret.getPosition());
+			if (towerRegionType == CommonCode.RegionType.MY_FIRST_EXPANSION || towerRegionType == CommonCode.RegionType.MY_THIRD_REGION) {
 				return true;
 			}
 		}

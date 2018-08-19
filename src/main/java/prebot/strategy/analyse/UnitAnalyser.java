@@ -39,16 +39,16 @@ public abstract class UnitAnalyser {
 	public void upateFoundInfo() {
 		if (!foundUnknown.isEmpty() && InfoUtils.enemyBase() != null) {
 			for (UnitInfo found : foundUnknown) {
-				RegionType regionType = PositionUtils.positionToRegionType(found.getLastPosition());
-				if (regionType == RegionType.ENEMY_BASE) {
+				CommonCode.RegionType regionType = PositionUtils.positionToRegionType(found.getLastPosition());
+				if (regionType == CommonCode.RegionType.ENEMY_BASE) {
 					foundFoundInEnemyBase.add(found);
-				} else if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
+				} else if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
 					foundInEnemyExpansion.add(found);
-				} else if (regionType == RegionType.MY_BASE) {
+				} else if (regionType == CommonCode.RegionType.MY_BASE) {
 					foundInMyBase.add(found);
-				} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
+				} else if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION) {
 					foundInMyExpansion.add(found);
-				} else if (regionType == RegionType.ETC) {
+				} else if (regionType == CommonCode.RegionType.ETC) {
 					foundEtc.add(found);
 				}
 			}
@@ -70,16 +70,16 @@ public abstract class UnitAnalyser {
 				}
 			}
 			if (!containUnit) {
-				RegionType regionType = PositionUtils.positionToRegionType(unitInfo.getLastPosition());
-				if (regionType == RegionType.ENEMY_BASE) {
+				CommonCode.RegionType regionType = PositionUtils.positionToRegionType(unitInfo.getLastPosition());
+				if (regionType == CommonCode.RegionType.ENEMY_BASE) {
 					foundFoundInEnemyBase.add(unitInfo);
-				} else if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
+				} else if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
 					foundInEnemyExpansion.add(unitInfo);
-				} else if (regionType == RegionType.MY_BASE) {
+				} else if (regionType == CommonCode.RegionType.MY_BASE) {
 					foundInMyBase.add(unitInfo);
-				} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
+				} else if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION) {
 					foundInMyExpansion.add(unitInfo);
-				} else if (regionType == RegionType.ETC) {
+				} else if (regionType == CommonCode.RegionType.ETC) {
 					foundEtc.add(unitInfo);
 				} else {
 					foundUnknown.add(unitInfo);
@@ -92,21 +92,21 @@ public abstract class UnitAnalyser {
 		}
 	}
 
-	protected List<UnitInfo> found(RegionType... regionTypes) {
+	protected List<UnitInfo> found(CommonCode.RegionType... regionTypes) {
 		if (regionTypes == null || regionTypes.length == 0) {
 			return foundAll;
 		}
 		List<UnitInfo> foundList = new ArrayList<>();
-		for (RegionType regionType : regionTypes) {
-			if (regionType == RegionType.ENEMY_BASE) {
+		for (CommonCode.RegionType regionType : regionTypes) {
+			if (regionType == CommonCode.RegionType.ENEMY_BASE) {
 				foundList.addAll(foundFoundInEnemyBase);
-			} else if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
+			} else if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
 				foundList.addAll(foundInEnemyExpansion);
-			} else if (regionType == RegionType.MY_BASE) {
+			} else if (regionType == CommonCode.RegionType.MY_BASE) {
 				foundList.addAll(foundInMyBase);
-			} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
+			} else if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION) {
 				foundList.addAll(foundInMyExpansion);
-			} else if (regionType == RegionType.ETC) {
+			} else if (regionType == CommonCode.RegionType.ETC) {
 				foundList.addAll(foundEtc);
 			} else {
 				foundList.addAll(foundUnknown);

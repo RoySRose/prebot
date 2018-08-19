@@ -2,7 +2,7 @@ package prebot.common.util;
 
 import bwapi.Player;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 
 /**
@@ -16,12 +16,12 @@ public class PlayerUtils {
 		return player == null || player.isDefeated() || player.leftGame();
 	}
 	
-	public static Player getPlayerByRange(PlayerRange playerRange) {
-		if (playerRange == PlayerRange.SELF) {
+	public static Player getPlayerByRange(CommonCode.PlayerRange playerRange) {
+		if (playerRange == CommonCode.PlayerRange.SELF) {
 			return Prebot.Broodwar.self();
-		} else if (playerRange == PlayerRange.ENEMY) {
+		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
 			return Prebot.Broodwar.enemy();
-		} else if (playerRange == PlayerRange.NEUTRAL) {
+		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
 			return Prebot.Broodwar.neutral();
 		} else {
 			return null;

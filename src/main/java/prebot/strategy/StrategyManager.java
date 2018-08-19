@@ -13,8 +13,8 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.macro.AttackDecisionMaker;
 import prebot.macro.Decision;
-import prebot.micro.constant.MicroConfig.MainSquadMode;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.micro.constant.MicroConfig;
+import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
 import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
 import prebot.strategy.manage.ActionManager;
@@ -86,17 +86,17 @@ public class StrategyManager extends GameManager {
 	/// 테스트용 임시 공격 타이밍
 	private void changeMainSquadMode() {
 		if (AttackDecisionMaker.Instance().decision == Decision.NO_MERCY_ATTACK) {
-			StrategyIdea.mainSquadMode = MainSquadMode.NO_MERCY;
+			StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.NO_MERCY;
 			
 		} else if (AttackDecisionMaker.Instance().decision == Decision.FULL_ATTACK) {
-			if (StrategyIdea.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
-				StrategyIdea.mainSquadMode = MainSquadMode.SPEED_ATTCK;
+			if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)) {
+				StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.SPEED_ATTCK;
 			} else {
-				StrategyIdea.mainSquadMode = MainSquadMode.ATTCK;
+				StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.ATTCK;
 			}
 			
 		} else {
-			StrategyIdea.mainSquadMode = MainSquadMode.NORMAL;
+			StrategyIdea.mainSquadMode = MicroConfig.MainSquadMode.NORMAL;
 		}
 	}
 

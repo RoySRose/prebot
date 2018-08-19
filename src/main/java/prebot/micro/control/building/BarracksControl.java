@@ -14,8 +14,8 @@ import prebot.micro.control.FlyCondition;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
-import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.manage.PositionFinder;
 
 public class BarracksControl extends BuildingFlyControl {
 
@@ -42,11 +42,11 @@ public class BarracksControl extends BuildingFlyControl {
         if(flyCondition.getBuildingFly() == BuildingFly.DOWN && !marinInBuildManager()){
 
 			// 앞마당으로 바뀐 경우 안전한 상황이라고 가정한다. 공격 또는 커맨드 건설 등을 위해 배럭을 띄운다.
-            if (StrategyIdea.campType != CampType.INSIDE && StrategyIdea.campType != CampType.FIRST_CHOKE) {
+            if (StrategyIdea.campType != PositionFinder.CampType.INSIDE && StrategyIdea.campType != PositionFinder.CampType.FIRST_CHOKE) {
                 flyCondition.setBuildingFly(BuildingFly.UP);
                 
             } else {
-            	if (StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+            	if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
             		if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture) >= 3) {
     					flyCondition.setBuildingFly(BuildingFly.UP);
     				}

@@ -13,7 +13,6 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.airforce.AirForceControl;
 import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
@@ -26,7 +25,7 @@ public class AirForceSquad extends Squad {
 	private AirForceControl airForceControl = new AirForceControl();
 
 	public AirForceSquad() {
-		super(SquadInfo.AIR_FORCE);
+		super(MicroConfig.SquadInfo.AIR_FORCE);
 		setUnitType(UnitType.Terran_Wraith);
 	}
 
@@ -96,7 +95,7 @@ public class AirForceSquad extends Squad {
 	}
 	
 	private Set<UnitInfo> getMainSquadEnemies() {
-		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(SquadInfo.MAIN_ATTACK.squadName);
+		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
 		if (mainSquad.squadExecuted()) {
 			return mainSquad.euiList;
 		} else {

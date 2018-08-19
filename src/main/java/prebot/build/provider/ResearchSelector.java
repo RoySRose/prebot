@@ -72,7 +72,7 @@ public class ResearchSelector implements Selector<MetaType>{
 			currentResearched++;
 		}
 		
-//		UpgradeOrder order = StrategyIdea.currentStrategy.upgrade;
+//		EnemyStrategyOptions.UpgradeOrder order = StrategyIdea.currentStrategy.upgrade;
 		
 		List<Unit> canMachineShop = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Machine_Shop);
 		

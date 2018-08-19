@@ -9,7 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.SquadInfo;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.building.BarracksControl;
 import prebot.micro.control.building.CommandCenterControl;
 import prebot.micro.control.building.ComsatControl;
@@ -26,7 +26,7 @@ public class BuildingSquad extends Squad {
 	private ComsatControl comsatControl = new ComsatControl();
 
 	public BuildingSquad() {
-		super(SquadInfo.BUILDING);
+		super(MicroConfig.SquadInfo.BUILDING);
 		setUnitType(UnitType.Terran_Barracks
 				, UnitType.Terran_Engineering_Bay
 				, UnitType.Terran_Command_Center

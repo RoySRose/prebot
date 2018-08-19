@@ -9,8 +9,7 @@ import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.Mission;
-import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
+import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -74,8 +73,8 @@ public abstract class Strategist {
 		}
 
 		if (!StrategyIdea.currentStrategy.missionTypeList.isEmpty()) {
-			for (MissionType missionType : StrategyIdea.currentStrategy.missionTypeList) {
-				if (!Mission.complete(missionType)) {
+			for (EnemyStrategyOptions.Mission.MissionType missionType : StrategyIdea.currentStrategy.missionTypeList) {
+				if (!EnemyStrategyOptions.Mission.complete(missionType)) {
 					return false;
 				}
 			}

@@ -15,8 +15,6 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -42,7 +40,7 @@ public class AirForceManager {
 		public static final int SORE_SPOT = 2; // 때리면 아픈 곳 공격 (커맨드센터건설중인 SCV, 팩토리 건설중인 SCV, 뭔가 건설중인 SCV, 체력이 적은 SCV, 가까운 SCV, 탱크)
 		public static final int POSSIBLE_SPOT = 1; // 때릴 수 있는 곳 공격 (벌처, 건물 등 잡히는 대로)
 		public static final int DEFENSE_MODE = 0;
-	}
+	}	
 
 	public static final int AIR_FORCE_TEAM_MERGE_DISTANCE = 80;
 	public static final int AIR_FORCE_SAFE_DISTANCE = 100; // 안전 실제 터렛 사정거리보다 추가로 확보하는 거리
@@ -60,7 +58,7 @@ public class AirForceManager {
 		return instance;
 	}
 	
-	private int strikeLevel = StrikeLevel.CRITICAL_SPOT;
+	private int strikeLevel = AirForceManager.StrikeLevel.CRITICAL_SPOT;
 	private boolean disabledAutoAdjustment = false;
 	
 	public int getStrikeLevel() {
@@ -282,7 +280,7 @@ public class AirForceManager {
 		double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 		double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 
-		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && expansionFirst) {
+		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT && expansionFirst) {
 			addAirForceTargetPositions(getMineralPositions());
 		}
 
@@ -295,7 +293,7 @@ public class AirForceManager {
 		}
 		addAirForceTargetPositions(secondBase.getPosition());
 
-		if (strikeLevel < StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
+		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
 			addAirForceTargetPositions(getMineralPositions());
 		}
 		
@@ -476,7 +474,7 @@ public class AirForceManager {
 
 	private void adjustStrikeLevel() {
 		if (isAirForceDefenseMode()) {
-			strikeLevel = StrikeLevel.DEFENSE_MODE;
+			strikeLevel = AirForceManager.StrikeLevel.DEFENSE_MODE;
 			return;
 		}
 		
@@ -488,12 +486,12 @@ public class AirForceManager {
 		boolean levelDown = false;
 		boolean levelUp = false;
 		if (strikeLevelStartFrame == CommonCode.NONE
-				|| StrikeLevel.SORE_SPOT >= strikeLevel && achievementEffectiveFrame > 0) {
+				|| AirForceManager.StrikeLevel.SORE_SPOT >= strikeLevel && achievementEffectiveFrame > 0) {
 			strikeLevelStartFrame = TimeUtils.elapsedFrames();
 		}
 		
 		int airunitCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith);
-		if (strikeLevel == StrikeLevel.CRITICAL_SPOT) {
+		if (strikeLevel == AirForceManager.StrikeLevel.CRITICAL_SPOT) {
 			if (InfoUtils.enemyRace() == Race.Terran) {
 				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 50 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
@@ -510,7 +508,7 @@ public class AirForceManager {
 				levelDown = true;
 			}
 			
-		} else if (strikeLevel == StrikeLevel.SORE_SPOT) {
+		} else if (strikeLevel == AirForceManager.StrikeLevel.SORE_SPOT) {
 			// TODO 레이쓰가 일정 수 파괴되었을 때로 할지 고민
 			int levelDownSeconds = Math.max(10 - airunitCount, 1);
 			if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > levelDownSeconds * TimeUtils.SECOND) {
@@ -519,13 +517,13 @@ public class AirForceManager {
 				levelDown = true;
 			}
 			
-		} else if (strikeLevel == StrikeLevel.POSSIBLE_SPOT) {
+		} else if (strikeLevel == AirForceManager.StrikeLevel.POSSIBLE_SPOT) {
 			if (achievementEffectiveFrame <= -100) { // defense 모드로 변경
 				levelDown = true;
 			} else if (achievementEffectiveFrame >= 150) {
 				levelUp = true;
 			}
-		} else if (strikeLevel == StrikeLevel.DEFENSE_MODE) {
+		} else if (strikeLevel == AirForceManager.StrikeLevel.DEFENSE_MODE) {
 			levelUp = true;
 		}
 		

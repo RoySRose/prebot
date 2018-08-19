@@ -94,7 +94,7 @@ public class AnalyzeStrategy {
 //						|| InfoUtils.enemyNumUnits(UnitType.Protoss_Forge) >= 1
 //						|| InfoUtils.enemyNumUnits(UnitType.Protoss_Pylon) >= 1) {
 //					// 1. 본진에 적 포톤캐논이 있는지 본다.
-//					List<Unit> enemysInMyBase = UnitUtils.getUnitsInRegion(RegionType.MY_BASE, PlayerRange.ENEMY);
+//					List<Unit> enemysInMyBase = UnitUtils.getUnitsInRegion(CommonCode.RegionType.MY_BASE, PlayerRange.ENEMY);
 //					for (Unit enemy : enemysInMyBase) {
 //						if (enemy.getType() == UnitType.Protoss_Photon_Cannon) {
 //							strategyEx = EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
@@ -104,7 +104,7 @@ public class AnalyzeStrategy {
 //					
 //					// 2. 앞마당 지역은 익셉션이 포톤러쉬가 아닌 상태면 찾아본다.
 //					if (strategyEx != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
-//						List<Unit> enemysInMyFirstExpansion = UnitUtils.getUnitsInRegion(RegionType.MY_FIRST_EXPANSION, PlayerRange.ENEMY);
+//						List<Unit> enemysInMyFirstExpansion = UnitUtils.getUnitsInRegion(CommonCode.RegionType.MY_FIRST_EXPANSION, PlayerRange.ENEMY);
 //						for (Unit enemy : enemysInMyFirstExpansion) {
 //							if (enemy.getType() == UnitType.Protoss_Photon_Cannon) {
 //								strategyEx = EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH;
@@ -115,7 +115,7 @@ public class AnalyzeStrategy {
 //
 //					if (strategyEx != EnemyStrategyException.PROTOSSEXCEPTION_PHOTONRUSH) {
 //						if (InfoUtils.enemyFirstExpansion() != null) {
-//							List<Unit> enemysInEnemyFirstExpansion = UnitUtils.getUnitsInRegion(RegionType.ENEMY_FIRST_EXPANSION, PlayerRange.ENEMY);
+//							List<Unit> enemysInEnemyFirstExpansion = UnitUtils.getUnitsInRegion(CommonCode.RegionType.ENEMY_FIRST_EXPANSION, PlayerRange.ENEMY);
 //							for (Unit enemy : enemysInEnemyFirstExpansion) {
 //								if (enemy.getType() == UnitType.Protoss_Photon_Cannon || enemy.getType() == UnitType.Protoss_Forge) {
 //									strategy = EnemyStrategy.PROTOSSBASIC_DOUBLEPHOTO;

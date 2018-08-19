@@ -5,12 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.SquadData;
@@ -18,13 +16,10 @@ import prebot.micro.WorkerData;
 import prebot.micro.WorkerData.WorkerJob;
 import prebot.micro.WorkerManager;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.SquadInfo;
 import prebot.micro.control.GundamControl;
 import prebot.micro.control.MarineControl;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
 
 public class EarlyDefenseSquad extends Squad {
 
@@ -34,7 +29,7 @@ public class EarlyDefenseSquad extends Squad {
 	private static final int REACT_RADIUS = 50;
 
 	public EarlyDefenseSquad() {
-		super(SquadInfo.EARLY_DEFENSE);
+		super(MicroConfig.SquadInfo.EARLY_DEFENSE);
 		setUnitType(UnitType.Terran_Marine, UnitType.Terran_SCV);
 	}
 

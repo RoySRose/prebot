@@ -8,14 +8,15 @@ import bwta.BaseLocation;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.TimeUtils;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
-import prebot.strategy.constant.EnemyStrategyOptions.FactoryRatio;
-import prebot.strategy.constant.StrategyCode.EnemyUnitStatus;
+import prebot.strategy.constant.StrategyCode;
 import prebot.strategy.manage.PositionFinder.CampType;
+import prebot.strategy.manage.SpiderMineManger;
 import prebot.strategy.manage.SpiderMineManger.MinePositionLevel;
 
 public class StrategyIdea {
@@ -29,12 +30,12 @@ public class StrategyIdea {
 	public static EnemyStrategy currentStrategy = EnemyStrategy.UNKNOWN;
 	public static List<EnemyStrategy> strategyHistory = new ArrayList<>();
 	
-	public static FactoryRatio factoryRatio = FactoryRatio.ratio(0, 0, 0, 1);
+	public static EnemyStrategyOptions.FactoryRatio factoryRatio = EnemyStrategyOptions.FactoryRatio.ratio(0, 0, 0, 1);
 	public static List<MetaType> upgrade = new ArrayList<>();
 	public static int marineCount = 0;
 	public static AddOnOption addOnOption = null;
 	public static ExpansionOption expansionOption = null;
-	public static BuildTimeMap buildTimeMap = new BuildTimeMap();
+	public static EnemyStrategyOptions.BuildTimeMap buildTimeMap = new EnemyStrategyOptions.BuildTimeMap();
 	
 	public static int wraithCount = 0;
 	public static int valkyrieCount = 0;
@@ -62,7 +63,7 @@ public class StrategyIdea {
 	// 빌드매니저: COMMING, IN_MY_REGION인 경우 벌처, 팩토리가 없는 경우 마린을 우선적으로 추가 생산한다.
 	// (마린 6기 이상이면 추가생산 없음, 벌처 2기 이상이면 추가생산 없음 - 적용 특이사항 예시) (initial이 끝나기 전)
 	// 컴뱃매니저: ?
-	public static EnemyUnitStatus enemyUnitStatus = EnemyUnitStatus.SLEEPING;
+	public static StrategyCode.EnemyUnitStatus enemyUnitStatus = StrategyCode.EnemyUnitStatus.SLEEPING;
 	public static Position totalEnemyCneterPosition = Position.Unknown;
 	public static Position nearGroundEnemyPosition = Position.Unknown;
 	public static Position nearAirEnemyPosition = Position.Unknown;
@@ -77,7 +78,7 @@ public class StrategyIdea {
 	// 모드에 따라 게릴라벌처 투입 비율이 조정된다.
 	// 수비모드, 공격모드에 따라 적 선택 방식이 달라진다.(수비모드인 경우 건물 위주, 공격모드인 경우 유닛 위주)
 	// 공격모드 종류에 따라 적 진영으로 빠르게 전진할지, 부하가 걸리는 컨트롤을 사용할지 여부 등을 결정한다. 
-	public static MainSquadMode mainSquadMode = MainSquadMode.NORMAL;
+	public static MainSquadMode mainSquadMode = MicroConfig.MainSquadMode.NORMAL;
 	public static int attackStartedFrame = CommonCode.NONE;
 	public static int retreatFrame = CommonCode.NONE;
 	
@@ -98,7 +99,7 @@ public class StrategyIdea {
 	public static int checkerMaxNumber = 0; // 정찰벌처 최대수
 	public static int spiderMineNumberPerPosition = 1; // 
 	public static int spiderMineNumberPerGoodPosition = 1;
-	public static MinePositionLevel watcherMinePositionLevel = MinePositionLevel.NOT_MY_OCCUPIED;
+	public static MinePositionLevel watcherMinePositionLevel = SpiderMineManger.MinePositionLevel.NOT_MY_OCCUPIED;
 	
 	// [전략에 따른 가스조절]
 	public static boolean gasAdjustment = false;

@@ -445,17 +445,17 @@ public class MicroUtils {
 	
 	private static int getRiskRadius(UnitType unitType) {
 		if (RISK_RADIUS_MAP.isEmpty()) {
-			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, Flee.RISK_RADIUS_VULTURE);
-			RISK_RADIUS_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, Flee.RISK_RADIUS_TANK);
-			RISK_RADIUS_MAP.put(UnitType.Terran_Goliath, Flee.RISK_RADIUS_GOLIATH);
-			RISK_RADIUS_MAP.put(UnitType.Terran_Wraith, Flee.RISK_RADIUS_WRAITH);
-			RISK_RADIUS_MAP.put(UnitType.Terran_Science_Vessel, Flee.RISK_RADIUS_VESSEL);
-			RISK_RADIUS_MAP.put(UnitType.Terran_SCV, Flee.RISK_RADIUS_DEFAULT);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Vulture, MicroConfig.Flee.RISK_RADIUS_VULTURE);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Siege_Tank_Tank_Mode, MicroConfig.Flee.RISK_RADIUS_TANK);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Goliath, MicroConfig.Flee.RISK_RADIUS_GOLIATH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Wraith, MicroConfig.Flee.RISK_RADIUS_WRAITH);
+			RISK_RADIUS_MAP.put(UnitType.Terran_Science_Vessel, MicroConfig.Flee.RISK_RADIUS_VESSEL);
+			RISK_RADIUS_MAP.put(UnitType.Terran_SCV, MicroConfig.Flee.RISK_RADIUS_DEFAULT);
 		}
 		
 		Integer riskRadius = RISK_RADIUS_MAP.get(unitType);
 		if (riskRadius == null) {
-			riskRadius = Flee.RISK_RADIUS_DEFAULT;
+			riskRadius = MicroConfig.Flee.RISK_RADIUS_DEFAULT;
 		}
 		return riskRadius;
 		
@@ -659,7 +659,7 @@ public class MicroUtils {
 	}
 	
 	public static boolean isMeleeUnit(UnitType unitType) {
-		return !unitType.isWorker() && unitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE; // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
+		return !unitType.isWorker() && unitType.groundWeapon().maxRange() <= MicroConfig.Tank.SIEGE_MODE_MIN_RANGE; // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단
 	}
 	public static boolean isRangeUnit(UnitType unitType) {
         return unitType.groundWeapon().maxRange() > UnitType.Zerg_Zergling.groundWeapon().maxRange(); // 시즈모드 최소사정거리 안의 공격범위는 melee 유닛으로 판단

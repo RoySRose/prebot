@@ -13,16 +13,15 @@ import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.constant.MicroConfig.Tank;
+import prebot.micro.constant.MicroConfig;
 import prebot.micro.predictor.WraithFightPredictor;
 import prebot.micro.targeting.TargetScoreCalculator;
 import prebot.micro.targeting.WraithTargetCalculator;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.constant.StrategyCode.SmallFightPredict;
+import prebot.strategy.constant.StrategyCode;
 import prebot.strategy.constant.StrategyConfig;
 import prebot.strategy.manage.AirForceManager;
-import prebot.strategy.manage.AirForceManager.StrikeLevel;
 import prebot.strategy.manage.AirForceTeam;
 
 public class MicroDecisionMaker {
@@ -54,7 +53,7 @@ public class MicroDecisionMaker {
 			if (enemyUnit == null) {
 				if (bestTargetUnitInfo == null) {
 					int distanceToTarget = myUnit.getDistance(eui.getLastPosition());
-					if (distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE) {
+					if (distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 						bestTargetUnitInfo = eui;
 						targetInRangeButOutOfSight = true;
 					}
@@ -68,9 +67,9 @@ public class MicroDecisionMaker {
 			
 			int distanceToTarget = myUnit.getDistance(enemyUnit.getPosition());
 			if (!myUnit.isInWeaponRange(enemyUnit)) { // 시즈 범위안에 타겟이 없을 경우 skip
-				if (distanceToTarget < Tank.SIEGE_MODE_MIN_RANGE) {
+				if (distanceToTarget < MicroConfig.Tank.SIEGE_MODE_MIN_RANGE) {
 					tooCloseTarget = enemyUnit;
-		        } else if (distanceToTarget > Tank.SIEGE_MODE_MAX_RANGE) {
+		        } else if (distanceToTarget > MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 		        	if (tooFarTarget == null || distanceToTarget < closestTooFarTargetDistance) {
 			        	tooFarTarget = enemyUnit;
 		        		closestTooFarTargetDistance = distanceToTarget;
@@ -112,7 +111,7 @@ public class MicroDecisionMaker {
 
 	public MicroDecision makeDecisionForAirForce(AirForceTeam airForceTeam, Collection<UnitInfo> euiList, int strikeLevel) {
 		int airunitMemorySeconds = 3;
-		if (strikeLevel < StrikeLevel.SORE_SPOT) {
+		if (strikeLevel < AirForceManager.StrikeLevel.SORE_SPOT) {
 			airunitMemorySeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}
 		
@@ -205,15 +204,15 @@ public class MicroDecisionMaker {
 				boolean mainSquadBonus = airForceTeam.leaderUnit.getDistance(StrategyIdea.mainSquadCenter) < 150;
 				// System.out.println("cloakingBonus : " + cloakingBonus);
 				
-				SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
+				StrategyCode.SmallFightPredict fightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, cloakingBonus, mainSquadBonus);
 				// System.out.println("fightPredict = " + fightPredict);
-				if (fightPredict == SmallFightPredict.ATTACK) {
+				if (fightPredict == StrategyCode.SmallFightPredict.ATTACK) {
 					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListAirWeapon, euiListAirDefenseBuilding);
 
 				} else {
 					if (euiListDetector.isEmpty() && !cloakingBonus && airForceTeam.cloakable()) {
-						SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
-						if (cloakingFightPredict == SmallFightPredict.ATTACK) {
+						StrategyCode.SmallFightPredict cloakingFightPredict = WraithFightPredictor.airForcePredictByUnitInfo(airForceTeam.memberList, euiListAirWeapon, true, mainSquadBonus);
+						if (cloakingFightPredict == StrategyCode.SmallFightPredict.ATTACK) {
 							return MicroDecision.change(airForceTeam.leaderUnit);
 						}
 					}
@@ -233,7 +232,7 @@ public class MicroDecisionMaker {
 							}
 						}
 					}
-					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding, StrikeLevel.SORE_SPOT);
+					bestTargetInfo = getBestTargetInfo(airForceTeam, euiListFeed, euiListAirDefenseBuilding, AirForceManager.StrikeLevel.SORE_SPOT);
 				}
 				
 			} else {

@@ -295,11 +295,11 @@ public class ConstructionManager extends GameManager {
 				
 				
 				if(b.getType().equals(UnitType.Terran_Supply_Depot)||b.getType().equals(UnitType.Terran_Barracks)||b.getType().equals(UnitType.Terran_Academy)) {
-					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.NextSupplePoint);
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.NextSupplePoint);
 				}else if(b.getType().equals(UnitType.Terran_Command_Center)) {
-					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.NextExpansionPoint);
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.NextExpansionPoint);
 				}else {
-					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, SeedPositionStrategy.MainBaseLocation);
+					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				}
 				if (relocationTilePosition == TilePosition.None) {
 					System.out.println(" relocationTilePosition recalculate desiredPosition None");
@@ -308,7 +308,7 @@ public class ConstructionManager extends GameManager {
 				}else{
 					for (BaseLocation baseLocation : BWTA.getBaseLocations()) {
 						if(TilePositionUtils.equals(relocationTilePosition, baseLocation.getTilePosition())){
-							relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), relocationTilePosition, SeedPositionStrategy.NoLocation);
+							relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), relocationTilePosition, BuildOrderItem.SeedPositionStrategy.NoLocation);
 							break;
 						}
 					}

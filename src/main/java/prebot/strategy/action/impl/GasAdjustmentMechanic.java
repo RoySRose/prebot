@@ -7,7 +7,7 @@ import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.action.Action;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 /**
  * 메카닉 테란 가스 조절
@@ -40,7 +40,7 @@ public class GasAdjustmentMechanic extends Action {
 					adjustGasWorkerCount = 1;
 				}
 			} else {
-				if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
+				if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY) {
 					if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
 						if (Prebot.Broodwar.self().gas() <= 250) {
 							adjustGasWorkerCount = 2;

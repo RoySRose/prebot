@@ -3,14 +3,13 @@ package prebot.strategy.analyse.protoss;
 import java.util.List;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.constant.CommonCode;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.StrategyAnalyseManager;
-import prebot.strategy.manage.StrategyAnalyseManager.LastCheckLocation;
 
 public class NexsusAnalyser extends UnitAnalyser {
 
@@ -31,7 +30,7 @@ public class NexsusAnalyser extends UnitAnalyser {
 		int doubleFrame = EnemyStrategy.PROTOSS_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Nexus, 20);
 		int forgeDoubleFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Nexus, 20);
 		
-		List<UnitInfo> found = found(RegionType.ENEMY_FIRST_EXPANSION);
+		List<UnitInfo> found = found(CommonCode.RegionType.ENEMY_FIRST_EXPANSION);
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			
@@ -42,7 +41,7 @@ public class NexsusAnalyser extends UnitAnalyser {
 				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NEXSUS_FAST_DOUBLE);
 			}
 		} else {
-			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
+			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(StrategyAnalyseManager.LastCheckLocation.FIRST_EXPANSION);
 			if (expansionLastCheckFrame > forgeDoubleFrame) { // 더블 타이밍 지남
 				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NEXSUS_NOT_DOUBLE);
 			}

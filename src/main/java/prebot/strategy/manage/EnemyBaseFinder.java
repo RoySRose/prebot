@@ -113,7 +113,7 @@ public class EnemyBaseFinder {
 		}
 
 		Position scoutPosition = euiList.get(0).getLastPosition();
-		RegionType regionType = PositionUtils.positionToRegionType(scoutPosition);
+		CommonCode.RegionType regionType = PositionUtils.positionToRegionType(scoutPosition);
 
 		
 		if (regionType != RegionType.MY_BASE && regionType != RegionType.MY_FIRST_EXPANSION) {

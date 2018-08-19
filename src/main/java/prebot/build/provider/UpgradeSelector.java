@@ -33,7 +33,7 @@ public class UpgradeSelector implements Selector<MetaType>{
     
     
     
-    //UpgradeOrder.VM_TS_VS;
+    //EnemyStrategyOptions.UpgradeOrder.VM_TS_VS;
     
     
     private void executeUpgrade() {

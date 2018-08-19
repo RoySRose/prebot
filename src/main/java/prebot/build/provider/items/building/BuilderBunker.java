@@ -13,7 +13,7 @@ import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class BuilderBunker extends DefaultBuildableItem {
 	
@@ -41,9 +41,9 @@ public class BuilderBunker extends DefaultBuildableItem {
 
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_INIT
-					|| StrategyIdea.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+					|| StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
 				int waitingBlockSeconds = 8;
-				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.TWOGATE)) {
+				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
 					waitingBlockSeconds = 5;
 				}
 				boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();

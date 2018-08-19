@@ -3,7 +3,7 @@ package prebot.strategy.analyse.zerg.unit;
 import java.util.List;
 
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.RegionType;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
@@ -38,14 +38,14 @@ public class ZerglingAnalyser extends UnitAnalyser {
 		int overPoolFrame = EnemyStrategy.ZERG_OVERPOOL.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 20); // 오버풀,11풀,12풀
 		int buildToZerglingFrame = UnitType.Zerg_Spawning_Pool.buildTime() + UnitType.Zerg_Zergling.buildTime();
 		
-		RegionType foundRegionType = PositionUtils.positionToRegionType(found.get(0).getLastPosition());
+		CommonCode.RegionType foundRegionType = PositionUtils.positionToRegionType(found.get(0).getLastPosition());
 		int movedFrame = 0;
-		if (foundRegionType == RegionType.ENEMY_BASE) {
+		if (foundRegionType == CommonCode.RegionType.ENEMY_BASE) {
 			movedFrame = 0;
-		} else if (foundRegionType == RegionType.ENEMY_FIRST_EXPANSION) {
+		} else if (foundRegionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
 			movedFrame = 5 * TimeUtils.SECOND;
-		} else if (foundRegionType == RegionType.MY_FIRST_EXPANSION
-				|| foundRegionType == RegionType.MY_BASE) {
+		} else if (foundRegionType == CommonCode.RegionType.MY_FIRST_EXPANSION
+				|| foundRegionType == CommonCode.RegionType.MY_BASE) {
 			movedFrame = baseToBaseFrame(UnitType.Zerg_Zergling) + 5 * TimeUtils.SECOND;
 		} else {
 			movedFrame = 10 * TimeUtils.SECOND; // 발견위치로 더 상세하게 판단 가능

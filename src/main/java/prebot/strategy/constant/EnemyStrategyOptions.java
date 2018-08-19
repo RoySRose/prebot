@@ -15,7 +15,6 @@ import bwapi.UpgradeType;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.RegionType;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -41,8 +40,8 @@ public class EnemyStrategyOptions {
 			this.goliath = goliath;
 			this.weight = weight;
 		}
-		public static FactoryRatio ratio(int vulture, int tank, int goliath, int weight) {
-			return new FactoryRatio(vulture, tank, goliath, weight);
+		public static EnemyStrategyOptions.FactoryRatio ratio(int vulture, int tank, int goliath, int weight) {
+			return new EnemyStrategyOptions.FactoryRatio(vulture, tank, goliath, weight);
 		}
 		@Override
 		public String toString() {
@@ -102,15 +101,15 @@ public class EnemyStrategyOptions {
 			, VULTURE, TANK, GOLIATH
 		}	
 		
-		public static List<MissionType> missions(MissionType... missions) {
-			List<MissionType> missionList = new ArrayList<>();
-			for (MissionType mission : missions) {
+		public static List<EnemyStrategyOptions.Mission.MissionType> missions(EnemyStrategyOptions.Mission.MissionType... missions) {
+			List<EnemyStrategyOptions.Mission.MissionType> missionList = new ArrayList<>();
+			for (EnemyStrategyOptions.Mission.MissionType mission : missions) {
 				missionList.add(mission);
 			}
 			return missionList;
 		}
 		
-		public static boolean complete(MissionType mission) {
+		public static boolean complete(EnemyStrategyOptions.Mission.MissionType mission) {
 			
 			switch (mission) {
 			case EXPANSION: // 앞마당
@@ -121,10 +120,10 @@ public class EnemyStrategyOptions {
 					if (commandCenter.isLifted()) {
 						continue;
 					}
-					RegionType regionType = PositionUtils.positionToRegionType(commandCenter.getPosition());
-					if (regionType == RegionType.MY_BASE) {
+					CommonCode.RegionType regionType = PositionUtils.positionToRegionType(commandCenter.getPosition());
+					if (regionType == CommonCode.RegionType.MY_BASE) {
 						baseCommandCentertOk = true;
-					} else if (regionType == RegionType.MY_FIRST_EXPANSION) {
+					} else if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION) {
 						expansionCommandCenterOk = true;
 					}
 				}
@@ -154,10 +153,10 @@ public class EnemyStrategyOptions {
 				boolean expansionTurretOk = false;
 				List<Unit> turretList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret);
 				for (Unit turret : turretList) {
-					RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
-					if (regionType == RegionType.MY_BASE) {
+					CommonCode.RegionType regionType = PositionUtils.positionToRegionType(turret.getPosition());
+					if (regionType == CommonCode.RegionType.MY_BASE) {
 						baseTurretOk = true;
-					} else if (regionType == RegionType.MY_FIRST_EXPANSION || regionType == RegionType.MY_THIRD_REGION) {
+					} else if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION || regionType == CommonCode.RegionType.MY_THIRD_REGION) {
 						expansionTurretOk = true;
 					}
 				}
@@ -195,7 +194,7 @@ public class EnemyStrategyOptions {
 		private Map<TechType, Integer> techTime = new HashMap<>();
 		private Map<UpgradeType, Integer> upgradeTime = new HashMap<>();
 		
-		public BuildTimeMap setFeature(Feature... features) {
+		public EnemyStrategyOptions.BuildTimeMap setFeature(EnemyStrategyOptions.BuildTimeMap.Feature... features) {
 			for (Feature feature : features) {
 				this.features.add(feature);
 			}
@@ -206,7 +205,7 @@ public class EnemyStrategyOptions {
 			return this.features.contains(feature);
 		}
 		
-		public BuildTimeMap put(UnitType unitType, int minutes, int seconds) {
+		public EnemyStrategyOptions.BuildTimeMap put(UnitType unitType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			List<Integer> defaultTimeList = buildingTime.get(unitType);
 			if (defaultTimeList == null) {
@@ -216,17 +215,17 @@ public class EnemyStrategyOptions {
 			buildingTime.put(unitType, defaultTimeList);
 			return this;
 		}
-		public BuildTimeMap put(TechType techType, int minutes, int seconds) {
+		public EnemyStrategyOptions.BuildTimeMap put(TechType techType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			techTime.put(techType, defaultTime);
 			return this;
 		}
-		public BuildTimeMap put(UpgradeType upgradeType, int minutes, int seconds) {
+		public EnemyStrategyOptions.BuildTimeMap put(UpgradeType upgradeType, int minutes, int seconds) {
 			int defaultTime = TimeUtils.timeToFrames(minutes, seconds);
 			upgradeTime.put(upgradeType, defaultTime);
 			return this;
 		}
-		public BuildTimeMap putAll(BuildTimeMap defaultTimeMap) {
+		public EnemyStrategyOptions.BuildTimeMap putAll(EnemyStrategyOptions.BuildTimeMap defaultTimeMap) {
 			buildingTime.putAll(defaultTimeMap.buildingTime);
 			techTime.putAll(defaultTimeMap.techTime);
 			upgradeTime.putAll(defaultTimeMap.upgradeTime);

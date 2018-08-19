@@ -88,7 +88,7 @@ public class PositionUtils {
 		return MapTools.Instance().getGroundDistance(origin, destination);
 	}
 
-	public static RegionType positionToRegionType(Position position) {
+	public static CommonCode.RegionType positionToRegionType(Position position) {
 		Region positionRegion = BWTA.getRegion(position);
 		Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		if (positionRegion == myBaseRegion) {
@@ -120,25 +120,25 @@ public class PositionUtils {
 		return CommonCode.RegionType.UNKNOWN;
 	}
 
-	public static Region regionTypeToRegion(RegionType regionType) {
-		if (regionType == RegionType.MY_BASE) {
+	public static Region regionTypeToRegion(CommonCode.RegionType regionType) {
+		if (regionType == CommonCode.RegionType.MY_BASE) {
 			return BWTA.getRegion(InfoUtils.myBase().getPosition());
 		}
-		if (regionType == RegionType.MY_FIRST_EXPANSION) {
+		if (regionType == CommonCode.RegionType.MY_FIRST_EXPANSION) {
 			return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		}
-		if (regionType == RegionType.MY_THIRD_REGION) {
+		if (regionType == CommonCode.RegionType.MY_THIRD_REGION) {
 			return InfoUtils.myThirdRegion();
 		}
 		
 		if (InfoUtils.enemyBase() != null) {
-			if (regionType == RegionType.ENEMY_BASE) {
+			if (regionType == CommonCode.RegionType.ENEMY_BASE) {
 				return BWTA.getRegion(InfoUtils.enemyBase().getPosition());
 			}
-			if (regionType == RegionType.ENEMY_FIRST_EXPANSION) {
+			if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
 				return BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 			}
-			if (regionType == RegionType.ENEMY_THIRD_REGION) {
+			if (regionType == CommonCode.RegionType.ENEMY_THIRD_REGION) {
 				return InfoUtils.enemyThirdRegion();
 			}
 		}

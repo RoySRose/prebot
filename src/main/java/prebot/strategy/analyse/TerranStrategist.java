@@ -4,9 +4,8 @@ import bwapi.UnitType;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.constant.EnemyStrategyOptions;
 
 public class TerranStrategist extends Strategist {
 	
@@ -104,7 +103,7 @@ public class TerranStrategist extends Strategist {
 			}
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.DOUBLE)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE)) {
 			if (hasInfo(Clue.ClueInfo.FACTORY_TWO)) {
 				return EnemyStrategy.TERRAN_DOUBLE_MECHANIC;
 				
@@ -132,7 +131,7 @@ public class TerranStrategist extends Strategist {
 			return EnemyStrategy.TERRAN_1FAC_1STAR;
 		}
 		
-		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.BIONIC)) {
+		if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.BIONIC)) {
 			return EnemyStrategy.TERRAN_BIONIC;
 		}
 
