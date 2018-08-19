@@ -52,6 +52,6 @@ public class MarineAnalyser extends UnitAnalyser {
 	private int marineInMyRegionFrame(int enemyCount) {
 		int barracksFrame = EnemyStrategy.TERRAN_2BARRACKS.buildTimeMap.frame(UnitType.Terran_Barracks, 10) + UnitType.Terran_Factory.buildTime();
 		int nMarineCompleteFrame = barracksFrame + UnitType.Terran_Marine.buildTime() * (enemyCount / 2 + 1);
-		return nMarineCompleteFrame + baseToBaseFrame(UnitType.Terran_Marine);
+		return nMarineCompleteFrame;
 	}
 }

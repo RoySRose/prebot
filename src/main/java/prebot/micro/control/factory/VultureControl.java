@@ -43,7 +43,7 @@ public class VultureControl extends Control {
 				continue;
 			}
 			
-			int saveUnitLevel = 2;
+			int saveUnitLevel = 1;
 			if (this.targetPosition != null) {
 				saveUnitLevel = 0;
 			}

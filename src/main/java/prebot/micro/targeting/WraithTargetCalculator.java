@@ -53,7 +53,7 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 
 	@Override
 	public int calculate(Unit unit, UnitInfo eui) {
-		if (airForceDefenseMode) {
+		if (InfoUtils.enemyRace() == Race.Zerg && airForceDefenseMode) {
 			return getDistanceScore(unit, eui.getLastPosition());
 		}
 		

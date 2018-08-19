@@ -48,6 +48,8 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			maxCountByCommandCenter = 2;
 		} else if (commandCenterCount == 3) {
 			maxCountByCommandCenter = 3;
+		} else if (commandCenterCount  >= 4) {
+			maxCountByCommandCenter = 4;
 		}
 		
 		if (Prebot.Broodwar.self().gas() > 300) {

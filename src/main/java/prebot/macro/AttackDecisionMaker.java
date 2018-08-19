@@ -1,14 +1,22 @@
 package prebot.macro;
 
+import static prebot.macro.EnemyCommandInfo.getMineralPatchesNearDepot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.BWTA;
 import bwta.BaseLocation;
-import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
+import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
@@ -21,22 +29,14 @@ import prebot.macro.scorecalculator.VultureScoreCalculator;
 import prebot.macro.scorecalculator.WraithScoreCalculator;
 import prebot.macro.util.EnemyUnitCounter;
 import prebot.macro.util.MutableFloat;
-import prebot.macro.util.UnitTypeList;
 import prebot.macro.util.ScoreBoard;
+import prebot.macro.util.UnitTypeList;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
-import prebot.strategy.manage.StrategyAnalyseManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static prebot.macro.EnemyCommandInfo.getMineralPatchesNearDepot;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class AttackDecisionMaker extends GameManager {
 
@@ -157,24 +157,72 @@ public class AttackDecisionMaker extends GameManager {
     }
 
     private Decision makeDecision(int myForcePoint, int enemyForcePoint) {
-
-    	//상대가 다크나, 마인이 있는데 공격 판단하면 안된다. 어덯게 할지?
+    	if (!detectorPrepared()) {
+    		return Decision.DEFENCE;
+    	}
     	
     	if(myForcePoint > 1200) {
-	        if(myForcePoint > enemyForcePoint){
-	        	if(decision == Decision.DEFENCE) {
-	        		Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
-	        	}
-	            return Decision.FULL_ATTACK;
+			if (myForcePoint > enemyForcePoint) {
+				// TODO 노머시 포인트 조절. 테테전은 타종족의 2배로 좀 여유있게 함
+				int noMercyPoint = enemyForcePoint + 2000;
+				if (InfoUtils.enemyRace() == Race.Terran) {
+					noMercyPoint *= 2;
+				}
+				if (decision == Decision.NO_MERCY_ATTACK) {
+					noMercyPoint = enemyForcePoint;
+				}
+				
+				if (myForcePoint > noMercyPoint) {
+					if (decision != Decision.NO_MERCY_ATTACK) {
+						Prebot.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
+					}
+					return Decision.NO_MERCY_ATTACK;
+				}
+				
+				if (decision != Decision.FULL_ATTACK) {
+					Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
+				}
+				return Decision.FULL_ATTACK;
 	        }
     	}
-    	if(decision == Decision.FULL_ATTACK) {
-    		Prebot.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
+    	
+    	if (quickAttack()) {
+    		return Decision.FULL_ATTACK;
     	}
+		if (decision == Decision.FULL_ATTACK) {
+			Prebot.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
+		}
         return Decision.DEFENCE;
     }
 
-    private void predictEnemyUnitZerg() {
+    private boolean detectorPrepared() {
+    	if (InfoUtils.enemyRace() == Race.Terran) {
+    		return true;
+    	} else {
+    		if (UnitUtils.invisibleEnemyDiscovered()) {
+        		if (UnitUtils.availableScanningCount() == 0 && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
+        			return false;
+        		}
+        	}
+    	}
+    	return true;
+	}
+    
+    private boolean quickAttack() {
+    	if (InfoUtils.enemyRace() == Race.Terran) {
+			int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+			return myTankSupplyCount >= 4 * 4;
+			
+		} else if (InfoUtils.enemyRace() == Race.Protoss) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(Feature.QUICK_ATTACK)) {
+				return true;
+			}
+		}
+    	return false;
+	}
+
+
+	private void predictEnemyUnitZerg() {
 
         EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;
 
