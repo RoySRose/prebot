@@ -24,11 +24,13 @@ public class DefaultGasCalculator implements GasCalculator{
 
     private int lastCheckFrame;
 
+    private boolean isMainBase;
 
-    public DefaultGasCalculator(Unit geyser) {
+    public DefaultGasCalculator(Unit geyser, boolean isMainBase) {
         this.geyser = geyser;
         this.hasGasBuilding = false;
         this.gasDepletedFrame = 0;
+        this.isMainBase = isMainBase;
     }
 
     public Position getGeyserPoint() {
@@ -68,12 +70,14 @@ public class DefaultGasCalculator implements GasCalculator{
             }
         }
         
-        List<UnitInfo> enemy = UnitCache.getCurrentCache().enemyAllUnitInfos(UnitType.AllUnits);
-
-        for (UnitInfo unitInfo : enemy) {
-        	if(unitInfo.getType().gasPrice() > 0) {
-        		return true;
-        	}
+        if(isMainBase) {
+	        List<UnitInfo> enemy = UnitCache.getCurrentCache().enemyAllUnitInfos(UnitType.AllUnits);
+	
+	        for (UnitInfo unitInfo : enemy) {
+	        	if(unitInfo.getType().gasPrice() > 0) {
+	        		return true;
+	        	}
+	        }
         }
         return false;
     }
