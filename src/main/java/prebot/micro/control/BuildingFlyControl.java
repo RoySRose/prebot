@@ -108,10 +108,10 @@ public abstract class BuildingFlyControl extends Control{
 
     public Position getFlyPosition0(Unit unit){
 
-        List<Unit> attackUnit = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
-        attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode));
-        attackUnit.addAll(UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Goliath));
-        List<UnitInfo> enemyUnit = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.VISIBLE,
+        List<Unit> attackUnit = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
+        attackUnit.addAll(UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode));
+        attackUnit.addAll(UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Goliath));
+        List<UnitInfo> enemyUnit = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.VISIBLE,
         		UnitType.Terran_Marine, UnitType.Terran_Goliath, UnitType.Terran_Wraith, UnitType.Terran_Valkyrie, UnitType.Terran_Battlecruiser, UnitType.Terran_Missile_Turret,
         		UnitType.Protoss_Dragoon, UnitType.Protoss_Archon, UnitType.Protoss_Corsair, UnitType.Protoss_Scout, UnitType.Protoss_Carrier, UnitType.Protoss_Photon_Cannon,
         		UnitType.Zerg_Hydralisk, UnitType.Zerg_Mutalisk, UnitType.Zerg_Devourer, UnitType.Zerg_Spore_Colony);

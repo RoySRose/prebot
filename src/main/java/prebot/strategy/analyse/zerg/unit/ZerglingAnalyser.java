@@ -7,8 +7,7 @@ import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -31,7 +30,7 @@ public class ZerglingAnalyser extends UnitAnalyser {
 	}
 
 	private void fastPoolByZergling(List<UnitInfo> found) {
-		if (ClueManager.Instance().containsClueType(ClueType.POOL_ASSUME)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.POOL_ASSUME)) {
 			return;
 		}
 		int fiveDroneFrame = EnemyStrategy.ZERG_5DRONE.buildTimeMap.frame(UnitType.Zerg_Spawning_Pool, 5);
@@ -54,11 +53,11 @@ public class ZerglingAnalyser extends UnitAnalyser {
 		
 		int foundFrame = found.get(0).getUpdateFrame();
 		if (foundFrame < fiveDroneFrame + buildToZerglingFrame + movedFrame) {
-			ClueManager.Instance().addClueInfo(ClueInfo.POOL_5DRONE);
+			ClueManager.Instance().addClueInfo(Clue.ClueInfo.POOL_5DRONE);
 		} else if (foundFrame < nineDroneFrame + buildToZerglingFrame + movedFrame) {
-			ClueManager.Instance().addClueInfo(ClueInfo.POOL_9DRONE_UNDER);
+			ClueManager.Instance().addClueInfo(Clue.ClueInfo.POOL_9DRONE_UNDER);
 		} else if (foundFrame < overPoolFrame + buildToZerglingFrame + movedFrame) {
-			ClueManager.Instance().addClueInfo(ClueInfo.POOL_OVERPOOL_UNDER);
+			ClueManager.Instance().addClueInfo(Clue.ClueInfo.POOL_OVERPOOL_UNDER);
 		}
 	}
 
@@ -75,17 +74,17 @@ public class ZerglingAnalyser extends UnitAnalyser {
 		if (found.size() >= 10) {
 			int lastUnitFoundFrame = lastUnitFoundFrame(found, 10);
 			if (lastUnitFoundFrame < thirdFastZerglingFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_OVERTEN_ZERGLING);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_OVERTEN_ZERGLING);
 			}
 		} else if (found.size() >= 8) {
 			int lastUnitFoundFrame = lastUnitFoundFrame(found, 8);
 			if (lastUnitFoundFrame < secondFastZerglingFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_EIGHT_ZERGLING);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_EIGHT_ZERGLING);
 			}
 		} else if (found.size() >= 6) {
 			int lastUnitFoundFrame = lastUnitFoundFrame(found, 6);
 			if (lastUnitFoundFrame < fastZerglingFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_SIX_ZERGLING);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_SIX_ZERGLING);
 			}
 		}
 	}

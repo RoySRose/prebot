@@ -22,7 +22,7 @@ import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
 import prebot.macro.AttackDecisionMaker;
 import prebot.micro.CombatManager;
-import prebot.micro.DecisionMaker;
+import prebot.micro.MicroDecisionMaker;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;

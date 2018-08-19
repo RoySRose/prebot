@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -24,7 +24,7 @@ public class ObserverAnalyser extends UnitAnalyser {
 					+ UnitType.Protoss_Observatory.buildTime() + UnitType.Protoss_Observer.buildTime();
 			int observerInMyRegionFrame = observerFrame + baseToBaseFrame(UnitType.Protoss_Observer);
 			if (minimumUpdateFrame < observerInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.OBSERVERTORY_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.OBSERVERTORY_FAST);
 			}
 		}
 	}

@@ -92,32 +92,32 @@ public class PositionUtils {
 		Region positionRegion = BWTA.getRegion(position);
 		Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		if (positionRegion == myBaseRegion) {
-			return RegionType.MY_BASE;
+			return CommonCode.RegionType.MY_BASE;
 		}
 		Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
 		if (positionRegion == myExpansionRegion) {
-			return RegionType.MY_FIRST_EXPANSION;
+			return CommonCode.RegionType.MY_FIRST_EXPANSION;
 		}
 		Region myThirdRegion = InfoUtils.myThirdRegion();
 		if (positionRegion == myThirdRegion) {
-			return RegionType.MY_THIRD_REGION;
+			return CommonCode.RegionType.MY_THIRD_REGION;
 		}
 		if (InfoUtils.enemyBase() != null) {
 			Region enemyBaseRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
 			if (positionRegion == enemyBaseRegion) {
-				return RegionType.ENEMY_BASE;
+				return CommonCode.RegionType.ENEMY_BASE;
 			}
 			Region enemyExpansionRegion = BWTA.getRegion(InfoUtils.enemyFirstExpansion().getPosition());
 			if (positionRegion == enemyExpansionRegion) {
-				return RegionType.ENEMY_FIRST_EXPANSION;
+				return CommonCode.RegionType.ENEMY_FIRST_EXPANSION;
 			}
 			Region enemyThirdRegion = InfoUtils.enemyThirdRegion();
 			if (positionRegion == enemyThirdRegion) {
-				return RegionType.ENEMY_THIRD_REGION;
+				return CommonCode.RegionType.ENEMY_THIRD_REGION;
 			}
-			return RegionType.ETC;
+			return CommonCode.RegionType.ETC;
 		}
-		return RegionType.UNKNOWN;
+		return CommonCode.RegionType.UNKNOWN;
 	}
 
 	public static Region regionTypeToRegion(RegionType regionType) {

@@ -8,6 +8,7 @@ import bwapi.TilePosition;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
+import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.IConditions.BaseCondition;
 
 public class BaseLocationUtils {
@@ -22,7 +23,7 @@ public class BaseLocationUtils {
 	}
 	
 	/** baseList 중 position에 가장 가까운 base 리턴 */
-	public static BaseLocation getClosestBaseToPosition(List<BaseLocation> baseList, Position position, BaseCondition baseCondition) {
+	public static BaseLocation getClosestBaseToPosition(List<BaseLocation> baseList, Position position, IConditions.BaseCondition baseCondition) {
 		if (baseList.size() == 0) {
 			return null;
 		}
@@ -47,7 +48,7 @@ public class BaseLocationUtils {
 	}
 	
 	/** baseList 중 position에 가장 가까운 base 리턴 */
-	public static BaseLocation getGroundClosestBaseToPosition(List<BaseLocation> baseList, BaseLocation fromBase, BaseCondition baseCondition) {
+	public static BaseLocation getGroundClosestBaseToPosition(List<BaseLocation> baseList, BaseLocation fromBase, IConditions.BaseCondition baseCondition) {
 		if (baseList.size() == 0) {
 			return null;
 		}
@@ -73,7 +74,7 @@ public class BaseLocationUtils {
 	}
 	
 	/** baseList 중 position에 가장 가까운 base 리턴 */
-	public static BaseLocation getGroundFarthestBaseToPosition(List<BaseLocation> baseList, BaseLocation fromBase, BaseCondition baseCondition) {
+	public static BaseLocation getGroundFarthestBaseToPosition(List<BaseLocation> baseList, BaseLocation fromBase, IConditions.BaseCondition baseCondition) {
 		if (baseList.size() == 0) {
 			return null;
 		}

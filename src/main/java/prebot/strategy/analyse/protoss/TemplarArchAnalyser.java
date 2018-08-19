@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,7 +21,7 @@ public class TemplarArchAnalyser extends UnitAnalyser {
 	}
 
 	private void fastTemplarArch() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_TEMPLAR_ARCH)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_TEMPLAR_ARCH)) {
 			return;
 		}
 		
@@ -32,9 +31,9 @@ public class TemplarArchAnalyser extends UnitAnalyser {
 			int fastTemplarArchFrame = EnemyStrategy.PROTOSS_FAST_DARK.buildTimeMap.frame(UnitType.Protoss_Templar_Archives, 30);
 
 			if (buildFrame < fastTemplarArchFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.TEMPLAR_ARCH_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.TEMPLAR_ARCH_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.TEMPLAR_ARCH_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.TEMPLAR_ARCH_FOUND);
 			}
 		}
 	}

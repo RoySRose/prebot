@@ -5,8 +5,8 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
-import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.StrategyAnalyseManager;
@@ -29,15 +29,15 @@ public class RefineryAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Refinery, 25);
 			if (buildFrame < mechanicGasFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.REFINERY_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.REFINERY_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.REFINERY_LATE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.REFINERY_LATE);
 			}
 		} else {
 			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
 			int mechanicGasFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Refinery, 25);
 			if (gasLastCheckFrame > mechanicGasFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.NO_REFINERY);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_REFINERY);
 			}
 		}
 	}

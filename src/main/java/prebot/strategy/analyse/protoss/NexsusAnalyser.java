@@ -5,8 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -25,7 +24,7 @@ public class NexsusAnalyser extends UnitAnalyser {
 	}
 
 	private void fastNexsus() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_NEXSUS)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_NEXSUS)) {
 			return;
 		}
 		
@@ -37,15 +36,15 @@ public class NexsusAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			
 			if (buildFrame < doubleFrame) { // 생더블 확정
-				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FASTEST_DOUBLE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NEXSUS_FASTEST_DOUBLE);
 				
 			} else if (buildFrame < forgeDoubleFrame) { // 포지더블, 게이트더블
-				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_FAST_DOUBLE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NEXSUS_FAST_DOUBLE);
 			}
 		} else {
 			int expansionLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.FIRST_EXPANSION);
 			if (expansionLastCheckFrame > forgeDoubleFrame) { // 더블 타이밍 지남
-				ClueManager.Instance().addClueInfo(ClueInfo.NEXSUS_NOT_DOUBLE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NEXSUS_NOT_DOUBLE);
 			}
 		}
 	}

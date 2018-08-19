@@ -77,13 +77,6 @@ public class MicroConfig {
 		public static final int RISK_RADIUS_VESSEL = 150;
 	}
 	
-//	public static class FreeKitingRadius {
-//		public static final int MARINE = (int) (UnitType.Terran_Marine.topSpeed() * UnitType.Terran_Marine.groundWeapon().damageCooldown() * 0.8);
-//		public static final int VULTURE = (int) (UnitType.Terran_Vulture.topSpeed() * UnitType.Terran_Vulture.groundWeapon().damageCooldown() * 0.8);
-//		public static final int GOLIATH = (int) (UnitType.Terran_Goliath.topSpeed() * UnitType.Terran_Goliath.groundWeapon().damageCooldown() * 0.8);
-//		public static final int TANK = (int) (UnitType.Terran_Siege_Tank_Tank_Mode.topSpeed() * UnitType.Terran_Siege_Tank_Tank_Mode.groundWeapon().damageCooldown() * 0.8);
-//	}
-	
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static final int WORKERS_PER_REFINERY = 3;
 	public static final int RANDOM_MOVE_DISTANCE = 90;
@@ -136,13 +129,6 @@ public class MicroConfig {
 	}
 	
 	public static class Common {
-		public static final boolean versusMechanicSet() {
-			if (InformationManager.Instance().enemyRace != Race.Terran) {
-				return false;
-			} else {
-				return true;
-			}
-		}
 		
 		public static final int DEFENSE_SECONDCHOKE_SIZE = 9;
 		public static final int DEFENSE_READY_TO_ATTACK_SIZE = 14;

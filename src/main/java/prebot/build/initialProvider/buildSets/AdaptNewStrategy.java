@@ -2,7 +2,7 @@ package prebot.build.initialProvider.buildSets;
 
 import bwapi.TilePosition;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
@@ -11,7 +11,7 @@ public class AdaptNewStrategy extends BaseBuild {
 
 	public void adapt(ExpansionOption strategy, TilePosition factoryPos, TilePosition starport1, TilePosition starport2) {
 		if (strategy == ExpansionOption.TWO_STARPORT) {
-			int starportCount = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Starport);
+			int starportCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Starport);
 			if (starportCount == 0) {
 				queueBuild(true, UnitType.Terran_Starport, starport1);
 				queueBuild(true, UnitType.Terran_Starport, starport2);
@@ -20,13 +20,13 @@ public class AdaptNewStrategy extends BaseBuild {
 			}
 			
 		} else if (strategy == ExpansionOption.TWO_FACTORY) {
-			int factoryCount = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory);
+			int factoryCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory);
 			if (factoryCount <= 1) {
 				queueBuild(true, UnitType.Terran_Factory, factoryPos);
 			}
 			
 		} else if (strategy == ExpansionOption.ONE_STARPORT) {
-			int starportCount = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Starport);
+			int starportCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Starport);
 			if (starportCount == 0) {
 				queueBuild(true, UnitType.Terran_Starport, starport1);
 			}

@@ -3,13 +3,11 @@ package prebot.strategy.analyse;
 import bwapi.Race;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions.Mission;
 import prebot.strategy.constant.EnemyStrategyOptions.Mission.MissionType;
@@ -86,7 +84,7 @@ public abstract class Strategist {
 			
 		} else {
 			// default mission
-			if (UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
+			if (UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center).size() < 2) {
 				return false;
 			}
 			
@@ -103,11 +101,11 @@ public abstract class Strategist {
 		return ClueManager.Instance().containsClueInfo(info);
 	}
 	
-	public boolean hasType(ClueType type) {
+	public boolean hasType(Clue.ClueType type) {
 		return ClueManager.Instance().containsClueType(type);
 	}
 	
-	public boolean hasAnyInfo(ClueInfo... infos) {
+	public boolean hasAnyInfo(Clue.ClueInfo... infos) {
 		for (ClueInfo info : infos) {
 			if (hasInfo(info)) {
 				return true;
@@ -116,7 +114,7 @@ public abstract class Strategist {
 		return false;
 	}
 	
-	public boolean hasAllInfo(ClueInfo... infos) {
+	public boolean hasAllInfo(Clue.ClueInfo... infos) {
 		for (ClueInfo info : infos) {
 			if (!hasInfo(info)) {
 				return false;
@@ -125,8 +123,8 @@ public abstract class Strategist {
 		return true;
 	}
 	
-	public boolean hasAnyType(ClueType... types) {
-		for (ClueType type : types) {
+	public boolean hasAnyType(Clue.ClueType... types) {
+		for (Clue.ClueType type : types) {
 			if (hasType(type)) {
 				return true;
 			}
@@ -134,8 +132,8 @@ public abstract class Strategist {
 		return false;
 	}
 	
-	public boolean hasAllType(ClueType... types) {
-		for (ClueType type : types) {
+	public boolean hasAllType(Clue.ClueType... types) {
+		for (Clue.ClueType type : types) {
 			if (!hasType(type)) {
 				return false;
 			}

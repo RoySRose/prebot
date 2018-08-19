@@ -6,16 +6,14 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.InitialBuildProvider;
-import prebot.build.initialProvider.InitialBuildProvider.AdaptStrategyStatus;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -57,7 +55,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 
 		// 리파이너리는 커맨드 센터보다 많을 필요 없다.
 		int refineryCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Refinery);
-		List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		
 		if (commandCenterList.size() <= refineryCount) {
 			return false;

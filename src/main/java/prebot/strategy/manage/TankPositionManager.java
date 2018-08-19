@@ -103,7 +103,7 @@ public class TankPositionManager {
 				    		continue;
 				    	}
 				    	
-				    	List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(PlayerRange.SELF, movePosition, SIEGE_ARRANGE_RADIUS, UnitType.Terran_Siege_Tank_Siege_Mode);
+				    	List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, movePosition, SIEGE_ARRANGE_RADIUS, UnitType.Terran_Siege_Tank_Siege_Mode);
 				    	int reservedCount = getPositionReserveCountInRadius(movePosition, SIEGE_ARRANGE_RADIUS);
 				    	
 						if (siegeModeTanks.size() + reservedCount < seigeNumLimit) {
@@ -170,7 +170,7 @@ public class TankPositionManager {
 		}
 		
 		Position leftPosition = new Position(position.getX() - 30, position.getY());
-		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, leftPosition, NEAR_BUILDING_DISTANCE);
+		List<Unit> nearUnitList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, leftPosition, NEAR_BUILDING_DISTANCE);
     	for (Unit nearUnit : nearUnitList) {
     		if (nearUnit.getType().isBuilding() && nearUnit.getType().canBuildAddon()) {
 				return false;

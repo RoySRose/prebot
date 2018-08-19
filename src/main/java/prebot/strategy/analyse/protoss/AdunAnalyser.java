@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,7 +21,7 @@ public class AdunAnalyser extends UnitAnalyser {
 	}
 
 	private void fastAdun() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_ADUN)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_ADUN)) {
 			return;
 		}
 		
@@ -32,9 +31,9 @@ public class AdunAnalyser extends UnitAnalyser {
 			int fastAdunFrame = EnemyStrategy.PROTOSS_FAST_DARK.buildTimeMap.frame(UnitType.Protoss_Citadel_of_Adun, 30);
 
 			if (buildFrame < fastAdunFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.ADUN_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ADUN_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.ADUN_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ADUN_FOUND);
 			}
 		}
 	}

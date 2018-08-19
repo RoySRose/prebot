@@ -10,7 +10,7 @@ import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
@@ -73,7 +73,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		int maxCCcount = 4;
 		int mineralValidCommandCenterCount = 0;
 		
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandCenter : commandCenters) {
 			if (validMineralCountNearDepot(commandCenter) > 6) {
 				mineralValidCommandCenterCount++;
@@ -99,8 +99,8 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				}
 				
 			} else if (InfoUtils.enemyRace() == Race.Terran) {
-				List<Unit> bunkers = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Bunker);
-				List<Unit> tankWraiths = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+				List<Unit> bunkers = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Bunker);
+				List<Unit> tankWraiths = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (!bunkers.isEmpty() && tankWraiths.size() >= 4) {
 					setCommandCenterBlockAndSeedPosition();
 //					System.out.println("fast 2nd commandcenter - bunker defense (vs terran)");

@@ -8,16 +8,16 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMaker;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMaker;
 import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.micro.targeting.WraithTargetCalculator;
@@ -52,7 +52,7 @@ public class AirForceControl extends Control {
 			findRat(airunits);
 			return;
 		}
-		if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size() <= 3 && UnitUtils.enemyAirUnitPower() == 0) {
+		if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL).size() <= 3 && UnitUtils.enemyAirUnitPower() == 0) {
 			for (Unit airunit : airunits) {
 				CommandUtils.attackMove(airunit, StrategyIdea.mainPosition);
 			}
@@ -60,12 +60,12 @@ public class AirForceControl extends Control {
 		}
 
 		
-		DecisionMaker decisionMaker = new DecisionMaker(new WraithTargetCalculator());
+		MicroDecisionMaker decisionMaker = new MicroDecisionMaker(new WraithTargetCalculator());
 
 		// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)
 		// 결정상세(공격, 카이팅, 이동시): 공격(ATTACK_UNIT), 뭉치기(UNITE), 카이팅(KITING_UNIT), 이동(ATTACK_POSITION)
-		Decision decision = null;
-		Decision decisionDetail = null;
+		MicroDecision decision = null;
+		MicroDecision decisionDetail = null;
 		
 		boolean applyDefenseModeFlee = false;
 		if (AirForceManager.Instance().isAirForceDefenseMode()) {
@@ -83,7 +83,7 @@ public class AirForceControl extends Control {
 					}
 				}
 				if (applyDefenseModeFlee) {
-					decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
+					decision = MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, null);
 
 					// apply airforce decision
 					Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
@@ -97,12 +97,12 @@ public class AirForceControl extends Control {
 			if (!airForceTeam.retreating()) {
 				decision = decisionMaker.makeDecisionForAirForce(airForceTeam, euiList, AirForceManager.Instance().getStrikeLevel());
 			} else {
-				decision = Decision.fleeFromUnit(airForceTeam.leaderUnit, null);
+				decision = MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, null);
 			}
 
-			if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
+			if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT || decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				decisionDetail = decisionMaker.makeDecisionForAirForceMovingDetail(airForceTeam, Arrays.asList(decision.eui), false);
-			} else if (decision.type == DecisionType.ATTACK_POSITION) { // 목적지 이동시 준수할 세부사항
+			} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) { // 목적지 이동시 준수할 세부사항
 				boolean movingAttack = true;
 				if (airForceTeam.repairCenter != null) {
 					movingAttack = false;
@@ -117,28 +117,28 @@ public class AirForceControl extends Control {
 
 		if (decisionDetail != null) {
 			// 공격 쿨타임
-			if (decisionDetail.type == DecisionType.ATTACK_UNIT) {
+			if (decisionDetail.type == MicroDecision.MicroDecisionType.ATTACK_UNIT) {
 				// ATTACK_UNIT, KITING_UNIT 동일
-				if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
+				if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT || decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 					for (Unit airunit : airunits) {
 						CommandUtils.attackUnit(airunit, decisionDetail.eui.getUnit());
 					}
 				}
 				// 지나가면서 한대씩 때리기
-				else if (decision.type == DecisionType.ATTACK_POSITION) {
+				else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) {
 					for (Unit airunit : airunits) {
 						airforceRightClick(airunit, decisionDetail.eui.getUnit());
 					}
 				}
 			}
 			// 뭉치기
-			else if (decisionDetail.type == DecisionType.UNITE) {
+			else if (decisionDetail.type == MicroDecision.MicroDecisionType.UNITE) {
 				for (Unit airunit : airunits) {
 					airforceRightClick(airunit, airForceTeam.leaderUnit.getPosition());
 				}
 			}
 			// 전진 카이팅, 카이팅
-			else if (decisionDetail.type == DecisionType.ATTACK_POSITION || decisionDetail.type == DecisionType.KITING_UNIT) {
+			else if (decisionDetail.type == MicroDecision.MicroDecisionType.ATTACK_POSITION || decisionDetail.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				if (airForceTeam.repairCenter != null) {
 					Position insidePosition = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
 					for (Unit airunit : airunits) {
@@ -160,7 +160,7 @@ public class AirForceControl extends Control {
 				}
 			}
 
-		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) { // 도망
+		} else if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) { // 도망
 			for (Unit airunit : airunits) {
 				airforceRightClick(airunit, airForceTeam.leaderOrderPosition);
 			}
@@ -187,12 +187,12 @@ public class AirForceControl extends Control {
 
 	// 결정: 도망(FLEE_FROM_UNIT), 공격(ATTACK_UNIT), 카이팅(KITING_UNIT), 클로킹(CHANGE_MODE), 이동(ATTACK_POSITION)
 	// 결정상세(공격, 카이팅, 이동시): 공격(ATTACK_UNIT), 뭉치기(UNITE), 카이팅(KITING_UNIT), 이동(ATTACK_POSITION)
-	private void applyAirForceDecision(AirForceTeam airForceTeam, Decision decision, Decision decisionDetail) {
+	private void applyAirForceDecision(AirForceTeam airForceTeam, MicroDecision decision, MicroDecision decisionDetail) {
 		Position airDrivingPosition = null;
 		
-		if (decision.type == DecisionType.ATTACK_UNIT || decision.type == DecisionType.KITING_UNIT) {
+		if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT || decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 			if (wraithKitingType(decision.eui)) {
-				if (decisionDetail.type == DecisionType.KITING_UNIT) { // 카이팅 후퇴
+				if (decisionDetail.type == MicroDecision.MicroDecisionType.KITING_UNIT) { // 카이팅 후퇴
 					if (AirForceManager.Instance().isAirForceDefenseMode()) {
 						Position airFleePosition = PositionFinder.Instance().baseFirstChokeMiddlePosition();
 						airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, Angles.AIR_FORCE_FREE);
@@ -204,9 +204,9 @@ public class AirForceControl extends Control {
 					}
 					
 				} else {
-					if (decision.type == DecisionType.ATTACK_UNIT) { // 제자리 공격
+					if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT) { // 제자리 공격
 						airDrivingPosition = airForceTeam.leaderUnit.getPosition();
-					} else if (decision.type == DecisionType.KITING_UNIT) { // 따라가서 공격
+					} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) { // 따라가서 공격
 						Unit enemyInSight = UnitUtils.unitInSight(decision.eui);
 						if (enemyInSight == null) {
 							airDrivingPosition = decision.eui.getLastPosition();
@@ -226,14 +226,14 @@ public class AirForceControl extends Control {
 				}
 				
 			} else {
-				if (decision.type == DecisionType.ATTACK_UNIT) {
+				if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT) {
 					airDrivingPosition = airForceTeam.leaderUnit.getPosition();
-				} else if (decision.type == DecisionType.KITING_UNIT) {
+				} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 					airDrivingPosition = decision.eui.getLastPosition();
 				}
 			}
 			
-		} else if (decision.type == DecisionType.ATTACK_POSITION) {
+		} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) {
 			if (airForceTeam.repairCenter != null) {
 				Position repairCenter = PositionFinder.Instance().commandCenterInsidePosition(airForceTeam.repairCenter);
 				airDrivingPosition = airDrivingPosition(airForceTeam, repairCenter, airForceTeam.driveAngle);
@@ -245,7 +245,7 @@ public class AirForceControl extends Control {
 				}
 			}
 			
-		} else if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+		} else if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 			airForceTeam.retreat(decision.eui);
 			Position airFleePosition = airFeePosition(airForceTeam, airForceTeam.fleeEui);
 			airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, airForceTeam.driveAngle);
@@ -257,9 +257,9 @@ public class AirForceControl extends Control {
 //	private Unit closestAssistant(Unit wraith, UnitInfo eui) {
 //		List<Unit> assistUnitList = null;
 //		if (eui.getType().isFlyer()) {
-//			assistUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret, UnitType.Terran_Goliath);
+//			assistUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Missile_Turret, UnitType.Terran_Goliath);
 //		} else {
-//			assistUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Goliath);
+//			assistUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Goliath);
 //		}
 //		Unit closeAssistant = UnitUtils.getClosestUnitToPosition(assistUnitList, wraith.getPosition());
 //		if (closeAssistant == null || MicroUtils.isInWeaponRange(closeAssistant, eui)) { // 도와줄 아군이 없거나 이미 근처에 있는 경우

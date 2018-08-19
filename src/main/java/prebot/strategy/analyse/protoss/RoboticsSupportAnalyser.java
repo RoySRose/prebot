@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,7 +21,7 @@ public class RoboticsSupportAnalyser extends UnitAnalyser {
 	}
 
 	private void fastRoboSupport() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_ROBO_SUPPORT)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_ROBO_SUPPORT)) {
 			return;
 		}
 		
@@ -32,9 +31,9 @@ public class RoboticsSupportAnalyser extends UnitAnalyser {
 			int fastRoboSupportFrame = EnemyStrategy.PROTOSS_ROBOTICS_REAVER.buildTimeMap.frame(UnitType.Protoss_Robotics_Support_Bay, 30);
 
 			if (buildFrame < fastRoboSupportFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.ROBO_SUPPORT_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ROBO_SUPPORT_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.ROBO_SUPPORT_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ROBO_SUPPORT_FOUND);
 			}
 		}
 	}

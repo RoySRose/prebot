@@ -4,8 +4,7 @@ import bwapi.Race;
 import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.EnemyUnitFindRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
@@ -37,7 +36,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 		int allVesselCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel);
 
 		if (allVesselCount <= maxVesselCount && activatedCommandCenterCount >= 2) {
-			if (UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
+			if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
 				setHighPriority(true);
 			}
 			return true;
@@ -60,7 +59,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg)) {
 				return 2;
 			} else if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Mutalisk)) {
-				if (UnitUtils.getEnemyUnitInfoCount(EnemyUnitFindRange.ALL, UnitType.Zerg_Mutalisk) >= 8) {
+				if (UnitUtils.getEnemyUnitInfoCount(CommonCode.EnemyUnitFindRange.ALL, UnitType.Zerg_Mutalisk) >= 8) {
 					return 2;
 				}
 				return 1;

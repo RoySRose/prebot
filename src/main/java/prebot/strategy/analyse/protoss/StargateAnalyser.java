@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -28,11 +28,11 @@ public class StargateAnalyser extends UnitAnalyser {
 			int doubleStargateFrame = EnemyStrategy.PROTOSS_DOUBLE_CARRIER.buildTimeMap.frame(UnitType.Protoss_Stargate, 30);
 
 			if (buildFrame < fastStargateFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_ONEGATE_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARGATE_ONEGATE_FAST);
 			} else if (buildFrame < doubleStargateFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_DOUBLE_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARGATE_DOUBLE_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.STARGATE_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.STARGATE_FOUND);
 			}
 		}
 	}

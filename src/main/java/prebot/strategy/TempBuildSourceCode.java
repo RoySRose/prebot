@@ -1,32 +1,5 @@
 package prebot.strategy;
 
-import java.util.List;
-
-import bwapi.Race;
-import bwapi.TechType;
-import bwapi.TilePosition;
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwapi.UpgradeType;
-import bwta.BaseLocation;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
-import prebot.build.prebot1.BuildOrderQueue;
-import prebot.build.prebot1.ConstructionManager;
-import prebot.build.prebot1.ConstructionPlaceFinder;
-import prebot.common.MapGrid;
-import prebot.common.MetaType;
-import prebot.common.main.Prebot;
-import prebot.common.util.CommandUtils;
-import prebot.common.util.InfoUtils;
-import prebot.common.util.UnitUtils;
-import prebot.micro.WorkerManager;
-import prebot.strategy.MapSpecificInformation.GameMap;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
-import prebot.strategy.manage.AttackExpansionManager;
-
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
 /// InformationManager 에 있는 정보들로부터 상황을 판단하고, <br>
 /// BuildManager 의 buildQueue에 빌드 (건물 건설 / 유닛 훈련 / 테크 리서치 / 업그레이드) 명령을 입력합니다.<br>
@@ -917,13 +890,13 @@ public class TempBuildSourceCode {
 //		}
 //
 //		if (CCcnt <= 1) {
-//			if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS) {
+//			if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.THE_HUNTERS) {
 //				maxFaccnt = 4;
 //			} else {
 //				maxFaccnt = 3;
 //			}
 //		} else if (CCcnt == 2) {
-//			if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.THE_HUNTERS) {
+//			if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.THE_HUNTERS) {
 //				maxFaccnt = 6;
 //			} else {
 //				maxFaccnt = 6;

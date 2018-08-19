@@ -9,7 +9,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
@@ -40,7 +40,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		
 		// 커맨드센터 개수에 따른 머신샵 max 설정
 		int maxCountByCommandCenter = 0;
-		int commandCenterCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
+		int commandCenterCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		
 		if (commandCenterCount == 1) {
 			maxCountByCommandCenter = 1;
@@ -56,12 +56,12 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			maxCountByCommandCenter++;
 		}
 		
-		int machineShopCountIncludeQueue = UnitUtils.getUnitCount(UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Machine_Shop);
+		int machineShopCountIncludeQueue = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Machine_Shop);
 		if (machineShopCountIncludeQueue >= maxCountByCommandCenter) {
 			return false;
 		}
 		
-		List<Unit> factories = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory);
+		List<Unit> factories = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
 		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 			if(StrategyIdea.addOnOption == AddOnOption.VULTURE_FIRST) {

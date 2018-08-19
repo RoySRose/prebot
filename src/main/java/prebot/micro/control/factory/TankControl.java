@@ -10,8 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Chokepoint;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
@@ -19,9 +18,9 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMakerPrebot1;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
@@ -63,7 +62,7 @@ public class TankControl extends Control {
 			return;
 		}
 		
-		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
+		List<Unit> vultureAndGoliath = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture, UnitType.Terran_Goliath);
 		this.hasEnoughBackUpUnitToSiege = vultureAndGoliath.size() > ENOUGH_BACKUP_VULTURE_AND_GOLIATH;
 		this.siegeModeSpreadRadius = StrategyIdea.mainSquadCoverRadius;
 		if (StrategyIdea.campType == CampType.INSIDE
@@ -126,22 +125,22 @@ public class TankControl extends Control {
 
 		for (Unit siege : siegeModeList) {
 //			Decision decision = decisionMaker.makeDecisionForSiegeMode(siege, euiList);
-			Decision decision = DecisionMakerPrebot1.makeDecisionForSiegeMode(siege, euiList, siegeModeList, saveUnitLevel);
-			if (decision.type == DecisionType.ATTACK_UNIT) {
+			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionForSiegeMode(siege, euiList, siegeModeList, saveUnitLevel);
+			if (decision.type == MicroDecision.MicroDecisionType.ATTACK_UNIT) {
 				CommandUtils.attackUnit(siege, decision.eui.getUnit());
 				
-			} else if (decision.type == DecisionType.STOP) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.STOP) {
 				siege.stop();
 				
-			} else if (decision.type == DecisionType.HOLD) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.HOLD) {
 				CommandUtils.holdPosition(siege);
 				
-			} else if (decision.type == DecisionType.CHANGE_MODE) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.CHANGE_MODE) {
 				if (siege.canUnsiege() && !leaderGroupIds.contains(siege.getID())) {
 					CommandUtils.unsiege(siege);
 				}
 				
-			} else if (decision.type == DecisionType.ATTACK_POSITION) { // NO ENEMY
+			} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) { // NO ENEMY
 				if (!TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition(), true)) {
 					CommandUtils.unsiege(siege);
 					TankPositionManager.Instance().siegeModeReservedMap.remove(siege.getID());
@@ -169,7 +168,7 @@ public class TankControl extends Control {
 	private void executeTankMode(List<Unit> tankModeList, Collection<UnitInfo> euiList) {
 //		DecisionMaker decisionMaker = new DecisionMaker(new DefaultTargetCalculator());
 		FleeOption fOption = new FleeOption(StrategyIdea.campPositionSiege, false, Angles.NARROW);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
+		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 
 		for (Unit tank : tankModeList) {
 			if (!StrategyIdea.mainSquadMode.isAttackMode) {
@@ -180,12 +179,12 @@ public class TankControl extends Control {
 				}
 			}
 			
-			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(tank, euiList, flyingEnemisInfos, saveUnitLevel);
+			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionPrebot1(tank, euiList, flyingEnemisInfos, saveUnitLevel);
 //			System.out.println(decision);
-			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+			if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(tank, decision.eui.getLastPosition(), fOption);
 
-			} else if (decision.type == DecisionType.KITING_UNIT) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				if (MicroUtils.isRemovableEnemySpiderMine(tank, decision.eui)) {
 					MicroUtils.holdControlToRemoveMine(tank, decision.eui.getLastPosition(), fOption);
 					
@@ -197,7 +196,7 @@ public class TankControl extends Control {
 					}
 				}
 
-			} else if (decision.type == DecisionType.ATTACK_POSITION) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.ATTACK_POSITION) {
 				
 //				if (TankPositionManager.Instance().isProperPositionToSiege(siege.getPosition())) {
 //					CommandUtils.unsiege(siege);
@@ -308,7 +307,7 @@ public class TankControl extends Control {
 				return true;
 			} else {
 				if (!eui.getType().isBuilding()) {
-					List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(PlayerRange.SELF, tank.getPosition(), Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
+					List<Unit> siegeModeTanks = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, tank.getPosition(), Tank.SIEGE_LINK_DISTANCE, UnitType.Terran_Siege_Tank_Siege_Mode);
 					for (Unit siegeModeTank : siegeModeTanks) {
 						if (tank.getID() == siegeModeTank.getID()) {
 							continue;

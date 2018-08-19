@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -32,27 +32,27 @@ public class BarracksAnalyser extends UnitAnalyser {
 				int bbsSecondBarrackFrame = EnemyStrategy.TERRAN_BBS.buildTimeMap.frameOfIndex(UnitType.Terran_Barracks, 1, 20);
 				
 				if (firstBuildFrame < bbsSecondBarrackFrame && secondBuildFrame < bbsSecondBarrackFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FASTEST_TWO);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_FASTEST_TWO);
 				} else if (firstBuildFrame < twoBarrackSecondBarrackFrame && secondBuildFrame < twoBarrackSecondBarrackFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FAST_TWO);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_FAST_TWO);
 				} else {
-					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_TWO);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_TWO);
 				}
 			
 			} else if (found.size() == 1) { // 배럭 1개
 				int firstBuildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Barracks, 15);
 				if (firstBuildFrame < mechanicFirstBarrackFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_FAST_ONE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_FAST_ONE);
 				} else {
-					ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_ONE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_ONE);
 				}
 			}
 		} else {
 			int mechanicFirstBarrackFrame = EnemyStrategy.TERRAN_MECHANIC.buildTimeMap.frame(UnitType.Terran_Barracks, 15);
 			int baseLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.BASE);
 			if (baseLastCheckFrame > mechanicFirstBarrackFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.BARRACK_NOT_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.BARRACK_NOT_FOUND);
 			}
 		}
 	}

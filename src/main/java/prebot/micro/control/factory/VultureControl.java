@@ -11,9 +11,9 @@ import bwta.Region;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
-import prebot.micro.Decision;
-import prebot.micro.Decision.DecisionType;
-import prebot.micro.DecisionMakerPrebot1;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecision.MicroDecisionType;
+import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.KitingOption.CoolTimeAttack;
@@ -36,7 +36,7 @@ public class VultureControl extends Control {
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		FleeOption fOption = new FleeOption(StrategyIdea.mainSquadCenter, false, Angles.WIDE);
-		KitingOption kOption = new KitingOption(fOption, CoolTimeAttack.COOLTIME_ALWAYS);
+		KitingOption kOption = new KitingOption(fOption, KitingOption.CoolTimeAttack.COOLTIME_ALWAYS);
 		
 		for (Unit unit : unitList) {
 			if (skipControl(unit)) {
@@ -48,11 +48,11 @@ public class VultureControl extends Control {
 				saveUnitLevel = 0;
 			}
 			
-			Decision decision = DecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
+			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
 			
-			if (decision.type == DecisionType.FLEE_FROM_UNIT) {
+			if (decision.type == MicroDecision.MicroDecisionType.FLEE_FROM_UNIT) {
 				MicroUtils.flee(unit, decision.eui.getLastPosition(), fOption);
-			} else if (decision.type == DecisionType.KITING_UNIT) {
+			} else if (decision.type == MicroDecision.MicroDecisionType.KITING_UNIT) {
 				MicroUtils.kiting(unit, decision.eui, kOption);
 			} else {
 				if (spiderMineOrderIssue(unit)) {

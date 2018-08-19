@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -27,9 +27,9 @@ public class ForgeAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Forge, 15);
 			if (buildFrame < forgeDoubleForgeFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FAST_IN_EXPANSION);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FORGE_FAST_IN_EXPANSION);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FORGE_FOUND);
 			}
 			
 		} else {
@@ -38,9 +38,9 @@ public class ForgeAnalyser extends UnitAnalyser {
 				int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 				int forgeDoubleForgeFrame = EnemyStrategy.PROTOSS_FORGE_DOUBLE.buildTimeMap.frame(UnitType.Protoss_Forge, 15);
 				if (buildFrame < forgeDoubleForgeFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FAST_IN_BASE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FORGE_FAST_IN_BASE);
 				} else {
-					ClueManager.Instance().addClueInfo(ClueInfo.FORGE_FOUND);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FORGE_FOUND);
 				}
 			}
 		}

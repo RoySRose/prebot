@@ -3,25 +3,16 @@ package prebot.build.provider;
 
 import java.util.List;
 
-import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.UnitUtils;
-import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.StrategyManager;
-import prebot.strategy.constant.EnemyStrategyOptions;
-import prebot.strategy.constant.EnemyStrategyOptions.UpgradeOrder;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategy;
-import prebot.strategy.constant.StrategyConfig.EnemyStrategyException;
-import prebot.build.provider.DefaultBuildableItem;
 
 //연구해야될 UpgradeType 만
 public class ResearchSelector implements Selector<MetaType>{
@@ -83,7 +74,7 @@ public class ResearchSelector implements Selector<MetaType>{
 		
 //		UpgradeOrder order = StrategyIdea.currentStrategy.upgrade;
 		
-		List<Unit> canMachineShop = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Machine_Shop);
+		List<Unit> canMachineShop = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Machine_Shop);
 		
 		boolean canResearch = false;
 		

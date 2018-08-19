@@ -10,7 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
-import prebot.common.constant.CommonCode.PlayerRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
@@ -21,8 +21,8 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 
-public class DecisionMakerPrebot1 {
-	public static Decision makeDecisionPrebot1(Unit mechanicUnit, Collection<UnitInfo> enemiesInfo, Collection<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
+public class MicroDecisionMakerPrebot1 {
+	public static MicroDecision makeDecisionPrebot1(Unit mechanicUnit, Collection<UnitInfo> enemiesInfo, Collection<UnitInfo> flyingEnemiesInfo, int saveUnitLevel) {
 
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -87,7 +87,7 @@ public class DecisionMakerPrebot1 {
 					}
 
 					if (distanceToNearEnemy < safeDistance) {
-						return Decision.fleeFromUnit(mechanicUnit, enemyInfo);
+						return MicroDecision.fleeFromUnit(mechanicUnit, enemyInfo);
 					}
 					// else if ((enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode)
 					// && (mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || mechanicUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode)
@@ -114,7 +114,7 @@ public class DecisionMakerPrebot1 {
 
 				// 시즈에 붙어있는 밀리유닛 : +200점
 				if (enemyUnitType.groundWeapon().maxRange() <= Tank.SIEGE_MODE_MIN_RANGE) {
-					List<Unit> nearSiege = UnitUtils.getUnitsInRadius(PlayerRange.SELF, enemyPosition, Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
+					List<Unit> nearSiege = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, enemyPosition, Tank.SIEGE_MODE_MIN_RANGE, UnitType.Terran_Siege_Tank_Siege_Mode);
 					if (!nearSiege.isEmpty()) {
 						specialScore += 100;
 					}
@@ -143,13 +143,13 @@ public class DecisionMakerPrebot1 {
 		}
 
 		if (bestTargetInfo == null) {
-			return Decision.attackPosition(mechanicUnit);
+			return MicroDecision.attackPosition(mechanicUnit);
 		} else {
-			return Decision.kitingUnit(mechanicUnit, bestTargetInfo);
+			return MicroDecision.kitingUnit(mechanicUnit, bestTargetInfo);
 		}
 	}
 	
-	public static Decision makeDecisionForSiegeMode(Unit mechanicUnit, Collection<UnitInfo> enemiesInfo, Collection<Unit> tanks, int saveUnitLevel) {
+	public static MicroDecision makeDecisionForSiegeMode(Unit mechanicUnit, Collection<UnitInfo> enemiesInfo, Collection<Unit> tanks, int saveUnitLevel) {
 
 		UnitInfo bestTargetInfo = null;
 		int bestTargetScore = -999999;
@@ -258,46 +258,46 @@ public class DecisionMakerPrebot1 {
 		
 		if (bestTargetInfo == null) {
 			if (existSplashLossTarget) {
-				return Decision.stop(mechanicUnit);
+				return MicroDecision.stop(mechanicUnit);
 			} else if (existTooCloseTarget) {
-				return Decision.change(mechanicUnit);
+				return MicroDecision.change(mechanicUnit);
 			} else if (existTooFarTarget) {
 				if (mechanicUnit.getDistance(StrategyIdea.mainPosition) < Tank.SIEGE_MODE_MAX_RANGE + 50) {
-					return Decision.doNothing(mechanicUnit);
+					return MicroDecision.doNothing(mechanicUnit);
 				}
 				for (Unit tank : tanks) { // target이 가까운 동료 시즈포격에서 자유롭지 못하다면 상태유지
 					int distanceToTarget = tank.getDistance(closestTooFarTarget);
 					if (saveUnitLevel <= 1 && tank.isInWeaponRange(closestTooFarTarget) && tank.getDistance(mechanicUnit.getPosition()) < Tank.SIEGE_LINK_DISTANCE) {
-						return Decision.doNothing(mechanicUnit);
+						return MicroDecision.doNothing(mechanicUnit);
 					} else if (saveUnitLevel == 2 && distanceToTarget <= Tank.SIEGE_MODE_MAX_RANGE + Common.BACKOFF_DIST_SIEGE_TANK) {
-						return Decision.doNothing(mechanicUnit);
+						return MicroDecision.doNothing(mechanicUnit);
 					}
 				}
 				if (saveUnitLevel == 0 || InformationManager.Instance().enemyRace != Race.Terran) {
-					return Decision.change(mechanicUnit);
+					return MicroDecision.change(mechanicUnit);
 				}
-				return Decision.doNothing(mechanicUnit);
+				return MicroDecision.doNothing(mechanicUnit);
 			} else if (existCloakTarget) {
 				if (cloakTargetUnit.getType() == UnitType.Protoss_Dark_Templar) {
 					if (InformationManager.Instance().isBlockingEnterance()) {
 						Region darkRegion = BWTA.getRegion(cloakTargetUnit.getPosition());
 						Region tankRegion = BWTA.getRegion(mechanicUnit.getPosition());
 						if (darkRegion != tankRegion) {
-							return Decision.doNothing(mechanicUnit);
+							return MicroDecision.doNothing(mechanicUnit);
 						}
 					}
-					return Decision.change(mechanicUnit);
+					return MicroDecision.change(mechanicUnit);
 				} else if (cloakTargetUnit.getType() == UnitType.Zerg_Lurker) {
-					return Decision.doNothing(mechanicUnit);
+					return MicroDecision.doNothing(mechanicUnit);
 				}
 			}
-			return Decision.attackPosition(mechanicUnit);
+			return MicroDecision.attackPosition(mechanicUnit);
 		} else {
 			if (targetOutOfSight) { // 보이지는 않지만 일정거리 안에 적이 있다면 시즈모드 유지(saveUnitLevel에 따라 변동)
 //				CommonUtils.consoleOut(1, mechanicUnit.getID(), "11111");
-				return Decision.doNothing(mechanicUnit);
+				return MicroDecision.doNothing(mechanicUnit);
 			} else {
-				return Decision.attackUnit(mechanicUnit, bestTargetInfo);
+				return MicroDecision.attackUnit(mechanicUnit, bestTargetInfo);
 			}
 		}
 		

@@ -9,7 +9,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
@@ -69,7 +69,7 @@ public class CommandCenterControl extends BuildingFlyControl {
 
     public Unit getSecondCommandCenter(){
     	
-    	for (Unit commandCenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
+    	for (Unit commandCenter : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
     		if (commandCenter.getTilePosition().equals(BlockingEntrance.Instance().starting)) {
     			continue;
     		}

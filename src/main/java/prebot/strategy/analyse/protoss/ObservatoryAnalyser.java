@@ -4,8 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -22,7 +21,7 @@ public class ObservatoryAnalyser extends UnitAnalyser {
 	}
 
 	private void fastObserver() {
-		if (ClueManager.Instance().containsClueType(ClueType.FAST_OB)) {
+		if (ClueManager.Instance().containsClueType(Clue.ClueType.FAST_OB)) {
 			return;
 		}
 		
@@ -32,9 +31,9 @@ public class ObservatoryAnalyser extends UnitAnalyser {
 			int fastObFrame = EnemyStrategy.PROTOSS_ROBOTICS_OB_DRAGOON.buildTimeMap.frame(UnitType.Protoss_Observatory, 30);
 
 			if (buildFrame < fastObFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.OBSERVERTORY_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.OBSERVERTORY_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.OBSERVERTORY_FOUND);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.OBSERVERTORY_FOUND);
 			}
 		}
 	}

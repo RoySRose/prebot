@@ -2,7 +2,7 @@ package prebot.strategy.action.impl;
 
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
@@ -47,7 +47,7 @@ public class ScvScoutAfterBuild extends Action {
 		if (assigned) {
 			return;
 		}
-		for (Unit building : UnitUtils.getUnitList(UnitFindRange.ALL, buildingType)) {
+		for (Unit building : UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, buildingType)) {
 			if (building.getType() == buildingType && building.getRemainingBuildTime() <= remainingFrames) {
 				assigned = true;
 				break;

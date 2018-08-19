@@ -16,8 +16,6 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
@@ -30,7 +28,7 @@ import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
-import prebot.strategy.MapSpecificInformation.GameMap;
+import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
@@ -135,8 +133,8 @@ public class SpiderMineManger {
 			return;
 		}
 
-		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-		int mineCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+		int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+		int mineCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
 
 		int mineNumPerPosition = Math.min(vultureCount / 3 + 1, 8);
 		if (StrategyIdea.buildTimeMap.featureEnabled(Feature.DEFENSE_FRONT)) {
@@ -188,9 +186,9 @@ public class SpiderMineManger {
 		
 		// 탱크 주변 마인 (테란 상대로는 제거 안함)
 		if (InfoUtils.enemyRace() != Race.Terran) {
-			List<Unit> siegeList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
+			List<Unit> siegeList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Siege_Mode);
 			for (Unit siegeTank : siegeList) {
-				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
@@ -202,7 +200,7 @@ public class SpiderMineManger {
 				mineRemoveDist = MINE_REMOVE_TANK_DIST / 2;
 			}
 			for (Unit siegeTank : siegeList) {
-				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
+				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
@@ -216,7 +214,7 @@ public class SpiderMineManger {
 			if (TimeUtils.elapsedFrames(mineInNextExpansionFrame) > 20 * TimeUtils.SECOND) {
 				BaseLocation nextExpansion = InformationManager.Instance().getNextExpansionLocation();
 				if (nextExpansion != null) {
-					List<Unit> spiderMines = UnitUtils.getUnitsInRadius(PlayerRange.SELF, nextExpansion.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
+					List<Unit> spiderMines = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, nextExpansion.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
 					for (Unit mine : spiderMines) {
 						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
 					}
@@ -225,7 +223,7 @@ public class SpiderMineManger {
 				List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansions();
 				for (BaseLocation base : otherExpansions) {
 					boolean centerExist = false;
-					List<Unit> centerList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Command_Center);
+					List<Unit> centerList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Command_Center);
 					for (Unit center : centerList) {
 						if (center.getDistance(base.getPosition()) < 500) {
 							centerExist = true;
@@ -234,7 +232,7 @@ public class SpiderMineManger {
 					}
 					
 					if (centerExist) {
-						List<Unit> nearMineList = UnitUtils.getUnitsInRadius(PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
+						List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
 						for (Unit mine : nearMineList) {
 							if (mineRemoveMap.get(mine.getID()) == null) {
 								mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND));
@@ -250,7 +248,7 @@ public class SpiderMineManger {
 			if (LagObserver.groupsize() <= 10) {
 				if (StrategyIdea.watcherMinePositionLevel == MinePositionLevel.NOT_MY_OCCUPIED) {
 					if (InfoUtils.euiListInBase() != null && InfoUtils.euiListInBase().isEmpty()) {
-						List<Unit> spiderMineList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
+						List<Unit> spiderMineList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture_Spider_Mine);
 						
 						Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 						for (Unit spiderMine : spiderMineList) {
@@ -370,7 +368,7 @@ public class SpiderMineManger {
 	
 	// position 기준으로 radius 범위내에 mineNumberPerPosition 숫자만큼 마인이 매설되어야 할때 마인매설 위치를 리턴
 	private Position findMinePosition(Position position, int radius, int mineNumberPerPosition) {
-		List<Unit> spiderMinesCount = UnitUtils.getUnitsInRadius(PlayerRange.SELF, position, radius, UnitType.Terran_Vulture_Spider_Mine);
+		List<Unit> spiderMinesCount = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, position, radius, UnitType.Terran_Vulture_Spider_Mine);
 		int reservedCount = numOfMineReserved(position, radius);
 		if (spiderMinesCount.size() + reservedCount >= mineNumberPerPosition) {
 			return null;
@@ -409,14 +407,14 @@ public class SpiderMineManger {
 		// }
 
 		// 해당 지역에 마인이 매설되어 있다.
-		// int exactPosMineNum = UnitUtils.getUnitsInRadius(PlayerRange.SELF, position, MicroConfig.Vulture.MINE_EXACT_RADIUS, UnitType.Terran_Vulture_Spider_Mine).size();
+		// int exactPosMineNum = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, position, MicroConfig.Vulture.MINE_EXACT_RADIUS, UnitType.Terran_Vulture_Spider_Mine).size();
 		// int overlapMine = InformationManager.Instance().enemyRace == Race.Terran ? 2 : 1;
 		// if (exactPosMineNum >= overlapMine) {
 		// return false;
 		// }
 
 		// 해당 지역에 아군 시즈탱크, 컴셋 스테이션, SCV 등이 있다면 금지
-		List<Unit> units = UnitUtils.getUnitsInRadius(PlayerRange.SELF, positionToMine, MINE_REMOVE_TANK_DIST,
+		List<Unit> units = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, positionToMine, MINE_REMOVE_TANK_DIST,
 				UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_SCV, UnitType.Terran_Comsat_Station);
 		if (!units.isEmpty()) {
 			return false;
@@ -438,7 +436,7 @@ public class SpiderMineManger {
 		bases.add(expansion1);
 
 		int times = 2;
-		if (InfoUtils.mapInformation().getMap().equals(GameMap.CIRCUITBREAKER)) {
+		if (InfoUtils.mapInformation().getMap().equals(MapSpecificInformation.GameMap.CIRCUITBREAKER)) {
 			times = 3;
 		}
 		for (int i = 0; i < times; i++) {

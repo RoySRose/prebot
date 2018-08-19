@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -29,15 +29,15 @@ public class AssimilatorAnalyser extends UnitAnalyser {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			int oneGateCoreGasFrame = EnemyStrategy.PROTOSS_1GATE_CORE.buildTimeMap.frame(UnitType.Protoss_Assimilator, 25);
 			if (buildFrame < oneGateCoreGasFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.ASSIMILATOR_FAST);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ASSIMILATOR_FAST);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.ASSIMILATOR_LATE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.ASSIMILATOR_LATE);
 			}
 		} else {
 			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
 			int oneGateCoreGasFrame = EnemyStrategy.PROTOSS_1GATE_CORE.buildTimeMap.frame(UnitType.Protoss_Assimilator, 25);
 			if (gasLastCheckFrame > oneGateCoreGasFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.NO_ASSIMILATOR);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_ASSIMILATOR);
 			}
 		}
 	}

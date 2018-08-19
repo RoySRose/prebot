@@ -26,11 +26,9 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.LagObserver;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
-import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -1327,7 +1325,7 @@ public class InformationManager extends GameManager {
                     continue;
                 
 //            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
-            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, baseLocation.getPosition(), 350);
+            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
             	for(Unit unit : enemyBuilding) {
             		if(unit.getType().isResourceDepot()) {
 //            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: " + unit.getType());
@@ -1373,7 +1371,7 @@ public class InformationManager extends GameManager {
                     continue;
                 
 //            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
-            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, baseLocation.getPosition(), 350);
+            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
             	for(Unit unit : enemyBuilding) {
 //            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: for enemyRegion :: " + unit.getType());
             		if(unit.getType().isResourceDepot()) {
@@ -2144,7 +2142,7 @@ public class InformationManager extends GameManager {
 
 	private void updateFirstVulture() {
 		if (!vultureStart) {
-			List<Unit> vulture = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+			List<Unit> vulture = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 			if (!vulture.isEmpty()) {
 				vultureStart = true;
 				firstVulture = vulture.get(0);
@@ -2160,7 +2158,7 @@ public class InformationManager extends GameManager {
 	private void updateFirstBarrack() {
 
 		if (barrackStart == -1) {
-			List<Unit> barrack = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
+			List<Unit> barrack = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
 			if (!barrack.isEmpty()) {
 				barrackStart = Prebot.Broodwar.getFrameCount();
 				// System.out.println("setting barrack: " + barrackStart);
@@ -2217,7 +2215,7 @@ public class InformationManager extends GameManager {
 		TilePosition firstSupplePos = BlockingEntrance.Instance().first_supple;
 		TilePosition secondSupplePos = BlockingEntrance.Instance().second_supple;
 
-		for (Unit supple : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Supply_Depot)) {
+		for (Unit supple : UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Supply_Depot)) {
 			if (supple.getTilePosition().equals(firstSupplePos)) {
 				firstSupple = true;
 				if (safePosition == null) {
@@ -2229,7 +2227,7 @@ public class InformationManager extends GameManager {
 			}
 		}
 
-		for (Unit barrack : UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Barracks)) {
+		for (Unit barrack : UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Barracks)) {
 			if (barrack.getTilePosition().equals(firstBarracks) && !barrack.isLifted()) {
 				firstBarrack = true;
 				break;
@@ -2272,9 +2270,9 @@ public class InformationManager extends GameManager {
 
 		double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
 		int moveCalcSize = (int) (unitType.topSpeed() * 40);
-		if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.CIRCUITBREAKER) {
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
 			moveCalcSize = (int) (unitType.topSpeed() * 40);
-		}else if (InformationManager.Instance().getMapSpecificInformation().getMap() == GameMap.FIGHTING_SPIRITS) {
+		}else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
 			 moveCalcSize = (int) (unitType.topSpeed() * 30);
 		}
 		Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),

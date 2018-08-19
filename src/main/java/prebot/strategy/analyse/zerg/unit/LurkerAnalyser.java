@@ -7,7 +7,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
@@ -35,11 +35,11 @@ public class LurkerAnalyser extends UnitAnalyser {
 			int lurkerInMyRegionFrame = lairBuildExpect + UnitType.Zerg_Lair.buildTime()
 				+ UnitType.Zerg_Lurker.buildTime() + baseToBaseFrame(UnitType.Zerg_Lurker) + 15 * TimeUtils.SECOND;
 			if (minimumUpdateFrame < lurkerInMyRegionFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_LURKER);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_LURKER);
 			}
 			
 			if (TimeUtils.before(lurkerInMyRegionFrame) && UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lurker_Egg)) {
-				ClueManager.Instance().addClueInfo(ClueInfo.FAST_LURKER);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_LURKER);
 			}
 		}
 	}

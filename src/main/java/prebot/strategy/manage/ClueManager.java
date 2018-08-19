@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import bwapi.UnitType;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.Clue.ClueInfo;
-import prebot.strategy.analyse.Clue.ClueType;
 
 public class ClueManager {
 	
@@ -39,7 +39,7 @@ public class ClueManager {
 		clueInfoSet.add(info);
 	}
 	
-	public boolean containsClueType(ClueType type) {
+	public boolean containsClueType(Clue.ClueType type) {
 		for (ClueInfo clueInfo : clueInfoSet) {
 			if (clueInfo.type == type) {
 				return true;

@@ -11,8 +11,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
@@ -149,7 +148,7 @@ public class CombatManager extends GameManager {
 			squadData.exclude(invalidUnit);
 		}
 		
-		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, squad.getUnitTypes());
+		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, squad.getUnitTypes());
 		
 		List<Unit> assignableUnitList = new ArrayList<>();
 		for (Unit unit : squadTypeUnitList) {
@@ -229,7 +228,7 @@ public class CombatManager extends GameManager {
 		}
 		
 		// create defense squad
-		List<Unit> commandCenters = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 
 		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 		Region expansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
@@ -297,7 +296,7 @@ public class CombatManager extends GameManager {
 	}
 	
 	private boolean assign(List<Squad> updatedSquadList, Set<Integer> defenseTankIdSet) {
-		List<Unit> tankList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+		List<Unit> tankList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 		
 		for (Squad defenseSquad : updatedSquadList) {
 			MultiDefenseSquad squad = (MultiDefenseSquad) defenseSquad;
@@ -345,11 +344,11 @@ public class CombatManager extends GameManager {
 			maxRatio = 0.0d;
 		}
 		
-		int vultureCount = UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+		int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		int maxCount = (int) (vultureCount * maxRatio);
 
 		List<Unit> assignableVultures = new ArrayList<>();
-		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
 		for (Unit unit : squadTypeUnitList) {
 			Squad unitSqaud = squadData.getSquad(unit);
 			if (unitSqaud instanceof GuerillaSquad) {
@@ -425,7 +424,7 @@ public class CombatManager extends GameManager {
 			}
 
 			// 일꾼이 없는 경우
-			List<Unit> workers = UnitUtils.getUnitsInRadius(PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
+			List<Unit> workers = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {
 				int vulturePower = VultureFightPredictor.powerOfWatchers(squad.unitList);
 				int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);

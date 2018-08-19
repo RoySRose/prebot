@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -23,20 +23,20 @@ public class VultureAnalyser extends UnitAnalyser {
 				int lastFoundFrame = lastUnitFoundFrame(found, 6);
 				int vultureInMyRegionFrame = vultureInMyRegionFrame(6);
 				if (lastFoundFrame < vultureInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_SIX_VULTURE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_SIX_VULTURE);
 				}
 			}
 			if (found.size() >= 4) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 4);
 				int vultureInMyRegionFrame = vultureInMyRegionFrame(4);
 				if (lastFoundFrame < vultureInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_FOUR_VULTURE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_FOUR_VULTURE);
 				}
 			} else if (found.size() >= 2) {
 				int lastFoundFrame = lastUnitFoundFrame(found, 2);
 				int vultureInMyRegionFrame = vultureInMyRegionFrame(2);
 				if (lastFoundFrame < vultureInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_TWO_VULTURE);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_TWO_VULTURE);
 				}
 			}
 		}

@@ -9,7 +9,7 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.Prebot;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
@@ -42,19 +42,19 @@ public class BuilderFactory extends DefaultBuildableItem {
 
 		if (TimeUtils.beforeTime(8, 0) && !PlayerUtils.enoughResource(800, 0)) {
 			if (StrategyIdea.expansionOption == ExpansionOption.TWO_STARPORT || StrategyIdea.expansionOption == ExpansionOption.ONE_STARPORT) {
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (commandCenterList.size() < 2) {
 					return false;
 				}
 	    	} else if (StrategyIdea.expansionOption == ExpansionOption.TWO_FACTORY) {
-	    		List<Unit> facotryList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Factory);
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+	    		List<Unit> facotryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Factory);
+				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (facotryList.size() >= 2 && commandCenterList.size() < 2) {
 					return false;
 				}
 	    	} else if (StrategyIdea.expansionOption == ExpansionOption.ONE_FACTORY) {
-	    		List<Unit> facotryList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Factory);
-				List<Unit> commandCenterList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Command_Center);
+	    		List<Unit> facotryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Factory);
+				List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 				if (facotryList.size() >= 1 && commandCenterList.size() < 2) {
 					return false;
 				}
@@ -62,7 +62,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 		}
 		
 		boolean factoryFullOperating = true;
-		List<Unit> factoryList = UnitUtils.getUnitList(UnitFindRange.ALL, UnitType.Terran_Factory);
+		List<Unit> factoryList = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Factory);
 		for (Unit factory : factoryList) {
 			if (!factory.isCompleted() || !factory.isTraining()) {
 				factoryFullOperating = false;
@@ -74,7 +74,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 		
 		int activeCommandCount = UnitUtils.activatedCommandCenterCount();
 
-		int completeFactoryCount = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Factory).size();
+		int completeFactoryCount = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory).size();
 		int maxFactoryCount = 0;
 		if (activeCommandCount == 1) {
 			maxFactoryCount = 3;

@@ -13,7 +13,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
-import prebot.common.constant.CommonCode.UnitFindRange;
+import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.Prebot;
 import prebot.common.util.InfoUtils;
@@ -250,7 +250,7 @@ public class AttackDecisionMaker extends GameManager {
     		return true;
     	} else {
     		if (UnitUtils.invisibleEnemyDiscovered()) {
-        		if (UnitUtils.availableScanningCount() == 0 && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
+        		if (UnitUtils.availableScanningCount() == 0 && UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
         			return false;
         		}
         	}

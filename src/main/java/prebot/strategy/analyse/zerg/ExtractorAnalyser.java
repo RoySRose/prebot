@@ -5,7 +5,7 @@ import java.util.List;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode.RegionType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -28,18 +28,18 @@ public class ExtractorAnalyser extends UnitAnalyser {
 		if (!found.isEmpty()) {
 			int buildFrame = buildStartFrameDefaultJustBefore(found.get(0));
 			if (buildFrame < nineDroneFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.EXTRACTOR_9DRONE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.EXTRACTOR_9DRONE);
 			} else if (buildFrame < overPoolFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.EXTRACTOR_OVERPOOL);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.EXTRACTOR_OVERPOOL);
 			} else if (buildFrame < doubleHatchFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.EXTRACTOR_2HAT);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.EXTRACTOR_2HAT);
 			} else {
-				ClueManager.Instance().addClueInfo(ClueInfo.EXTRACTOR_LATE);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.EXTRACTOR_LATE);
 			}
 		} else {
 			int gasLastCheckFrame = StrategyAnalyseManager.Instance().lastCheckFrame(LastCheckLocation.GAS);
 			if (gasLastCheckFrame > doubleHatchFrame) {
-				ClueManager.Instance().addClueInfo(ClueInfo.NO_EXTRACTOR);
+				ClueManager.Instance().addClueInfo(Clue.ClueInfo.NO_EXTRACTOR);
 			}
 		}
 	}

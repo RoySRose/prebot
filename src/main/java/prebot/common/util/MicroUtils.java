@@ -16,8 +16,6 @@ import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.PlayerRange;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.Prebot;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
@@ -176,7 +174,7 @@ public class MicroUtils {
 	
 	private static int airRiskOfPosition(UnitType myUnitType, Position movePosition, int radius) {
 		int risk = 0;
-		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(PlayerRange.ALL, movePosition, radius);
+		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ALL, movePosition, radius);
 		for (Unit unit : unitsInRadius) {
 			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
 				int damage = Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType);
@@ -258,7 +256,7 @@ public class MicroUtils {
 	
 	public static void kiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption) {
 		if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
-			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
+			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		} else if (groundUnitFreeKiting(rangedUnit)) {
@@ -266,7 +264,7 @@ public class MicroUtils {
 			kOption.fOption.angles = Angles.WIDE;
 		}
 		if (!targetUnit.isDetected()) {
-			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
+			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
 		}
 
 		boolean timeToAttack = timeToAttack(rangedUnit, targetUnit, kOption.cooltimeAlwaysAttack);
@@ -318,7 +316,7 @@ public class MicroUtils {
 	
 	public static void Blockingkiting(Unit rangedUnit, Unit targetUnit, KitingOption kOption, Position safePosition) {
 		//if (!killedByNShot(rangedUnit, targetUnit, 1) && killedByNShot(targetUnit, rangedUnit, 2)) {
-			kOption.cooltimeAlwaysAttack = CoolTimeAttack.KEEP_SAFE_DISTANCE;
+			kOption.cooltimeAlwaysAttack = KitingOption.CoolTimeAttack.KEEP_SAFE_DISTANCE;
 			kOption.fOption.united = false;
 			kOption.fOption.angles = Angles.WIDE;
 		//} 		
@@ -361,7 +359,7 @@ public class MicroUtils {
 			catchTime -= TimeUtils.SECOND;
 		} else {
 			if (targetUnit.getType() == UnitType.Zerg_Lurker || targetUnit.getType() == UnitType.Protoss_Dark_Templar) { // 다크를 죽여버린다.
-				cooltimeAttack = CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE;
+				cooltimeAttack = KitingOption.CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE;
 			}
 		}
 		
@@ -377,7 +375,7 @@ public class MicroUtils {
 		}
 		
 		// TODO 테스트 필요. 사정거리를 유지
-		if (cooltimeAttack == CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE) {
+		if (cooltimeAttack == KitingOption.CoolTimeAttack.COOLTIME_ALWAYS_IN_RANGE) {
 			if (!rangedUnit.isInWeaponRange(targetUnit)) {
 				return true;
 			}
@@ -400,7 +398,7 @@ public class MicroUtils {
 	}
 	
 	private static boolean groundUnitFreeKiting(Unit rangedUnit) {
-		List<Unit> nearUnits = UnitUtils.getUnitsInRadius(PlayerRange.SELF, rangedUnit.getPosition(), (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8));
+		List<Unit> nearUnits = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, rangedUnit.getPosition(), (int) (rangedUnit.getType().topSpeed() * rangedUnit.getType().groundWeapon().damageCooldown() * 0.8));
 		boolean freeKiting = true;
 		int myGroundUnitCount = 0;
 		for (Unit unit : nearUnits) {
@@ -519,7 +517,7 @@ public class MicroUtils {
 
 	private static int riskOfPosition(UnitType myUnitType, Position movePosition, int radius, boolean united) {
 		int risk = 0;
-		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(PlayerRange.ALL, movePosition, radius);
+		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ALL, movePosition, radius);
 		for (Unit unit : unitsInRadius) {
 			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
 				if (Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType) > 0) { // 적군이 공격할 수 있으면 위험하겠지
@@ -719,7 +717,7 @@ public class MicroUtils {
 	
 	public static int totalComsatCount() {
 		int count = 0;
-		List<Unit> comsatList = UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+		List<Unit> comsatList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
 		for (Unit comsat : comsatList) {
 			if (comsat.getEnergy() >= 50) {
 				count++;

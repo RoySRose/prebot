@@ -4,7 +4,7 @@ import java.util.List;
 
 import bwapi.UnitType;
 import prebot.strategy.UnitInfo;
-import prebot.strategy.analyse.Clue.ClueInfo;
+import prebot.strategy.analyse.Clue;
 import prebot.strategy.analyse.UnitAnalyser;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.ClueManager;
@@ -25,7 +25,7 @@ public class ZealotAnalyser extends UnitAnalyser {
 				int threeZealotFrame = EnemyStrategy.PROTOSS_2GATE.buildTimeMap.frameOfIndex(UnitType.Protoss_Gateway, 1, 30) + UnitType.Protoss_Zealot.buildTime();
 				int threeZealotInMyRegionFrame = threeZealotFrame + baseToBaseFrame(UnitType.Protoss_Zealot);
 				if (lastUnitFoundFrame < threeZealotInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_THREE_ZEALOT);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_THREE_ZEALOT);
 				}
 			} else if (found.size() >= 1) {
 				int lastUnitFoundFrame = found.get(0).getUpdateFrame();
@@ -33,7 +33,7 @@ public class ZealotAnalyser extends UnitAnalyser {
 				int oneZealotFrame = EnemyStrategy.PROTOSS_2GATE.buildTimeMap.frameOfIndex(UnitType.Protoss_Gateway, 0, 5) + UnitType.Protoss_Zealot.buildTime();
 				int oneZealotInMyRegionFrame = oneZealotFrame + baseToBaseFrame(UnitType.Protoss_Zealot);
 				if (lastUnitFoundFrame < oneZealotInMyRegionFrame) {
-					ClueManager.Instance().addClueInfo(ClueInfo.FAST_ONE_ZEALOT);
+					ClueManager.Instance().addClueInfo(Clue.ClueInfo.FAST_ONE_ZEALOT);
 				}
 			}
 		}
