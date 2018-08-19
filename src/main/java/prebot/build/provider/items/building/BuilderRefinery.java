@@ -86,7 +86,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 //				System.out.println("isReservedTile :: true :: " + geyserAround.getTilePosition());
 //			}
 
-			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE && geyserAround != null) {
+			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE && geyserAround != null) {
 //				FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: aaa :: " + geyserAround.getTilePosition());
 				if (InformationManager.Instance().getMyfirstGas() != null) {
 //					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: bbb :: " + geyserAround.getTilePosition());

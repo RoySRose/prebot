@@ -1047,9 +1047,9 @@ public class UXManager {
 	public void drawBuildOrderQueueOnScreen(int x, int y) {
 		char initialFinishedColor;
 		AdaptStrategyStatus adaptStrategyStatus = InitialBuildProvider.Instance().getAdaptStrategyStatus();
-		if (adaptStrategyStatus == AdaptStrategyStatus.COMPLETE) {
+		if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.COMPLETE) {
 			initialFinishedColor = UxColor.CHAR_WHITE;
-		} else if (adaptStrategyStatus == AdaptStrategyStatus.PROGRESSING) {
+		} else if (adaptStrategyStatus == InitialBuildProvider.AdaptStrategyStatus.PROGRESSING) {
 			initialFinishedColor = UxColor.CHAR_YELLOW;
 		} else {
 			initialFinishedColor = UxColor.CHAR_GREEN;

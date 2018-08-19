@@ -12,7 +12,7 @@ public class BuildManagerFailureProtector {
 	
 	private static final int INITIAL_TIME = 10 * TimeUtils.SECOND;
 	
-	private Map<MetaType, FailInfo> failCountMap = new HashMap<>();
+	private Map<MetaType, BuildManagerFailureProtector.FailInfo> failCountMap = new HashMap<>();
 	
 	private class FailInfo {
 		public int failCount;
@@ -47,9 +47,9 @@ public class BuildManagerFailureProtector {
 	}
 
 	public void update(MetaType metaType) {
-		FailInfo failInfo = failCountMap.get(metaType);
+		BuildManagerFailureProtector.FailInfo failInfo = failCountMap.get(metaType);
 		if (failInfo == null) {
-			failInfo = new FailInfo(metaType);
+			failInfo = new BuildManagerFailureProtector.FailInfo(metaType);
 		}
 		failInfo.failCount = failInfo.failCount + 1;
 		failCountMap.put(metaType, failInfo);

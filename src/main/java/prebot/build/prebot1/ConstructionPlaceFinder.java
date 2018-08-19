@@ -740,7 +740,7 @@ public class ConstructionPlaceFinder {
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
-						&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != AdaptStrategyStatus.COMPLETE
+						&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE
 					){
 						continue;
 					}
