@@ -6,11 +6,11 @@ import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwta.Region;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
@@ -28,7 +28,7 @@ public class MultiDefenseSquad extends Squad {
 	
 	private DefenseType type;
 	private Unit commandCenter = null;
-	private Region defenseRegion = null;
+	private Position defensePosition = null;
 	private int defenseUnitAssignedFrame = CommonCode.UNKNOWN;
 	
 	public DefenseType getType() {
@@ -65,12 +65,16 @@ public class MultiDefenseSquad extends Squad {
 		return unitList.size() >= max;
 	}
 	
-	public MultiDefenseSquad(Region defenseRegion, Position positionForName) {
-		super(SquadInfo.MULTI_DEFENSE_, positionForName);
+	public MultiDefenseSquad(Position basePosition) {
+		super(SquadInfo.MULTI_DEFENSE_, basePosition);
 		setUnitType(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Vulture);
 		
+		Position centerPosition = TilePositionUtils.getCenterTilePosition().toPosition();
+		double radian = MicroUtils.targetDirectionRadian(centerPosition, basePosition);
+		Position defensePosition = MicroUtils.getMovePosition(centerPosition, radian, 1000).makeValid();
+		
 		this.type = DefenseType.REGION_OCCUPY;
-		this.defenseRegion = defenseRegion;
+		this.defensePosition = defensePosition;
 	}
 	
 	public MultiDefenseSquad(Unit commandCenter) {
@@ -105,7 +109,7 @@ public class MultiDefenseSquad extends Squad {
 //				System.out.println("region is null. " + getSquadName());
 //				return;
 //			}
-			defensePosition = defenseRegion.getCenter();
+			defensePosition = this.defensePosition;
 		}
 		
 		euiList = MicroUtils.filterTargetInfos(euiList, TargetFilter.AIR_UNIT|TargetFilter.LARVA_LURKER_EGG);
@@ -131,7 +135,7 @@ public class MultiDefenseSquad extends Squad {
 		if (type == DefenseType.CENTER_DEFENSE) {
 			return commandCenter.getPosition();
 		} else if (type == DefenseType.REGION_OCCUPY) {
-			return defenseRegion.getCenter();
+			return this.defensePosition;
 		}
 		return null;
 	}

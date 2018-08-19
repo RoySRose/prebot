@@ -129,9 +129,15 @@ public class WatcherSquad extends Squad {
 		
 		Position goalPosition = StrategyIdea.watcherPosition;
 		Unit closestUnit = UnitUtils.getClosestUnitToPosition(unitList, goalPosition);
-		
 		if (closestUnit != null) {
 			addEnemyUnitInfosInRadius(euiList, closestUnit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
+			
+			for (Unit unit : unitList) {
+				if (unit.getID() == closestUnit.getID() || unit.getDistance(closestUnit) < 500) {
+					continue;
+				}
+				addEnemyUnitInfosInRadius(euiList, unit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
+			}
 		}
 	}
 	
@@ -168,7 +174,7 @@ public class WatcherSquad extends Squad {
 					double radian1 = MicroUtils.targetDirectionRadian(currentPosition, goalPosition);
 					double radian2 = MicroUtils.targetDirectionRadian(currentPosition, eui.getLastPosition());
 //					System.out.println(radian1 + " / " + radian2 + " = " + Math.abs(radian1 - radian2));
-					if (Math.abs(radian1 - radian2) < 1.0) {
+					if (Math.abs(radian1 - radian2) < 1.2) {
 						add = true;
 					}
 				}

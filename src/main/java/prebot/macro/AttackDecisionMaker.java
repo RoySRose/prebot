@@ -64,6 +64,7 @@ public class AttackDecisionMaker extends GameManager {
     public int UXGasToPredict;
     public int UXMinusMineralToPredict;
     public int UXMinusGasToPredict;
+	private boolean pushSiege=false;
     
     public void onStart() {
         this.enemyResourceDepotInfoMap = new HashMap<>();
@@ -161,29 +162,19 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-    	if(myForcePoint > 1200) {
-			if (myForcePoint > enemyForcePoint) {
-				// TODO 노머시 포인트 조절. 테테전은 타종족의 2배로 좀 여유있게 함
-				int noMercyPoint = enemyForcePoint + 2000;
-				if (InfoUtils.enemyRace() == Race.Terran) {
-					noMercyPoint *= 2;
-				}
-				if (decision == Decision.NO_MERCY_ATTACK) {
-					noMercyPoint = enemyForcePoint;
-				}
-				
-				if (myForcePoint > noMercyPoint) {
-					if (decision != Decision.NO_MERCY_ATTACK) {
-						Prebot.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
-					}
-					return Decision.NO_MERCY_ATTACK;
-				}
-				
-				if (decision != Decision.FULL_ATTACK) {
+    	if (myForcePoint > attackPoint()) {
+    		Decision decision = attackType(myForcePoint, enemyForcePoint);
+    		if (decision == Decision.NO_MERCY_ATTACK) {
+    			if (decision != Decision.NO_MERCY_ATTACK) {
+					Prebot.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
+    			}
+    			return Decision.NO_MERCY_ATTACK;
+    		} else if (decision == Decision.FULL_ATTACK) {
+    			if (decision != Decision.FULL_ATTACK) {
 					Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
-				}
-				return Decision.FULL_ATTACK;
-	        }
+    			}
+    			return Decision.FULL_ATTACK;
+    		}
     	}
     	
     	if (quickAttack()) {
@@ -194,8 +185,67 @@ public class AttackDecisionMaker extends GameManager {
 		}
         return Decision.DEFENCE;
     }
+    
+    private Decision attackType(int myForcePoint, int enemyForcePoint) {
+    	if (InfoUtils.enemyRace() == Race.Protoss) {
+    		if (pushSiege(myForcePoint, enemyForcePoint)) {
+    			return Decision.NO_MERCY_ATTACK;
+    		} else if (myForcePoint > enemyForcePoint) {
+    			return Decision.FULL_ATTACK;
+    		}
+    	} else if (InfoUtils.enemyRace() == Race.Terran) {
+    		if (myForcePoint > enemyForcePoint * 2.0) {
+    			
+    			return Decision.NO_MERCY_ATTACK;
+    		} else if (myForcePoint > enemyForcePoint) {
+    			return Decision.FULL_ATTACK;
+    		}
+    	} else if (InfoUtils.enemyRace() == Race.Zerg) {
+    		if (myForcePoint > enemyForcePoint * 1.5) {
+    			return Decision.NO_MERCY_ATTACK;
+    		} else if (myForcePoint > enemyForcePoint) {
+    			return Decision.FULL_ATTACK;
+    		}
+    	}
+    	return Decision.DEFENCE;
+	}
 
-    private boolean detectorPrepared() {
+	private boolean pushSiege(int myForcePoint, int enemyForcePoint) {
+		if (Prebot.Broodwar.self().supplyUsed() < 320) {
+			pushSiege = false;
+		} else if (Prebot.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 1.5) {
+			pushSiege = true;
+		}
+		return pushSiege;
+	}
+
+	private int attackPoint() {
+    	int point = 1200;
+    	if (InfoUtils.enemyRace() == Race.Protoss) {
+    		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
+    			point = 3000;
+    		} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
+        		point = 5000;	
+    		} else {
+    			point = 7000;	
+    		}
+    	} else if (InfoUtils.enemyRace() == Race.Terran) {
+    		point = 1200;
+    	} else if (InfoUtils.enemyRace() == Race.Zerg) {
+    		point = 1200;
+    	}
+    	
+    	if (decision == Decision.FULL_ATTACK || decision == Decision.NO_MERCY_ATTACK) {
+    		if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
+    			point = (int) (point * 0.3);
+    		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+    			point = (int) (point * 0.6);
+        	}
+		}
+		return point;
+	}
+
+	private boolean detectorPrepared() {
     	if (InfoUtils.enemyRace() == Race.Terran) {
     		return true;
     	} else {
