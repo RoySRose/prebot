@@ -64,7 +64,7 @@ public class EnemyCommandInfo {
             gasCalculator = new NoGasCalculator();
         }else{
             hasGas = true;
-            gasCalculator = new DefaultGasCalculator(geyser);
+            gasCalculator = new DefaultGasCalculator(geyser, isMainBase);
         }
 
         List<EnemyMineral> mineralList = getMineralPatchesNearDepot(unitInfo.getLastPosition());
