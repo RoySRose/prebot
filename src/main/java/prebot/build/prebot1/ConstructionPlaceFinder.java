@@ -362,6 +362,12 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = 0;
 		}
 		
+		if( (TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1) ||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2))
+				&& buildingType == UnitType.Terran_Starport)
+		{
+			buildingGapSpace = 0;
+		}
+		
 		
 ////		if( (desiredPosition.equals(BlockingEntrance.Instance().first_supple))
 ////			|| (desiredPosition.equals(BlockingEntrance.Instance().second_supple))
@@ -871,7 +877,7 @@ public class ConstructionPlaceFinder {
 			seedPosition = InfoUtils.myBase().getTilePosition();
 		}
 		
-		FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
+//		FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
 
 		//TODO BASICBOT 1.1 버젼의 가스 처리다.. 확인해 봐야함.
 //		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
@@ -908,20 +914,20 @@ public class ConstructionPlaceFinder {
 		for (Unit geyser : Prebot.Broodwar.getStaticGeysers()) {
 			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
 			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
-			FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
+//			FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
 
 			Position geyserPos = geyser.getInitialPosition();
 			TilePosition geyserTilePos = geyser.getInitialTilePosition();
 
 			// 이미 예약되어있는가
 			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
-				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
+//				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
 				continue;
 			}
 
 			// if it is not connected fron seedPosition, it is located in another island
 			if (!BWTA.isConnected(seedPosition, geyserTilePos)) {
-				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos not connected :: " + geyserTilePos + " :: " + seedPosition);
+//				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos not connected :: " + geyserTilePos + " :: " + seedPosition);
 				continue;
 			}
 
@@ -930,7 +936,7 @@ public class ConstructionPlaceFinder {
 			List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
 			for (Unit u : alreadyBuiltUnits) {
 				if (u.getType().isRefinery() && u.exists()) {
-					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
+//					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
 					refineryAlreadyBuilt = true;
 					break;
 				}
@@ -941,7 +947,7 @@ public class ConstructionPlaceFinder {
 				if (thisDistance < minGeyserDistanceFromSeedPosition) {
 					minGeyserDistanceFromSeedPosition = thisDistance;
 					closestGeyser = geyser.getInitialTilePosition();
-					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear set closestGeyser :: " + closestGeyser);
+//					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear set closestGeyser :: " + closestGeyser);
 				}
 			}
 		}
@@ -1556,7 +1562,7 @@ public class ConstructionPlaceFinder {
 					if(!BlockingEntrance.Instance().yinc) {
 //						5시
 //						supply_x = BlockingEntrance.Instance().getSupplyPosition(mainbase).getX();
-						supply_y = supply_y - 1 - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
+						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
 					}
 
 					
@@ -1567,7 +1573,7 @@ public class ConstructionPlaceFinder {
 					}else {
 //						7시
 						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;
-						supply_y = supply_y - 1 - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
+						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
 					}
 				}
 				
@@ -1575,7 +1581,9 @@ public class ConstructionPlaceFinder {
 				int max_supY = BlockingEntrance.Instance().maxSupplyCntY * 2;
 				
 				for(int x = 0; x < max_supX + 1  ; x++){
-					for(int y = 0;  y < max_supY + 1; y++){
+					for(int y = 0;  y < max_supY; y++){
+//						for(int x = 0; x < max_supX + 1  ; x++){
+//							for(int y = 0;  y < max_supY + 1; y++){		
 						TilePosition t = new TilePosition(supply_x+x,supply_y+y);
 						tilesToAvoidSupply.add(t);
 //						System.out.println("supply region ==>>>>  ("+t.getX()+","+t.getY()+")");

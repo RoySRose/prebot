@@ -226,7 +226,7 @@ public class BuildManager extends GameManager {
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
-								System.out.println("desiredPosition is not null :: " + t.getUnitType() + " :: " + desiredPosition);
+//								System.out.println("desiredPosition is not null :: " + t.getUnitType() + " :: " + desiredPosition);
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -649,6 +649,16 @@ public class BuildManager extends GameManager {
 	// (MainBase . MainBase 주위 . MainBase 길목 . MainBase 가까운 앞마당 . MainBase 가까운 앞마당의 길목 . 탐색 종료)
 	public TilePosition getDesiredPosition(UnitType unitType, TilePosition seedPosition,BuildOrderItem.SeedPositionStrategy seedPositionStrategy) {
         TilePosition desiredPosition = null;
+        
+//        20180819. hkk. 1분에 한번씩 초기화
+        if(Prebot.Broodwar.getFrameCount() % (24*60) == 1) {
+	        mainBaseLocationFull = false;
+	        secondStartLocationFull = false;
+			firstChokePointFull = false;
+			firstExpansionLocationFull = false;
+			secondChokePointFull = false;
+			fisrtSupplePointFull = false;
+        }
 
         
         int count = 0;
@@ -994,7 +1004,7 @@ public class BuildManager extends GameManager {
 //											}
 //										}
 //										if(needcnt > requirecnt){		
-											System.out.println("Inserting blocked unit: " + requiredUnitType);
+//											System.out.println("Inserting blocked unit: " + requiredUnitType);
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(requiredUnitType), true);
 										//}
 									}
