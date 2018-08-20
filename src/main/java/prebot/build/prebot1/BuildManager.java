@@ -26,6 +26,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -649,14 +650,16 @@ public class BuildManager extends GameManager {
         TilePosition desiredPosition = null;
         
 //        20180819. hkk. 1분에 한번씩 초기화
-        if(MyBotModule.Broodwar.getFrameCount() % (24*60) == 1) {
-	        mainBaseLocationFull = false;
-	        secondStartLocationFull = false;
-			firstChokePointFull = false;
-			firstExpansionLocationFull = false;
-			secondChokePointFull = false;
-			fisrtSupplePointFull = false;
-        }
+
+//        if(Prebot.Broodwar.getFrameCount() % (24*60) == 1) {
+//	        mainBaseLocationFull = false;
+//	        secondStartLocationFull = false;
+//			firstChokePointFull = false;
+//			firstExpansionLocationFull = false;
+//			secondChokePointFull = false;
+//			fisrtSupplePointFull = false;
+//        }
+
 
         
         int count = 0;
@@ -700,9 +703,9 @@ public class BuildManager extends GameManager {
                 }
             }
 
-//	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before desiredPosition :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before desiredPosition :: " + MyBotModule.Broodwar.getFrameCount()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-//            FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition after desiredPosition :: "+ unitType + " :: " + desiredPosition);
+            FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition after desiredPosition :: " + MyBotModule.Broodwar.getFrameCount()+ " :: " + unitType + " :: " + desiredPosition);
             
             if(desiredPosition == null) {
 //            	20180815. hkk. seedPosition 이 지정되어 들어올경우 null이 나와도 SeedPositionStrategy 가 의미가 없으므로 1번만 찾는다.

@@ -35,7 +35,9 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 		int maxVesselCount = getMaxVesselCount();
 		int allVesselCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel);
 
+//		System.out.println("BuilderScienceVessel activatedCommandCenterCount :: " + activatedCommandCenterCount);
 		if (allVesselCount <= maxVesselCount && activatedCommandCenterCount >= 2) {
+
 			if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
 				setHighPriority(true);
 			}
