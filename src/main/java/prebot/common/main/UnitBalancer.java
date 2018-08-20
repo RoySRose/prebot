@@ -38,14 +38,12 @@ public class UnitBalancer {
 
     public static boolean skipControl(Unit unit) {
 
-        return (Prebot.Broodwar.getFrameCount() % groupSize) !=  mapper.get(unit.getID());
+        return (MyBotModule.Broodwar.getFrameCount() % groupSize) !=  mapper.get(unit.getID());
     }
 
     public void update(){
-        if(groupSize != LagObserver.groupsize()){
-            groupSize = LagObserver.groupsize();
-            resetMap();
-        }
+        groupSize = LagObserver.groupsize();
+        resetMap();
     }
 
     private void resetMap() {
