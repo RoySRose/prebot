@@ -397,10 +397,6 @@ public class WorkerManager extends GameManager {
 				continue;
 			}
 			//일정 거리 이상은 수리하러 안감 - (base - 센터 거리 기준)
-			if(isReapirZone(unit)){
-				continue;
-			}
-			
 			repairWorkCnt = workerData.workerRepairMap.size();
 			repairWraithWorkCnt = workerData.workerWraithRepairMap.size();
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
@@ -444,6 +440,10 @@ public class WorkerManager extends GameManager {
 					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
 					|| unit.getType() == UnitType.Terran_Science_Vessel) && repairWorkCnt < repairmax
 					&& unit.getHitPoints() < unit.getType().maxHitPoints()) {
+				
+				if(isReapirZone(unit)){
+					continue;
+				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
 				// SCV 는 수리 대상에서 제외. 전투 유닛만 수리하도록 한다
 				if(repairWorker != null){
