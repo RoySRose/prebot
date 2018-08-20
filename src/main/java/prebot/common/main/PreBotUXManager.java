@@ -163,7 +163,7 @@ public class PreBotUXManager {
 				drawTurretMap();
 			} else if (uxOption == 8) {
 				drawExpectedResource();
-				drawExpectedResource2();
+				//drawExpectedResource2();
 			}
 
 			drawMineralIdOnMap();
@@ -190,12 +190,14 @@ public class PreBotUXManager {
 	
 	private void drawExpectedResource2() {
 		 int m=190;
-        MyBotModule.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
-        int l=10;
+        //MyBotModule.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
+        System.out.println("EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
+		int l=10;
         for (Entry<UnitType, MutableFloat> enenmy : AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.entrySet()){
         	float cnt = enenmy.getValue().get();
            	UnitType unitType = enenmy.getKey();
-           	MyBotModule.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
+           	System.out.println( unitType.toString().substring(7, 14)+" : "+cnt);
+           	//MyBotModule.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
         }
 	}
     private void drawExpectedResource() {
@@ -209,6 +211,8 @@ public class PreBotUXManager {
         MyBotModule.Broodwar.drawTextScreen(10, y+=10, "frame ==== " + MyBotModule.Broodwar.getFrameCount());
         
         y=drawCalculation(10, y);
+        
+        /*
         y+=10;
 	    if (enemyCommandInfoMap.size() == 0){
             MyBotModule.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
@@ -248,7 +252,7 @@ public class PreBotUXManager {
             }
 
         }
-	    
+	    */
     }
     
     private int drawCalculation(int x, int y) {

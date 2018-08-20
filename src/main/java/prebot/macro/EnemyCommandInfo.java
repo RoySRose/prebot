@@ -1,6 +1,7 @@
 package prebot.macro;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
@@ -17,15 +18,8 @@ import java.util.List;
 
 public class EnemyCommandInfo {
 
-//    static final double MINERAL_INCREMENT_RATE_Line1 = 0.04663;
-//    static final double MINERAL_INCREMENT_RATE_Line2 = 0.037514;
-
-//	static final double MINERAL_INCREMENT_RATE_Line1 =0.04763;
-//    static final double MINERAL_INCREMENT_RATE_Line2 = 0.036922;
-
-	static final double MINERAL_INCREMENT_RATE_Line1 =0.04734;
-//    static final double MINERAL_INCREMENT_RATE_Line2 = 0.03926;
-    static final double MINERAL_INCREMENT_RATE_Line2 = 0.034924;
+	private double MINERAL_INCREMENT_RATE_Line1 =0.047782;
+	private double MINERAL_INCREMENT_RATE_Line2 = 0.034482;
     
     UnitInfo unitInfo;
     public int lastCheckFrame;
@@ -83,6 +77,16 @@ public class EnemyCommandInfo {
         this.fullWorkerFrame =0;
         this.halfWorkerFrame =0;
         
+        if (InformationManager.Instance().enemyRace == Race.Terran) {
+        	MINERAL_INCREMENT_RATE_Line1 =0.046391;
+         	MINERAL_INCREMENT_RATE_Line2 = 0.035873;
+        } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+        	MINERAL_INCREMENT_RATE_Line1 =0.050565;
+          	MINERAL_INCREMENT_RATE_Line2 = 0.031698;
+        } else {
+        	MINERAL_INCREMENT_RATE_Line1 =0.047782;
+         	MINERAL_INCREMENT_RATE_Line2 = 0.034482;
+        }
     }
 
     private Unit getGeyser(Position unitPosition) {
