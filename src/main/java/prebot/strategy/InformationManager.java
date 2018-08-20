@@ -911,6 +911,11 @@ public class InformationManager extends GameManager {
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			} else if (numberOfCC == 3) {
 				resultBase = secondStartPosition;
+				if (!InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).contains(resultBase)
+					&& InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer).contains(resultBase))
+					{
+						resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, true);
+					}
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			} else{
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);

@@ -276,7 +276,7 @@ public class ConstructionManager extends GameManager {
 	            continue;
 	        }
 
-			//System.out.println( "find build place near desiredPosition " + b.desiredPosition.x + "," + b.desiredPosition.y );
+//			System.out.println( "assignWorkersToUnassignedBuildings start :: " + b.getType());
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
 //	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
@@ -738,9 +738,13 @@ public class ConstructionManager extends GameManager {
 						}
 					}
 				}
+//				20180819. hkk. 터렛은 가다 일꾼이 잡히면 계속 보내기보다는 기다리는게 좋으므로 무조건 큐에서 뺀다.
+				if (b.getType() == UnitType.Terran_Missile_Turret && b.getConstructionWorker() == null) {
+					isDeadlockCase = true;
+				}
 
 				if (isDeadlockCase) {
-					System.out.println("deadlock cancel at conQ:" + requiredUnits.toString());
+					System.out.println("deadlock cancel at conQ :: " + b.getType() + " :: required :: " + requiredUnits.toString());
 					toCancel.add(b);
 				}
 			}
@@ -779,6 +783,8 @@ public class ConstructionManager extends GameManager {
 				unit.cancelConstruction();
 				cancelConstructionTaskDoNotReturnResources(unit.getType(), unit.getTilePosition());
 			}
+			
+			
 		}
 	}
 	// COMPLETED

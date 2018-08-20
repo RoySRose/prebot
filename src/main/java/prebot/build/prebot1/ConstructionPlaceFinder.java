@@ -153,8 +153,8 @@ public class ConstructionPlaceFinder {
             case SecondMainBaseLocation:
             	
             	if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory) && BuildManager.Instance().fisrtSupplePointFull) {
-                    desiredPosition = BlockingEntrance.Instance().getSupplyPosition(InformationManager.Instance().secondStartPosition.getTilePosition());
-                    desiredPosition = getBuildLocationNear(buildingType, desiredPosition);
+//                    desiredPosition = BlockingEntrance.Instance().getSupplyPosition(InformationManager.Instance().secondStartPosition.getTilePosition());
+                    desiredPosition = getBuildLocationNear(buildingType, BlockingEntrance.Instance().getSupplyPosition(InformationManager.Instance().secondStartPosition.getTilePosition()));
 //                    System.out.println(" getSupplyPosition ==>>>> " + desiredPosition);
                 }else {
                 	desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getSecondStartPosition().getTilePosition(), true);
@@ -414,6 +414,7 @@ public class ConstructionPlaceFinder {
 						break;
 					}
 				}
+
 			}else if(InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
 				maxRange = 25;
 				for (BaseLocation base : BWTA.getBaseLocations()) {
