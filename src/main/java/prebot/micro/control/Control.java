@@ -10,6 +10,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
 import prebot.common.LagObserver;
+import prebot.common.main.UnitBalancer;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
@@ -39,7 +40,8 @@ public abstract class Control {
 	public abstract void control(Collection<Unit> unitList, Collection<UnitInfo> euiList);
 	
 	protected boolean skipControl(Unit unit) {
-		return !TimeUtils.executeUnitRotation(unit, LagObserver.groupsize());
+		//return !TimeUtils.executeUnitRotation(unit, LagObserver.groupsize());
+        return UnitBalancer.skipControl(unit);
 	}
 	
 	public boolean findRat(Collection<Unit> unitList) {

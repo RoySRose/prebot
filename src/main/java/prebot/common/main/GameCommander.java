@@ -32,7 +32,8 @@ public class GameCommander {
 
 	private static GameCommander instance = new GameCommander();
 	private LagObserver logObserver = new LagObserver(); // for debugging
-	
+    private UnitBalancer unitBalancer = new UnitBalancer(); // for debugging
+
 	/// static singleton 객체를 리턴합니다
 	public static GameCommander Instance() {
 		return instance;
@@ -62,101 +63,7 @@ public class GameCommander {
 	{
 		StrategyManager.Instance().onEnd(isWinner);
 	}
-	Unit geyser= null;
-	boolean sout =false;
-	/// 경기 진행 중 매 프레임마다 발생하는 이벤트를 처리합니다
 
-
-    void temp2() {
-    	
-    	int f = MyBotModule.Broodwar.getFrameCount();
-    	
-    	if(!once && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) == 18 ) {
-    		System.out.println("scv meet " +  MyBotModule.Broodwar.getFrameCount());
-    		once = true;
-    	}
-    	if(f>3000 && f < 5000) {
-	    	if(f % 10 == 0) {
-		    	System.out.print("frame== " +  MyBotModule.Broodwar.getFrameCount() +", ");
-		    	System.out.println("mineral: " +  MyBotModule.Broodwar.self().gatheredMinerals());
-	    	}
-    	}else {
-    		if(f % 1000 == 0) {
-		    	System.out.print("frame== " +  MyBotModule.Broodwar.getFrameCount() +", ");
-		    	System.out.println("mineral: " +  MyBotModule.Broodwar.self().gatheredMinerals());
-	    	}
-    	}
-    	
-    		
-    		
-    		
-//        System.out.println("Zerg_Lair price : " + UnitType.Zerg_Lair.mineralPrice() + ", " + UnitType.Zerg_Lair.gasPrice());
-//        System.out.println("Zerg_Egg price : " + UnitType.Zerg_Egg.mineralPrice() + ", " + UnitType.Zerg_Egg.gasPrice());
-//        System.out.println("Zerg_Lurke price : " + UnitType.Zerg_Lurker.mineralPrice() + ", " + UnitType.Zerg_Lurker.gasPrice());
-//        System.out.println("Zerg_Lurker_Egg price : " + UnitType.Zerg_Lurker_Egg.mineralPrice() + ", " + UnitType.Zerg_Lurker_Egg.gasPrice());
-//        System.out.println("Zerg_Cocoon price : " + UnitType.Zerg_Cocoon.mineralPrice() + ", " + UnitType.Zerg_Cocoon.gasPrice());
-//        System.out.println("Zerg_Scourge price : " + UnitType.Zerg_Scourge.mineralPrice() + ", " + UnitType.Zerg_Scourge.gasPrice());
-//        System.out.println("Zerg_Zergling price : " + UnitType.Zerg_Zergling.mineralPrice() + ", " + UnitType.Zerg_Zergling.gasPrice());
-
-    }
-	void temp() {
-		Unit depot = null;
-		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
-        {
-            if ((unit.getType() == UnitType.Terran_Command_Center))
-            {
-            	depot = unit;
-            }
-        }
-//		if(depot!= null) {
-//			for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
-//	            if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < 320) {
-//	            	System.out.println("mineral: " + unit.getID() + ", " + unit.getResources());
-//	            }
-//	        }
-//		}
-		
-		
-		if(geyser==null) {
-			for (Unit unit : MyBotModule.Broodwar.getStaticGeysers()) {
-				System.out.println("unit: " + unit.getPosition());
-	            if (unit.getType() == UnitType.Resource_Vespene_Geyser && unit.getDistance(depot) < 320) {
-	            	geyser = unit;
-	            	System.out.println("geyser: " + geyser.getPosition());
-	            }
-	        }
-		}
-		
-		List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
-		
-			
-        for (Unit u : alreadyBuiltUnits) {
-        	//System.out.println("search " + u.getType());
-            if (u.getType().isRefinery() && u.exists()) {
-            	sout = true;
-            }
-        }
-        
-        if(!sout) {
-        	int cnt=0;
-        	for (Unit unit : MyBotModule.Broodwar.getAllUnits())
-	        {
-	            if ((unit.getType() == UnitType.Terran_SCV) && unit.isCompleted())
-	            {
-	            	cnt++;
-	            }
-	        }
-        	
-        	System.out.println("scv: " + cnt);
-        }
-        
-        if(MyBotModule.Broodwar.getFrameCount() % 10 == 0) {
-	        System.out.println("===============" + MyBotModule.Broodwar.getFrameCount());
-	        if(sout) {
-	        	System.out.println("gas: " + geyser.getID() + ", " + geyser.getResources());
-	        }
-        }
-	}
 	public void onFrame()
 	{
 
@@ -187,6 +94,7 @@ public class GameCommander {
             //temp2();
 				
 			logObserver.observe();
+            unitBalancer.update();
 			BigWatch.record("... GAME COMMANDER ...");
 
 		} catch (Exception e) {
