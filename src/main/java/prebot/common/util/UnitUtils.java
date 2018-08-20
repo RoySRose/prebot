@@ -415,7 +415,7 @@ public class UnitUtils {
 		if (enemyRace == Race.Protoss) {
 			return enemyUnitDiscovered(UnitType.Protoss_Dark_Templar, UnitType.Protoss_Templar_Archives, UnitType.Protoss_Citadel_of_Adun, UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal);	
 		} else if (enemyRace == Race.Terran) {
-			return enemyUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Starport, UnitType.Terran_Control_Tower, UnitType.Terran_Ghost);
+			return enemyUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Starport, UnitType.Terran_Control_Tower, UnitType.Terran_Ghost, UnitType.Terran_Vulture_Spider_Mine);
 		} else if (enemyRace == Race.Zerg) {
 			return enemyUnitDiscovered(UnitType.Zerg_Lurker, UnitType.Zerg_Lurker_Egg);
 		}

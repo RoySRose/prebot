@@ -23,8 +23,7 @@ import prebot.micro.KitingOption;
 import prebot.micro.MicroDecision;
 import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Angles;
-import prebot.micro.constant.MicroConfig.Common;
+import prebot.micro.constant.MicroConfig.MainSquadMode;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -283,6 +282,10 @@ public class TankControl extends Control {
 			}
 			
 		} else {
+			if (StrategyIdea.mainSquadMode == MainSquadMode.NO_MERCY) {
+				return false;
+			}
+			
 			if (eui.getType().isWorker()) {
 				return false;
 			}

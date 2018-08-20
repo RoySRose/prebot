@@ -9,7 +9,6 @@ import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
@@ -47,10 +46,18 @@ public class BuilderArmory extends DefaultBuildableItem {
 		if (UnitUtils.enemyCompleteUnitDiscovered(
 				UnitType.Protoss_Scout, UnitType.Protoss_Shuttle, UnitType.Protoss_Carrier,
 				UnitType.Zerg_Mutalisk,
-				UnitType.Terran_Wraith, UnitType.Terran_Dropship)) {
+				UnitType.Terran_Dropship)) {
 			setBlocking(true);
 			setHighPriority(true);
 //			setRecoverItemCount(1);
+			return true;
+		}
+		
+		if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
+			if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {
+				setBlocking(true);
+				setHighPriority(true);
+			}
 			return true;
 		}
 

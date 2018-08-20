@@ -9,21 +9,22 @@ import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Region;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.MicroDecision;
-import prebot.micro.MicroDecision.MicroDecisionType;
-import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
-import prebot.micro.KitingOption.CoolTimeAttack;
+import prebot.micro.MicroDecision;
+import prebot.micro.MicroDecisionMakerPrebot1;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.control.Control;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
@@ -60,11 +61,11 @@ public class WatcherControl extends Control {
 		int coverRadius = StrategyIdea.mainSquadCoverRadius;
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			int tankCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-//			if (tankCount >= 3 && StrategyIdea.mainSquadCrossBridge) {
-////				int watcherBackEnoughDistance = (int) (StrategyIdea.mainSquadCoverRadius * 1.5);
-////				double radian = MicroUtils.targetDirectionRadian(fleePosition, InfoUtils.myBase().getPosition());
-////				fleePosition = MicroUtils.getMovePosition(fleePosition, radian, watcherBackEnoughDistance);
-//				
+			if (tankCount >= 3 && StrategyIdea.mainSquadCrossBridge) {
+				int watcherBackEnoughDistance = (int) (StrategyIdea.mainSquadCoverRadius * (1 + (Math.log(unitList.size()) * 0.3)));
+				double radian = MicroUtils.targetDirectionRadian(fleePosition, InfoUtils.myBase().getPosition());
+				fleePosition = MicroUtils.getMovePosition(fleePosition, radian, watcherBackEnoughDistance);
+				
 //				List<Unit> centers = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 //				Region myBaseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
 //				Region myExpansionRegion = BWTA.getRegion(InfoUtils.myFirstExpansion().getPosition());
@@ -76,7 +77,7 @@ public class WatcherControl extends Control {
 //						break;
 //					}
 //				}
-//			}
+			}
 			
 		} else {
 			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK || StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_LURKER) {
@@ -153,7 +154,17 @@ public class WatcherControl extends Control {
 					} else {
 						if (MicroUtils.timeToRandomMove(unit)) {
 							Position randomPosition = PositionUtils.randomPosition(unit.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
-							CommandUtils.attackMove(unit, randomPosition);
+							
+							boolean avoidExpansionLocation = false;
+							if (UnitUtils.getUnitCount(UnitFindRange.ALL, UnitType.Terran_Command_Center) <= 1) {
+								BaseLocation myFirstExpansion = InfoUtils.myFirstExpansion();
+								if (randomPosition.getDistance(myFirstExpansion) < 200) {
+									avoidExpansionLocation = true;
+								}
+							}
+							if (!avoidExpansionLocation) {
+								CommandUtils.attackMove(unit, randomPosition);
+							}
 						}
 					}
 

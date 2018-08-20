@@ -24,6 +24,9 @@ public class BarracksControl extends BuildingFlyControl {
 
 
         for(Unit unit :  unitList){
+        	if (skipControl(unit)) {
+        		continue;
+        	}
             buildingFlyMap.put(unit, new FlyCondition(false, true, BlockingEntrance.Instance().barrack));
 
             if (MyBotModule.Broodwar.getFrameCount() > 12000) {

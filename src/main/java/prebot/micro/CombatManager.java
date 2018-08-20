@@ -164,9 +164,28 @@ public class CombatManager extends GameManager {
 			return;
 		}
 		
+		int mainSquadTankCount = 0;
+		Squad mainSquad = squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
+		for (Unit unit : mainSquad.unitList) {
+			if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+				mainSquadTankCount++;
+			}
+		}
+		
 		int defenseTankCount = 0;
 		Set<Integer> defenseTankIdSet = new HashSet<>();
 		List<Squad> squadList = squadData.getSquadList(MicroConfig.SquadInfo.MULTI_DEFENSE_.squadName);
+		
+		if (mainSquadTankCount <= 4) {
+			for (Squad defenseSquad : squadList) {
+				squadData.removeSquad(defenseSquad.getSquadName());
+			}
+			return;
+		}
+		
+		if (mainSquadTankCount <= 5) {
+			return;
+		}
 		
 		if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY) {
 			for (Squad defenseSquad : squadList) {
@@ -204,22 +223,12 @@ public class CombatManager extends GameManager {
 			return;
 		}
 		
-		int tankCount = 0;
-		Squad mainSquad = squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
-		for (Unit unit : mainSquad.unitList) {
-			if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				tankCount++;
-			}
-		}
-		if (tankCount <= 4) {
-			return;
-		}
 		if (InfoUtils.enemyRace() == Race.Terran) {
-			if (defenseTankCount > tankCount * 0.4) {
+			if (defenseTankCount > mainSquadTankCount * 0.4) {
 				return;
 			}
 		} else {
-			if (defenseTankCount > tankCount * 0.2) {
+			if (defenseTankCount > mainSquadTankCount * 0.2) {
 				return;
 			}
 		}

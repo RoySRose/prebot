@@ -15,7 +15,6 @@ import bwapi.UnitType;
 import bwapi.WeaponType;
 import bwta.BaseLocation;
 import prebot.common.MapGrid;
-import prebot.common.MapGrid.GridCell;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
@@ -30,8 +29,10 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.manage.PositionFinder;
 
 public class ComsatControl extends Control {
+	
 	private int scanUsedFrame = 0;
 	private int scanEnemySquadFrame = 10 * TimeUtils.MINUTE;
 
@@ -44,8 +45,16 @@ public class ComsatControl extends Control {
 			return;
 		}
 		
-		// 상대 클록 유닛
-		Position scanPosition = scanPositionForInvisibleEnemy(euiList);
+		Position scanPosition;
+		boolean scanAtReadyTo;
+		if (InfoUtils.enemyRace() == Race.Terran && PositionFinder.Instance().scanAtReadyToPosition()) {
+			scanPosition = InfoUtils.myReadyToPosition();
+			scanAtReadyTo = true;
+		} else { // 상대 클록 유닛
+			scanPosition = scanPositionForInvisibleEnemy(euiList);
+			scanAtReadyTo = false;
+		}
+		
 		if (PositionUtils.isValidPosition(scanPosition)) {
 			if (!MapGrid.Instance().scanIsActiveAt(scanPosition)) {
 				Unit comsatMaxEnergy = null;
@@ -60,7 +69,13 @@ public class ComsatControl extends Control {
 					MapGrid.Instance().scanAtPosition(scanPosition);
 					comsatMaxEnergy.useTech(TechType.Scanner_Sweep, scanPosition);
 					scanUsedFrame = TimeUtils.elapsedFrames();
-					System.out.println("scan for invisible. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+					
+					if (scanAtReadyTo) {
+						System.out.println("scan for ready to position. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+					} else {
+						System.out.println("scan for invisible. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+					}
+					
 					return;
 				}
 			}

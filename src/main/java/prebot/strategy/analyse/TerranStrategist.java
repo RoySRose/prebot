@@ -1,6 +1,7 @@
 package prebot.strategy.analyse;
 
 import bwapi.UnitType;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -165,7 +166,7 @@ public class TerranStrategist extends Strategist {
 			}
 			if (!isBionic) {
 				// 내 레이쓰 수가 0개 유지 상태, 적 골리앗이 1기 이하, 내 탱크가 10개 이상인 경우 역레이쓰 
-				if (goliathCount <= 2 && StrategyIdea.wraithCount == 0) {
+				if (StrategyIdea.wraithCount == 0 && (goliathCount <= 2 || MyBotModule.Broodwar.self().supplyUsed() > 380)) {
 					int myTankCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
 					if (myTankCount >= 10) {
 //						AirForceManager.Instance().setAirForceWaiting();

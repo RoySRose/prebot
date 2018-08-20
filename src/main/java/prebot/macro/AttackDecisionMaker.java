@@ -17,6 +17,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.PlayerUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
@@ -64,7 +65,6 @@ public class AttackDecisionMaker extends GameManager {
     public int UXGasToPredict;
     public int UXMinusMineralToPredict;
     public int UXMinusGasToPredict;
-	private boolean pushSiege=false;
 	private boolean attackByFullSupply=false;
     
     public void onStart() {
@@ -163,8 +163,11 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-    	if (myForcePoint > attackPoint()) {
+    	int attackPoint = attackPoint();
+    	
+    	if (myForcePoint > attackPoint) {
     		Decision decision = attackType(myForcePoint, enemyForcePoint);
+    		
     		if (decision == Decision.NO_MERCY_ATTACK) {
     			if (decision != Decision.NO_MERCY_ATTACK) {
 					MyBotModule.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
@@ -179,10 +182,6 @@ public class AttackDecisionMaker extends GameManager {
     		}
     	}
     	
-    	if (attackByFullSupply()) {
-    		return Decision.FULL_ATTACK;
-    	}
-    	
     	if (quickAttack()) {
     		return Decision.FULL_ATTACK;
     	}
@@ -194,21 +193,24 @@ public class AttackDecisionMaker extends GameManager {
 
 	private Decision attackType(int myForcePoint, int enemyForcePoint) {
     	if (InfoUtils.enemyRace() == Race.Terran) {
-    		if (myForcePoint > enemyForcePoint * 2.0 && attackByFullSupply()) {
+    		boolean attackByFullSupply = attackByFullSupply();
+    		if (attackByFullSupply && myForcePoint > enemyForcePoint * 2.0) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
     		
     	} else if (InfoUtils.enemyRace() == Race.Protoss) {
-    		if (myForcePoint > enemyForcePoint * 2.0) {
+    		boolean attackByFullSupply = attackByFullSupply();
+    		if (attackByFullSupply || myForcePoint > enemyForcePoint * 2.0) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
     		
     	} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    		if (myForcePoint > enemyForcePoint * 1.5) {
+    		boolean attackByFullSupply = attackByFullSupply();
+    		if (attackByFullSupply || myForcePoint > enemyForcePoint * 1.5) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
@@ -216,21 +218,18 @@ public class AttackDecisionMaker extends GameManager {
     	}
     	return Decision.DEFENCE;
 	}
-
-	private boolean pushSiege(int myForcePoint, int enemyForcePoint) {
-		if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
-			pushSiege = false;
-		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 2.0) {
-			pushSiege = true;
-		}
-		return pushSiege;
-	}
     
     private boolean attackByFullSupply() {
 		if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
 			attackByFullSupply = false;
 		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
-			attackByFullSupply = true;
+			if (InfoUtils.myRace() == Race.Terran) {
+				if (PlayerUtils.enoughResource(2000, 1500)) {
+					attackByFullSupply = true;
+				}
+			} else {
+				attackByFullSupply = true;
+			}
 		}
 		return attackByFullSupply;
 	}

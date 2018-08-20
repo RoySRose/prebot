@@ -42,9 +42,9 @@ public class BuilderBunker extends DefaultBuildableItem {
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_INIT
 					|| StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
-				int waitingBlockSeconds = 8;
+				int waitingBlockSeconds = 12;
 				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
-					waitingBlockSeconds = 5;
+					waitingBlockSeconds = 8;
 				}
 				boolean entranceBlocked = InformationManager.Instance().isBlockingEnterance();
 				if (entranceBlocked) {

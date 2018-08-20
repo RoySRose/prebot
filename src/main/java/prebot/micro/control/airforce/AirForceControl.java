@@ -73,7 +73,7 @@ public class AirForceControl extends Control {
 					if (StrategyIdea.mainSquadMode.isAttackMode) {
 						applyDefenseModeFlee = StrategyIdea.mainSquadCenter.getDistance(airForceTeam.leaderUnit) > StrategyIdea.mainSquadCoverRadius + 250;
 						if (!applyDefenseModeFlee) {
-							Set<UnitInfo> killerInRadius = UnitUtils.getCompleteEnemyInfosInRadiusForAir(airForceTeam.leaderUnit.getPosition(), 120, UnitUtils.wraithKillerUnitType());
+							Set<UnitInfo> killerInRadius = UnitUtils.getCompleteEnemyInfosInRadiusForAir(airForceTeam.leaderUnit.getPosition(), 200, UnitUtils.wraithKillerUnitType());
 							applyDefenseModeFlee = !killerInRadius.isEmpty();
 						}
 						
