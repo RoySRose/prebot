@@ -81,6 +81,7 @@ public class BuildManager extends GameManager {
 			return;
 		}
 
+//		FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager Start :: " + System.currentTimeMillis());
 //		System.out.println("frame count debug ==>> " + Prebot.Broodwar.getFrameCount());
 		
 		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
@@ -145,7 +146,7 @@ public class BuildManager extends GameManager {
                     //System.out.println("marin out");
                 	break;
                 }
-                if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > MyBotModule.Broodwar.getFrameCount()) {
+                if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > System.currentTimeMillis()) {
                     //System.out.println("marin wait");
                 	break;
                 }
@@ -222,10 +223,12 @@ public class BuildManager extends GameManager {
 						else {
 							// ConstructionPlaceFinder 를 통해 건설 가능 위치 desiredPosition 를 알아내서 ConstructionManager 의 ConstructionTask Queue에 추가를 해서 desiredPosition 에 건설을 하게 한다.
 							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시 ConstructionPlaceFinder 를 통해 건설 가능 위치를 desiredPosition 주위에서 찾을 것이다
+//							FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before :: buildManager :: " + System.currentTimeMillis()+ " :: " + t.getUnitType() + " :: "+ currentItem.seedLocation + " :: " + currentItem.seedLocationStrategy);
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
 //								System.out.println("desiredPosition is not null :: " + t.getUnitType() + " :: " + desiredPosition);
+//								FileUtils.appendTextToFile("log.txt", "desiredPosition is not null :: " + System.currentTimeMillis());
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -286,9 +289,12 @@ public class BuildManager extends GameManager {
 				currentItem = buildQueue.getItem();
 			} else {
 				// so break out
+//				FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager break out :: " + System.currentTimeMillis());
 				break;
 			}
 		}
+		
+//		FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager End :: " + System.currentTimeMillis());
 	}
 
 	/// 해당 MetaType 을 build 할 수 있는 producer 를 찾아 반환합니다
@@ -666,8 +672,7 @@ public class BuildManager extends GameManager {
 		while (count < 15) {
 //		while (true) {
 	    	count++;
-	    	
-//	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//	    	FileUtils.appendTextToFile("log.txt", "\n while getDesiredPosition :: " + System.currentTimeMillis() + " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
                 if (mainBaseLocationFull) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
@@ -703,9 +708,9 @@ public class BuildManager extends GameManager {
                 }
             }
 
-	    	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before desiredPosition :: " + MyBotModule.Broodwar.getFrameCount()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//	    	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-            FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition after desiredPosition :: " + MyBotModule.Broodwar.getFrameCount()+ " :: " + unitType + " :: " + desiredPosition);
+//            FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy after :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy + " :: " + desiredPosition);
             
             if(desiredPosition == null) {
 //            	20180815. hkk. seedPosition 이 지정되어 들어올경우 null이 나와도 SeedPositionStrategy 가 의미가 없으므로 1번만 찾는다.
