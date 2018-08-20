@@ -70,11 +70,6 @@ public class WorkerCounter {
     		return 0;
     	}
     	double result=0;
-    	if (InformationManager.Instance().enemyRace == Race.Terran) {
-    		if(realWorkerCount > 10) {
-        		workerTrainRate = 0.004;
-        	}
-        }
     	
     	if(lastFullCheckFrame>0) {
 	        result=(realWorkerCount + (MyBotModule.Broodwar.getFrameCount() - lastFullCheckFrame) * workerTrainRate);
@@ -113,12 +108,6 @@ public class WorkerCounter {
 	        		}
 	        		
 	        		if(gasCalculator.hasGasBuilding()){
-		//            		if(gasWorker.isGatheringGas() || gasWorker.isCarryingGas()) {
-		//        			gasWorkerCnt++;
-		//        		}else if(gasWorker.getDistance(PositionUtils.center(gasCalculator.getGeyserPoint(), enemyResourceDepot.getPoint())) < 60 ){
-		//        			if(!gasWorker.isCarryingMinerals())
-		//        			gasWorkerCnt++;
-		//        		}
 		        		if(worker.isGatheringGas()) {
 		        			gasWorkerCnt++;
 		        		}
