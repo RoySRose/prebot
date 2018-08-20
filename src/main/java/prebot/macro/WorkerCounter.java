@@ -6,7 +6,7 @@ import java.util.List;
 import bwapi.Race;
 import bwapi.Unit;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
@@ -77,11 +77,11 @@ public class WorkerCounter {
         }
     	
     	if(lastFullCheckFrame>0) {
-	        result=(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastFullCheckFrame) * workerTrainRate);
+	        result=(realWorkerCount + (MyBotModule.Broodwar.getFrameCount() - lastFullCheckFrame) * workerTrainRate);
     	}else if(lastCheckFrame>0){
-    		result=(realWorkerCount + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
+    		result=(realWorkerCount + (MyBotModule.Broodwar.getFrameCount() - lastCheckFrame) * workerTrainRate);
     	}else {
-    		result=((Prebot.Broodwar.getFrameCount() - depotInfo.completFrame()) * workerTrainRate);
+    		result=((MyBotModule.Broodwar.getFrameCount() - depotInfo.completFrame()) * workerTrainRate);
     	}
     	
     	if(lastCheckFrame == 0) {
@@ -99,8 +99,8 @@ public class WorkerCounter {
         //System.out.println("visible: " + enemyResourceDepot.isVisible() + ", " + mineralCalculator.allVisible());
         
         if(enemyResourceDepot.isVisible() && mineralCalculator.allVisible()){
-        	if(Prebot.Broodwar.getFrameCount() - fullCheckStartFrame > 300) {
-        		fullCheckStartFrame = Prebot.Broodwar.getFrameCount();
+        	if(MyBotModule.Broodwar.getFrameCount() - fullCheckStartFrame > 300) {
+        		fullCheckStartFrame = MyBotModule.Broodwar.getFrameCount();
         	
 	            List<Unit> workerList =  UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, enemyResourceDepot.getPosition(), 320, InformationManager.Instance().getWorkerType(InformationManager.Instance().enemyRace));
 	            int workerCnt = workerList.size();
@@ -132,13 +132,13 @@ public class WorkerCounter {
 	        	workerCnt -= buildWorkerCnt;
 	            workerCnt -= gasWorkerCnt;
 	            
-	            this.lastFullCheckFrame = Prebot.Broodwar.getFrameCount();
+	            this.lastFullCheckFrame = MyBotModule.Broodwar.getFrameCount();
 	            //System.out.println("setting realworker1: " + workerCnt);
 	            setWorkerCount(workerCnt);
         	}
         }else if(enemyResourceDepot.isVisible()){
         	
-        	if(Prebot.Broodwar.getFrameCount() - lastFullCheckFrame < 1000) {
+        	if(MyBotModule.Broodwar.getFrameCount() - lastFullCheckFrame < 1000) {
         		return;
         	}
 
@@ -177,7 +177,7 @@ public class WorkerCounter {
             if(visibleMineral > 2) {
                 workerCnt = (int) ((double) workerCnt + (double) mineralCalculator.getMineralCount()/visibleMineral);
 
-                this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
+                this.lastCheckFrame = MyBotModule.Broodwar.getFrameCount();
                 //System.out.println("setting realworker2: " + workerCnt);
                 setWorkerCount(workerCnt);
             }

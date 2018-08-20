@@ -7,7 +7,7 @@ import java.util.Vector;
 import bwapi.Position;
 import bwapi.TilePosition;
 import prebot.common.DistanceMap;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 /// provides useful tools for analyzing the starcraft map<br>
 /// calculates connectivity and distances using flood fills
@@ -38,8 +38,8 @@ public class MapTools {
 
 	// constructor for MapTools
 	public MapTools() {
-		rows = Prebot.Broodwar.mapHeight();
-		cols = Prebot.Broodwar.mapWidth();
+		rows = MyBotModule.Broodwar.mapHeight();
+		cols = MyBotModule.Broodwar.mapWidth();
 		map = new boolean[rows * cols];
 		units = new boolean[rows * cols];
 		fringe = new int[rows * cols];
@@ -76,7 +76,7 @@ public class MapTools {
 					// check each walk tile within this TilePosition
 					for (int i = 0; i < 4; ++i) {
 						for (int j = 0; j < 4; ++j) {
-							if (!Prebot.Broodwar.isWalkable(c * 4 + i, r * 4 + j)) {
+							if (!MyBotModule.Broodwar.isWalkable(c * 4 + i, r * 4 + j)) {
 								clear = false;
 								break;
 							}
@@ -214,7 +214,7 @@ public class MapTools {
 	/// Position 에서 가까운 순서대로 타일의 목록을 반환한다
 	public final Vector<TilePosition> getClosestTilesTo(Position pos) {
 		// make sure the distance map is calculated with pos as a destination
-		int a = getGroundDistance(Prebot.Broodwar.self().getStartLocation().toPosition(), pos);
+		int a = getGroundDistance(MyBotModule.Broodwar.self().getStartLocation().toPosition(), pos);
 
 		return allMaps.get(pos).getSortedTiles();
 	}

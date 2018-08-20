@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import bwapi.Unit;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.micro.control.FlyCondition;
 import prebot.strategy.InformationManager;
@@ -19,7 +19,7 @@ public class EngineeringBayControl extends BuildingFlyControl {
 
             buildingFlyMap.put(unit, new FlyCondition(true, false, null));
 
-            if (Prebot.Broodwar.getFrameCount() > 12000) {
+            if (MyBotModule.Broodwar.getFrameCount() > 12000) {
                 buildingFlyMap.get(unit).setFlyPosition(getFlyPosition0(unit));
             }
 

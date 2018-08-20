@@ -8,7 +8,7 @@ import java.util.Vector;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.MapGrid;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class UnitData {
 
@@ -84,7 +84,7 @@ public class UnitData {
 		}
 		
 		ui.setUnit(unit);
-		ui.setUpdateFrame(Prebot.Broodwar.getFrameCount());
+		ui.setUpdateFrame(MyBotModule.Broodwar.getFrameCount());
 		ui.setPlayer(unit.getPlayer());
 		ui.setLastPosition(unit.getPosition());
 		ui.setLastHealth(unit.getHitPoints());
@@ -200,7 +200,7 @@ public class UnitData {
 		}
 
 		if(ui.getType() == InformationManager.Instance().getBasicResourceDepotBuildingType(InformationManager.Instance().enemyRace) ) {
-			if (Prebot.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32)) { 
+			if (MyBotModule.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32)) { 
 				
 				
 				if(ui.getUnit().getPosition() == null) {
@@ -216,7 +216,7 @@ public class UnitData {
 		}else
 		
 		// If the unit is a building and we can currently see its position and it is not there
-		if (ui.getType().isBuilding() && Prebot.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32) && (!ui.getUnit().isTargetable() || !ui.getUnit().isVisible()))
+		if (ui.getType().isBuilding() && MyBotModule.Broodwar.isVisible(ui.getLastPosition().getX()/32, ui.getLastPosition().getY()/32) && (!ui.getUnit().isTargetable() || !ui.getUnit().isVisible()))
 		{
 			if (MapGrid.Instance().scanAbnormalTime()) {
 				return false;

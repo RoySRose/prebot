@@ -16,7 +16,7 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -26,7 +26,6 @@ import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions;
 import prebot.micro.PositionReserveInfo;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
@@ -191,7 +190,7 @@ public class SpiderMineManger {
 				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, siegeTank.getPosition(), MINE_REMOVE_TANK_DIST, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
-						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), MyBotModule.Broodwar.getFrameCount()));
 					}
 				}
 			}
@@ -203,7 +202,7 @@ public class SpiderMineManger {
 				List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, siegeTank.getPosition(), mineRemoveDist, UnitType.Terran_Vulture_Spider_Mine);
 				for (Unit mine : nearMineList) {
 					if (mineRemoveMap.get(mine.getID()) == null) {
-						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount()));
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), MyBotModule.Broodwar.getFrameCount()));
 					}
 				}
 			}
@@ -216,7 +215,7 @@ public class SpiderMineManger {
 				if (nextExpansion != null) {
 					List<Unit> spiderMines = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, nextExpansion.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
 					for (Unit mine : spiderMines) {
-						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
+						mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), MyBotModule.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND)); // 20초 이상 길게 유지
 					}
 				}
 				
@@ -235,7 +234,7 @@ public class SpiderMineManger {
 						List<Unit> nearMineList = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, base.getPosition(), 300, UnitType.Terran_Vulture_Spider_Mine);
 						for (Unit mine : nearMineList) {
 							if (mineRemoveMap.get(mine.getID()) == null) {
-								mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), Prebot.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND));
+								mineRemoveMap.put(mine.getID(), new PositionReserveInfo(mine.getID(), mine.getPosition(), MyBotModule.Broodwar.getFrameCount() + 20 * TimeUtils.SECOND));
 							}
 						}
 					}
@@ -254,7 +253,7 @@ public class SpiderMineManger {
 						for (Unit spiderMine : spiderMineList) {
 							Region mineRegion = BWTA.getRegion(spiderMine.getPosition());
 							if (myBaseRegion == mineRegion) {
-								mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), Prebot.Broodwar.getFrameCount()));
+								mineRemoveMap.put(spiderMine.getID(), new PositionReserveInfo(spiderMine.getID(), spiderMine.getPosition(), MyBotModule.Broodwar.getFrameCount()));
 							}
 						}
 					}
@@ -283,7 +282,7 @@ public class SpiderMineManger {
 			PositionReserveInfo removeReserved = mineRemoveMap.get(mineId);
 			
 			if (vulture.getDistance(removeReserved.position) < UnitType.Terran_Vulture.groundWeapon().maxRange()) {
-				Unit spiderMine = Prebot.Broodwar.getUnit(removeReserved.unitId);
+				Unit spiderMine = MyBotModule.Broodwar.getUnit(removeReserved.unitId);
 				if (UnitUtils.isValidUnit(spiderMine)) {
 					return spiderMine;
 				}
@@ -300,7 +299,7 @@ public class SpiderMineManger {
 		if (SpiderMineManger.MinePositionLevel.ONLY_GOOD_POSITION.equals(minePositionLevel)) {
 			Position position = positionToMineOnlyGoodPosition(vulture, StrategyIdea.spiderMineNumberPerGoodPosition);
 			if (position != null) {
-				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
+				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, MyBotModule.Broodwar.getFrameCount()));
 			}
 			return position;
 		} else {
@@ -339,7 +338,7 @@ public class SpiderMineManger {
 			
 			Position position = positionToMineNearPosition(vulture, vulture.getPosition(), mineNumberPerPosition);
 			if (position != null) {
-				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, Prebot.Broodwar.getFrameCount()));
+				mineReservedMap.put(vulture.getID(), new PositionReserveInfo(vulture.getID(), position, MyBotModule.Broodwar.getFrameCount()));
 			}
 			return position;
 		}
@@ -356,12 +355,12 @@ public class SpiderMineManger {
 	
 	private Position positionToMineNearPosition(Unit vulture, Position position, int mineNumberPerPosition) {
 		Position positionToMine = null;
-		List<Unit> unitsOnTile = Prebot.Broodwar.getUnitsOnTile(position.toTilePosition());
+		List<Unit> unitsOnTile = MyBotModule.Broodwar.getUnitsOnTile(position.toTilePosition());
 		if (unitsOnTile.isEmpty()) {
-			positionToMine = findMinePosition(position, Vulture.MINE_EXACT_RADIUS, mineNumberPerPosition);
+			positionToMine = findMinePosition(position, MicroConfig.Vulture.MINE_EXACT_RADIUS, mineNumberPerPosition);
 		}
 		if (positionToMine == null) {
-			positionToMine = findMinePosition(position, Vulture.MINE_SPREAD_RADIUS, mineNumberPerPosition);
+			positionToMine = findMinePosition(position, MicroConfig.Vulture.MINE_SPREAD_RADIUS, mineNumberPerPosition);
 		}
 		return positionToMine;
 	}

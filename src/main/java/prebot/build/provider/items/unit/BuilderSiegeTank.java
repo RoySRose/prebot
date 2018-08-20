@@ -4,7 +4,7 @@ import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions;
@@ -20,11 +20,11 @@ public class BuilderSiegeTank extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
+    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
     		return false;
     	}
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
     		return false;
     	}
 

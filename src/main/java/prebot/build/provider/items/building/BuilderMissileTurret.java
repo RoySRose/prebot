@@ -14,7 +14,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
@@ -33,10 +33,10 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 	public int add_turret = 0;
 
 	public final boolean buildCondition() {
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Engineering_Bay) == 0) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret) >= 10) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret) >= 10) {
 			return false;
 		}
 		if (TimeUtils.before(StrategyIdea.turretBuildStartFrame)) {
@@ -102,7 +102,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int otherCommandTurret = 1;
 		
-		if(Prebot.Broodwar.enemy().getRace()== Race.Protoss) {
+		if(MyBotModule.Broodwar.enemy().getRace()== Race.Protoss) {
 			baseTurret = 2;
 //			otherCommandTurret = 1;
 		}
@@ -123,7 +123,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
 
 //		int turretCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
-		int turretCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret);
+		int turretCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Missile_Turret);
 
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
@@ -246,7 +246,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		int radiusP = 0;
 		
-		if(Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
+		if(MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
 			radiusP = UnitType.Zerg_Lurker.groundWeapon().maxRange();
 		}else {
 			radiusP = 80;

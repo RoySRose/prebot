@@ -19,7 +19,7 @@ import bwta.BaseLocation;
 import bwta.Region;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.internal.IConditions;
 import prebot.common.util.internal.SpecificValueCache;
 import prebot.common.util.internal.UnitCache;
@@ -46,7 +46,7 @@ public class UnitUtils {
 
 	/** 시야에 있는 unitinfo이면 unit 정보 리턴 */
 	public static Unit unitInSight(UnitInfo eui) {
-		Unit enemyUnit = Prebot.Broodwar.getUnit(eui.getUnitID());
+		Unit enemyUnit = MyBotModule.Broodwar.getUnit(eui.getUnitID());
 		if (UnitUtils.isValidUnit(enemyUnit)) {
 			return enemyUnit;
 		} else {
@@ -270,16 +270,16 @@ public class UnitUtils {
 			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
+				weaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 			} else {
 				if (addGroundWeoponRadius) {
 					if (eui.getType().groundWeapon() != WeaponType.None) {
-						weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
+						weaponRange = Math.max(weaponRange, MyBotModule.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
 					}
 				}
 				if (addAirWeoponRadius) {
 					if (eui.getType().airWeapon() != WeaponType.None) {
-						weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
+						weaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 					}
 				}
 			}
@@ -299,15 +299,15 @@ public class UnitUtils {
 	public static List<Unit> getUnitsInRadius(CommonCode.PlayerRange playerRange, Position position, int radius, UnitType... unitTypes) {
 		Player player = null;
 		if (playerRange == CommonCode.PlayerRange.SELF) {
-			player = Prebot.Broodwar.self();
+			player = MyBotModule.Broodwar.self();
 		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
-			player = Prebot.Broodwar.enemy();
+			player = MyBotModule.Broodwar.enemy();
 		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
-			player = Prebot.Broodwar.neutral();
+			player = MyBotModule.Broodwar.neutral();
 		}
 		
 		List<Unit> unitsInRadius = new ArrayList<>();
-		for (Unit unit : Prebot.Broodwar.getUnitsInRadius(position, radius)) {
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(position, radius)) {
 			if (player != null && player != unit.getPlayer()) {
 				continue;
 			}
@@ -328,7 +328,7 @@ public class UnitUtils {
 	/** position 근처의 유닛리스트를 리턴 */
 	public static void addUnitsInRadius(Collection<Unit> units, CommonCode.PlayerRange playerRange, Position position, int radius) {
 		Player player = PlayerUtils.getPlayerByRange(playerRange);
-		for (Unit unit : Prebot.Broodwar.getUnitsInRadius(position, radius)) {
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(position, radius)) {
 			if (player != null && player != unit.getPlayer()) {
 				continue;
 			}
@@ -371,13 +371,13 @@ public class UnitUtils {
 	public static List<Unit> getUnitsInRegion(CommonCode.RegionType regionType, CommonCode.PlayerRange playerRange, IConditions.UnitCondition unitCondition) {
 		List<Unit> totalUnits = null;
 		if (playerRange == CommonCode.PlayerRange.SELF) {
-			totalUnits = Prebot.Broodwar.self().getUnits();
+			totalUnits = MyBotModule.Broodwar.self().getUnits();
 		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
-			totalUnits = Prebot.Broodwar.enemy().getUnits();
+			totalUnits = MyBotModule.Broodwar.enemy().getUnits();
 		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
-			totalUnits = Prebot.Broodwar.neutral().getUnits();
+			totalUnits = MyBotModule.Broodwar.neutral().getUnits();
 		} else {
-			totalUnits = Prebot.Broodwar.getAllUnits();
+			totalUnits = MyBotModule.Broodwar.getAllUnits();
 		}
 		
 		List<Unit> unitsInRegion = new ArrayList<>();
@@ -471,20 +471,20 @@ public class UnitUtils {
 	/** 즉시 생산할 수 있는 상태인지 판단 */
 	public static boolean isProduceableImmediately(UnitType unitType) {
 		// 생산할 수 있는 자원이 있어야 한다.
-		if (Prebot.Broodwar.self().minerals() < unitType.mineralPrice()
-				&& Prebot.Broodwar.self().gas() < unitType.gasPrice()) {
+		if (MyBotModule.Broodwar.self().minerals() < unitType.mineralPrice()
+				&& MyBotModule.Broodwar.self().gas() < unitType.gasPrice()) {
 			return false;
 		}
 		
 		// 서플라이가 있어야 한다.
 		if (unitType.supplyRequired() > 0) {
-			int supplySpace = Prebot.Broodwar.self().supplyTotal() - Prebot.Broodwar.self().supplyUsed();
+			int supplySpace = MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed();
 			if (supplySpace < unitType.supplyRequired()) {
 				return false;
 			}
 		}
 		
-		return Prebot.Broodwar.canMake(unitType);
+		return MyBotModule.Broodwar.canMake(unitType);
 	}
 
 	/** unitList 중 position에 가장 가까운 유닛 리턴 */
@@ -659,7 +659,7 @@ public class UnitUtils {
 			return 0;
 		}
 		int mineralsNearDepot = 0;
-		for (Unit mineral : Prebot.Broodwar.getAllUnits()) {
+		for (Unit mineral : MyBotModule.Broodwar.getAllUnits()) {
 			if (mineral.getType().isMineralField() && pointUnit.getDistance(mineral) < 200) {
 				mineralsNearDepot++;
 			}

@@ -4,7 +4,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class BuilderTankSiegeMode extends DefaultBuildableItem {
 
@@ -29,7 +29,7 @@ public class BuilderTankSiegeMode extends DefaultBuildableItem {
 		if (researchSelector.getSelected().getTechType() != metaType.getTechType()) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().isResearching(researchSelector.getSelected().getTechType())) {
+		if (MyBotModule.Broodwar.self().isResearching(researchSelector.getSelected().getTechType())) {
 			return false;
 		}
 

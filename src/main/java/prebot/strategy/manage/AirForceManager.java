@@ -15,7 +15,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -430,8 +430,8 @@ public class AirForceManager {
 	}
 	
 	private void setRetreatPositionForUseMapSetting() {
-		int width = Prebot.Broodwar.mapWidth() * 32 - 1;
-		int height = Prebot.Broodwar.mapHeight() * 32 - 1;
+		int width = MyBotModule.Broodwar.mapWidth() * 32 - 1;
+		int height = MyBotModule.Broodwar.mapHeight() * 32 - 1;
 		
 		List<Position> positions = new ArrayList<>();
 		positions.add(new Position(0, 0));
@@ -615,7 +615,7 @@ public class AirForceManager {
 		List<Integer> invalidUnitIds = new ArrayList<>();
 		
 		for (Integer airunitId : airForceTeamMap.keySet()) {
-			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			Unit airunit = MyBotModule.Broodwar.getUnit(airunitId);
 			if (!UnitUtils.isCompleteValidUnit(airunit)) {
 				invalidUnitIds.add(airunitId);
 			} else if (airForceTeamMap.get(airunitId).leaderUnit == null) {
@@ -688,7 +688,7 @@ public class AirForceManager {
 		List<Integer> uncloakedAirunitList = new ArrayList<>(); // 언클락 유닛
 		
 		for (Integer airunitId : airForceTeamMap.keySet()) {
-			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			Unit airunit = MyBotModule.Broodwar.getUnit(airunitId);
 			if (airunit.getHitPoints() <= 50) { // repair hit points
 				AirForceTeam repairTeam = airForceTeamMap.get(airunitId);
 				if (repairTeam == null || repairTeam.repairCenter == null) {
@@ -712,7 +712,7 @@ public class AirForceManager {
 		
 		// create separated team for no energy airunit
 		for (Integer airunitId : uncloakedAirunitList) {
-			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			Unit airunit = MyBotModule.Broodwar.getUnit(airunitId);
 			AirForceTeam uncloackedForceTeam = new AirForceTeam(airunit);
 			uncloackedForceTeam.memberList.add(airunit);
 			
@@ -721,7 +721,7 @@ public class AirForceManager {
 		
 		// create repair airforce team
 		for (Integer airunitId : needRepairAirunitList) {
-			Unit airunit = Prebot.Broodwar.getUnit(airunitId);
+			Unit airunit = MyBotModule.Broodwar.getUnit(airunitId);
 			AirForceTeam needRepairTeam = new AirForceTeam(airunit);
 			needRepairTeam.memberList.add(airunit);
 			needRepairTeam.repairCenter = airunitRepairCenterMap.get(airunit.getID());

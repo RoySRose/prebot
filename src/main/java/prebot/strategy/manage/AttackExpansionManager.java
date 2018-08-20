@@ -6,7 +6,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -52,16 +52,16 @@ public class AttackExpansionManager {
 		int killedcombatunit = getTotKilledCombatUnits();
 		int deadCombatunit = myDeadCombatUnitSupplies();
 		
-		int totworkerkilled = Prebot.Broodwar.self().killedUnitCount(InformationManager.Instance().getWorkerType(InfoUtils.enemyRace())) * 2;
-		int totworkerdead = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_SCV) * 2;
+		int totworkerkilled = MyBotModule.Broodwar.self().killedUnitCount(InformationManager.Instance().getWorkerType(InfoUtils.enemyRace())) * 2;
+		int totworkerdead = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_SCV) * 2;
 		
 		if (TimeUtils.beforeTime(15, 0)) { // 약 시작 ~ 15분까지
-			unitPoint += (totworkerkilled - totworkerdead) * (-Prebot.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
+			unitPoint += (totworkerkilled - totworkerdead) * (-MyBotModule.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
 			unitPoint += (killedcombatunit - deadCombatunit);
 
 		} else if (TimeUtils.beforeTime(28, 0)) { // 약 15분 ~ 28분까지 // 여기서부턴 시간보다.... 현재 전체 규모수가 중요할듯?
-			unitPoint += (totworkerkilled - totworkerdead) * (-Prebot.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
-			unitPoint += (killedcombatunit - deadCombatunit) * (-Prebot.Broodwar.getFrameCount() / 20000.0 + 2.0);
+			unitPoint += (totworkerkilled - totworkerdead) * (-MyBotModule.Broodwar.getFrameCount() / 40000.0 * 3.0 + 3.0);
+			unitPoint += (killedcombatunit - deadCombatunit) * (-MyBotModule.Broodwar.getFrameCount() / 20000.0 + 2.0);
 		}
 		
 		int myExpansioningCount = selfExspansioningCount();
@@ -149,17 +149,17 @@ public class AttackExpansionManager {
 				plus = 2;
 			}
 
-			if (unitPoint > 10 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4 + plus) {
+			if (unitPoint > 10 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 4 + plus) {
 				isAttackMode = true;
-			} else if (unitPoint > 0 && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5 + plus) {
+			} else if (unitPoint > 0 && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 5 + plus) {
 				isAttackMode = true;
-			} else if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
-					+ Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6 + plus) {
+			} else if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode)
+					+ MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 6 + plus) {
 				isAttackMode = true;
 			}
-			int completeCommandCenterCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+			int completeCommandCenterCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
 			if (isAttackMode && unitPoint < 0) {
 				if (completeCommandCenterCount == 1 && myFactoryUnitPoint + unitPoint < 0) {
 					isAttackMode = false;
@@ -174,7 +174,7 @@ public class AttackExpansionManager {
 			}
 			
 			pushSiegeLine = false;
-			if ((myFactoryUnitPoint > 250 - completeCommandCenterCount * 10 || Prebot.Broodwar.self().supplyUsed() > 392)) {
+			if ((myFactoryUnitPoint > 250 - completeCommandCenterCount * 10 || MyBotModule.Broodwar.self().supplyUsed() > 392)) {
 				pushSiegeLine = true;
 				combatStartCase = 1;
 			}
@@ -193,7 +193,7 @@ public class AttackExpansionManager {
 
 		} else {
 			// 공통 예외 상황
-			if ((myFactoryUnitPoint > 170 || Prebot.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
+			if ((myFactoryUnitPoint > 170 || MyBotModule.Broodwar.self().supplyUsed() > 392) && !isAttackMode) {// 팩토리 유닛 130 이상 또는 서플 196 이상
 				isAttackMode = true;
 				combatStartCase = 1;
 			}
@@ -202,7 +202,7 @@ public class AttackExpansionManager {
 
 				if (InformationManager.Instance().enemyRace == Race.Zerg
 						&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
-					if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) < Prebot.Broodwar.self()
+					if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) < MyBotModule.Broodwar.self()
 							.completedUnitCount(UnitType.Terran_Goliath)) {
 						isAttackMode = true;
 					}
@@ -214,13 +214,13 @@ public class AttackExpansionManager {
 			}
 
 			if (!isAttackMode && StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)
-					&& Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
+					&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 1) {
 				isAttackMode = true;
 				fastAttack = true;
 				combatStartCase = 5;
 
 				if (combatTime == 0) {
-					combatTime = Prebot.Broodwar.getFrameCount() + 5000;
+					combatTime = MyBotModule.Broodwar.getFrameCount() + 5000;
 				}
 			}
 
@@ -232,7 +232,7 @@ public class AttackExpansionManager {
 
 					if (InformationManager.Instance().enemyRace == Race.Zerg
 							&& InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > 6) {
-						if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > Prebot.Broodwar.self()
+						if (InformationManager.Instance().getNumUnits(UnitType.Zerg_Mutalisk, InformationManager.Instance().enemyPlayer) > MyBotModule.Broodwar.self()
 								.completedUnitCount(UnitType.Terran_Goliath)) {
 							isAttackMode = false;
 						}
@@ -244,7 +244,7 @@ public class AttackExpansionManager {
 						isAttackMode = false;
 					}
 				} else if (combatStartCase == 5) {
-					if (combatTime < Prebot.Broodwar.getFrameCount() && ((myFactoryUnitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
+					if (combatTime < MyBotModule.Broodwar.getFrameCount() && ((myFactoryUnitPoint < 20 && unitPoint < 20) || unitPoint < -10)) {
 						isAttackMode = false;
 						
 					} else if (InfoUtils.enemyNumUnits(UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon)
@@ -258,9 +258,9 @@ public class AttackExpansionManager {
 				if (InformationManager.Instance().enemyRace == Race.Protoss) {
 					
 					if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)) {
-						if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
+						if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
 								&& UnitUtils.availableScanningCount() == 0) {
-							Prebot.Broodwar.printf("dark and no comsat or vessel");
+							MyBotModule.Broodwar.printf("dark and no comsat or vessel");
 							isAttackMode = false;
 						}
 					}
@@ -452,12 +452,12 @@ public class AttackExpansionManager {
 
 	private int myDeadCombatUnitSupplies() {
 
-		int totmarine = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
-		int tottank = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
-		int totgoliath = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
-		int totvulture = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
-		int totwraith = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
-		int totvessel = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
+		int totmarine = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Marine);
+		int tottank = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) + MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int totgoliath = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
+		int totvulture = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
+		int totwraith = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
+		int totvessel = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
 
 		int result = (tottank + totgoliath + totvulture + totwraith + totvessel) * 2 + totmarine;
 		return result * 2;// 스타에서는 두배
@@ -468,13 +468,13 @@ public class AttackExpansionManager {
 		if (InformationManager.Instance().enemyRace == Race.Terran) {
 			int totbio = 0;
 
-			int tottank = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
-			int totgoliath = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
-			int totvulture = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
-			int totwraith = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
-			int totvessel = Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
-			totbio = Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Marine) + Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Firebat)
-					+ Prebot.Broodwar.self().killedUnitCount(UnitType.Terran_Medic);
+			int tottank = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) + MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+			int totgoliath = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Goliath);
+			int totvulture = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Vulture);
+			int totwraith = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith);
+			int totvessel = MyBotModule.Broodwar.self().deadUnitCount(UnitType.Terran_Science_Vessel);
+			totbio = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Marine) + MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Firebat)
+					+ MyBotModule.Broodwar.self().killedUnitCount(UnitType.Terran_Medic);
 
 			int res = tottank + totgoliath + totvulture + totwraith + totvessel;
 			res = res * 2 + totbio;
@@ -490,14 +490,14 @@ public class AttackExpansionManager {
 			int totlurker = 0;
 
 			// tot = MyBotModule.Broodwar.self().killedUnitCount(UnitType.AllUnits);
-			totzerling = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Zergling);
-			tothydra = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Hydralisk);
-			totlurker = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker) + Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker_Egg);
-			totmutal = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Mutalisk);
-			totoverload = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
-			int totguardian = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Guardian);
-			int totultra = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Ultralisk);
-			int totsunken = Prebot.Broodwar.self().killedUnitCount(UnitType.Zerg_Sunken_Colony);
+			totzerling = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Zergling);
+			tothydra = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Hydralisk);
+			totlurker = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker) + MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Lurker_Egg);
+			totmutal = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Mutalisk);
+			totoverload = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Overlord);
+			int totguardian = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Guardian);
+			int totultra = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Ultralisk);
+			int totsunken = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Zerg_Sunken_Colony);
 
 			int res = totzerling + (totsunken * 2) + (tothydra * 2) + (totmutal * 4) + (totoverload * 3) + (totlurker * 5) + (totguardian * 8) + (totultra * 10);
 			return res; // 저그는 저글링 때문에 이미 2배 함
@@ -506,13 +506,13 @@ public class AttackExpansionManager {
 
 			// tot = MyBotModule.Broodwar.self().killedUnitCount();
 
-			int totzealot = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Zealot);
-			int totdragoon = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Dragoon);
-			int totarchon = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Archon);
-			int totphoto = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Photon_Cannon);
-			int tothigh = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_High_Templar);
-			int totdark = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Dark_Templar);
-			int totcarrier = Prebot.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
+			int totzealot = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Zealot);
+			int totdragoon = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Dragoon);
+			int totarchon = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Archon);
+			int totphoto = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Photon_Cannon);
+			int tothigh = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_High_Templar);
+			int totdark = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Dark_Templar);
+			int totcarrier = MyBotModule.Broodwar.self().killedUnitCount(UnitType.Protoss_Carrier);
 
 			int res = (totzealot + totdragoon + totphoto + tothigh + totdark) * 2 + totarchon * 4 + totcarrier * 8;
 			return res * 2;
@@ -552,7 +552,7 @@ public class AttackExpansionManager {
 
 		int mineralsNearDepot = 0;
 
-		for (Unit unit : Prebot.Broodwar.getAllUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits()) {
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 450 && unit.getResources() > 200) {
 				mineralsNearDepot++;
 			}

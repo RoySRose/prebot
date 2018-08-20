@@ -1,7 +1,7 @@
 package prebot.macro;
 
 import bwapi.Unit;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class EnemyMineral {
 
@@ -39,8 +39,8 @@ public class EnemyMineral {
     }
 
     public void updateResources() {
-        if(mineralUnit.isVisible() || Prebot.Broodwar.isVisible(mineralUnit.getInitialPosition().getX()/32, mineralUnit.getInitialPosition().getY()/32)){
-            this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
+        if(mineralUnit.isVisible() || MyBotModule.Broodwar.isVisible(mineralUnit.getInitialPosition().getX()/32, mineralUnit.getInitialPosition().getY()/32)){
+            this.lastCheckFrame = MyBotModule.Broodwar.getFrameCount();
             this.realMineral = 1500 - mineralUnit.getResources();
         } 
     }

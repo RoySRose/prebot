@@ -2,7 +2,7 @@ package prebot.strategy.action.impl;
 
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -35,7 +35,7 @@ public class GasAdjustment8Barrack111 extends Action {
 			if (workerCount < 8) {
 				StrategyIdea.gasAdjustmentWorkerCount = 0;
 			} else {
-				if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) > 0 || Prebot.Broodwar.self().gas() >= 100) {
+				if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) > 0 || MyBotModule.Broodwar.self().gas() >= 100) {
 					StrategyIdea.gasAdjustmentWorkerCount = 1;
 				} else {
 					StrategyIdea.gasAdjustmentWorkerCount = 2;

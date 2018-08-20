@@ -12,7 +12,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 
@@ -84,7 +84,7 @@ public class WorkerData {
 	public WorkerData() 
 	{
 		
-		for (Unit unit : Prebot.Broodwar.getAllUnits())
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field))
 			{
@@ -111,7 +111,7 @@ public class WorkerData {
 				workers.remove(worker);
 			}
 			else {
-				if (worker.getType().isWorker() == false || worker.getPlayer() != Prebot.Broodwar.self() 
+				if (worker.getType().isWorker() == false || worker.getPlayer() != MyBotModule.Broodwar.self() 
 						|| worker.exists() == false || worker.getHitPoints() == 0) {
 									
 					clearPreviousJob(worker);
@@ -603,7 +603,7 @@ public class WorkerData {
 	    int radius = 320;
 	    int c = 0;
 	    ArrayList<Minerals> mineralList = new ArrayList<Minerals>();
-	    for (Unit unit : Prebot.Broodwar.getMinerals())
+	    for (Unit unit : MyBotModule.Broodwar.getMinerals())
 		{
 			if (unit.getType() == UnitType.Resource_Mineral_Field && unit.getDistance(depot) < radius)
 			{
@@ -619,7 +619,7 @@ public class WorkerData {
 	    if (mineralList.size() == 0)
 	    {
 	    	mineralList = new ArrayList<Minerals>();
-	    	for (Unit unit : Prebot.Broodwar.getMinerals()) {
+	    	for (Unit unit : MyBotModule.Broodwar.getMinerals()) {
 	        	/*if(unit.getDistance(enemyBaseLocation) < radius)
 	        		continue;*/
 			    if ((unit.getType() == UnitType.Resource_Mineral_Field))
@@ -642,7 +642,7 @@ public class WorkerData {
 
 		int mineralsNearDepot = 0;
 
-		for (Unit unit : Prebot.Broodwar.getAllUnits())
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 		{
 			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320)
 			{
@@ -660,7 +660,7 @@ public class WorkerData {
 
 		int mineralsNearDepot = 0;
 
-		for (Unit unit : Prebot.Broodwar.getMinerals())
+		for (Unit unit : MyBotModule.Broodwar.getMinerals())
 		{
 			if (unit.getDistance(depot) < 320)
 			{
@@ -676,7 +676,7 @@ public class WorkerData {
 			return null;
 		}
 
-		for (Unit geyser : Prebot.Broodwar.getGeysers()) {
+		for (Unit geyser : MyBotModule.Broodwar.getGeysers()) {
 			if (geyser.getDistance(base) < 320) {
 				return geyser;
 			}

@@ -15,7 +15,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
@@ -71,10 +71,10 @@ public abstract class BuildingFlyControl extends Control{
             flyCondition.setBuildingFly(BuildingFly.UP);
         }else {
             if (flyCondition.isGateway()) {
-                if (Prebot.Broodwar.enemy().getRace() == Race.Zerg) {
+                if (MyBotModule.Broodwar.enemy().getRace() == Race.Zerg) {
                     flyCondition.setBuildingFly(BuildingFly.DOWN);
                 }else{
-                	 if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount() && checkEnemyNearBy(unit) == false) {
+                	 if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > MyBotModule.Broodwar.getFrameCount() && checkEnemyNearBy(unit) == false) {
                          flyCondition.setBuildingFly(BuildingFly.UP);
                          //System.out.println("wait!");
                      } else {

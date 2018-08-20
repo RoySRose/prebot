@@ -10,7 +10,7 @@ import bwapi.UpgradeType;
 import prebot.build.prebot1.BuildManager;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
@@ -46,12 +46,12 @@ public class ResearchSelector implements Selector<MetaType>{
     
     public void executeResearchChk() {
 
-		boolean VS = (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false)
-				|| (Prebot.Broodwar.self().isUpgrading(UpgradeType.Ion_Thrusters) ? true : false);
-		boolean VM = (Prebot.Broodwar.self().hasResearched(TechType.Spider_Mines)) || (Prebot.Broodwar.self().isResearching(TechType.Spider_Mines));
-		boolean TS = (Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) || (Prebot.Broodwar.self().isResearching(TechType.Tank_Siege_Mode));
-		boolean GR = (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1 ? true : false)
-				|| (Prebot.Broodwar.self().isUpgrading(UpgradeType.Charon_Boosters) ? true : false);
+		boolean VS = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1 ? true : false)
+				|| (MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Ion_Thrusters) ? true : false);
+		boolean VM = (MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)) || (MyBotModule.Broodwar.self().isResearching(TechType.Spider_Mines));
+		boolean TS = (MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) || (MyBotModule.Broodwar.self().isResearching(TechType.Tank_Siege_Mode));
+		boolean GR = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1 ? true : false)
+				|| (MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Charon_Boosters) ? true : false);
 
 		
 		
@@ -115,8 +115,8 @@ public class ResearchSelector implements Selector<MetaType>{
 					continue;
 				}
 				if(e.isUpgrade()) {
-					if(Prebot.Broodwar.self().getUpgradeLevel(e.getUpgradeType()) == 1 
-							|| Prebot.Broodwar.self().isUpgrading(e.getUpgradeType())
+					if(MyBotModule.Broodwar.self().getUpgradeLevel(e.getUpgradeType()) == 1 
+							|| MyBotModule.Broodwar.self().isUpgrading(e.getUpgradeType())
 							|| BuildManager.Instance().buildQueue.getItemCount(e.getUpgradeType()) != 0
 							) {
 						continue;
@@ -127,8 +127,8 @@ public class ResearchSelector implements Selector<MetaType>{
 					}
 				}
 				if(e.isTech()) {
-					if(Prebot.Broodwar.self().hasResearched(e.getTechType()) 
-							|| Prebot.Broodwar.self().isResearching(e.getTechType())
+					if(MyBotModule.Broodwar.self().hasResearched(e.getTechType()) 
+							|| MyBotModule.Broodwar.self().isResearching(e.getTechType())
 							|| BuildManager.Instance().buildQueue.getItemCount(e.getTechType()) != 0
 							){
 						continue;

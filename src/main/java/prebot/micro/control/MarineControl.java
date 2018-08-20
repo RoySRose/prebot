@@ -22,7 +22,6 @@ import prebot.micro.KitingOption;
 import prebot.micro.MicroDecision;
 import prebot.micro.MicroDecisionMaker;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Angles;
 import prebot.micro.targeting.DefaultTargetCalculator;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -55,7 +54,7 @@ public class MarineControl extends Control {
 		
 		// TODO 초반 저글링 디펜스가 필요한 경우 일꾼 사이로 위치 고정
 		if (bunker == null && inCompleteBunker == null) {
-			CampType campType = StrategyIdea.campType;
+			PositionFinder.CampType campType = StrategyIdea.campType;
 			for (Unit marine : unitList) {
 				if (skipControl(marine)) {
 					continue;

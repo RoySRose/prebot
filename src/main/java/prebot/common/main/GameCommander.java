@@ -22,7 +22,6 @@ import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
 import prebot.macro.AttackDecisionMaker;
 import prebot.micro.CombatManager;
-import prebot.micro.MicroDecisionMaker;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyManager;
@@ -43,7 +42,7 @@ public class GameCommander {
 	public void onStart() 
 	{
 		System.out.println("onStart() started");
-		TilePosition startLocation = Prebot.Broodwar.self().getStartLocation();
+		TilePosition startLocation = MyBotModule.Broodwar.self().getStartLocation();
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
 		}
@@ -70,21 +69,21 @@ public class GameCommander {
 
     void temp2() {
     	
-    	int f = Prebot.Broodwar.getFrameCount();
+    	int f = MyBotModule.Broodwar.getFrameCount();
     	
-    	if(!once && Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) == 18 ) {
-    		System.out.println("scv meet " +  Prebot.Broodwar.getFrameCount());
+    	if(!once && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) == 18 ) {
+    		System.out.println("scv meet " +  MyBotModule.Broodwar.getFrameCount());
     		once = true;
     	}
     	if(f>3000 && f < 5000) {
 	    	if(f % 10 == 0) {
-		    	System.out.print("frame== " +  Prebot.Broodwar.getFrameCount() +", ");
-		    	System.out.println("mineral: " +  Prebot.Broodwar.self().gatheredMinerals());
+		    	System.out.print("frame== " +  MyBotModule.Broodwar.getFrameCount() +", ");
+		    	System.out.println("mineral: " +  MyBotModule.Broodwar.self().gatheredMinerals());
 	    	}
     	}else {
     		if(f % 1000 == 0) {
-		    	System.out.print("frame== " +  Prebot.Broodwar.getFrameCount() +", ");
-		    	System.out.println("mineral: " +  Prebot.Broodwar.self().gatheredMinerals());
+		    	System.out.print("frame== " +  MyBotModule.Broodwar.getFrameCount() +", ");
+		    	System.out.println("mineral: " +  MyBotModule.Broodwar.self().gatheredMinerals());
 	    	}
     	}
     	
@@ -102,7 +101,7 @@ public class GameCommander {
     }
 	void temp() {
 		Unit depot = null;
-		for (Unit unit : Prebot.Broodwar.getAllUnits())
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits())
         {
             if ((unit.getType() == UnitType.Terran_Command_Center))
             {
@@ -119,7 +118,7 @@ public class GameCommander {
 		
 		
 		if(geyser==null) {
-			for (Unit unit : Prebot.Broodwar.getStaticGeysers()) {
+			for (Unit unit : MyBotModule.Broodwar.getStaticGeysers()) {
 				System.out.println("unit: " + unit.getPosition());
 	            if (unit.getType() == UnitType.Resource_Vespene_Geyser && unit.getDistance(depot) < 320) {
 	            	geyser = unit;
@@ -128,7 +127,7 @@ public class GameCommander {
 	        }
 		}
 		
-		List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
+		List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
 		
 			
         for (Unit u : alreadyBuiltUnits) {
@@ -140,7 +139,7 @@ public class GameCommander {
         
         if(!sout) {
         	int cnt=0;
-        	for (Unit unit : Prebot.Broodwar.getAllUnits())
+        	for (Unit unit : MyBotModule.Broodwar.getAllUnits())
 	        {
 	            if ((unit.getType() == UnitType.Terran_SCV) && unit.isCompleted())
 	            {
@@ -151,8 +150,8 @@ public class GameCommander {
         	System.out.println("scv: " + cnt);
         }
         
-        if(Prebot.Broodwar.getFrameCount() % 10 == 0) {
-	        System.out.println("===============" + Prebot.Broodwar.getFrameCount());
+        if(MyBotModule.Broodwar.getFrameCount() % 10 == 0) {
+	        System.out.println("===============" + MyBotModule.Broodwar.getFrameCount());
 	        if(sout) {
 	        	System.out.println("gas: " + geyser.getID() + ", " + geyser.getResources());
 	        }
@@ -256,7 +255,7 @@ public class GameCommander {
 		
 		if (unit.getPlayer() == InformationManager.Instance().selfPlayer) {
 			if (unit.getType() == UnitType.Terran_Command_Center) {
-				Unit closestMineral = UnitUtils.getClosestUnitToPosition(Prebot.Broodwar.getMinerals(), unit.getPosition());
+				Unit closestMineral = UnitUtils.getClosestUnitToPosition(MyBotModule.Broodwar.getMinerals(), unit.getPosition());
 				if (closestMineral != null) {
 					unit.setRallyPoint(closestMineral);
 				}
@@ -314,7 +313,7 @@ public class GameCommander {
 	}
 
 	private boolean playableCondition() {
-		return !Prebot.Broodwar.isPaused() && !PlayerUtils.isDisabled(Prebot.Broodwar.self()) && !PlayerUtils.isDisabled(Prebot.Broodwar.enemy());
+		return !MyBotModule.Broodwar.isPaused() && !PlayerUtils.isDisabled(MyBotModule.Broodwar.self()) && !PlayerUtils.isDisabled(MyBotModule.Broodwar.enemy());
 	}
 
 }

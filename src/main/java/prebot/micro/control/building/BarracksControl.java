@@ -6,7 +6,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.micro.control.BuildingFly;
 import prebot.micro.control.BuildingFlyControl;
@@ -26,7 +26,7 @@ public class BarracksControl extends BuildingFlyControl {
         for(Unit unit :  unitList){
             buildingFlyMap.put(unit, new FlyCondition(false, true, BlockingEntrance.Instance().barrack));
 
-            if (Prebot.Broodwar.getFrameCount() > 12000) {
+            if (MyBotModule.Broodwar.getFrameCount() > 12000) {
                 buildingFlyMap.get(unit).setFlyPosition(getFlyPosition0(unit));
             }
 

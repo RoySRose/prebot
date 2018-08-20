@@ -5,7 +5,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.build.prebot1.ConstructionPlaceFinder;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.internal.UnitCache;
@@ -53,9 +53,9 @@ public class EnemyCommandInfo {
         this.isMainBase = isMainBase;
 
         if(unitInfo.isCompleted()) {
-            this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
+            this.lastCheckFrame = MyBotModule.Broodwar.getFrameCount();
         }else{
-            this.lastCheckFrame = Prebot.Broodwar.getFrameCount() + unitInfo.getRemainingBuildTime();
+            this.lastCheckFrame = MyBotModule.Broodwar.getFrameCount() + unitInfo.getRemainingBuildTime();
         }
         
         Unit geyser = getGeyser(unitInfo.getLastPosition());
@@ -100,7 +100,7 @@ public class EnemyCommandInfo {
         int radius = 280;
         ArrayList<EnemyMineral> mineralList = new ArrayList<>();
         
-        for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
+        for (Unit unit : MyBotModule.Broodwar.getStaticMinerals()) {
             if (unit.getInitialPosition().getDistance(depotPosition) < radius) {
                 EnemyMineral newMineral = new EnemyMineral(unit);
                 mineralList.add(newMineral);
@@ -122,7 +122,7 @@ public class EnemyCommandInfo {
 
         if(unitInfo.getUnit() != null && unitInfo.getUnit().isVisible() && mineralCalculator.allVisible()){
 
-            lastFullCheckFrame = Prebot.Broodwar.getFrameCount();
+            lastFullCheckFrame = MyBotModule.Broodwar.getFrameCount();
             workerCounter.setLastFullCheckFrame(lastFullCheckFrame);
             
             workerCounter.updateCount(unitInfo, mineralCalculator, gasCalculator);
@@ -171,13 +171,13 @@ public class EnemyCommandInfo {
         	halfWorkerFrame =0;
         }
         
-        if(fullWorkerFrame == 0 && workerCount == mineralCalculator.getMineralCount()*2  && Prebot.Broodwar.getFrameCount()>7000) {
-        	fullWorkerFrame = Prebot.Broodwar.getFrameCount();
+        if(fullWorkerFrame == 0 && workerCount == mineralCalculator.getMineralCount()*2  && MyBotModule.Broodwar.getFrameCount()>7000) {
+        	fullWorkerFrame = MyBotModule.Broodwar.getFrameCount();
         	 //System.out.println("update fullWorkerFrame: " + fullWorkerFrame+", " + workerCount);
         }
         
-        if(halfWorkerFrame == 0 && workerCount > mineralCalculator.getMineralCount() && Prebot.Broodwar.getFrameCount()>3800) {
-        	halfWorkerFrame = Prebot.Broodwar.getFrameCount();
+        if(halfWorkerFrame == 0 && workerCount > mineralCalculator.getMineralCount() && MyBotModule.Broodwar.getFrameCount()>3800) {
+        	halfWorkerFrame = MyBotModule.Broodwar.getFrameCount();
         	 //System.out.println("update halfWorkerFrame: " + halfWorkerFrame+", " + workerCount);
         }
         
@@ -197,19 +197,19 @@ public class EnemyCommandInfo {
         	if(halfWorkerFrame > lastCheckedFrame) {
             	term1 = halfWorkerFrame - lastCheckedFrame;
       			term2 =	fullWorkerFrame - halfWorkerFrame;
-            	term3 = Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
+            	term3 = MyBotModule.Broodwar.getFrameCount() - fullWorkerFrame;
             	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
                 appliedWorkerCount2 = (workerCounter.halfWorker + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
         	}else if (fullWorkerFrame > lastCheckedFrame){
         		term1 = 0;
             	term2 = fullWorkerFrame - lastCheckedFrame;
-            	term3 =	Prebot.Broodwar.getFrameCount() - fullWorkerFrame;
+            	term3 =	MyBotModule.Broodwar.getFrameCount() - fullWorkerFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCounter.maxWorker) / 2 - workerCounter.halfWorker;
         	}else {
         		term1 = 0;
         		term2 = 0;
-            	term3 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
+            	term3 = MyBotModule.Broodwar.getFrameCount() - lastCheckedFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = 0;
         	}
@@ -239,12 +239,12 @@ public class EnemyCommandInfo {
         	
         	if(halfWorkerFrame > lastCheckedFrame) {
             	term1 = halfWorkerFrame - lastCheckedFrame;
-      			term2 =	Prebot.Broodwar.getFrameCount() - halfWorkerFrame;
+      			term2 =	MyBotModule.Broodwar.getFrameCount() - halfWorkerFrame;
             	appliedWorkerCount = (lastFullCheckWorkerCount + workerCounter.halfWorker) / 2;
                 appliedWorkerCount2 = (workerCounter.halfWorker + workerCount) / 2 - workerCounter.halfWorker;
         	}else {
         		term1 = 0;
-            	term2 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
+            	term2 = MyBotModule.Broodwar.getFrameCount() - lastCheckedFrame;
             	appliedWorkerCount = 0;
                 appliedWorkerCount2 = (lastFullCheckWorkerCount + workerCount) / 2 - workerCounter.halfWorker;
         	}
@@ -274,7 +274,7 @@ public class EnemyCommandInfo {
 //	            predictedIncrementMineral = firstTermIncremental;
         }else {
         	//(if(enemyMineral.getLastCheckFrame() == 0)
-        	term1 = Prebot.Broodwar.getFrameCount() - lastCheckedFrame;
+        	term1 = MyBotModule.Broodwar.getFrameCount() - lastCheckedFrame;
         	appliedWorkerCount = (lastFullCheckWorkerCount + workerCount) / 2;
 
         	int firstSetIncremental = 0;

@@ -11,7 +11,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -287,7 +287,7 @@ public class TankControl extends Control {
 				return false;
 			}
 			if (MicroUtils.isMeleeUnit(eui.getType())) {
-				if (!hasEnoughBackUpUnitToSiege || Prebot.Broodwar.self().supplyUsed() > 380) {
+				if (!hasEnoughBackUpUnitToSiege || MyBotModule.Broodwar.self().supplyUsed() > 380) {
 					return false;
 				}
 			}

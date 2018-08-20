@@ -1,6 +1,6 @@
 package prebot.common;
 
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class LagObserver {
 
@@ -39,21 +39,21 @@ public class LagObserver {
 	}
 	
 	public void observe() {
-		observedTime[Prebot.Broodwar.getFrameCount() % OBSERVER_CAPACITY] = System.currentTimeMillis() - this.startTime;
+		observedTime[MyBotModule.Broodwar.getFrameCount() % OBSERVER_CAPACITY] = System.currentTimeMillis() - this.startTime;
 		this.startTime = System.currentTimeMillis();
 		this.adjustment();
 	}
 	
 	public void adjustment() {
 		if (ADJUST_ON) {
-			long cost = observedTime[Prebot.Broodwar.getFrameCount() % OBSERVER_CAPACITY];
+			long cost = observedTime[MyBotModule.Broodwar.getFrameCount() % OBSERVER_CAPACITY];
 			
 			if (cost > MILLISEC_MAX_COAST) {
 				if (groupsize < groupMaxSize) {
 					groupsize++;
 				}
 			} else {
-				if (Prebot.Broodwar.self().supplyUsed() > 300) {
+				if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
 					groupMinSize = 8;
 				} else {
 					groupMinSize = 3;

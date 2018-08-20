@@ -9,7 +9,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitCommand;
 import bwapi.UnitCommandType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class CommandUtils {
 	public static Map<Integer, Integer> siegeModeChangeMap = new HashMap<>();
@@ -63,7 +63,7 @@ public class CommandUtils {
 		if (!UnitUtils.isValidUnit(target)) {
 			return;
 		}
-		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) {
 			return;
 		}
 		UnitCommand currentCommand = unit.getLastCommand();
@@ -82,7 +82,7 @@ public class CommandUtils {
 		if (!PositionUtils.isValidPosition(position)) {
 			return;
 		}
-		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) {
 			return;
 		}
 		UnitCommand currentCommand = unit.getLastCommand();
@@ -197,7 +197,7 @@ public class CommandUtils {
 		if (!PositionUtils.isValidPosition(position)) {
 			return false;
 		}
-		if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) {
 			return false;
 		}
 		if (notIssueOnAttackFrame && unit.isAttackFrame()) {
@@ -227,7 +227,7 @@ public class CommandUtils {
         if (!PositionUtils.isValidTilePosition(tilePosition)) {
             return false;
         }
-        if (unit.getLastCommandFrame() >= Prebot.Broodwar.getFrameCount()) {
+        if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount()) {
             return false;
         }
         if (notIssueOnAttackFrame && unit.isAttackFrame()) {
@@ -239,7 +239,7 @@ public class CommandUtils {
         }
         UnitCommand lastCommand = unit.getLastCommand();
         if (lastCommand.getUnitCommandType() == commandType) {
-            	if (unit.getLastCommandFrame() + 1 >= Prebot.Broodwar.getFrameCount()) {    
+            	if (unit.getLastCommandFrame() + 1 >= MyBotModule.Broodwar.getFrameCount()) {    
                     return false;
                 }
         }

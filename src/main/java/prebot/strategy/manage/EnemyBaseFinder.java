@@ -9,7 +9,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
@@ -38,7 +38,7 @@ public class EnemyBaseFinder {
 			finished = true;
 			return;
 		}
-		if (StrategyIdea.enemyBaseExpected != null && Prebot.Broodwar.isExplored(StrategyIdea.enemyBaseExpected.getTilePosition())) {
+		if (StrategyIdea.enemyBaseExpected != null && MyBotModule.Broodwar.isExplored(StrategyIdea.enemyBaseExpected.getTilePosition())) {
 			StrategyIdea.enemyBaseExpected = null;
 		}
 		if (StrategyIdea.enemyBaseExpected != null) {
@@ -72,7 +72,7 @@ public class EnemyBaseFinder {
 				if (startLocation.getTilePosition().equals(InfoUtils.myBase().getTilePosition())) {
 					continue;
 				}
-				if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+				if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
 					continue;
 				}
 				if (eui.getLastPosition().getDistance(centerPosition) < 500) {
@@ -128,7 +128,7 @@ public class EnemyBaseFinder {
 			if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
 				continue;
 			}
-			if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+			if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
 				continue;
 			}
 

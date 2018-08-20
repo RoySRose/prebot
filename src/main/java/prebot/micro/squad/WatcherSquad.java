@@ -10,7 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
@@ -159,10 +159,10 @@ public class WatcherSquad extends Squad {
 			
 			int weaponRange = 0; // radius 안의 공격범위가 닿는 적까지 포함
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				weaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
+				weaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 			} else {
 				if (eui.getType().groundWeapon() != WeaponType.None) {
-					weaponRange = Math.max(weaponRange, Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
+					weaponRange = Math.max(weaponRange, MyBotModule.Broodwar.enemy().weaponMaxRange(eui.getType().groundWeapon()));
 				}
 			}
 			
@@ -180,7 +180,7 @@ public class WatcherSquad extends Squad {
 				
 				if (add) {
 					euis.add(eui);
-					Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), 30, Color.Red, false);
+					MyBotModule.Broodwar.drawCircleMap(eui.getLastPosition(), 30, Color.Red, false);
 				}
 			}
 		}

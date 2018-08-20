@@ -3,7 +3,7 @@ package prebot.common.util;
 import bwapi.Player;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 /**
  * @author insaneojw
@@ -18,11 +18,11 @@ public class PlayerUtils {
 	
 	public static Player getPlayerByRange(CommonCode.PlayerRange playerRange) {
 		if (playerRange == CommonCode.PlayerRange.SELF) {
-			return Prebot.Broodwar.self();
+			return MyBotModule.Broodwar.self();
 		} else if (playerRange == CommonCode.PlayerRange.ENEMY) {
-			return Prebot.Broodwar.enemy();
+			return MyBotModule.Broodwar.enemy();
 		} else if (playerRange == CommonCode.PlayerRange.NEUTRAL) {
-			return Prebot.Broodwar.neutral();
+			return MyBotModule.Broodwar.neutral();
 		} else {
 			return null;
 		}
@@ -33,7 +33,7 @@ public class PlayerUtils {
 	}
 	
 	public static boolean enoughResource(int mineralNeed, int gasNeed) {
-		return mineralNeed <= Prebot.Broodwar.self().minerals() &&  gasNeed <= Prebot.Broodwar.self().gas();
+		return mineralNeed <= MyBotModule.Broodwar.self().minerals() &&  gasNeed <= MyBotModule.Broodwar.self().gas();
 	}
 	
 }

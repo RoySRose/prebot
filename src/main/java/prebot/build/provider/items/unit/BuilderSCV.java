@@ -13,7 +13,7 @@ import prebot.build.prebot1.BuildOrderQueue;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -31,10 +31,10 @@ public class BuilderSCV extends DefaultBuildableItem {
 
 	public final boolean buildCondition() {
 
-		if (Prebot.Broodwar.self().supplyTotal() - Prebot.Broodwar.self().supplyUsed() < 2) {
+		if (MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 2) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().minerals() < 50) {
+		if (MyBotModule.Broodwar.self().minerals() < 50) {
 			return false;
 		}
 
@@ -45,7 +45,7 @@ public class BuilderSCV extends DefaultBuildableItem {
 
 		List<Unit> commandCenters = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center);
 		if (!StrategyIdea.EXOK) {
-			if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
+			if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) == 2) {
 				Unit secondCommandCenter = null;
 
 				for (Unit commandCenter : commandCenters) {
@@ -97,8 +97,8 @@ public class BuilderSCV extends DefaultBuildableItem {
 			}
 		}
 
-		int maxworkerCount = tot_mineral_self * 2 + 8 * Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
-		int workerCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_SCV); // workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
+		int maxworkerCount = tot_mineral_self * 2 + 8 * MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+		int workerCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_SCV); // workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
 		// List CommandCenter = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		for (Unit commandcenter : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			if (commandcenter.isTraining()) {
@@ -161,11 +161,11 @@ public class BuilderSCV extends DefaultBuildableItem {
 						setHighPriority(true);
 						return true;
 					} else {
-						int checkgas = checkItem.metaType.getUnitType().gasPrice() - Prebot.Broodwar.self().gas();
+						int checkgas = checkItem.metaType.getUnitType().gasPrice() - MyBotModule.Broodwar.self().gas();
 						if (checkgas < 0) {
 							checkgas = 0;
 						}
-						if (Prebot.Broodwar.self().minerals() > checkItem.metaType.getUnitType().mineralPrice() + 50 - checkgas) {
+						if (MyBotModule.Broodwar.self().minerals() > checkItem.metaType.getUnitType().mineralPrice() + 50 - checkgas) {
 							// BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 							setHighPriority(true);
 							return true;

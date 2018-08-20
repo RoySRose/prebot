@@ -10,7 +10,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -26,7 +26,7 @@ public class BuilderArmory extends DefaultBuildableItem {
 
 	public final boolean buildCondition() {
 //		setRecoverItemCount(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory));
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) == 0) {
 			return false;
 		}
 		
@@ -65,9 +65,9 @@ public class BuilderArmory extends DefaultBuildableItem {
 		}
 		
 		// 활성화 되기 전 2팩이상 가스 여유가 있으면 빠른  아머리
-		int commandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-		int factoryCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
-		if (commandCenterCount == 2 && factoryCount >= 2 && Prebot.Broodwar.self().gas() > 200) {
+		int commandCenterCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int factoryCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory);
+		if (commandCenterCount == 2 && factoryCount >= 2 && MyBotModule.Broodwar.self().gas() > 200) {
 			return true;
 		}
 

@@ -9,7 +9,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 
 public class BuilderBarracks extends DefaultBuildableItem {
@@ -25,7 +25,7 @@ public class BuilderBarracks extends DefaultBuildableItem {
     
     public final boolean buildCondition(){
     	
-    	nowBarrack = Prebot.Broodwar.self().incompleteUnitCount(UnitType.Terran_Barracks) + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks);
+    	nowBarrack = MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Terran_Barracks) + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks);
     	
     	if(nowBarrack > 0) {
     		bfBarrack = nowBarrack;
@@ -53,10 +53,10 @@ public class BuilderBarracks extends DefaultBuildableItem {
     	
     	
 		
-		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 0) {
+		if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 0) {
 			return true;
 
-		} else if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 1) {
+		} else if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Barracks) == 1) {
 			List<Unit> barracksList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
 
 			for (Unit unit : barracksList) {

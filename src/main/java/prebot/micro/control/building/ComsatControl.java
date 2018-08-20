@@ -17,7 +17,7 @@ import bwta.BaseLocation;
 import prebot.common.MapGrid;
 import prebot.common.MapGrid.GridCell;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -154,7 +154,7 @@ public class ComsatControl extends Control {
 					continue;
 				}
 
-				int weaponMaxRange = Prebot.Broodwar.self().weaponMaxRange(weaponType);
+				int weaponMaxRange = MyBotModule.Broodwar.self().weaponMaxRange(weaponType);
 				int weaponRangeMargin = 15; // 쉽게 스캔을 사용해 공격할 수 있도록 두는 여유값(조절필요)
 				if (!enemyUnit.isMoving()) {
 					weaponRangeMargin += 10;
@@ -228,7 +228,7 @@ public class ComsatControl extends Control {
 		}
 		int oldestLastCheckTime = CommonCode.INT_MAX;
 		for (TilePosition scanTilePosition : scanTilePositionCandidate) {
-			if (Prebot.Broodwar.isVisible(scanTilePosition)) {
+			if (MyBotModule.Broodwar.isVisible(scanTilePosition)) {
 				continue;
 			}
 			Position scanPosotion = scanTilePosition.toPosition();

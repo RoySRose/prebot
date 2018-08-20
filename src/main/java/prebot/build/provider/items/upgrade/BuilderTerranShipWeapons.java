@@ -6,7 +6,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class BuilderTerranShipWeapons extends DefaultBuildableItem {
 
@@ -20,7 +20,7 @@ public class BuilderTerranShipWeapons extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
+    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
     		return false;
     	}
 		if (upgradeSelector.getSelected() == null) {
@@ -35,7 +35,7 @@ public class BuilderTerranShipWeapons extends DefaultBuildableItem {
 		if (upgradeSelector.getSelected().getUpgradeType() != metaType.getUpgradeType()) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().isUpgrading(upgradeSelector.getSelected().getUpgradeType())) {
+		if (MyBotModule.Broodwar.self().isUpgrading(upgradeSelector.getSelected().getUpgradeType())) {
 			return false;
 		}
     	

@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import prebot.common.constant.CommonConfig;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class FileUtils {
 
@@ -68,7 +68,7 @@ public class FileUtils {
 
 	/// 파일 유틸 - 경기 결과를 텍스트 파일로부터 읽어들인다
 	public void readResults() {
-		String enemyName = Prebot.Broodwar.enemy().getName();
+		String enemyName = MyBotModule.Broodwar.enemy().getName();
 		enemyName = enemyName.replace(" ", "_");
 
 		String enemyResultsFile = CommonConfig.FileConfig.READ_DIRECTORY + enemyName + ".txt";
@@ -99,7 +99,7 @@ public class FileUtils {
 
 	/// 파일 유틸 - 경기 결과를 텍스트 파일에 저장한다
 	public void writeResults() {
-		String enemyName = Prebot.Broodwar.enemy().getName();
+		String enemyName = MyBotModule.Broodwar.enemy().getName();
 		enemyName = enemyName.replace(" ", "_");
 
 		String enemyResultsFile = CommonConfig.FileConfig.WRITE_DIRECTORY + enemyName + ".txt";

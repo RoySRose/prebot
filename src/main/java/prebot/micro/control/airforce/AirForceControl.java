@@ -9,7 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -51,7 +51,7 @@ public class AirForceControl extends Control {
 			findRat(airunits);
 			return;
 		}
-		if (Prebot.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL).size() <= 3 && UnitUtils.enemyAirUnitPower() == 0) {
+		if (MyBotModule.Broodwar.self().supplyUsed() > 300 && UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL).size() <= 3 && UnitUtils.enemyAirUnitPower() == 0) {
 			for (Unit airunit : airunits) {
 				CommandUtils.attackMove(airunit, StrategyIdea.mainPosition);
 			}
@@ -283,7 +283,7 @@ public class AirForceControl extends Control {
 
 	private Position airFeePosition(AirForceTeam airForceTeam, UnitInfo eui) {
 		Position enemyPosition;
-		Unit enemyUnit = Prebot.Broodwar.getUnit(eui.getUnitID());
+		Unit enemyUnit = MyBotModule.Broodwar.getUnit(eui.getUnitID());
 		if (enemyUnit != null) {
 			enemyPosition = enemyUnit.getPosition();
 		} else {

@@ -13,7 +13,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -36,11 +36,11 @@ public class BuilderRefinery extends DefaultBuildableItem {
 		
 //		FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: check gasrush :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().isGasRushed());
     	
-		if (!InformationManager.Instance().isGasRushed() && Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Refinery) == 0) {
+		if (!InformationManager.Instance().isGasRushed() && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Refinery) == 0) {
 			
-			int barrackCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Barracks);
-			int suppleCompleteCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
-			int scvCompleteCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV);
+			int barrackCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Barracks);
+			int suppleCompleteCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Supply_Depot);
+			int scvCompleteCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV);
 			
 			if (barrackCount > 0 && suppleCompleteCount > 0 && scvCompleteCount > 10) {
 				
@@ -54,7 +54,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 		}
 
 		// 리파이너리는 커맨드 센터보다 많을 필요 없다.
-		int refineryCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Refinery);
+		int refineryCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Refinery);
 		List<Unit> commandCenterList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center);
 		
 		if (commandCenterList.size() <= refineryCount) {
@@ -65,7 +65,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 		for (Unit commandCenter : commandCenterList) {
 			Unit geyserAround = null;
 			boolean refineryAlreadyBuilt = false;
-			for (Unit unitsAround : Prebot.Broodwar.getUnitsInRadius(commandCenter.getPosition(), 300)) {
+			for (Unit unitsAround : MyBotModule.Broodwar.getUnitsInRadius(commandCenter.getPosition(), 300)) {
 				if (unitsAround == null)
 					continue;
 				if (unitsAround.getType() == UnitType.Terran_Refinery || unitsAround.getType() == UnitType.Zerg_Extractor

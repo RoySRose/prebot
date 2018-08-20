@@ -1,7 +1,7 @@
 package prebot.common.debug.chat.impl;
 
-import prebot.common.debug.UXManager;
 import prebot.common.debug.chat.ChatExecuter;
+import prebot.common.main.PreBotUXManager;
 
 public class UxOptionChanger extends ChatExecuter {
 	public UxOptionChanger(char type) {
@@ -11,6 +11,6 @@ public class UxOptionChanger extends ChatExecuter {
 	@Override
 	public void execute(String option) {
 		int optionInt = stringToInteger(option);
-		UXManager.Instance().setUxOption(optionInt);
+		PreBotUXManager.Instance().setUxOption(optionInt);
 	}
 };

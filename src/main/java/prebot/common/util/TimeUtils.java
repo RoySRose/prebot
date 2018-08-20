@@ -3,7 +3,7 @@ package prebot.common.util;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class TimeUtils {
 	
@@ -17,7 +17,7 @@ public class TimeUtils {
 	}
 	
 	public static boolean before(int frame) {
-		return Prebot.Broodwar.getFrameCount() < frame;
+		return MyBotModule.Broodwar.getFrameCount() < frame;
 	}
 	
 	/// 지나간 프레임이면 true
@@ -26,37 +26,37 @@ public class TimeUtils {
 	}
 	
 	public static boolean after(int frame) {
-		return Prebot.Broodwar.getFrameCount() > frame;
+		return MyBotModule.Broodwar.getFrameCount() > frame;
 	}
 
 	/// 경과시간을 frame으로 리턴
 	public static int elapsedFrames() {
-		return Prebot.Broodwar.getFrameCount();
+		return MyBotModule.Broodwar.getFrameCount();
 	}
 	
 	/// 경과시간을 second로 리턴
 	public static int elapsedSeconds() {
-		return Prebot.Broodwar.getFrameCount() / SECOND;
+		return MyBotModule.Broodwar.getFrameCount() / SECOND;
 	}
 	
 	/// 경과시간을 minute으로 리턴
 	public static int elapsedMiniutes() {
-		return Prebot.Broodwar.getFrameCount() / MINUTE;
+		return MyBotModule.Broodwar.getFrameCount() / MINUTE;
 	}
 	
 	/// 경과시간을 frame으로 리턴
 	public static int elapsedFrames(int startFrame) {
-		return Prebot.Broodwar.getFrameCount() - startFrame;
+		return MyBotModule.Broodwar.getFrameCount() - startFrame;
 	}
 
 	/// 경과시간을 second으로 리턴
 	public static int elapsedSeconds(int startFrame) {
-		return (Prebot.Broodwar.getFrameCount() - startFrame) / SECOND;
+		return (MyBotModule.Broodwar.getFrameCount() - startFrame) / SECOND;
 	}
 
 	/// 경과시간을 minute으로 리턴
 	public static int elapsedMiniutes(int startFrame) {
-		return (Prebot.Broodwar.getFrameCount() - startFrame) / MINUTE;
+		return (MyBotModule.Broodwar.getFrameCount() - startFrame) / MINUTE;
 	}
 
 	/// frame을 second로 단위변경하여 리턴
@@ -114,7 +114,7 @@ public class TimeUtils {
 
 	/// 실행할 frame되어야 하는 frame이면 true
 	public static boolean executeRotation(int group, int rotationSize) {
-		return (Prebot.Broodwar.getFrameCount() % rotationSize) == group;
+		return (MyBotModule.Broodwar.getFrameCount() % rotationSize) == group;
 //		return true;
 	}
 

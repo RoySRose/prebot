@@ -28,7 +28,7 @@ import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -145,8 +145,8 @@ public class InformationManager extends GameManager {
 	}
 
 	public InformationManager() {
-		selfPlayer = Prebot.Broodwar.self();
-		enemyPlayer = Prebot.Broodwar.enemy();
+		selfPlayer = MyBotModule.Broodwar.self();
+		enemyPlayer = MyBotModule.Broodwar.enemy();
 		selfRace = selfPlayer.getRace();
 		enemyRace = enemyPlayer.getRace();
 
@@ -171,7 +171,7 @@ public class InformationManager extends GameManager {
 		secondStartPosition = null;
 //		MainBaseSuppleLimit =0;
 
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if (unit.getType() == UnitType.Terran_Command_Center && FirstCC == null) {
 				FirstCC = unit;
 			}
@@ -186,14 +186,14 @@ public class InformationManager extends GameManager {
 		occupiedRegions.put(selfPlayer, new HashSet<Region>());
 		occupiedRegions.put(enemyPlayer, new HashSet<Region>());
 
-		mainBaseLocations.put(selfPlayer, BWTA.getStartLocation(Prebot.Broodwar.self()));
+		mainBaseLocations.put(selfPlayer, BWTA.getStartLocation(MyBotModule.Broodwar.self()));
 		mainBaseLocationChanged.put(selfPlayer, new Boolean(true));
 
 		occupiedBaseLocations.get(selfPlayer).add(mainBaseLocations.get(selfPlayer));
 		occupiedByCCBaseLocations.get(selfPlayer).add(mainBaseLocations.get(selfPlayer));
 		if (mainBaseLocations.get(selfPlayer) != null) {
 			updateOccupiedRegions(BWTA.getRegion(mainBaseLocations.get(selfPlayer).getTilePosition()),
-					Prebot.Broodwar.self());
+					MyBotModule.Broodwar.self());
 		}
 
 //		BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
@@ -292,7 +292,7 @@ public class InformationManager extends GameManager {
 
 		if (checkGasRush == true) {
 
-			for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if (unit.getType() == UnitType.Terran_Refinery && unit.isCompleted() && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
 //						FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: we have Refinery :: not danger gas rush");
@@ -300,7 +300,7 @@ public class InformationManager extends GameManager {
 					}
 				}
 			}
-			for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 				if (unit.getType() == getRefineryBuildingType(enemyRace) && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
 //						FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRsuhed is true :: "+ Prebot.Broodwar.getFrameCount() + " :: " + unit.getType());
@@ -344,7 +344,7 @@ public class InformationManager extends GameManager {
 			}
 		}
 		// 10000프레임 이전까지만 포톤러쉬 확인.
-		if (Prebot.Broodwar.getFrameCount() < 10000) {
+		if (MyBotModule.Broodwar.getFrameCount() < 10000) {
 			// 1. 본진에 적 포톤캐논이 있는지 본다.
 			List<UnitInfo> enemyUnitsInRegion = InfoUtils.euiListInMyRegion(InfoUtils.myBase().getRegion());
 			if (enemyUnitsInRegion.size() >= 1) {
@@ -362,11 +362,11 @@ public class InformationManager extends GameManager {
 	/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
 	public void updateUnitsInfo() {
 		// update our units info
-		for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 //			System.out.println(unit.getID() + ", " + unit.getType());
 			updateUnitInfo(unit);
 		}
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			updateUnitInfo(unit);
 		}
 		updateEnemiesLocation();
@@ -514,7 +514,7 @@ public class InformationManager extends GameManager {
 		// for (final Unit kv :
 		// getUnitData(player).getUnits().keySet().iterator()){
 
-		int currFrame = Prebot.Broodwar.getFrameCount();
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
 		while (it.hasNext()) {
 			final UnitInfo ui = getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
 			if (unitInfo.contains(ui)) {
@@ -598,7 +598,7 @@ public class InformationManager extends GameManager {
 					}
 				}
 
-				if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+				if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
 					// if it's explored, increment
 					exploredStartLocations++;
 				} else {
@@ -630,7 +630,7 @@ public class InformationManager extends GameManager {
 						if (startLocation.getTilePosition().equals(myBase.getTilePosition())) {
 							continue;
 						}
-						if (Prebot.Broodwar.isExplored(startLocation.getTilePosition())) {
+						if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
 							continue;
 						}
 						expectBase = startLocation;
@@ -671,7 +671,7 @@ public class InformationManager extends GameManager {
 			// enemy의 mainBaseLocations를 방문안한 상태에서는 건물이 하나도 없다고 판단하여 mainBaseLocation 을 변경하는
 			// 현상이 발생해서 enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.
 			TilePosition enemyBaseTile = mainBaseLocations.get(enemyPlayer).getTilePosition();
-			if (Prebot.Broodwar.isExplored(enemyBaseTile)) {
+			if (MyBotModule.Broodwar.isExplored(enemyBaseTile)) {
 				if (existsPlayerBuildingInRegion(BWTA.getRegion(enemyBaseTile), enemyPlayer) == false) {
 					System.out.println("not exist in enemy region. tile=" + enemyBaseTile);
 					
@@ -687,7 +687,7 @@ public class InformationManager extends GameManager {
 					// 방문한 적이 없는 starting location으로 설정 (최초 정찰이 실패하여 적 지역 예측했을 때)
 					if (enemyBaseLocation == null) {
 						for (BaseLocation loaction : BWTA.getStartLocations()) {
-							if (!Prebot.Broodwar.isExplored(loaction.getTilePosition())) {
+							if (!MyBotModule.Broodwar.isExplored(loaction.getTilePosition())) {
 								enemyBaseLocation = loaction;
 								break;
 							}
@@ -728,7 +728,7 @@ public class InformationManager extends GameManager {
 				final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
 				if (ui.getType().isBuilding()) {
 					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()),
-							Prebot.Broodwar.enemy());
+							MyBotModule.Broodwar.enemy());
 				}
 			}
 		}
@@ -748,7 +748,7 @@ public class InformationManager extends GameManager {
 					}
 
 					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()),
-							Prebot.Broodwar.self());
+							MyBotModule.Broodwar.self());
 				}
 			}
 		}
@@ -902,7 +902,7 @@ public class InformationManager extends GameManager {
 		BaseLocation resultBase = null;
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
-			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+			int numberOfCC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 //			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center));
 //			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center);
 //			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) +" + "+ Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center));
@@ -1544,7 +1544,7 @@ public class InformationManager extends GameManager {
 				if (ui.getType().isBuilding()) {
 
 					// 띄워졌있는 배럭, 엔베는 차지한 영역으로 안쓴다. 왜냐면 우리는 이것들을 시야확보용으로 쓸 것이기 때문이다.
-					if (player == Prebot.Broodwar.self() && UnitUtils.isCompleteValidUnit(ui.getUnit())
+					if (player == MyBotModule.Broodwar.self() && UnitUtils.isCompleteValidUnit(ui.getUnit())
 							&& ui.getUnit().isLifted() && (ui.getType() == UnitType.Terran_Barracks
 									|| ui.getType() == UnitType.Terran_Engineering_Bay)) {
 						continue;
@@ -1740,7 +1740,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Basic Combat Unit 에 해당하는 UnitType을 리턴합니다
 	public UnitType getBasicCombatUnitType() {
-		return getBasicCombatUnitType(Prebot.Broodwar.self().getRace());
+		return getBasicCombatUnitType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Basic Combat Unit 에 해당하는 UnitType을 리턴합니다
@@ -1758,7 +1758,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Advanced Combat Unit 에 해당하는 UnitType을 리턴합니다
 	public UnitType getAdvancedCombatUnitType() {
-		return getAdvancedCombatUnitType(Prebot.Broodwar.self().getRace());
+		return getAdvancedCombatUnitType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Advanced Combat Unit 에 해당하는 UnitType을 리턴합니다
@@ -1776,7 +1776,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Basic Combat Unit 을 생산하기 위해 건설해야하는 UnitType을 리턴합니다
 	public UnitType getBasicCombatBuildingType() {
-		return getBasicCombatBuildingType(Prebot.Broodwar.self().getRace());
+		return getBasicCombatBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Basic Combat Unit 을 생산하기 위해 건설해야하는 UnitType을 리턴합니다
@@ -1794,7 +1794,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Observer 에 해당하는 UnitType을 리턴합니다
 	public UnitType getObserverUnitType() {
-		return getObserverUnitType(Prebot.Broodwar.self().getRace());
+		return getObserverUnitType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Observer 에 해당하는 UnitType을 리턴합니다
@@ -1812,7 +1812,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 ResourceDepot 기능을 하는 UnitType을 리턴합니다
 	public UnitType getBasicResourceDepotBuildingType() {
-		return getBasicResourceDepotBuildingType(Prebot.Broodwar.self().getRace());
+		return getBasicResourceDepotBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 ResourceDepot 기능을 하는 UnitType을 리턴합니다
@@ -1830,7 +1830,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Refinery 기능을 하는 UnitType을 리턴합니다
 	public UnitType getRefineryBuildingType() {
-		return getRefineryBuildingType(Prebot.Broodwar.self().getRace());
+		return getRefineryBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Refinery 기능을 하는 UnitType을 리턴합니다
@@ -1848,7 +1848,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Worker 에 해당하는 UnitType을 리턴합니다
 	public UnitType getWorkerType() {
-		return getWorkerType(Prebot.Broodwar.self().getRace());
+		return getWorkerType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Worker 에 해당하는 UnitType을 리턴합니다
@@ -1866,7 +1866,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 SupplyProvider 기능을 하는 UnitType을 리턴합니다
 	public UnitType getBasicSupplyProviderUnitType() {
-		return getBasicSupplyProviderUnitType(Prebot.Broodwar.self().getRace());
+		return getBasicSupplyProviderUnitType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 SupplyProvider 기능을 하는 UnitType을 리턴합니다
@@ -1884,7 +1884,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Basic Depense 기능을 하는 UnitType을 리턴합니다
 	public UnitType getBasicDefenseBuildingType() {
-		return getBasicDefenseBuildingType(Prebot.Broodwar.self().getRace());
+		return getBasicDefenseBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Basic Depense 기능을 하는 UnitType을 리턴합니다
@@ -1902,7 +1902,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 Advanced Depense 기능을 하는 UnitType을 리턴합니다
 	public UnitType getAdvancedDefenseBuildingType() {
-		return getAdvancedDefenseBuildingType(Prebot.Broodwar.self().getRace());
+		return getAdvancedDefenseBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Advanced Depense 기능을 하는 UnitType을 리턴합니다
@@ -1920,7 +1920,7 @@ public class InformationManager extends GameManager {
 
 	// 해당 종족의 UnitType 중 방어유닛 러쉬 기능을 하는 UnitType을 리턴합니다
 	public UnitType getAdvancedRushBuildingType() {
-		return getAdvancedRushBuildingType(Prebot.Broodwar.self().getRace());
+		return getAdvancedRushBuildingType(MyBotModule.Broodwar.self().getRace());
 	}
 
 	// 해당 종족의 UnitType 중 Advanced Depense 기능을 하는 UnitType을 리턴합니다
@@ -1946,7 +1946,7 @@ public class InformationManager extends GameManager {
 	public void updateMapSpecificInformation() {
 		// name으로 map 판단
 		MapSpecificInformation.GameMap gameMap = MapSpecificInformation.GameMap.UNKNOWN;
-		String mapName = Prebot.Broodwar.mapFileName().toUpperCase();
+		String mapName = MyBotModule.Broodwar.mapFileName().toUpperCase();
 		if (mapName.matches(".*CIRCUIT.*")) {
 			gameMap = MapSpecificInformation.GameMap.CIRCUITBREAKER;
 		} else if (mapName.matches(".*SPIRIT.*")) {
@@ -1992,7 +1992,7 @@ public class InformationManager extends GameManager {
 
 		Vector<Position> regionVertices = new Vector<>();
 
-		final Position basePosition = Prebot.Broodwar.self().getStartLocation().toPosition();
+		final Position basePosition = MyBotModule.Broodwar.self().getStartLocation().toPosition();
 		final Vector<TilePosition> closestTobase = MapTools.Instance().getClosestTilesTo(basePosition);
 		Set<Position> unsortedVertices = new HashSet<Position>();
 
@@ -2007,19 +2007,19 @@ public class InformationManager extends GameManager {
 			// 2) in all 4 directions there's a buildable tile
 			boolean surrounded = true;
 			if (BWTA.getRegion(new TilePosition(tp.getX() + 1, tp.getY())) != enemyRegion
-					|| !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
+					|| !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
 					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() + 1)) != enemyRegion
-					|| !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
+					|| !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
 					|| BWTA.getRegion(new TilePosition(tp.getX() - 1, tp.getY())) != enemyRegion
-					|| !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
+					|| !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
 					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() - 1)) != enemyRegion
-					|| !Prebot.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1))) {
+					|| !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1))) {
 				surrounded = false;
 			}
 
 			// push the tiles that aren't surrounded
 			// Region의 가장자리 타일들만 추가한다
-			if (!surrounded && Prebot.Broodwar.isBuildable(tp)) {
+			if (!surrounded && MyBotModule.Broodwar.isBuildable(tp)) {
 				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
 			}
 		}
@@ -2159,7 +2159,7 @@ public class InformationManager extends GameManager {
 		if (barrackStart == -1) {
 			List<Unit> barrack = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Barracks);
 			if (!barrack.isEmpty()) {
-				barrackStart = Prebot.Broodwar.getFrameCount();
+				barrackStart = MyBotModule.Broodwar.getFrameCount();
 				// System.out.println("setting barrack: " + barrackStart);
 				firstBarrack = barrack.get(0);
 			}
@@ -2197,11 +2197,11 @@ public class InformationManager extends GameManager {
 		// 터렛지어지면 더이상 체크 안함
 		if (UnitUtils.myUnitDiscovered(UnitType.Terran_Missile_Turret) 
 				&& !UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)
-				||  Prebot.Broodwar.getFrameCount() > 12000) {
+				||  MyBotModule.Broodwar.getFrameCount() > 12000) {
 			return;
 		}
 		// 저그는 입막 안하므로 체크 안함
-		if (Prebot.Broodwar.self().getRace() == Race.Zerg) {
+		if (MyBotModule.Broodwar.self().getRace() == Race.Zerg) {
 			blockingEnterance = false;
 			return;
 		}

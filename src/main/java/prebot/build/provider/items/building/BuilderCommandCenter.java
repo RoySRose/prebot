@@ -12,7 +12,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
@@ -30,7 +30,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     }
     
 	public final boolean buildCondition() {
-		if (Prebot.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center) > 0) {
+		if (MyBotModule.Broodwar.self().incompleteUnitCount(UnitType.Terran_Command_Center) > 0) {
 			return false;
 		}
 		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Command_Center);
@@ -52,19 +52,19 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	public boolean executeExpansion() {
 		if (TimeUtils.beforeTime(8, 0) && !PlayerUtils.enoughResource(800, 0)) {
 			if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_STARPORT) {
-				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 2) {
+				if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 2) {
 					return false;
 				}
 			} else if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {
-				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 1) {
+				if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Starport) < 1) {
 					return false;
 				}
 			} else if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY) {
-				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 1) {
+				if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 1) {
 					return false;
 				}
 			} else if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY) {
-				if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 2) {
+				if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) < 2) {
 					return false;
 				}
 			}
@@ -84,7 +84,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 
 		int factoryUnitCount = UnitUtils.myFactoryUnitSupplyCount();
-		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int allCommandCenterCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
 
 		// 앞마당 전
 		if (allCommandCenterCount == 1) {
@@ -108,7 +108,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				}
 			}
 			
-			if (Prebot.Broodwar.self().minerals() > 400) {
+			if (MyBotModule.Broodwar.self().minerals() > 400) {
 				if (InfoUtils.enemyRace() == Race.Protoss && !StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE)) {
 					if (UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
 						setCommandCenterBlockAndSeedPosition();
@@ -116,7 +116,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 						return true;
 					}
 				} else if (UnitUtils.myUnitDiscovered(UnitType.Terran_Starport)) {
-					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Valkyrie) || Prebot.Broodwar.self().minerals() > 600) {
+					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Valkyrie) || MyBotModule.Broodwar.self().minerals() > 600) {
 						setCommandCenterBlockAndSeedPosition();
 //						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
@@ -135,28 +135,28 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			boolean isAttackMode = StrategyIdea.mainSquadMode.isAttackMode;
 
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
-			if (Prebot.Broodwar.self().minerals() > 600 && factoryUnitCount > 30 * 4) {
+			if (MyBotModule.Broodwar.self().minerals() > 600 && factoryUnitCount > 30 * 4) {
 				setCommandCenterBlockAndSeedPosition();
 //				System.out.println("normal next commandcenter - over 30 mechanics & over 600 minerals");
 				return true;
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
-			if (isAttackMode && StrategyIdea.mainSquadMode != MicroConfig.MainSquadMode.SPEED_ATTCK && Prebot.Broodwar.self().minerals() > 250) {
+			if (isAttackMode && StrategyIdea.mainSquadMode != MicroConfig.MainSquadMode.SPEED_ATTCK && MyBotModule.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
 //				System.out.println("attack and next commandcenter - attack & over 250 minerals");
 				return true;
 			}
 			
 			// READY TO POSITION 까지 나왔는데 아직 커맨드가 2개이면 250 넘었을 때 멀티
-			if (StrategyIdea.campType == PositionFinder.CampType.READY_TO && allCommandCenterCount == 2 && Prebot.Broodwar.self().minerals() > 250) {
+			if (StrategyIdea.campType == PositionFinder.CampType.READY_TO && allCommandCenterCount == 2 && MyBotModule.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
 //				System.out.println("ready to commandcenter - only 2 center & over 250 minerals");
 				return true;
 			}
 			
 			// 800 넘으면 멀티하기
-			if (Prebot.Broodwar.self().minerals() > 800) {
+			if (MyBotModule.Broodwar.self().minerals() > 800) {
 				setCommandCenterBlockAndSeedPosition();
 //				System.out.println("minerals next commandcenter - over 800 minerals");
 				return true;
@@ -215,7 +215,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	private void setCommandCenterBlockAndSeedPosition() {
 		BuildOrderItem.SeedPositionStrategy seedPosition = null;
 
-		int allCommandCenterCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
+		int allCommandCenterCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
     	if (allCommandCenterCount <= 1) {
     		if (StrategyIdea.campType == PositionFinder.CampType.INSIDE || StrategyIdea.campType == PositionFinder.CampType.FIRST_CHOKE) {
     			seedPosition = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;

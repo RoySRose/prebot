@@ -7,7 +7,7 @@ import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
@@ -18,7 +18,7 @@ public class BuilderControlTower extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-    	if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
+    	if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
     		return false;
     	}
 
@@ -28,7 +28,7 @@ public class BuilderControlTower extends DefaultBuildableItem {
     	
 		boolean addControlTower = false;
 			
-		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
+		if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Science_Facility) >= 1) {
 			addControlTower = true;
 		} else if (StrategyIdea.valkyrieCount > 0) {
 			addControlTower = true;

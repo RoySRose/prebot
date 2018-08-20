@@ -10,7 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionTask;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.strategy.InformationManager;
 import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
@@ -227,7 +227,7 @@ public class UnitCache {
 	}
 
 	private void putSelfData() {
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if (unit == null) {
 				continue;
 			}
@@ -259,7 +259,7 @@ public class UnitCache {
 	}
 
 	private void putEnemyData() {
-		UnitData enemyUnitData = InformationManager.Instance().getUnitData(Prebot.Broodwar.enemy());
+		UnitData enemyUnitData = InformationManager.Instance().getUnitData(MyBotModule.Broodwar.enemy());
 		for (int unitId : enemyUnitData.getUnitAndUnitInfoMap().keySet()) {
 			UnitInfo unitInfo = enemyUnitData.getUnitAndUnitInfoMap().get(unitId);
 
@@ -269,7 +269,7 @@ public class UnitCache {
 
 			allUnitList.add(unitInfo);
 			enemyAllUnitInfoList.add(unitInfo);
-			Unit enemy = Prebot.Broodwar.getUnit(unitInfo.getUnitID());
+			Unit enemy = MyBotModule.Broodwar.getUnit(unitInfo.getUnitID());
 			if (enemy != null && enemy.getType() != UnitType.Unknown) {
 				visibleUnitList.add(unitInfo);
 				enemyVisibileUnitInfoList.add(unitInfo);
@@ -285,7 +285,7 @@ public class UnitCache {
 	}
 
 	private void updateDiscoveredMap() {
-		for (Unit selfUnit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit selfUnit : MyBotModule.Broodwar.self().getUnits()) {
 			if (selfUnit == null) {
 				continue;
 			}
@@ -303,7 +303,7 @@ public class UnitCache {
 			}
 		}
 		
-		for (Unit enemyUnit : Prebot.Broodwar.enemy().getUnits()) {
+		for (Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
 			if (enemyUnit == null) {
 				continue;
 			}

@@ -1,7 +1,7 @@
 package prebot.macro;
 
 
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class MineralCalculator {
     public boolean allVisible() {
         for(EnemyMineral minerals : mineralsList) {
         	
-        	if(Prebot.Broodwar.isVisible(minerals.getMineralUnit().getInitialPosition().getX()/32, minerals.getMineralUnit().getInitialPosition().getY()/32)){
+        	if(MyBotModule.Broodwar.isVisible(minerals.getMineralUnit().getInitialPosition().getX()/32, minerals.getMineralUnit().getInitialPosition().getY()/32)){
         	
         	}else {
         		return false;

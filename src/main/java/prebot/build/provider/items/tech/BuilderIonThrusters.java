@@ -5,7 +5,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class BuilderIonThrusters extends DefaultBuildableItem {
 
@@ -32,7 +32,7 @@ public class BuilderIonThrusters extends DefaultBuildableItem {
 		if (researchSelector.getSelected().getUpgradeType() != metaType.getUpgradeType()) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
+		if (MyBotModule.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
 			return false;
 		}
 

@@ -15,7 +15,7 @@ import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TilePositionUtils;
@@ -443,7 +443,7 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionX = 0;
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
-				if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+				if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
 //					FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear :: " + buildingType + " :: spiralMaxLength ==>> "+ spiralMaxLength + " :: [" + currentX+" , "+currentY+"] ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 					if (isPossiblePlace) {
@@ -490,7 +490,7 @@ public class ConstructionPlaceFinder {
 //					1시
 					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
 						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
-							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
 
 								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
 
@@ -522,7 +522,7 @@ public class ConstructionPlaceFinder {
 //					5시
 					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
 						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
-							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
 
 								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
 
@@ -559,7 +559,7 @@ public class ConstructionPlaceFinder {
 //					11시
 					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
 						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
-							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
 
 								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
 
@@ -590,7 +590,7 @@ public class ConstructionPlaceFinder {
 //					7시
 					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
 						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
-							if (currentX >= 0 && currentX < Prebot.Broodwar.mapWidth() && currentY >= 0 && currentY < Prebot.Broodwar.mapHeight()) {
+							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
 
 								isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, 0);
 
@@ -667,7 +667,7 @@ public class ConstructionPlaceFinder {
 			// builderTile에 Lifted 건물이 아니고 whatBuilds 건물이 아닌 건물이 있는지 체크
 			for (int i = 0; i <= builderType.tileWidth(); ++i) {
 				for (int j = 0; j <= builderType.tileHeight(); ++j) {
-					for (Unit unit : Prebot.Broodwar.getUnitsOnTile(builderTile.getX() + i, builderTile.getY() + j)) {
+					for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(builderTile.getX() + i, builderTile.getY() + j)) {
 						if ((unit.getType() != builderType) && (!unit.isLifted())) {
 							return false;
 						}
@@ -823,7 +823,7 @@ public class ConstructionPlaceFinder {
 		}
 
 		// if this rectangle doesn't fit on the map we can't build here
-		if (startx < 0 || starty < 0 || endx > Prebot.Broodwar.mapWidth() || endx < position.getX() + width || endy > Prebot.Broodwar.mapHeight()) {
+		if (startx < 0 || starty < 0 || endx > MyBotModule.Broodwar.mapWidth() || endx < position.getX() + width || endy > MyBotModule.Broodwar.mapHeight()) {
 //			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return false :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		} else {
@@ -836,7 +836,7 @@ public class ConstructionPlaceFinder {
 	/// 해당 위치에 건물 건설이 가능한지 여부를 리턴합니다 <br>
 	/// Broodwar 의 canBuildHere 및 _reserveMap 와 isOverlapsWithBaseLocation 을 체크
 	public final boolean canBuildHere(TilePosition position, final ConstructionTask b) {
-		if (!Prebot.Broodwar.canBuildHere(position, b.getType())) {
+		if (!MyBotModule.Broodwar.canBuildHere(position, b.getType())) {
 //			FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> !Prebot.Broodwar.canBuildHere :: " + position);
 			return false;
 		}
@@ -907,7 +907,7 @@ public class ConstructionPlaceFinder {
 		double minGeyserDistanceFromSeedPosition = 100000000;
 		
 		// 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
-		for (Unit geyser : Prebot.Broodwar.getStaticGeysers()) {
+		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers()) {
 			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
 			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
 //			FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
@@ -929,7 +929,7 @@ public class ConstructionPlaceFinder {
 
 			// 이미 지어져 있는가
 			boolean refineryAlreadyBuilt = false;
-			List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
+			List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
 			for (Unit u : alreadyBuiltUnits) {
 				if (u.getType().isRefinery() && u.exists()) {
 //					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
@@ -959,7 +959,7 @@ public class ConstructionPlaceFinder {
         double minGeyserDistanceFromSeedPosition = 100000000;
 
         // 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
-        for (Unit geyser : Prebot.Broodwar.getStaticGeysers()) {
+        for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers()) {
             // geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
             // 반드시 geyser->getInitialPosition() 을 사용해야 한다
 
@@ -1033,13 +1033,13 @@ public class ConstructionPlaceFinder {
 
 		// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 체크
 		//if (BWAPI::Broodwar->isBuildable(x, y) == false)
-		if (Prebot.Broodwar.isBuildable(x, y, true) == false)
+		if (MyBotModule.Broodwar.isBuildable(x, y, true) == false)
 		{
 			return false;
 		}
 
 		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
-		for (Unit unit : Prebot.Broodwar.getUnitsOnTile(x, y))
+		for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(x, y))
 		{
 			if ((b.getConstructionWorker() != null) && (unit != b.getConstructionWorker()))
 			{
@@ -1256,7 +1256,7 @@ public class ConstructionPlaceFinder {
 		{
 			// Island 일 경우 건물 지을 공간이 절대적으로 좁기 때문에 건물 안짓는 공간을 두지 않는다
 			if (base.isIsland()) continue;
-			if (BWTA.isConnected(base.getTilePosition(), InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition()) == false) continue;
+			if (BWTA.isConnected(base.getTilePosition(), InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition()) == false) continue;
 
 			// dimensions of the base location
 			int bx0 = base.getTilePosition().getX();
@@ -1316,9 +1316,9 @@ public class ConstructionPlaceFinder {
 					int fromx = mineral.getTilePosition().getX()-2;
 					int fromy = mineral.getTilePosition().getY()-2;
 					
-					for (int x = fromx; x > 0 && x < fromx + 6 && x < Prebot.Broodwar.mapWidth(); x++)
+					for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
 				        {
-				            for (int y = fromy ; y > 0 && y < fromy + 6 && y < Prebot.Broodwar.mapHeight(); y++)
+				            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
 				            {
 							TilePosition temp = new TilePosition(x,y);
 							tilesToAvoid.add(temp);
@@ -1338,9 +1338,9 @@ public class ConstructionPlaceFinder {
 		int fromx = firstgas.getTilePosition().getX()-1;
 		int fromy = firstgas.getTilePosition().getY()-1;
 		
-		for (int x = fromx; x > 0 && x < fromx + 8 && x < Prebot.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
 	        {
-	            for (int y = fromy ; y > 0 && y < fromy + 6 && y < Prebot.Broodwar.mapHeight(); y++)
+	            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
 	            {
 	            	if(fromx < x && x < fromx+5 && fromy < y && y < fromy+3){
 						continue;
@@ -1391,11 +1391,11 @@ public class ConstructionPlaceFinder {
 		int fromy = unit.getTilePosition().getY();
 		
 
-		for (int x = fromx; x > 0 && x < fromx + 6 && x < Prebot.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy ; y > 0 && y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+			for (int y = fromy ; y > 0 && y < fromy + 3 && y < MyBotModule.Broodwar.mapHeight(); y++)
             {
 				if((x==fromx + 4 || x==fromx + 5) && y == fromy){
 					continue;
@@ -1424,9 +1424,9 @@ public class ConstructionPlaceFinder {
 		boolean addon = false;
 		
 		if(unit.getType().isAddon()) {
-			for (int x = fromx; x > 0 && x < fromx + 2 && x < Prebot.Broodwar.mapWidth(); x++)
+			for (int x = fromx; x > 0 && x < fromx + 2 && x < MyBotModule.Broodwar.mapWidth(); x++)
 	        {
-				for (int y = fromy ; y > 0 && y < fromy  + 2&& y < Prebot.Broodwar.mapHeight(); y++)
+				for (int y = fromy ; y > 0 && y < fromy  + 2&& y < MyBotModule.Broodwar.mapHeight(); y++)
 	            {
 					if(isTilesToAvoidAddonBuilding(x, y)) {
 						TilePosition temp = new TilePosition(x,y);
@@ -1441,9 +1441,9 @@ public class ConstructionPlaceFinder {
 			}
 //			20180815. hkk. addon 이 있다면, 팩토리(등) 이 파괴될때 타일에서 빼지않고 addon 이 파괴될때 tile에서 제거
 			if(addon) {
-				for (int x = fromx; x > 0 && x < fromx + 4 && x < Prebot.Broodwar.mapWidth(); x++)
+				for (int x = fromx; x > 0 && x < fromx + 4 && x < MyBotModule.Broodwar.mapWidth(); x++)
 		        {
-					for (int y = fromy ; y > 0 && y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+					for (int y = fromy ; y > 0 && y < fromy + 3 && y < MyBotModule.Broodwar.mapHeight(); y++)
 		            {
 						if(isTilesToAvoidAddonBuilding(x, y)) {
 							TilePosition temp = new TilePosition(x,y);
@@ -1452,9 +1452,9 @@ public class ConstructionPlaceFinder {
 					}
 				}
 			}else {
-				for (int x = fromx; x > 0 && x < fromx + 6 && x < Prebot.Broodwar.mapWidth(); x++)
+				for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
 		        {
-					for (int y = fromy ; y > 0 && y < fromy + 3 && y < Prebot.Broodwar.mapHeight(); y++)
+					for (int y = fromy ; y > 0 && y < fromy + 3 && y < MyBotModule.Broodwar.mapHeight(); y++)
 		            {
 						if((x==fromx + 4 || x==fromx + 5) && y == fromy){
 							continue;
@@ -1490,7 +1490,7 @@ public class ConstructionPlaceFinder {
 
 					TilePosition t = new TilePosition(addonX+x,addonY+y);
 //					2018015. hkk. 컴셋 자리는 커맨드센터도 짓지 못하게끔 피해준다.
-					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition())) {
+					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition())) {
 //						System.out.println("comsat position of main command :: " + t);
 						tilesToAvoidComSat.add(t);
 					}
@@ -1517,11 +1517,11 @@ public class ConstructionPlaceFinder {
 			fromy =0;
 		}*/
 		
-		for (int x = fromx; x > 0 && x < fromx + 5 && x < Prebot.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x > 0 && x < fromx + 5 && x < MyBotModule.Broodwar.mapWidth(); x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy ; y > 0 && y < fromy + 4 && y < Prebot.Broodwar.mapHeight(); y++)
+			for (int y = fromy ; y > 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
             {
 
 				TilePosition temp = new TilePosition(x,y);

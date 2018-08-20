@@ -8,7 +8,7 @@ import java.util.Set;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.TimeUtils;
@@ -132,7 +132,7 @@ public class MainAttackSquad extends Squad {
 			saveUnitLevel = 0;
 		} else { // combat manager 자체 판단
 			if (InformationManager.Instance().enemyRace != Race.Terran) {
-				if (Prebot.Broodwar.self().supplyUsed() >= 380) { // || pushLine) {
+				if (MyBotModule.Broodwar.self().supplyUsed() >= 380) { // || pushLine) {
 					saveUnitLevel = 0;
 				}
 			}

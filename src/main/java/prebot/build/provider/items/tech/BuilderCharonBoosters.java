@@ -7,7 +7,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.FileUtils;
 
 public class BuilderCharonBoosters extends DefaultBuildableItem {
@@ -22,7 +22,7 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
     public final boolean buildCondition(){
     	
     	//if(researchSelector.getSelected().getUpgradeType().equals(metaType.getUpgradeType())) {
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
+    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) == 0) {
     		return false;
     	}
     	
@@ -38,7 +38,7 @@ public class BuilderCharonBoosters extends DefaultBuildableItem {
 		if (researchSelector.getSelected().getUpgradeType() != metaType.getUpgradeType()) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
+		if (MyBotModule.Broodwar.self().isUpgrading(researchSelector.getSelected().getUpgradeType())) {
 			return false;
 		}
 

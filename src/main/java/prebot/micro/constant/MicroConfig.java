@@ -9,7 +9,7 @@ import bwapi.TechType;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.LagObserver;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.strategy.InformationManager;
 
 public class MicroConfig {
@@ -186,7 +186,7 @@ public class MicroConfig {
 	}
 	
 	public static class Network {
-		public static final int LATENCY = Prebot.Broodwar.getLatency(); // LAN (UDP) : 5
+		public static final int LATENCY = MyBotModule.Broodwar.getLatency(); // LAN (UDP) : 5
 	}
 	
 	public static class Upgrade {
@@ -200,7 +200,7 @@ public class MicroConfig {
 			if (upgrade == UpgradeType.Ion_Thrusters) {
 				if (vultureSpeedUpgrade) {
 					return 3.0 * 24.0; // 벌처 업그레이드 된 스피드 안나온다. 걍 frame당 3pixel 더 간다고 치자.
-				} else if (!vultureSpeedUpgrade && Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) > 0) {
+				} else if (!vultureSpeedUpgrade && MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) > 0) {
 					vultureSpeedUpgrade = true;
 //					MyBotModule.Broodwar.sendText("Ion Thrusters Upgraded!");
 					return 3.0 * 24.0;
@@ -208,7 +208,7 @@ public class MicroConfig {
 			} else if (upgrade == UpgradeType.Charon_Boosters) {
 				if (goliathAttkRangeUpgrade) {
 					return 3.0 * 24.0; // 골리앗 대공 사정거리 업그레이드 : 5(→8)
-				} else if (!goliathAttkRangeUpgrade && Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) > 0) {
+				} else if (!goliathAttkRangeUpgrade && MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) > 0) {
 					goliathAttkRangeUpgrade = true;
 //					MyBotModule.Broodwar.sendText("Charon Boosters Upgraded!");
 					return 3.0 * 24.0;

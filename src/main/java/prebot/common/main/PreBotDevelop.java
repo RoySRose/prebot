@@ -11,9 +11,8 @@ import bwapi.Flag.Enum;
 import bwta.BWTA;
 import prebot.common.constant.CommonConfig;
 import prebot.common.debug.BigWatch;
-import prebot.common.debug.UXManager;
 
-public class Prebot extends DefaultBWListener {
+public class PreBotDevelop extends DefaultBWListener {
 
 	private boolean isGameLostConditionSatisfied = false; /// 자동 패배 체크 결과
 	private int gameLostConditionSatisfiedFrame = 0; /// 자동 패배 조건이 시작된 프레임 시점
@@ -95,7 +94,7 @@ public class Prebot extends DefaultBWListener {
 
 		// 화면 출력 및 사용자 입력 처리
 		// 빌드서버에서는 Dependency가 없는 빌드서버 전용 UXManager 를 실행시킵니다
-		UXManager.Instance().update();
+		PreBotUXManager.Instance().update();
 
 		if (timeToGG()) {
 			Broodwar.leaveGame();
@@ -227,7 +226,7 @@ public class Prebot extends DefaultBWListener {
 		int canAttackBuildingCount = 0;
 		int canDoSomeThingNonBuildingUnitCount = 0;
 
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if (unit.getType().isBuilding()) {
 
 				// 생산 가능 건물이 하나라도 있으면 게임 지속 가능.
@@ -259,12 +258,12 @@ public class Prebot extends DefaultBWListener {
 
 		// 자동 패배조건 만족하게 된 프레임 기록
 		if (canDoSomeThingNonBuildingUnitCount == 0 && canProduceBuildingCount == 0 && canAttackBuildingCount == 0 && isGameLostConditionSatisfied == false) {
-			Prebot.Broodwar.sendText("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
-			Prebot.Broodwar.sendText("GG");
+			MyBotModule.Broodwar.sendText("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
+			MyBotModule.Broodwar.sendText("GG");
 			System.out.println("I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
 
 			isGameLostConditionSatisfied = true;
-			gameLostConditionSatisfiedFrame = Prebot.Broodwar.getFrameCount();
+			gameLostConditionSatisfiedFrame = MyBotModule.Broodwar.getFrameCount();
 		}
 		// 자동 패배조건 벗어나게 되면 리셋
 		else if (canDoSomeThingNonBuildingUnitCount != 0 || canProduceBuildingCount != 0 || canAttackBuildingCount != 0) {
@@ -274,11 +273,11 @@ public class Prebot extends DefaultBWListener {
 		// 자동 패배조건 만족 상황이 일정시간 동안 지속되었으면 게임 패배로 처리
 		if (isGameLostConditionSatisfied) {
 
-			Prebot.Broodwar.drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
-			Prebot.Broodwar.drawTextScreen(250, 115,
-					"I will leave game in " + (maxDurationForGameLostCondition - (Prebot.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame)) + " frames");
+			MyBotModule.Broodwar.drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
+			MyBotModule.Broodwar.drawTextScreen(250, 115,
+					"I will leave game in " + (maxDurationForGameLostCondition - (MyBotModule.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame)) + " frames");
 
-			if (Prebot.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame >= maxDurationForGameLostCondition) {
+			if (MyBotModule.Broodwar.getFrameCount() - gameLostConditionSatisfiedFrame >= maxDurationForGameLostCondition) {
 				return true;
 			}
 		}

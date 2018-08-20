@@ -14,13 +14,12 @@ import bwta.Region;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.IConditions;
 import prebot.micro.constant.MicroConfig;
-import prebot.micro.constant.MicroConfig.Vulture;
 import prebot.micro.predictor.GuerillaScore;
 import prebot.micro.predictor.VultureFightPredictor;
 import prebot.micro.squad.AirForceSquad;
@@ -265,7 +264,7 @@ public class CombatManager extends GameManager {
 		
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			Region enemyRegion = BWTA.getRegion(InfoUtils.enemyBase().getPosition());
-			Set<Region> occupiedRegions = InformationManager.Instance().getOccupiedRegions(Prebot.Broodwar.self());
+			Set<Region> occupiedRegions = InformationManager.Instance().getOccupiedRegions(MyBotModule.Broodwar.self());
 			
 			for (BaseLocation base : BWTA.getStartLocations()) {
 				Region region = BWTA.getRegion(base.getPosition());
@@ -381,7 +380,7 @@ public class CombatManager extends GameManager {
 		}
 
 		// 안개속의 적들을 상대로 계산해서 게릴라 타깃이 가능한지 확인한다.
-		Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+		Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(bestGuerillaSite.getPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS);
 		int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
 		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
 		if (vulturePower < enemyPower) {
@@ -400,7 +399,7 @@ public class CombatManager extends GameManager {
 			for (Unit assignableVulture : assignableVultures) {
 				squadData.assign(assignableVulture, guerillaSquad);
 				int squadPower = VultureFightPredictor.powerOfWatchers(guerillaSquad.unitList);
-				if (squadPower > enemyPower + Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
+				if (squadPower > enemyPower + MicroConfig.Vulture.GEURILLA_EXTRA_ENEMY_POWER) {
 					break; // 충분한 파워
 				}
 			}
@@ -415,14 +414,14 @@ public class CombatManager extends GameManager {
 		}
 
 		// 게릴라 지역에 적군이 없다.
-		if (Prebot.Broodwar.isVisible(squad.getTargetPosition().toTilePosition())) {
-			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS);
+		if (MyBotModule.Broodwar.isVisible(squad.getTargetPosition().toTilePosition())) {
+			Set<UnitInfo> euiList = UnitUtils.getAllEnemyUnitInfosInRadiusForGround(squad.getTargetPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS);
 			if (euiList.isEmpty()) {
 				return true;
 			}
 
 			// 일꾼이 없는 경우
-			List<Unit> workers = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, squad.getTargetPosition(), Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
+			List<Unit> workers = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, squad.getTargetPosition(), MicroConfig.Vulture.GEURILLA_ENEMY_RADIUS, UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone);
 			if (workers.isEmpty()) {
 				int vulturePower = VultureFightPredictor.powerOfWatchers(squad.unitList);
 				int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);

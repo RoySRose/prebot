@@ -20,7 +20,7 @@ import bwta.Chokepoint;
 import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -502,7 +502,7 @@ public class PositionFinder {
 			if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_DROP)) {
 				// 드롭인 경우 본진과 세컨초크를 왓다리갓다리 한다.
 				int nSeconds = 12 * TimeUtils.SECOND;
-				int zeroToNSeconds = Prebot.Broodwar.getFrameCount() % nSeconds;
+				int zeroToNSeconds = MyBotModule.Broodwar.getFrameCount() % nSeconds;
 				if (zeroToNSeconds < (nSeconds / 2)) {
 					watcherPosition = InfoUtils.myBase().getPosition();	
 				} else {
@@ -535,7 +535,7 @@ public class PositionFinder {
 		// watcher 기본 포지션
 		if (watcherPosition == Position.Unknown) {
 			if (InfoUtils.enemyBase() != null) {
-				if (InfoUtils.enemyRace() == Race.Terran && Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 0) {
+				if (InfoUtils.enemyRace() == Race.Terran && MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 0) {
 					watcherPosition = InfoUtils.enemyReadyToPosition();
 				} else {
 					watcherPosition = InfoUtils.enemyBase().getPosition();
@@ -691,7 +691,7 @@ public class PositionFinder {
 		int y = 0;
 		int mineralCnt = 0;
 
-		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()) {
+		for (Unit mineral : MyBotModule.Broodwar.neutral().getUnits()) {
 			if ((mineral.getType() == UnitType.Resource_Mineral_Field) && mineral.getDistance(commandCenter) < 320) {
 				x += mineral.getPosition().getX();
 				y += mineral.getPosition().getY();
@@ -809,7 +809,7 @@ public class PositionFinder {
 	}
 
 	public boolean enemyBaseDestroyed(BaseLocation enemyBase) {
-		if (!Prebot.Broodwar.isExplored(enemyBase.getTilePosition())) {
+		if (!MyBotModule.Broodwar.isExplored(enemyBase.getTilePosition())) {
 			return false;
 		}
 
@@ -835,7 +835,7 @@ public class PositionFinder {
 		}
 
 		// 적 유닛
-		for (Unit unit : Prebot.Broodwar.enemy().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 			if (unit.getType() == UnitType.Zerg_Larva || !unit.isVisible()) {
 				continue;
 			}
@@ -845,14 +845,14 @@ public class PositionFinder {
 		// starting location 중에서 탐험되지 않은 지역
 		List<BaseLocation> startingBases = InfoUtils.mapInformation().getStartingBaseLocation();
 		for (BaseLocation startingBase : startingBases) {
-			if (!Prebot.Broodwar.isExplored(startingBase.getTilePosition())) {
+			if (!MyBotModule.Broodwar.isExplored(startingBase.getTilePosition())) {
 				return startingBase.getPosition();
 			}
 		}
 
 		// 앞마당 지역
 		BaseLocation enemyExpansion = InfoUtils.enemyFirstExpansion();
-		if (enemyExpansion != null && !Prebot.Broodwar.isExplored(enemyExpansion.getTilePosition())) {
+		if (enemyExpansion != null && !MyBotModule.Broodwar.isExplored(enemyExpansion.getTilePosition())) {
 			return enemyExpansion.getPosition();
 		}
 		
@@ -860,7 +860,7 @@ public class PositionFinder {
 		List<BaseLocation> otherExpansions = InfoUtils.enemyOtherExpansions();
 		if (otherExpansions != null) {
 			for (BaseLocation otherExpansion : otherExpansions) {
-				if (!Prebot.Broodwar.isExplored(otherExpansion.getTilePosition())) {
+				if (!MyBotModule.Broodwar.isExplored(otherExpansion.getTilePosition())) {
 					return otherExpansion.getPosition();
 				}
 			}

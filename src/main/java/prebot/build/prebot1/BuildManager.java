@@ -25,7 +25,7 @@ import prebot.common.LagObserver;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -144,7 +144,7 @@ public class BuildManager extends GameManager {
                     //System.out.println("marin out");
                 	break;
                 }
-                if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > Prebot.Broodwar.getFrameCount()) {
+                if (InformationManager.Instance().firstBarrack != null && InformationManager.Instance().barrackStart + 24*3 > MyBotModule.Broodwar.getFrameCount()) {
                     //System.out.println("marin wait");
                 	break;
                 }
@@ -437,7 +437,7 @@ public class BuildManager extends GameManager {
 							// if the map won't let you build here, we can't
 							// build it.
 							// 맵 타일 자체가 건설 불가능한 타일인 경우 + 기존 건물이 해당 타일에 이미 있는경우
-							if (!Prebot.Broodwar.isBuildable(tilePos, true)) {
+							if (!MyBotModule.Broodwar.isBuildable(tilePos, true)) {
 								isBlocked = true;
 							}
 
@@ -445,7 +445,7 @@ public class BuildManager extends GameManager {
 							// can't build it
 							// 아군 유닛은 Addon 지을 위치에 있어도 괜찮음. (적군 유닛은 Addon 지을 위치에
 							// 있으면 건설 안되는지는 아직 불확실함)
-							for (Unit u : Prebot.Broodwar.getUnitsOnTile(tilePos.getX(), tilePos.getY())) {
+							for (Unit u : MyBotModule.Broodwar.getUnitsOnTile(tilePos.getX(), tilePos.getY())) {
 								//System.out.println("Construct " + t.getName() + " beside " + unit.getType() + "("
 								//		+ unit.getID() + ")" + ", units on Addon Tile " + tilePos.getX() + ","
 								//		+ tilePos.getY() + " is " + u.getType() + "(ID : " + u.getID() + " Player : "
@@ -611,11 +611,11 @@ public class BuildManager extends GameManager {
 				// MyBotModule.Broodwar.canMake : Checks all the requirements
 				// include resources, supply, technology tree, availability, and
 				// required units
-				canMake = Prebot.Broodwar.canMake(t.getUnitType(), producer);
+				canMake = MyBotModule.Broodwar.canMake(t.getUnitType(), producer);
 			} else if (t.isTech()) {
-				canMake = Prebot.Broodwar.canResearch(t.getTechType(), producer);
+				canMake = MyBotModule.Broodwar.canResearch(t.getTechType(), producer);
 			} else if (t.isUpgrade()) {
-				canMake = Prebot.Broodwar.canUpgrade(t.getUpgradeType(), producer);
+				canMake = MyBotModule.Broodwar.canUpgrade(t.getUpgradeType(), producer);
 			}
 		}
 
@@ -649,7 +649,7 @@ public class BuildManager extends GameManager {
         TilePosition desiredPosition = null;
         
 //        20180819. hkk. 1분에 한번씩 초기화
-        if(Prebot.Broodwar.getFrameCount() % (24*60) == 1) {
+        if(MyBotModule.Broodwar.getFrameCount() % (24*60) == 1) {
 	        mainBaseLocationFull = false;
 	        secondStartLocationFull = false;
 			firstChokePointFull = false;
@@ -747,12 +747,12 @@ public class BuildManager extends GameManager {
 
 	// 사용가능 미네랄 = 현재 보유 미네랄 - 사용하기로 예약되어있는 미네랄
 	public int getAvailableMinerals() {
-		return Prebot.Broodwar.self().minerals() - ConstructionManager.Instance().getReservedMinerals();
+		return MyBotModule.Broodwar.self().minerals() - ConstructionManager.Instance().getReservedMinerals();
 	}
 
 	// 사용가능 가스 = 현재 보유 가스 - 사용하기로 예약되어있는 가스
 	public int getAvailableGas() {
-		return Prebot.Broodwar.self().gas() - ConstructionManager.Instance().getReservedGas();
+		return MyBotModule.Broodwar.self().gas() - ConstructionManager.Instance().getReservedGas();
 	}
 
 	// return whether or not we meet resources, including building reserves
@@ -772,7 +772,7 @@ public class BuildManager extends GameManager {
 	// selects a unit of a given type
 	public Unit selectUnitOfType(UnitType type, Position closestTo) {
 		// if we have none of the unit type, return null right away
-		if (Prebot.Broodwar.self().completedUnitCount(type) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(type) == 0) {
 			return null;
 		}
 
@@ -783,7 +783,7 @@ public class BuildManager extends GameManager {
 		if (closestTo != Position.None) {
 			double minDist = 1000000000;
 
-			for (Unit u : Prebot.Broodwar.self().getUnits()) {
+			for (Unit u : MyBotModule.Broodwar.self().getUnits()) {
 				if (u.getType() == type) {
 					double distance = u.getDistance(closestTo);
 					if (unit == null || distance < minDist) {
@@ -797,7 +797,7 @@ public class BuildManager extends GameManager {
 			// with the least
 			// amount of training time remaining
 		} else if (type.isBuilding()) {
-			for (Unit u : Prebot.Broodwar.self().getUnits()) {
+			for (Unit u : MyBotModule.Broodwar.self().getUnits()) {
 				if (u.getType() == type && u.isCompleted() && !u.isTraining() && !u.isLifted() && u.isPowered()) {
 
 					return u;
@@ -805,7 +805,7 @@ public class BuildManager extends GameManager {
 			}
 			// otherwise just return the first unit we come across
 		} else {
-			for (Unit u : Prebot.Broodwar.self().getUnits()) {
+			for (Unit u : MyBotModule.Broodwar.self().getUnits()) {
 				if (u.getType() == type && u.isCompleted() && u.getHitPoints() > 0 && !u.isLifted() && u.isPowered()) {
 					return u;
 				}
@@ -834,13 +834,13 @@ public class BuildManager extends GameManager {
 
 		switch (seedLocationStrategy) {
 		case MainBaseLocation:
-			tempBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self());
+			tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 			if (tempBaseLocation != null) {
 				seedPosition = tempBaseLocation.getPosition(); 
 			}
 			break;
 		case MainBaseBackYard:
-			tempBaseLocation = InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self());
+			tempBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 			tempChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 			tempBaseRegion = BWTA.getRegion(tempBaseLocation.getPosition());
 
@@ -874,7 +874,7 @@ public class BuildManager extends GameManager {
 				
 				//std::cout << "k";
 				// 해당 지점이 같은 Region 에 속하고 Buildable 한 타일인지 확인
-				if (!tempTilePosition.isValid() || !Prebot.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*BuildConfig.TILE_SIZE, by*BuildConfig.TILE_SIZE))) {
+				if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*BuildConfig.TILE_SIZE, by*BuildConfig.TILE_SIZE))) {
 					//std::cout << "l";
 	
 					// BaseLocation 에서 ChokePoint 방향에 대해 오른쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t-90) = sin(t),   sin(t-90) = - cos(t))
@@ -884,14 +884,14 @@ public class BuildManager extends GameManager {
 					// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
 					//std::cout << "m";
 	
-					if (!tempTilePosition.isValid() || !Prebot.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
+					if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false)) {
 						// BaseLocation 에서 ChokePoint 방향에 대해 왼쪽으로 90도 꺾은 방향의 Back Yard : 데카르트 좌표계에서 (cos(t+90) = -sin(t),   sin(t+90) = cos(t))
 						bx = tempBaseLocation.getTilePosition().getX() - (int)(d * Math.sin(theta) / BuildConfig.TILE_SIZE);
 						by = tempBaseLocation.getTilePosition().getY() - (int)(d * Math.cos(theta) / BuildConfig.TILE_SIZE);
 						tempTilePosition = new TilePosition(bx, by);
 						// std::cout << "ConstructionPlaceFinder MainBaseBackYard tempTilePosition " << tempTilePosition.x << "," << tempTilePosition.y << std::endl;
 	
-						if (!tempTilePosition.isValid() || !Prebot.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*BuildConfig.TILE_SIZE, by*BuildConfig.TILE_SIZE))) {
+						if (!tempTilePosition.isValid() || !MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) || tempBaseRegion != BWTA.getRegion(new Position(bx*BuildConfig.TILE_SIZE, by*BuildConfig.TILE_SIZE))) {
 	
 							// BaseLocation 에서 ChokePoint 방향 절반 지점의 Back Yard : 데카르트 좌표계에서 (cos(t),   sin(t))
 							bx = tempBaseLocation.getTilePosition().getX() + (int)(d * Math.cos(theta) / BuildConfig.TILE_SIZE);
@@ -905,7 +905,7 @@ public class BuildManager extends GameManager {
 				}
 				//std::cout << "z";
 				if (tempTilePosition.isValid() == false 
-					|| Prebot.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) == false) {
+					|| MyBotModule.Broodwar.isBuildable(tempTilePosition.getX(), tempTilePosition.getY(), false) == false) {
 					seedPosition = tempTilePosition.toPosition();
 				}
 				else {
@@ -917,7 +917,7 @@ public class BuildManager extends GameManager {
 			break;
 
 		case FirstExpansionLocation:
-			tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.self());
+			tempBaseLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
 			if (tempBaseLocation != null) {
 				seedPosition = tempBaseLocation.getPosition();
 			}
@@ -931,7 +931,7 @@ public class BuildManager extends GameManager {
 			break;
 
 		case SecondChokePoint:
-			tempChokePoint = InformationManager.Instance().getSecondChokePoint(Prebot.Broodwar.self());
+			tempChokePoint = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());
 			if (tempChokePoint != null) {
 				seedPosition = tempChokePoint.getCenter();
 			}
@@ -947,8 +947,8 @@ public class BuildManager extends GameManager {
 	public boolean isProducerWillExist(UnitType producerType) {
 		boolean isProducerWillExist = true;
 
-		if (Prebot.Broodwar.self().completedUnitCount(producerType) == 0
-				&& Prebot.Broodwar.self().incompleteUnitCount(producerType) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(producerType) == 0
+				&& MyBotModule.Broodwar.self().incompleteUnitCount(producerType) == 0) {
 			// producer 가 건물 인 경우 : 건물이 건설 중인지 추가 파악
 			// 만들려는 unitType = Addon 건물. Lair. Hive. Greater Spire. Sunken
 			// Colony. Spore Colony. 프로토스 및 테란의 지상유닛 / 공중유닛.
@@ -984,8 +984,8 @@ public class BuildManager extends GameManager {
 					while (it.hasNext()) {
 						UnitType requiredUnitType = it.next(); // C++ : u.first;
 						if (requiredUnitType != UnitType.None) {
-							if (Prebot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-									&& Prebot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+							if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+									&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 								// 선행 건물이 건설 예정이지도 않으면 만들기
 								if (requiredUnitType.isBuilding()) {
 									if (BuildManager.Instance().buildQueue.getItemCount(requiredUnitType) == 0
@@ -1022,7 +1022,7 @@ public class BuildManager extends GameManager {
 		// this can cause issues for the build order search system so don't plan
 		// a search on these frames
 		boolean canPlanBuildOrderNow = true;
-		for (final Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (final Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if (unit.getRemainingTrainTime() == 0) {
 				continue;
 			}
@@ -1103,7 +1103,7 @@ public class BuildManager extends GameManager {
 							hasAvailableGeyser = false;
 						} else {
 							// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead lock
-							for (Unit u : Prebot.Broodwar.getUnitsOnTile(testLocation)) {
+							for (Unit u : MyBotModule.Broodwar.getUnitsOnTile(testLocation)) {
 								if (u.getType().isRefinery() && u.exists()) {
 									hasAvailableGeyser = false;
 									break;
@@ -1118,8 +1118,8 @@ public class BuildManager extends GameManager {
 
 					// 선행 기술 리서치가 되어있지 않고, 리서치 중이지도 않으면 dead lock
 					if (!isDeadlockCase && requiredTechType != TechType.None) {
-						if (Prebot.Broodwar.self().hasResearched(requiredTechType) == false) {
-							if (Prebot.Broodwar.self().isResearching(requiredTechType) == false) {
+						if (MyBotModule.Broodwar.self().hasResearched(requiredTechType) == false) {
+							if (MyBotModule.Broodwar.self().isResearching(requiredTechType) == false) {
 								isDeadlockCase = true;
 							}
 						}
@@ -1130,7 +1130,7 @@ public class BuildManager extends GameManager {
 					if (currentItem.metaType.getUnitType().isAddon()){ 
 						UnitType ProducerType = currentItem.metaType.getUnitType().whatBuilds().first;
 						
-						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+						for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 							if(ProducerType == unit.getType() && unit.isCompleted() ){
 //								
 								if(InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.BEFORE) {
@@ -1178,8 +1178,8 @@ public class BuildManager extends GameManager {
 								 */
 
 								// 선행 건물 / 유닛이 존재하지 않고, 생산 중이지도 않고
-								if (Prebot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-										&& Prebot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+								if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+										&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 									// 선행 건물이 건설 예정이지도 않으면 dead lock
 									if (requiredUnitType.isBuilding()) {
 										if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType, null) == 0) {
@@ -1192,8 +1192,8 @@ public class BuildManager extends GameManager {
 					}
 
 					// 건물이 아닌 지상/공중 유닛인 경우, 서플라이가 400 꽉 찼으면 dead lock
-					if (!isDeadlockCase && !unitType.isBuilding() && Prebot.Broodwar.self().supplyTotal() == 400
-							&& Prebot.Broodwar.self().supplyUsed() + unitType.supplyRequired() > 400) {
+					if (!isDeadlockCase && !unitType.isBuilding() && MyBotModule.Broodwar.self().supplyTotal() == 400
+							&& MyBotModule.Broodwar.self().supplyUsed() + unitType.supplyRequired() > 400) {
 						isDeadlockCase = true;
 					}
 
@@ -1267,12 +1267,12 @@ public class BuildManager extends GameManager {
 					 * producerType));
 					 */
 
-					if (Prebot.Broodwar.self().hasResearched(techType)
-							|| Prebot.Broodwar.self().isResearching(techType)) {
+					if (MyBotModule.Broodwar.self().hasResearched(techType)
+							|| MyBotModule.Broodwar.self().isResearching(techType)) {
 						isDeadlockCase = true;
 					} 
-					else if (Prebot.Broodwar.self().completedUnitCount(producerType) == 0
-							&& Prebot.Broodwar.self().incompleteUnitCount(producerType) == 0) 
+					else if (MyBotModule.Broodwar.self().completedUnitCount(producerType) == 0
+							&& MyBotModule.Broodwar.self().incompleteUnitCount(producerType) == 0) 
 					{
 						if (ConstructionManager.Instance().getConstructionQueueItemCount(producerType, null) == 0) 
 						{
@@ -1290,7 +1290,7 @@ public class BuildManager extends GameManager {
 
 								if (producerTypeOfProducerType != UnitType.None) {
 
-									for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+									for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 										if (unit == null)
 											continue;
 										if (unit.getType() != producerTypeOfProducerType) {
@@ -1326,8 +1326,8 @@ public class BuildManager extends GameManager {
 						 * requiredUnitType) + std::endl;
 						 */
 
-						if (Prebot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-								&& Prebot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+						if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+								&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 							if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType,
 									null) == 0) {
 								isDeadlockCase = true;
@@ -1339,8 +1339,8 @@ public class BuildManager extends GameManager {
 				// 존재하지도 않고 건설예정이지도 않으면 dead lock
 				else if (currentItem.metaType.isUpgrade()) {
 					UpgradeType upgradeType = currentItem.metaType.getUpgradeType();
-					int maxLevel = Prebot.Broodwar.self().getMaxUpgradeLevel(upgradeType);
-					int currentLevel = Prebot.Broodwar.self().getUpgradeLevel(upgradeType);
+					int maxLevel = MyBotModule.Broodwar.self().getMaxUpgradeLevel(upgradeType);
+					int currentLevel = MyBotModule.Broodwar.self().getUpgradeLevel(upgradeType);
 					UnitType requiredUnitType = upgradeType.whatsRequired();
 
 					/*
@@ -1357,10 +1357,10 @@ public class BuildManager extends GameManager {
 					 * requiredUnitType.getName() + std::endl;
 					 */
 
-					if (currentLevel >= maxLevel || Prebot.Broodwar.self().isUpgrading(upgradeType)) {
+					if (currentLevel >= maxLevel || MyBotModule.Broodwar.self().isUpgrading(upgradeType)) {
 						isDeadlockCase = true;
-					} else if (Prebot.Broodwar.self().completedUnitCount(producerType) == 0
-							&& Prebot.Broodwar.self().incompleteUnitCount(producerType) == 0) {
+					} else if (MyBotModule.Broodwar.self().completedUnitCount(producerType) == 0
+							&& MyBotModule.Broodwar.self().incompleteUnitCount(producerType) == 0) {
 						if (ConstructionManager.Instance().getConstructionQueueItemCount(producerType, null) == 0) {
 
 							// 업그레이드의 producerType이 Addon 건물인 경우, Addon 건물 건설이
@@ -1376,7 +1376,7 @@ public class BuildManager extends GameManager {
 
 								if (producerTypeOfProducerType != UnitType.None) {
 
-									for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+									for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 										if (unit == null)
 											continue;
 										if (unit.getType() != producerTypeOfProducerType) {
@@ -1400,8 +1400,8 @@ public class BuildManager extends GameManager {
 							}
 						}
 					} else if (requiredUnitType != UnitType.None) {
-						if (Prebot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-								&& Prebot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
+						if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+								&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0) {
 							if (ConstructionManager.Instance().getConstructionQueueItemCount(requiredUnitType,
 									null) == 0) {
 								isDeadlockCase = true;
@@ -1414,7 +1414,7 @@ public class BuildManager extends GameManager {
 					// producerID 를 지정했는데, 해당 ID 를 가진 유닛이 존재하지 않으면 dead lock
 					if (currentItem.producerID != -1 ) {
 						boolean isProducerAlive = false;
-						for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+						for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 							if (unit != null && unit.getID() == currentItem.producerID && unit.exists() && unit.getHitPoints() > 0) {
 								isProducerAlive = true;
 								break;
@@ -1447,14 +1447,14 @@ public class BuildManager extends GameManager {
 
 		// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 체크
 		//if (BWAPI::Broodwar->isBuildable(x, y) == false)
-		if (Prebot.Broodwar.isBuildable(x, y, true) == false)
+		if (MyBotModule.Broodwar.isBuildable(x, y, true) == false)
 		{
 			//System.out.println("not buildable at: " + x + ", " + y);
 			return false;
 		}
 
 		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
-		if(Prebot.Broodwar.getUnitsOnTile(x, y).size() > 0){
+		if(MyBotModule.Broodwar.getUnitsOnTile(x, y).size() > 0){
 //			List<Unit> temp= MyBotModule.Broodwar.getUnitsOnTile(x, y);
 //			for(Unit u : temp){
 //				System.out.println("unit: "+ u.getType() + " at " + u.getPosition().toString());

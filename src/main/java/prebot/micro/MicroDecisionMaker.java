@@ -9,7 +9,7 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
@@ -158,7 +158,7 @@ public class MicroDecisionMaker {
 			if (enemyUnit != null) {
 				// 벙커 별도 처리
 				if (enemyUnit.getType() == UnitType.Terran_Bunker) {
-					int range = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+					int range = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
 					if (enemyUnit.getDistance(airForceTeam.leaderUnit) < range) {
 						return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 					}
@@ -225,7 +225,7 @@ public class MicroDecisionMaker {
 							} else {
 								// isInWeaponRange는 제외해도 괜찮다.
 								int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
-								int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
+								int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
 								if (enemyUnitDistance < weaponMaxRange) {
 									return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
 								}
@@ -433,12 +433,12 @@ public class MicroDecisionMaker {
 		int enemyWeaponRange = 0;
 
 		if (enemyUnitType == UnitType.Terran_Bunker) {
-			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
+			enemyWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 		} else {
 			if (myUnit.isFlying()) {
-				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.airWeapon());
+				enemyWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnitType.airWeapon());
 			} else {
-				enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
+				enemyWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
 			}
 		}
 		return distanceToNearEnemy <= enemyWeaponRange + BACKOFF_DIST;

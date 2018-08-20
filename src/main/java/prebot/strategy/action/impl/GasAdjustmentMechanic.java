@@ -2,7 +2,7 @@ package prebot.strategy.action.impl;
 
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -36,13 +36,13 @@ public class GasAdjustmentMechanic extends Action {
 		if (workerCount > 8) {
 			adjustGasWorkerCount = 3;
 			if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Factory)) {
-				if (Prebot.Broodwar.self().gas() >= 92) {
+				if (MyBotModule.Broodwar.self().gas() >= 92) {
 					adjustGasWorkerCount = 1;
 				}
 			} else {
 				if (StrategyIdea.expansionOption == EnemyStrategyOptions.ExpansionOption.ONE_FACTORY) {
 					if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
-						if (Prebot.Broodwar.self().gas() <= 250) {
+						if (MyBotModule.Broodwar.self().gas() <= 250) {
 							adjustGasWorkerCount = 2;
 						} else {
 							adjustGasWorkerCount = 1;
@@ -52,7 +52,7 @@ public class GasAdjustmentMechanic extends Action {
 					}
 				} else {
 					if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Command_Center) < 2) {
-						if (Prebot.Broodwar.self().gas() <= 100) {
+						if (MyBotModule.Broodwar.self().gas() <= 100) {
 							adjustGasWorkerCount = 3;
 						} else {
 							adjustGasWorkerCount = 2;
