@@ -130,6 +130,7 @@ public class PreBotUXManager {
 				drawUnitTargetOnMap();
 				drawnextPoints();
 				drawTurretMap();
+				drawManagerTimeSpent(490, 210);
 
 				// draw tile position of mouse cursor
 				int mouseX = MyBotModule.Broodwar.getMousePosition().getX() + MyBotModule.Broodwar.getScreenPosition().getX();
@@ -1156,17 +1157,6 @@ public class PreBotUXManager {
 			int y2 = (t.getY() + 1) * 32 - 8;
 
 			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
-		}
-		
-		Set<TilePosition> tilesToAvoidAddonBuilding = ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding();
-		for (TilePosition t : tilesToAvoidAddonBuilding)
-		{
-			int x1 = t.getX() * 32 + 8;
-			int y1 = t.getY() * 32 + 8;
-			int x2 = (t.getX() + 1) * 32 - 8;
-			int y2 = (t.getY() + 1) * 32 - 8;
-
-			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Black, false);
 		}
 		
 		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation();
