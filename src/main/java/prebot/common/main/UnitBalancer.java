@@ -37,7 +37,8 @@ public class UnitBalancer {
     }
 
     public static boolean skipControl(Unit unit) {
-
+    	if(mapper.get(unit.getID()) == null)
+    			System.out.println("unit.getID " + unit.getID() +", " +unit.getType() +", " + unit.isCompleted());
         return (MyBotModule.Broodwar.getFrameCount() % groupSize) !=  mapper.get(unit.getID());
     }
 
@@ -47,11 +48,10 @@ public class UnitBalancer {
     }
 
     private void resetMap() {
-
         mapper.clear();
         int count=0;
         for(UnitType unitType : listType){
-
+    		
             List<Unit> units = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, unitType);
             for(Unit unit : units){
                 mapper.put(unit.getID(), count);

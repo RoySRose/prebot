@@ -74,7 +74,8 @@ public class GameCommander {
 		try {
 			BigWatch.start("... GAME COMMANDER ...");
 			logObserver.start();
-	
+			
+			
 			InformationManager.Instance().updateTimeCheck();
 			MapGrid.Instance().updateTimeCheck();
 			StrategyManager.Instance().updateTimeCheck();
@@ -86,6 +87,8 @@ public class GameCommander {
 			
 			ConstructionManager.Instance().updateTimeCheck();
 
+			unitBalancer.update();
+			
 			WorkerManager.Instance().updateTimeCheck();
 			CombatManager.Instance().updateTimeCheck();
 			
@@ -94,7 +97,7 @@ public class GameCommander {
             //temp2();
 				
 			logObserver.observe();
-            unitBalancer.update();
+            
 			BigWatch.record("... GAME COMMANDER ...");
 
 		} catch (Exception e) {
