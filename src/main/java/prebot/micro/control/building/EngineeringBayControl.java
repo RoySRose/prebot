@@ -3,11 +3,9 @@ package prebot.micro.control.building;
 import java.util.Collection;
 
 import bwapi.Unit;
-import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.main.MyBotModule;
 import prebot.micro.control.BuildingFlyControl;
 import prebot.micro.control.FlyCondition;
-import prebot.strategy.InformationManager;
 import prebot.strategy.UnitInfo;
 
 public class EngineeringBayControl extends BuildingFlyControl {
@@ -16,6 +14,9 @@ public class EngineeringBayControl extends BuildingFlyControl {
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 
         for(Unit unit :  unitList){
+        	if (skipControl(unit)) {
+        		continue;
+        	}
 
             buildingFlyMap.put(unit, new FlyCondition(true, false, null));
 

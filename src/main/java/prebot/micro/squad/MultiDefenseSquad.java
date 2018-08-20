@@ -121,11 +121,16 @@ public class MultiDefenseSquad extends Squad {
 	@Override
 	public void findEnemies() {
 		euiList.clear();
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, getTargetPosition(), UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+		Position targetPosition = getTargetPosition();
+		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, targetPosition, UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		for (Unit tank : unitList) {
 			if (!TimeUtils.executeUnitRotation(tank, LagObserver.groupsize())) {
 				continue;
 			}
+			if (tank.getDistance(targetPosition) < 250) {
+				continue;
+			}
+			
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, tank.getPosition(), 100);
 		}
 	}

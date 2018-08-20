@@ -19,6 +19,9 @@ public class ScienceFacilityControl extends BuildingFlyControl {
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 
         for(Unit unit :  unitList){
+        	if (skipControl(unit)) {
+        		continue;
+        	}
 
             buildingFlyMap.put(unit, new FlyCondition(false, false, null));
 

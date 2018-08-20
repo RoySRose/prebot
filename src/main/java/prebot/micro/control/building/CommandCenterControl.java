@@ -34,6 +34,9 @@ public class CommandCenterControl extends BuildingFlyControl {
 //        }
 
         for(Unit unit :  unitList){
+        	if (skipControl(unit)) {
+        		continue;
+        	}
 
             buildingFlyMap.put(unit, new FlyCondition());
 

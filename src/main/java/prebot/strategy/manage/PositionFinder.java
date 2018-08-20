@@ -65,6 +65,29 @@ public class PositionFinder {
 	
 	private int watcherOtherPositionFrame = CommonCode.NONE;
 	private Position watcherOtherPosition = null;
+	
+	
+	private boolean scanAtReadyToPosition = false;
+	private int scanAtReadyToOrderFrame = CommonCode.NONE;
+	private boolean scanAtReadyToDisabled = false;
+	
+	/// comsatControl에서 호출한다.
+	public boolean scanAtReadyToPosition() {
+		if (scanAtReadyToDisabled) {
+			return false;
+		}
+		
+		if (scanAtReadyToPosition) {
+			if (scanAtReadyToOrderFrame != CommonCode.NONE && TimeUtils.after(scanAtReadyToOrderFrame)) {
+				// comsat을 사용한다.
+				scanAtReadyToOrderFrame = CommonCode.NONE;
+				scanAtReadyToPosition = false;
+				scanAtReadyToDisabled = true;
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private static PositionFinder instance = new PositionFinder();
 
@@ -193,6 +216,10 @@ public class PositionFinder {
 			
 			// 병력이 쌓였다면 second choke에서 방어한다.
 			if (myTankSupplyCount >= 3 * 4 && InfoUtils.myReadyToPosition() != null) {
+				if (!scanAtReadyToDisabled && !scanAtReadyToPosition) {
+					scanAtReadyToPosition = true;
+					scanAtReadyToOrderFrame = TimeUtils.elapsedFrames() + 3 * TimeUtils.SECOND;
+				}
 				return PositionFinder.CampType.READY_TO;
 			}
 			// 병력이 조금 있거나 앞마당이 차지되었다면 expansion에서 방어한다.
@@ -836,7 +863,12 @@ public class PositionFinder {
 
 		// 적 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.getType() == UnitType.Zerg_Larva || !unit.isVisible()) {
+			if (unit.getType() == UnitType.Zerg_Larva
+					|| unit.getType() == UnitType.Zerg_Overlord
+					|| unit.getType() == UnitType.Protoss_Observer
+					|| unit.getType() == UnitType.Protoss_Shuttle
+					|| unit.getType() == UnitType.Terran_Dropship
+					|| !unit.isVisible()) {
 				continue;
 			}
 			return unit.getPosition();

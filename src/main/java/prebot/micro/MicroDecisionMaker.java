@@ -220,15 +220,8 @@ public class MicroDecisionMaker {
 					for (UnitInfo eui : euiListAirWeapon) {
 						Unit unitInSight = UnitUtils.unitInSight(eui);
 						if (unitInSight != null) {
-							if (unitInSight.isInWeaponRange(airForceTeam.leaderUnit)) {
+							if (isInWeaponRangeSafely(unitInSight, airForceTeam.leaderUnit)) {
 								return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
-							} else {
-								// isInWeaponRange는 제외해도 괜찮다.
-								int enemyUnitDistance = airForceTeam.leaderUnit.getDistance(unitInSight);
-								int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(unitInSight.getType().airWeapon()) + 30;
-								if (enemyUnitDistance < weaponMaxRange) {
-									return MicroDecision.fleeFromUnit(airForceTeam.leaderUnit, eui);
-								}
 							}
 						}
 					}
@@ -252,6 +245,24 @@ public class MicroDecisionMaker {
 		}
 	}
 	
+	private boolean isInWeaponRangeSafely(Unit enemyUnit, Unit myUnit) {
+		if (enemyUnit.isInWeaponRange(myUnit)) {
+			return true;
+		} else {
+			// isInWeaponRange는 제외해도 괜찮다.
+			int enemyUnitDistance = myUnit.getDistance(enemyUnit);
+			int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnit.getType().airWeapon()) + 30;
+			
+			if (enemyUnit.getType() == UnitType.Terran_Goliath) {
+				weaponMaxRange += 100;
+			}
+			if (enemyUnitDistance < weaponMaxRange) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private UnitInfo getBestTargetInfo(AirForceTeam airForceTeam, List<UnitInfo> euiListTarget, List<UnitInfo> euiListAirDefenseBuilding) {
 		return getBestTargetInfo(airForceTeam, euiListTarget, euiListAirDefenseBuilding, AirForceManager.Instance().getStrikeLevel());
 	}
