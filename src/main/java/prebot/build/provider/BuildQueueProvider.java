@@ -50,7 +50,7 @@ import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.FileUtils;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
@@ -74,7 +74,7 @@ public class BuildQueueProvider extends GameManager {
 	}
 	
 	public int upgradeRemainingFrame(UpgradeType upgradeType) {
-		if (!Prebot.Broodwar.self().isUpgrading(upgradeType)) {
+		if (!MyBotModule.Broodwar.self().isUpgrading(upgradeType)) {
 			return CommonCode.UNKNOWN;
 		}
 		Integer startFrame = upgradeStartMap.get(upgradeType);
@@ -273,34 +273,34 @@ public class BuildQueueProvider extends GameManager {
 
         //Deactivate
     	/*upgrade*/
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Ion_Thrusters) == 1) {
     		buildableList.remove(ionThrusters);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Charon_Boosters) == 1) {
     		buildableList.remove(charonBoosters);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1) {
     		buildableList.remove(apolloReactor);
     	}
-    	if(Prebot.Broodwar.self().hasResearched(TechType.Spider_Mines)) {
+    	if(MyBotModule.Broodwar.self().hasResearched(TechType.Spider_Mines)) {
     		buildableList.remove(spiderMines);
     	}
-    	if(Prebot.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) {
+    	if(MyBotModule.Broodwar.self().hasResearched(TechType.Tank_Siege_Mode)) {
     		buildableList.remove(tankSiegeMode);
     	}
-    	if(Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
+    	if(MyBotModule.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
     		buildableList.remove(cloakingField);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Plating) == 3) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Plating) == 3) {
     		buildableList.remove(terranShipPlating);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Weapons) == 3) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Ship_Weapons) == 3) {
     		buildableList.remove(terranShipWeapons);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 3) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Plating) == 3) {
     		buildableList.remove(terranVehiclePlating);
     	}
-    	if(Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 3) {
+    	if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Terran_Vehicle_Weapons) == 3) {
     		buildableList.remove(terranVehicleWeapons);
     	}
     	
@@ -329,13 +329,13 @@ public class BuildQueueProvider extends GameManager {
     
     public void executeCombatUnitTrainingBlocked() {
 		
-		if (Prebot.Broodwar.self().supplyTotal() - Prebot.Broodwar.self().supplyUsed() < 4) {
+		if (MyBotModule.Broodwar.self().supplyTotal() - MyBotModule.Broodwar.self().supplyUsed() < 4) {
 			return;
 		}
-		if (Prebot.Broodwar.self().supplyUsed() > 392) {
+		if (MyBotModule.Broodwar.self().supplyUsed() > 392) {
 			return;
 		}
-		if (Prebot.Broodwar.self().minerals() < 500) {
+		if (MyBotModule.Broodwar.self().minerals() < 500) {
 			return;
 		}
 		BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -401,12 +401,12 @@ public class BuildQueueProvider extends GameManager {
 			blockingItem = tempbuildQueue.getItem();
 		}
 		
-		boolean isArmoryExists = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) > 0;
+		boolean isArmoryExists = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Armory) > 0;
 		boolean vultureInTheQueue = tempbuildQueue.getItemCount(UnitType.Terran_Vulture) > 0;
 		
-		int totVulture = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
-		int totTank = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
-		int totGoliath = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
+		int totVulture = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Vulture);
+		int totTank = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode);
+		int totGoliath = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Goliath);
 
 		int vultureratio = StrategyIdea.factoryRatio.vulture;
 		int tankratio = StrategyIdea.factoryRatio.tank;
@@ -461,7 +461,7 @@ public class BuildQueueProvider extends GameManager {
 			
 			if (!vultureInTheQueue) {
 				int mineralNeed = selected.mineralPrice();
-				if (Prebot.Broodwar.self().gas() < 250) {
+				if (MyBotModule.Broodwar.self().gas() < 250) {
 					mineralNeed = 75;
 				}
 				mineralNeed = blockingItem.metaType.mineralPrice() + mineralNeed;

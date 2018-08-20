@@ -10,7 +10,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -24,7 +24,7 @@ public class BuilderFactory extends DefaultBuildableItem {
     }
     
     public final boolean buildCondition(){
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
 			return false;
 		}
 		if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory, null) > 0) {
@@ -32,7 +32,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 		}
 		
 		// 배럭이 있고, 가스는 100 이상인데 팩토리가 없을경우. 첫팩은 무조건 있어야 하므로
-		if (Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Factory) == 0 && Prebot.Broodwar.self().gas() > 100) {
+		if (MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Factory) == 0 && MyBotModule.Broodwar.self().gas() > 100) {
     		int buildQueueCount = BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory);
     		int constructionCount = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null);
     		if (buildQueueCount + constructionCount == 0) {
@@ -100,7 +100,7 @@ public class BuilderFactory extends DefaultBuildableItem {
 			return true;
 
 		} else if (completeFactoryCount < maxFactoryCount) {
-			if (Prebot.Broodwar.self().minerals() > 200 + additonalmin && Prebot.Broodwar.self().gas() > 100 + additonalgas) {
+			if (MyBotModule.Broodwar.self().minerals() > 200 + additonalmin && MyBotModule.Broodwar.self().gas() > 100 + additonalgas) {
 				if (completeFactoryCount == 2) {
 					if (UnitUtils.myFactoryUnitSupplyCount() > 24 && factoryFullOperating) {
 						return true;

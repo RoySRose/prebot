@@ -10,7 +10,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.BuildOrderItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 //import prebot.common.util.UnitUtils;
 import prebot.common.util.UnitUtils;
 
@@ -65,7 +65,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
         }
         //when blocking is false check resource
 		if (!buildCondition.blocking) {
-			if (metaType.mineralPrice() <= Prebot.Broodwar.self().minerals() && metaType.gasPrice() <= Prebot.Broodwar.self().gas()) {
+			if (metaType.mineralPrice() <= MyBotModule.Broodwar.self().minerals() && metaType.gasPrice() <= MyBotModule.Broodwar.self().gas()) {
 				setBuildQueue();
 			}
 		} else {
@@ -121,7 +121,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 
     protected int getCurrentItemCount(){
         int currentItemCount = BuildManager.Instance().buildQueue.getItemCount(metaType.getUnitType()) +
-                Prebot.Broodwar.self().allUnitCount(metaType.getUnitType());
+                MyBotModule.Broodwar.self().allUnitCount(metaType.getUnitType());
         return currentItemCount;
     }
 
@@ -155,7 +155,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     }
 
     private final boolean supplySpaceAvailable(){
-    	int supplyMargin = Prebot.Broodwar.self().supplyTotal() -  Prebot.Broodwar.self().supplyUsed();
+    	int supplyMargin = MyBotModule.Broodwar.self().supplyTotal() -  MyBotModule.Broodwar.self().supplyUsed();
     	int metaTypeSupplyCount = metaType.supplyRequired(); 
 		return metaTypeSupplyCount <= supplyMargin;
     }
@@ -179,7 +179,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
 		}
 
 		int mineralsNearDepot = 0;
-		for (Unit mineral : Prebot.Broodwar.neutral().getUnits()) {
+		for (Unit mineral : MyBotModule.Broodwar.neutral().getUnits()) {
 			if (mineral.getType() != UnitType.Resource_Mineral_Field) {
 				continue;
 			}

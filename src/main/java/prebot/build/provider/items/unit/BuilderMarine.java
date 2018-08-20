@@ -9,7 +9,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
@@ -23,7 +23,7 @@ public class BuilderMarine extends DefaultBuildableItem {
 
     public final boolean buildCondition(){
     	
-    	if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
+    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
     		return false;
     	}
     	
@@ -38,7 +38,7 @@ public class BuilderMarine extends DefaultBuildableItem {
     		return false;
     	}
 
-    	int nowMarine = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
+    	int nowMarine = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Marine);
     	
 //    	마린이 2마리가 생산된 상태에서 팩토리가 없다면 팩토리 먼저
     	if(nowMarine == 2 && UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory) == 0) {

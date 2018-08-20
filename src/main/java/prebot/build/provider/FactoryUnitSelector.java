@@ -3,7 +3,7 @@ package prebot.build.provider;
 
 import bwapi.UnitType;
 import prebot.build.prebot1.BuildManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -16,11 +16,11 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 	public int wgt = 1;
 	
 	public int GetCurrentTot(UnitType checkunit) {
-		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + Prebot.Broodwar.self().allUnitCount(checkunit);
+		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + MyBotModule.Broodwar.self().allUnitCount(checkunit);
 	}
 
 	public int GetCurrentTotBlocked(UnitType checkunit) {
-		int cnt = Prebot.Broodwar.self().allUnitCount(checkunit);
+		int cnt = MyBotModule.Broodwar.self().allUnitCount(checkunit);
 		return cnt;
 	}
 	
@@ -153,7 +153,7 @@ public class FactoryUnitSelector implements Selector<UnitType>{
 			wgt = StrategyIdea.factoryRatio.weight;
 
 			UnitType selected = chooseunit(vultureratio, tankratio, goliathratio, wgt, totalVulture, totalTank, totalGoliath);
-			if (PlayerUtils.enoughResource(selected.mineralPrice(), selected.gasPrice()) && Prebot.Broodwar.self().supplyUsed() <= 392) {
+			if (PlayerUtils.enoughResource(selected.mineralPrice(), selected.gasPrice()) && MyBotModule.Broodwar.self().supplyUsed() <= 392) {
 //				System.out.println("vultureratio=" + vultureratio + ", tankratio" + tankratio + ", goliathratio=" + goliathratio + ", wgt=" + wgt
 //						+ ", totalVulture=" + totalVulture+ ", totalTank" + totalTank+ ", totalGoliath=" + totalGoliath + " => selected=" + selected);
 				unitType = selected;

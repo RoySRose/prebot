@@ -18,7 +18,7 @@ import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
@@ -445,7 +445,7 @@ public class ConstructionManager extends GameManager {
 
 					// set the buildCommandGiven flag to true
 					b.setBuildCommandGiven(true);
-					b.setLastBuildCommandGivenFrame(Prebot.Broodwar.getFrameCount());
+					b.setLastBuildCommandGivenFrame(MyBotModule.Broodwar.getFrameCount());
 					b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 	            }
 				// if this is not the first time we've sent this guy to build this
@@ -453,7 +453,7 @@ public class ConstructionManager extends GameManager {
 				// 이 경우, 해당 일꾼의 build command 를 해제하고, 건물 상태를 Unassigned 로 바꿔서, 다시 건물 위치를 정하고, 다른 일꾼을 지정하는 식으로 처리합니다
 				else
 	            {
-					if (Prebot.Broodwar.getFrameCount() - b.getLastBuildCommandGivenFrame() > 24) {
+					if (MyBotModule.Broodwar.getFrameCount() - b.getLastBuildCommandGivenFrame() > 24) {
 
 						//System.out.println(b.getType() + " (" + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY() + ") buildCommandGiven . but now Unassigned" );
 
@@ -496,7 +496,7 @@ public class ConstructionManager extends GameManager {
 	public void checkForStartedConstruction()
 	{				
 		// for each building unit which is being constructed
-	    for (Unit buildingThatStartedConstruction : Prebot.Broodwar.self().getUnits())
+	    for (Unit buildingThatStartedConstruction : MyBotModule.Broodwar.self().getUnits())
 	    {
 	        // filter out units which aren't buildings under construction
 	        if (!buildingThatStartedConstruction.getType().isBuilding() || !buildingThatStartedConstruction.isBeingConstructed())
@@ -528,12 +528,12 @@ public class ConstructionManager extends GameManager {
 
 	                // if we are zerg, make the buildingUnit null since it's morphed or destroyed
 					// Extractor 의 경우 destroyed 되고, 그외 건물의 경우 morphed 된다
-	                if (Prebot.Broodwar.self().getRace() == Race.Zerg)
+	                if (MyBotModule.Broodwar.self().getRace() == Race.Zerg)
 	                {
 	                	b.setConstructionWorker(null);
 	                }
 					// if we are protoss, give the worker back to worker manager
-					else if (Prebot.Broodwar.self().getRace() == Race.Protoss)
+					else if (MyBotModule.Broodwar.self().getRace() == Race.Protoss)
 	                {
 	                    WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 	                    b.setConstructionWorker(null);
@@ -567,11 +567,11 @@ public class ConstructionManager extends GameManager {
 	/// 참고로, 프로토스 / 저그는 건설을 시작하면 일꾼 포인터를 null 로 만들기 때문에 (constructionWorker = null) 건설 도중에 죽은 일꾼을 신경쓸 필요 없습니다 
 	public void checkForDeadTerranBuilders()
 	{
-		if (Prebot.Broodwar.self().getRace() != Race.Terran) {
+		if (MyBotModule.Broodwar.self().getRace() != Race.Terran) {
 			return;
 		}
 
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) <= 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV) <= 0) {
 			return;
 		}
 			
@@ -596,7 +596,7 @@ public class ConstructionManager extends GameManager {
 					if (workerToAssign != null) {
 						b.setConstructionWorker(workerToAssign);
 						b.setBuildCommandGiven(true);
-						b.setLastBuildCommandGivenFrame(Prebot.Broodwar.getFrameCount());
+						b.setLastBuildCommandGivenFrame(MyBotModule.Broodwar.getFrameCount());
 						b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 					}
 				} else {
@@ -631,7 +631,7 @@ public class ConstructionManager extends GameManager {
 				//System.out.println("Construction " + b.getType() + " completed at " + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY());
 				
 				// if we are terran, give the worker back to worker manager
-	            if (Prebot.Broodwar.self().getRace() == Race.Terran)
+	            if (MyBotModule.Broodwar.self().getRace() == Race.Terran)
 	            {
 	                WorkerManager.Instance().setIdleWorker(b.getConstructionWorker());
 	            }
@@ -688,7 +688,7 @@ public class ConstructionManager extends GameManager {
 					}
 					else {
 						// Refinery 를 지으려는 장소에 Refinery 가 이미 건설되어 있다면 dead lock 
-						for (Unit u : Prebot.Broodwar.getUnitsOnTile(testLocation)) {
+						for (Unit u : MyBotModule.Broodwar.getUnitsOnTile(testLocation)) {
 							if (u.getType().isRefinery() && u.exists() ) {
 								hasAvailableGeyser = false;
 								break;
@@ -724,8 +724,8 @@ public class ConstructionManager extends GameManager {
 						if (requiredUnitType != UnitType.None) {
 
 							// 선행 건물 / 유닛이 존재하지 않고, 생산 중이지도 않고
-							if (Prebot.Broodwar.self().completedUnitCount(requiredUnitType) == 0
-								&& Prebot.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0)
+							if (MyBotModule.Broodwar.self().completedUnitCount(requiredUnitType) == 0
+								&& MyBotModule.Broodwar.self().incompleteUnitCount(requiredUnitType) == 0)
 							{
 								// 선행 건물이 건설 예정이지도 않으면 dead lock
 								if (requiredUnitType.isBuilding())
@@ -757,11 +757,11 @@ public class ConstructionManager extends GameManager {
 
 	public void checkConstructionBuildings()
 	{
-		if (Prebot.Broodwar.self().getRace() != Race.Terran) {
+		if (MyBotModule.Broodwar.self().getRace() != Race.Terran) {
 			return;
 		}
 
-		for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			// 건설중인 건물의 경우 공격 받고 있고 에너지가 100밑이면 건설 취소
 			if (!unit.getType().isBuilding()) {
 				continue;
@@ -804,7 +804,7 @@ public class ConstructionManager extends GameManager {
 	    {
 	        for (int y=0; y<b.getType().tileHeight(); ++y)
 	        {
-	            if (!Prebot.Broodwar.isExplored(tile.getX()+ x,tile.getY() + y))
+	            if (!MyBotModule.Broodwar.isExplored(tile.getX()+ x,tile.getY() + y))
 	            {
 	                return false;
 	            }

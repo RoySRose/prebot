@@ -10,7 +10,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import prebot.build.constant.BuildConfig;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.constant.StrategyConfig;
@@ -71,7 +71,7 @@ public class MapGrid extends GameManager {
 	
 	public GridCell[] gridCells;
 
-	private static MapGrid instance = new MapGrid(Prebot.Broodwar.mapHeight() * 32, Prebot.Broodwar.mapHeight() * 32, BuildConfig.MAP_GRID_SIZE);
+	private static MapGrid instance = new MapGrid(MyBotModule.Broodwar.mapHeight() * 32, MyBotModule.Broodwar.mapHeight() * 32, BuildConfig.MAP_GRID_SIZE);
 	
 	/// static singleton 객체를 리턴합니다
 	public static MapGrid Instance() {
@@ -109,12 +109,12 @@ public class MapGrid extends GameManager {
 				Position cellCenter = getCellCenter(r, c);
 
 				// don't worry about places that aren't connected to our start locatin
-				if (!BWTA.isConnected(cellCenter.toTilePosition(), Prebot.Broodwar.self().getStartLocation()))
+				if (!BWTA.isConnected(cellCenter.toTilePosition(), MyBotModule.Broodwar.self().getStartLocation()))
 				{
 					continue;
 				}
 
-				Position home = Prebot.Broodwar.self().getStartLocation().toPosition();
+				Position home = MyBotModule.Broodwar.self().getStartLocation().toPosition();
 				double dist = home.getDistance(getCellByIndex(r, c).center);
 				int lastVisited = getCellByIndex(r, c).timeLastVisited;
 				if (lastVisited < minSeen || ((lastVisited == minSeen) && (dist > minSeenDist)))
@@ -212,19 +212,19 @@ public class MapGrid extends GameManager {
 		//MyBotModule.Broodwar.printf("MapGrid info: WH(%d, %d)  CS(%d)  RC(%d, %d)  C(%d)", mapWidth, mapHeight, cellSize, rows, cols, cells.size());
 
 		// add our units to the appropriate cell
-		for (Unit unit : Prebot.Broodwar.self().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			getCell(unit).ourUnits.add(unit);
-			getCell(unit).timeLastVisited = Prebot.Broodwar.getFrameCount();
+			getCell(unit).timeLastVisited = MyBotModule.Broodwar.getFrameCount();
 		}
 
 		// add enemy units to the appropriate cell
-		for (Unit unit : Prebot.Broodwar.enemy().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		{
 			if (unit.getHitPoints() > 0)
 			{
 				getCell(unit).oppUnits.add(unit);
-				getCell(unit).timeLastOpponentSeen = Prebot.Broodwar.getFrameCount();
+				getCell(unit).timeLastOpponentSeen = MyBotModule.Broodwar.getFrameCount();
 			}
 		}
 	}
@@ -244,7 +244,7 @@ public class MapGrid extends GameManager {
 	public List<Unit> getUnitsNearForAir(Position position, int radius, boolean ourUnits, boolean oppUnits)
 	{
 		List<Unit> units = new ArrayList<>();
-		List<Unit> unitsInRadius = Prebot.Broodwar.getUnitsInRadius(position, radius);
+		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
 		for (Unit u : unitsInRadius) {
 			if (oppUnits && u.getPlayer() == InformationManager.Instance().enemyPlayer) {
 				
@@ -290,7 +290,7 @@ public class MapGrid extends GameManager {
 	public List<Unit> getUnitsNear(Position position, int radius, boolean ourUnits, boolean oppUnits, UnitType unitType)
 	{
 		List<Unit> units = new ArrayList<>();
-		List<Unit> unitsInRadius = Prebot.Broodwar.getUnitsInRadius(position, radius);
+		List<Unit> unitsInRadius = MyBotModule.Broodwar.getUnitsInRadius(position, radius);
 		for (Unit u : unitsInRadius) {
 			if (ourUnits && u.getPlayer() == InformationManager.Instance().selfPlayer) {
 				if ((unitType == null || u.getType() == unitType) && !units.contains(u)) {
@@ -359,14 +359,14 @@ public class MapGrid extends GameManager {
 	// again before it wears off.
 	public void scanAtPosition(Position pos) {
 		GridCell cell = getCell(pos);
-		cell.timeLastScan = Prebot.Broodwar.getFrameCount();
+		cell.timeLastScan = MyBotModule.Broodwar.getFrameCount();
 		
 		this.lastScanGridCell = cell;
 	}
 	
 	public boolean scanIsActiveAt(Position pos) {
 		GridCell cell = getCell(pos);
-		return cell.timeLastScan + StrategyConfig.SCAN_DURATION > Prebot.Broodwar.getFrameCount();
+		return cell.timeLastScan + StrategyConfig.SCAN_DURATION > MyBotModule.Broodwar.getFrameCount();
 	}
 
 	
@@ -406,7 +406,7 @@ public class MapGrid extends GameManager {
 			return 100000000;
 		}
 //		System.out.println("timeLastVisited returning: " + (MyBotModule.Broodwar.getFrameCount() - latesttime));
-		return Prebot.Broodwar.getFrameCount() - latesttime;
+		return MyBotModule.Broodwar.getFrameCount() - latesttime;
 	}
 	
 

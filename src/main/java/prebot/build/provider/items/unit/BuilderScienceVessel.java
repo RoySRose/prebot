@@ -5,7 +5,7 @@ import bwapi.UnitType;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.UnitUtils;
 
@@ -16,13 +16,13 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 	}
 
 	public final boolean buildCondition() {
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Facility) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Facility) == 0) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Control_Tower) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Control_Tower) == 0) {
 			return false;
 		}
 
@@ -33,7 +33,7 @@ public class BuilderScienceVessel extends DefaultBuildableItem {
 		// 활성화된 커맨드가 2개 이상일 경우
 		int activatedCommandCenterCount = UnitUtils.activatedCommandCenterCount();
 		int maxVesselCount = getMaxVesselCount();
-		int allVesselCount = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel);
+		int allVesselCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Science_Vessel);
 
 		if (allVesselCount <= maxVesselCount && activatedCommandCenterCount >= 2) {
 			if (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {

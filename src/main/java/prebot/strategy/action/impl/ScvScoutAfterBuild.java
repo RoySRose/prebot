@@ -3,7 +3,7 @@ package prebot.strategy.action.impl;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
@@ -32,7 +32,7 @@ public class ScvScoutAfterBuild extends Action {
 				marginFrames--;
 				return false;
 			} else {
-				if (InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()) == null) {
+				if (InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()) == null) {
 					StrategyIdea.assignScoutScv = true;
 				}
 				return true;

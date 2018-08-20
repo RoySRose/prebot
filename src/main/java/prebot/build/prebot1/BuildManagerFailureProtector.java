@@ -5,7 +5,7 @@ import java.util.Map;
 
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 
 public class BuildManagerFailureProtector {
@@ -38,7 +38,7 @@ public class BuildManagerFailureProtector {
 			failInfo.suspendDurationFrame *= 2; // 정지 시간을 2배로 증가시킨다.
 			
 			String message = "*** " + metaType.getName() + " unlocked ***";
-			Prebot.Broodwar.printf(message);
+			MyBotModule.Broodwar.printf(message);
 			System.out.println(message);
 			return false;
 		}
@@ -59,7 +59,7 @@ public class BuildManagerFailureProtector {
 			failInfo.suspendStartFrame = TimeUtils.elapsedFrames();
 
 			String message = "*** " + metaType.getName() + " locked - " + TimeUtils.framesToTimeString(failInfo.suspendDurationFrame) + " ***";
-			Prebot.Broodwar.printf(message);
+			MyBotModule.Broodwar.printf(message);
 			System.out.println(message);
 		}
 	}

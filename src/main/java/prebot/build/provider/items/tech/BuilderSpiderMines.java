@@ -5,7 +5,7 @@ import prebot.build.provider.BuildQueueProvider;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.FileUtils;
 
 public class BuilderSpiderMines extends DefaultBuildableItem {
@@ -31,7 +31,7 @@ public class BuilderSpiderMines extends DefaultBuildableItem {
 		if (researchSelector.getSelected().getTechType() != metaType.getTechType()) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().isResearching(researchSelector.getSelected().getTechType())) {
+		if (MyBotModule.Broodwar.self().isResearching(researchSelector.getSelected().getTechType())) {
 			return false;
 		}
 

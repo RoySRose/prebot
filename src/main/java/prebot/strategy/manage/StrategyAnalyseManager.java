@@ -8,7 +8,7 @@ import bwapi.TilePosition;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.UxColor;
 import prebot.common.debug.chat.impl.StrategyChanger;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -112,7 +112,7 @@ public class StrategyAnalyseManager {
 
 		if (!StrategyChanger.stopStrategiestForDebugging) {
 			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
-				Prebot.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+				MyBotModule.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
 				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
 				StrategyIdea.currentStrategy = strategyToApply;
 				this.applyDetailValue(strategyToApply);
@@ -225,15 +225,15 @@ public class StrategyAnalyseManager {
 		TilePosition enemyGasTile = InfoUtils.enemyBaseGas().getTilePosition();
 		TilePosition enemyFirstExpansionTile = InfoUtils.enemyFirstExpansion().getTilePosition();
 		
-		if (Prebot.Broodwar.isVisible(enemyBaseTile)) {
+		if (MyBotModule.Broodwar.isVisible(enemyBaseTile)) {
 //			System.out.println("base explored");
 			lastCheckFrameBase = TimeUtils.elapsedFrames();
 		}
-		if (Prebot.Broodwar.isVisible(enemyGasTile)) {
+		if (MyBotModule.Broodwar.isVisible(enemyGasTile)) {
 //			System.out.println("gas explored");
 			lastCheckFrameGas = TimeUtils.elapsedFrames();
 		}
-		if (Prebot.Broodwar.isVisible(enemyFirstExpansionTile)) {
+		if (MyBotModule.Broodwar.isVisible(enemyFirstExpansionTile)) {
 //			System.out.println("expansion explored");
 			lastCheckFrameFirstExpansion = TimeUtils.elapsedFrames();
 		}

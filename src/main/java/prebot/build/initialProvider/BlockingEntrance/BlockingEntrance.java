@@ -6,7 +6,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.strategy.InformationManager;
 import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.MapSpecificInformation.GameMap;
@@ -103,7 +103,7 @@ public class BlockingEntrance {
     	    	
 
         //starting position..... needed?
-        for (Unit unit : Prebot.Broodwar.self().getUnits()) {
+        for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
             if (unit.getType() == UnitType.Terran_Command_Center) {
 
                 //System.out.println("unit.getTilePosition().getX() ==>> " + unit.getTilePosition().getX() + "  //  unit.getTilePosition().getY() ==>> " +unit.getTilePosition().getY());

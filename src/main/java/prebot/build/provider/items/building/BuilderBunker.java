@@ -6,7 +6,7 @@ import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -29,10 +29,10 @@ public class BuilderBunker extends DefaultBuildableItem {
     	// inital에 들어가야 하고 들어가야 한다.
     	// 입구가 막히지 않았을 때 건설. 케이스별 생각해볼게 있음
     	
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
     		return false;
     	}
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3) {
     		return false;
     	}
 		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Bunker)) {
@@ -59,9 +59,9 @@ public class BuilderBunker extends DefaultBuildableItem {
 					if (bunkerBuildLeftSecond == CommonCode.UNKNOWN || leftSeconds < bunkerBuildLeftSecond) {
 						bunkerBuildLeftSecond = leftSeconds;
 						if (bunkerBuildLeftSecond == 0) {
-							Prebot.Broodwar.sendText("Bunker.");
+							MyBotModule.Broodwar.sendText("Bunker.");
 						} else {
-							Prebot.Broodwar.sendText("" + bunkerBuildLeftSecond);
+							MyBotModule.Broodwar.sendText("" + bunkerBuildLeftSecond);
 						}
 					}
 				}

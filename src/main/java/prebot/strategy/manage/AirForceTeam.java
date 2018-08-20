@@ -9,7 +9,7 @@ import java.util.Set;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
@@ -183,7 +183,7 @@ public class AirForceTeam {
 	}
 	
 	public boolean cloakable() {
-		if (!Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
+		if (!MyBotModule.Broodwar.self().hasResearched(TechType.Cloaking_Field)) {
 			return false;
 		}
 		if (cloakingMode) {

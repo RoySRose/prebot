@@ -1,4 +1,4 @@
-package prebot.common.debug;
+package prebot.common.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,8 +40,8 @@ import prebot.common.MapGrid;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonConfig;
-import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.debug.BigWatch;
+import prebot.common.debug.UxColor;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
@@ -72,9 +72,9 @@ import prebot.strategy.manage.VultureTravelManager;
 
 /// 봇 프로그램 개발의 편의성 향상을 위해 게임 화면에 추가 정보들을 표시하는 class<br>
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
-public class UXManager {
+public class PreBotUXManager {
 	
-	private int uxOption = 1;
+	private int uxOption = 0;
 
 	public void setUxOption(int uxOption) {
 		this.uxOption = uxOption;
@@ -100,10 +100,10 @@ public class UXManager {
 	private UnitType factorySelected = UnitType.None;
 	
 	private Map<Integer, MicroDecision> decisionListForUx = new HashMap<>();
-	private static UXManager instance = new UXManager();
+	private static PreBotUXManager instance = new PreBotUXManager();
 	
 	/// static singleton 객체를 리턴합니다
-	public static UXManager Instance() {
+	public static PreBotUXManager Instance() {
 		return instance;
 	}
 	
@@ -114,91 +114,66 @@ public class UXManager {
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
 		if (uxOption == 0) {
-			drawDebugginUxMenu();
+			UXManager.Instance().update();
+//			drawDebugginUxMenu();
+		} else {
 			
-		} else if (uxOption == 1) {
-			drawGameInformationOnScreen(5, 5);
-//			drawUnitStatisticsOnScreen1(400, 15);
-			// drawUnitStatisticsOnScreen2(370, 50);
-//			System.out.println("1");
-			drawBWTAResultOnMap();
-//			drawMapGrid();
-			// 빌드오더큐 : 빌드 실행 전
-			drawBuildOrderQueueOnScreen(500, 50);
-			// 빌드 실행 상황 : 건물 건설, 유닛 생산, 업그레이드, 리서치
-			drawBuildStatusOnScreen(370, 50);
-			// 건물 건설 큐. 건물 건설 상황
-			drawConstructionQueueOnScreenAndMap(200, 150);
-			// 건물이 건설될 위치
-			// 건물 건설 장소 예약 지점
-			drawReservedBuildingTilesOnMap();
-			// 건물 건설 불가 구역 (미네랄/가스/베이스 사이)
-//			System.out.println("2");
-			drawTilesToAvoidOnMap();
-//			drawLeaderUnitOnMap();
-			// drawUnitExtendedInformationOnMap();
-			// 각 일꾼들의 임무 상황
-//			drawWorkerStateOnScreen(260, 60);
-			// 베이스캠프당 일꾼 수
-//			drawWorkerCountOnMap();
-			// 일꾼 자원채취 임무 상황
-			drawWorkerMiningStatusOnMap();
-//			System.out.println("3");
-			// 정찰
-//			drawScoutInformation(220, 330);
-			// 공격
-			drawUnitTargetOnMap();
-			
-//			System.out.println("4");
-			// 미사일, 럴커의 보이지않는 공격등을 표시
-			// drawBulletsOnMap();
-			drawnextPoints();
-			
-			
-			drawTurretMap();
-			
-			// draw tile position of mouse cursor
-			int mouseX = Prebot.Broodwar.getMousePosition().getX() + Prebot.Broodwar.getScreenPosition().getX();
-			int mouseY = Prebot.Broodwar.getMousePosition().getY() + Prebot.Broodwar.getScreenPosition().getY();
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int) (mouseX / CommonConfig.UxConfig.TILE_SIZE) + ", " + (int) (mouseY / CommonConfig.UxConfig.TILE_SIZE) + ")");
-			Prebot.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
-			//미네랄PATH
-		} else if (uxOption == 2) {
-			drawStrategy();
-			
-		} else if (uxOption == 3) {
-			drawEnemyBuildTimer();
-			//drawCCtoScvCount();
-		} else if (uxOption == 4) {
-			drawSquadInfoOnMap(20, 30);
-			drawManagerTimeSpent(490, 210);
-			drawDecision();
-			drawEnemyAirDefenseRange();
-			drawAirForceInformation();
-			drawVulturePolicy();
-			
-		} else if (uxOption == 5) {
-			drawEnemyBaseToBaseTime();
-			
-		} else if (uxOption == 6) {
-			drawBigWatch();
-			drawManagerTimeSpent(490, 210);
-		} else if (uxOption == 7) {
-			drawTurretMap();
-        }else if (uxOption == 8) {
-            drawExpectedResource();
-            drawExpectedResource2();
-        }
+			if (uxOption == 1) {
+				drawGameInformationOnScreen(5, 5);
+				drawBWTAResultOnMap();
+				drawBuildOrderQueueOnScreen(500, 50);
+				drawBuildStatusOnScreen(370, 50);
+				drawConstructionQueueOnScreenAndMap(200, 150);
+				drawReservedBuildingTilesOnMap();
+				drawTilesToAvoidOnMap();
+				drawWorkerMiningStatusOnMap();
+				drawUnitTargetOnMap();
+				drawnextPoints();
+				drawTurretMap();
 
-		drawMineralIdOnMap();
-		drawUnitIdOnMap();
-		drawPositionInformation();
-		drawTimer();
-		drawPathData();
-		drawSquadUnitTagMap();
-		
+				// draw tile position of mouse cursor
+				int mouseX = MyBotModule.Broodwar.getMousePosition().getX() + MyBotModule.Broodwar.getScreenPosition().getX();
+				int mouseY = MyBotModule.Broodwar.getMousePosition().getY() + MyBotModule.Broodwar.getScreenPosition().getY();
+				MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY,
+						"(" + (int) (mouseX / CommonConfig.UxConfig.TILE_SIZE) + ", " + (int) (mouseY / CommonConfig.UxConfig.TILE_SIZE) + ")");
+				MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY + 10, "(" + (int) (mouseX) + ", " + (int) (mouseY) + ")");
+				// 미네랄PATH
+			} else if (uxOption == 2) {
+				drawStrategy();
+
+			} else if (uxOption == 3) {
+				drawEnemyBuildTimer();
+				// drawCCtoScvCount();
+			} else if (uxOption == 4) {
+				drawSquadInfoOnMap(20, 30);
+				drawManagerTimeSpent(490, 210);
+				drawDecision();
+				drawEnemyAirDefenseRange();
+				drawAirForceInformation();
+				drawVulturePolicy();
+
+			} else if (uxOption == 5) {
+				drawEnemyBaseToBaseTime();
+
+			} else if (uxOption == 6) {
+				drawBigWatch();
+				drawManagerTimeSpent(490, 210);
+			} else if (uxOption == 7) {
+				drawTurretMap();
+			} else if (uxOption == 8) {
+				drawExpectedResource();
+				drawExpectedResource2();
+			}
+
+			drawMineralIdOnMap();
+			drawUnitIdOnMap();
+			drawPositionInformation();
+			drawTimer();
+			drawPathData();
+			drawSquadUnitTagMap();
+		}
+
 		clearDecisionListForUx();
-		
 		
 //		if (TimeUtils.executeRotation(1, 11)) {
 ////			System.out.println("execute debugBuildLocationSet");
@@ -214,28 +189,28 @@ public class UXManager {
 	
 	private void drawExpectedResource2() {
 		 int m=190;
-        Prebot.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
+        MyBotModule.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
         int l=10;
         for (Entry<UnitType, MutableFloat> enenmy : AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.entrySet()){
         	float cnt = enenmy.getValue().get();
            	UnitType unitType = enenmy.getKey();
-           	Prebot.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
+           	MyBotModule.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
         }
 	}
     private void drawExpectedResource() {
 	    Map<UnitInfo, EnemyCommandInfo> enemyCommandInfoMap = AttackDecisionMaker.Instance().enemyResourceDepotInfoMap;
 
 	    int y=0;
-	    Prebot.Broodwar.drawTextScreen(10, y+=10, "this mymineral  : " + Prebot.Broodwar.self().gatheredMinerals());
-	    Prebot.Broodwar.drawTextScreen(10, y+=10, "total enemy cnt : " + enemyCommandInfoMap.size());
-        Prebot.Broodwar.drawTextScreen(10, y+=10, "mygas           : " + Prebot.Broodwar.self().gatheredGas());
-        Prebot.Broodwar.drawTextScreen(10, y+=10, "mywrkcnt(real)  : " + Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_SCV));
-        Prebot.Broodwar.drawTextScreen(10, y+=10, "frame ==== " + Prebot.Broodwar.getFrameCount());
+	    MyBotModule.Broodwar.drawTextScreen(10, y+=10, "this mymineral  : " + MyBotModule.Broodwar.self().gatheredMinerals());
+	    MyBotModule.Broodwar.drawTextScreen(10, y+=10, "total enemy cnt : " + enemyCommandInfoMap.size());
+        MyBotModule.Broodwar.drawTextScreen(10, y+=10, "mygas           : " + MyBotModule.Broodwar.self().gatheredGas());
+        MyBotModule.Broodwar.drawTextScreen(10, y+=10, "mywrkcnt(real)  : " + MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_SCV));
+        MyBotModule.Broodwar.drawTextScreen(10, y+=10, "frame ==== " + MyBotModule.Broodwar.getFrameCount());
         
         y=drawCalculation(10, y);
         y+=10;
 	    if (enemyCommandInfoMap.size() == 0){
-            Prebot.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
+            MyBotModule.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
         }else{
 
 	        int k =1;
@@ -248,26 +223,26 @@ public class UXManager {
                 EnemyCommandInfo enemyCommandInfo = entry.getValue();
 
                 if(AttackDecisionMaker.Instance().skipResourceDepot.size() ==0){
-                    Prebot.Broodwar.drawTextScreen(10, y += 10, "skipped base : no skipped base");
+                    MyBotModule.Broodwar.drawTextScreen(10, y += 10, "skipped base : no skipped base");
                 }else {
                     for (UnitInfo skip : AttackDecisionMaker.Instance().skipResourceDepot) {
-                        Prebot.Broodwar.drawTextScreen(10, y += 10, "skipped base : " + skip.getLastPosition());
+                        MyBotModule.Broodwar.drawTextScreen(10, y += 10, "skipped base : " + skip.getLastPosition());
                     }
                 }
                 
-                Prebot.Broodwar.drawTextScreen(x, y+=10, k++ + " base"  + unitInfo.getLastPosition() + ", " + enemyCommandInfo.mineralCalculator.getMineralCount());
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "isMainBase      : "  + enemyCommandInfo.isMainBase);
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "has gas         : "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(real)   : " + ((int)enemyCommandInfo.mineralCalculator.getFullCheckMineral()+(int)50));
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "mineral(r+p):   : " + ((int)enemyCommandInfo.uxmineral+(int)50));
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "gas(r+p)        : " + enemyCommandInfo.gasCalculator.getGas());
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "fullWorkerFrame : " + enemyCommandInfo.fullWorkerFrame);
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "halfWorkerFrame : " + enemyCommandInfo.halfWorkerFrame);
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(real)    : " + enemyCommandInfo.workerCounter.realWorkerCount);
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(r+p)     : " + ((int)enemyCommandInfo.workerCounter.getWorkerCount(enemyCommandInfo.lastFullCheckFrame)));
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "fwrkcnt         : " + ((int)enemyCommandInfo.lastFullCheckWorkerCount));
-                Prebot.Broodwar.drawTextScreen(x, y+=10, "last full check : " + enemyCommandInfo.lastFullCheckFrame);
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, k++ + " base"  + unitInfo.getLastPosition() + ", " + enemyCommandInfo.mineralCalculator.getMineralCount());
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "isMainBase      : "  + enemyCommandInfo.isMainBase);
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "has gas         : "  + enemyCommandInfo.gasCalculator.hasGasBuilding());
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "mineral(real)   : " + ((int)enemyCommandInfo.mineralCalculator.getFullCheckMineral()+(int)50));
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "mineral(r+p):   : " + ((int)enemyCommandInfo.uxmineral+(int)50));
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "gas(real)       : " + enemyCommandInfo.gasCalculator.getRealGas());
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "gas(r+p)        : " + enemyCommandInfo.gasCalculator.getGas());
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "fullWorkerFrame : " + enemyCommandInfo.fullWorkerFrame);
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "halfWorkerFrame : " + enemyCommandInfo.halfWorkerFrame);
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(real)    : " + enemyCommandInfo.workerCounter.realWorkerCount);
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "wrkcnt(r+p)     : " + ((int)enemyCommandInfo.workerCounter.getWorkerCount(enemyCommandInfo.lastFullCheckFrame)));
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "fwrkcnt         : " + ((int)enemyCommandInfo.lastFullCheckWorkerCount));
+                MyBotModule.Broodwar.drawTextScreen(x, y+=10, "last full check : " + enemyCommandInfo.lastFullCheckFrame);
                 x+=140;
             }
 
@@ -277,24 +252,24 @@ public class UXManager {
     
     private int drawCalculation(int x, int y) {
     	 y+=10;
-    	 Prebot.Broodwar.drawTextScreen(x, y+=10, UxColor.CHAR_RED +  "Decision : " + AttackDecisionMaker.Instance().decision + ", phase3: " +  StrategyAnalyseManager.Instance().getPhase() +", strategy" + StrategyIdea.currentStrategy.name());
-    	 Prebot.Broodwar.drawTextScreen(x, y+=10, "MineralToPredict: " + AttackDecisionMaker.Instance().UXMineralToPredict);
-         Prebot.Broodwar.drawTextScreen(x, y+=10, "GasToPredict    : " + AttackDecisionMaker.Instance().UXGasToPredict);
-         Prebot.Broodwar.drawTextScreen(x, y+=10, "MineralMinus:   : " + AttackDecisionMaker.Instance().UXMinusMineralToPredict);
-         Prebot.Broodwar.drawTextScreen(x, y+=10, "GasMinus        : " + AttackDecisionMaker.Instance().UXMinusGasToPredict);
+    	 MyBotModule.Broodwar.drawTextScreen(x, y+=10, UxColor.CHAR_RED +  "Decision : " + AttackDecisionMaker.Instance().decision + ", phase3: " +  StrategyAnalyseManager.Instance().getPhase() +", strategy" + StrategyIdea.currentStrategy.name());
+    	 MyBotModule.Broodwar.drawTextScreen(x, y+=10, "MineralToPredict: " + AttackDecisionMaker.Instance().UXMineralToPredict);
+         MyBotModule.Broodwar.drawTextScreen(x, y+=10, "GasToPredict    : " + AttackDecisionMaker.Instance().UXGasToPredict);
+         MyBotModule.Broodwar.drawTextScreen(x, y+=10, "MineralMinus:   : " + AttackDecisionMaker.Instance().UXMinusMineralToPredict);
+         MyBotModule.Broodwar.drawTextScreen(x, y+=10, "GasMinus        : " + AttackDecisionMaker.Instance().UXMinusGasToPredict);
          
-         Prebot.Broodwar.drawTextScreen(x, y+=10, "my point        : " + AttackDecisionMaker.Instance().tempMypoint);
-         Prebot.Broodwar.drawTextScreen(x, y+=10, "enemy point     : " + AttackDecisionMaker.Instance().tempEnemypoint);
+         MyBotModule.Broodwar.drawTextScreen(x, y+=10, "my point        : " + AttackDecisionMaker.Instance().tempMypoint);
+         MyBotModule.Broodwar.drawTextScreen(x, y+=10, "enemy point     : " + AttackDecisionMaker.Instance().tempEnemypoint);
          return y;
     }
 
 	private void drawDecision() {
 		for (Integer unitId : decisionListForUx.keySet()) {
-			Unit unit = Prebot.Broodwar.getUnit(unitId);
+			Unit unit = MyBotModule.Broodwar.getUnit(unitId);
 			MicroDecision decision = decisionListForUx.get(unitId);
-			Prebot.Broodwar.drawTextMap(unit.getPosition(), UxColor.CHAR_YELLOW + decision.toString());
+			MyBotModule.Broodwar.drawTextMap(unit.getPosition(), UxColor.CHAR_YELLOW + decision.toString());
 			if (decision.eui != null) {
-				Prebot.Broodwar.drawLineMap(unit.getPosition(), decision.eui.getLastPosition(), Color.Yellow);
+				MyBotModule.Broodwar.drawLineMap(unit.getPosition(), decision.eui.getLastPosition(), Color.Yellow);
 			}
 		}
 	}
@@ -312,10 +287,10 @@ public class UXManager {
 		if (StrategyIdea.initiated) {
 			battleColor = UxColor.CHAR_RED;
 		}
-		Prebot.Broodwar.drawTextScreen(170, 353, battleColor + StrategyIdea.mainSquadMode.toString() + ": " + TimeUtils.framesToTimeString(TimeUtils.elapsedFrames()) + "(" + TimeUtils.elapsedFrames() + ")");
+		MyBotModule.Broodwar.drawTextScreen(170, 353, battleColor + StrategyIdea.mainSquadMode.toString() + ": " + TimeUtils.framesToTimeString(TimeUtils.elapsedFrames()) + "(" + TimeUtils.elapsedFrames() + ")");
 		
 		char apmColor = UxColor.CHAR_WHITE;
-		int apm = Prebot.Broodwar.getAPM();
+		int apm = MyBotModule.Broodwar.getAPM();
 		if (apm > 3000) {
 			apmColor = UxColor.CHAR_RED;
 		} else if (apm > 2000) {
@@ -325,7 +300,7 @@ public class UXManager {
 		} else {
 			apmColor = UxColor.CHAR_WHITE;
 		}
-		Prebot.Broodwar.drawTextScreen(395, 353, apmColor + "APM : " + Prebot.Broodwar.getAPM());
+		MyBotModule.Broodwar.drawTextScreen(395, 353, apmColor + "APM : " + MyBotModule.Broodwar.getAPM());
 	}
 	
 	private void drawEnemyBuildTimer() {
@@ -335,19 +310,19 @@ public class UXManager {
 		Set<UnitType> buildTimeCertain = EnemyBuildTimer.Instance().buildTimeCertain;
 
 		int y = 20;
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "engine Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.engineeringBayBuildStartFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "turret Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.turretBuildStartFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "turret Need  Frame : " + TimeUtils.framesToTimeString(StrategyIdea.turretNeedFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "engine Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.engineeringBayBuildStartFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "turret Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.turretBuildStartFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "turret Need  Frame : " + TimeUtils.framesToTimeString(StrategyIdea.turretNeedFrame));
 		y += 15;
 		
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "academy Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "comsat Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame + UnitType.Terran_Academy.buildTime()));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "academy Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "comsat Build Frame : " + TimeUtils.framesToTimeString(StrategyIdea.academyFrame + UnitType.Terran_Academy.buildTime()));
 		y += 15;
 		
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "darkTemplarInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().darkTemplarInMyBaseFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "reaverInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().reaverInMyBaseFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "mutaliskInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().mutaliskInMyBaseFrame));
-		Prebot.Broodwar.drawTextScreen(20, y += 15, "lurkerInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().lurkerInMyBaseFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "darkTemplarInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().darkTemplarInMyBaseFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "reaverInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().reaverInMyBaseFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "mutaliskInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().mutaliskInMyBaseFrame));
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "lurkerInMyBaseFrame : " + TimeUtils.framesToTimeString(EnemyBuildTimer.Instance().lurkerInMyBaseFrame));
 		y += 15;
 
 		for (UnitType unitType : buildTimeExpectMap.keySet()) {
@@ -360,17 +335,17 @@ public class UXManager {
 					minimum = TimeUtils.framesToTimeString(buildMinimum);
 				}
 				
-				Prebot.Broodwar.drawTextScreen(20, y += 15, unitType + " : " + expect + " - min: " + minimum + " (" + buildTimeCertain.contains(unitType) + ")");
+				MyBotModule.Broodwar.drawTextScreen(20, y += 15, unitType + " : " + expect + " - min: " + minimum + " (" + buildTimeCertain.contains(unitType) + ")");
 			}
 		}
 	}
 
 	private void drawDebugginUxMenu() {
-		Prebot.Broodwar.drawTextScreen(20, 20, "1. Default Information");
-		Prebot.Broodwar.drawTextScreen(20, 35, "2. Strategy Information");
-		Prebot.Broodwar.drawTextScreen(20, 50, "3. Position Finder Test");
-		Prebot.Broodwar.drawTextScreen(20, 65, "4. Air Micro Test");
-		Prebot.Broodwar.drawTextScreen(20, 80, "5. Unit Bast To Base");
+		MyBotModule.Broodwar.drawTextScreen(20, 20, "1. Default Information");
+		MyBotModule.Broodwar.drawTextScreen(20, 35, "2. Strategy Information");
+		MyBotModule.Broodwar.drawTextScreen(20, 50, "3. Position Finder Test");
+		MyBotModule.Broodwar.drawTextScreen(20, 65, "4. Air Micro Test");
+		MyBotModule.Broodwar.drawTextScreen(20, 80, "5. Unit Bast To Base");
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -391,8 +366,8 @@ public class UXManager {
 //		y += 11;
 		
 		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Current Strategy : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + StrategyIdea.currentStrategy.name());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Current Strategy : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + StrategyIdea.currentStrategy.name());
 		y += 11;
 		
 		String history = "";
@@ -404,8 +379,8 @@ public class UXManager {
 				history = StrategyIdea.strategyHistory.get(i).name() + " -> "+ history;
 			}
 		}
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Strategy History : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + history);
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Strategy History : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_WHITE + history);
 		y += 11;
 		
 		int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL, UnitType.Terran_Vulture);
@@ -418,53 +393,53 @@ public class UXManager {
 		}
 		
 		
-		Prebot.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_TEAL + "" + vultureCount + "      " + tankCount + "        " + goliathCount);
-		Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio + ", selected=" + factorySelected);
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y + 5, UxColor.CHAR_TEAL + "" + vultureCount + "      " + tankCount + "        " + goliathCount);
+		MyBotModule.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + StrategyIdea.factoryRatio + ", selected=" + factorySelected);
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Wraith Count : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.wraithCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
 		y += 11;
 		
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Valkyrie Count : ");
-		Prebot.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie));
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "Valkyrie Count : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 75, y, "" + UxColor.CHAR_WHITE + StrategyIdea.valkyrieCount + " / " + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Valkyrie));
 		y += 11;
 
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_RED + Prebot.Broodwar.self().getKillScore());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYKillScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 70, y, "" + UxColor.CHAR_RED + MyBotModule.Broodwar.self().getKillScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYRazingScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + UxColor.CHAR_RED + Prebot.Broodwar.self().getRazingScore());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_RED + "MYRazingScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, y, "" + UxColor.CHAR_RED + MyBotModule.Broodwar.self().getRazingScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_PURPLE + "EnemyKillScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 85, y, "" + UxColor.CHAR_PURPLE + Prebot.Broodwar.enemy().getKillScore());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_PURPLE + "EnemyKillScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, y, "" + UxColor.CHAR_PURPLE + MyBotModule.Broodwar.enemy().getKillScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_PURPLE + "EnemyRazingScore : ");
-		Prebot.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_PURPLE + Prebot.Broodwar.enemy().getRazingScore());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_PURPLE + "EnemyRazingScore : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 100, y, "" + UxColor.CHAR_PURPLE + MyBotModule.Broodwar.enemy().getRazingScore());
 		y += 11;
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_TEAL + "Reserved Resource : " + ConstructionManager.Instance().getReservedMinerals() + " / " + ConstructionManager.Instance().getReservedGas());
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_TEAL + "Reserved Resource : " + ConstructionManager.Instance().getReservedMinerals() + " / " + ConstructionManager.Instance().getReservedGas());
 		y += 11;
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
 	public void drawAPM(int x, int y) {
-		int bwapiAPM = Prebot.Broodwar.getAPM();
-		Prebot.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM);
+		int bwapiAPM = MyBotModule.Broodwar.getAPM();
+		MyBotModule.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM);
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
 	public void drawPlayers() {
-		for (Player p : Prebot.Broodwar.getPlayers()) {
-			Prebot.Broodwar.sendText("Player [" + p.getID() + "]: " + p.getName() + " is in force: " + p.getForce().getName());
+		for (Player p : MyBotModule.Broodwar.getPlayers()) {
+			MyBotModule.Broodwar.sendText("Player [" + p.getID() + "]: " + p.getName() + " is in force: " + p.getForce().getName());
 		}
 	}
 
 	/// Player 들의 팀 (Force) 들의 정보를 Screen 에 표시합니다
 	public void drawForces() {
-		for (Force f :  Prebot.Broodwar.getForces()) {
-			Prebot.Broodwar.sendText("Force " + f.getName() + " has the following players:");
+		for (Force f :  MyBotModule.Broodwar.getForces()) {
+			MyBotModule.Broodwar.sendText("Force " + f.getName() + " has the following players:");
 			for (Player p : f.getPlayers()) {
-				Prebot.Broodwar.sendText("  - Player [" + p.getID() + "]: " + p.getName());
+				MyBotModule.Broodwar.sendText("  - Player [" + p.getID() + "]: " + p.getName());
 			}
 		}
 	}
@@ -495,9 +470,9 @@ public class UXManager {
 				int bottom = pos.getY() + type.dimensionDown();
 	
 				// 적 유닛이면 주위에 박스 표시
-				if (!Prebot.Broodwar.isVisible(ui.getLastPosition().toTilePosition())) {
-					Prebot.Broodwar.drawBoxMap(new Position(left, top), new Position(right, bottom), Color.Grey, false);
-					Prebot.Broodwar.drawTextMap(new Position(left + 3, top + 4), ui.getType().toString());
+				if (!MyBotModule.Broodwar.isVisible(ui.getLastPosition().toTilePosition())) {
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, top), new Position(right, bottom), Color.Grey, false);
+					MyBotModule.Broodwar.drawTextMap(new Position(left + 3, top + 4), ui.getType().toString());
 				}
 	
 				// 유닛의 HitPoint 남아있는 비율 표시
@@ -513,14 +488,14 @@ public class UXManager {
 					int hpTop = top + verticalOffset;
 					int hpBottom = top + 4 + verticalOffset;
 	
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), hpColor, true);
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), hpColor, true);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
 	
 					int ticWidth = 3;
 	
 					for (int i = left; i < right - 1; i += ticWidth) {
-						Prebot.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
+						MyBotModule.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
 					}
 				}
 	
@@ -532,21 +507,21 @@ public class UXManager {
 					int hpTop = top - 3 + verticalOffset;
 					int hpBottom = top + 1 + verticalOffset;
 	
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Blue, true);
-					Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Blue, true);
+					MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
 	
 					int ticWidth = 3;
 	
 					for (int i = left; i < right - 1; i += ticWidth) {
-						Prebot.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
+						MyBotModule.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
 					}
 				}
 			}
 		}
 
 		// draw neutral units and our units
-		for (Unit unit : Prebot.Broodwar.getAllUnits()) {
+		for (Unit unit : MyBotModule.Broodwar.getAllUnits()) {
 			if (unit.getPlayer() == InformationManager.Instance().enemyPlayer) {
 				continue;
 			}
@@ -572,14 +547,14 @@ public class UXManager {
 				int hpTop = top + verticalOffset;
 				int hpBottom = top + 4 + verticalOffset;
 
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), hpColor, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), hpColor.Black, false);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), hpColor, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), hpColor.Black, false);
 
 				int ticWidth = 3;
 
 				for (int i = left; i < right - 1; i += ticWidth) {
-					Prebot.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
+					MyBotModule.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
 				}
 			}
 
@@ -591,14 +566,14 @@ public class UXManager {
 				int hpTop = top - 3 + verticalOffset;
 				int hpBottom = top + 1 + verticalOffset;
 
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Blue, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Blue, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
 
 				int ticWidth = 3;
 
 				for (int i = left; i < right - 1; i += ticWidth) {
-					Prebot.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
+					MyBotModule.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
 				}
 			}
 
@@ -610,14 +585,14 @@ public class UXManager {
 				int hpTop = top + verticalOffset;
 				int hpBottom = top + 4 + verticalOffset;
 
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Cyan, true);
-				Prebot.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Grey, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(ratioRight, hpBottom), Color.Cyan, true);
+				MyBotModule.Broodwar.drawBoxMap(new Position(left, hpTop), new Position(right, hpBottom), Color.Black, false);
 
 				int ticWidth = 3;
 
 				for (int i = left; i < right - 1; i += ticWidth) {
-					Prebot.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
+					MyBotModule.Broodwar.drawLineMap(new Position(i, hpTop), new Position(i, hpBottom), Color.Black);
 				}
 			}
 		}
@@ -628,7 +603,7 @@ public class UXManager {
 		int currentY = y;
 
 		// 아군이 입은 피해 누적값
-		Prebot.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_WHITE + " Self Loss:" + UxColor.CHAR_WHITE + " Minerals: " + UxColor.CHAR_BROWN + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getMineralsLost() + UxColor.CHAR_WHITE + " Gas: " + UxColor.CHAR_RED + InformationManager.Instance().getUnitData(Prebot.Broodwar.self()).getGasLost());
+		MyBotModule.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_WHITE + " Self Loss:" + UxColor.CHAR_WHITE + " Minerals: " + UxColor.CHAR_BROWN + InformationManager.Instance().getUnitData(MyBotModule.Broodwar.self()).getMineralsLost() + UxColor.CHAR_WHITE + " Gas: " + UxColor.CHAR_RED + InformationManager.Instance().getUnitData(MyBotModule.Broodwar.self()).getGasLost());
 		currentY += 10;
 
 		// 아군 모든 유닛 숫자 합계
@@ -663,7 +638,7 @@ public class UXManager {
 		// 적군이 입은 피해 누적값
 		if(InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer) != null)
 		{
-			Prebot.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_BROWN + " Enemy Loss:" + UxColor.CHAR_WHITE +" Minerals: " + UxColor.CHAR_RED + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + UxColor.CHAR_WHITE + " Gas: " + UxColor.CHAR_TEAL + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
+			MyBotModule.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_BROWN + " Enemy Loss:" + UxColor.CHAR_WHITE +" Minerals: " + UxColor.CHAR_RED + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getMineralsLost() + UxColor.CHAR_WHITE + " Gas: " + UxColor.CHAR_TEAL + InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer).getGasLost());
 		}
 	}	
 		
@@ -672,10 +647,10 @@ public class UXManager {
 		int currentY = y;
 		
 		// 적군의 UnitType 별 파악된 Unit 숫자를 표시
-		Prebot.Broodwar.drawTextScreen(x,		 currentY, UxColor.CHAR_WHITE + " UNIT NAME");
+		MyBotModule.Broodwar.drawTextScreen(x,		 currentY, UxColor.CHAR_WHITE + " UNIT NAME");
 		//MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 20, white + " Created");
 		//MyBotModule.Broodwar.drawTextScreen(x + 150, currentY + 20, white + " Dead");
-		Prebot.Broodwar.drawTextScreen(x + 85, currentY, UxColor.CHAR_WHITE + " Alive");
+		MyBotModule.Broodwar.drawTextScreen(x + 85, currentY, UxColor.CHAR_WHITE + " Alive");
 
 		int yspace = 0;
 		
@@ -718,10 +693,10 @@ public class UXManager {
 				
 				if (numUnits > 0)
 				{
-					Prebot.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
+					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
 //					MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
 //					MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					Prebot.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}
@@ -767,10 +742,10 @@ public class UXManager {
 				
 				if (numUnits > 0)
 				{
-					Prebot.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
+					MyBotModule.Broodwar.drawTextScreen(x,		 currentY + 30 + ((yspace)* 10), displayname);
 					//MyBotModule.Broodwar.drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "" + numCreatedUnits);
 					//MyBotModule.Broodwar.drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "" + numDeadUnits);
-					Prebot.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
+					MyBotModule.Broodwar.drawTextScreen(x + 110, currentY + 30 + ((yspace)* 10), "" + numUnits);
 					yspace++;
 				}
 			}
@@ -947,7 +922,7 @@ public class UXManager {
 		{
 			for(int i1=0 ; i1<blue.length ; i1++)
 			{
-				Prebot.Broodwar.drawBoxMap(blue[i1][0], blue[i1][1], blue[i1][2], blue[i1][3], Color.Blue);
+				MyBotModule.Broodwar.drawBoxMap(blue[i1][0], blue[i1][1], blue[i1][2], blue[i1][3], Color.Blue);
 			}
 //			for(int i1=0 ; i1<purple.length ; i1++)
 //			{
@@ -955,58 +930,58 @@ public class UXManager {
 //			}
 			for(int i2=0 ; i2<cyan.length ; i2++)
 			{
-				Prebot.Broodwar.drawCircleMap(cyan[i2][0], cyan[i2][1], 30, Color.Cyan);	
+				MyBotModule.Broodwar.drawCircleMap(cyan[i2][0], cyan[i2][1], 30, Color.Cyan);	
 			}
 			for(int i3=0 ; i3<orange.length ; i3++)
 			{
-				Prebot.Broodwar.drawBoxMap(orange[i3][0], orange[i3][1], orange[i3][2], orange[i3][3], Color.Orange);
+				MyBotModule.Broodwar.drawBoxMap(orange[i3][0], orange[i3][1], orange[i3][2], orange[i3][3], Color.Orange);
 			}
 			for(int i4=0 ; i4<yellow.size() ; i4++)
 			{
-				Prebot.Broodwar.drawCircleMap(yellow.get(i4), 80, Color.Yellow);	
+				MyBotModule.Broodwar.drawCircleMap(yellow.get(i4), 80, Color.Yellow);	
 			}
 			for(int i5=0 ; i5<green1.size() ; i5++)
 			{
-				Prebot.Broodwar.drawLineMap(green1.get(i5), green2.get(i5), Color.Green);	
+				MyBotModule.Broodwar.drawLineMap(green1.get(i5), green2.get(i5), Color.Green);	
 			}
 			for(int i6=0 ; i6<red1.size() ; i6++)
 			{
-				Prebot.Broodwar.drawLineMap(red1.get(i6), red2.get(i6), Color.Red);	
+				MyBotModule.Broodwar.drawLineMap(red1.get(i6), red2.get(i6), Color.Red);	
 			}			
 
 			// OccupiedBaseLocation 을 원으로 표시
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Blue);	
+				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Blue);	
 			}
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-				Prebot.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Red);	
+				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * CommonConfig.UxConfig.TILE_SIZE, Color.Red);	
 			}
 
 			// ChokePoint, BaseLocation 을 텍스트로 표시
-			if (InformationManager.Instance().getFirstChokePoint(Prebot.Broodwar.self()) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getPosition(), "My MainBaseLocation");
+			if (InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self()) != null) {
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition(), "My MainBaseLocation");
 			}
-			if (InformationManager.Instance().getFirstChokePoint(Prebot.Broodwar.self()) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getFirstChokePoint(Prebot.Broodwar.self()).getCenter(), "My First ChokePoint");
+			if (InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self()) != null) {
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self()).getCenter(), "My First ChokePoint");
 			}
-			if (InformationManager.Instance().getSecondChokePoint(Prebot.Broodwar.self()) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getSecondChokePoint(Prebot.Broodwar.self()).getCenter(), "My Second ChokePoint");
+			if (InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self()) != null) {
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self()).getCenter(), "My Second ChokePoint");
 			}
-			if (InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.self()) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.self()).getPosition(), "My First ExpansionLocation");
+			if (InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self()) != null) {
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self()).getPosition(), "My First ExpansionLocation");
 			}
 
 			if (InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getPosition(), "Enemy MainBaseLocation");
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getPosition(), "Enemy MainBaseLocation");
 			}
 			if (InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer).getCenter(), "Enemy First ChokePoint");
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer).getCenter(), "Enemy First ChokePoint");
 			}
 			if (InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer).getCenter(), "Enemy Second ChokePoint");
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer).getCenter(), "Enemy Second ChokePoint");
 			}
 			if (InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer) != null) {
-				Prebot.Broodwar.drawTextMap(InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer).getPosition(), "Enemy First ExpansionLocation");
+				MyBotModule.Broodwar.drawTextMap(InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer).getPosition(), "Enemy First ExpansionLocation");
 			}
 			
 		}
@@ -1021,18 +996,18 @@ public class UXManager {
 		int	cols = MapGrid.Instance().getCols();
 		
 		for (int i = 0; i<cols; i++) {
-			Prebot.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Blue);
+			MyBotModule.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Blue);
 		}
 
 		for (int j = 0; j<rows; j++) {
-			Prebot.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Blue);
+			MyBotModule.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Blue);
 		}
 		
 		for (int r = 0; r < rows; r+=2)
 		{
 			for (int c = 0; c < cols; c+=2)
 			{
-				Prebot.Broodwar.drawTextMap(c * 32, r * 32, c + "," + r);
+				MyBotModule.Broodwar.drawTextMap(c * 32, r * 32, c + "," + r);
 			}
 		}		
 	}
@@ -1049,7 +1024,7 @@ public class UXManager {
 			initialFinishedColor = UxColor.CHAR_GREEN;
 		}
 		
-		Prebot.Broodwar.drawTextScreen(x, y, initialFinishedColor + " <Build Order>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, initialFinishedColor + " <Build Order>");
 
 		/*
 		std.deque< BuildOrderItem >* queue = BuildManager.Instance().buildQueue.getQueue();
@@ -1074,7 +1049,7 @@ public class UXManager {
 		
 		for(int i=0 ; i<tempQueue.length ; i++){
 			BuildOrderItem currentItem = (BuildOrderItem)tempQueue[i];
-			Prebot.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + UxColor.CHAR_WHITE + currentItem.metaType.getName());
+			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + (itemCount * 10), currentItem.blocking + " " + UxColor.CHAR_WHITE + currentItem.metaType.getName());
 			itemCount++;
 			if (itemCount >= 24) break;
 		}
@@ -1084,7 +1059,7 @@ public class UXManager {
 	public void drawBuildStatusOnScreen(int x, int y) {
 		// 건설 / 훈련 중인 유닛 진행상황 표시
 		Vector<Unit> unitsUnderConstruction = new Vector<Unit>();
-		for (Unit unit : Prebot.Broodwar.self().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit != null && unit.isBeingConstructed())
 			{
@@ -1101,7 +1076,7 @@ public class UXManager {
 		}
 		// C++ : std.sort(unitsUnderConstruction.begin(), unitsUnderConstruction.end(), CompareWhenStarted());
 
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Build Status>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Build Status>");
 
 		int reps = unitsUnderConstruction.size() < 10 ? unitsUnderConstruction.size() : 10;
 
@@ -1114,7 +1089,7 @@ public class UXManager {
 				t = unit.getBuildType();
 			}
 
-			Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + t + " (" + unit.getRemainingBuildTime() + ")");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "" + UxColor.CHAR_WHITE + t + " (" + unit.getRemainingBuildTime() + ")");
 		}
 
 		// Tech Research 표시
@@ -1141,7 +1116,7 @@ public class UXManager {
 						int x2 = (x + 1) * 32 - 8;
 						int y2 = (y + 1) * 32 - 8;
 
-						Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Yellow, false);
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Yellow, false);
 					}
 				}
 			}
@@ -1158,7 +1133,7 @@ public class UXManager {
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
 		}
 		
 		Set<TilePosition> tilesToAvoid3 = ConstructionPlaceFinder.Instance().getTilesToAvoidAbsolute();
@@ -1169,7 +1144,7 @@ public class UXManager {
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
 		}
 		
 		Set<TilePosition> tilesToAvoidSupply = ConstructionPlaceFinder.Instance().getTilesToAvoidSupply();
@@ -1180,7 +1155,7 @@ public class UXManager {
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 		}
 		
 		Set<TilePosition> tilesToAvoidAddonBuilding = ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding();
@@ -1191,7 +1166,7 @@ public class UXManager {
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Black, false);
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Black, false);
 		}
 		
 		Set<TilePosition> tilesToAvoidBase = ConstructionPlaceFinder.Instance().getTilesToAvoidBaseLocation();
@@ -1202,14 +1177,14 @@ public class UXManager {
 			int x2 = (t.getX() + 1) * 32 - 8;
 			int y2 = (t.getY() + 1) * 32 - 8;
 
-			Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Yellow, false);
+			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Yellow, false);
 		}
 		
 	}
 
 	/// ConstructionQueue 를 Screen 에 표시합니다
 	public void drawConstructionQueueOnScreenAndMap(int x, int y) {
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Construction Status>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + " <Construction Status>");
 
 		int yspace = 0;
 
@@ -1221,15 +1196,15 @@ public class UXManager {
 
 			if (b.getStatus() == ConstructionTask.ConstructionStatus.Unassigned.ordinal())
 			{
-				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + UxColor.CHAR_WHITE + b.getType() + " - No Worker");
+				MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + UxColor.CHAR_WHITE + b.getType() + " - No Worker");
 			}
 			else if (b.getStatus() == ConstructionTask.ConstructionStatus.Assigned.ordinal())
 			{
 				if (b.getConstructionWorker() == null) {
-					Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), b.getType() + " - Assigned Worker Null");
+					MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), b.getType() + " - Assigned Worker Null");
 				}			
 				else {
-					Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), b.getType() + " - Assigned Worker " + b.getConstructionWorker().getID() + ", Position (" + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY() + ")");
+					MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), b.getType() + " - Assigned Worker " + b.getConstructionWorker().getID() + ", Position (" + b.getFinalPosition().getX() + "," + b.getFinalPosition().getY() + ")");
 				}
 
 				int x1 = b.getFinalPosition().getX() * 32;
@@ -1237,12 +1212,12 @@ public class UXManager {
 				int x2 = (b.getFinalPosition().getX()+ b.getType().tileWidth()) * 32;
 				int y2 = (b.getFinalPosition().getY() + b.getType().tileHeight()) * 32;
 
-				Prebot.Broodwar.drawLineMap(b.getConstructionWorker().getPosition().getX(), b.getConstructionWorker().getPosition().getY(), (x1 + x2) / 2, (y1 + y2) / 2, Color.Orange);
-				Prebot.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
+				MyBotModule.Broodwar.drawLineMap(b.getConstructionWorker().getPosition().getX(), b.getConstructionWorker().getPosition().getY(), (x1 + x2) / 2, (y1 + y2) / 2, Color.Orange);
+				MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 			}
 			else if (b.getStatus() == ConstructionTask.ConstructionStatus.UnderConstruction.ordinal())
 			{
-				Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + UxColor.CHAR_WHITE + b.getType() + " - Under Construction");
+				MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + UxColor.CHAR_WHITE + b.getType() + " - Under Construction");
 			}
 			yspace++;
 		}
@@ -1262,63 +1237,63 @@ public class UXManager {
 	    
 	    
 		if(secondStartPosition!= null) {
-			Prebot.Broodwar.drawTextScreen(10, 120, "secondStartPosition: " + secondStartPosition.getTilePosition());
-			Prebot.Broodwar.drawTextMap(secondStartPosition.getPosition(), "secondStartPosition");
+			MyBotModule.Broodwar.drawTextScreen(10, 120, "secondStartPosition: " + secondStartPosition.getTilePosition());
+			MyBotModule.Broodwar.drawTextMap(secondStartPosition.getPosition(), "secondStartPosition");
 		}else {
-			Prebot.Broodwar.drawTextScreen(10, 120, "secondStartPosition: null");
+			MyBotModule.Broodwar.drawTextScreen(10, 120, "secondStartPosition: null");
 		}
 		if(getExpansionLocation!= null) {
-			Prebot.Broodwar.drawTextScreen(10, 130, "getExpansionLocation: " + getExpansionLocation.getTilePosition());
-			Prebot.Broodwar.drawTextMap(getExpansionLocation.getPosition(), "nextEX");
+			MyBotModule.Broodwar.drawTextScreen(10, 130, "getExpansionLocation: " + getExpansionLocation.getTilePosition());
+			MyBotModule.Broodwar.drawTextMap(getExpansionLocation.getPosition(), "nextEX");
 		}else {
-			Prebot.Broodwar.drawTextScreen(10, 130, "getExpansionLocation: null");
+			MyBotModule.Broodwar.drawTextScreen(10, 130, "getExpansionLocation: null");
 		}
 		if(getLastBuildingLocation!= null) {
-			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation: " + getLastBuildingLocation);
-			Prebot.Broodwar.drawTextMap(getLastBuildingLocation.toPosition(), "nextBuild");
+			MyBotModule.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation: " + getLastBuildingLocation);
+			MyBotModule.Broodwar.drawTextMap(getLastBuildingLocation.toPosition(), "nextBuild");
 		}else {
-			Prebot.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation: null");
+			MyBotModule.Broodwar.drawTextScreen(10, 140, "getLastBuildingLocation: null");
 		}
 		if(getLastBuildingFinalLocation!= null) {
-			Prebot.Broodwar.drawTextScreen(10, 150, "getLastBuildingFinalLocation: " + getLastBuildingFinalLocation);
-			Prebot.Broodwar.drawTextMap(getLastBuildingFinalLocation.toPosition(), "LastBuild");
+			MyBotModule.Broodwar.drawTextScreen(10, 150, "getLastBuildingFinalLocation: " + getLastBuildingFinalLocation);
+			MyBotModule.Broodwar.drawTextMap(getLastBuildingFinalLocation.toPosition(), "LastBuild");
 		}else {
-			Prebot.Broodwar.drawTextScreen(10, 150, "getLastBuildingFinalLocation: null");
+			MyBotModule.Broodwar.drawTextScreen(10, 150, "getLastBuildingFinalLocation: null");
 		}
 
 		
-		Prebot.Broodwar.drawTextScreen(10, 160, "mainBaseLocationFull: " + BuildManager.Instance().mainBaseLocationFull);
-		Prebot.Broodwar.drawTextScreen(10, 170, "secondChokePointFull: " + BuildManager.Instance().secondChokePointFull);
-		Prebot.Broodwar.drawTextScreen(10, 180, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
-		Prebot.Broodwar.drawTextScreen(10, 190, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
+		MyBotModule.Broodwar.drawTextScreen(10, 160, "mainBaseLocationFull: " + BuildManager.Instance().mainBaseLocationFull);
+		MyBotModule.Broodwar.drawTextScreen(10, 170, "secondChokePointFull: " + BuildManager.Instance().secondChokePointFull);
+		MyBotModule.Broodwar.drawTextScreen(10, 180, "secondStartLocationFull: " + BuildManager.Instance().secondStartLocationFull);
+		MyBotModule.Broodwar.drawTextScreen(10, 190, "fisrtSupplePointFull: " + BuildManager.Instance().fisrtSupplePointFull);
 		
-		Prebot.Broodwar.drawTextScreen(10, 200, "myMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self()).getTilePosition());
-		Prebot.Broodwar.drawTextScreen(10, 210, "enemyMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy()).getTilePosition());
+		MyBotModule.Broodwar.drawTextScreen(10, 200, "myMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition());
+		MyBotModule.Broodwar.drawTextScreen(10, 210, "enemyMainbaseLocation : " + InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()).getTilePosition());
 
 	}
 	
 	
 	public void drawMineralIdOnMap() {
-        for (Unit unit : Prebot.Broodwar.getStaticMinerals()) {
+        for (Unit unit : MyBotModule.Broodwar.getStaticMinerals()) {
 		
-			Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
+			MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
 		}
 	}
 	/// Unit 의 Id 를 Map 에 표시합니다
 	public void drawUnitIdOnMap() {
-		for (Unit unit : Prebot.Broodwar.self().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if(unit.getType().isBuilding()){
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "" + UxColor.CHAR_WHITE + unit.getTilePosition().getX() + " / " + unit.getTilePosition().getY());
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "" + UxColor.CHAR_WHITE + unit.getTilePosition().getX() + " / " + unit.getTilePosition().getY());
 			}else{
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
 			}
 			
 		}
-		for (Unit unit : Prebot.Broodwar.enemy().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		{
-			Prebot.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
+			MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + UxColor.CHAR_WHITE + unit.getID());
 		}
 	}
 
@@ -1338,7 +1313,7 @@ public class UXManager {
 	public void drawWorkerStateOnScreen(int x, int y) {
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
 
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "<Workers : " + workerData.getNumMineralWorkers() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "<Workers : " + workerData.getNumMineralWorkers() + ">");
 
 		int yspace = 0;
 
@@ -1351,13 +1326,13 @@ public class UXManager {
 				continue;
 			}
 
-			Prebot.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), UxColor.CHAR_WHITE + " " + unit.getID());
+			MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), UxColor.CHAR_WHITE + " " + unit.getID());
 
 			if (workerData.getJobCode(unit) == 'B') {
-				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), UxColor.CHAR_WHITE + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
+				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), UxColor.CHAR_WHITE + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
 			}
 			else {
-				Prebot.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), UxColor.CHAR_WHITE + " " + workerData.getJobCode(unit));
+				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), UxColor.CHAR_WHITE + " " + workerData.getJobCode(unit));
 			}
 		}
 	}
@@ -1371,8 +1346,8 @@ public class UXManager {
 			int x = depot.getPosition().getX() - 64;
 			int y = depot.getPosition().getY() - 32;
 
-			Prebot.Broodwar.drawBoxMap(x - 2, y - 1, x + 75, y + 14, Color.Black, true);
-			Prebot.Broodwar.drawTextMap(x, y, UxColor.CHAR_WHITE + " Workers: " + WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(depot));
+			MyBotModule.Broodwar.drawBoxMap(x - 2, y - 1, x + 75, y + 14, Color.Black, true);
+			MyBotModule.Broodwar.drawTextMap(x, y, UxColor.CHAR_WHITE + " Workers: " + WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(depot));
 		}
 	}
 
@@ -1386,9 +1361,9 @@ public class UXManager {
 
 			Position pos = worker.getTargetPosition();
 
-			Prebot.Broodwar.drawTextMap(worker.getPosition().getX(), worker.getPosition().getY() - 5, "" + UxColor.CHAR_WHITE + workerData.getJobCode(worker));
+			MyBotModule.Broodwar.drawTextMap(worker.getPosition().getX(), worker.getPosition().getY() - 5, "" + UxColor.CHAR_WHITE + workerData.getJobCode(worker));
 			
-			Prebot.Broodwar.drawLineMap(worker.getPosition().getX(), worker.getPosition().getY(), pos.getX(), pos.getY(), Color.Cyan);
+			MyBotModule.Broodwar.drawLineMap(worker.getPosition().getX(), worker.getPosition().getY(), pos.getX(), pos.getY(), Color.Cyan);
 
 			/*
 			// ResourceDepot ~ Worker 사이에 직선 표시
@@ -1420,10 +1395,10 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			Prebot.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ")");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ")");
 		}
 		else {
-			Prebot.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
 		}
 
 //		if (currentScoutStatus == OldScoutManager.ScoutStatus.NoScout.ordinal()) {
@@ -1471,20 +1446,20 @@ public class UXManager {
 	/// Unit 의 Target 으로 잇는 선을 Map 에 표시합니다
 	public void drawUnitTargetOnMap() 
 	{
-		for (Unit unit : Prebot.Broodwar.self().getUnits())
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			if (unit != null && unit.isCompleted() && !unit.getType().isBuilding() && !unit.getType().isWorker())
 			{
 				Unit targetUnit = unit.getTarget();
-				if (targetUnit != null && targetUnit.getPlayer() != Prebot.Broodwar.self()) {
-					Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Red, true);
-					Prebot.Broodwar.drawCircleMap(targetUnit.getTargetPosition(), dotRadius, Color.Red, true);
-					Prebot.Broodwar.drawLineMap(unit.getPosition(), targetUnit.getTargetPosition(), Color.Red);
+				if (targetUnit != null && targetUnit.getPlayer() != MyBotModule.Broodwar.self()) {
+					MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Red, true);
+					MyBotModule.Broodwar.drawCircleMap(targetUnit.getTargetPosition(), dotRadius, Color.Red, true);
+					MyBotModule.Broodwar.drawLineMap(unit.getPosition(), targetUnit.getTargetPosition(), Color.Red);
 				}
 				else if (unit.isMoving()) {
-					Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
-					Prebot.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
-					Prebot.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
+					MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
+					MyBotModule.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
+					MyBotModule.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
 				}
 
 			}
@@ -1495,7 +1470,7 @@ public class UXManager {
 	/// Cloaking Unit 의 Bullet 표시에 쓰입니다
 	public void drawBulletsOnMap()
 	{
-		for (Bullet b : Prebot.Broodwar.getBullets())
+		for (Bullet b : MyBotModule.Broodwar.getBullets())
 		{
 			Position p = b.getPosition();
 			double velocityX = b.getVelocityX();
@@ -1540,10 +1515,10 @@ public class UXManager {
 			else if(b.getType() == BulletType.Yamato_Gun) bulletTypeName = "Yamato_Gun";
 			
 			// 아군 것이면 녹색, 적군 것이면 빨간색
-			Prebot.Broodwar.drawLineMap(p, new Position(p.getX() + (int)velocityX, p.getY() + (int)velocityY), b.getPlayer() == Prebot.Broodwar.self() ? Color.Green : Color.Red);
+			MyBotModule.Broodwar.drawLineMap(p, new Position(p.getX() + (int)velocityX, p.getY() + (int)velocityY), b.getPlayer() == MyBotModule.Broodwar.self() ? Color.Green : Color.Red);
 			if(b.getType() != null)
 			{
-				Prebot.Broodwar.drawTextMap(p, (b.getPlayer() == Prebot.Broodwar.self() ? "" + UxColor.CHAR_TEAL : "" + UxColor.CHAR_RED) + bulletTypeName);
+				MyBotModule.Broodwar.drawTextMap(p, (b.getPlayer() == MyBotModule.Broodwar.self() ? "" + UxColor.CHAR_TEAL : "" + UxColor.CHAR_RED) + bulletTypeName);
 			}
 		}
 	}
@@ -1567,21 +1542,21 @@ public class UXManager {
 			}
 
 			for (Unit unit : squad.unitList) {
-				Prebot.Broodwar.drawCircleMap(unit.getPosition(), 10, color);
-				Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 30, squadName);
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 10, color);
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 30, squadName);
 				if (smallFightPredict != null && smallFightPredict == StrategyCode.SmallFightPredict.BACK) {
-					Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + smallFightPredict.toString());
+					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 15, UxColor.CHAR_RED + smallFightPredict.toString());
 				}
 			}
 			
 			Map<Integer, Integer> checkerSiteMap = VultureTravelManager.Instance().getCheckerSiteMap2();
 			List<BaseLocation> baseList = VultureTravelManager.Instance().getBaseLocationsCheckerOrdered();
 			for (Integer checkerId : checkerSiteMap.keySet()) {
-				Unit unit = Prebot.Broodwar.getUnit(checkerId);
+				Unit unit = MyBotModule.Broodwar.getUnit(checkerId);
 				if (UnitUtils.isValidUnit(unit)) {
 					Integer index = checkerSiteMap.get(checkerId);
 					if (index != null) {
-						Prebot.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 5, UxColor.CHAR_ORANGE + baseList.get(index).getPosition().toString());
+						MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX() - 20, unit.getPosition().getY() - 5, UxColor.CHAR_ORANGE + baseList.get(index).getPosition().toString());
 					}
 					
 				}
@@ -1592,25 +1567,25 @@ public class UXManager {
 	private void drawSquadInfoOnMap(int x, int y) {
 		// TODO Auto-generated method stub
 		/// ConstructionQueue 를 Screen 에 표시합니다
-		Prebot.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "<Squad Name>");
-		Prebot.Broodwar.drawTextScreen(x +110, y, UxColor.CHAR_WHITE + " <Unit Size>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, UxColor.CHAR_WHITE + "<Squad Name>");
+		MyBotModule.Broodwar.drawTextScreen(x +110, y, UxColor.CHAR_WHITE + " <Unit Size>");
 		
 		y += 15;
-		Prebot.Broodwar.drawTextScreen(x, y, "" + "*" + "SCV");
-		Prebot.Broodwar.drawTextScreen(x +120, y, "" + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV));
+		MyBotModule.Broodwar.drawTextScreen(x, y, "" + "*" + "SCV");
+		MyBotModule.Broodwar.drawTextScreen(x +120, y, "" + UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_SCV));
 		y += 10;
 		for (Squad squad : CombatManager.Instance().squadData.getSquadMap().values()) {
 			Color squadColor = UxColor.SQUAD_COLOR.get(squad.getClass());
 			if (squadColor != null) {
-				Prebot.Broodwar.drawTextScreen(x, y, "" + UxColor.COLOR_TO_CHARACTER.get(squadColor) + squad.getSquadName());
+				MyBotModule.Broodwar.drawTextScreen(x, y, "" + UxColor.COLOR_TO_CHARACTER.get(squadColor) + squad.getSquadName());
 			} else {
-				Prebot.Broodwar.drawTextScreen(x, y, "" + "*" + squad.getSquadName());
+				MyBotModule.Broodwar.drawTextScreen(x, y, "" + "*" + squad.getSquadName());
 			}
 			String unitIds = " ... ";
 			for (Unit unit : squad.unitList) {
 				unitIds = unitIds + unit.getID() + "/";
 			}
-			Prebot.Broodwar.drawTextScreen(x +120, y, "" + squad.unitList.size() + unitIds);
+			MyBotModule.Broodwar.drawTextScreen(x +120, y, "" + squad.unitList.size() + unitIds);
 			y+=10;
 		}
 	}
@@ -1630,7 +1605,7 @@ public class UXManager {
 		int currentY = y;
 		for (GameManager gameManager : gameManagers) {
 			currentY += 10;
-			Prebot.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_PURPLE + gameManager.getClass().getSimpleName());
+			MyBotModule.Broodwar.drawTextScreen(x, currentY, UxColor.CHAR_PURPLE + gameManager.getClass().getSimpleName());
 
 			char drawColor = UxColor.CHAR_WHITE;
 			if (gameManager.getRecorded() > 10L) {
@@ -1638,11 +1613,11 @@ public class UXManager {
 			} else if (gameManager.getRecorded() > 30L) {
 				drawColor = UxColor.CHAR_RED;
 			}
-			Prebot.Broodwar.drawTextScreen(x + 103, currentY, ": " + drawColor + gameManager.getRecorded());
+			MyBotModule.Broodwar.drawTextScreen(x + 103, currentY, ": " + drawColor + gameManager.getRecorded());
 		}
 
-		Prebot.Broodwar.drawTextScreen(x, currentY += 15, "* group size: " + LagObserver.groupsize());
-		Prebot.Broodwar.drawTextScreen(x, currentY += 10, "* manager rotation size: " + LagObserver.managerRotationSize());
+		MyBotModule.Broodwar.drawTextScreen(x, currentY += 15, "* group size: " + LagObserver.groupsize());
+		MyBotModule.Broodwar.drawTextScreen(x, currentY += 10, "* manager rotation size: " + LagObserver.managerRotationSize());
 	}
 
 	private void drawBigWatch() {
@@ -1664,7 +1639,7 @@ public class UXManager {
 			} else if (recordTime > 30L) {
 				drawColor = UxColor.CHAR_RED;
 			}
-			Prebot.Broodwar.drawTextScreen(10, currentY += 10, UxColor.CHAR_WHITE + tag + " : " + resultTime + " / " + drawColor + recordTime);
+			MyBotModule.Broodwar.drawTextScreen(10, currentY += 10, UxColor.CHAR_WHITE + tag + " : " + resultTime + " / " + drawColor + recordTime);
 		}
 	}
 	
@@ -1683,16 +1658,16 @@ public class UXManager {
 			
 			for(Minerals minr : mineralsList){
 				if(minr.mineralTrick != null ){
-					Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
-					Prebot.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
+					MyBotModule.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Blue,true );
+					MyBotModule.Broodwar.drawCircleMap(minr.mineralTrick.getPosition().getX(),minr.mineralTrick.getPosition().getY(),4,Color.Purple,true );
 				}
 			}
 
 
 			for(Minerals minr : WorkerData.depotMineral.get(depot)){
 				if( minr.posTrick != bwapi.Position.None ){
-					Prebot.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
-					Prebot.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Yellow,true );
+					MyBotModule.Broodwar.drawCircleMap( minr.posTrick.getX(),minr.posTrick.getY(),4,Color.Red,true );
+					MyBotModule.Broodwar.drawCircleMap(minr.mineralUnit.getPosition().getX(),minr.mineralUnit.getPosition().getY(),4,Color.Yellow,true );
 				}
 			}
 
@@ -1717,23 +1692,23 @@ public class UXManager {
 		EnemyStrategy strategy = StrategyIdea.currentStrategy;
 		int phase = StrategyAnalyseManager.Instance().getPhase();
 		
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "[" + strategy.name() + " ...(phase "+ phase + ")]");
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "FAC RATIO : " + StrategyIdea.factoryRatio + ".. (" + UnitUtils.myFactoryUnitSupplyCount() + ")");
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "UPGRADE   : " + upgradeString);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MARINE CNT : " + StrategyIdea.marineCount);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "ADDON     : " + StrategyIdea.addOnOption);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "EXPANSION : " + StrategyIdea.expansionOption);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "WRAITH CNT : " + StrategyIdea.wraithCount);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "VALKYRIE CNT : " + StrategyIdea.valkyrieCount);
-		Prebot.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MISSION    : " + strategy.missionTypeList);
-		Prebot.Broodwar.drawTextScreen(20, y += 20, UxColor.CHAR_YELLOW + "" + strategy.buildTimeMap);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "[" + strategy.name() + " ...(phase "+ phase + ")]");
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "FAC RATIO : " + StrategyIdea.factoryRatio + ".. (" + UnitUtils.myFactoryUnitSupplyCount() + ")");
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "UPGRADE   : " + upgradeString);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MARINE CNT : " + StrategyIdea.marineCount);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "ADDON     : " + StrategyIdea.addOnOption);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "EXPANSION : " + StrategyIdea.expansionOption);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "WRAITH CNT : " + StrategyIdea.wraithCount);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "VALKYRIE CNT : " + StrategyIdea.valkyrieCount);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 12, UxColor.CHAR_YELLOW + "MISSION    : " + strategy.missionTypeList);
+		MyBotModule.Broodwar.drawTextScreen(20, y += 20, UxColor.CHAR_YELLOW + "" + strategy.buildTimeMap);
 		
-		Prebot.Broodwar.drawTextScreen(20, 260, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
+		MyBotModule.Broodwar.drawTextScreen(20, 260, "" + UxColor.CHAR_YELLOW + ClueManager.Instance().getClueInfoList());
 
 		y = 10;
 		for (EnemyStrategy enemyStrategy : EnemyStrategy.values()) {
 			if (enemyStrategy.name().startsWith(enemyRace.toString().toUpperCase())) {
-				Prebot.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
+				MyBotModule.Broodwar.drawTextScreen(400, y += 10, "" + UxColor.CHAR_YELLOW + enemyStrategy.name());
 			}
 		}
 	}
@@ -1742,14 +1717,14 @@ public class UXManager {
 		List<UnitInfo> airDefenseEuiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL, UnitUtils.enemyAirDefenseUnitType());
 		for (UnitInfo eui : airDefenseEuiList) {
 			if (eui.getType() == UnitType.Terran_Bunker) {
-				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96, Color.White);
+				MyBotModule.Broodwar.drawCircleMap(eui.getLastPosition(), MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96, Color.White);
 			} else {
-				Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
+				MyBotModule.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.White);
 			}
 		}
 		List<UnitInfo> wraithKillerEuiList = UnitUtils.getEnemyUnitInfoList(CommonCode.EnemyUnitFindRange.ALL, UnitUtils.wraithKillerUnitType());
 		for (UnitInfo eui : wraithKillerEuiList) {
-			Prebot.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.Grey);
+			MyBotModule.Broodwar.drawCircleMap(eui.getLastPosition(), eui.getType().airWeapon().maxRange(), Color.Grey);
 		}
 	}
 	
@@ -1757,16 +1732,16 @@ public class UXManager {
 		// wraith moving
 		for (Unit unit : UnitUtils.getUnitList(UnitType.Terran_Wraith)) {
 			if (unit.isMoving()) {
-				Prebot.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
-				Prebot.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
-				Prebot.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), dotRadius, Color.Orange, true);
+				MyBotModule.Broodwar.drawCircleMap(unit.getTargetPosition(), dotRadius, Color.Orange, true);
+				MyBotModule.Broodwar.drawLineMap(unit.getPosition(), unit.getTargetPosition(), Color.Orange);
 			}
 		}
 		
 		// target position
 		List<Position> targetPositions = AirForceManager.Instance().getTargetPositions();
 		for (int i = 0; i < targetPositions.size(); i++) {
-			Prebot.Broodwar.drawTextMap(targetPositions.get(i), "position#" + i);
+			MyBotModule.Broodwar.drawTextMap(targetPositions.get(i), "position#" + i);
 		}
 		
 		// air force team
@@ -1802,22 +1777,22 @@ public class UXManager {
 
 	private void drawVulturePolicy() {
 		int y = 10;
-		Prebot.Broodwar.drawTextScreen(400, y += 15, "[vulture policy]");
-		Prebot.Broodwar.drawTextScreen(400, y += 15, "checkerMaxNumber=" + StrategyIdea.checkerMaxNumber);
-		Prebot.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerPosition=" + StrategyIdea.spiderMineNumberPerPosition);
-		Prebot.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerGoodPosition=" + StrategyIdea.spiderMineNumberPerGoodPosition);
-		Prebot.Broodwar.drawTextScreen(400, y += 15, "watcherMinePositionLevel=" + StrategyIdea.watcherMinePositionLevel);
+		MyBotModule.Broodwar.drawTextScreen(400, y += 15, "[vulture policy]");
+		MyBotModule.Broodwar.drawTextScreen(400, y += 15, "checkerMaxNumber=" + StrategyIdea.checkerMaxNumber);
+		MyBotModule.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerPosition=" + StrategyIdea.spiderMineNumberPerPosition);
+		MyBotModule.Broodwar.drawTextScreen(400, y += 15, "spiderMineNumberPerGoodPosition=" + StrategyIdea.spiderMineNumberPerGoodPosition);
+		MyBotModule.Broodwar.drawTextScreen(400, y += 15, "watcherMinePositionLevel=" + StrategyIdea.watcherMinePositionLevel);
 	}
 	
 	private void drawEnemyBaseToBaseTime() {
 		int y = 0;
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "campPosition : " + StrategyIdea.campPosition + " / " + StrategyIdea.campType);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainPosition : " + StrategyIdea.mainPosition);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "watcherPosition : " + StrategyIdea.watcherPosition);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "mainSquadCenter : " + StrategyIdea.mainSquadCenter);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyGroundSquadPosition : " + StrategyIdea.nearGroundEnemyPosition + " / " + StrategyIdea.enemyUnitStatus);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.nearAirEnemyPosition);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyDropEnemyPosition : " + StrategyIdea.dropEnemyPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "campPosition : " + StrategyIdea.campPosition + " / " + StrategyIdea.campType);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "mainPosition : " + StrategyIdea.mainPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "watcherPosition : " + StrategyIdea.watcherPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "mainSquadCenter : " + StrategyIdea.mainSquadCenter);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyGroundSquadPosition : " + StrategyIdea.nearGroundEnemyPosition + " / " + StrategyIdea.enemyUnitStatus);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.nearAirEnemyPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyDropEnemyPosition : " + StrategyIdea.dropEnemyPosition);
 		
 		y += 10;
 		Position enemyBasePosition = null;
@@ -1827,11 +1802,11 @@ public class UXManager {
 			enemyExpansionPosition = InfoUtils.enemyBase().getPosition();
 			
 		}
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + enemyBasePosition);
-		Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyFirstExpansion : " + enemyExpansionPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyBase : " + enemyBasePosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyFirstExpansion : " + enemyExpansionPosition);
 		
 		if (StrategyIdea.enemyBaseExpected != null) {
-			Prebot.Broodwar.drawTextScreen(10, y += 15, "enemyBase (Expect) : " + StrategyIdea.enemyBaseExpected.getPosition());
+			MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyBase (Expect) : " + StrategyIdea.enemyBaseExpected.getPosition());
 		}
 //		for (Entry<UnitType, Integer> unitType : InformationManager.Instance().baseToBaseUnit.entrySet()) {
 //			Prebot.Broodwar.drawTextScreen(20, y += 10, "" + UxColor.CHAR_YELLOW + unitType.getKey() + " : " + unitType.getValue());
@@ -1841,53 +1816,53 @@ public class UXManager {
 	private void drawPositionInformation() {
 
 		if (StrategyIdea.mainSquadLeaderPosition != null) {
-			Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainSquadLeaderPosition, 0, -20), UxColor.CHAR_WHITE + "V");
+			MyBotModule.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainSquadLeaderPosition, 0, -20), UxColor.CHAR_WHITE + "V");
 		}
 		if (StrategyIdea.campPosition.equals(StrategyIdea.mainPosition)) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_ORANGE + "camp & main");
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_ORANGE + "camp & main");
 		} else {
 			if (StrategyIdea.campPosition != null) {
-				Prebot.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_YELLOW + "camp");
+				MyBotModule.Broodwar.drawTextMap(StrategyIdea.campPosition, UxColor.CHAR_YELLOW + "camp");
 			}
 			if (StrategyIdea.mainPosition != null) {
-				Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainPosition, 0, -10), UxColor.CHAR_RED + "main");
+				MyBotModule.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.mainPosition, 0, -10), UxColor.CHAR_RED + "main");
 			}
 		}
 		if (StrategyIdea.campPositionSiege != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.campPositionSiege, UxColor.CHAR_YELLOW + "camp (siege)");
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.campPositionSiege, UxColor.CHAR_YELLOW + "camp (siege)");
 		}
 		if (StrategyIdea.watcherPosition != null) {
-			Prebot.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.watcherPosition, 0, -20), UxColor.CHAR_BLUE + "watcherPos");
+			MyBotModule.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(StrategyIdea.watcherPosition, 0, -20), UxColor.CHAR_BLUE + "watcherPos");
 		}
 		if (StrategyIdea.mainSquadCenter != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.mainSquadCenter, "mainSqCntr");
-			Prebot.Broodwar.drawCircleMap(StrategyIdea.mainSquadCenter.getX(), StrategyIdea.mainSquadCenter.getY(), StrategyIdea.mainSquadCoverRadius, Color.Cyan);
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.mainSquadCenter, "mainSqCntr");
+			MyBotModule.Broodwar.drawCircleMap(StrategyIdea.mainSquadCenter.getX(), StrategyIdea.mainSquadCenter.getY(), StrategyIdea.mainSquadCoverRadius, Color.Cyan);
 		}
 		if (StrategyIdea.nearGroundEnemyPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.nearGroundEnemyPosition, UxColor.CHAR_RED + "nearEnemySq(Ground)");
-			Prebot.Broodwar.drawCircleMap(StrategyIdea.nearGroundEnemyPosition, 150, Color.Red);
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.nearGroundEnemyPosition, UxColor.CHAR_RED + "nearEnemySq(Ground)");
+			MyBotModule.Broodwar.drawCircleMap(StrategyIdea.nearGroundEnemyPosition, 150, Color.Red);
 		}
 		if (StrategyIdea.nearAirEnemyPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.nearAirEnemyPosition, UxColor.CHAR_RED + "nearEnemySq(Air)");
-			Prebot.Broodwar.drawCircleMap(StrategyIdea.nearAirEnemyPosition, 150, Color.Red);
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.nearAirEnemyPosition, UxColor.CHAR_RED + "nearEnemySq(Air)");
+			MyBotModule.Broodwar.drawCircleMap(StrategyIdea.nearAirEnemyPosition, 150, Color.Red);
 		}
 		if (StrategyIdea.dropEnemyPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.dropEnemyPosition, UxColor.CHAR_RED + "dropEnemySq");
-			Prebot.Broodwar.drawCircleMap(StrategyIdea.dropEnemyPosition, 150, Color.Red);
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.dropEnemyPosition, UxColor.CHAR_RED + "dropEnemySq");
+			MyBotModule.Broodwar.drawCircleMap(StrategyIdea.dropEnemyPosition, 150, Color.Red);
 		}
 		if (StrategyIdea.totalEnemyCneterPosition != null) {
-			Prebot.Broodwar.drawTextMap(StrategyIdea.totalEnemyCneterPosition, "totalEnemySq");
-			Prebot.Broodwar.drawCircleMap(StrategyIdea.totalEnemyCneterPosition, 250, Color.Red);
+			MyBotModule.Broodwar.drawTextMap(StrategyIdea.totalEnemyCneterPosition, "totalEnemySq");
+			MyBotModule.Broodwar.drawCircleMap(StrategyIdea.totalEnemyCneterPosition, 250, Color.Red);
 		}
 		if (InfoUtils.myReadyToPosition() != null) {
-			Prebot.Broodwar.drawTextMap(InfoUtils.myReadyToPosition(), "myReadyTo");
+			MyBotModule.Broodwar.drawTextMap(InfoUtils.myReadyToPosition(), "myReadyTo");
 		}
 		if (InfoUtils.enemyReadyToPosition() != null) {
-			Prebot.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
+			MyBotModule.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
 		}
 		if (VultureTravelManager.Instance().getTravelSites() != null) {
 			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
-				Prebot.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
+				MyBotModule.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
 			}
 		}
 	}
@@ -1897,7 +1872,7 @@ public class UXManager {
 		int y = 100;
 		for (Unit depot : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 			// update workerData with the new job
-			Prebot.Broodwar.drawTextScreen(500 , y,"depot.getID() : " + depot.getID() +  " cnt : " + WorkerData.depotWorkerCount.get(depot.getID()) );
+			MyBotModule.Broodwar.drawTextScreen(500 , y,"depot.getID() : " + depot.getID() +  " cnt : " + WorkerData.depotWorkerCount.get(depot.getID()) );
 			y += 10;
 		}
 	}
@@ -1910,7 +1885,7 @@ public class UXManager {
 		Chokepoint myFirstChoke = InfoUtils.myFirstChoke();
 		Chokepoint mySecondChoke = InfoUtils.mySecondChoke();
 		
-		int turretCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
+		int turretCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Missile_Turret);
 		
 		Position firstChokeMainHalf = new Position((myBase.getPosition().getX() + myFirstChoke.getX() * 2) / 3 - 60,
 				(myBase.getPosition().getY() + myFirstChoke.getY() * 2) / 3 - 60);
@@ -1927,17 +1902,17 @@ public class UXManager {
 //		
 //		Prebot.Broodwar.drawCircleMap(firstChokeMainHalf, 150 + turretCount * 15, Color.Red, false);
 		
-		Prebot.Broodwar.drawTextMap(firstChokeExpHalf.getX() + 20, firstChokeExpHalf.getY() + 10, "(" + (int) (firstChokeExpHalf.getX()) + ", " + (int) (firstChokeExpHalf.getY()) + ")");
+		MyBotModule.Broodwar.drawTextMap(firstChokeExpHalf.getX() + 20, firstChokeExpHalf.getY() + 10, "(" + (int) (firstChokeExpHalf.getX()) + ", " + (int) (firstChokeExpHalf.getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 150, Color.Orange, false);
+		MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf, 150, Color.Orange, false);
 		
-		Prebot.Broodwar.drawCircleMap(firstChokeExpHalf, 150 + turretCount * 15, Color.Orange, false);
+		MyBotModule.Broodwar.drawCircleMap(firstChokeExpHalf, 150 + turretCount * 15, Color.Orange, false);
 		
-		Prebot.Broodwar.drawTextMap(mySecondChoke.getCenter().getX() + 20, mySecondChoke.getCenter().getY() + 10, "(" + (int) (mySecondChoke.getCenter().getX()) + ", " + (int) (mySecondChoke.getCenter().getY()) + ")");
+		MyBotModule.Broodwar.drawTextMap(mySecondChoke.getCenter().getX() + 20, mySecondChoke.getCenter().getY() + 10, "(" + (int) (mySecondChoke.getCenter().getX()) + ", " + (int) (mySecondChoke.getCenter().getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150, Color.Cyan, false);
+		MyBotModule.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150, Color.Cyan, false);
 		
-		Prebot.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150 + turretCount * 15, Color.Cyan, false);  
+		MyBotModule.Broodwar.drawCircleMap(mySecondChoke.getCenter(), 150 + turretCount * 15, Color.Cyan, false);  
 		
 //		Prebot.Broodwar.drawTextMap(betweenChoke.getX() + 20, betweenChoke.getY() + 10, "(" + (int) (betweenChoke.getX()) + ", " + (int) (betweenChoke.getY()) + ")");
 //		
@@ -1958,11 +1933,11 @@ public class UXManager {
 //		Position betweenChoke2 = new Position((firstChokeMainHalf.getX() * 4 + mySecondChoke.getX() * 7) / 11,
 //				(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
 		
-		Prebot.Broodwar.drawTextMap(betweenChoke2.getX() + 20, betweenChoke2.getY() + 10, "(" + (int) (betweenChoke2.getX()) + ", " + (int) (betweenChoke2.getY()) + ")");
+		MyBotModule.Broodwar.drawTextMap(betweenChoke2.getX() + 20, betweenChoke2.getY() + 10, "(" + (int) (betweenChoke2.getX()) + ", " + (int) (betweenChoke2.getY()) + ")");
 		
-		Prebot.Broodwar.drawCircleMap(betweenChoke2, 120, Color.White, false);
+		MyBotModule.Broodwar.drawCircleMap(betweenChoke2, 120, Color.White, false);
 		
-		Prebot.Broodwar.drawCircleMap(betweenChoke2, 120 + turretCount * 15, Color.White, false);
+		MyBotModule.Broodwar.drawCircleMap(betweenChoke2, 120 + turretCount * 15, Color.White, false);
 		
 //		radius1 + turretCount * 15
 		

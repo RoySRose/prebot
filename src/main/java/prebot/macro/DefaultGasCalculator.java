@@ -5,7 +5,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.build.constant.BuildConfig;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.internal.UnitCache;
 import prebot.strategy.UnitInfo;
 
@@ -45,13 +45,13 @@ public class DefaultGasCalculator implements GasCalculator{
         if(!hasGasBuilding) {
             return 0;
         }else{
-        	int predictedGas = (int) (realGas + (Prebot.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
+        	int predictedGas = (int) (realGas + (MyBotModule.Broodwar.getFrameCount() - lastCheckFrame) * GAS_INCREMENT_RATE);
         	if(realGas <= 5000 && predictedGas > 5000) {
-        		gasDepletedFrame = Prebot.Broodwar.getFrameCount();
+        		gasDepletedFrame = MyBotModule.Broodwar.getFrameCount();
         	}
         	
         	if(gasDepletedFrame>0) {
-    			predictedGas = (int) (5000 + (Prebot.Broodwar.getFrameCount() - gasDepletedFrame) * GAS_INCREMENT_RATE/4);
+    			predictedGas = (int) (5000 + (MyBotModule.Broodwar.getFrameCount() - gasDepletedFrame) * GAS_INCREMENT_RATE/4);
         	}
         	return predictedGas;
         }
@@ -63,7 +63,7 @@ public class DefaultGasCalculator implements GasCalculator{
 
     private boolean getGasBuilding()
     {
-        List<Unit> alreadyBuiltUnits = Prebot.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
+        List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyser.getPosition(), 4 * BuildConfig.TILE_SIZE);
         for (Unit u : alreadyBuiltUnits) {
             if (u.getType().isRefinery() && u.exists()) {
                 return true;
@@ -90,7 +90,7 @@ public class DefaultGasCalculator implements GasCalculator{
         }
 
         if(geyser.isVisible()){
-            this.lastCheckFrame = Prebot.Broodwar.getFrameCount();
+            this.lastCheckFrame = MyBotModule.Broodwar.getFrameCount();
             this.realGas = 5000 - geyser.getResources();
 
             if(!hasGasBuilding && geyser.getResources() < 5000){

@@ -10,7 +10,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.FactoryUnitSelector;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
@@ -25,7 +25,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
     }
     
     public final boolean buildCondition(){
-		if (Prebot.Broodwar.self().minerals() < 50 || Prebot.Broodwar.self().gas() < 50) {
+		if (MyBotModule.Broodwar.self().minerals() < 50 || MyBotModule.Broodwar.self().gas() < 50) {
 			return false;
 		}
 		
@@ -52,7 +52,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			maxCountByCommandCenter = 4;
 		}
 		
-		if (Prebot.Broodwar.self().gas() > 300) {
+		if (MyBotModule.Broodwar.self().gas() > 300) {
 			maxCountByCommandCenter++;
 		}
 		
@@ -63,7 +63,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 		
 		List<Unit> factories = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Factory);
 		
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop) == 0) {
 			if(StrategyIdea.addOnOption == EnemyStrategyOptions.AddOnOption.VULTURE_FIRST) {
 				if (UnitUtils.myUnitDiscovered(UnitType.Terran_Vulture)) {
 					for (Unit factory : factories) {
@@ -81,7 +81,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			
 		
 		int factoryCountForMachineShop = 0;
-		int machineShopCount = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop);
+		int machineShopCount = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Machine_Shop);
 		
 		
 		for (Unit factory : factories) {
@@ -113,7 +113,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
 			}
 			
 			int addition = 3;
-			if (Prebot.Broodwar.self().gas() > 300) {
+			if (MyBotModule.Broodwar.self().gas() > 300) {
 				UnitType selected = FactoryUnitSelector.chooseunit(vultureratio, tankratio, goliathratio, wgt, tot_vulture, tot_tank, tot_goliath);
 				if (selected == UnitType.Terran_Siege_Tank_Tank_Mode) {
 					addition = 0;
@@ -129,7 +129,7 @@ public class BuilderMachineShop extends DefaultBuildableItem {
     }
     
     public int GetCurrentTot(UnitType checkunit) {
-		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + Prebot.Broodwar.self().allUnitCount(checkunit);
+		return BuildManager.Instance().buildQueue.getItemCount(checkunit) + MyBotModule.Broodwar.self().allUnitCount(checkunit);
 	}
     
     @Override

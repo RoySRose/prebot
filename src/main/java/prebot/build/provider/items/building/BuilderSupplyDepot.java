@@ -11,7 +11,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 
@@ -33,7 +33,7 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
 //    		return false;
 //    	}
 
-        if (Prebot.Broodwar.self().supplyTotal() >= 400) {
+        if (MyBotModule.Broodwar.self().supplyTotal() >= 400) {
             return false;
         }
         
@@ -78,15 +78,15 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
 //        int satrportMargin = 2;
 
         
-        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) > 0) {
+        if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) > 0) {
         	barrackflag = true;
         }
         
-        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0) {
+        if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) > 0) {
         	factoryflag = true;
         }
         
-        if(Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
+        if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
         	starportflag = true;
         }
         
@@ -103,7 +103,7 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
 
         int Faccnt =0;
         int Starportcnt =0;
-        int CCcnt  = Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
+        int CCcnt  = MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center);
         int facFullOperating =0;
         int starportOperating =0;
         
@@ -152,7 +152,7 @@ public class BuilderSupplyDepot extends DefaultBuildableItem {
         }
 
         // currentSupplyShortage 를 계산한다
-        int currentSupplyShortage = Prebot.Broodwar.self().supplyUsed() + supplyMargin + 1 - Prebot.Broodwar.self().supplyTotal();
+        int currentSupplyShortage = MyBotModule.Broodwar.self().supplyUsed() + supplyMargin + 1 - MyBotModule.Broodwar.self().supplyTotal();
 
         if (currentSupplyShortage > 0) {
             // 생산/건설 중인 Supply를 센다

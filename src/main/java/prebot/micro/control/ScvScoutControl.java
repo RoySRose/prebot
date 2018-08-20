@@ -15,7 +15,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
@@ -74,17 +74,17 @@ public class ScvScoutControl extends Control {
 			
 			CommandUtils.move(scoutScv, scoutBaseLocation.getPosition());
 		} else {
-			if (!Prebot.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
+			if (!MyBotModule.Broodwar.isExplored(enemyBaseLocation.getTilePosition())) {
 				CommandUtils.move(scoutScv, enemyBaseLocation.getPosition());
 			} else {
 				Position currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(scoutScv);
-				if(Prebot.Broodwar.getFrameCount() % 2000 == 0){
+				if(MyBotModule.Broodwar.getFrameCount() % 2000 == 0){
 					scoutFirstExpansionFlag = true;
 				}
 				if(scoutFirstExpansionFlag){
 					if(canMoveFirstExpansion(scoutScv,enemyBaseLocation)){
 						BaseLocation enemyFisrtExpansionPosition = getClosestFirstExpansionBase(enemyBaseLocation);
-						if (!Prebot.Broodwar.isVisible(enemyFisrtExpansionPosition.getTilePosition())) {
+						if (!MyBotModule.Broodwar.isVisible(enemyFisrtExpansionPosition.getTilePosition())) {
 							CommandUtils.move(scoutScv, enemyFisrtExpansionPosition.getPosition());
 						}else{
 							CommandUtils.move(scoutScv, currentScoutTargetPosition);
@@ -159,7 +159,7 @@ public class ScvScoutControl extends Control {
 		BaseLocation notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
-				return !Prebot.Broodwar.isExplored(base.getTilePosition()) && !otherScvScoutBaseList.contains(base);
+				return !MyBotModule.Broodwar.isExplored(base.getTilePosition()) && !otherScvScoutBaseList.contains(base);
 			}
 		});
 		
@@ -167,7 +167,7 @@ public class ScvScoutControl extends Control {
 			notExploredBase = BaseLocationUtils.getGroundClosestBaseToPosition(BWTA.getStartLocations(), nearestBase, new IConditions.BaseCondition() {
 				@Override
 				public boolean correspond(BaseLocation base) {
-					return !Prebot.Broodwar.isExplored(base.getTilePosition());
+					return !MyBotModule.Broodwar.isExplored(base.getTilePosition());
 				}
 			});
 		}
@@ -179,7 +179,7 @@ public class ScvScoutControl extends Control {
 		BaseLocation notExploredFarthestBase = BaseLocationUtils.getGroundFarthestBaseToPosition(BWTA.getStartLocations(), InfoUtils.myBase(), new IConditions.BaseCondition() {
 			@Override
 			public boolean correspond(BaseLocation base) {
-				return !Prebot.Broodwar.isExplored(base.getTilePosition());
+				return !MyBotModule.Broodwar.isExplored(base.getTilePosition());
 			}
 		});
 		return notExploredFarthestBase;
@@ -196,7 +196,7 @@ public class ScvScoutControl extends Control {
 		}
 		
 		if (regionVertices.isEmpty()) {
-			return Prebot.Broodwar.self().getStartLocation().toPosition();
+			return MyBotModule.Broodwar.self().getStartLocation().toPosition();
 		}
 
 		// if this is the first flee, we will not have a previous perimeter index
@@ -206,7 +206,7 @@ public class ScvScoutControl extends Control {
 			vertexIndex = getClosestVertexIndex(scoutWorker.getPosition(), regionVertices);
 
 			if (vertexIndex == CommonCode.INDEX_NOT_FOUND) {
-				return Prebot.Broodwar.self().getStartLocation().toPosition();
+				return MyBotModule.Broodwar.self().getStartLocation().toPosition();
 			} else {
 				scoutVertexIndexMap.put(scoutWorker.getID(), vertexIndex);
 				return regionVertices.get(vertexIndex);
@@ -285,9 +285,9 @@ public class ScvScoutControl extends Control {
 		int enemyWeaponRange = 0;
 
 		if (enemyUnitType == UnitType.Terran_Bunker) {
-			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
+			enemyWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 96;
 		} else {
-			enemyWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
+			enemyWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnitType.groundWeapon());
 		}
 		return distanceToNearEnemy <= enemyWeaponRange + 64;
 	}

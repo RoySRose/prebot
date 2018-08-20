@@ -16,7 +16,7 @@ import bwapi.UpgradeType;
 import bwapi.WeaponType;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.micro.FleeOption;
 import prebot.micro.KitingOption;
 import prebot.micro.MirrorBugFixed;
@@ -172,8 +172,8 @@ public class MicroUtils {
 		int risk = 0;
 		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ALL, movePosition, radius);
 		for (Unit unit : unitsInRadius) {
-			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
-				int damage = Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType);
+			if (unit.getPlayer() == MyBotModule.Broodwar.enemy()) { // 적군인 경우
+				int damage = MyBotModule.Broodwar.getDamageFrom(unit.getType(), myUnitType);
 				if (damage > 0) {
 					if (unit.getType().isBuilding()) {
 						risk += 30;
@@ -182,7 +182,7 @@ public class MicroUtils {
 					}
 				}
 				
-			} else if (unit.getPlayer() == Prebot.Broodwar.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
+			} else if (unit.getPlayer() == MyBotModule.Broodwar.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
 				if (unit.getType() == UnitType.Terran_Missile_Turret) {
 					risk += 20;
 				} else {
@@ -343,13 +343,13 @@ public class MicroUtils {
 			}
 		}
 		// 벌처가 아닌경우, 자신보다 보다 긴 사정거리를 가진 적에게 카이팅은 무의미하다.
-		else if (Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon) <= Prebot.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
+		else if (MyBotModule.Broodwar.self().weaponMaxRange(attackUnitWeapon) <= MyBotModule.Broodwar.enemy().weaponMaxRange(targetWeapon)) {
 			return true;
 		}
 		
 		int cooltime = rangedUnit.isStartingAttack() ? attackUnitWeapon.damageCooldown() // // 쿨타임시간(frame)
 				: (targetUnit.isFlying() ? rangedUnit.getAirWeaponCooldown() : rangedUnit.getGroundWeaponCooldown());
-		double distanceToAttack = rangedUnit.getDistance(targetUnit) - Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
+		double distanceToAttack = rangedUnit.getDistance(targetUnit) - MyBotModule.Broodwar.self().weaponMaxRange(attackUnitWeapon); // 공격하기 위해 이동해야 하는 거리(pixel)
 		int catchTime = (int) (distanceToAttack / rangedUnit.getType().topSpeed()); // 상대를 잡기위해 걸리는 시간 (frame) = 거리(pixel) / 속도(pixel per frame)
 		if (!targetUnit.isDetected() && UnitUtils.availableScanningCount() == 0) {
 			catchTime -= TimeUtils.SECOND;
@@ -360,7 +360,7 @@ public class MicroUtils {
 		}
 		
 		// 상대가 때리기 위해 거리를 좁히거나 벌려야 하는 경우(coolTime <= catchTime)
-		if (cooltime <= catchTime + Prebot.Broodwar.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
+		if (cooltime <= catchTime + MyBotModule.Broodwar.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
 //			System.out.println("#################################");
 //			System.out.println("vulture id " + rangedUnit.getID() + ": " + cooltime + " <= " + catchTime + " + " + Prebot.Broodwar.getLatency() * 2);
 //			System.out.println("distanceToAttack = " + distanceToAttack);
@@ -515,8 +515,8 @@ public class MicroUtils {
 		int risk = 0;
 		List<Unit> unitsInRadius = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ALL, movePosition, radius);
 		for (Unit unit : unitsInRadius) {
-			if (unit.getPlayer() == Prebot.Broodwar.enemy()) { // 적군인 경우
-				if (Prebot.Broodwar.getDamageFrom(unit.getType(), myUnitType) > 0) { // 적군이 공격할 수 있으면 위험하겠지
+			if (unit.getPlayer() == MyBotModule.Broodwar.enemy()) { // 적군인 경우
+				if (MyBotModule.Broodwar.getDamageFrom(unit.getType(), myUnitType) > 0) { // 적군이 공격할 수 있으면 위험하겠지
 					if (unit.getType().isBuilding()) { // 건물이 공격할 수 있으면 진짜 위험한거겠지
 						risk += 20;
 					} else if (!unit.getType().isFlyer()) { // 날아다니지 않으면 길막까지 하니까
@@ -536,7 +536,7 @@ public class MicroUtils {
 					}
 				}
 				
-			} else if (unit.getPlayer() == Prebot.Broodwar.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
+			} else if (unit.getPlayer() == MyBotModule.Broodwar.self()) { // 아군인 경우, united값에 따라 좋은지 싫은지 판단을 다르게 한다.
 				if (!unit.getType().isFlyer()) {
 					risk += united ? -2 : 2;
 				} else {
@@ -570,7 +570,7 @@ public class MicroUtils {
 		if (attackerType == UnitType.Protoss_Zealot || attackerType == UnitType.Terran_Goliath && targetType.isFlyer()) {
 			numberOfAttack *= 2;
 		}
-		int damageExpected = Prebot.Broodwar.getDamageFrom(attackerType, targetType, attackUnit.getPlayer(), targetUnit.getPlayer()) * numberOfAttack;
+		int damageExpected = MyBotModule.Broodwar.getDamageFrom(attackerType, targetType, attackUnit.getPlayer(), targetUnit.getPlayer()) * numberOfAttack;
 		
 		int targetHitPoints = targetUnit.getHitPoints();
 		if (targetType.regeneratesHP()) {
@@ -635,8 +635,8 @@ public class MicroUtils {
 			
 			double distanceToNearEnemy = position.getDistance(ui.getLastPosition());
 			WeaponType nearEnemyWeapon = ui.getType().groundWeapon();
-			int enemyWeaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
-			double enemyTopSpeed = Prebot.Broodwar.enemy().topSpeed(ui.getType());
+			int enemyWeaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(nearEnemyWeapon);
+			double enemyTopSpeed = MyBotModule.Broodwar.enemy().topSpeed(ui.getType());
 			double backOffDist = ui.getType().isBuilding() ? MicroConfig.Common.BACKOFF_DIST_DEF_TOWER : 0.0;
 			
 			if (distanceToNearEnemy <= enemyWeaponMaxRange + enemyTopSpeed * 24 + backOffDist) {
@@ -706,7 +706,7 @@ public class MicroUtils {
 			return myUnit.isInWeaponRange(enemy);
 		} else {
 			int enemyUnitDistance = myUnit.getDistance(eui.getLastPosition());
-			int weaponMaxRange = Prebot.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
+			int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(eui.getType().airWeapon());
 			return enemyUnitDistance <= weaponMaxRange;
 		}
 	}

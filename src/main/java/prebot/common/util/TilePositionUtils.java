@@ -1,13 +1,13 @@
 package prebot.common.util;
 
 import bwapi.TilePosition;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 public class TilePositionUtils {
 
 	/// 건설 가능한 tilePosition이면 true 리턴
 	public static boolean isBuildable(TilePosition tilePosition, boolean includeBuilding) {
-		return tilePosition.isValid() && Prebot.Broodwar.isBuildable(tilePosition, includeBuilding);
+		return tilePosition.isValid() && MyBotModule.Broodwar.isBuildable(tilePosition, includeBuilding);
 	}
 
 

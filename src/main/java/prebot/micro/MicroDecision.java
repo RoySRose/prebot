@@ -1,7 +1,6 @@
 package prebot.micro;
 
 import bwapi.Unit;
-import prebot.common.debug.UXManager;
 import prebot.strategy.UnitInfo;
 
 public class MicroDecision {
@@ -43,67 +42,67 @@ public class MicroDecision {
 
 	public static MicroDecision kitingUnit(Unit myUnit, UnitInfo eui) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.KITING_UNIT, myUnit, eui);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 
 	public static MicroDecision attackUnit(Unit myUnit, UnitInfo eui) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.ATTACK_UNIT, myUnit, eui);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision fleeFromUnit(Unit myUnit, UnitInfo eui) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.FLEE_FROM_UNIT, myUnit, eui);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision attackPosition(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.ATTACK_POSITION, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision fleeFromPosition(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.FLEE_FROM_POSITION, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision hold(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.HOLD, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision stop(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.STOP, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision change(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.CHANGE_MODE, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision move(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.RIGHT_CLICK, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision unite(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.UNITE, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 	
 	public static MicroDecision doNothing(Unit myUnit) {
 		MicroDecision decision = new MicroDecision(MicroDecision.MicroDecisionType.DO_NOTHING, myUnit);
-		UXManager.Instance().addDecisionListForUx(myUnit, decision);
+//		UXManager.Instance().addDecisionListForUx(myUnit, decision);
 		return decision;
 	}
 

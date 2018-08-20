@@ -2,7 +2,7 @@ package prebot.strategy.analyse;
 
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -187,7 +187,7 @@ public class ZergStrategist extends Strategist {
 		if (StrategyIdea.wraithCount > 0 || StrategyIdea.valkyrieCount > 0) {
 			return false;
 		}
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) > 0) {
 			return true;
 		}
 		warithActivatedFrame = TimeUtils.elapsedFrames();

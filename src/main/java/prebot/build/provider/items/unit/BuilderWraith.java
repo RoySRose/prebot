@@ -5,7 +5,7 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.StarportUnitSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
 
@@ -22,12 +22,12 @@ public class BuilderWraith extends DefaultBuildableItem {
     	
     	int maxWraithCnt = StrategyIdea.wraithCount;
     	
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Starport) == 0) {
 			return false;
 		}
 
     	
-		if (Prebot.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) < maxWraithCnt) {
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Wraith) < maxWraithCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Wraith, null) == 0) {
 				if (!UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Wraith)) {

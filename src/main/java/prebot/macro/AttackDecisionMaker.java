@@ -15,7 +15,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.UnitUtils;
@@ -148,7 +148,7 @@ public class AttackDecisionMaker extends GameManager {
 
         int point=0;
 
-        if(Prebot.Broodwar.getFrameCount() % 500 ==0) {
+        if(MyBotModule.Broodwar.getFrameCount() % 500 ==0) {
 //        System.out.println(predictedTotalEnemyAttackUnit);
         }
         for (Map.Entry<UnitType, MutableFloat> enemyUnit : predictedTotalEnemyAttackUnit.entrySet()){
@@ -167,13 +167,13 @@ public class AttackDecisionMaker extends GameManager {
     		Decision decision = attackType(myForcePoint, enemyForcePoint);
     		if (decision == Decision.NO_MERCY_ATTACK) {
     			if (decision != Decision.NO_MERCY_ATTACK) {
-					Prebot.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
+					MyBotModule.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.NO_MERCY_ATTACK;
     			
     		} else if (decision == Decision.FULL_ATTACK) {
     			if (decision != Decision.FULL_ATTACK) {
-					Prebot.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
+					MyBotModule.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.FULL_ATTACK;
     		}
@@ -187,7 +187,7 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.FULL_ATTACK;
     	}
 		if (decision == Decision.FULL_ATTACK) {
-			Prebot.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
+			MyBotModule.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
 		}
         return Decision.DEFENCE;
     }
@@ -218,18 +218,18 @@ public class AttackDecisionMaker extends GameManager {
 	}
 
 	private boolean pushSiege(int myForcePoint, int enemyForcePoint) {
-		if (Prebot.Broodwar.self().supplyUsed() < 320) {
+		if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
 			pushSiege = false;
-		} else if (Prebot.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 2.0) {
+		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380 && myForcePoint > enemyForcePoint * 2.0) {
 			pushSiege = true;
 		}
 		return pushSiege;
 	}
     
     private boolean attackByFullSupply() {
-		if (Prebot.Broodwar.self().supplyUsed() < 320) {
+		if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
 			attackByFullSupply = false;
-		} else if (Prebot.Broodwar.self().supplyUsed() > 380) {
+		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
 			attackByFullSupply = true;
 		}
 		return attackByFullSupply;
@@ -238,13 +238,13 @@ public class AttackDecisionMaker extends GameManager {
 	private int attackPoint() {
     	int point = 1200;
     	if (InfoUtils.enemyRace() == Race.Protoss) {
-    		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
-    			point = 3000;
-    		} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
-        		point = 5000;	
-    		} else {
-    			point = 7000;	
-    		}
+//    		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
+//    			point = 3000;
+//    		} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
+//        		point = 5000;	
+//    		} else {
+//    			point = 7000;	
+//    		}
     	} else if (InfoUtils.enemyRace() == Race.Terran) {
     		point = 1200;
     	} else if (InfoUtils.enemyRace() == Race.Zerg) {
@@ -416,7 +416,7 @@ public class AttackDecisionMaker extends GameManager {
     		setCount = setByGas;
     	}
 	
-        if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
+        if(MyBotModule.Broodwar.getFrameCount() % 100 ==0) {
         //System.out.println("counting: " + setCount);
         }
         enemyMineralToPredict -= enemyUnitCounter.getMineralSet()*setCount;
@@ -426,12 +426,12 @@ public class AttackDecisionMaker extends GameManager {
             MutableFloat count = predictedTotalEnemyAttackUnit.get(enemyUnit.getKey());
             if (count == null) {
                 predictedTotalEnemyAttackUnit.put(enemyUnit.getKey(), new MutableFloat(enemyUnit.getValue() * setCount));
-                if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
+                if(MyBotModule.Broodwar.getFrameCount() % 100 ==0) {
                 //System.out.println("increase map: " + enemyUnit.getKey() + ", " + enemyUnit.getValue() * setCount);
                 }
             }else {
                 count.increment(enemyUnit.getValue() * setCount);
-                if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
+                if(MyBotModule.Broodwar.getFrameCount() % 100 ==0) {
                 //System.out.println("increase map: " + enemyUnit.getKey() + ", " + enemyUnit.getValue() * setCount);
                 }
             }
@@ -456,12 +456,12 @@ public class AttackDecisionMaker extends GameManager {
         }
         if (count == null) {
             predictedTotalEnemyAttackUnit.put(unitType, new MutableFloat(d * baseUnitCount));
-            if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
+            if(MyBotModule.Broodwar.getFrameCount() % 100 ==0) {
             //System.out.println("increase map: " + unitType + ", " + d * baseUnitCount);
             }
         }else {
             count.increment(d * baseUnitCount);
-            if(Prebot.Broodwar.getFrameCount() % 100 ==0) {
+            if(MyBotModule.Broodwar.getFrameCount() % 100 ==0) {
             //System.out.println("increase map: " + unitType + ", " + d * baseUnitCount);  
             }
         }
@@ -484,8 +484,8 @@ public class AttackDecisionMaker extends GameManager {
         
         //TODO 존나 빠른 앞마당 저그 같은 경우는? 일단 상대 본진에서 앞마당 못 찾으면...
         if(enemyResourceDepotInfoMap.size() == 0) {
-        	enemyMineralToCalculateCombatUnit += Prebot.Broodwar.self().gatheredMinerals() * 0.97;
-	        enemyGasToCalculateCombatUnit += Prebot.Broodwar.self().gatheredGas() * 0.97;
+        	enemyMineralToCalculateCombatUnit += MyBotModule.Broodwar.self().gatheredMinerals() * 0.97;
+	        enemyGasToCalculateCombatUnit += MyBotModule.Broodwar.self().gatheredGas() * 0.97;
         }else {
 		    for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
 		
@@ -502,7 +502,7 @@ public class AttackDecisionMaker extends GameManager {
 
             //confirmedUnit
             int unitCount = UnitCache.getCurrentCache().enemyAllCount(enemyUnitType);
-            int killedUnitCount = Prebot.Broodwar.self().killedUnitCount(enemyUnitType);
+            int killedUnitCount = MyBotModule.Broodwar.self().killedUnitCount(enemyUnitType);
 
             if(!enemyUnitType.isBuilding() && !enemyUnitType.isWorker() && unitCount>0) {
 
@@ -580,7 +580,7 @@ public class AttackDecisionMaker extends GameManager {
             	enemyMineralToCalculateCombatUnit -= enemyUnitType.mineralPrice()/2*killedUnitCount;
 	            enemyGasToCalculateCombatUnit -= enemyUnitType.gasPrice()/2*killedUnitCount;
             }else {
-            	if(Prebot.Broodwar.getFrameCount() % 1000 ==0)
+            	if(MyBotModule.Broodwar.getFrameCount() % 1000 ==0)
             	if(killedUnitCount > 0 ) {
 //            		System.out.println(enemyUnitType +": " + killedUnitCount);
             	}
@@ -699,7 +699,7 @@ public class AttackDecisionMaker extends GameManager {
                 }
             }else {
             	//For moving CommandCenter
-            	if(InformationManager.Instance().enemyRace == Race.Terran && Prebot.Broodwar.getFrameCount()>30000 && !resourceDepotPosition.contains(unitInfo.getLastPosition())){
+            	if(InformationManager.Instance().enemyRace == Race.Terran && MyBotModule.Broodwar.getFrameCount()>30000 && !resourceDepotPosition.contains(unitInfo.getLastPosition())){
             		if(!unitInfo.getUnit().isFlying() && getMineralPatchesNearDepot(unitInfo.getLastPosition()).size() > 6 ){
             			selectedUnitInfo2 = unitInfo;
                     }

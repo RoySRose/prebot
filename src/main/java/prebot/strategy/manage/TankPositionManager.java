@@ -15,7 +15,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -142,7 +142,7 @@ public class TankPositionManager {
 	private int getPositionReserveCountInRadius(Position position, int radius) {
 		int count = 0;
 		for (PositionReserveInfo positionReserveInfo : siegeModeReservedMap.values()) {
-			Unit tank = Prebot.Broodwar.getUnit(positionReserveInfo.unitId);
+			Unit tank = MyBotModule.Broodwar.getUnit(positionReserveInfo.unitId);
 			if (tank.isSieged()) {
 				continue;
 			}
@@ -177,7 +177,7 @@ public class TankPositionManager {
     	}
 		
 		
-    	List<Unit> unitList = Prebot.Broodwar.getUnitsOnTile(position.getX(),position.getY());
+    	List<Unit> unitList = MyBotModule.Broodwar.getUnitsOnTile(position.getX(),position.getY());
     	for (Unit unit : unitList) {
     		if (unit.getType().isBuilding()) {
     			return false;

@@ -11,7 +11,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwta.BaseLocation;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
@@ -125,8 +125,8 @@ public class VultureTravelManager {
 	private void updateVisitFrame() {
 		// 시야가 밝혀졌다면 visitFrame을 계속 업데이트 한다.
 		for (TravelSite travelSite : travelSites) {
-			if (Prebot.Broodwar.isVisible(travelSite.baseLocation.getTilePosition())) {
-				travelSite.visitFrame = Prebot.Broodwar.getFrameCount();
+			if (MyBotModule.Broodwar.isVisible(travelSite.baseLocation.getTilePosition())) {
+				travelSite.visitFrame = MyBotModule.Broodwar.getFrameCount();
 			}
 		}
 	}
@@ -140,7 +140,7 @@ public class VultureTravelManager {
 
 		for (Integer vultureId : checkerSiteMap2.keySet()) {
 			// 유효하지 않은 벌처
-			Unit checker = Prebot.Broodwar.getUnit(vultureId);
+			Unit checker = MyBotModule.Broodwar.getUnit(vultureId);
 			if (!UnitUtils.isCompleteValidUnit(checker)) {
 				invalidList.add(checker.getID());
 				continue;
@@ -197,7 +197,7 @@ public class VultureTravelManager {
 	private void refreshRetiredCheckers() {
 		List<Integer> removeList = new ArrayList<>();
 		for (Integer checkerId : checkerRetiredTimeMap.keySet()) {
-			Unit checker = Prebot.Broodwar.getUnit(checkerId);
+			Unit checker = MyBotModule.Broodwar.getUnit(checkerId);
 			if (!UnitUtils.isCompleteValidUnit(checker)) {
 				removeList.add(checkerId);
 			} else {
@@ -239,7 +239,7 @@ public class VultureTravelManager {
 		}
 
 		int vulturePower = VultureFightPredictor.powerOfWatchers(assignableVultures);
-		int currFrame = Prebot.Broodwar.getFrameCount();
+		int currFrame = MyBotModule.Broodwar.getFrameCount();
 
 		int bestScore = 0;
 		TravelSite bestTravelSite = null;
@@ -281,6 +281,6 @@ public class VultureTravelManager {
 	}
 
 	public void guerillaStart(String squadName) {
-		guerillaIgnoreMap.put(squadName, Prebot.Broodwar.getFrameCount());
+		guerillaIgnoreMap.put(squadName, MyBotModule.Broodwar.getFrameCount());
 	}
 }

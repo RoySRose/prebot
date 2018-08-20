@@ -13,7 +13,7 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.internal.SpecificValueCache;
 import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
@@ -33,43 +33,43 @@ public class InfoUtils {
 	}
 	
 	public static BaseLocation myBase() {
-		return InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.self());
+		return InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 	}
 	
 	public static BaseLocation enemyBase() {
-		return InformationManager.Instance().getMainBaseLocation(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
 	}
 	
 	public static Chokepoint myFirstChoke() {
-		return InformationManager.Instance().getFirstChokePoint(Prebot.Broodwar.self());
+		return InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self());
 	}
 
 	public static Chokepoint enemyFirstChoke() {
-		return InformationManager.Instance().getFirstChokePoint(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.enemy());
 	}
 
 	public static Chokepoint mySecondChoke() {
-		return InformationManager.Instance().getSecondChokePoint(Prebot.Broodwar.self());
+		return InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self());
 	}
 
 	public static Chokepoint enemySecondChoke() {
-		return InformationManager.Instance().getSecondChokePoint(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.enemy());
 	}
 
 	public static BaseLocation myFirstExpansion() {
-		return InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.self());
+		return InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
 	}
 	
 	public static BaseLocation enemyFirstExpansion() {
-		return InformationManager.Instance().getFirstExpansionLocation(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
 	}
 
 	public static Position myReadyToPosition() {
-		return InformationManager.Instance().getReadyToAttackPosition(Prebot.Broodwar.self());
+		return InformationManager.Instance().getReadyToAttackPosition(MyBotModule.Broodwar.self());
 	}
 
 	public static Position enemyReadyToPosition() {
-		return InformationManager.Instance().getReadyToAttackPosition(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getReadyToAttackPosition(MyBotModule.Broodwar.enemy());
 	}
 	
 	public static List<BaseLocation> enemyOtherExpansions() {
@@ -77,11 +77,11 @@ public class InfoUtils {
 	}
 	
 	public static List<BaseLocation> myOccupiedBases() {
-		return InformationManager.Instance().getOccupiedBaseLocations(Prebot.Broodwar.self());
+		return InformationManager.Instance().getOccupiedBaseLocations(MyBotModule.Broodwar.self());
 	}
 	
 	public static List<BaseLocation> enemyOccupiedBases() {
-		return InformationManager.Instance().getOccupiedBaseLocations(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getOccupiedBaseLocations(MyBotModule.Broodwar.enemy());
 	}
 	
 	public static boolean enemyFirstExpansionOccupied() {
@@ -126,7 +126,7 @@ public class InfoUtils {
 	public static int myNumUnits(UnitType... unitTypes) {
 		int numUnits = 0;
 		for (UnitType unitType : unitTypes) {
-			numUnits += InformationManager.Instance().getNumUnits(unitType, Prebot.Broodwar.self());
+			numUnits += InformationManager.Instance().getNumUnits(unitType, MyBotModule.Broodwar.self());
 		}
 		return numUnits;
 	}
@@ -134,7 +134,7 @@ public class InfoUtils {
 	public static int enemyNumUnits(UnitType... unitTypes) {
 		int numUnits = 0;
 		for (UnitType unitType : unitTypes) {
-			numUnits += InformationManager.Instance().getNumUnits(unitType, Prebot.Broodwar.enemy());
+			numUnits += InformationManager.Instance().getNumUnits(unitType, MyBotModule.Broodwar.enemy());
 		}
 		return numUnits;
 	}
@@ -142,7 +142,7 @@ public class InfoUtils {
 	public static int myDeadNumUnits(UnitType... unitTypes) {
 		int numUnits = 0;
 		for (UnitType unitType : unitTypes) {
-			numUnits += Prebot.Broodwar.self().deadUnitCount(unitType);
+			numUnits += MyBotModule.Broodwar.self().deadUnitCount(unitType);
 		}
 		return numUnits;
 	}
@@ -150,13 +150,13 @@ public class InfoUtils {
 	public static int enemyDeadNumUnits(UnitType... unitTypes) {
 		int numUnits = 0;
 		for (UnitType unitType : unitTypes) {
-			numUnits += Prebot.Broodwar.enemy().deadUnitCount(unitType);
+			numUnits += MyBotModule.Broodwar.enemy().deadUnitCount(unitType);
 		}
 		return numUnits;
 	}
 	
 	public static Map<Integer, UnitInfo> enemyUnitInfoMap() {
-		return InformationManager.Instance().getUnitAndUnitInfoMap(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getUnitAndUnitInfoMap(MyBotModule.Broodwar.enemy());
 	}
 	
 	public static MapSpecificInformation mapInformation() {
@@ -188,11 +188,11 @@ public class InfoUtils {
 	}
 	
 	public static Region myThirdRegion() {
-		return InformationManager.Instance().getThirdRegion(Prebot.Broodwar.self());
+		return InformationManager.Instance().getThirdRegion(MyBotModule.Broodwar.self());
 	}
 	
 	public static Region enemyThirdRegion() {
-		return InformationManager.Instance().getThirdRegion(Prebot.Broodwar.enemy());
+		return InformationManager.Instance().getThirdRegion(MyBotModule.Broodwar.enemy());
 	}
 	
 	

@@ -13,7 +13,7 @@ import java.util.Queue;
 import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.strategy.StrategyManager;
 

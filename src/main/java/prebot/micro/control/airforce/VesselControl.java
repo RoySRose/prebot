@@ -10,7 +10,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -130,7 +130,7 @@ public class VesselControl extends Control {
 					temp = VESSEL_CHECK_SPEED * 3;
 				}
 				if (mostDangerousTarget.isInWeaponRange(vessel)
-						|| (vessel.getDistance(mostDangerousTarget) <= Prebot.Broodwar.enemy().weaponMaxRange(
+						|| (vessel.getDistance(mostDangerousTarget) <= MyBotModule.Broodwar.enemy().weaponMaxRange(
 								mostDangerousTarget.getType().airWeapon()) + VESSEL_CHECK_SPEED + temp)) {
 					Position fleePosition = getFleePosition(vessel, mostDangerousTarget.getPosition(), (int) VESSEL_CHECK_SPEED,fOption);
 					vessel.move(fleePosition);
@@ -217,7 +217,7 @@ public class VesselControl extends Control {
 		dangerous_targets.addAll(UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, position, VESSEL_SIGHT, UnitType.Terran_Goliath));
 			for (Unit enemyunits : dangerous_targets) {
 				
-				double inrange =  Prebot.Broodwar.enemy().weaponMaxRange(enemyunits.getType().airWeapon());
+				double inrange =  MyBotModule.Broodwar.enemy().weaponMaxRange(enemyunits.getType().airWeapon());
 				double additionalrange = VESSEL_CHECK_SPEED;		
 				double distance = enemyunits.getDistance(position);
 				if(enemyunits.getType().airWeapon() != WeaponType.None){

@@ -11,7 +11,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.Region;
 import prebot.common.constant.CommonCode;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
@@ -48,11 +48,11 @@ public class MicroDecisionMakerPrebot1 {
 			if (enemyIsComplete && saveUnitLevel >= 1) {
 				if (enemyUnitType == UnitType.Zerg_Sunken_Colony || enemyUnitType == UnitType.Protoss_Photon_Cannon || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode
 						|| enemyUnitType == UnitType.Terran_Bunker || (enemyUnitType == UnitType.Zerg_Lurker && enemy != null && enemy.isBurrowed() && !enemy.isDetected())
-						|| (saveUnitLevel >= 2 && allRangeUnitType(Prebot.Broodwar.enemy(), enemyUnitType))) {
+						|| (saveUnitLevel >= 2 && allRangeUnitType(MyBotModule.Broodwar.enemy(), enemyUnitType))) {
 
 					int enemyGroundWeaponRange = enemyUnitType.groundWeapon().maxRange();
 					if (enemyUnitType == UnitType.Terran_Bunker) {
-						enemyGroundWeaponRange = Prebot.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64; // 32->64(엄청 뚜두려맞아서 올림)
+						enemyGroundWeaponRange = MyBotModule.Broodwar.enemy().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 64; // 32->64(엄청 뚜두려맞아서 올림)
 					}
 					double safeDistance = enemyGroundWeaponRange;
 					if (enemyUnitType == UnitType.Terran_Siege_Tank_Tank_Mode || enemyUnitType == UnitType.Terran_Siege_Tank_Siege_Mode) {
@@ -168,7 +168,7 @@ public class MicroDecisionMakerPrebot1 {
 			Unit enemy = UnitUtils.unitInSight(enemyInfo);
 			if (enemy == null) {
 				if (bestTargetInfo == null && !enemyInfo.getType().isBuilding()) {
-					if (!Prebot.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
+					if (!MyBotModule.Broodwar.isVisible(enemyInfo.getLastPosition().toTilePosition())) {
 						int distanceToTarget = mechanicUnit.getDistance(enemyInfo.getLastPosition());
 						if (saveUnitLevel == 0 && distanceToTarget <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE + 5) {
 							bestTargetInfo = enemyInfo;

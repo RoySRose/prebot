@@ -7,7 +7,7 @@ import prebot.build.provider.DefaultBuildableItem;
 import prebot.build.provider.ResearchSelector;
 import prebot.build.provider.UpgradeSelector;
 import prebot.common.MetaType;
-import prebot.common.main.Prebot;
+import prebot.common.main.MyBotModule;
 
 //Wraith Mana
 public class BuilderApolloReactor extends DefaultBuildableItem {
@@ -25,8 +25,8 @@ public class BuilderApolloReactor extends DefaultBuildableItem {
   		return false;
   	}
   	
-  	ApolloReactor = (Prebot.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1 ? true : false)
-				|| (Prebot.Broodwar.self().isUpgrading(UpgradeType.Apollo_Reactor) ? true : false);
+  	ApolloReactor = (MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Apollo_Reactor) == 1 ? true : false)
+				|| (MyBotModule.Broodwar.self().isUpgrading(UpgradeType.Apollo_Reactor) ? true : false);
   	
   	if(!ApolloReactor) {
   		return false;
@@ -38,7 +38,7 @@ public class BuilderApolloReactor extends DefaultBuildableItem {
 //				|| (Prebot.Broodwar.self().isUpgrading(UpgradeType.Charon_Boosters) ? true : false);
   	
 		boolean WraithCloacking = false;
-		WraithCloacking = (Prebot.Broodwar.self().hasResearched(TechType.Cloaking_Field)) || (Prebot.Broodwar.self().isResearching(TechType.Cloaking_Field));
+		WraithCloacking = (MyBotModule.Broodwar.self().hasResearched(TechType.Cloaking_Field)) || (MyBotModule.Broodwar.self().isResearching(TechType.Cloaking_Field));
 		
   	if(WraithCloacking) {
 		return true;
