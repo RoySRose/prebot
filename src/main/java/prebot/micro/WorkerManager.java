@@ -423,7 +423,8 @@ public class WorkerManager extends GameManager {
 								&& unit.getHitPoints() < unit.getType().maxHitPoints() * 0.9) {
 							setRepairWorker(repairWorker, unit);
 						}
-					} else {
+					} else if(unit.getType() != UnitType.Terran_Supply_Depot 
+							&& unit.getType() != UnitType.Terran_Armory){
 						setRepairWorker(repairWorker, unit);
 					}
 				}
