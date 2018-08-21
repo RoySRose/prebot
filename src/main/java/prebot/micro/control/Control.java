@@ -40,8 +40,8 @@ public abstract class Control {
 	public abstract void control(Collection<Unit> unitList, Collection<UnitInfo> euiList);
 	
 	protected boolean skipControl(Unit unit) {
-		//return !TimeUtils.executeUnitRotation(unit, LagObserver.groupsize());
-        return UnitBalancer.skipControl(unit);
+		return !TimeUtils.executeUnitRotation(unit, LagObserver.groupsize());
+//        return UnitBalancer.skipControl(unit);
 	}
 	
 	public boolean findRat(Collection<Unit> unitList) {

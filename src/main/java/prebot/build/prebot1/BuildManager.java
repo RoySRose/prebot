@@ -658,12 +658,12 @@ public class BuildManager extends GameManager {
 //        20180819. hkk. 1분에 한번씩 초기화
 
 //        if(Prebot.Broodwar.getFrameCount() % (24*60) == 1) {
-//	        mainBaseLocationFull = false;
-//	        secondStartLocationFull = false;
-//			firstChokePointFull = false;
-//			firstExpansionLocationFull = false;
-//			secondChokePointFull = false;
-//			fisrtSupplePointFull = false;
+	        mainBaseLocationFull = false;
+	        secondStartLocationFull = false;
+			firstChokePointFull = false;
+			firstExpansionLocationFull = false;
+			secondChokePointFull = false;
+			fisrtSupplePointFull = false;
 //        }
 
 

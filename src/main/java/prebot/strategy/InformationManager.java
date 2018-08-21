@@ -1356,58 +1356,59 @@ public class InformationManager extends GameManager {
                 }
             }
             secondStartPosition = resultBase;
-        }else {
-        	
-//        	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: re calculate");
-        	
-        	int closestDistance = 99999999;
-            BaseLocation resultBase = null;
-
-            for (BaseLocation baseLocation : BWTA.getStartLocations()) {
-            	
-//            	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: check postion is  :: " + baseLocation.getTilePosition());
-            	
-            	enemyRegion = false;
-            	
-                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition()))
-                    continue;
-                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
-                    continue;
-                
-//            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
-            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
-            	for(Unit unit : enemyBuilding) {
-//            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: for enemyRegion :: " + unit.getType());
-            		if(unit.getType().isResourceDepot()) {
-//            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is ResourceDepot :: " + unit.getType());
-            			enemyRegion = true;
-            		}
-            			
-            	}
-            	
-            	if(enemyBuilding.size() > 3) {
-//            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
-            		enemyRegion = true;
-            	}
-
-            	if(enemyRegion) continue;
-
-                int enemyFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(enemyPlayer).getPosition(), baseLocation.getPosition());
-                int selfFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(selfPlayer).getPosition(), baseLocation.getPosition());
-
-                int closeFromMyExpansionButFarFromEnemy = selfFirstToBase - enemyFirstToBase;
-
-                if (closeFromMyExpansionButFarFromEnemy < closestDistance) {
-                    closestDistance = closeFromMyExpansionButFarFromEnemy;
-                    resultBase = baseLocation;
-//                    FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: set resultBase :: " + resultBase.getTilePosition());
-                }
-            }
-            if(!TilePositionUtils.equals(secondStartPosition.getTilePosition(), resultBase.getTilePosition())) {
-            	secondStartPosition = resultBase;
-            	BuildManager.Instance().secondStartLocationFull = false;
-            }
         }
+//	    else {
+//        	
+////        	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: re calculate");
+//        	
+//        	int closestDistance = 99999999;
+//            BaseLocation resultBase = null;
+//
+//            for (BaseLocation baseLocation : BWTA.getStartLocations()) {
+//            	
+////            	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: check postion is  :: " + baseLocation.getTilePosition());
+//            	
+//            	enemyRegion = false;
+//            	
+//                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(enemyPlayer).getTilePosition()))
+//                    continue;
+//                if (baseLocation.getTilePosition().equals(mainBaseLocations.get(selfPlayer).getTilePosition()))
+//                    continue;
+//                
+////            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
+//            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
+//            	for(Unit unit : enemyBuilding) {
+////            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: for enemyRegion :: " + unit.getType());
+//            		if(unit.getType().isResourceDepot()) {
+////            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is ResourceDepot :: " + unit.getType());
+//            			enemyRegion = true;
+//            		}
+//            			
+//            	}
+//            	
+//            	if(enemyBuilding.size() > 3) {
+////            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
+//            		enemyRegion = true;
+//            	}
+//
+//            	if(enemyRegion) continue;
+//
+//                int enemyFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(enemyPlayer).getPosition(), baseLocation.getPosition());
+//                int selfFirstToBase = PositionUtils.getGroundDistance(firstExpansionLocation.get(selfPlayer).getPosition(), baseLocation.getPosition());
+//
+//                int closeFromMyExpansionButFarFromEnemy = selfFirstToBase - enemyFirstToBase;
+//
+//                if (closeFromMyExpansionButFarFromEnemy < closestDistance) {
+//                    closestDistance = closeFromMyExpansionButFarFromEnemy;
+//                    resultBase = baseLocation;
+////                    FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: set resultBase :: " + resultBase.getTilePosition());
+//                }
+//            }
+//            if(!TilePositionUtils.equals(secondStartPosition.getTilePosition(), resultBase.getTilePosition())) {
+//            	secondStartPosition = resultBase;
+//            	BuildManager.Instance().secondStartLocationFull = false;
+//            }
+//        }
     }
 
 	public void updateOtherExpansionLocation(BaseLocation baseLocation) {

@@ -338,12 +338,13 @@ public class ConstructionManager extends GameManager {
 			int width = b.getType().tileWidth();
 			int height = b.getType().tileHeight();
 			
-			if (b.getType() == UnitType.Terran_Command_Center ||
+			if (
 					b.getType() == UnitType.Terran_Factory ||
 					b.getType() == UnitType.Terran_Starport)
 //					b.getType() == UnitType.Terran_Science_Facility)
 				{
-					width += 2;
+					width += 3;
+					height += 1;
 			}
 			
 //				System.out.println("reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
