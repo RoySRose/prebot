@@ -254,7 +254,7 @@ public class MicroDecisionMaker {
 			int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnit.getType().airWeapon()) + 30;
 			
 			if (enemyUnit.getType() == UnitType.Terran_Goliath) {
-				weaponMaxRange += 100;
+				weaponMaxRange += 300;
 			}
 			if (enemyUnitDistance < weaponMaxRange) {
 				return true;
@@ -302,7 +302,7 @@ public class MicroDecisionMaker {
 
 	private boolean protectedByBuilding(UnitInfo eui, List<UnitInfo> euiListAirDefenseBuilding) {
 		for (UnitInfo euiBuilding : euiListAirDefenseBuilding) {
-			int buildingWeaponRange = euiBuilding.getType().airWeapon().maxRange();// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+			int buildingWeaponRange = euiBuilding.getType().airWeapon().maxRange() + 25;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
 			double distanceWithBuilding = eui.getLastPosition().getDistance(euiBuilding.getLastPosition());
 			if (distanceWithBuilding < buildingWeaponRange) {
 				return true;

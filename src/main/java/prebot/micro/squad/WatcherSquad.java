@@ -2,6 +2,7 @@ package prebot.micro.squad;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import bwapi.Color;
 import bwapi.Position;
@@ -23,7 +24,6 @@ import prebot.micro.targeting.TargetFilter;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.StrategyCode;
-import prebot.strategy.manage.AttackExpansionManager;
 import prebot.strategy.manage.PositionFinder;
 
 public class WatcherSquad extends Squad {
@@ -101,9 +101,8 @@ public class WatcherSquad extends Squad {
 			saveUnitLevel = 0;
 		} else if (smallFightPredict == StrategyCode.SmallFightPredict.OVERWHELM) {
 			saveUnitLevel = 0;
-		} else if (AttackExpansionManager.Instance().pushSiegeLine) {
-			saveUnitLevel = 0;
 		}
+		
 		if (smallFightPredict != StrategyCode.SmallFightPredict.BACK) {
 			regroupLeader = null;
 		}
@@ -129,6 +128,13 @@ public class WatcherSquad extends Squad {
 		Position goalPosition = StrategyIdea.watcherPosition;
 		Unit closestUnit = UnitUtils.getClosestUnitToPosition(unitList, goalPosition);
 		if (closestUnit != null) {
+			if (StrategyIdea.initiated) {
+				Set<UnitInfo> mainSquadEnemies = getMainSquadEnemies();
+				if (mainSquadEnemies != null) {
+					euiList.addAll(mainSquadEnemies);
+				}
+			}
+			
 			addEnemyUnitInfosInRadius(euiList, closestUnit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
 			
 			for (Unit unit : unitList) {
@@ -136,6 +142,10 @@ public class WatcherSquad extends Squad {
 					continue;
 				}
 				addEnemyUnitInfosInRadius(euiList, unit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
+			}
+			
+			if (closestUnit.getDistance(goalPosition) < 500) {
+				UnitUtils.addEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT, euiList, goalPosition, UnitType.Terran_Vulture.sightRange(), true, false);
 			}
 		}
 	}

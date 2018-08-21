@@ -11,7 +11,6 @@ import bwapi.UnitType;
 import prebot.common.LagObserver;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
-import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.micro.control.airforce.AirForceControl;
 import prebot.micro.targeting.TargetFilter;
@@ -92,16 +91,6 @@ public class AirForceSquad extends Squad {
 			}
 		}
 		return euis;
-	}
-	
-	private Set<UnitInfo> getMainSquadEnemies() {
-		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
-		if (mainSquad.squadExecuted()) {
-			return mainSquad.euiList;
-		} else {
-			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
-			return null;
-		}
 	}
 
 	@Override

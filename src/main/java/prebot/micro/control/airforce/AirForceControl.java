@@ -215,7 +215,6 @@ public class AirForceControl extends Control {
 							int catchTime = (int) (distanceToAttack / UnitType.Terran_Wraith.topSpeed());
 							if (catchTime > 0) { 
 								airDrivingPosition = decision.eui.getLastPosition();
-								
 							} else {
 								Position airFleePosition = airFeePosition(airForceTeam, decision.eui);
 								airDrivingPosition = airDrivingPosition(airForceTeam, airFleePosition, airForceTeam.driveAngle);
@@ -297,6 +296,9 @@ public class AirForceControl extends Control {
 	}
 
 	private boolean wraithKitingType(UnitInfo eui) {
+		if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Goliath, UnitType.Zerg_Hydralisk)) {
+			return true;
+		}
 		return eui.getType().airWeapon() != WeaponType.None && eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange();
 	}
 	

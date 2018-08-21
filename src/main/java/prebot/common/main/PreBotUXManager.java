@@ -3,6 +3,7 @@ package prebot.common.main;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +58,6 @@ import prebot.micro.WorkerManager;
 import prebot.micro.squad.Squad;
 import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
-import prebot.strategy.MapSpecificInformation;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
 import prebot.strategy.TravelSite;
@@ -65,6 +65,7 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode;
 import prebot.strategy.manage.AirForceManager;
+import prebot.strategy.manage.AirForceTeam;
 import prebot.strategy.manage.ClueManager;
 import prebot.strategy.manage.EnemyBuildTimer;
 import prebot.strategy.manage.StrategyAnalyseManager;
@@ -1739,34 +1740,34 @@ public class PreBotUXManager {
 		}
 		
 		// air force team
-//		int y = 150;
-//		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
-//		List<AirForceTeam> airForceList = new ArrayList<>(airForceTeamSet);
-//		airForceList.sort(new Comparator<AirForceTeam>() {
-//			@Override
-//			public int compare(AirForceTeam a1, AirForceTeam a2) {
-//				int memberGap = a1.memberList.size() - a2.memberList.size();
-//				int idGap = a1.leaderUnit.getID() - a2.leaderUnit.getID();
-//				return memberGap * 100 + idGap;
-//			}
-//		});
-//		for (AirForceTeam airForceTeam : airForceList) {
-//			char color = UxColor.CHAR_WHITE;
-//			if (airForceTeam.repairCenter != null) {
-//				color = UxColor.CHAR_RED;
-//			}
-//			Position position = airForceTeam.leaderUnit.getPosition();
-//			Prebot.Broodwar.drawTextMap(position.getX(), position.getY() - 10, color + "leader#" + airForceTeam.leaderUnit.getID());
-//			
-//			Position targetPosition = new Position(airForceTeam.getTargetPosition().getX(), airForceTeam.getTargetPosition().getY() - 10);
-//			Prebot.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceTeam.leaderUnit.getID());
-//			Prebot.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceTeam.toString());
-//		}
-//		Prebot.Broodwar.drawTextScreen(20, y += 15, "Defense Mode? " + AirForceManager.Instance().isAirForceDefenseMode());
-//		Prebot.Broodwar.drawTextScreen(20, y += 15, "strike level=" + AirForceManager.Instance().getStrikeLevel());
-//		Prebot.Broodwar.drawTextScreen(20, y += 15, "total achievement=" + AirForceManager.Instance().getAchievementEffectiveFrame());
-//		Prebot.Broodwar.drawTextScreen(20, y += 15, "accumulated achievement=" + AirForceManager.Instance().getAccumulatedAchievement());
-//		Prebot.Broodwar.drawTextScreen(20, y += 15, "wraith count=" + StrategyIdea.wraithCount);
+		int y = 190;
+		Set<AirForceTeam> airForceTeamSet = new HashSet<>(AirForceManager.Instance().getAirForceTeamMap().values());
+		List<AirForceTeam> airForceList = new ArrayList<>(airForceTeamSet);
+		airForceList.sort(new Comparator<AirForceTeam>() {
+			@Override
+			public int compare(AirForceTeam a1, AirForceTeam a2) {
+				int memberGap = a1.memberList.size() - a2.memberList.size();
+				int idGap = a1.leaderUnit.getID() - a2.leaderUnit.getID();
+				return memberGap * 100 + idGap;
+			}
+		});
+		for (AirForceTeam airForceTeam : airForceList) {
+			char color = UxColor.CHAR_WHITE;
+			if (airForceTeam.repairCenter != null) {
+				color = UxColor.CHAR_RED;
+			}
+			Position position = airForceTeam.leaderUnit.getPosition();
+			MyBotModule.Broodwar.drawTextMap(position.getX(), position.getY() - 10, color + "leader#" + airForceTeam.leaderUnit.getID());
+			
+			Position targetPosition = new Position(airForceTeam.getTargetPosition().getX(), airForceTeam.getTargetPosition().getY() - 10);
+			MyBotModule.Broodwar.drawTextMap(targetPosition, UxColor.CHAR_RED + "*" + airForceTeam.leaderUnit.getID());
+			MyBotModule.Broodwar.drawTextScreen(20, y += 15, "" + UxColor.CHAR_YELLOW + airForceTeam.toString());
+		}
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "Defense Mode? " + AirForceManager.Instance().isAirForceDefenseMode());
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "strike level=" + AirForceManager.Instance().getStrikeLevel());
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "total achievement=" + AirForceManager.Instance().getAchievementEffectiveFrame());
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "accumulated achievement=" + AirForceManager.Instance().getAccumulatedAchievement());
+		MyBotModule.Broodwar.drawTextScreen(20, y += 15, "wraith count=" + StrategyIdea.wraithCount);
 	}
 
 	private void drawVulturePolicy() {
