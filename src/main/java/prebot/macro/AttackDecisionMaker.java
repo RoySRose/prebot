@@ -194,21 +194,13 @@ public class AttackDecisionMaker extends GameManager {
 	private Decision attackType(int myForcePoint, int enemyForcePoint) {
     	if (InfoUtils.enemyRace() == Race.Terran) {
     		boolean attackByFullSupply = attackByFullSupply();
-    		if (attackByFullSupply && myForcePoint > enemyForcePoint * 2.0) {
+    		if (attackByFullSupply && myForcePoint > enemyForcePoint * 1.5) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
     		
-    	} else if (InfoUtils.enemyRace() == Race.Protoss) {
-    		boolean attackByFullSupply = attackByFullSupply();
-    		if (attackByFullSupply || myForcePoint > enemyForcePoint * 2.0) {
-    			return Decision.NO_MERCY_ATTACK;
-    		} else if (myForcePoint > enemyForcePoint) {
-    			return Decision.FULL_ATTACK;
-    		}
-    		
-    	} else if (InfoUtils.enemyRace() == Race.Zerg) {
+    	} else if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Zerg) {
     		boolean attackByFullSupply = attackByFullSupply();
     		if (attackByFullSupply || myForcePoint > enemyForcePoint * 1.5) {
     			return Decision.NO_MERCY_ATTACK;
@@ -224,7 +216,7 @@ public class AttackDecisionMaker extends GameManager {
 			attackByFullSupply = false;
 		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
 			if (InfoUtils.myRace() == Race.Terran) {
-				if (PlayerUtils.enoughResource(2000, 1500)) {
+				if (PlayerUtils.enoughResource(2500, 2000)) {
 					attackByFullSupply = true;
 				}
 			} else {
@@ -236,20 +228,6 @@ public class AttackDecisionMaker extends GameManager {
 
 	private int attackPoint() {
     	int point = 1200;
-    	if (InfoUtils.enemyRace() == Race.Protoss) {
-//    		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
-//    			point = 3000;
-//    		} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
-//        		point = 5000;	
-//    		} else {
-//    			point = 7000;	
-//    		}
-    	} else if (InfoUtils.enemyRace() == Race.Terran) {
-    		point = 1200;
-    	} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    		point = 1200;
-    	}
-    	
     	if (decision == Decision.FULL_ATTACK || decision == Decision.NO_MERCY_ATTACK) {
     		if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
     			point = (int) (point * 0.3);
