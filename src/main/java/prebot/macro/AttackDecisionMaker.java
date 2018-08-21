@@ -88,23 +88,23 @@ public class AttackDecisionMaker extends GameManager {
         addNewResourceDepot(InformationManager.Instance().enemyRace);
         updateResources(InformationManager.Instance().enemyRace);
 
-        if(tempPhase = checkPhase3()) {
-            summaryResource();
+//        if(tempPhase = checkPhase3()) {
+        summaryResource();
 
-            if (InformationManager.Instance().enemyRace == Race.Terran) {
-                predictEnemyUnitTerran();
-            } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
-                predictEnemyUnitProtoss();
-            } else {
-                predictEnemyUnitZerg();
-            }
-
-            int myForcePoint = calculateMyForce();
-            int enemyForcePoint = calculateEnemyForce();
-            decision = makeDecision(myForcePoint, enemyForcePoint);
-        }else{
-            decision = Decision.DEFENCE;
+        if (InformationManager.Instance().enemyRace == Race.Terran) {
+            predictEnemyUnitTerran();
+        } else if (InformationManager.Instance().enemyRace == Race.Protoss) {
+            predictEnemyUnitProtoss();
+        } else {
+            predictEnemyUnitZerg();
         }
+
+        int myForcePoint = calculateMyForce();
+        int enemyForcePoint = calculateEnemyForce();
+        decision = makeDecision(myForcePoint, enemyForcePoint);
+//        }else{
+//            decision = Decision.DEFENCE;
+//        }
     }
 
     private boolean checkPhase3() {
@@ -163,19 +163,18 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-    	int attackPoint = attackPoint();
-    	
-    	if (myForcePoint > attackPoint) {
+    	Decision oldDecision = decision;
+    	if (myForcePoint > attackPoint()) {
     		Decision decision = attackType(myForcePoint, enemyForcePoint);
     		
     		if (decision == Decision.NO_MERCY_ATTACK) {
-    			if (decision != Decision.NO_MERCY_ATTACK) {
+    			if (oldDecision != Decision.NO_MERCY_ATTACK) {
 					MyBotModule.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.NO_MERCY_ATTACK;
     			
     		} else if (decision == Decision.FULL_ATTACK) {
-    			if (decision != Decision.FULL_ATTACK) {
+    			if (oldDecision != Decision.FULL_ATTACK) {
 					MyBotModule.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
     			}
     			return Decision.FULL_ATTACK;
@@ -185,7 +184,7 @@ public class AttackDecisionMaker extends GameManager {
     	if (quickAttack()) {
     		return Decision.FULL_ATTACK;
     	}
-		if (decision == Decision.FULL_ATTACK) {
+		if (oldDecision != Decision.DEFENCE) {
 			MyBotModule.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
 		}
         return Decision.DEFENCE;
@@ -193,24 +192,29 @@ public class AttackDecisionMaker extends GameManager {
 
 	private Decision attackType(int myForcePoint, int enemyForcePoint) {
     	if (InfoUtils.enemyRace() == Race.Terran) {
-    		boolean attackByFullSupply = attackByFullSupply();
-    		if (attackByFullSupply && myForcePoint > enemyForcePoint * 2.0) {
-    			return Decision.NO_MERCY_ATTACK;
-    		} else if (myForcePoint > enemyForcePoint) {
-    			return Decision.FULL_ATTACK;
+    		if(decision == Decision.NO_MERCY_ATTACK) {
+    			if (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0) {
+        			return Decision.FULL_ATTACK;
+        		}else {
+        			return Decision.NO_MERCY_ATTACK;
+        		}
+    		}else {
+	    		if ((myForcePoint > 8000 && myForcePoint > enemyForcePoint * 2.0) || attackByFullSupply()) {
+	    			return Decision.NO_MERCY_ATTACK;
+	    		} else if (myForcePoint > enemyForcePoint) {
+	    			return Decision.FULL_ATTACK;
+	    		}
     		}
     		
     	} else if (InfoUtils.enemyRace() == Race.Protoss) {
-    		boolean attackByFullSupply = attackByFullSupply();
-    		if (attackByFullSupply || myForcePoint > enemyForcePoint * 2.0) {
+    		if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 2.0) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
     		}
     		
     	} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    		boolean attackByFullSupply = attackByFullSupply();
-    		if (attackByFullSupply || myForcePoint > enemyForcePoint * 1.5) {
+    		if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 1.5) {
     			return Decision.NO_MERCY_ATTACK;
     		} else if (myForcePoint > enemyForcePoint) {
     			return Decision.FULL_ATTACK;
@@ -265,7 +269,7 @@ public class AttackDecisionMaker extends GameManager {
     		return true;
     	} else {
     		if (UnitUtils.invisibleEnemyDiscovered()) {
-        		if (UnitUtils.availableScanningCount() == 0 && UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
+        		if (UnitUtils.availableScanningCount() < 3 && UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) == 0) {
         			return false;
         		}
         	}
