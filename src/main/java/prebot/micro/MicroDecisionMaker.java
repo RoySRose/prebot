@@ -253,9 +253,9 @@ public class MicroDecisionMaker {
 			int enemyUnitDistance = myUnit.getDistance(enemyUnit);
 			int weaponMaxRange = MyBotModule.Broodwar.enemy().weaponMaxRange(enemyUnit.getType().airWeapon()) + 30;
 			
-			if (enemyUnit.getType() == UnitType.Terran_Goliath) {
-				weaponMaxRange += 100;
-			}
+//			if (enemyUnit.getType() == UnitType.Terran_Goliath) {
+//				weaponMaxRange += 200;
+//			}
 			if (enemyUnitDistance < weaponMaxRange) {
 				return true;
 			}

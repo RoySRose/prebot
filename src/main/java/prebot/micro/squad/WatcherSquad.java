@@ -99,9 +99,8 @@ public class WatcherSquad extends Squad {
 		int saveUnitLevel = 1;
 		if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY) {
 			saveUnitLevel = 0;
+			smallFightPredict = StrategyCode.SmallFightPredict.ATTACK;
 		} else if (smallFightPredict == StrategyCode.SmallFightPredict.OVERWHELM) {
-			saveUnitLevel = 0;
-		} else if (AttackExpansionManager.Instance().pushSiegeLine) {
 			saveUnitLevel = 0;
 		}
 		if (smallFightPredict != StrategyCode.SmallFightPredict.BACK) {
@@ -128,15 +127,17 @@ public class WatcherSquad extends Squad {
 		
 		Position goalPosition = StrategyIdea.watcherPosition;
 		Unit closestUnit = UnitUtils.getClosestUnitToPosition(unitList, goalPosition);
+		
 		if (closestUnit != null) {
 			addEnemyUnitInfosInRadius(euiList, closestUnit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
 			
 			for (Unit unit : unitList) {
-				if (unit.getID() == closestUnit.getID() || unit.getDistance(closestUnit) < 500) {
+				if (unit.getID() == closestUnit.getID() || unit.getDistance(closestUnit) < 500 ) {
 					continue;
 				}
-				addEnemyUnitInfosInRadius(euiList, unit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
+//				addEnemyUnitInfosInRadius(euiList, unit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());
 			}
+			
 		}
 	}
 	
