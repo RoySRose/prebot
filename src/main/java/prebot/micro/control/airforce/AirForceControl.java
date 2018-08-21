@@ -296,7 +296,7 @@ public class AirForceControl extends Control {
 	}
 
 	private boolean wraithKitingType(UnitInfo eui) {
-		if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Goliath, UnitType.Zerg_Hydralisk)) {
+		if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Goliath)) {
 			return true;
 		}
 		return eui.getType().airWeapon() != WeaponType.None && eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange();
