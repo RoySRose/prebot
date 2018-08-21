@@ -12,6 +12,7 @@ import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
+import prebot.micro.CombatManager;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.UnitInfo;
 
@@ -115,6 +116,16 @@ public abstract class Squad {
 			for (Unit unit : unitList) {
 				UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, unit.getPosition(), unit.getType().sightRange());
 			}
+		}
+	}
+	
+	protected Set<UnitInfo> getMainSquadEnemies() {
+		MainAttackSquad mainSquad = (MainAttackSquad) CombatManager.Instance().squadData.getSquad(MicroConfig.SquadInfo.MAIN_ATTACK.squadName);
+		if (mainSquad.squadExecuted()) {
+			return mainSquad.euiList;
+		} else {
+			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
+			return null;
 		}
 	}
 

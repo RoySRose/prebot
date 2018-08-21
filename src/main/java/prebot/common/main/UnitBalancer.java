@@ -4,6 +4,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
+import prebot.common.debug.BigWatch;
 import prebot.common.util.UnitUtils;
 
 import java.util.ArrayList;
@@ -43,8 +44,10 @@ public class UnitBalancer {
     }
 
     public void update(){
+    	BigWatch.start("balancer");
         groupSize = LagObserver.groupsize();
         resetMap();
+        BigWatch.record("balancer");
     }
 
     private void resetMap() {

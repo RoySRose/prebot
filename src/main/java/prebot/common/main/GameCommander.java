@@ -1,13 +1,10 @@
 package prebot.common.main;
 
-import java.util.List;
-
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import prebot.build.constant.BuildConfig;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;

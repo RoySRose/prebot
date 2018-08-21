@@ -52,6 +52,8 @@ public class AirForceManager {
 	
 	private static AirForceManager instance = new AirForceManager();
 	private int strikeLevelStartFrame = CommonCode.NONE;
+	
+	private boolean goliathDiscovered = false;
 
 	/// static singleton 객체를 리턴합니다
 	public static AirForceManager Instance() {
@@ -92,6 +94,7 @@ public class AirForceManager {
 	private Map<Integer, AirForceTeam> airForceTeamMap = new HashMap<>(); // key : wraith ID
 	private int achievementEffectiveFrame = 0; // 일정기간 안에서의 성취 (공격성 레벨 조절)
 	private int accumulatedAchievement = 0; // 누적된 총 성취 (레이쓰 숫자 조절. 조절되면 값 리셋)
+	
 	private boolean airForceDefenseMode = false;
 	private int waitingEndFrame = 0;
 	private int offensePositionResetFrame = 0;
@@ -160,7 +163,7 @@ public class AirForceManager {
 		int powerOfEnemies = WraithFightPredictor.powerOfEnemies(airEuiList);
 		
 		if (airForceDefenseMode) { // 방어에서 공격으로 바꿀땐 충분한 힘을 모으고 나가라
-			powerOfEnemies += 250;
+			powerOfEnemies += 200;
 		}
 		// System.out.println("airforce defense mode = " + powerOfAirForce + " / " + powerOfEnemies);
 		if (powerOfAirForce > powerOfEnemies) { // airBattlePredict
@@ -540,6 +543,13 @@ public class AirForceManager {
 	}
 
 	private void adjustWraithCount() {
+		if (!goliathDiscovered && UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Goliath)) {
+			goliathDiscovered = true;
+			if (StrategyIdea.wraithCount > 4) {
+				StrategyIdea.wraithCount = 4;
+			}
+		}
+		
 		// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
 		boolean suppress = false;
 		if (InfoUtils.enemyRace() == Race.Terran && !StrategyIdea.mainSquadMode.isAttackMode) {
