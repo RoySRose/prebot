@@ -23,6 +23,7 @@ import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public abstract class BuildingFlyControl extends Control{
 
@@ -168,6 +169,11 @@ public abstract class BuildingFlyControl extends Control{
         }else{
             halfway = new Position((SC.getX()*5+2048)/6, (SC.getY()*5+2048)/6);
         }
+        
+        if(StrategyIdea.campType == CampType.FIRST_CHOKE || StrategyIdea.campType == CampType.INSIDE) {
+        	halfway = SC.getPoint();
+        }
+        		
     
         if (InfoUtils.enemyBase() == null) {
         	return orderPos;
