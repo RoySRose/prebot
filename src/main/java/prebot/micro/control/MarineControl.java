@@ -215,27 +215,13 @@ public class MarineControl extends Control {
 	}
 
 	public Unit getCompleteBunker(Region campRegion) {
-		Unit bunkerInRegion = null;
-		for (Unit bunker : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Bunker)) {
-				bunkerInRegion = bunker;
-				break;
-		}
-		return bunkerInRegion;
+		Collection<Unit> bunkers = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Bunker);
+		return UnitUtils.getClosestUnitToPosition(bunkers, InfoUtils.mySecondChoke().getCenter());
 	}
 
-	private Unit getIncompleteBunker(Region campRegion) { 
-		Unit bunkerInRegion = null;
-		for (Unit bunker : UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker)) {
-			/*if (bunker.getRemainingBuildTime() > 3 * TimeUtils.SECOND) {
-				continue;
-			}*/
-			/*Region bunkerRegion = BWTA.getRegion(bunker.getPosition());
-			if (bunkerRegion == campRegion) {*/
-				bunkerInRegion = bunker;
-				//break;
-			//}
-		}
-		return bunkerInRegion;
+	private Unit getIncompleteBunker(Region campRegion) {
+		Collection<Unit> bunkers = UnitUtils.getUnitList(CommonCode.UnitFindRange.INCOMPLETE, UnitType.Terran_Bunker);
+		return UnitUtils.getClosestUnitToPosition(bunkers, InfoUtils.mySecondChoke().getCenter());
 	}
 
 	private void intoTheBunker(Unit bunker, Unit marine) {

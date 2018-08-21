@@ -7,7 +7,6 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.manage.EnemyBuildTimer;
 
@@ -21,6 +20,10 @@ public class ZergStrategist extends Strategist {
 	
 	@Override
 	protected EnemyStrategy strategyPhase01() {
+		if (hasAnyType(Clue.ClueType.HYDRADEN, Clue.ClueType.FAST_HYDRA) || hasInfo(Clue.ClueInfo.THREE_MANY_HYDRA)) {
+			return EnemyStrategy.ZERG_HYDRA_ALL_IN;
+		}
+		
 		if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT)) {
 			return EnemyStrategy.ZERG_3HAT;
 		}

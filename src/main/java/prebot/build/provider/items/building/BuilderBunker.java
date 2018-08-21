@@ -14,6 +14,8 @@ import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class BuilderBunker extends DefaultBuildableItem {
 	
@@ -25,17 +27,26 @@ public class BuilderBunker extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-		// TODO
-    	// inital에 들어가야 하고 들어가야 한다.
-    	// 입구가 막히지 않았을 때 건설. 케이스별 생각해볼게 있음
-    	
 		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Barracks) == 0) {
     		return false;
     	}
 		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Vulture) >= 3) {
     		return false;
     	}
-		if (UnitUtils.hasUnitOrWillBe(UnitType.Terran_Bunker)) {
+		
+		int bunkerWillBeCount = UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Bunker);
+		if (InfoUtils.enemyRace() == Race.Zerg) {
+			if (bunkerWillBeCount <= 1
+					&& StrategyIdea.buildTimeMap.featureEnabled(Feature.ZERG_FAST_ALL_IN)
+					&& (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE)
+					&& !UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
+				setBlocking(true);
+				setHighPriority(true);
+				setTilePosition(BlockingEntrance.Instance().bunker2);
+				return true;
+			}
+			
+		} else if (bunkerWillBeCount >= 1) {
 			return false;
 		}
 

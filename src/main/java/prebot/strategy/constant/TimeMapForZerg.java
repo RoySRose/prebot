@@ -1,7 +1,6 @@
 package prebot.strategy.constant;
 
 import bwapi.UnitType;
-import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 
 public class TimeMapForZerg {
 	
@@ -79,6 +78,14 @@ public class TimeMapForZerg {
 		.put(UnitType.Zerg_Lair, 3, 50);
 	}
 	
+	public static EnemyStrategyOptions.BuildTimeMap HYDRA_ALL_IN() {
+		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.ZERG_FAST_ALL_IN)
+		.put(UnitType.Zerg_Spawning_Pool, 1, 15)
+		.put(UnitType.Zerg_Extractor, 1, 20)
+		.put(UnitType.Zerg_Overlord, 1, 30)
+		.put(UnitType.Zerg_Lair, 2, 40);
+	}
+	
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_FAST_MUTAL() {
 		return new EnemyStrategyOptions.BuildTimeMap();
 	}
@@ -89,7 +96,8 @@ public class TimeMapForZerg {
 		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR);
 	}
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_NO_LAIR_HYDRA() {
-		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR, EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT);
+		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR
+				, EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT, EnemyStrategyOptions.BuildTimeMap.Feature.ZERG_FAST_ALL_IN);
 	}
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_LAIR_MIXED() {
 		return new EnemyStrategyOptions.BuildTimeMap();
