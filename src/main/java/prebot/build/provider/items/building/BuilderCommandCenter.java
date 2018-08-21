@@ -3,10 +3,11 @@ package prebot.build.provider.items.building;
 import java.util.List;
 
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.build.prebot1.BuildManager;
-import prebot.build.prebot1.BuildOrderItem;
 import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.DefaultBuildableItem;
@@ -15,6 +16,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
+import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.WorkerManager;
@@ -22,6 +24,7 @@ import prebot.micro.constant.MicroConfig;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.constant.EnemyStrategyOptions;
 import prebot.strategy.manage.PositionFinder;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 public class BuilderCommandCenter extends DefaultBuildableItem {
 
@@ -213,20 +216,32 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 	
 
 	private void setCommandCenterBlockAndSeedPosition() {
-		BuildOrderItem.SeedPositionStrategy seedPosition = null;
+		SeedPositionStrategy seedPosition = SeedPositionStrategy.NoLocation;
+		TilePosition seedTilePosition = TilePosition.None;
 
 		int allCommandCenterCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
     	if (allCommandCenterCount <= 1) {
-    		if (StrategyIdea.campType == PositionFinder.CampType.INSIDE || StrategyIdea.campType == PositionFinder.CampType.FIRST_CHOKE) {
-    			seedPosition = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;
+    		if (StrategyIdea.campType == CampType.INSIDE || StrategyIdea.campType == CampType.FIRST_CHOKE) {
+//    			seedPosition = SeedPositionStrategy.MainBaseLocation;
+    			if(BlockingEntrance.Instance().entrance_turret1 != TilePosition.None) {
+    				seedTilePosition = BlockingEntrance.Instance().entrance_turret1;
+    			}else {
+    				seedPosition = SeedPositionStrategy.MainBaseLocation;
+    			}
     		} else {
-    			seedPosition = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;
+    			seedPosition = SeedPositionStrategy.FirstExpansionLocation;
     		}
     	} else if (allCommandCenterCount >= 2) {
-    		seedPosition = BuildOrderItem.SeedPositionStrategy.NextExpansionPoint;
+    		seedPosition = SeedPositionStrategy.NextExpansionPoint;
     	}
-    	
-    	setSeedPositionStrategy(seedPosition);
+    	if(TilePositionUtils.isValidTilePosition(seedTilePosition)){
+//    		System.out.println("set command center to 1 turret position");
+//    		FileUtils.appendTextToFile("log.txt", "\n set command center to 1 turret position :: " + seedTilePosition);
+    		setTilePosition(seedTilePosition);
+    	}else {
+//    		FileUtils.appendTextToFile("log.txt", "\n set command center to :: " + seedPosition);
+    		setSeedPositionStrategy(seedPosition);
+    	}
     	setBlocking(true);
 	}
 }

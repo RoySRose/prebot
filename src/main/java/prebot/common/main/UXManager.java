@@ -830,18 +830,75 @@ public class UXManager {
 	}
 	
 	/// Construction 을 하지 못하는 Tile 들을 Map 에 표시합니다
-	public void drawTilesToAvoidOnMap() {
-		Set<TilePosition> tilesToAvoid = ConstructionPlaceFinder.Instance().getTilesToAvoid();
-		for (TilePosition t : tilesToAvoid)
-		{
-			int x1 = t.getX() * 32 + 8;
-			int y1 = t.getY() * 32 + 8;
-			int x2 = (t.getX() + 1) * 32 - 8;
-			int y2 = (t.getY() + 1) * 32 - 8;
-
-			MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+		public void drawTilesToAvoidOnMap() {
+//			Set<TilePosition> tilesToAvoid = ConstructionPlaceFinder.Instance().getTilesToAvoid();
+//			for (TilePosition t : tilesToAvoid)
+//			{
+//				int x1 = t.getX() * 32 + 8;
+//				int y1 = t.getY() * 32 + 8;
+//				int x2 = (t.getX() + 1) * 32 - 8;
+//				int y2 = (t.getY() + 1) * 32 - 8;
+	//
+//				MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+//			}
+			int y=0;
+			int x=0;
+			
+			
+			for(y = 0; y < 128 ; y++) {
+				for(x = 0; x < 128 ; x++) {
+					if(ConstructionPlaceFinder.Instance().getTilesToAvoid(x, y)) {
+						int x1 = x * 32 + 8;
+						int y1 = y * 32 + 8;
+						int x2 = (x + 1) * 32 - 8;
+						int y2 = (y + 1) * 32 - 8;
+		
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+					}
+//					
+				}
+			}
+			
+			
+			for(y = 0; y < 128 ; y++) {
+				for(x = 0; x < 128 ; x++) {
+					if(ConstructionPlaceFinder.Instance().getTilesToAvoid(x, y)) {
+						int x1 = x * 32 + 8;
+						int y1 = y * 32 + 8;
+						int x2 = (x + 1) * 32 - 8;
+						int y2 = (y + 1) * 32 - 8;
+		
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+					}
+					if(ConstructionPlaceFinder.Instance().getTilesToAvoidAbsolute(x, y)) {
+						int x1 = x * 32 + 8;
+						int y1 = y * 32 + 8;
+						int x2 = (x + 1) * 32 - 8;
+						int y2 = (y + 1) * 32 - 8;
+		
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Purple, false);
+					}
+					if(ConstructionPlaceFinder.Instance().getTilesToAvoidSupply(x, y)) {
+						int x1 = x * 32 + 8;
+						int y1 = y * 32 + 8;
+						int x2 = (x + 1) * 32 - 8;
+						int y2 = (y + 1) * 32 - 8;
+		
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
+					}
+					
+					if(ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding(x, y)) {
+						int x1 = x * 32 + 8;
+						int y1 = y * 32 + 8;
+						int x2 = (x + 1) * 32 - 8;
+						int y2 = (y + 1) * 32 - 8;
+		
+						MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Black, false);
+					}
+//					
+				}
+			}
 		}
-	}
 
 	/// ConstructionQueue 를 Screen 에 표시합니다
 	public void drawConstructionQueueOnScreenAndMap(int x, int y) {
