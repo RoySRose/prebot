@@ -46,24 +46,24 @@ public class CommandCenterControl extends BuildingFlyControl {
         	
         	setInt = 0;
 
-
             buildingFlyMap.put(unit, new FlyCondition());
 
-            if(unit.equals(InformationManager.Instance().getFirstCC())){
-                continue;
-            }
-            if(unit.equals(getSecondCommandCenter())) {
-            	setInt = 1;
-                processFly(unit);
-            }
-            if(unit.equals(getWrongPositionCommand())) {
-            	setInt = 2;
-                processFly(unit);
-            }
-            
-            
-            
-            
+			Unit firstCC = InformationManager.Instance().getFirstCC();
+			if (firstCC != null && unit.getID() == firstCC.getID()) {
+				continue;
+			}
+
+			Unit secondCommandCenter = getSecondCommandCenter();
+			if (secondCommandCenter != null && unit.getID() == secondCommandCenter.getID()) {
+				setInt = 1;
+				processFly(unit);
+			}
+
+			Unit wrongPositionCommand = getWrongPositionCommand();
+			if (wrongPositionCommand != null && unit.getID() == wrongPositionCommand.getID()) {
+				setInt = 2;
+				processFly(unit);
+			}
         }
 	}
 

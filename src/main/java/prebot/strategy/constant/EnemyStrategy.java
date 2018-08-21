@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import prebot.common.MetaType;
-import prebot.strategy.constant.EnemyStrategyOptions.AddOnOption;
-import prebot.strategy.constant.EnemyStrategyOptions.ExpansionOption;
 
 public enum EnemyStrategy {
 
@@ -142,6 +140,10 @@ public enum EnemyStrategy {
 	
 	ZERG_TWIN_HAT(ZERG_2HAT_GAS),
 	
+	ZERG_HYDRA_ALL_IN(1, 2, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM)
+			, EnemyStrategyOptions.MarineCount.EIGHT_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
+	
 	ZERG_3HAT(2, 1, 1, EnemyStrategyOptions.FactoryRatio.Weight.VULTURE, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VS) // camp=S_CHOKE, 벙커(공격)
 			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.VULTURE_FIRST, EnemyStrategyOptions.ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_3HAT()),
@@ -174,7 +176,7 @@ public enum EnemyStrategy {
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.VULTURE)),
 	
 	ZERG_NO_LAIR_HYDRA(1, 2, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM) // camp=F_CHOKE
-			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
+			, EnemyStrategyOptions.MarineCount.EIGHT_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION, EnemyStrategyOptions.Mission.MissionType.TANK)),
 	

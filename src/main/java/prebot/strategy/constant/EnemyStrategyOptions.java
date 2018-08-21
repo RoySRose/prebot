@@ -14,7 +14,6 @@ import bwapi.UnitType;
 import bwapi.UpgradeType;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.RegionType;
 import prebot.common.util.PositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -185,7 +184,7 @@ public class EnemyStrategyOptions {
 	public static class BuildTimeMap {
 		public enum Feature {
 			DOUBLE, QUICK_ATTACK, DEFENSE_FRONT, DEFENSE_DROP, DETECT_IMPORTANT,
-			TWOGATE, MECHANIC, BIONIC, NO_LAIR
+			TWOGATE, MECHANIC, BIONIC, NO_LAIR, ZERG_FAST_ALL_IN
 		}
 		
 		private Set<Feature> features = new HashSet<>();
