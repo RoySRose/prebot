@@ -38,8 +38,10 @@ public class UnitBalancer {
     }
 
     public static boolean skipControl(Unit unit) {
-    	if(mapper.get(unit.getID()) == null)
-    			System.out.println("unit.getID " + unit.getID() +", " +unit.getType() +", " + unit.isCompleted());
+    	if(mapper.get(unit.getID()) == null) {
+    		System.out.println("성욱한테 말하기 오류는 안날꺼 unit.getID " + unit.getID() +", " +unit.getType() +", " + unit.isCompleted());
+    		return false;
+    	}
         return (MyBotModule.Broodwar.getFrameCount() % groupSize) !=  mapper.get(unit.getID());
     }
 
