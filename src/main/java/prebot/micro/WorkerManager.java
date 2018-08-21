@@ -9,6 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Region;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
@@ -16,12 +17,16 @@ import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
+import prebot.common.util.MicroUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.UnitInfo;
+import prebot.strategy.manage.PositionFinder;
+import prebot.strategy.manage.PositionFinder.CampType;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -399,11 +404,17 @@ public class WorkerManager extends GameManager {
 			//일정 거리 이상은 수리하러 안감 - (base - 센터 거리 기준)
 			repairWorkCnt = workerData.workerRepairMap.size();
 			repairWraithWorkCnt = workerData.workerWraithRepairMap.size();
+			
 			// 건물의 경우 아무리 멀어도 무조건 수리. 일꾼 한명이 순서대로 수리
 			// 나르는 건물 수리 안함.
 			if (unit.getType().isBuilding() && unit.getHitPoints() < unit.getType().maxHitPoints()
 					&& repairWorkCnt < repairmax) {
 				if (unit.isFlying()) {
+					continue;
+				}
+				
+				//건물은 본진과 앞마당만 수리
+				if(!isReapirBuilding(unit)){
 					continue;
 				}
 				Unit repairWorker = chooseRepairWorkerClosestTo(unit, 0);
@@ -450,8 +461,6 @@ public class WorkerManager extends GameManager {
 					setRepairWorker(repairWorker, unit);
 				}
 			}
-			
-			
 		}
 	}
 
@@ -1247,6 +1256,21 @@ public class WorkerManager extends GameManager {
 		Position myBase = InfoUtils.myBase().getPosition();
 		double maxReparitDistance = myBase.getDistance(TilePositionUtils.getCenterTilePosition().toPosition()); 
 		if(myBase.getDistance(unit) > maxReparitDistance){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	//public boolean isInsidePositionToBase(Position position) {
+	public boolean isReapirBuilding(Unit building) {
+		Region unitRegion = BWTA.getRegion(building.getPosition());
+		Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+		
+		Position expansionPosition = InfoUtils.myFirstExpansion().getPosition();
+		Region expansionRegion = BWTA.getRegion(expansionPosition);
+
+		if (unitRegion == baseRegion || unitRegion == expansionRegion) {
 			return true;
 		}else{
 			return false;
