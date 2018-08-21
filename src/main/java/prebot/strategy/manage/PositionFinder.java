@@ -71,6 +71,8 @@ public class PositionFinder {
 	private int scanAtReadyToOrderFrame = CommonCode.NONE;
 	private boolean scanAtReadyToDisabled = false;
 	
+	private Map<Integer, Integer> dropUnitDiscoveredMap = new HashMap<>();
+	
 	/// comsatControl에서 호출한다.
 	public boolean scanAtReadyToPosition() {
 		if (scanAtReadyToDisabled) {
@@ -439,9 +441,17 @@ public class PositionFinder {
 			}
 			
 			if (eui.getType() == UnitType.Terran_Dropship || eui.getType() == UnitType.Protoss_Shuttle) {
-				sumOfDropX += eui.getLastPosition().getX();
-				sumOfDropY += eui.getLastPosition().getY();
-				dropCount++;
+				if (dropUnitDiscoveredMap.get(eui.getUnitID()) == null) {
+					dropUnitDiscoveredMap.put(eui.getUnitID(), TimeUtils.elapsedFrames());
+				}
+				
+				Integer discoveredFrame = dropUnitDiscoveredMap.get(eui.getUnitID());
+				if (TimeUtils.elapsedFrames(discoveredFrame) < 15 * TimeUtils.SECOND) {
+					System.out.println("drop!!");
+					sumOfDropX += eui.getLastPosition().getX();
+					sumOfDropY += eui.getLastPosition().getY();
+					dropCount++;
+				}
 				
 			} else if (eui.getType().isFlyer()) {
 				sumOfAirX += eui.getLastPosition().getX();
@@ -863,12 +873,7 @@ public class PositionFinder {
 
 		// 적 유닛
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-			if (unit.getType() == UnitType.Zerg_Larva
-					|| unit.getType() == UnitType.Zerg_Overlord
-					|| unit.getType() == UnitType.Protoss_Observer
-					|| unit.getType() == UnitType.Protoss_Shuttle
-					|| unit.getType() == UnitType.Terran_Dropship
-					|| !unit.isVisible()) {
+			if (unit.getType() == UnitType.Zerg_Larva || unit.getType().isFlyer() || !unit.isVisible()) {
 				continue;
 			}
 			return unit.getPosition();

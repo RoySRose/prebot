@@ -43,7 +43,7 @@ public class WorkerManager extends GameManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
-		if (!TimeUtils.executeRotation(6, LagObserver.managerRotationSize())) {
+		if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER6, 0), LagObserver.managerRotationSize())) {
 			return;
 		}
 		

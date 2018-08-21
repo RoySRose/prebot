@@ -202,29 +202,27 @@ public class MapGrid extends GameManager {
 	/// 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록 등을 업데이트 합니다
 	public void update()
 	{
-		if (!TimeUtils.executeRotation(2, LagObserver.managerRotationSize())) {
-			return;
-		}
-		
-		// clear the grid
-		clearGrid();
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER2, 0), LagObserver.managerRotationSize())) {
+			// clear the grid
+			clearGrid();
 
-		//MyBotModule.Broodwar.printf("MapGrid info: WH(%d, %d)  CS(%d)  RC(%d, %d)  C(%d)", mapWidth, mapHeight, cellSize, rows, cols, cells.size());
+			//MyBotModule.Broodwar.printf("MapGrid info: WH(%d, %d)  CS(%d)  RC(%d, %d)  C(%d)", mapWidth, mapHeight, cellSize, rows, cols, cells.size());
 
-		// add our units to the appropriate cell
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			getCell(unit).ourUnits.add(unit);
-			getCell(unit).timeLastVisited = MyBotModule.Broodwar.getFrameCount();
-		}
-
-		// add enemy units to the appropriate cell
-		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
-		{
-			if (unit.getHitPoints() > 0)
+			// add our units to the appropriate cell
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 			{
-				getCell(unit).oppUnits.add(unit);
-				getCell(unit).timeLastOpponentSeen = MyBotModule.Broodwar.getFrameCount();
+				getCell(unit).ourUnits.add(unit);
+				getCell(unit).timeLastVisited = MyBotModule.Broodwar.getFrameCount();
+			}
+
+			// add enemy units to the appropriate cell
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
+			{
+				if (unit.getHitPoints() > 0)
+				{
+					getCell(unit).oppUnits.add(unit);
+					getCell(unit).timeLastOpponentSeen = MyBotModule.Broodwar.getFrameCount();
+				}
 			}
 		}
 	}

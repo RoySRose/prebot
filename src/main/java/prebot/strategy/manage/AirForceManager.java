@@ -542,6 +542,7 @@ public class AirForceManager {
 		}
 	}
 
+	// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
 	private void adjustWraithCount() {
 		if (!goliathDiscovered && UnitUtils.enemyCompleteUnitDiscovered(UnitType.Terran_Goliath)) {
 			goliathDiscovered = true;
@@ -550,10 +551,13 @@ public class AirForceManager {
 			}
 		}
 		
-		// 레이쓰 출산전략 : 유지숫자가 커지면 증가율을 낮추고, 감소율을 높힌다.
 		boolean suppress = false;
-		if (InfoUtils.enemyRace() == Race.Terran && !StrategyIdea.mainSquadMode.isAttackMode) {
-			suppress = true;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			if (StrategyIdea.mainSquadMode.isAttackMode || UnitUtils.enemyUnitDiscovered(UnitType.Terran_Battlecruiser, UnitType.Terran_Physics_Lab)) {
+				suppress = false;
+			} else {
+				suppress = true;
+			}
 		}
 		
 		int downAchievement;

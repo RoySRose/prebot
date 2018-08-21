@@ -9,6 +9,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.EnemyUnitFindRange;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.MicroUtils;
@@ -47,7 +48,9 @@ public class AirForceControl extends Control {
 		}
 		
 //		if (true) {
-		if (TimeUtils.before(StrategyIdea.findRatFinishFrame)) {
+		
+		int enemySize = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size();
+		if (TimeUtils.afterTime(10, 0) && enemySize <= 2) {
 			findRat(airunits);
 			return;
 		}

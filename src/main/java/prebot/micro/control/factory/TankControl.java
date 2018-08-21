@@ -203,7 +203,12 @@ public class TankControl extends Control {
 					int distToOrder = tank.getDistance(mainPosition);
 					if (distToOrder <= MicroConfig.Tank.SIEGE_MODE_MAX_RANGE) {
 						if (tank.canSiege() && TankPositionManager.Instance().isProperPositionToSiege(tank.getPosition(), true)) { // orderPosition의 둘러싼 대형을 만든다.
-							tank.siege();
+							if (StrategyIdea.mainSquadMode != MainSquadMode.NO_MERCY) {
+								tank.siege();
+							} else {
+								Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+								CommandUtils.attackMove(tank, randomPosition);
+							}
 						} else {
 							if (MicroUtils.timeToRandomMove(tank)) {
 								Position randomPosition = PositionUtils.randomPosition(tank.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
