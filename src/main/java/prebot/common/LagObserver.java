@@ -5,15 +5,30 @@ import prebot.common.main.MyBotModule;
 public class LagObserver {
 
 	private static int groupsize = 3; // 1 ... 24
+	
 	public static int groupsize() {
 		return groupsize;
 	}
 	
 	private static int managerLagLevel = 1;
+	
 	private static final int MANAGER_ROTATION_SIZE = 7;
+	
 	public static int managerRotationSize() { // 7, 14, 21, 28
 		return MANAGER_ROTATION_SIZE * managerLagLevel;
 	}
+	
+	public static int managerExecuteRotation(int manager, int index) {
+		return (MANAGER_ROTATION_SIZE * index + manager) % managerRotationSize();
+	}
+	
+	public static final int MANAGER0 = 0; //info
+	public static final int MANAGER1 = 1; //strategy
+	public static final int MANAGER2 = 2; //mapgrid
+	public static final int MANAGER3 = 3; //build provider
+	public static final int MANAGER4 = 4; //build
+	public static final int MANAGER5 = 5; //construction
+	public static final int MANAGER6 = 6; //worker
 
 	private static final boolean ADJUST_ON = true;
 	

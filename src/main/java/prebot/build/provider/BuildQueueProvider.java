@@ -48,10 +48,8 @@ import prebot.build.provider.items.upgrade.BuilderTerranVehicleWeapons;
 import prebot.common.LagObserver;
 import prebot.common.MetaType;
 import prebot.common.constant.CommonCode;
-import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
-import prebot.common.util.FileUtils;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -311,19 +309,19 @@ public class BuildQueueProvider extends GameManager {
     }
 
 	public void update() {
-		if (!TimeUtils.executeRotation(3, LagObserver.managerRotationSize())) {
-			return;
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER3, 0), LagObserver.managerRotationSize())) {
+			turnOffReseach();
+	    	researchSelector.select();
+	        upgradeSelector.select();
+	        factoryUnitSelector.select();
+	        for(BuildableItem buildableItem: buildableList) {
+	    		buildableItem.process();
+	    	}
 		}
 		
-    	turnOffReseach();
-    	researchSelector.select();
-        upgradeSelector.select();
-        factoryUnitSelector.select();
-        for(BuildableItem buildableItem: buildableList) {
-    		buildableItem.process();
-    	}
-
-       	executeCombatUnitTrainingBlocked();
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER3, 1), LagObserver.managerRotationSize())) {
+			executeCombatUnitTrainingBlocked();
+		}
     }
     
     public void executeCombatUnitTrainingBlocked() {

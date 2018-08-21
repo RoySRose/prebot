@@ -55,34 +55,25 @@ public class StrategyManager extends GameManager {
 
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
-		if (!TimeUtils.executeRotation(1, LagObserver.managerRotationSize())) {
-			return;
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER1, 0), LagObserver.managerRotationSize())) {
+			// 전략 파악
+			InitialAction.Instance().update();
+			StrategyAnalyseManager.Instance().update();
+			ActionManager.Instance().update();
+			DefenseTowerTimer.Instance().update();
+
+			SpiderMineManger.Instance().update();
+			VultureTravelManager.Instance().update();
+			TankPositionManager.Instance().update();	
 		}
 
-		// 전략 파악
-		BigWatch.start("part1");
-		InitialAction.Instance().update();
-		StrategyAnalyseManager.Instance().update();
-		ActionManager.Instance().update();
-		DefenseTowerTimer.Instance().update();
-		BigWatch.record("part1");
-
-		BigWatch.start("part2");
-		SpiderMineManger.Instance().update();
-		VultureTravelManager.Instance().update();
-		TankPositionManager.Instance().update();
-		BigWatch.record("part2");
-		
-		BigWatch.start("part2-2");
-		AirForceManager.Instance().update();
-		PositionFinder.Instance().update();
-		EnemyBaseFinder.Instance().update();
-		BigWatch.record("part2-2");
-		
-		BigWatch.start("part3");
-		expansionOkay();
-		changeMainSquadMode();
-		BigWatch.record("part3");
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER1, 1), LagObserver.managerRotationSize())) {
+			AirForceManager.Instance().update();
+			PositionFinder.Instance().update();
+			EnemyBaseFinder.Instance().update();
+			expansionOkay();
+			changeMainSquadMode();
+		}
 	}
 
 	/// 테스트용 임시 공격 타이밍

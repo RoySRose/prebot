@@ -14,7 +14,6 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
-import prebot.build.prebot1.BuildOrderItem.SeedPositionStrategy;
 import prebot.common.LagObserver;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
@@ -160,10 +159,6 @@ public class ConstructionManager extends GameManager {
 	
 	public void update()
 	{
-		if (!TimeUtils.executeRotation(5, LagObserver.managerRotationSize())) {
-			return;
-		}
-
 		// constructionQueue 에 들어있는 ConstructionTask 들은 
 		// Unassigned . Assigned (buildCommandGiven=false) . Assigned (buildCommandGiven=true) . UnderConstruction . (Finished) 로 상태 변화된다
 
@@ -189,28 +184,32 @@ public class ConstructionManager extends GameManager {
 	    }
 	    */
 
-	    BigWatch.start("construction1");
-	    validateWorkersAndBuildings();  
-	    BigWatch.record("construction1");
-	    BigWatch.start("construction1-2");
-	    //haltConstructionBuildings();
-	    assignWorkersToUnassignedBuildings();
-	    BigWatch.record("construction1-2");
-	    
-	    BigWatch.start("construction2");
-		checkForStartedConstruction();
-		constructAssignedBuildings();
-		BigWatch.record("construction2");
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER5, 0), LagObserver.managerRotationSize())) {
+		    BigWatch.start("construction1");
+		    validateWorkersAndBuildings();  
+		    BigWatch.record("construction1");
+		    BigWatch.start("construction1-2");
+		    //haltConstructionBuildings();
+		    assignWorkersToUnassignedBuildings();
+		    BigWatch.record("construction1-2");
+		    
+		    BigWatch.start("construction2");
+			checkForStartedConstruction();
+			constructAssignedBuildings();
+			BigWatch.record("construction2");
+		}
 
-	    BigWatch.start("construction3");
-		checkForDeadTerranBuilders();
-		checkForCompletedBuildings();
-		BigWatch.record("construction3");
-
-	    BigWatch.start("construction4");
-		checkForDeadlockConstruction();
-		checkConstructionBuildings();
-		BigWatch.record("construction4");
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER5, 1), LagObserver.managerRotationSize())) {
+		    BigWatch.start("construction3");
+			checkForDeadTerranBuilders();
+			checkForCompletedBuildings();
+			BigWatch.record("construction3");
+	
+		    BigWatch.start("construction4");
+			checkForDeadlockConstruction();
+			checkConstructionBuildings();
+			BigWatch.record("construction4");
+		}
 	}
 
 	public void haltConstructionBuildings()
