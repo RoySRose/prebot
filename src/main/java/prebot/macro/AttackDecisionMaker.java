@@ -171,7 +171,7 @@ public class AttackDecisionMaker extends GameManager {
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			
     		if(decision == Decision.NO_MERCY_ATTACK) {
-    			if (MyBotModule.Broodwar.self().supplyUsed() < 150 && (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0)) {
+    			if (MyBotModule.Broodwar.self().supplyUsed() < 300) {
         			return Decision.FULL_ATTACK;
         		}else {
         			return Decision.NO_MERCY_ATTACK;
