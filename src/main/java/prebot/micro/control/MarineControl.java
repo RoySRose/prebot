@@ -302,7 +302,7 @@ public class MarineControl extends Control {
 		
 		
 		
-		// 세번째 지역까지 OK
+	/*	// 세번째 지역까지 OK
 		if (unitRegion == InfoUtils.myThirdRegion()) {
 			return true;
 		}
@@ -312,7 +312,7 @@ public class MarineControl extends Control {
 		// 세번째 지역 반경 OK
 		if (marine.getDistance(InfoUtils.myThirdRegion()) < 500) {
 			return true;
-		}
+		}*/
 
 		return false;
 	}
