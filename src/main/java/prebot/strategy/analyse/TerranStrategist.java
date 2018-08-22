@@ -157,6 +157,10 @@ public class TerranStrategist extends Strategist {
 		int vultureCount = InfoUtils.enemyNumUnits(UnitType.Terran_Vulture);
 		int goliathCount = InfoUtils.enemyNumUnits(UnitType.Terran_Goliath);
 		int tankCount = InfoUtils.enemyNumUnits(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+
+		if (StrategyIdea.wraithCount == 0 && MyBotModule.Broodwar.self().supplyUsed() > 380) {
+			StrategyIdea.wraithCount = 5;
+		}
 		
 		int airUnitPoint = UnitUtils.enemyAirUnitPower();
 		if (airUnitPoint ==  0) {
@@ -165,8 +169,8 @@ public class TerranStrategist extends Strategist {
 				isBionic = true;
 			}
 			if (!isBionic) {
-				// 내 레이쓰 수가 0개 유지 상태, 적 골리앗이 1기 이하, 내 탱크가 10개 이상인 경우 역레이쓰 
-				if (StrategyIdea.wraithCount == 0 && (goliathCount <= 2 || MyBotModule.Broodwar.self().supplyUsed() > 380)) {
+				// 내 레이쓰 수가 0개 유지 상태, 적 골리앗이 1기 이하, 내 탱크가 10개 이상인 경우 역레이쓰
+				if (StrategyIdea.wraithCount == 0 && goliathCount <= 2) {
 					int myTankCount = InfoUtils.myNumUnits(UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Siege_Tank_Tank_Mode);
 					if (myTankCount >= 10) {
 //						AirForceManager.Instance().setAirForceWaiting();

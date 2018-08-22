@@ -32,7 +32,7 @@ public class LagObserver {
 
 	private static final boolean ADJUST_ON = true;
 	
-	private static final long MILLISEC_MAX_COAST = 50;
+	public static final long MILLISEC_MAX_COAST = 48;
 //	private static final long MILLISEC_MIN_COAST = 30;
 	
 	

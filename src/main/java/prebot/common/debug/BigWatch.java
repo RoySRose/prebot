@@ -8,6 +8,7 @@ import java.util.Map;
 import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.provider.BuildQueueProvider;
+import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.main.GameManager;
 import prebot.common.util.TimeUtils;
@@ -63,8 +64,8 @@ public class BigWatch {
 			}
 		}
 		
-		Long time = resultTimeMap.get("... GAME COMMANDER ...");
-		if (time >= 55) {
+		Long timeSpent = resultTimeMap.get("... GAME COMMANDER ...");
+		if (timeSpent >= LagObserver.MILLISEC_MAX_COAST) {
 			List<GameManager> gameManagers = Arrays.asList(
 					InformationManager.Instance(),
 					StrategyManager.Instance(),
@@ -80,7 +81,7 @@ public class BigWatch {
 			for (GameManager gameManager : gameManagers) {
 				String simpleName = gameManager.getClass().getSimpleName();
 				long recorded = gameManager.getRecorded();
-				if (recorded > 30) {
+				if (recorded > 20) {
 					Integer integer = totalDebugMap.get(simpleName);
 					if (integer != null) {
 						integer++;
