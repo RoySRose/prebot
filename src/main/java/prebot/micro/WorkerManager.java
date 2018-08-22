@@ -1146,7 +1146,7 @@ public class WorkerManager extends GameManager {
 		
 		
 		for(Minerals minr : minerals){
-			 if("D".equals(minr.facing)){ //scv arrives at top of mineral
+			 if("D".equals(minr.facing)){ //top of mineral
 				for(Minerals minrTemp : minerals){
 					if(minr.unitId != minrTemp.unitId && minrTemp.mineralUnit.getDistance( minr.mineralUnit ) <= 1*20
 						&& minrTemp.mineralTrick == null
@@ -1155,7 +1155,7 @@ public class WorkerManager extends GameManager {
 							minrTemp.mineralTrick = minr.mineralUnit;
 					}
 				}
-			} else if("L".equals(minr.facing)){ //scv arrives at left  of mineral
+			} else if("L".equals(minr.facing)){ //left  of mineral
 				for(Minerals minrTemp : minerals){
 					if(minr.unitId != minrTemp.unitId && minrTemp.mineralUnit.getDistance( minr.mineralUnit ) <= 1*20
 						&& minrTemp.mineralTrick == null
@@ -1164,7 +1164,7 @@ public class WorkerManager extends GameManager {
 						minrTemp.mineralTrick = minr.mineralUnit;
 					}
 				}
-			} else if("R".equals(minr.facing)){ //scv arrives at right  of mineral
+			} else if("R".equals(minr.facing)){ //right  of mineral
 				for(Minerals minrTemp : minerals){
 					if(minr.unitId != minrTemp.unitId && minrTemp.mineralUnit.getDistance(minr.mineralUnit ) <= 1*20
 						&& minrTemp.mineralTrick == null
@@ -1173,7 +1173,7 @@ public class WorkerManager extends GameManager {
 						minrTemp.mineralTrick = minr.mineralUnit;
 					}
 				}
-			} else if("U".equals(minr.facing)){ //scv arrives at top of mineral
+			} else if("U".equals(minr.facing)){ //top of mineral
 				for(Minerals minrTemp : minerals){
 					if(minr.unitId != minrTemp.unitId && minrTemp.mineralUnit.getDistance(minr.mineralUnit ) <= 1*20
 						&& minrTemp.mineralTrick == null
