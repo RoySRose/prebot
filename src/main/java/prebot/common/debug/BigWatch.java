@@ -82,6 +82,9 @@ public class BigWatch {
 				long recorded = gameManager.getRecorded();
 				if (recorded > 30) {
 					Integer integer = totalDebugMap.get(simpleName);
+					if (integer != null) {
+						integer++;
+					}
 					totalDebugMap.put(simpleName, integer);
 				}
 				System.out.println(simpleName + "=" + recorded);
