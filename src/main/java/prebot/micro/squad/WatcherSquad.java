@@ -11,6 +11,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
+import prebot.common.LagObserver;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -139,6 +140,9 @@ public class WatcherSquad extends Squad {
 			
 			for (Unit unit : unitList) {
 				if (unit.getID() == closestUnit.getID() || unit.getDistance(closestUnit) < 500) {
+					continue;
+				}
+				if (!TimeUtils.executeUnitRotation(unit, LagObserver.groupsize())) {
 					continue;
 				}
 				addEnemyUnitInfosInRadius(euiList, unit.getPosition(), goalPosition, UnitType.Terran_Vulture.sightRange());

@@ -17,16 +17,12 @@ import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
 import prebot.common.util.InfoUtils;
-import prebot.common.util.MicroUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.micro.constant.MicroConfig;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.UnitInfo;
-import prebot.strategy.manage.PositionFinder;
-import prebot.strategy.manage.PositionFinder.CampType;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager extends GameManager {
@@ -48,25 +44,24 @@ public class WorkerManager extends GameManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
-		if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER6, 0), LagObserver.managerRotationSize())) {
-			return;
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER6, 0), LagObserver.managerRotationSize())) {
+			defaltMineralInfo();
+			updateWorkerStatus();
 		}
 		
-		// if there is a valid ResourceDepot (Command Center, Nexus, Hatchery)
-		scvIsOut = false;
-		// 1초에 1번만 실행한다
-		// if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
-		defaltMineralInfo();
-		updateWorkerStatus();
-		handleGasWorkers();
-		handleIdleWorkers();
-		handleMineralWorkers();
-		// cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
-		handleMoveWorkers();
-		handleRepairWorkers();
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER6, 1), LagObserver.managerRotationSize())) {
+			handleGasWorkers();
+			handleIdleWorkers();
+			handleMineralWorkers();
+			// cc재배치는 cc를 기준으로 반복문 돈다. (max는 3으로 생각하다.)
+			handleMoveWorkers();
+			handleRepairWorkers();
+		}
 	}
 
 	public void updateWorkerStatus() {
+		scvIsOut = false;
+		
 		// Drone 은 건설을 위해 isConstructing = true 상태로 건설장소까지 이동한 후,
 		// 잠깐 getBuildType() == none 가 되었다가, isConstructing = true, isMorphing =
 		// true 가 된 후, 건설을 시작한다

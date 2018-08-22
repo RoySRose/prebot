@@ -4,6 +4,7 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.MyBotModule;
+import prebot.common.main.UnitBalancer;
 
 public class TimeUtils {
 	
@@ -120,8 +121,9 @@ public class TimeUtils {
 
 	/// unit이 실행할 rotation이면 true
 	public static boolean executeUnitRotation(Unit unit, int rotationSize) {
-		int unitGroup = unit.getID() % rotationSize;
-		return executeRotation(unitGroup, rotationSize);
+		return UnitBalancer.skipControl(unit);
+//		int unitGroup = unit.getID() % rotationSize;
+//		return executeRotation(unitGroup, rotationSize);
 	}
 	
 }

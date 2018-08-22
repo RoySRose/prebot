@@ -1,14 +1,11 @@
 package prebot.macro.util;
 
-import bwapi.DamageType;
-import bwapi.Race;
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwapi.WeaponType;
-import prebot.strategy.InformationManager;
-
 import java.util.Arrays;
 import java.util.List;
+
+import bwapi.Race;
+import bwapi.UnitType;
+import prebot.strategy.InformationManager;
 
 public class UnitTypeList {
 
