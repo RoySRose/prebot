@@ -50,7 +50,7 @@ public class AirForceControl extends Control {
 //		if (true) {
 		
 		int enemySize = UnitUtils.getEnemyUnitInfoList(EnemyUnitFindRange.ALL).size();
-		if (TimeUtils.afterTime(10, 0) && enemySize <= 2) {
+		if (TimeUtils.afterTime(10, 0) && enemySize <= 3) {
 			findRat(airunits);
 			return;
 		}
@@ -300,7 +300,7 @@ public class AirForceControl extends Control {
 
 	private boolean wraithKitingType(UnitInfo eui) {
 		if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Goliath)) {
-			return eui.getType() != UnitType.Terran_Wraith;
+			return eui.getType() != UnitType.Terran_Wraith && eui.getType() != UnitType.Terran_Dropship;
 		}
 		return eui.getType().airWeapon() != WeaponType.None && eui.getType().airWeapon().maxRange() < UnitType.Terran_Wraith.groundWeapon().maxRange();
 	}

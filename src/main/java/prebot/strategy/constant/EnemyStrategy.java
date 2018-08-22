@@ -144,6 +144,8 @@ public enum EnemyStrategy {
 			, EnemyStrategyOptions.MarineCount.EIGHT_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()),
 	
+	ZERG_LURKER_ALL_IN(ZERG_HYDRA_ALL_IN),
+	
 	ZERG_3HAT(2, 1, 1, EnemyStrategyOptions.FactoryRatio.Weight.VULTURE, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VS) // camp=S_CHOKE, 벙커(공격)
 			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.VULTURE_FIRST, EnemyStrategyOptions.ExpansionOption.TWO_STARPORT
 			, TimeMapForZerg.ZERG_3HAT()),
@@ -162,6 +164,11 @@ public enum EnemyStrategy {
 	
 	ZERG_FAST_LURKER(3, 1, 0, EnemyStrategyOptions.FactoryRatio.Weight.VULTURE, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS) // camp=F_CHOKE
 			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
+			, TimeMapForZerg.ZERG_FAST_LURKER()
+			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION, EnemyStrategyOptions.Mission.MissionType.COMSAT_OK, EnemyStrategyOptions.Mission.MissionType.TURRET_OK, EnemyStrategyOptions.Mission.MissionType.TANK)),
+	
+	ZERG_FAST_1HAT_LURKER(3, 1, 0, EnemyStrategyOptions.FactoryRatio.Weight.VULTURE, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS)
+			, EnemyStrategyOptions.MarineCount.EIGHT_MARINE, EnemyStrategyOptions.AddOnOption.VULTURE_FIRST, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForZerg.ZERG_FAST_LURKER()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION, EnemyStrategyOptions.Mission.MissionType.COMSAT_OK, EnemyStrategyOptions.Mission.MissionType.TURRET_OK, EnemyStrategyOptions.Mission.MissionType.TANK)),
 	

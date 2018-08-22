@@ -490,8 +490,8 @@ public class BlockingEntrance {
     			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.BARRACK)   		   , new TilePosition(113	,111));
     			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.SECOND_SUPPLY)   , new TilePosition(123	,113));
     			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.FACTORY)   		   , new TilePosition(110	,116));
-    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.BUNKER1)   		   , new TilePosition(115	,114));
-    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.BUNKER2)   		   , new TilePosition(117, 110));
+    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.BUNKER1)   		   , new TilePosition(115, 114));
+    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.BUNKER2)   		   , new TilePosition(117, 100));
 //    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.ENTRANCE_TURRET1), TilePosition.None);
 //    			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.ENTRANCE_TURRET2), TilePosition.None);
 

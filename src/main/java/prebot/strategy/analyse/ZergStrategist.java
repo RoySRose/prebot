@@ -7,7 +7,9 @@ import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.analyse.Clue.ClueInfo;
 import prebot.strategy.constant.EnemyStrategy;
+import prebot.strategy.constant.EnemyStrategyOptions.BuildTimeMap.Feature;
 import prebot.strategy.manage.EnemyBuildTimer;
 
 public class ZergStrategist extends Strategist {
@@ -21,7 +23,15 @@ public class ZergStrategist extends Strategist {
 	@Override
 	protected EnemyStrategy strategyPhase01() {
 		if (hasAnyType(Clue.ClueType.HYDRADEN, Clue.ClueType.FAST_HYDRA) || hasInfo(Clue.ClueInfo.THREE_MANY_HYDRA)) {
-			return EnemyStrategy.ZERG_HYDRA_ALL_IN;
+			if (hasAnyInfo(ClueInfo.LAIR_1HAT_FAST, ClueInfo.LAIR_COMPLETE)) {
+				return EnemyStrategy.ZERG_LURKER_ALL_IN;
+			} else if (hasInfo(ClueInfo.DOUBLE_HATCH_LATE) && hasAnyInfo(ClueInfo.LAIR_COMPLETE, ClueInfo.LAIR_INCOMPLETE)) {
+				return EnemyStrategy.ZERG_LURKER_ALL_IN;
+			}
+			
+			if (hasAnyInfo(ClueInfo.DOUBLE_HATCH_LATE)) {
+				return EnemyStrategy.ZERG_HYDRA_ALL_IN;
+			}
 		}
 		
 		if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT)) {
@@ -90,11 +100,22 @@ public class ZergStrategist extends Strategist {
 			if (spireTech && hydraTech) {
 				return EnemyStrategy.ZERG_LAIR_MIXED;
 			} else if (lurkerFound) {
-				return EnemyStrategy.ZERG_FAST_LURKER;
+				if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.ZERG_FAST_ALL_IN)
+						|| hasAnyInfo(ClueInfo.DOUBLE_HATCH_LATE)) {
+					return EnemyStrategy.ZERG_FAST_1HAT_LURKER;
+				} else {
+					return EnemyStrategy.ZERG_FAST_LURKER;
+				}
+				
 			} else if (hydraFiveMany) {
 				return EnemyStrategy.ZERG_HYDRA_WAVE;
 			} else if (hydraTech) {
-				return EnemyStrategy.ZERG_FAST_LURKER;
+				if (StrategyIdea.startStrategy.buildTimeMap.featureEnabled(Feature.ZERG_FAST_ALL_IN)
+						|| hasAnyInfo(ClueInfo.DOUBLE_HATCH_LATE)) {
+					return EnemyStrategy.ZERG_FAST_1HAT_LURKER;
+				} else {
+					return EnemyStrategy.ZERG_FAST_LURKER;
+				}
 			} else if (spireTech) {
 				return fastMutaliskByTime();
 			} else {

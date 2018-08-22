@@ -7,6 +7,7 @@ import prebot.common.MetaType;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.StrategyIdea;
+import prebot.strategy.constant.EnemyStrategy;
 
 public class BuilderAcademy extends DefaultBuildableItem {
 
@@ -28,6 +29,10 @@ public class BuilderAcademy extends DefaultBuildableItem {
 		}
 
 		if (TimeUtils.afterTime(9, 0)) {
+			return true;
+		}
+		
+		if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_1HAT_LURKER) {
 			return true;
 		}
 

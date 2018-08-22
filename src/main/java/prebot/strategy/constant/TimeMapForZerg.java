@@ -92,6 +92,9 @@ public class TimeMapForZerg {
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_FAST_LURKER() {
 		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.DETECT_IMPORTANT);
 	}
+	public static EnemyStrategyOptions.BuildTimeMap ZERG_FAST_1HAT_LURKER() {
+		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.DETECT_IMPORTANT, EnemyStrategyOptions.BuildTimeMap.Feature.ZERG_FAST_ALL_IN);
+	}
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_NO_LAIR_LING() {
 		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR);
 	}
