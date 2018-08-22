@@ -22,7 +22,7 @@ public class AdaptNewStrategy extends BaseBuild {
 		} else if (strategy == EnemyStrategyOptions.ExpansionOption.TWO_FACTORY) {
 			int factoryCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.ALL_AND_CONSTRUCTION_QUEUE, UnitType.Terran_Factory);
 			if (factoryCount <= 1) {
-				queueBuild(true, UnitType.Terran_Factory, factoryPos);
+				queueBuild(true, UnitType.Terran_Factory);
 			}
 			
 		} else if (strategy == EnemyStrategyOptions.ExpansionOption.ONE_STARPORT) {

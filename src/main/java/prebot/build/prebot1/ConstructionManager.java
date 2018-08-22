@@ -326,20 +326,20 @@ public class ConstructionManager extends GameManager {
 			int width = b.getType().tileWidth();
 			int height = b.getType().tileHeight();
 			
-			if (
-					b.getType() == UnitType.Terran_Factory ||
-					b.getType() == UnitType.Terran_Starport)
-//					b.getType() == UnitType.Terran_Science_Facility)
-				{
-					width += 3;
-					height += 1;
-			}
+//			if (
+//					b.getType() == UnitType.Terran_Factory ||
+//					b.getType() == UnitType.Terran_Starport)
+////					b.getType() == UnitType.Terran_Science_Facility)
+//				{
+//					width += 2;
+////					height += 1;
+//			}
 			
 //				System.out.println("reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
 //				FileUtils.appendTextToFile("log.txt", "\n reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
 			
 			// reserve this building's space
-			ConstructionPlaceFinder.Instance().reserveTiles(relocationTilePosition, width, height);
+			ConstructionPlaceFinder.Instance().reserveTiles(relocationTilePosition, width, height, b.getType());
 			b.setLastConstructionWorkerID(b.getConstructionWorker().getID());
 	    }
 	}
