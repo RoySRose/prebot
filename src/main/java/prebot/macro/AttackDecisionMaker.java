@@ -193,7 +193,7 @@ public class AttackDecisionMaker extends GameManager {
 	private Decision attackType(int myForcePoint, int enemyForcePoint) {
     	if (InfoUtils.enemyRace() == Race.Terran) {
     		if(decision == Decision.NO_MERCY_ATTACK) {
-    			if (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0) {
+    			if (!attackByFullSupply() && (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0)) {
         			return Decision.FULL_ATTACK;
         		}else {
         			return Decision.NO_MERCY_ATTACK;
@@ -224,7 +224,7 @@ public class AttackDecisionMaker extends GameManager {
 	}
     
     private boolean attackByFullSupply() {
-		if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
+		if (MyBotModule.Broodwar.self().supplyUsed() < 300) {
 			attackByFullSupply = false;
 		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
 			if (InfoUtils.myRace() == Race.Terran) {
