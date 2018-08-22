@@ -63,6 +63,7 @@ public class CommandCenterControl extends BuildingFlyControl {
 
 			Unit wrongPositionCommand = getWrongPositionCommand();
 			if (wrongPositionCommand != null && unit.getID() == wrongPositionCommand.getID()) {
+//				System.out.println(" this command is wrong position :: " + wrongPositionCommand.getTilePosition() + " :: has turret");
 				setInt = 2;
 				processFly(unit);
 			}
@@ -89,22 +90,28 @@ public class CommandCenterControl extends BuildingFlyControl {
 	            }
         	}else if(setInt == 2) {
         		
+        		
         		TilePosition correctLocation = TilePosition.None;
         		for (BaseLocation targetBaseLocation : BWTA.getBaseLocations()) {
-        			if(checkCC.getDistance(targetBaseLocation.getPosition())<100) {
+        			if(checkCC.getDistance(targetBaseLocation.getPosition())<200) {
         				correctLocation = targetBaseLocation.getTilePosition();
+//        				System.out.println(" this is correctLocation");
         				break;
         			}
         		}
         		
         		if (TilePositionUtils.isValidTilePosition(correctLocation)) {
+//        			System.out.println(" command center go to correctLocation :: " + correctLocation.getX() + " :: " + correctLocation.getY());
 	        		int tot_ontile_unit = 0;
 	        		
 	        		for(int x = 0; x < 4 ; x++) {
 	        			for(int y = 0; y < 3 ; y++) {
 	        				List<Unit> unitOnBaseTile = MyBotModule.Broodwar.getUnitsOnTile(correctLocation.getX()+x, correctLocation.getY()+y);
 	        				for(Unit unit : unitOnBaseTile) {
-	        					if(unit.getType() != UnitType.Terran_Command_Center) {
+//	        					System.out.println(unit.getType() + " :: " + unit.getTilePosition() + " is at " + (correctLocation.getX()+x) + " / " + (correctLocation.getY()+y));
+	        					if(unit.getType() != UnitType.Terran_Command_Center 
+	        							&& unit.getType() != UnitType.Terran_Missile_Turret
+	        							&& unit.getType() != UnitType.Terran_SCV) {
 	        						tot_ontile_unit ++;
 	        					}
 	        				}
@@ -112,6 +119,7 @@ public class CommandCenterControl extends BuildingFlyControl {
 	        		}
 	            	
 	            	if(tot_ontile_unit == 0) {
+//	            		System.out.println(" command center gogogogogogogo!!!!!!!!!!!!!!!!!!!!!!");
 	            		if (checkCC.isLifted() == false) {
 	                        buildingFlyMap.get(checkCC).setBuildingFly(BuildingFly.UP);
 	    	            } else {
@@ -159,10 +167,14 @@ public class CommandCenterControl extends BuildingFlyControl {
 				continue;
         	}
         	
+//        	System.out.println(" this command is wrong position :: " + commandCenter.getTilePosition());
         	List<Unit> nearTurret = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, commandCenter.getPosition(), 250, UnitType.Terran_Missile_Turret);
 			if (nearTurret.size() > 0) {
+//				System.out.println(" this command is wrong position :: " + commandCenter.getTilePosition() + " :: has turret");
 				return commandCenter;
 			}
+			
+			
 //        	List<Unit> unitOnBaseTile = MyBotModule.Broodwar.getUnitsOnTile(commandCenter.getTilePosition());
 //        	if(unitOnBaseTile.size() != 0) {
 //        		continue;

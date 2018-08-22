@@ -86,7 +86,7 @@ public class ConstructionPlaceFinder {
 	{
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (TilePositionUtils.isValidTilePosition(seedPosition)) {
-			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before PlaceFinder seedPosition true ==>> " + buildingType + " :: " + seedPosition);
+//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before PlaceFinder seedPosition true ==>> " + buildingType + " :: " + seedPosition);
 			TilePosition desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
 			return desiredPosition;
 		}
@@ -315,10 +315,12 @@ public class ConstructionPlaceFinder {
 
 		// ResourceDepot (Nexus, Command Center, Hatchery), Protoss_Pylon, Terran_Supply_Depot, 
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 buildingGapSpace을 다른 Config 값으로 설정하도록 한다
-		if (buildingType.isResourceDepot()) {
-			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
-			
-		} else if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
+		buildingGapSpace = 0 ;
+//		if (buildingType.isResourceDepot()) {
+//			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
+//			
+//		} else
+		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 			buildingGapSpace = BuildConfig.BUILDING_SUPPLY_DEPOT_SPACING;
 			if (spaceZero) {
 				buildingGapSpace = 0;
@@ -497,7 +499,7 @@ public class ConstructionPlaceFinder {
 					if (isPossiblePlace) {
                         if (b.getType() == UnitType.Terran_Factory && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 2) {
 						
-                        	System.out.println("finding place for fac: " + BlockingEntrance.Instance().loc);
+//                        	System.out.println("finding place for fac: " + BlockingEntrance.Instance().loc);
                             int currentXPlus = currentX;
                             int adjust =0;
 
@@ -505,23 +507,27 @@ public class ConstructionPlaceFinder {
                                 if (BlockingEntrance.Instance().loc == Location.Eleven || BlockingEntrance.Instance().loc == Location.Seven ) {
                                     currentXPlus--;
                                     adjust = 1;
-                                    System.out.println("finding place for fac minus");
+//                                    System.out.println("finding place for fac minus");
                                 } else {
                                     currentXPlus++;
                                     adjust = -1;
-                                    System.out.println("finding place for fac plus");
+//                                    System.out.println("finding place for fac plus");
                                 }
+//                                System.out.println(" final location of factory :: " + currentXPlus + " / " + currentY);
                                 if (currentXPlus < 0 || currentXPlus + 3 > MyBotModule.Broodwar.mapWidth()) {
                                     break;
                                 }
+                                
                                 boolean isPossiblePlaceAjust = canBuildHereWithSpace(new TilePosition(currentXPlus, currentY), b, buildingGapSpace);
                                 if (!isPossiblePlaceAjust) {
-                                	System.out.println("finding place for fac stop move");
+//                                	System.out.println("finding place for fac stop move");
                                     break;
                                 }
+//                                System.out.println(" real     final location of factory :: " + currentXPlus + " / " + currentY);
                             }
 
                             resultPosition = new TilePosition(currentXPlus+adjust, currentY);
+//                            System.out.println(" resultPosition of factory :: " + resultPosition);
                             break;
                         }else {
                             resultPosition = new TilePosition(currentX, currentY);
@@ -800,9 +806,9 @@ public class ConstructionPlaceFinder {
 
 
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
-			for (int x = startx; x < endx; x++)
+			for (int x = startx; x >= 0 && x < endx; x++)
 			{
-				for (int y = starty; y < endy; y++)
+				for (int y = starty; y >= 0 && y < endy; y++)
 				{
 					
 //					if(canAddonBuilding == true && 
@@ -840,13 +846,13 @@ public class ConstructionPlaceFinder {
 					}else {
 					// if we can't build here, or space is reserved, we can't build here
 						if (isBuildableTile(b, x, y) == false) {
-	//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
 
 //					if (isReservedTile(x, y)) {
-////						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 //						return false;
 //					}
 					
@@ -926,7 +932,7 @@ public class ConstructionPlaceFinder {
 		}
 
 		// if this rectangle doesn't fit on the map we can't build here
-		if (startx < 0 || starty < 0 || endx > MyBotModule.Broodwar.mapWidth() || endx < position.getX() + width || endy > MyBotModule.Broodwar.mapHeight()) {
+		if (b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport &&(startx < 0 || starty < 0 || endx > MyBotModule.Broodwar.mapWidth() || endx < position.getX() + width || endy > MyBotModule.Broodwar.mapHeight())) {
 //			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return false :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		} else {
@@ -1146,8 +1152,13 @@ public class ConstructionPlaceFinder {
 		{
 			if ((b.getConstructionWorker() != null) && (unit != b.getConstructionWorker()))
 			{
+				if (unit.getType().isBuilding() && unit.isLifted()) {
+					continue;
+				}
 				return false;
 			}
+			
+			
 		}
 
 		return true;
@@ -1168,8 +1179,9 @@ public class ConstructionPlaceFinder {
 			// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
 			for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(x, y))
 			{
-				if (unit.getType().isBuilding())
+				if (unit.getType().isBuilding() && !unit.isLifted())
 				{
+//					System.out.println(" there is something for const :: " + b.getType() + " :: "+unit.getType()+"(" + x + " , " + y +")");
 					return false;
 				}
 			}
@@ -1180,7 +1192,7 @@ public class ConstructionPlaceFinder {
 	/// 건물 건설 예정 타일로 예약해서, 다른 건물을 중복해서 짓지 않도록 합니다
 	public void reserveTiles(TilePosition position, int width, int height, UnitType unit)
 	{
-		System.out.println(" Set reserveMap start:: " + unit + " :: " + position + " :: width :: " + width + " :: height :: " + height);
+//		System.out.println(" Set reserveMap start:: " + unit + " :: " + position + " :: width :: " + width + " :: height :: " + height);
 		/*int rwidth = reserveMap.size();
 		int rheight = reserveMap.get(0).size();
 		for (int x = position.getX(); x < position.getX() + width && x < rwidth; x++)
@@ -1200,8 +1212,8 @@ public class ConstructionPlaceFinder {
 				unit == UnitType.Terran_Starport)
 //				b.getType() == UnitType.Terran_Science_Facility)
 			{
-				x = x>1?x-1:0;
-				y = y>1?y-1:0;
+				x = x>0?x-1:0;
+				y = y>0?y-1:0;
 				widthx = widthx+3;
 				heighty = heighty + 1;
 //				height += 1;
@@ -1216,13 +1228,13 @@ public class ConstructionPlaceFinder {
 //		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + (position.getX() + widthx) + " :: to Y :: " + (position.getY() + heighty));
 		int rwidth = reserveMap.length;
 		int rheight = reserveMap[0].length;
-		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + tox + " :: to Y :: " + toy
-				+ " :: rwidth :: " + rwidth + " :: rheight :: " + rheight);
+//		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + tox + " :: to Y :: " + toy
+//				+ " :: rwidth :: " + rwidth + " :: rheight :: " + rheight);
 		for (int startx = x ; startx < tox && startx < rwidth; startx++)
 		{
 			for (int starty = y ; starty < toy && starty < rheight; starty++)
 			{
-				System.out.println(" Set reserveMap :: " + unit + " :: (" + startx +" , "+ starty + ")");
+//				System.out.println(" Set reserveMap :: " + unit + " :: (" + startx +" , "+ starty + ")");
 				//reserveMap.get(x).set(y, true);
 				reserveMap[startx][starty] = true;
 				// C++ : reserveMap[x][y] = true;
@@ -1257,8 +1269,8 @@ public class ConstructionPlaceFinder {
 				unit == UnitType.Terran_Starport)
 //				b.getType() == UnitType.Terran_Science_Facility)
 			{
-				x = x>1?x-1:0;
-				y = y>1?y-1:0;
+				x = x>0?x-1:0;
+				y = y>0?y-1:0;
 				widthx = widthx+3;
 				heighty = heighty + 1;
 //				height += 1;
@@ -1533,9 +1545,9 @@ public class ConstructionPlaceFinder {
 					int fromx = mineral.getTilePosition().getX()-2;
 					int fromy = mineral.getTilePosition().getY()-2;
 					
-					for (int x = fromx; x > 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
+					for (int x = fromx; x >= 0 && x < fromx + 6 && x < MyBotModule.Broodwar.mapWidth(); x++)
 				        {
-				            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
+				            for (int y = fromy ; y >= 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
 				            {
 //							TilePosition temp = new TilePosition(x,y);
 //							tilesToAvoid.add(temp);
@@ -1556,9 +1568,9 @@ public class ConstructionPlaceFinder {
 		int fromx = firstgas.getTilePosition().getX()-1;
 		int fromy = firstgas.getTilePosition().getY()-1;
 		
-		for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
 	        {
-	            for (int y = fromy ; y > 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
+	            for (int y = fromy ; y >= 0 && y < fromy + 6 && y < MyBotModule.Broodwar.mapHeight(); y++)
 	            {
 	            	if(fromx < x && x < fromx+5 && fromy < y && y < fromy+3){
 						continue;
@@ -1627,11 +1639,11 @@ public class ConstructionPlaceFinder {
 		int fromy = unit.getTilePosition().getY() - 1;
 		
 
-		for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy; y > 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
+			for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
             {
 				if(x==fromx + 5 || x==fromx + 6 || x==fromx + 7){
 					if(y == fromy) {
@@ -1689,9 +1701,9 @@ public class ConstructionPlaceFinder {
 		}
 		
 		if(allFree) {
-			for (int x = fromx; x > 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++){
+			for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++){
 				
-				for (int y = fromy; y > 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++){
+				for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++){
 				
 			
 					if(x==fromx + 5 || x==fromx + 6 || x==fromx + 7){
@@ -1751,11 +1763,11 @@ public class ConstructionPlaceFinder {
 			fromy =0;
 		}*/
 		
-		for (int x = fromx; x > 0 && x < fromx + 5 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x >= 0 && x < fromx + 5 && x < MyBotModule.Broodwar.mapWidth(); x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy ; y > 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
+			for (int y = fromy ; y >= 0 && y < fromy + 4 && y < MyBotModule.Broodwar.mapHeight(); y++)
             {
 
 //				TilePosition temp = new TilePosition(x,y);

@@ -29,6 +29,7 @@ import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
+import prebot.common.util.FileUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
 import prebot.common.util.PositionUtils;
@@ -906,33 +907,40 @@ public class InformationManager extends GameManager {
 //			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center));
 //			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center);
 //			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) +" + "+ Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center));
-			if (numberOfCC == 2) {
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, true);
-//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
-			} else if (numberOfCC == 3) {
-				resultBase = secondStartPosition;
-				if (!InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).contains(resultBase)
-					&& InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer).contains(resultBase))
-					{
-						resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, true);
-					}else {
-						for(Unit unit : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
-							if(TilePositionUtils.equals(resultBase.getTilePosition(), unit.getTilePosition())) {
-								resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
-								break;
-							}
-						}
-						
-					}
-				
-//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
-			} else{
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
-			}
-
-			if (resultBase == null) {
+//			if (numberOfCC == 2) {
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+////				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
+//			}
+			
+			if (numberOfCC >= 2) {
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			}
+//			else if (numberOfCC == 3) {
+//				resultBase = secondStartPosition;
+//				if (!InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).contains(resultBase)
+//					&& InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer).contains(resultBase))
+//					{
+//						resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, true);
+//					}else {
+//						for(Unit unit : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
+//							if(TilePositionUtils.equals(resultBase.getTilePosition(), unit.getTilePosition())) {
+//								resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
+//								break;
+//							}
+//						}
+//						
+//					}
+//				
+////				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
+//			} 
+//			else{
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
+//			}
+
+//			if (resultBase == null) {
+//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+//			}
 			
 //			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation numberOfCC :: " + numberOfCC + " :: " + resultBase.getTilePosition());
 		}
@@ -1073,20 +1081,20 @@ public class InformationManager extends GameManager {
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
 //				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + (int)closeFromMyExpansionButFarFromEnemy +" < " + (int)closestDistance);
-				if(thirdPosition) {
-//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
-					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
-					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
-						closestDistanceToSecondExp = distanceToSecondExpansion;
-						closestDistance = closeFromMyExpansionButFarFromEnemy;
-//						FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition true set resultBase :: " + base.getTilePosition());
-						resultBase = base;
-					}
-				}else {
+//				if(thirdPosition) {
+////					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+//					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
+//					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
+//						closestDistanceToSecondExp = distanceToSecondExpansion;
+//						closestDistance = closeFromMyExpansionButFarFromEnemy;
+////						FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition true set resultBase :: " + base.getTilePosition());
+//						resultBase = base;
+//					}
+//				}else {
 					closestDistance = closeFromMyExpansionButFarFromEnemy;
 //					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation set resultBase :: " + base.getTilePosition());
 					resultBase = base;	
-				}
+//				}
 			}
 		}
 

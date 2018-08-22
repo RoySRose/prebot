@@ -53,7 +53,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			// 첫번째 터렛이 없고, 입막 터렛 위치가 지정되어있을경우
 //			noTurretNearPosition
 			if (TilePositionUtils.isValidTilePosition(BlockingEntrance.Instance().entrance_turret1)) {
-				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret1.toPosition(), 30, 30, 0, 1, 15)) {
+				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret1.toPosition(), 80, 30, 0, 1, 10)) {
 					setHighPriority(true);
 					setBlocking(true);
 					setTilePosition(BlockingEntrance.Instance().entrance_turret1);
@@ -63,7 +63,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			}
 			
 			if (TilePositionUtils.isValidTilePosition(BlockingEntrance.Instance().entrance_turret2)) {
-				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret2.toPosition(), 30, 30, 0, 1, 15)) {
+				if(noTurretNearPosition(BlockingEntrance.Instance().entrance_turret2.toPosition(), 80, 30, 0, 1, 10)) {
 					setHighPriority(true);
 					setBlocking(true);
 					setTilePosition(BlockingEntrance.Instance().entrance_turret2);
@@ -139,11 +139,14 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		Position mutalDef = PositionFinder.Instance().expansionDefensePositionSiege();
 		
+//		System.out.println("Const Turret to mutalDef :: " + mutalDef.toTilePosition());
+		
 		if (noTurretNearPosition(mutalDef, 150, 120, turretCount, 1+add_turret, 15)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(mutalDef.toTilePosition());
-//			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mutalDef :: " + mutalDef.toTilePosition());
+//			System.out.println("need turret to  mutalDef :: " + mutalDef.toTilePosition());
+			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mutalDef :: " + mutalDef.toTilePosition());
 			return true;
 		}
 
@@ -275,7 +278,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				
 			}
 		}
-		
+//		System.out.println("Const Turret to centerPosition :: " + centerPosition.toTilePosition());
 
 //		int buildQueueCountNear = BuildManager.Instance().buildQueue.getItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
 //		int constructionCountNear = ConstructionManager.Instance().getConstructionQueueItemCountNear(UnitType.Terran_Missile_Turret, centerPosition.toTilePosition(), radius2);
