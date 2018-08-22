@@ -77,6 +77,7 @@ public class BlockingEntrance {
     private final int CENTER = 64;
     
     private static Location loc_t = null;
+    public Location loc = Location.START;
     
     private Map mapName = null;
     
@@ -85,21 +86,16 @@ public class BlockingEntrance {
 
     private HashMap<Integer, TilePosition> postitionStorage = new HashMap<>();
 
-    private final int combine(Map map, Location location, Building building) {
-        return map.getValue() * 100 + location.getValue() * 10 + building.getValue();
+
+
+    public void onStart() {
+        setInitialPosition();
+        setBlockingEntrance();
+        SetBlockingTilePosition();
     }
 
-    public void SetBlockingTilePosition() {
+    private void setInitialPosition() {
 
-//		서킷브레이커만 4X4
-		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
-			maxSupplyCntX = 7;
-			maxSupplyCntY = 2;
-	    }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
-	    	maxSupplyCntX = 2;
-			maxSupplyCntY = 7;
-	    }
-    	    	
 
         //starting position..... needed?
         for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -110,20 +106,16 @@ public class BlockingEntrance {
             }
         }
 
-
-
-      //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
+        //TODO MAP, 지도의 ABCD 이름에 맞춰 바꾸면 될듯
 //        mapName = Map.CIRCUITBREAKER;
         if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
-        	mapName = Map.FIGHTING_SPIRITS;
+            mapName = Map.FIGHTING_SPIRITS;
         }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
-        	mapName = Map.CIRCUITBREAKER;
+            mapName = Map.CIRCUITBREAKER;
         }else {
-        	mapName = Map.UNKNOWN;
+            mapName = Map.UNKNOWN;
         }
         //System.out.println("this map ==>> " + map.toString());
-
-        Location loc = Location.START;
 
         if(starting.getX() < SMALL
                 && starting.getY() < SMALL){
@@ -147,7 +139,7 @@ public class BlockingEntrance {
         }
         //center
         if(SMALL < starting.getX()  && starting.getX() < BIG
-                 && SMALL < starting.getY()  && starting.getY() < BIG){
+                && SMALL < starting.getY()  && starting.getY() < BIG){
             loc = Location.Twelve;
         }
         if(BIG < starting.getX()
@@ -160,7 +152,7 @@ public class BlockingEntrance {
             xinc = true;
             yinc = false;
         }
-       if(SMALL < starting.getX()  && starting.getX() < BIG
+        if(SMALL < starting.getX()  && starting.getX() < BIG
                 && starting.getY() > SMALL){
             loc = Location.Six;
         }
@@ -170,11 +162,29 @@ public class BlockingEntrance {
             xinc = false;
             yinc = false;
         }
-        
+
         if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
-        	xinc = true;
+            xinc = true;
             yinc = true;
         }
+
+
+    }
+
+    private final int combine(Map map, Location location, Building building) {
+        return map.getValue() * 100 + location.getValue() * 10 + building.getValue();
+    }
+
+    public void SetBlockingTilePosition() {
+
+//		서킷브레이커만 4X4
+		if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
+			maxSupplyCntX = 7;
+			maxSupplyCntY = 2;
+	    }else if (InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.FIGHTING_SPIRITS) {
+	    	maxSupplyCntX = 2;
+			maxSupplyCntY = 7;
+	    }
 
         first_supple = postitionStorage.get(combine(mapName, loc, Building.FIRST_SUPPLY));
         second_supple = postitionStorage.get(combine(mapName, loc, Building.SECOND_SUPPLY));
@@ -613,7 +623,7 @@ public class BlockingEntrance {
 		Location loc = Location.START;
 
 
-		
+
         if(tilepos.getX() < SMALL
                 && tilepos.getY() < SMALL){
             loc = Location.Eleven;
@@ -705,4 +715,5 @@ public class BlockingEntrance {
 		
 		return TilePosition.None;
 	}
+
 }

@@ -44,8 +44,8 @@ public class GameCommander {
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
 		}
-		BlockingEntrance.Instance().setBlockingEntrance();
-		BlockingEntrance.Instance().SetBlockingTilePosition();
+
+        BlockingEntrance.Instance().onStart();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidSupply();
 		ConstructionPlaceFinder.Instance().setTilesToAvoidBaseLocation();
 		InitialBuildProvider.Instance().onStart();

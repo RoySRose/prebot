@@ -13,6 +13,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import prebot.build.constant.BuildConfig;
+import prebot.build.initialProvider.BlockingEntrance.Location;
 import prebot.build.initialProvider.InitialBuildProvider;
 import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.main.MyBotModule;
@@ -494,9 +495,33 @@ public class ConstructionPlaceFinder {
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 //					FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace after PlaceFinder seedPosition true ==>> "  + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition + " :: " + isPossiblePlace);
 					if (isPossiblePlace) {
-						resultPosition = new TilePosition(currentX, currentY);
+                        if (b.getType() == UnitType.Terran_Factory) {
+                            int currentXPlus = currentX;
+                            int adjust =0;
 
-						break;
+                            while (true) {
+                                if (BlockingEntrance.Instance().loc == Location.Eleven || BlockingEntrance.Instance().loc == Location.Seven ) {
+                                    currentXPlus++;
+                                    adjust = -1;
+                                } else {
+                                    currentXPlus--;
+                                    adjust = 1;
+                                }
+                                if (currentXPlus < 0 || currentXPlus + 3 > MyBotModule.Broodwar.mapWidth()) {
+                                    break;
+                                }
+                                boolean isPossiblePlaceAjust = canBuildHereWithSpace(new TilePosition(currentXPlus, currentY), b, buildingGapSpace);
+                                if (!isPossiblePlaceAjust) {
+                                    break;
+                                }
+                            }
+
+                            resultPosition = new TilePosition(currentXPlus+adjust, currentY);
+                            break;
+                        }else {
+                            resultPosition = new TilePosition(currentX, currentY);
+                            break;
+                        }
 					}
 				}
 
@@ -768,7 +793,9 @@ public class ConstructionPlaceFinder {
 				endx = position.getX() + width + buildingGapSpace;
 				endy = position.getY() + height;
 			}
-			
+
+
+
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
 			for (int x = startx; x < endx; x++)
 			{
