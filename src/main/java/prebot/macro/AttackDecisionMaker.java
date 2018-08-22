@@ -163,37 +163,14 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-    	Decision oldDecision = decision;
-    	if (myForcePoint > attackPoint()) {
-    		Decision decision = attackType(myForcePoint, enemyForcePoint);
+    	if (decision == Decision.DEFENCE && myForcePoint < 1200) {
+    		return Decision.DEFENCE;
+    	}
     		
-    		if (decision == Decision.NO_MERCY_ATTACK) {
-    			if (oldDecision != Decision.NO_MERCY_ATTACK) {
-					MyBotModule.Broodwar.sendText("NO MERCY ATTACK@@@ GOGOGO@@@@");
-    			}
-    			return Decision.NO_MERCY_ATTACK;
-    			
-    		} else if (decision == Decision.FULL_ATTACK) {
-    			if (oldDecision != Decision.FULL_ATTACK) {
-					MyBotModule.Broodwar.sendText("FULL ATTACK@@@ GOGOGO@@@@");
-    			}
-    			return Decision.FULL_ATTACK;
-    		}
-    	}
-    	
-    	if (quickAttack()) {
-    		return Decision.FULL_ATTACK;
-    	}
-		if (oldDecision != Decision.DEFENCE) {
-			MyBotModule.Broodwar.sendText("BACK TO DEFENCE JOTBAB IN JUNG@@@@");
-		}
-        return Decision.DEFENCE;
-    }
-
-	private Decision attackType(int myForcePoint, int enemyForcePoint) {
-    	if (InfoUtils.enemyRace() == Race.Terran) {
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			
     		if(decision == Decision.NO_MERCY_ATTACK) {
-    			if (!attackByFullSupply() && (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0)) {
+    			if (MyBotModule.Broodwar.self().supplyUsed() < 150 && (myForcePoint < 4000 || myForcePoint < enemyForcePoint * 1.0)) {
         			return Decision.FULL_ATTACK;
         		}else {
         			return Decision.NO_MERCY_ATTACK;
@@ -207,61 +184,69 @@ public class AttackDecisionMaker extends GameManager {
     		}
     		
     	} else if (InfoUtils.enemyRace() == Race.Protoss) {
-    		if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 2.0) {
-    			return Decision.NO_MERCY_ATTACK;
-    		} else if (myForcePoint > enemyForcePoint) {
-    			return Decision.FULL_ATTACK;
+    		
+    		if(decision == Decision.NO_MERCY_ATTACK) {
+    			if (myForcePoint < enemyForcePoint * 1.4 ) {
+        			return Decision.FULL_ATTACK;
+        		}else {
+        			return Decision.NO_MERCY_ATTACK;
+        		}
+    		} else if(decision == Decision.FULL_ATTACK) {
+    			if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 2.0 ) {
+        			return Decision.NO_MERCY_ATTACK;
+        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.5) {
+        			
+        		} else {
+        			return Decision.FULL_ATTACK;
+        		}
+    		} else if(decision == Decision.DEFENCE) {
+    			if (myForcePoint > enemyForcePoint || attackByFullSupply()) {
+        			return Decision.FULL_ATTACK;
+        		}
     		}
     		
+    		
     	} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    		if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 1.5) {
-    			return Decision.NO_MERCY_ATTACK;
-    		} else if (myForcePoint > enemyForcePoint) {
-    			return Decision.FULL_ATTACK;
+    		
+    		if(decision == Decision.NO_MERCY_ATTACK) {
+    			if (myForcePoint < enemyForcePoint * 1.4 ) {
+        			return Decision.FULL_ATTACK;
+        		}else {
+        			return Decision.NO_MERCY_ATTACK;
+        		}
+    		} else if(decision == Decision.FULL_ATTACK) {
+    			if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 1.5 ) {
+        			return Decision.NO_MERCY_ATTACK;
+        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.5) {
+        			
+        		} else {
+        			return Decision.FULL_ATTACK;
+        		}
+    		} else if(decision == Decision.DEFENCE) {
+    			if (myForcePoint > enemyForcePoint || attackByFullSupply()) {
+        			return Decision.FULL_ATTACK;
+        		}
     		}
-    	}
-    	return Decision.DEFENCE;
-	}
-    
-    private boolean attackByFullSupply() {
-		if (MyBotModule.Broodwar.self().supplyUsed() < 300) {
-			attackByFullSupply = false;
-		} else if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
-			if (InfoUtils.myRace() == Race.Terran) {
-				if (PlayerUtils.enoughResource(2000, 1500)) {
-					attackByFullSupply = true;
-				}
-			} else {
-				attackByFullSupply = true;
-			}
-		}
-		return attackByFullSupply;
-	}
-
-	private int attackPoint() {
-    	int point = 1200;
-    	if (InfoUtils.enemyRace() == Race.Protoss) {
-//    		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
-//    			point = 3000;
-//    		} else if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal)) {
-//        		point = 5000;	
-//    		} else {
-//    			point = 7000;	
-//    		}
-    	} else if (InfoUtils.enemyRace() == Race.Terran) {
-    		point = 1200;
-    	} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    		point = 1200;
+    		
     	}
     	
-    	if (decision == Decision.FULL_ATTACK || decision == Decision.NO_MERCY_ATTACK) {
-    		if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
-    			point = (int) (point * 0.3);
-    		} else if (InfoUtils.enemyRace() == Race.Zerg) {
-    			point = (int) (point * 0.6);
-        	}
+    	if (quickAttack()) {
+    		return Decision.FULL_ATTACK;
+    	}
+        return Decision.DEFENCE;
+    }
+
+    private boolean attackByFullSupply() {
+		if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
+			if (InfoUtils.myRace() == Race.Terran) {
+				if (PlayerUtils.enoughResource(2000, 1500)) {
+					return true;
+				}
+			} else {
+				return true;
+			}
 		}
-		return point;
+		return false;
 	}
 
 	private boolean detectorPrepared() {
