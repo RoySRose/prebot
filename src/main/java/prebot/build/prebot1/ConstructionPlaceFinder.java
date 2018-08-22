@@ -759,7 +759,7 @@ public class ConstructionPlaceFinder {
 			if (b.getType() == UnitType.Terran_Factory
 //				b.getType() == UnitType.Terran_Starport 
 				) {
-				width += 3;
+				width += 2;
 //				width += 2;
 //				buildingGapSpace = 0;
 //				horizontalOnly = true;
@@ -785,6 +785,7 @@ public class ConstructionPlaceFinder {
 			if (horizontalOnly == false) {
 				startx = position.getX() - buildingGapSpace;
 				starty = position.getY() - buildingGapSpace;
+//				endx = startx + width + buildingGapSpace;
 				endx = position.getX() + width + buildingGapSpace;
 				endy = position.getY() + height + buildingGapSpace;
 			}
@@ -799,9 +800,9 @@ public class ConstructionPlaceFinder {
 
 
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
-			for (int x = startx; x <= endx; x++)
+			for (int x = startx; x < endx; x++)
 			{
-				for (int y = starty; y <= endy; y++)
+				for (int y = starty; y < endy; y++)
 				{
 					
 //					if(canAddonBuilding == true && 
@@ -824,7 +825,7 @@ public class ConstructionPlaceFinder {
 					
 					if (b.getType() == UnitType.Terran_Factory ||
 						b.getType() == UnitType.Terran_Starport ) {
-						if(x > startx && x <= endx -1 && y > starty && y <= endy-1) {
+						if(x > startx && x < endx -1 && y > starty && y < endy-1) {
 //								System.out.println(" avoid tile check :: " + position + " :: (" + x + " , " + y + ")");
 							if (isBuildableTile(b, x, y) == false) {
 //									FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
@@ -855,7 +856,7 @@ public class ConstructionPlaceFinder {
 //						}
 //					}
 					
-//					20180815. hkk. 커맨드 센터 일경우. new 커맨드 센터 본진이, old 커맨드 센터 컴셋 위치를 침범하면 안된다.
+////					20180815. hkk. 커맨드 센터 일경우. new 커맨드 센터 본진이, old 커맨드 센터 컴셋 위치를 침범하면 안된다.
 					if(b.getType() == UnitType.Terran_Command_Center) {
 						if(x != position.getX() + 4 && x != position.getX() + 5 && x != position.getX() + 6) {
 							if(isTilesToAvoidComsat(x, y)) {
@@ -1179,6 +1180,7 @@ public class ConstructionPlaceFinder {
 	/// 건물 건설 예정 타일로 예약해서, 다른 건물을 중복해서 짓지 않도록 합니다
 	public void reserveTiles(TilePosition position, int width, int height, UnitType unit)
 	{
+		System.out.println(" Set reserveMap start:: " + unit + " :: " + position + " :: width :: " + width + " :: height :: " + height);
 		/*int rwidth = reserveMap.size();
 		int rheight = reserveMap.get(0).size();
 		for (int x = position.getX(); x < position.getX() + width && x < rwidth; x++)
@@ -1200,28 +1202,36 @@ public class ConstructionPlaceFinder {
 			{
 				x = x>1?x-1:0;
 				y = y>1?y-1:0;
-				widthx = widthx+1;
+				widthx = widthx+3;
 				heighty = heighty + 1;
 //				height += 1;
 		}
 		
+//		int startx = x;
+		int tox = position.getX() + widthx;
+		int toy = position.getY() + heighty;
+		
 		
 //		if()
+//		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + (position.getX() + widthx) + " :: to Y :: " + (position.getY() + heighty));
 		int rwidth = reserveMap.length;
 		int rheight = reserveMap[0].length;
-		for ( ; x < position.getX() + widthx && x < rwidth; x++)
+		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + tox + " :: to Y :: " + toy
+				+ " :: rwidth :: " + rwidth + " :: rheight :: " + rheight);
+		for (int startx = x ; startx < tox && startx < rwidth; startx++)
 		{
-			for (  ; y < position.getY() + heighty && y < rheight; y++)
+			for (int starty = y ; starty < toy && starty < rheight; starty++)
 			{
+				System.out.println(" Set reserveMap :: " + unit + " :: (" + startx +" , "+ starty + ")");
 				//reserveMap.get(x).set(y, true);
-				reserveMap[x][y] = true;
+				reserveMap[startx][starty] = true;
 				// C++ : reserveMap[x][y] = true;
 			}
 		}
 	}
 	
 	/// 건물 건설 예정 타일로 예약했던 것을 해제합니다
-	public void freeTiles(TilePosition position, int width, int height)
+	public void freeTiles(TilePosition position, int width, int height, UnitType unit)
 	{
 		/*int rwidth = reserveMap.size();
 		int rheight = reserveMap.get(0).size();
@@ -1238,16 +1248,41 @@ public class ConstructionPlaceFinder {
 			return;
 		}
 		
+		int x = position.getX();
+		int y = position.getY();
+		int widthx = width;
+		int heighty = height;
+		if (
+				unit == UnitType.Terran_Factory ||
+				unit == UnitType.Terran_Starport)
+//				b.getType() == UnitType.Terran_Science_Facility)
+			{
+				x = x>1?x-1:0;
+				y = y>1?y-1:0;
+				widthx = widthx+3;
+				heighty = heighty + 1;
+//				height += 1;
+		}
+		
+//		int startx = x;
+		int tox = position.getX() + widthx;
+		int toy = position.getY() + heighty;
+		
+		
+//		if()
+//		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + (position.getX() + widthx) + " :: to Y :: " + (position.getY() + heighty));
 		int rwidth = reserveMap.length;
 		int rheight = reserveMap[0].length;
-
-		for (int x = position.getX(); x < position.getX() + width && x < rwidth; x++)
+//		System.out.println(" Set reserveMap :: "+ unit +" :: to X :: " + tox + " :: to Y :: " + toy
+//				+ " :: rwidth :: " + rwidth + " :: rheight :: " + rheight);
+		for (int startx = x ; startx < tox && startx < rwidth; startx++)
 		{
-			for (int y = position.getY() ; y < position.getY() + height && y < rheight; y++)
+			for (int starty = y ; starty < toy && starty < rheight; starty++)
 			{
-				//reserveMap.get(x).set(y, false);
-				reserveMap[x][y] = false;
-				// C++ : reserveMap[x][y] = false;
+//				System.out.println(" Set reserveMap :: " + unit + " :: (" + startx +" , "+ starty + ")");
+				//reserveMap.get(x).set(y, true);
+				reserveMap[startx][starty] = false;
+				// C++ : reserveMap[x][y] = true;
 			}
 		}
 	}
@@ -1688,10 +1723,11 @@ public class ConstructionPlaceFinder {
 
 //					TilePosition t = new TilePosition(addonX+x,addonY+y);
 //					2018015. hkk. 컴셋 자리는 커맨드센터도 짓지 못하게끔 피해준다.
-					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition())) {
+//					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition())) {
+//					if( x == 0 || x == 1 || x == 6) {
 //						System.out.println("comsat position of main command :: " + t);
 						tilesToAvoidAbsolute[addonX+x][addonY+y] = true;
-					}
+//					}
 //					tilesToBaseLocationAvoid.add(t);
 //					tilesToAvoid.add(t);
 //					tilesToAvoidAddonBuilding.add(t);

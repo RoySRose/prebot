@@ -161,6 +161,8 @@ public class PreBotUXManager {
 				drawManagerTimeSpent(490, 210);
 			} else if (uxOption == 7) {
 				drawTurretMap();
+				drawTilesToAvoidOnMap();
+				drawReservedBuildingTilesOnMap();
 			} else if (uxOption == 8) {
 				drawExpectedResource();
 				//drawExpectedResource2();
@@ -1144,19 +1146,19 @@ public class PreBotUXManager {
 		int x=0;
 		
 		
-		for(y = 0; y < 128 ; y++) {
-			for(x = 0; x < 128 ; x++) {
-				if(ConstructionPlaceFinder.Instance().getTilesToAvoid(x, y)) {
-					int x1 = x * 32 + 8;
-					int y1 = y * 32 + 8;
-					int x2 = (x + 1) * 32 - 8;
-					int y2 = (y + 1) * 32 - 8;
-	
-					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
-				}
-//				
-			}
-		}
+//		for(y = 0; y < 128 ; y++) {
+//			for(x = 0; x < 128 ; x++) {
+//				if(ConstructionPlaceFinder.Instance().getTilesToAvoid(x, y)) {
+//					int x1 = x * 32 + 8;
+//					int y1 = y * 32 + 8;
+//					int x2 = (x + 1) * 32 - 8;
+//					int y2 = (y + 1) * 32 - 8;
+//	
+//					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Orange, false);
+//				}
+////				
+//			}
+//		}
 		
 		
 		for(y = 0; y < 128 ; y++) {
