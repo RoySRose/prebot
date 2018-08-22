@@ -82,7 +82,13 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				mineralValidCommandCenterCount++;
 			}
 		}
+		
 		if (mineralValidCommandCenterCount >= maxCCcount) {
+			return false;
+		}
+		
+		// 총 최대 커맨드 개수 7개
+		if (commandCenters.size() > 7) {
 			return false;
 		}
 
