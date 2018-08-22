@@ -1,11 +1,35 @@
 package prebot.common.debug;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import prebot.build.prebot1.BuildManager;
+import prebot.build.prebot1.ConstructionManager;
+import prebot.build.provider.BuildQueueProvider;
+import prebot.common.MapGrid;
+import prebot.common.main.GameManager;
 import prebot.common.util.TimeUtils;
+import prebot.micro.CombatManager;
+import prebot.micro.WorkerManager;
+import prebot.strategy.InformationManager;
+import prebot.strategy.StrategyManager;
 
 public class BigWatch {
+	
+	private static Map<String, Integer> totalDebugMap = new HashMap<>();
+	
+	static {
+		totalDebugMap.put("InformationManager", 0);
+		totalDebugMap.put("StrategyManager", 0);
+		totalDebugMap.put("MapGrid", 0);
+		totalDebugMap.put("BuildManager", 0);
+		totalDebugMap.put("BuildQueueProvider", 0);
+		totalDebugMap.put("ConstructionManager", 0);
+		totalDebugMap.put("WorkerManager", 0);
+		totalDebugMap.put("CombatManager", 0);
+	}
 	
 	private static final int TIME_TO_LIVE_SECONDS = 10;
 	private static Map<String, Long> startTimeMap = new HashMap<>();
@@ -37,6 +61,38 @@ public class BigWatch {
 			if (TimeUtils.elapsedFrames(recordFrame) > TIME_TO_LIVE_SECONDS * TimeUtils.SECOND) {
 				recordMap.remove(tag);
 			}
+		}
+		
+		Long time = resultTimeMap.get("... GAME COMMANDER ...");
+		if (time >= 55) {
+			List<GameManager> gameManagers = Arrays.asList(
+					InformationManager.Instance(),
+					StrategyManager.Instance(),
+					MapGrid.Instance(),
+					BuildManager.Instance(),
+					BuildQueueProvider.Instance(),
+					ConstructionManager.Instance(),
+					WorkerManager.Instance(),
+					CombatManager.Instance());
+			
+			System.out.println("################# over 55ms ########################");
+			System.out.println("[managers]");
+			for (GameManager gameManager : gameManagers) {
+				String simpleName = gameManager.getClass().getSimpleName();
+				long recorded = gameManager.getRecorded();
+				if (recorded > 30) {
+					Integer integer = totalDebugMap.get(simpleName);
+					totalDebugMap.put(simpleName, integer);
+				}
+				System.out.println(simpleName + "=" + recorded);
+			}
+			System.out.println();
+			System.out.println("[bigwatch]");
+			System.out.println(resultTimeMap);
+			System.out.println();
+			System.out.println("[result]");
+			System.out.println(totalDebugMap);
+			System.out.println("####################################################");
 		}
 		
 		startTimeMap.clear();

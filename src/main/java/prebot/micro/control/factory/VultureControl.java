@@ -3,6 +3,7 @@ package prebot.micro.control.factory;
 import java.util.Collection;
 
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwta.BWTA;
@@ -40,9 +41,15 @@ public class VultureControl extends Control {
 				continue;
 			}
 			
-			int saveUnitLevel = 1;
+			int saveUnitLevel;
 			if (this.targetPosition != null) {
 				saveUnitLevel = 0;
+			} else {
+				if (InfoUtils.enemyRace() == Race.Protoss) {
+					saveUnitLevel = 2;					
+				} else {
+					saveUnitLevel = 1;
+				}
 			}
 			
 			MicroDecision decision = MicroDecisionMakerPrebot1.makeDecisionPrebot1(unit, euiList, null, saveUnitLevel);
