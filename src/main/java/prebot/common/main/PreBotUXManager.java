@@ -213,7 +213,7 @@ public class PreBotUXManager {
         
         y=drawCalculation(10, y);
         
-        /*
+        
         y+=10;
 	    if (enemyCommandInfoMap.size() == 0){
             MyBotModule.Broodwar.drawTextScreen(10, y+=10, "No enemy base info");
@@ -253,7 +253,7 @@ public class PreBotUXManager {
             }
 
         }
-	    */
+	    
     }
     
     private int drawCalculation(int x, int y) {
