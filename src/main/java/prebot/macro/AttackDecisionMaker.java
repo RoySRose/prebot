@@ -84,8 +84,9 @@ public class AttackDecisionMaker extends GameManager {
     	enemyMineralToPredict=0;
     	enemyGasToPredict=0;
         //removeDestroyedDepot(InformationManager.Instance().enemyRace);
-        addFakeMainDepot(InformationManager.Instance().enemyRace);
+        
         addNewResourceDepot(InformationManager.Instance().enemyRace);
+        addFakeMainDepot(InformationManager.Instance().enemyRace);
         updateResources(InformationManager.Instance().enemyRace);
 
 //        if(tempPhase = checkPhase3()) {
@@ -637,25 +638,22 @@ public class AttackDecisionMaker extends GameManager {
     
     private void addNewResourceDepot(Race race) {
 
-        //List<UnitInfo> enemyResourceDepot = UnitCache.getCurrentCache().enemyAllUnitInfos(InformationManager.Instance().getBasicResourceDepotBuildingType(race));
-        UnitData unitData = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer);
-        List<UnitInfo> enemyResourceDepot = new ArrayList<>();
-        
-        Iterator<Integer> it = null;
-		if (unitData != null) {
-			it = unitData.getUnitAndUnitInfoMap().keySet().iterator();
-
-			while (it.hasNext()) {
-				final UnitInfo ui = unitData.getUnitAndUnitInfoMap().get(it.next());
-				if (ui.getType() == InformationManager.Instance().getBasicResourceDepotBuildingType(race)) {
-
-					enemyResourceDepot.add(ui);
-				}
-			}
-		}
-        
-        
-        
+    	List<UnitInfo> enemyResourceDepot = UnitCache.getCurrentCache().enemyAllUnitInfos(InformationManager.Instance().getBasicResourceDepotBuildingType(race));
+//        UnitData unitData = InformationManager.Instance().getUnitData(InformationManager.Instance().enemyPlayer);
+//        List<UnitInfo> enemyResourceDepot = new ArrayList<>();
+//        
+//        Iterator<Integer> it = null;
+//		if (unitData != null) {
+//			it = unitData.getUnitAndUnitInfoMap().keySet().iterator();
+//
+//			while (it.hasNext()) {
+//				final UnitInfo ui = unitData.getUnitAndUnitInfoMap().get(it.next());
+//				if (ui.getType() == InformationManager.Instance().getBasicResourceDepotBuildingType(race)) {
+//
+//					enemyResourceDepot.add(ui);
+//				}
+//			}
+//		}
         List<Position> resourceDepotPosition = new ArrayList<>();
         
         boolean isMainBase = false;
@@ -673,19 +671,31 @@ public class AttackDecisionMaker extends GameManager {
                 	
                 	//TODO 여기서 판단해서. 정말 본진을 찾은건지... 아니면 멀티를 찾은건지 구분하고. 본진을 찾았으면 그냥 진행하면 되겠지? 멀티를 찾고. 본진 못 찾았다면. 파악됬다고 하더라도 공격하면 안된다. 처리하자.
                 	
-                	System.out.println("add : " + unitInfo + ", " + unitInfo.getLastPosition());
                 	
                 	BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
                     
                 	if(enemyBaseLocation !=null)
                 	isMainBase = PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition());
                     
+                	System.out.println("add : " + unitInfo + ", " + isMainBase + ", " + unitInfo.getLastPosition());
+                	
                 	selectedUnitInfo = unitInfo;
                     resourceDepotPosition.add(unitInfo.getLastPosition());
                     
                     break;
                 }
             }else {
+            	if(!foundEnemyMainBase) {
+            		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+                    
+            		if(enemyBaseLocation != null) {
+	            		if(PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition())) {
+	            			System.out.println("multi first but save");
+	            			foundEnemyMainBase = true;
+	            			enemyResourceDepotInfoMap.get(unitInfo).isMainBase = true;
+	            		}
+            		}
+            	}
             	//For moving CommandCenter
             	if(InformationManager.Instance().enemyRace == Race.Terran && MyBotModule.Broodwar.getFrameCount()>30000 && !resourceDepotPosition.contains(unitInfo.getLastPosition())){
             		if(!unitInfo.getUnit().isFlying() && getMineralPatchesNearDepot(unitInfo.getLastPosition()).size() > 6 ){
