@@ -99,6 +99,7 @@ public class WatcherSquad extends Squad {
 		
 		int saveUnitLevel = 1;
 		if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.NO_MERCY) {
+			smallFightPredict = StrategyCode.SmallFightPredict.ATTACK;
 			saveUnitLevel = 0;
 		} else if (smallFightPredict == StrategyCode.SmallFightPredict.OVERWHELM) {
 			saveUnitLevel = 0;

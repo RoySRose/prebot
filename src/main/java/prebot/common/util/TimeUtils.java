@@ -121,7 +121,7 @@ public class TimeUtils {
 
 	/// unit이 실행할 rotation이면 true
 	public static boolean executeUnitRotation(Unit unit, int rotationSize) {
-		return UnitBalancer.skipControl(unit);
+		return !UnitBalancer.skipControl(unit);
 //		int unitGroup = unit.getID() % rotationSize;
 //		return executeRotation(unitGroup, rotationSize);
 	}

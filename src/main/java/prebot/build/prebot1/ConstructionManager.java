@@ -185,30 +185,18 @@ public class ConstructionManager extends GameManager {
 	    */
 
 		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER5, 0), LagObserver.managerRotationSize())) {
-		    BigWatch.start("construction1");
 		    validateWorkersAndBuildings();  
-		    BigWatch.record("construction1");
-		    BigWatch.start("construction1-2");
 		    //haltConstructionBuildings();
 		    assignWorkersToUnassignedBuildings();
-		    BigWatch.record("construction1-2");
-		    
-		    BigWatch.start("construction2");
 			checkForStartedConstruction();
 			constructAssignedBuildings();
-			BigWatch.record("construction2");
 		}
 
 		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER5, 1), LagObserver.managerRotationSize())) {
-		    BigWatch.start("construction3");
 			checkForDeadTerranBuilders();
 			checkForCompletedBuildings();
-			BigWatch.record("construction3");
-	
-		    BigWatch.start("construction4");
 			checkForDeadlockConstruction();
 			checkConstructionBuildings();
-			BigWatch.record("construction4");
 		}
 	}
 
