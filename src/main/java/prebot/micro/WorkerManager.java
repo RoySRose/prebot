@@ -444,7 +444,8 @@ public class WorkerManager extends GameManager {
 			else if ((unit.getType() == UnitType.Terran_Goliath 
 					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
 					|| unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-					|| unit.getType() == UnitType.Terran_Science_Vessel) && repairWorkCnt < repairmax
+					|| unit.getType() == UnitType.Terran_Science_Vessel
+					|| unit.getType() == UnitType.Terran_Valkyrie) && repairWorkCnt < repairmax
 					&& unit.getHitPoints() < unit.getType().maxHitPoints()) {
 				
 				if(isReapirZone(unit)){
@@ -597,7 +598,11 @@ public class WorkerManager extends GameManager {
 			for (Unit unit : UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
 				if (unit == null)
 					continue;
-
+				
+				if (isCheckEnemy(unit) == true) {
+					continue;
+				}
+				
 				if (unit.getType().isResourceDepot()) {
 					if (workerData.getMineralsNearDepot(unit) > 0) {
 						double distance = unit.getDistance(worker);
