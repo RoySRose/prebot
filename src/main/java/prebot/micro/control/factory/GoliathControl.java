@@ -58,9 +58,11 @@ public class GoliathControl extends Control {
 					continue;
 				}
 			} else {
-				if (unit.getDistance(StrategyIdea.mainSquadCenter) > coverRadius) {
-					CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
-					continue;
+				if (InfoUtils.euiListInBase().isEmpty() && InfoUtils.euiListInExpansion().isEmpty()) {
+					if (unit.getDistance(StrategyIdea.mainSquadCenter) > coverRadius) {
+						CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
+						continue;
+					}
 				}
 			}
 			
