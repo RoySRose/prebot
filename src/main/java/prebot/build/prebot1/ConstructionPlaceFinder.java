@@ -496,22 +496,26 @@ public class ConstructionPlaceFinder {
 //					FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace after PlaceFinder seedPosition true ==>> "  + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition + " :: " + isPossiblePlace);
 					if (isPossiblePlace) {
                         if (b.getType() == UnitType.Terran_Factory) {
+                        	System.out.println("finding place for fac: " + BlockingEntrance.Instance().loc);
                             int currentXPlus = currentX;
                             int adjust =0;
 
                             while (true) {
                                 if (BlockingEntrance.Instance().loc == Location.Eleven || BlockingEntrance.Instance().loc == Location.Seven ) {
-                                    currentXPlus++;
-                                    adjust = -1;
-                                } else {
                                     currentXPlus--;
                                     adjust = 1;
+                                    System.out.println("finding place for fac minus");
+                                } else {
+                                    currentXPlus++;
+                                    adjust = -1;
+                                    System.out.println("finding place for fac plus");
                                 }
                                 if (currentXPlus < 0 || currentXPlus + 3 > MyBotModule.Broodwar.mapWidth()) {
                                     break;
                                 }
                                 boolean isPossiblePlaceAjust = canBuildHereWithSpace(new TilePosition(currentXPlus, currentY), b, buildingGapSpace);
                                 if (!isPossiblePlaceAjust) {
+                                	System.out.println("finding place for fac stop move");
                                     break;
                                 }
                             }
