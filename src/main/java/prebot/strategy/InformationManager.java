@@ -915,7 +915,16 @@ public class InformationManager extends GameManager {
 					&& InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer).contains(resultBase))
 					{
 						resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, true);
+					}else {
+						for(Unit unit : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
+							if(TilePositionUtils.equals(resultBase.getTilePosition(), unit.getTilePosition())) {
+								resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
+								break;
+							}
+						}
+						
 					}
+				
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			} else{
 				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);

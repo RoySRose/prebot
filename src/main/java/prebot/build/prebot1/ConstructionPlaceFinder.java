@@ -495,7 +495,8 @@ public class ConstructionPlaceFinder {
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
 //					FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace after PlaceFinder seedPosition true ==>> "  + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition + " :: " + isPossiblePlace);
 					if (isPossiblePlace) {
-                        if (b.getType() == UnitType.Terran_Factory) {
+                        if (b.getType() == UnitType.Terran_Factory && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 2) {
+						
                         	System.out.println("finding place for fac: " + BlockingEntrance.Instance().loc);
                             int currentXPlus = currentX;
                             int adjust =0;
@@ -730,7 +731,6 @@ public class ConstructionPlaceFinder {
 		//buildingGapSpace = 0;@@@@@@
 		
 		boolean horizontalOnly = false;
-		boolean canAddonBuilding = false;
 
 		if (b.getType().isAddon()) { // Addon 타입의 건물일 경우에는, 그 Addon 건물 왼쪽에 whatBuilds 건물이 있는지를 체크한다
 			final UnitType builderType = b.getType().whatBuilds().first;
@@ -756,20 +756,18 @@ public class ConstructionPlaceFinder {
 //			}
 		} else {
 			//make sure we leave space for add-ons. These types of units can have addon:
-			if (b.getType() == UnitType.Terran_Starport ||
-				b.getType() == UnitType.Terran_Factory
+			if (b.getType() == UnitType.Terran_Factory
 //				b.getType() == UnitType.Terran_Starport 
 				) {
 				width += 3;
 //				width += 2;
-				canAddonBuilding = true;
 //				buildingGapSpace = 0;
 //				horizontalOnly = true;
 			}
-//			else if(b.getType() == UnitType.Terran_Command_Center) {
-//				width += 2;
-//				canAddonBuilding = true;
-//			}
+			else if(b.getType() == UnitType.Terran_Starport) {
+				width += 2;
+
+			}
 	
 //			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
 //				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY() && b.getType() == UnitType.Terran_Starport)
@@ -801,9 +799,9 @@ public class ConstructionPlaceFinder {
 
 
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
-			for (int x = startx; x < endx; x++)
+			for (int x = startx; x <= endx; x++)
 			{
-				for (int y = starty; y < endy; y++)
+				for (int y = starty; y <= endy; y++)
 				{
 					
 //					if(canAddonBuilding == true && 
@@ -826,10 +824,15 @@ public class ConstructionPlaceFinder {
 					
 					if (b.getType() == UnitType.Terran_Factory ||
 						b.getType() == UnitType.Terran_Starport ) {
-						if(x > startx && x < endx -1 && y > starty && y < endy-1) {
+						if(x > startx && x <= endx -1 && y > starty && y <= endy-1) {
 //								System.out.println(" avoid tile check :: " + position + " :: (" + x + " , " + y + ")");
 							if (isBuildableTile(b, x, y) == false) {
 //									FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+								return false;
+							}
+						}else {
+							if (isBuildableTileFac(b, x, y) == false) {
+	//								FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 								return false;
 							}
 						}
@@ -1148,9 +1151,33 @@ public class ConstructionPlaceFinder {
 
 		return true;
 	}
+	
+	
+	/// 건물 건설 가능 타일인지 여부를 리턴합니다
+		public final boolean isBuildableTileFac(final ConstructionTask b, int x, int y)
+		{
+			TilePosition tp = new TilePosition(x, y);
+			if (!tp.isValid())
+			{
+				return false;
+			}
+
+			// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 
+
+			// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
+			for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(x, y))
+			{
+				if (unit.getType().isBuilding())
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
 
 	/// 건물 건설 예정 타일로 예약해서, 다른 건물을 중복해서 짓지 않도록 합니다
-	public void reserveTiles(TilePosition position, int width, int height)
+	public void reserveTiles(TilePosition position, int width, int height, UnitType unit)
 	{
 		/*int rwidth = reserveMap.size();
 		int rheight = reserveMap.get(0).size();
@@ -1162,11 +1189,29 @@ public class ConstructionPlaceFinder {
 				// C++ : reserveMap[x][y] = true;
 			}
 		}*/
+		int x = position.getX();
+		int y = position.getY();
+		int widthx = width;
+		int heighty = height;
+		if (
+				unit == UnitType.Terran_Factory ||
+				unit == UnitType.Terran_Starport)
+//				b.getType() == UnitType.Terran_Science_Facility)
+			{
+				x = x>1?x-1:0;
+				y = y>1?y-1:0;
+				widthx = widthx+1;
+				heighty = heighty + 1;
+//				height += 1;
+		}
+		
+		
+//		if()
 		int rwidth = reserveMap.length;
 		int rheight = reserveMap[0].length;
-		for (int x = position.getX(); x < position.getX() + width && x < rwidth; x++)
+		for ( ; x < position.getX() + widthx && x < rwidth; x++)
 		{
-			for (int y = position.getY() ; y < position.getY() + height && y < rheight; y++)
+			for (  ; y < position.getY() + heighty && y < rheight; y++)
 			{
 				//reserveMap.get(x).set(y, true);
 				reserveMap[x][y] = true;
@@ -1645,7 +1690,7 @@ public class ConstructionPlaceFinder {
 //					2018015. hkk. 컴셋 자리는 커맨드센터도 짓지 못하게끔 피해준다.
 					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition())) {
 //						System.out.println("comsat position of main command :: " + t);
-						tilesToAvoidComSat[addonX+x][addonY+y] = true;
+						tilesToAvoidAbsolute[addonX+x][addonY+y] = true;
 					}
 //					tilesToBaseLocationAvoid.add(t);
 //					tilesToAvoid.add(t);
