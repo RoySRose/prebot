@@ -99,15 +99,15 @@ public class ConstructionManager extends GameManager {
 				int width = b.getType().tileWidth();
 				int height = b.getType().tileHeight();
 				
-				if (b.getType() == UnitType.Terran_Command_Center ||
-					b.getType() == UnitType.Terran_Factory ||
-					b.getType() == UnitType.Terran_Starport )
-//						b.getType() == UnitType.Terran_Science_Facility)
-				{
-					width += 2;
-				}
+//				if (b.getType() == UnitType.Terran_Command_Center ||
+//					b.getType() == UnitType.Terran_Factory ||
+//					b.getType() == UnitType.Terran_Starport )
+////						b.getType() == UnitType.Terran_Science_Facility)
+//				{
+//					width += 2;
+//				}
 //				FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
-				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 			}
 	        constructionQueue.remove(b);
 	    }
@@ -129,16 +129,16 @@ public class ConstructionManager extends GameManager {
 					
 					int width = b.getType().tileWidth();
 					int height = b.getType().tileHeight();
-					
-					if (b.getType() == UnitType.Terran_Command_Center ||
-						b.getType() == UnitType.Terran_Factory ||
-						b.getType() == UnitType.Terran_Starport )
-//						b.getType() == UnitType.Terran_Science_Facility)
-					{
-						width += 2;
-					}
+//					
+//					if (b.getType() == UnitType.Terran_Command_Center ||
+//						b.getType() == UnitType.Terran_Factory ||
+//						b.getType() == UnitType.Terran_Starport )
+////						b.getType() == UnitType.Terran_Science_Facility)
+//					{
+//						width += 2;
+//					}
 //					FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
-					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 				}
 		        constructionQueue.remove(b);
 		    }
@@ -397,14 +397,14 @@ public class ConstructionManager extends GameManager {
 				int width = b.getType().tileWidth();
 				int height = b.getType().tileHeight();
 				
-				if (b.getType() == UnitType.Terran_Command_Center ||
-						b.getType() == UnitType.Terran_Factory ||
-						b.getType() == UnitType.Terran_Starport)
-//						b.getType() == UnitType.Terran_Science_Facility)
-					{
-						width += 2;
-				}
-				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+//				if (b.getType() == UnitType.Terran_Command_Center ||
+//						b.getType() == UnitType.Terran_Factory ||
+//						b.getType() == UnitType.Terran_Starport)
+////						b.getType() == UnitType.Terran_Science_Facility)
+//					{
+//						width += 2;
+//				}
+				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 				// free the previous location in reserved
 				b.setConstructionWorker(null);
 				b.setBuildCommandGiven(false);
@@ -453,14 +453,14 @@ public class ConstructionManager extends GameManager {
 						int width = b.getType().tileWidth();
 						int height = b.getType().tileHeight();
 						
-						if (b.getType() == UnitType.Terran_Command_Center ||
-								b.getType() == UnitType.Terran_Factory ||
-								b.getType() == UnitType.Terran_Starport )
-//								b.getType() == UnitType.Terran_Science_Facility)
-							{
-								width += 2;
-						}
-						ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+//						if (b.getType() == UnitType.Terran_Command_Center ||
+//								b.getType() == UnitType.Terran_Factory ||
+//								b.getType() == UnitType.Terran_Starport )
+////								b.getType() == UnitType.Terran_Science_Facility)
+//							{
+//								width += 2;
+//						}
+						ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 
 						// nullify its current builder unit
 						b.setConstructionWorker(null);
@@ -531,14 +531,14 @@ public class ConstructionManager extends GameManager {
 	                int width = b.getType().tileWidth();
 					int height = b.getType().tileHeight();
 					
-					if (b.getType() == UnitType.Terran_Command_Center ||
-							b.getType() == UnitType.Terran_Factory ||
-							b.getType() == UnitType.Terran_Starport )
-//							b.getType() == UnitType.Terran_Science_Facility)
-						{
-							width += 2;
-					}
-					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height);
+//					if (b.getType() == UnitType.Terran_Command_Center ||
+//							b.getType() == UnitType.Terran_Factory ||
+//							b.getType() == UnitType.Terran_Starport )
+////							b.getType() == UnitType.Terran_Science_Facility)
+//						{
+//							width += 2;
+//					}
+					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 
 					// put it in the under construction vector
 	                b.setStatus(ConstructionTask.ConstructionStatus.UnderConstruction.ordinal());

@@ -139,7 +139,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		
 		Position mutalDef = PositionFinder.Instance().expansionDefensePositionSiege();
 		
-		if (noTurretNearPosition(mutalDef, 120, 120, turretCount, 1+add_turret, 15)) {
+		if (noTurretNearPosition(mutalDef, 150, 120, turretCount, 1+add_turret, 15)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(mutalDef.toTilePosition());
@@ -169,7 +169,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 	//		Position betweenChoke = new Position((firstChokeMainHalf.getX() * 3 + mySecondChoke.getX() * 4) / 7,
 	//				(firstChokeMainHalf.getY() * 4 + mySecondChoke.getY() * 7) / 11);
 			
-			if (noTurretNearPosition(betweenChoke, 120, 120, turretCount, 1, 15)) {
+			if (noTurretNearPosition(betweenChoke, 150, 120, turretCount, 1, 15)) {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(betweenChoke.toTilePosition());
