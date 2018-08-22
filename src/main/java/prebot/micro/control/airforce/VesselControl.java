@@ -55,7 +55,9 @@ public class VesselControl extends Control {
 			else if (vessel.getEnergy() >= 100) {
 				List<Unit> matrixTargets = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, vessel.getPosition(), VESSEL_SIGHT + 300); 
 				for (Unit target : matrixTargets) {
-					if (target.getType() == UnitType.Terran_SCV	|| target.getType() == UnitType.Terran_Vulture_Spider_Mine) {
+					if (target.getType() == UnitType.Terran_SCV
+							|| target.getType() == UnitType.Terran_Vulture_Spider_Mine
+							|| target.getType() == UnitType.Terran_Wraith) {
 						continue;
 					}
 					if (target.isUnderAttack() && !target.isDefenseMatrixed()

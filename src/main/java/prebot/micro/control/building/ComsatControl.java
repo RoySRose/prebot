@@ -16,6 +16,7 @@ import bwapi.WeaponType;
 import bwta.BaseLocation;
 import prebot.common.MapGrid;
 import prebot.common.constant.CommonCode;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.MicroUtils;
@@ -170,6 +171,9 @@ public class ComsatControl extends Control {
 				}
 
 				int weaponMaxRange = MyBotModule.Broodwar.self().weaponMaxRange(weaponType);
+				if (myAttackUnit.getType() == UnitType.Terran_Bunker) {
+					weaponMaxRange = MyBotModule.Broodwar.self().weaponMaxRange(UnitType.Terran_Marine.groundWeapon()) + 20;// + AirForceManager.AIR_FORCE_SAFE_DISTANCE;
+				}
 				int weaponRangeMargin = 15; // 쉽게 스캔을 사용해 공격할 수 있도록 두는 여유값(조절필요)
 				if (!enemyUnit.isMoving()) {
 					weaponRangeMargin += 10;
@@ -190,7 +194,10 @@ public class ComsatControl extends Control {
 							return eui.getLastPosition();
 						}
 					} else if (enemyRace == Race.Zerg) {
-						if (myAttackUnitInWeaponRangeCount >= 5 || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+						if (myAttackUnitInWeaponRangeCount >= 5
+								|| myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
+								|| myAttackUnit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+								|| (myAttackUnit.getType() == UnitType.Terran_Bunker && UnitUtils.getUnitCount(UnitFindRange.COMPLETE, UnitType.Terran_Marine) > 0)) {
 							return eui.getLastPosition();
 						}
 					}

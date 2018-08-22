@@ -56,7 +56,11 @@ public class MultiDefenseSquad extends Squad {
 			if (InfoUtils.enemyRace() == Race.Zerg) {
 				max = 3;
 			} else if (InfoUtils.enemyRace() == Race.Terran) {
-				max = 1;
+				if (!UnitUtils.enemyUnitDiscovered(UnitType.Terran_Dropship)) {
+					max = 1;
+				} else {
+					max = 3;
+				}
 			} else if (InfoUtils.enemyRace() == Race.Protoss) {
 				max = 0;
 			}

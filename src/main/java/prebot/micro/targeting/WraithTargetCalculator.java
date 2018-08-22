@@ -13,7 +13,6 @@ import prebot.common.util.MicroUtils;
 import prebot.common.util.UnitUtils;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.AirForceManager;
-import prebot.strategy.manage.AirForceManager.StrikeLevel;
 
 public class WraithTargetCalculator extends TargetScoreCalculator {
 
@@ -100,7 +99,9 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 	// CRITICAL_SPOT = 3; // 때리면 죽는 곳 공격 (터렛건설중인 SCV, 아모리 건설중인 SCV, 엔지니어링베이 건설중인 SCV)
 	private int criticalHighestScore(Unit enemyUnit) {
 		if (InfoUtils.enemyRace() == Race.Terran) {
-			if (enemyUnit.getType().isWorker()) {
+			if (enemyUnit.getType() == UnitType.Terran_Dropship) {
+				return 310;
+			} else if (enemyUnit.getType().isWorker()) {
 				if (enemyUnit.isConstructing() && enemyUnit.getOrderTarget() != null) {
 					UnitType constructingBuilding = enemyUnit.getOrderTarget().getType();
 					if (constructingBuilding == UnitType.Terran_Missile_Turret) {

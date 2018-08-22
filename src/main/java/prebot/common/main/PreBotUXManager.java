@@ -60,7 +60,6 @@ import prebot.micro.squad.WatcherSquad;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
 import prebot.strategy.StrategyManager;
-import prebot.strategy.TravelSite;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.StrategyCode;
@@ -1878,11 +1877,11 @@ public class PreBotUXManager {
 		if (InfoUtils.enemyReadyToPosition() != null) {
 			MyBotModule.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
 		}
-		if (VultureTravelManager.Instance().getTravelSites() != null) {
-			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
-				MyBotModule.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
-			}
-		}
+//		if (VultureTravelManager.Instance().getTravelSites() != null) {
+//			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {
+//				MyBotModule.Broodwar.drawTextMap(site.baseLocation.getPosition(), "travel site\n" + site);
+//			}
+//		}
 	}
 	
 	private void drawCCtoScvCount() {

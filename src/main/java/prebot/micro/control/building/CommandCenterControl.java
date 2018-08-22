@@ -1,6 +1,7 @@
 package prebot.micro.control.building;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import bwapi.TilePosition;
@@ -13,6 +14,7 @@ import prebot.build.initialProvider.BlockingEntrance.BlockingEntrance;
 import prebot.common.constant.CommonCode;
 import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.main.MyBotModule;
+import prebot.common.util.BaseLocationUtils;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.UnitUtils;
@@ -145,32 +147,22 @@ public class CommandCenterControl extends BuildingFlyControl {
     }
     
     public Unit getWrongPositionCommand(){
+		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) < 3) {
+			return null;
+		}
     	
-    	if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Command_Center) < 3) {
-    		return null;
-    	}
-    	
-    	boolean nextCommand = false;
+    	HashSet<TilePosition> baseTileSet = BaseLocationUtils.getBaseLocationTileHashSet();
         for(Unit commandCenter : UnitUtils.getUnitList(UnitFindRange.COMPLETE, UnitType.Terran_Command_Center)) {
-        	nextCommand = false;
-        	for (BaseLocation targetBaseLocation : BWTA.getBaseLocations()) {
-//        		20180821. hkk. 커맨드 센터와 일치하는 베이스 로케이션이 있으면 다음 커맨드센터 확인.
-    			if(TilePositionUtils.equals(commandCenter.getTilePosition(), targetBaseLocation.getTilePosition())) {
-    				nextCommand = true;
-    				break;
-    			}
-    			 
-    		}
-        	if(nextCommand) continue;
-        	
-        	List<Unit> nearTurret = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, commandCenter.getPosition(), 250, UnitType.Terran_Missile_Turret);
-        	if(nearTurret.size() > 0) {
-        		return commandCenter;
+			// 20180821. hkk. 커맨드 센터와 일치하는 베이스 로케이션이 있으면 다음 커맨드센터 확인.
+			// 20180822. ojw. 커맨드 센터가 올라가 있을 때 base와 tile이 일치하는 상황 커버
+        	if (!commandCenter.isLifted() && baseTileSet.contains(commandCenter.getTilePosition())) {
+				continue;
         	}
         	
-        	
-
-//        	
+        	List<Unit> nearTurret = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.SELF, commandCenter.getPosition(), 250, UnitType.Terran_Missile_Turret);
+			if (nearTurret.size() > 0) {
+				return commandCenter;
+			}
 //        	List<Unit> unitOnBaseTile = MyBotModule.Broodwar.getUnitsOnTile(commandCenter.getTilePosition());
 //        	if(unitOnBaseTile.size() != 0) {
 //        		continue;
