@@ -16,7 +16,9 @@ public class ValkyrieScoreCalculator extends DefaultScoreCalculator{
 		
 		if(StrategyIdea.currentStrategy == EnemyStrategy.ZERG_AIR1 
 				|| StrategyIdea.currentStrategy == EnemyStrategy.ZERG_AIR2){
-			addtionalPoint = (float) (basePoint * 1.5);
+			if(unitCount > 2) {
+				addtionalPoint = (float) (basePoint * 2.5);
+			}
 		}
 	}
 }

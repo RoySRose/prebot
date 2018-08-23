@@ -200,7 +200,7 @@ public class AttackDecisionMaker extends GameManager {
     		} else if(decision == Decision.FULL_ATTACK) {
     			if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 2.0 ) {
         			return Decision.NO_MERCY_ATTACK;
-        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.5) {
+        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.75) {
         			
         		} else {
         			return Decision.FULL_ATTACK;
@@ -223,7 +223,7 @@ public class AttackDecisionMaker extends GameManager {
     		} else if(decision == Decision.FULL_ATTACK) {
     			if (myForcePoint > 4000 && myForcePoint > enemyForcePoint * 1.5 ) {
         			return Decision.NO_MERCY_ATTACK;
-        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.5) {
+        		} else if (MyBotModule.Broodwar.self().supplyUsed() < 150 && myForcePoint < enemyForcePoint * 0.75) {
         			
         		} else {
         			return Decision.FULL_ATTACK;
