@@ -12,7 +12,7 @@ public class LagObserver {
 	
 	private static int managerLagLevel = 1;
 	
-	private static final int MANAGER_ROTATION_SIZE = 7;
+	private static final int MANAGER_ROTATION_SIZE = 8;
 	
 	public static int managerRotationSize() { // 7, 14, 21, 28
 		return MANAGER_ROTATION_SIZE * managerLagLevel;
@@ -22,6 +22,45 @@ public class LagObserver {
 		return (MANAGER_ROTATION_SIZE * index + manager) % managerRotationSize();
 	}
 	
+//	public static void main(String[] ar) {
+//		
+//		for (int frame = 0; frame < 32; frame++) {
+//			boolean e0 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER0, 0), testRotationSize());
+//			boolean e0_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER0, 1), testRotationSize());
+//			boolean e1 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER1, 0), testRotationSize());
+//			boolean e1_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER1, 1), testRotationSize());
+//			boolean e2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER2, 0), testRotationSize());
+//			boolean e2_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER2, 1), testRotationSize());
+//			boolean e3 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER3, 0), testRotationSize());
+//			boolean e3_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER3, 1), testRotationSize());
+//			boolean e4 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER4, 0), testRotationSize());
+//			boolean e4_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER4, 1), testRotationSize());
+//			boolean e5 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER5, 0), testRotationSize());
+//			boolean e5_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER5, 1), testRotationSize());
+//			boolean e6 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER6, 0), testRotationSize());
+//			boolean e6_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER6, 1), testRotationSize());
+//			boolean e7 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER7, 0), testRotationSize());
+//			boolean e7_2 = testRotation(frame, testManagerExecuteRotation(LagObserver.MANAGER7, 1), testRotationSize());
+//			System.out.println(e0 + ", " + e1 + ", " + e2 + ", " + e3 + ", " + e4 + ", " + e5 + ", " + e6 + ", " + e7);
+//			System.out.println(e0_2 + ", " + e1_2 + ", " + e2_2 + ", " + e3_2 + ", " + e4_2 + ", " + e5_2 + ", " + e6_2 + ", " + e7_2);
+//			System.out.println();
+//		}
+//	}
+//	
+//
+//	private static int testManagerExecuteRotation(int manager, int index) {
+//		return (MANAGER_ROTATION_SIZE * index + manager) % testRotationSize();
+//	}
+//	
+//	private static boolean testRotation(int frame, int group, int rotationSize) {
+//		return (frame % rotationSize) == group;
+////		return true;
+//	}
+//	
+//	private static int testRotationSize() {
+//		return 16;
+//	}
+	
 	public static final int MANAGER0 = 0; //info
 	public static final int MANAGER1 = 1; //strategy
 	public static final int MANAGER2 = 2; //mapgrid
@@ -29,6 +68,7 @@ public class LagObserver {
 	public static final int MANAGER4 = 4; //build
 	public static final int MANAGER5 = 5; //construction
 	public static final int MANAGER6 = 6; //worker
+	public static final int MANAGER7 = 7; //attack decision
 
 	private static final boolean ADJUST_ON = true;
 	

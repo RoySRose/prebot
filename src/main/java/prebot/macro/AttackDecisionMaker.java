@@ -4,7 +4,6 @@ import static prebot.macro.EnemyCommandInfo.getMineralPatchesNearDepot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -13,12 +12,14 @@ import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BaseLocation;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.PlayerUtils;
 import prebot.common.util.PositionUtils;
+import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
 import prebot.common.util.internal.UnitCache;
 import prebot.macro.scorecalculator.GoliathScoreCalculator;
@@ -34,7 +35,6 @@ import prebot.macro.util.ScoreBoard;
 import prebot.macro.util.UnitTypeList;
 import prebot.strategy.InformationManager;
 import prebot.strategy.StrategyIdea;
-import prebot.strategy.UnitData;
 import prebot.strategy.UnitInfo;
 import prebot.strategy.constant.EnemyStrategy;
 import prebot.strategy.constant.EnemyStrategyOptions;
@@ -79,7 +79,10 @@ public class AttackDecisionMaker extends GameManager {
     }
 
     public void update() {
-
+    	if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER7, 0), LagObserver.managerRotationSize())) {
+    		return;
+    	}
+    	
     	predictedTotalEnemyAttackUnit.clear();
     	enemyMineralToPredict=0;
     	enemyGasToPredict=0;
@@ -171,7 +174,7 @@ public class AttackDecisionMaker extends GameManager {
 		if (InfoUtils.enemyRace() == Race.Terran) {
 			
     		if(decision == Decision.NO_MERCY_ATTACK) {
-    			if (MyBotModule.Broodwar.self().supplyUsed() < 300) {
+    			if (MyBotModule.Broodwar.self().supplyUsed() < 320) {
         			return Decision.FULL_ATTACK;
         		}else {
         			return Decision.NO_MERCY_ATTACK;

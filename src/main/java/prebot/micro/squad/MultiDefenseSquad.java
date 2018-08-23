@@ -134,7 +134,9 @@ public class MultiDefenseSquad extends Squad {
 			if (tank.getDistance(targetPosition) < 250) {
 				continue;
 			}
-			
+			if (!TimeUtils.executeUnitRotation(tank, LagObserver.groupsize())) {
+				continue;
+			}
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, tank.getPosition(), 100);
 		}
 	}

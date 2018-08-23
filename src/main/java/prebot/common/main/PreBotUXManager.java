@@ -130,7 +130,7 @@ public class PreBotUXManager {
 				drawUnitTargetOnMap();
 				drawnextPoints();
 				drawTurretMap();
-				drawManagerTimeSpent(490, 210);
+				drawManagerTimeSpent(490, 200);
 
 				// draw tile position of mouse cursor
 				int mouseX = MyBotModule.Broodwar.getMousePosition().getX() + MyBotModule.Broodwar.getScreenPosition().getX();
@@ -147,7 +147,7 @@ public class PreBotUXManager {
 				// drawCCtoScvCount();
 			} else if (uxOption == 4) {
 				drawSquadInfoOnMap(20, 30);
-				drawManagerTimeSpent(490, 210);
+				drawManagerTimeSpent(490, 200);
 				drawDecision();
 				drawEnemyAirDefenseRange();
 				drawAirForceInformation();
@@ -158,7 +158,7 @@ public class PreBotUXManager {
 
 			} else if (uxOption == 6) {
 				drawBigWatch();
-				drawManagerTimeSpent(490, 210);
+				drawManagerTimeSpent(490, 200);
 			} else if (uxOption == 7) {
 				drawTurretMap();
 				drawTilesToAvoidOnMap();
@@ -1618,7 +1618,8 @@ public class PreBotUXManager {
 				BuildQueueProvider.Instance(),
 				ConstructionManager.Instance(),
 				WorkerManager.Instance(),
-				CombatManager.Instance());
+				CombatManager.Instance(),
+				AttackDecisionMaker.Instance());
 		
 		
 		int currentY = y;

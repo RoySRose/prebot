@@ -12,6 +12,7 @@ import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.main.GameManager;
 import prebot.common.util.TimeUtils;
+import prebot.macro.AttackDecisionMaker;
 import prebot.micro.CombatManager;
 import prebot.micro.WorkerManager;
 import prebot.strategy.InformationManager;
@@ -30,6 +31,7 @@ public class BigWatch {
 		totalDebugMap.put("ConstructionManager", 0);
 		totalDebugMap.put("WorkerManager", 0);
 		totalDebugMap.put("CombatManager", 0);
+		totalDebugMap.put("AttackDecisionMaker", 0);
 	}
 	
 	private static final int TIME_TO_LIVE_SECONDS = 10;
@@ -74,7 +76,8 @@ public class BigWatch {
 					BuildQueueProvider.Instance(),
 					ConstructionManager.Instance(),
 					WorkerManager.Instance(),
-					CombatManager.Instance());
+					CombatManager.Instance(),
+					AttackDecisionMaker.Instance());
 			
 			System.out.println("################# over 55ms ########################");
 			System.out.println("[managers]");
