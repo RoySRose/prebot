@@ -255,6 +255,10 @@ public class InformationManager extends GameManager {
 		updateBlockingEnterance();
 
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
+
+        if (mainBaseLocations.get(enemyPlayer) == null) {
+            updateBaseLocationInfo();
+        }else
 		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER0, 0), LagObserver.managerRotationSize())) {
 			updateBaseLocationInfo();
 		}
