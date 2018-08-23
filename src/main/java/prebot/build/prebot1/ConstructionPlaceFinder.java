@@ -893,7 +893,7 @@ public class ConstructionPlaceFinder {
 						}
 					}
 					
-					if(b.getType() == UnitType.Terran_Missile_Turret) {
+					if(b.getType() == UnitType.Terran_Missile_Turret || b.getType() == UnitType.Terran_Supply_Depot) {
 //						tilesToAvoidAddonBuilding[x][y] = false;
 						if (isTilesToAvoidAddonBuilding(x, y)) {
 							return false;
