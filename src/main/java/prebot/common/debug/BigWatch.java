@@ -67,7 +67,7 @@ public class BigWatch {
 		}
 		
 		Long timeSpent = resultTimeMap.get("... GAME COMMANDER ...");
-		if (timeSpent >= LagObserver.MILLISEC_MAX_COAST) {
+		if (timeSpent >= 55) {
 			List<GameManager> gameManagers = Arrays.asList(
 					InformationManager.Instance(),
 					StrategyManager.Instance(),

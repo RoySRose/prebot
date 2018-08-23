@@ -5,13 +5,16 @@ import prebot.common.main.MyBotModule;
 public class LagObserver {
 
 	private static int groupsize = 3; // 1 ... 24
+	private static int managerLagLevel = 1;
 	
 	public static int groupsize() {
 		return groupsize;
 	}
 	
-	private static int managerLagLevel = 1;
-	
+	public static int getManagerLagLevel() {
+		return managerLagLevel;
+	}
+
 	private static final int MANAGER_ROTATION_SIZE = 8;
 	
 	public static int managerRotationSize() { // 7, 14, 21, 28
@@ -72,7 +75,7 @@ public class LagObserver {
 
 	private static final boolean ADJUST_ON = true;
 	
-	public static final long MILLISEC_MAX_COAST = 48;
+	public static final long MILLISEC_MAX_COAST = 30;
 //	private static final long MILLISEC_MIN_COAST = 30;
 	
 	
@@ -108,12 +111,6 @@ public class LagObserver {
 					groupsize++;
 				}
 			} else {
-				if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
-					groupMinSize = 8;
-				} else {
-					groupMinSize = 3;
-				}
-				
 				if (groupsize > groupMinSize) {
 					boolean exceedTimeExist = false;
 					for (long t : observedTime) {
@@ -127,8 +124,14 @@ public class LagObserver {
 					}
 				}
 			}
+			managerLagLevel = groupsize / 8 + 1;
 			
-			managerLagLevel = groupsize / 6 + 1;				
+			if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
+				groupMinSize = 8;
+				if (groupsize < groupMinSize) {
+					groupsize = 8;
+				}
+			}
 		}
 	}
 

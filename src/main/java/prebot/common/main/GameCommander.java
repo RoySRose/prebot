@@ -11,7 +11,6 @@ import prebot.build.prebot1.BuildManager;
 import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.provider.BuildQueueProvider;
-import prebot.common.LagObserver;
 import prebot.common.MapGrid;
 import prebot.common.debug.BigWatch;
 import prebot.common.debug.chat.ChatBot;
@@ -28,7 +27,6 @@ import prebot.strategy.StrategyManager;
 public class GameCommander {
 
 	private static GameCommander instance = new GameCommander();
-	private LagObserver logObserver = new LagObserver(); // for debugging
     private UnitBalancer unitBalancer = new UnitBalancer(); // for debugging
 
 	/// static singleton 객체를 리턴합니다
@@ -70,8 +68,6 @@ public class GameCommander {
 
 		try {
 			BigWatch.start("... GAME COMMANDER ...");
-			logObserver.start();
-			
 			
 			InformationManager.Instance().updateTimeCheck();
 			MapGrid.Instance().updateTimeCheck();
@@ -88,13 +84,8 @@ public class GameCommander {
 			
 			WorkerManager.Instance().updateTimeCheck();
 			CombatManager.Instance().updateTimeCheck();
-			
 			AttackDecisionMaker.Instance().updateTimeCheck();
-			//temp();
-            //temp2();
-				
-			logObserver.observe();
-            
+			
 			BigWatch.record("... GAME COMMANDER ...");
 
 		} catch (Exception e) {

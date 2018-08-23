@@ -11,6 +11,7 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Region;
+import prebot.common.LagObserver;
 import prebot.common.constant.CommonCode;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
@@ -40,6 +41,8 @@ import prebot.strategy.UnitInfo;
 import prebot.strategy.manage.VultureTravelManager;
 
 public class CombatManager extends GameManager {
+	
+	private LagObserver logObserver = new LagObserver();
 	private static CombatManager instance = new CombatManager();
 
 	public static CombatManager Instance() {
@@ -98,9 +101,13 @@ public class CombatManager extends GameManager {
 	}
 
 	public void update() {
+		logObserver.start();
+
 		updateSquadData();
 		combatUnitArrangement();
 		squadExecution();
+		
+		logObserver.observe();
 	}
 
 	private void updateSquadData() {
