@@ -187,7 +187,7 @@ public class MarineControl extends Control {
 							intoTheBunker(bunker, marine);
 						} else {
 							if(!enemyInSight.getType().isWorker() && enemyInSight.getType() != UnitType.Zerg_Overlord
-									&& marine.getDistance(bunker) > 200){
+									&& marine.getDistance(bunker) > 300){
 								intoTheBunker(bunker, marine);
 							}
 							if(bunker.getLoadedUnits().size() > Math.round((unitList.size() / 2))){
