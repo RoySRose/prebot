@@ -142,6 +142,15 @@ public class EarlyDefenseSquad extends Squad {
 					continue;
 				}
 				
+				if(enemy.getType().isWorker()){
+					Region unitRegion = BWTA.getRegion(enemy.getPosition());
+					Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
+					if(unitRegion != baseRegion){
+						continue;
+					}
+					
+				}
+				
 				if(bunker != null && bunker.getLoadedUnits().size() > 0 || marineList.size() >= 2){
 					if (enemy.getType() == UnitType.Protoss_Probe || enemy.getType() == UnitType.Zerg_Drone) {
 						scvCountForDefense += 1.0;
