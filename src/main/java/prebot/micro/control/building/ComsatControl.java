@@ -83,17 +83,17 @@ public class ComsatControl extends Control {
 		}
 		
 		Unit comsatToUse = null;
-		int usableEnergy = 150;
+		int usableEnergy = 100;
 		int comsatCnt = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
-		if(comsatCnt > 1){
-			usableEnergy = 135;
-		}
+//		if(comsatCnt > 1){
+//			usableEnergy = 85;
+//		}
 		if(comsatCnt > 2){
 			
 			if(comsatCnt < 6) {
-				usableEnergy -= 20 * (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station) - 2);
+				usableEnergy -= 15 * (UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station) - 2);
 			}else {
-				usableEnergy -= 20 * 3;
+				usableEnergy -= 15 * 3;
 			}
 		}
 		
@@ -102,7 +102,7 @@ public class ComsatControl extends Control {
 			usableEnergy += 50;
 			
 			if(UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Science_Vessel) > 0){
-				usableEnergy -= 25;
+				usableEnergy -= 35;
 			}
 			
 		}
