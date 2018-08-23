@@ -25,7 +25,7 @@ public class ScienceFacilityControl extends BuildingFlyControl {
 
             buildingFlyMap.put(unit, new FlyCondition(false, false, null));
 
-            if (MyBotModule.Broodwar.getFrameCount() > 12000) {
+            if (MyBotModule.Broodwar.getFrameCount() > 10000) {
                 buildingFlyMap.get(unit).setFlyPosition(getFlyPosition0(unit));
             }
 

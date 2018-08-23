@@ -190,49 +190,86 @@ public abstract class BuildingFlyControl extends Control{
 
 		BaseLocation attackBase = expansionOccupied ? InfoUtils.enemyFirstExpansion() : InfoUtils.enemyBase();
 
+		
+		
+//		System.out.println("================== orderPos : " + orderPos);
         if(fleeing){
+        	
         	if(leader == null) {
+//        		System.out.println("fleeing : SC");
         		goalPos = SC.getPoint();
         	}else {
+//        		System.out.println("fleeing : leader: " + leaderPos);
         		goalPos = leaderPos;
         	}
         }else{
 
         	if (orderPos.getDistance(attackBase) > SC.getDistance(attackBase)) {
+//        		System.out.println("behind SC halfway: " + halfway);
                 goalPos = halfway;
             }else {
-        	
-	            if(mostDangerousBuilding != null){
-	                if(mostDangerousBuilding.getUnit().isVisible() == false){
-	                    goalPos = mostDangerousBuilding.getLastPosition();
-	                }
-	            }
-	           
 	            if(leader == null) {
+//	            	System.out.println("no leader halfway: " + halfway);
 	                goalPos = halfway;
 	            }else {
 	            	
-	            	if(buildingUnit.getDistance(leader) > 350){
-	                    goalPos = leaderPos;
+	            	Position tempPoint = new Position((InfoUtils.enemyBase().getX() + 2048*2)/3 , (InfoUtils.enemyBase().getY() + 2048*2)/3);
+	            	if (leaderPos.getDistance(attackBase) > tempPoint.getDistance(attackBase)) {
+//	            		System.out.println("================== Still far attack to enemy SC " +  tempPoint);
+	            		orderPos = tempPoint;
 	                }
-	
-	                if(mostDangerousUnit != null){
-	                	Position enemy = mostDangerousUnit.getLastPosition().getPoint();
-	                	int myDist = buildingUnit.getDistance(leader);
-	                	if(enemy.getDistance(buildingUnit) + myDist <= 135) {
-		                    if(myDist > 128){
-		                        goalPos = buildingUnit.getPosition();
-		                    }
-	                	}
-	                }
-	
-	                if (leaderPos.getDistance(orderPos) > SC.getDistance(orderPos)) {
+	            	
+	            	int myDist = buildingUnit.getDistance(leader);
+	            	double leaderToOrder = leaderPos.getDistance(orderPos);
+//	            	System.out.println("================== leaderPos : " + leaderPos + ", " + leader.getID());
+                	if (leaderToOrder > SC.getDistance(orderPos)) {
+//                		System.out.println("before SC choke halfway: " + halfway);
 	                    goalPos = halfway;
+	                }else {
+	                	if (leaderToOrder < buildingUnit.getDistance(orderPos)) {
+//	                		System.out.println("after SC behind leader orderPos: " + orderPos);
+		                    goalPos = orderPos;
+		                }else {
+		                	
+		                	int range = 350;
+		                	if(mostDangerousUnit != null){
+//		                		System.out.println("enemey!!:");
+		                		range = 135;
+		                	}else {
+//		                		System.out.println("NONO enemey!!:");
+		                		range = 350;
+		                	}
+		                	
+		                	if(myDist > range){
+//		                		System.out.println("front of leader too far from leader leaderPos: " + leaderPos);
+			                    goalPos = leaderPos;
+			                }else if(myDist < range -10){
+//			                	System.out.println("front of leader still going orderPos: " + orderPos);
+			                    goalPos = orderPos;
+			                }else {
+//			                	System.out.println("front of leader stay : " + buildingUnit.getPosition());
+			                    goalPos = buildingUnit.getPosition();
+			                }
+		                }
 	                }
-	
-	                if (leaderPos.getDistance(orderPos) < buildingUnit.getDistance(orderPos)) {
-	                    goalPos = orderPos;
-	                }
+                	
+//                	if(mostDangerousUnit == null){
+//                		
+//	                }else {
+//	                	if(myDist > 135) {
+//	                		System.out.println("enemy seen leaderPos : " + leaderPos);
+//	                		goalPos = leaderPos;
+//	                	}else {
+//	                        goalPos = buildingUnit.getPosition();
+//	                	}
+//	                }
+	                
+	                if(goalPos == buildingUnit.getPosition() && mostDangerousBuilding != null){
+		                if(mostDangerousBuilding.getUnit().isVisible() == false){
+//		                	System.out.println("take care of building : " + mostDangerousBuilding.getLastPosition());
+		                    goalPos = mostDangerousBuilding.getLastPosition();
+		                }
+		            }
 	            }
             }
         }
