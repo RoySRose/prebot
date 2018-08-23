@@ -66,7 +66,7 @@ public class AttackDecisionMaker extends GameManager {
     public int UXGasToPredict;
     public int UXMinusMineralToPredict;
     public int UXMinusGasToPredict;
-	private boolean attackByFullSupply=false;
+	private int quickAttackFrame=CommonCode.NONE;
     
     public void onStart() {
         this.enemyResourceDepotInfoMap = new HashMap<>();
@@ -169,7 +169,17 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-		if (decision == Decision.DEFENCE && myForcePoint < startForcePoint()) {
+    	if (InfoUtils.enemyRace() == Race.Protoss) {
+			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)) {
+				quickAttackFrame = TimeUtils.elapsedFrames();
+			}
+			
+			if (quickAttackFrame!=CommonCode.NONE && TimeUtils.elapsedFrames(quickAttackFrame) < 60 * TimeUtils.SECOND) {
+    			return Decision.FULL_ATTACK;
+			}
+		}
+    	
+    	if (decision == Decision.DEFENCE && myForcePoint < startForcePoint()) {
     		return Decision.DEFENCE;
     	}
     		
@@ -235,10 +245,14 @@ public class AttackDecisionMaker extends GameManager {
     		}
     		
     	}
+		
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
+			if (myTankSupplyCount >= 4 * 4) {
+				return Decision.FULL_ATTACK;
+			}
+		}
     	
-    	if (quickAttack()) {
-    		return Decision.FULL_ATTACK;
-    	}
         return Decision.DEFENCE;
     }
 
@@ -283,20 +297,6 @@ public class AttackDecisionMaker extends GameManager {
     	return true;
 	}
     
-    private boolean quickAttack() {
-    	if (InfoUtils.enemyRace() == Race.Terran) {
-			int myTankSupplyCount = UnitUtils.myUnitSupplyCount(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
-			return myTankSupplyCount >= 4 * 4;
-			
-		} else if (InfoUtils.enemyRace() == Race.Protoss) {
-			if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)) {
-				return true;
-			}
-		}
-    	return false;
-	}
-
-
 	private void predictEnemyUnitZerg() {
 
         EnemyStrategy strategyToApply = StrategyIdea.currentStrategy;

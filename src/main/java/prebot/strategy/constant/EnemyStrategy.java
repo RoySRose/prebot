@@ -86,7 +86,7 @@ public enum EnemyStrategy {
 			, TimeMapForProtoss.PROTOSS_DOUBLE_GROUND()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION)),
 	
-	PROTOSS_DOUBLE_CARRIER(2, 3, 1, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
+	PROTOSS_DOUBLE_CARRIER(2, 3, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
 			, EnemyStrategyOptions.MarineCount.ONE_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_DOUBLE_CARRIER()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.RETREAT)),

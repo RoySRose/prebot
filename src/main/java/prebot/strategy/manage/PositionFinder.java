@@ -343,23 +343,19 @@ public class PositionFinder {
 			}
 			
 			if (!enemyBaseDestroyed(enemyBase)) {
-				if (StrategyIdea.mainSquadMode == MicroConfig.MainSquadMode.SPEED_ATTCK) {
-					return enemyBase.getPosition();
-					
-				} else {
-					// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
-					// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
-					// 안전한 위치까지 바로 전진하도록 한다.
-					if (InfoUtils.enemyRace() == Race.Terran && UnitUtils.myFactoryUnitSupplyCount() < 10 * 4) {
-						return InfoUtils.enemyReadyToPosition();
-					}
-					BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
-					if (enemyFirstExpansion != null && InfoUtils.enemyFirstExpansionOccupied()) {
-						return enemyFirstExpansion.getPosition();
-					} else {
-						return enemyBase.getPosition();
-					}
+				// TODO 병력이 뭉쳐서 움적이기 위한 전략 getNextChoke의 업그레이드 필요
+				// 백만년 조이기를 하지 않기 위해 checker로 탐색된 곳과 적 주력병력 주둔지를 고려하여
+				// 안전한 위치까지 바로 전진하도록 한다.
+				if (InfoUtils.enemyRace() == Race.Terran && UnitUtils.myFactoryUnitSupplyCount() < 10 * 4) {
+					return InfoUtils.enemyReadyToPosition();
 				}
+				BaseLocation enemyFirstExpansion = InfoUtils.enemyFirstExpansion();
+				if (enemyFirstExpansion != null && InfoUtils.enemyFirstExpansionOccupied()) {
+					return enemyFirstExpansion.getPosition();
+				} else {
+					return enemyBase.getPosition();
+				}
+				
 			} else {
 				return letsfindRatPosition();
 			}

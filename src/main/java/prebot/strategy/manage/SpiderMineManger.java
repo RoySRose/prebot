@@ -118,7 +118,7 @@ public class SpiderMineManger {
 			initialized = init();
 			return;
 		}
-		if (!secondInitialized && UnitUtils.activatedCommandCenterCount() >= 2) {
+		if (!secondInitialized && TimeUtils.afterTime(10, 0)) {
 			secondInitialized = secondInit();	
 		}
 		
