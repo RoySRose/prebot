@@ -309,9 +309,9 @@ public class BlockingEntrance {
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SUPPLY_AREA), new TilePosition(10, 125));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(10, 0));
 	    	
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT1),    new TilePosition(121, 0  ));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(102, 4  ));
-	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT1),   new TilePosition(106, 106));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT1),    new TilePosition(118, 0  ));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.STARPORT2),    new TilePosition(121, 3  ));
+	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT1),   new TilePosition(106, 107));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.STARPORT2),   new TilePosition(104, 110));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT1),  new TilePosition(13, 119 ));
 	    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.STARPORT2),  new TilePosition(20, 119 ));
@@ -333,33 +333,33 @@ public class BlockingEntrance {
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)  , new TilePosition(122, 24));
     			//postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)   , new TilePosition(125, 24));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BARRACK)   		 , new TilePosition(118, 23));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SECOND_SUPPLY)  , new TilePosition(122, 25));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FACTORY)   		 , new TilePosition(116, 16));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SECOND_SUPPLY)  , new TilePosition(125, 25));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FACTORY)   		 , new TilePosition(113, 15));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BUNKER1)   		   , new TilePosition(122, 22));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BUNKER2)   		   , new TilePosition(107, 34));
 		
 		
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FIRST_SUPPLY)   , new TilePosition(122, 101));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FIRST_SUPPLY)   , new TilePosition(125, 100));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BARRACK)   		  , new TilePosition(118, 102));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SECOND_SUPPLY)  , new TilePosition(125, 100));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FACTORY)   		  , new TilePosition(118, 109));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SECOND_SUPPLY)  , new TilePosition(122, 101));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FACTORY)   		  , new TilePosition(111, 118));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BUNKER1)   		  , new TilePosition(122, 103));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BUNKER2)   		  , new TilePosition(106, 93));
 
 		
 		
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FIRST_SUPPLY)   , new TilePosition(4 , 102));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FIRST_SUPPLY)   , new TilePosition(7 , 102));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BARRACK)   		 , new TilePosition(0 , 101));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SECOND_SUPPLY)  , new TilePosition(7 , 102));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FACTORY)   		 , new TilePosition(14, 110));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SECOND_SUPPLY)  , new TilePosition(4 , 102));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FACTORY)   		 , new TilePosition(11, 116));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BUNKER1)   		   , new TilePosition(4 , 103));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BUNKER2)   		   , new TilePosition(18 , 93));
 
    				
-   				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FIRST_SUPPLY)   , new TilePosition(5 , 23));
+   				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FIRST_SUPPLY)   , new TilePosition(8 , 23));
 		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BARRACK)   		  , new TilePosition(1 , 24));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SECOND_SUPPLY)  , new TilePosition(8 , 23));
-		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FACTORY)   		  , new TilePosition(12, 17));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SECOND_SUPPLY)  , new TilePosition(5 , 23));
+		    	postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FACTORY)   		  , new TilePosition(12, 13));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BUNKER1)   		  , new TilePosition(5 , 21));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BUNKER2)   		  , new TilePosition(17 , 34));
 
@@ -367,12 +367,12 @@ public class BlockingEntrance {
 		    	
     		}else {
     			
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)  , new TilePosition(115, 13));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BARRACK)   		 , new TilePosition(115, 15));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SECOND_SUPPLY)   , new TilePosition(114, 10));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FACTORY)   		 , new TilePosition(120, 16));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FIRST_SUPPLY)  , new TilePosition(119, 16));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BARRACK)   		 , new TilePosition(115, 14));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.SECOND_SUPPLY)   , new TilePosition(114, 9));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.FACTORY)   		 , new TilePosition(113, 11));
 
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BUNKER1)   		   , new TilePosition(118, 13));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BUNKER1)   		   , new TilePosition(119, 14));
    				postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.BUNKER2)   		   , new TilePosition(122, 25));
 //    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.ENTRANCE_TURRET1), TilePosition.None);
 //    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.One, Building.ENTRANCE_TURRET2), TilePosition.None);
@@ -382,7 +382,7 @@ public class BlockingEntrance {
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FIRST_SUPPLY)  , new TilePosition(112, 115));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BARRACK)   		  , new TilePosition(113, 112));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.SECOND_SUPPLY)   , new TilePosition(122, 113));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FACTORY)   		  , new TilePosition(110, 118));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.FACTORY)   		  , new TilePosition(111, 118));
 
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BUNKER1)   		  , new TilePosition(115, 115));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Five, Building.BUNKER2)   		  , new TilePosition(120, 101));
@@ -393,7 +393,7 @@ public class BlockingEntrance {
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FIRST_SUPPLY)  , new TilePosition(7, 111));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BARRACK)   		 , new TilePosition(3, 111));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.SECOND_SUPPLY)   , new TilePosition(1 , 115));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FACTORY)   		 , new TilePosition(12 , 115));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.FACTORY)   		 , new TilePosition(11 , 116));
 
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BUNKER1)   		   , new TilePosition(5 , 115));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Seven, Building.BUNKER2)   		   , new TilePosition(4 , 101));
@@ -402,11 +402,11 @@ public class BlockingEntrance {
 
 
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FIRST_SUPPLY)  , new TilePosition(8 , 16));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BARRACK)   		  , new TilePosition(3, 16));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SECOND_SUPPLY)   , new TilePosition(11 , 16));
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FACTORY)   		  , new TilePosition(10 , 13));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BARRACK)   		  , new TilePosition(11, 16));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.SECOND_SUPPLY)   , new TilePosition(4 , 16));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.FACTORY)   		  , new TilePosition(11 , 13));
 
-    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BUNKER1)   		  , new TilePosition(7 , 14));
+    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BUNKER1)   		  , new TilePosition(8 , 14));
     			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.BUNKER2)   		  , new TilePosition(3 , 25));
 //    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.ENTRANCE_TURRET1), TilePosition.None);
 //    			postitionStorage.put(combine(Map.CIRCUITBREAKER, Location.Eleven, Building.ENTRANCE_TURRET2), TilePosition.None);
@@ -429,7 +429,7 @@ public class BlockingEntrance {
 	    	postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Eleven, Building.SUPPLY_AREA), new TilePosition(17, 0));
 	    	
 	    	postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.One, Building.STARPORT1),    new TilePosition(110, 21   ));
-			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.One, Building.STARPORT2),    new TilePosition(114, 25  ));
+			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.One, Building.STARPORT2),    new TilePosition(112, 24  ));
 			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.STARPORT1),   new TilePosition(111, 124));
 			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Five, Building.STARPORT2),   new TilePosition(118, 124));
 			postitionStorage.put(combine(Map.FIGHTING_SPIRITS, Location.Seven, Building.STARPORT1),  new TilePosition(8, 99 ));
