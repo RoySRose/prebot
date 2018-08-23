@@ -167,12 +167,16 @@ public class ProtossStrategist extends Strategist {
 		}
 		
 		boolean airUnitExsit = UnitUtils.enemyUnitDiscovered(
-				UnitType.Protoss_Arbiter_Tribunal, UnitType.Protoss_Stargate, UnitType.Protoss_Arbiter, UnitType.Protoss_Scout);
+				UnitType.Protoss_Arbiter_Tribunal, UnitType.Protoss_Arbiter, UnitType.Protoss_Scout);
 		
 		if (airUnitExsit) {
 			return EnemyStrategy.PROTOSS_PROTOSS_AIR1;
-		} else {
-			return EnemyStrategy.PROTOSS_GROUND;
 		}
+		
+		if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Stargate)) {
+			return EnemyStrategy.PROTOSS_PROTOSS_AIR2;
+		}
+		
+		return EnemyStrategy.PROTOSS_GROUND;
 	}
 }
