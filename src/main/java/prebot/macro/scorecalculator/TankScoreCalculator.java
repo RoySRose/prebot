@@ -1,6 +1,8 @@
 package prebot.macro.scorecalculator;
 
+import bwapi.Race;
 import bwapi.UnitType;
+import prebot.common.util.InfoUtils;
 import prebot.macro.util.ScoreBoard;
 
 public class TankScoreCalculator extends DefaultScoreCalculator{
@@ -11,8 +13,11 @@ public class TankScoreCalculator extends DefaultScoreCalculator{
 	
 	@Override
 	public void calcOptional() {
-		if(unitCount > 5) {
-			addtionalPoint += (unitCount -5)/24 * basePoint;
-        }
+		
+		if (InfoUtils.enemyRace() != Race.Terran) {
+			if(unitCount > 5) {
+				addtionalPoint += (unitCount -5)/24 * basePoint;
+	        }
+		}
 	}
 }
