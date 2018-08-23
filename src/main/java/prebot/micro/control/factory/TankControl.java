@@ -64,7 +64,7 @@ public class TankControl extends Control {
 		if (StrategyIdea.campType == PositionFinder.CampType.INSIDE
 				|| StrategyIdea.campType == PositionFinder.CampType.FIRST_CHOKE
 				|| StrategyIdea.campType == PositionFinder.CampType.EXPANSION) {
-			siegeModeSpreadRadius = siegeModeSpreadRadius * 3 / 4;
+			siegeModeSpreadRadius = (int) (siegeModeSpreadRadius * 0.4);
 		}
 		
 		this.flyingEnemisInfos = MicroUtils.filterFlyingTargetInfos(euiList);
