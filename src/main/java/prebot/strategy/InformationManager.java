@@ -300,7 +300,7 @@ public class InformationManager extends GameManager {
 			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 				if (unit.getType() == UnitType.Terran_Refinery && unit.isCompleted() && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
-//						FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: we have Refinery :: not danger gas rush");
+//						//FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: we have Refinery :: not danger gas rush");
 						checkGasRush = false;// 가스 러쉬 위험 끝
 					}
 				}
@@ -308,10 +308,10 @@ public class InformationManager extends GameManager {
 			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 				if (unit.getType() == getRefineryBuildingType(enemyRace) && myfirstGas != null) {
 					if (myfirstGas.getPosition().equals(unit.getPosition())) {
-//						FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRsuhed is true :: "+ Prebot.Broodwar.getFrameCount() + " :: " + unit.getType());
+//						//FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRsuhed is true :: "+ Prebot.Broodwar.getFrameCount() + " :: " + unit.getType());
 						gasRushed = true;// 가스 러쉬 당함
 						gasRushEnemyRefi = unit;
-//						FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRushEnemyRefi :: "+ Prebot.Broodwar.getFrameCount() + " :: "+ gasRushEnemyRefi.getType());
+//						//FileUtils.appendTextToFile("log.txt", "\n  checkGasRush :: gasRushEnemyRefi :: "+ Prebot.Broodwar.getFrameCount() + " :: "+ gasRushEnemyRefi.getType());
 						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) > 0) {
 
 							BuildOrderQueue tempbuildQueue = BuildManager.Instance().getBuildQueue();
@@ -339,7 +339,7 @@ public class InformationManager extends GameManager {
 			if (gasRushed == true && gasRushEnemyRefi != null) {
 				if (gasRushEnemyRefi == null || gasRushEnemyRefi.getHitPoints() <= 0
 						|| gasRushEnemyRefi.isTargetable() == false) {
-//					FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: gas rush end"+ Prebot.Broodwar.getFrameCount());
+//					//FileUtils.appendTextToFile("log.txt", "\n Information checkGasRush :: gas rush end"+ Prebot.Broodwar.getFrameCount());
 					gasRushed = false;// 가스 러쉬 위험 끝
 //					System.out.println("gas rush finished");
 //					if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) < 1){
@@ -908,9 +908,9 @@ public class InformationManager extends GameManager {
 
 		if (mainBaseLocations.get(enemyPlayer) != null) {
 			int numberOfCC = MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center);
-//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center));
+//			//FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center));
 //			int numberOfCC = Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) + Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center);
-//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) +" + "+ Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center));
+//			//FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation CommandCenter cnt :: " + numberOfCC + " :: " + Prebot.Broodwar.self().allUnitCount(UnitType.Terran_Command_Center) +" + "+ Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Command_Center));
 //			if (numberOfCC == 2) {
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
 ////				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
@@ -946,7 +946,7 @@ public class InformationManager extends GameManager {
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
 //			}
 			
-//			FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation numberOfCC :: " + numberOfCC + " :: " + resultBase.getTilePosition());
+//			//FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation numberOfCC :: " + numberOfCC + " :: " + resultBase.getTilePosition());
 		}
 		
 
@@ -1036,7 +1036,7 @@ public class InformationManager extends GameManager {
 		double closestDistance = 1000000000;
 		double closestDistanceToSecondExp = 0;
 
-//		FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start");
+//		//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation start");
 		
 		for (BaseLocation base : bases) {
 			if (onlyStartLocation && !base.isStartLocation())
@@ -1046,11 +1046,11 @@ public class InformationManager extends GameManager {
 			if (base.getTilePosition().equals(enemyBaseLocation.getTilePosition()))
 				continue;
 			
-//			FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation chk this base ::" + base.getTilePosition());
+//			//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation chk this base ::" + base.getTilePosition());
 
 			if (isMulti) {
 				
-//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation isMulti True");
+//				//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation isMulti True");
 
 				if (firstExpansionLocation.get(enemyPlayer) != null) {
 					if (base.getTilePosition().equals(firstExpansionLocation.get(enemyPlayer).getTilePosition()))
@@ -1084,19 +1084,19 @@ public class InformationManager extends GameManager {
 			closeFromMyExpansionButFarFromEnemy = firstExpansionToOccupied - enemyBaseToOccupied;
 
 			if (closeFromMyExpansionButFarFromEnemy < closestDistance && firstExpansionToOccupied > 0) {
-//				FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + (int)closeFromMyExpansionButFarFromEnemy +" < " + (int)closestDistance);
+//				//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation closeFromMyExpansionButFarFromEnemy < closestDistance :: " + (int)closeFromMyExpansionButFarFromEnemy +" < " + (int)closestDistance);
 //				if(thirdPosition) {
-////					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
+////					//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition is true");
 //					closestDistanceToSecondExp = secondStartPosition.getGroundDistance(base);
 //					if(closestDistanceToSecondExp < distanceToSecondExpansion) {
 //						closestDistanceToSecondExp = distanceToSecondExpansion;
 //						closestDistance = closeFromMyExpansionButFarFromEnemy;
-////						FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition true set resultBase :: " + base.getTilePosition());
+////						//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation thirdPosition true set resultBase :: " + base.getTilePosition());
 //						resultBase = base;
 //					}
 //				}else {
 					closestDistance = closeFromMyExpansionButFarFromEnemy;
-//					FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation set resultBase :: " + base.getTilePosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n getCloseButFarFromEnemyLocation set resultBase :: " + base.getTilePosition());
 					resultBase = base;	
 //				}
 			}
@@ -1337,7 +1337,7 @@ public class InformationManager extends GameManager {
     	
 	    if(secondStartPosition == null) {
 	    	
-//	    	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: new One");
+//	    	//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: new One");
 	    	
             int closestDistance = 99999999;
             BaseLocation resultBase = null;
@@ -1353,14 +1353,14 @@ public class InformationManager extends GameManager {
             	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
             	for(Unit unit : enemyBuilding) {
             		if(unit.getType().isResourceDepot()) {
-//            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: " + unit.getType());
+//            			//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: " + unit.getType());
             			enemyRegion = true;
             		}
             			
             	}
             	
             	if(enemyBuilding.size() > 5) {
-//            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
+//            		//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
             		enemyRegion = true;
             	}
 
@@ -1380,14 +1380,14 @@ public class InformationManager extends GameManager {
         }
 //	    else {
 //        	
-////        	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: re calculate");
+////        	//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: re calculate");
 //        	
 //        	int closestDistance = 99999999;
 //            BaseLocation resultBase = null;
 //
 //            for (BaseLocation baseLocation : BWTA.getStartLocations()) {
 //            	
-////            	FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: check postion is  :: " + baseLocation.getTilePosition());
+////            	//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: check postion is  :: " + baseLocation.getTilePosition());
 //            	
 //            	enemyRegion = false;
 //            	
@@ -1399,16 +1399,16 @@ public class InformationManager extends GameManager {
 ////            	20180815. hkk. 해당지역에 적 메인 건물이 있거나, 건물이 5개 초과이면 적 지역이라고 인식한다.
 //            	List<Unit> enemyBuilding = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, baseLocation.getPosition(), 350);
 //            	for(Unit unit : enemyBuilding) {
-////            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: for enemyRegion :: " + unit.getType());
+////            		//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: for enemyRegion :: " + unit.getType());
 //            		if(unit.getType().isResourceDepot()) {
-////            			FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is ResourceDepot :: " + unit.getType());
+////            			//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is ResourceDepot :: " + unit.getType());
 //            			enemyRegion = true;
 //            		}
 //            			
 //            	}
 //            	
 //            	if(enemyBuilding.size() > 3) {
-////            		FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
+////            		//FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: there is enemyRegion :: building cnt:: " + enemyBuilding.size());
 //            		enemyRegion = true;
 //            	}
 //
@@ -1422,7 +1422,7 @@ public class InformationManager extends GameManager {
 //                if (closeFromMyExpansionButFarFromEnemy < closestDistance) {
 //                    closestDistance = closeFromMyExpansionButFarFromEnemy;
 //                    resultBase = baseLocation;
-////                    FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: set resultBase :: " + resultBase.getTilePosition());
+////                    //FileUtils.appendTextToFile("log.txt", "\n updateMySecondBaseLocation :: set resultBase :: " + resultBase.getTilePosition());
 //                }
 //            }
 //            if(!TilePositionUtils.equals(secondStartPosition.getTilePosition(), resultBase.getTilePosition())) {

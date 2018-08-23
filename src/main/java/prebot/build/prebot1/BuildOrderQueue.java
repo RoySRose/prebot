@@ -176,8 +176,8 @@ public class BuildOrderQueue {
 			final MetaType item = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType;
 			TilePosition itemPosition = ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation;
 			Point seedPositionPoint = null;
-//			FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> item => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType.getUnitType());
-//			FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> seedTile => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation);
+//			//FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> item => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).metaType.getUnitType());
+//			//FileUtils.appendTextToFile("log.txt", "\n test log getItemCountNear()==>>> seedTile => " + ((BuildOrderItem)tempArr[queue.size() - 1 - i]).seedLocation);
 			if(queryTilePosition != null)
 			{
 //				20180716. hkk debug
