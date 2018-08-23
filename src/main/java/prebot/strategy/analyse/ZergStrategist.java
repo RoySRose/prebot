@@ -28,10 +28,7 @@ public class ZergStrategist extends Strategist {
 			} else if (hasInfo(ClueInfo.DOUBLE_HATCH_LATE) && hasAnyInfo(ClueInfo.LAIR_COMPLETE, ClueInfo.LAIR_INCOMPLETE)) {
 				return EnemyStrategy.ZERG_LURKER_ALL_IN;
 			}
-			
-			if (hasAnyInfo(ClueInfo.DOUBLE_HATCH_LATE)) {
-				return EnemyStrategy.ZERG_HYDRA_ALL_IN;
-			}
+			return EnemyStrategy.ZERG_HYDRA_ALL_IN;
 		}
 		
 		if (hasInfo(Clue.ClueInfo.DOUBLE_HATCH_3HAT)) {

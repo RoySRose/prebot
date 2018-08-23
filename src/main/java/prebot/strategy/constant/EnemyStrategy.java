@@ -174,7 +174,7 @@ public enum EnemyStrategy {
 	
 	ZERG_HYDRA_WAVE(1, 2, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM) // camp=F_CHOKE
 			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
-			, TimeMapForZerg.ZERG_NO_LAIR_HYDRA()
+			, TimeMapForZerg.ZERG_HYDRA_WAVE()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION, EnemyStrategyOptions.Mission.MissionType.TANK)),
 	
 	ZERG_NO_LAIR_LING(3, 1, 0, EnemyStrategyOptions.FactoryRatio.Weight.VULTURE, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.VS) // camp=F_CHOKE

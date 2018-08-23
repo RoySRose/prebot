@@ -102,6 +102,9 @@ public class TimeMapForZerg {
 		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.NO_LAIR
 				, EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT, EnemyStrategyOptions.BuildTimeMap.Feature.ZERG_FAST_ALL_IN);
 	}
+	public static EnemyStrategyOptions.BuildTimeMap ZERG_HYDRA_WAVE() {
+		return new EnemyStrategyOptions.BuildTimeMap().setFeature(EnemyStrategyOptions.BuildTimeMap.Feature.DEFENSE_FRONT);
+	}
 	public static EnemyStrategyOptions.BuildTimeMap ZERG_LAIR_MIXED() {
 		return new EnemyStrategyOptions.BuildTimeMap();
 	}
