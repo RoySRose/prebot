@@ -81,7 +81,7 @@ public class BuildManager extends GameManager {
 			return;
 		}
 
-//		FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager Start :: " + System.currentTimeMillis());
+//		//FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager Start :: " + System.currentTimeMillis());
 //		System.out.println("frame count debug ==>> " + Prebot.Broodwar.getFrameCount());
 		
 		// Dead Lock 중에 앞선 건물이 없을 경우 추가한다.
@@ -223,12 +223,12 @@ public class BuildManager extends GameManager {
 						else {
 							// ConstructionPlaceFinder 를 통해 건설 가능 위치 desiredPosition 를 알아내서 ConstructionManager 의 ConstructionTask Queue에 추가를 해서 desiredPosition 에 건설을 하게 한다.
 							// ConstructionManager 가 건설 도중에 해당 위치에 건설이 어려워지면 다시 ConstructionPlaceFinder 를 통해 건설 가능 위치를 desiredPosition 주위에서 찾을 것이다
-//							FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before :: buildManager :: " + System.currentTimeMillis()+ " :: " + t.getUnitType() + " :: "+ currentItem.seedLocation + " :: " + currentItem.seedLocationStrategy);
+//							//FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition before :: buildManager :: " + System.currentTimeMillis()+ " :: " + t.getUnitType() + " :: "+ currentItem.seedLocation + " :: " + currentItem.seedLocationStrategy);
 							TilePosition desiredPosition = getDesiredPosition(t.getUnitType(), currentItem.seedLocation,currentItem.seedLocationStrategy);
 
 							if (desiredPosition != TilePosition.None) {
 //								System.out.println("desiredPosition is not null :: " + t.getUnitType() + " :: " + desiredPosition);
-//								FileUtils.appendTextToFile("log.txt", "desiredPosition is not null :: " + System.currentTimeMillis());
+//								//FileUtils.appendTextToFile("log.txt", "desiredPosition is not null :: " + System.currentTimeMillis());
 								ConstructionManager.Instance().addConstructionTask(t.getUnitType(), desiredPosition);
 							} else {
 								// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
@@ -289,12 +289,12 @@ public class BuildManager extends GameManager {
 				currentItem = buildQueue.getItem();
 			} else {
 				// so break out
-//				FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager break out :: " + System.currentTimeMillis());
+//				//FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager break out :: " + System.currentTimeMillis());
 				break;
 			}
 		}
 		
-//		FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager End :: " + System.currentTimeMillis());
+//		//FileUtils.appendTextToFile("log.txt", "\n frame count debug BuildManager End :: " + System.currentTimeMillis());
 	}
 
 	/// 해당 MetaType 을 build 할 수 있는 producer 를 찾아 반환합니다
@@ -421,7 +421,7 @@ public class BuildManager extends GameManager {
 						{
 							if(baseLocation.getTilePosition().getX() == unit.getTilePosition().getX()
 								&& baseLocation.getTilePosition().getY() == unit.getTilePosition().getY()) {
-//								FileUtils.appendTextToFile("log.txt", "\n CommandCenter is right postion ==>> " + baseLocation.getTilePosition());
+//								//FileUtils.appendTextToFile("log.txt", "\n CommandCenter is right postion ==>> " + baseLocation.getTilePosition());
 								comsat_ret = true;
 								break;
 							}
@@ -471,25 +471,25 @@ public class BuildManager extends GameManager {
 			}
 			
 //			if(t.getUnitType() == UnitType.Terran_Vulture || t.getUnitType() == UnitType.Terran_Goliath) {
-////				FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture");
+////				//FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture");
 //				
 ////				20180818. hkk. 배정된 팩토리에 머신샵이 있을경우 일단 임시생산자로 지정. 다시 루프를 돌려 생산자가 머신샵이 없을 경우 그걸로 배정. 끝까지 돌렸으나 머신샵 없는 생산자가 없을 경우 그냥 배정.
 //				if(tempProducer == null) {
-//					FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture initset :: " + unit.getType() + " ::  addon :: " + unit.getAddon());
+//					//FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture initset :: " + unit.getType() + " ::  addon :: " + unit.getAddon());
 //					tempProducer = unit;
 //				}
 //				
 //				if(tempProducer.getAddon() != null && unit.getAddon() == null) {
-//					FileUtils.appendTextToFile("log.txt", "\n getProducer of vulture :: factory that has addon to change non-addon");
+//					//FileUtils.appendTextToFile("log.txt", "\n getProducer of vulture :: factory that has addon to change non-addon");
 //					tempProducer = unit;
 //				}
 //				
 //				if(tempProducer.getAddon() != null) {
-//					FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture continue :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
+//					//FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture continue :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
 //					continue;
 //				}
 //				
-//				FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture set this tempProducer :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
+//				//FileUtils.appendTextToFile("log.txt", "\n setProducer of vulture set this tempProducer :: " + tempProducer.getType() + " ::  addon :: " + tempProducer.getAddon());
 //				candidateProducers.add(tempProducer); // C++ :
 //				
 //			}else {
@@ -672,7 +672,7 @@ public class BuildManager extends GameManager {
 		while (count < 15) {
 //		while (true) {
 	    	count++;
-//	    	FileUtils.appendTextToFile("log.txt", "\n while getDesiredPosition :: " + System.currentTimeMillis() + " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//	    	//FileUtils.appendTextToFile("log.txt", "\n while getDesiredPosition :: " + System.currentTimeMillis() + " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.MainBaseLocation) {
                 if (mainBaseLocationFull) {
                     seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;//TODO 다음 검색 위치
@@ -708,15 +708,15 @@ public class BuildManager extends GameManager {
                 }
             }
 
-//	    	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//	    	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
             desiredPosition = ConstructionPlaceFinder.Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
-//            FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy after :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy + " :: " + desiredPosition);
+//            //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy after :: buildManager :: " + System.currentTimeMillis()+ " :: " + unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy + " :: " + desiredPosition);
             
             if(desiredPosition == null) {
 //            	20180815. hkk. seedPosition 이 지정되어 들어올경우 null이 나와도 SeedPositionStrategy 가 의미가 없으므로 1번만 찾는다.
             	
                 if (TilePositionUtils.isValidTilePosition(seedPosition)) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null break :: " + unitType + " :: seedPosition :: "+ seedPosition);
+//                	//FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null break :: " + unitType + " :: seedPosition :: "+ seedPosition);
                 	break;
                 }
             	
@@ -729,7 +729,7 @@ public class BuildManager extends GameManager {
             			break;
             		}
             	}
-//            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition is null :: "+ unitType + " :: "+ seedPosition + " :: " + seedPositionStrategy);
                 if (seedPositionStrategy == BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified) {
                     System.out.println("Fixed seedPosition out");
                     break;
@@ -746,7 +746,7 @@ public class BuildManager extends GameManager {
                 	break;
                 }
             }else {
-//            	FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ desiredPosition + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getDesiredPosition desiredPosition not null break:: "+ unitType + " :: "+ desiredPosition + " :: " + seedPositionStrategy);
             	break;
             }
         }
@@ -766,10 +766,10 @@ public class BuildManager extends GameManager {
 	// return whether or not we meet resources, including building reserves
 	public boolean hasEnoughResources(MetaType type) {
 		// return whether or not we meet the resources
-//		FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
+//		//FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
 //		return (type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas());
 		if((type.mineralPrice() <= getAvailableMinerals()) && (type.gasPrice() <= getAvailableGas())) {
-//			FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
+//			//FileUtils.appendTextToFile("log.txt", "\n hasEnoughResources :: " + type + " :: M :" + getAvailableMinerals() + " :: G : " + getAvailableGas());
 			return true;
 		}
 		
@@ -1095,14 +1095,14 @@ public class BuildManager extends GameManager {
 //					if (!isDeadlockCase && unitType == InformationManager.Instance().getRefineryBuildingType()) {
 					if (!isDeadlockCase && unitType == InformationManager.Instance().getRefineryBuildingType()) {
 						
-//						FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: refinery lock check");
+//						//FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: refinery lock check");
 						boolean hasAvailableGeyser = true;
 
 						// Refinery가 지어질 수 있는 장소를 찾아본다
 						TilePosition testLocation = getDesiredPosition(unitType, currentItem.seedLocation,
 								currentItem.seedLocationStrategy);
 						
-//						FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: getDesiredPosition :: " + testLocation);
+//						//FileUtils.appendTextToFile("log.txt", "\n checkBuildOrderQueueDeadlockAndAndFixIt :: getDesiredPosition :: " + testLocation);
 
 						// Refinery 를 지으려는 장소를 찾을 수 없으면 dead lock
 						if (testLocation == TilePosition.None || testLocation == TilePosition.Invalid

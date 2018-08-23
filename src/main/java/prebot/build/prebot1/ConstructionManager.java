@@ -19,6 +19,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -70,7 +71,7 @@ public class ConstructionManager extends GameManager {
 		reservedGas += type.gasPrice();
 
 		constructionQueue.add(b); // C++ : constructionQueue.push_back(b);
-//		FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: reservedMinerals :: " + reservedMinerals  + " :: reservedGas :: " + reservedGas );
+//		//FileUtils.appendTextToFile("log.txt", "\n addConstructionTask :: " + b.getType() + " :: reservedMinerals :: " + reservedMinerals  + " :: reservedGas :: " + reservedGas );
 	}
 
 	
@@ -106,7 +107,7 @@ public class ConstructionManager extends GameManager {
 //				{
 //					width += 2;
 //				}
-//				FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
 				ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 			}
 	        constructionQueue.remove(b);
@@ -137,7 +138,7 @@ public class ConstructionManager extends GameManager {
 //					{
 //						width += 2;
 //					}
-//					FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n cancelConstructionTaskDoNotReturnResources :: freeTiles :: " + b.getType() + " :: " + b.getFinalPosition());
 					ConstructionPlaceFinder.Instance().freeTiles(b.getFinalPosition(), width, height, b.getType());
 				}
 		        constructionQueue.remove(b);
@@ -266,7 +267,8 @@ public class ConstructionManager extends GameManager {
 //			System.out.println( "assignWorkersToUnassignedBuildings start :: " + b.getType());
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
-//	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+//	        //FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+//	        //FileUtils.appendTextToFile(b.getType(), "log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
@@ -278,7 +280,7 @@ public class ConstructionManager extends GameManager {
 //	        	System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
 				System.out.println(b.getType().toString() + "'s relocationTilePosition not found. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
 				
-//				FileUtils.appendTextToFile("log.txt", "\n "+b.getType().toString() + "'s relocationTilePosition is not valid. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
+//				//FileUtils.appendTextToFile("log.txt", "\n "+b.getType().toString() + "'s relocationTilePosition is not valid. lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition() + ", relocationTilePosition=" + relocationTilePosition);
 				
 				
 				if(b.getType().equals(UnitType.Terran_Supply_Depot)||b.getType().equals(UnitType.Terran_Barracks)||b.getType().equals(UnitType.Terran_Academy)) {
@@ -290,7 +292,7 @@ public class ConstructionManager extends GameManager {
 				}
 				if (relocationTilePosition == TilePosition.None) {
 					System.out.println(" relocationTilePosition recalculate desiredPosition None");
-//					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition None");
+//					//FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition None");
 					continue;
 				}else{
 					for (BaseLocation baseLocation : BWTA.getBaseLocations()) {
@@ -303,7 +305,7 @@ public class ConstructionManager extends GameManager {
 					if (relocationTilePosition == TilePosition.None) continue;
 					
 					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
-//					FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
+//					//FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 				}
 			}
 
@@ -336,7 +338,7 @@ public class ConstructionManager extends GameManager {
 //			}
 			
 //				System.out.println("reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
-//				FileUtils.appendTextToFile("log.txt", "\n reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
+//				//FileUtils.appendTextToFile("log.txt", "\n reserveTiles Unit :: " + b.getType() + "("+ testLocation.getX() +", "+testLocation.getY()+" ) / width :: " + width  + " / height :: " + height);
 			
 			// reserve this building's space
 			ConstructionPlaceFinder.Instance().reserveTiles(relocationTilePosition, width, height, b.getType());
@@ -741,7 +743,7 @@ public class ConstructionManager extends GameManager {
 		for (ConstructionTask i : toCancel)
 		{
 			System.out.println("cacnel type=" + i.getType() + ", desiredPosition=" + i.getDesiredPosition());
-//			FileUtils.appendTextToFile("log.txt", "\n cacnel type= "+ i.getType() + ", desiredPosition=" + i.getDesiredPosition() + " :: " + Prebot.Broodwar.getFrameCount());
+//			//FileUtils.appendTextToFile("log.txt", "\n cacnel type= "+ i.getType() + ", desiredPosition=" + i.getDesiredPosition() + " :: " + Prebot.Broodwar.getFrameCount());
 //			cancelConstructionTask(i.getType(), i.getDesiredPosition());
 			cancelConstructionTask(i);
 		}

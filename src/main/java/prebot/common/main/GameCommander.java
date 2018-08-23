@@ -12,6 +12,7 @@ import prebot.build.prebot1.ConstructionManager;
 import prebot.build.prebot1.ConstructionPlaceFinder;
 import prebot.build.provider.BuildQueueProvider;
 import prebot.common.MapGrid;
+import prebot.common.constant.CommonCode.UnitFindRange;
 import prebot.common.debug.BigWatch;
 import prebot.common.debug.chat.ChatBot;
 import prebot.common.util.PlayerUtils;
@@ -122,6 +123,8 @@ public class GameCommander {
 			||unit.getType() == UnitType.Terran_Machine_Shop || unit.getType() == UnitType.Terran_Control_Tower) {
 			ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuildingFree(unit);
 		}
+		
+		
 //		if (unit.getType() == UnitType.Terran_Machine_Shop || unit.getType() == UnitType.Terran_Control_Tower) { 
 ////				|| unit.getType() == UnitType.Terran_Covert_Ops || unit.getType() == UnitType.Terran_Physics_Lab) {
 //			ConstructionPlaceFinder.Instance().setTilesToAvoidAddonBuildingFree(unit);
