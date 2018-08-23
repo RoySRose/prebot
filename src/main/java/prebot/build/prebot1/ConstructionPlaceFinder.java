@@ -61,8 +61,8 @@ public class ConstructionPlaceFinder {
 	private boolean[][] tilesToAvoidAddonBuilding = new boolean[128][128];
 	//커맨드 센터 와 컴셋 건설지역
 //	private Set<TilePosition> tilesToBaseLocationAvoid = new HashSet<TilePosition>();
-//	private Set<TilePosition> tilesToAvoidComSat = new HashSet<TilePosition>();
-	private boolean[][] tilesToAvoidComSat = new boolean[128][128];
+//	private Set<TilePosition> tilesToAvoidEntranceTurret = new HashSet<TilePosition>();
+	private boolean[][] tilesToAvoidEntranceTurret = new boolean[128][128];
 	
 	
 	private static ConstructionPlaceFinder instance = new ConstructionPlaceFinder();
@@ -864,10 +864,8 @@ public class ConstructionPlaceFinder {
 					
 ////					20180815. hkk. 커맨드 센터 일경우. new 커맨드 센터 본진이, old 커맨드 센터 컴셋 위치를 침범하면 안된다.
 					if(b.getType() == UnitType.Terran_Command_Center) {
-						if(x != position.getX() + 4 && x != position.getX() + 5 && x != position.getX() + 6) {
-							if(isTilesToAvoidComsat(x, y)) {
-								return false;
-							}
+						if(isTilesToAvoidEntranceTurret(x, y)) {
+							return false;
 						}
 					}
 
@@ -921,12 +919,11 @@ public class ConstructionPlaceFinder {
 					}
 					
 					
-//					if (b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport) {
+					if(b.getType() != UnitType.Terran_Command_Center) {
 						if (isTilesToAvoidAbsolute(x, y)) {
-	//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidAbsolute false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
-//					}
+					}
 				}
 			}
 		}
@@ -950,15 +947,36 @@ public class ConstructionPlaceFinder {
 			return false;
 		}
 		
+		int addWidth = 0;
+		int addHeight = 0;
+		
+		if(b.getType() == UnitType.Terran_Factory || b.getType() == UnitType.Terran_Starport) {
+			addWidth = 2;
+		}
+		
+		int rwidth = reserveMap.length;
+		int rheight = tilesToAvoid[0].length;
+//		if (x < 0 || y < 0 || x >= rwidth || y >= rheight)
+//		{
+//			return false;
+//		}
+		
 		// check the reserve map
-		for (int x = position.getX() ; x < position.getX() + b.getType().tileWidth(); x++)
+		for (int x = position.getX() ; x < position.getX() + b.getType().tileWidth() + addWidth; x++)
 		{
-			for (int y = position.getY() ; y < position.getY() + b.getType().tileHeight(); y++)
+			for (int y = position.getY() ; y < position.getY() + b.getType().tileHeight() + addHeight; y++)
 			{
+				
+//				20180823. hkk. 애드온 지역이 맵밖으로 나간다면 그곳은 건설 불가
+				if (x < 0 || y < 0 || x >= rwidth || y >= rheight)
+				{
+					return false;
+				}
+				
 				//if (reserveMap.get(x).get(y))
 				if (reserveMap[x][y])
 				{
-//					FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here reserveMap :: " + x + " , " + y);
+//							FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here reserveMap :: " + x + " , " + y);
 					return false;
 				}
 			}
@@ -1403,7 +1421,7 @@ public class ConstructionPlaceFinder {
 //		return false;
 //	}
 	
-	public final boolean isTilesToAvoidComsat(int x, int y)
+	public final boolean isTilesToAvoidEntranceTurret(int x, int y)
 	{
 //		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().second_supple
@@ -1415,7 +1433,7 @@ public class ConstructionPlaceFinder {
 //			return true;
 //		}
 		
-//		for (TilePosition t : tilesToAvoidComSat) {
+//		for (TilePosition t : tilesToAvoidEntranceTurret) {
 //			if (t.getX() == x && t.getY() == y) {
 //				return true;
 //			}
@@ -1423,13 +1441,13 @@ public class ConstructionPlaceFinder {
 		
 //
 //		return false;
-		int rwidth = tilesToAvoidComSat.length;
-		int rheight = tilesToAvoidComSat[0].length;
+		int rwidth = tilesToAvoidEntranceTurret.length;
+		int rheight = tilesToAvoidEntranceTurret[0].length;
 		if (x < 0 || y < 0 || x >= rwidth || y >= rheight)
 		{
 			return false;
 		}
-		return tilesToAvoidComSat[x][y];
+		return tilesToAvoidEntranceTurret[x][y];
 	}
 	
 	
@@ -1851,7 +1869,7 @@ public class ConstructionPlaceFinder {
 					for(int y = 0; y<2; y++) {
 //						TilePosition turret_p = new TilePosition(turret_x+x,turret_y+y);
 						tilesToAvoid[turret_x+x][turret_y+y] = true;
-						tilesToAvoidComSat[turret_x+x][turret_y+y] = true;
+						tilesToAvoidEntranceTurret[turret_x+x][turret_y+y] = true;
 					}
 					
 				}
