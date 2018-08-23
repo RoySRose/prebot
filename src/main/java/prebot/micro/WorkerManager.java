@@ -426,7 +426,8 @@ public class WorkerManager extends GameManager {
 							setRepairWorker(repairWorker, unit);
 						}
 					} else if(unit.getType() != UnitType.Terran_Supply_Depot 
-							&& unit.getType() != UnitType.Terran_Armory){
+							&& unit.getType() != UnitType.Terran_Armory
+							&& unit.getType() != UnitType.Terran_Academy){
 						setRepairWorker(repairWorker, unit);
 					}
 				}
