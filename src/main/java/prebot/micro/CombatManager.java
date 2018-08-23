@@ -16,7 +16,6 @@ import prebot.common.constant.CommonCode;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
-import prebot.common.main.PreBotDevelop;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -225,6 +224,11 @@ public class CombatManager extends GameManager {
 			}
 		}
 		
+
+    	if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER7, 0), LagObserver.managerRotationSize())) {
+    		return;
+    	}
+		
 		if (!StrategyIdea.mainSquadCrossBridge) {
 			return;
 		}
@@ -341,40 +345,42 @@ public class CombatManager extends GameManager {
 	}
 
 	private void updateGuerillaSquad() {
-		
-		double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
-		if (StrategyIdea.nearGroundEnemyPosition != null) {
-			maxRatio = 0.0d;
-		} else {
-			if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadCrossBridge) {
-				maxRatio = 0.5;
-			}
-		}
-		
-		int gurillaFailFrame = VultureTravelManager.Instance().getGurillaFailFrame();
-		if (TimeUtils.elapsedFrames(gurillaFailFrame) < 10 * TimeUtils.SECOND) {
-			maxRatio = 0.0d;
-		}
-		
-		int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-		int maxCount = (int) (vultureCount * maxRatio);
 
-		List<Unit> assignableVultures = new ArrayList<>();
-		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
-		for (Unit unit : squadTypeUnitList) {
-			Squad unitSqaud = squadData.getSquad(unit);
-			if (unitSqaud instanceof GuerillaSquad) {
-				continue;
+		if (TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER7, 0), LagObserver.managerRotationSize())) {
+			double maxRatio = StrategyIdea.mainSquadMode.maxGuerillaVultureRatio;
+			if (StrategyIdea.nearGroundEnemyPosition != null) {
+				maxRatio = 0.0d;
+			} else {
+				if (InfoUtils.enemyRace() == Race.Terran && StrategyIdea.mainSquadCrossBridge) {
+					maxRatio = 0.5;
+				}
 			}
 			
-			assignableVultures.add(unit);
-			if (assignableVultures.size() >= maxCount) {
-				break;
+			int gurillaFailFrame = VultureTravelManager.Instance().getGurillaFailFrame();
+			if (TimeUtils.elapsedFrames(gurillaFailFrame) < 10 * TimeUtils.SECOND) {
+				maxRatio = 0.0d;
 			}
+			
+			int vultureCount = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+			int maxCount = (int) (vultureCount * maxRatio);
+	
+			List<Unit> assignableVultures = new ArrayList<>();
+			List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture);
+			for (Unit unit : squadTypeUnitList) {
+				Squad unitSqaud = squadData.getSquad(unit);
+				if (unitSqaud instanceof GuerillaSquad) {
+					continue;
+				}
+				
+				assignableVultures.add(unit);
+				if (assignableVultures.size() >= maxCount) {
+					break;
+				}
+			}
+	
+			// 새 게릴라 스퀴드
+			newGuerillaSquad(assignableVultures);
 		}
-
-		// 새 게릴라 스퀴드
-		newGuerillaSquad(assignableVultures);
 
 		// 게릴라 임무해제
 		List<Squad> guerillaSquads = squadData.getSquadList(MicroConfig.SquadInfo.GUERILLA_.squadName);
