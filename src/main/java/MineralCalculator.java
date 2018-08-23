@@ -36,7 +36,6 @@ public class MineralCalculator {
         	}
             //if(!minerals.getMineralUnit().isVisible() && minerals.getMineralUnit().getResources() > 0){
 //        	if(!minerals.getMineralUnit().isVisible()) {
-//            	System.out.println("visible is false : " +  minerals.getMineralUnit().getID() + ", " + minerals.getMineralUnit().getResources());
 //                return false;
 //            }
         }

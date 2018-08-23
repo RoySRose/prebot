@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import bwapi.Color;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
@@ -179,7 +178,6 @@ public class WatcherSquad extends Squad {
 				
 				if (add) {
 					euis.add(eui);
-					MyBotModule.Broodwar.drawCircleMap(eui.getLastPosition(), 30, Color.Red, false);
 				}
 			}
 		}

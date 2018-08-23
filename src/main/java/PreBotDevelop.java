@@ -43,11 +43,9 @@ public class PreBotDevelop extends DefaultBWListener {
 		Broodwar.setLocalSpeed(CommonConfig.Config.SetLocalSpeed);
 		Broodwar.setFrameSkip(CommonConfig.Config.SetFrameSkip);
 
-		System.out.println("Map analyzing started");
 		BWTA.readMap();
 		BWTA.analyze();
 		BWTA.buildChokeNodes();
-		System.out.println("Map analyzing finished");
 
 		gameCommander.onStart();
 	}
@@ -55,15 +53,7 @@ public class PreBotDevelop extends DefaultBWListener {
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다
 	@Override
 	public void onEnd(boolean isWinner) {
-		if (isWinner) {
-			System.out.println("I won the game");
-		} else {
-			System.out.println("I lost the game");
-		}
-
 		gameCommander.onEnd(isWinner);
-
-		System.out.println("Match ended");
 		System.exit(0);
 	}
 
@@ -81,12 +71,9 @@ public class PreBotDevelop extends DefaultBWListener {
 			gameCommander.onFrame();
 		} catch (Exception e) {
 			Broodwar.printf("[Error Stack Trace]");
-			System.out.println("[Error Stack Trace]");
 			Broodwar.sendText(e.toString());
-			System.out.println(e.toString());
 			for (StackTraceElement ste : e.getStackTrace()) {
 				Broodwar.sendText(ste.toString());
-				System.out.println(ste.toString());
 			}
 		}
 

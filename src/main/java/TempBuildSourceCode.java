@@ -195,7 +195,6 @@ public class TempBuildSourceCode {
 //			if (InformationManager.Instance().enemyRace == Race.Terran) {
 //				nomorescv = 60;
 //			}
-//			// System.out.println("maxworkerCount: " + maxworkerCount);
 //			if (workerCount < nomorescv && workerCount < maxworkerCount) {
 //				for (Unit unit : Prebot.Broodwar.self().getUnits()) {
 //					if (unit.getType().isResourceDepot() && unit.isCompleted() && unit.isTraining() == false) {
@@ -226,7 +225,6 @@ public class TempBuildSourceCode {
 //								return;
 //							}
 //						}
-//						// System.out.println("checkItem: " + checkItem.metaType.getName());
 //						if (checkItem == null) {
 //							BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 //						} else if (checkItem.metaType.isUnit()) {
@@ -715,10 +713,6 @@ public class TempBuildSourceCode {
 //		// armory end2
 //
 //		// battlecruiser start
-//		// System.out.println("need_battlecruiser: " + RespondToStrategy.Instance().need_battlecruiser);
-//		// System.out.println("CC: " + CC);
-//		// System.out.println("max_battlecruiser: " + RespondToStrategy.Instance().max_battlecruiser);
-//		// System.out.println("battlecnt: " + battlecnt);
 //
 //		// if(RespondToStrategy.Instance().need_battlecruiser == true && CC>=3 && RespondToStrategy.Instance().max_battlecruiser > battlecnt){
 //		//

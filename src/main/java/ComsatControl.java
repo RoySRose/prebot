@@ -55,9 +55,9 @@ public class ComsatControl extends Control {
 					scanUsedFrame = TimeUtils.elapsedFrames();
 					
 					if (scanAtReadyTo) {
-						System.out.println("scan for ready to position. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+//						System.out.println("scan for ready to position. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 					} else {
-						System.out.println("scan for invisible. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+//						System.out.println("scan for invisible. position=" + scanPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 					}
 					
 					return;
@@ -227,7 +227,7 @@ public class ComsatControl extends Control {
 		Position oldestCheckPosition = CheckForResourceInfoNeeded();
 		
 		if(oldestCheckPosition != Position.None) {
-			System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+//			System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
 			
 			return oldestCheckPosition;
 		}

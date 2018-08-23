@@ -93,13 +93,11 @@ public class MultiDefenseSquad extends Squad {
 		Position defensePosition = null;
 		if (type == MultiDefenseSquad.DefenseType.CENTER_DEFENSE) {
 			if (!UnitUtils.isValidUnit(commandCenter)) {
-				System.out.println("invalid commandCetner. " + getSquadName());
 				return;
 			}
 			defensePosition = commandCenter.getPosition();
 		} else if (type == MultiDefenseSquad.DefenseType.REGION_OCCUPY) {
 //			if (!UnitUtils.isValidUnit(commandCenter)) {
-//				System.out.println("region is null. " + getSquadName());
 //				return;
 //			}
 			defensePosition = this.defensePosition;

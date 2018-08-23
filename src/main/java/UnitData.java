@@ -73,8 +73,6 @@ public class UnitData {
 		if(ui.getUnitID() == unit.getID() && unit.getType() != ui.getType()){
 			
 			if(ui.getType()!=UnitType.None){
-//				System.out.println("unitid: " + unit.getID() + ", " +unit.getType());
-//				System.out.println("ui_id: " + ui.getUnitID() + ", " +ui.getType());
 				removeUnitbyMorph(unit, ui.getType());
 				firstSeen = true;
 				unitAndUnitInfoMap.put(unit.getID(), new UnitInfo());
@@ -202,11 +200,9 @@ public class UnitData {
 				
 				
 				if(ui.getUnit().getPosition() == null) {
-					System.out.println("here?: disappeared");
 					return true;
 				}else {
 					if(ui.getUnit().getPosition() == ui.getLastPosition())	
-							System.out.println("here?: same place");
 				
 					return false;
 				}

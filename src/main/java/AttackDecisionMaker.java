@@ -620,7 +620,7 @@ public class AttackDecisionMaker extends GameManager {
     	falseDepot.setUpdateFrame(0);
     	falseDepot.setRemainingBuildTime(0);
     	
-    	System.out.println("add false: " + falseDepot.getLastPosition());
+//    	System.out.println("add false: " + falseDepot.getLastPosition());
     	
     	falseEnemyMainBase =true;
         EnemyCommandInfo enemyCommandInfo = new EnemyCommandInfo(falseDepot, true);
@@ -674,7 +674,7 @@ public class AttackDecisionMaker extends GameManager {
                 	
                 	EnemyCommandInfo enemyCommandInfo;
                 	if(isMainBase) {
-                		System.out.println("found real main: " + unitInfo.getLastPosition());
+//                		System.out.println("found real main: " + unitInfo.getLastPosition());
                 		if(falseEnemyMainBase) {
                 			enemyCommandInfo = removefake(unitInfo);
                 			falseEnemyMainBase = false;
@@ -685,7 +685,7 @@ public class AttackDecisionMaker extends GameManager {
         	        }else {
             			enemyCommandInfo = new EnemyCommandInfo(unitInfo, isMainBase);
             		}
-                	System.out.println("add : " + unitInfo + ", " + isMainBase + ", " + unitInfo.getLastPosition());
+//                	System.out.println("add : " + unitInfo + ", " + isMainBase + ", " + unitInfo.getLastPosition());
         	        enemyResourceDepotInfoMap.put(unitInfo, enemyCommandInfo);
                 	
                     resourceDepotPosition.add(unitInfo.getLastPosition());
@@ -725,7 +725,7 @@ public class AttackDecisionMaker extends GameManager {
            EnemyCommandInfo enemyCommandInfo = enemyResourceDepot.getValue();
 
            if(enemyCommandInfo.isMainBase) {
-        	   System.out.println("removing fake!: " + enemyResourceDepot.getKey().getLastPosition());
+//        	   System.out.println("removing fake!: " + enemyResourceDepot.getKey().getLastPosition());
         	   preserve = enemyResourceDepot.getValue();
         	   preserve.setUnitInfo(unitInfo);
         	   selectedUnitInfo = enemyResourceDepot.getKey();
@@ -734,7 +734,7 @@ public class AttackDecisionMaker extends GameManager {
         }
     	
     	if(selectedUnitInfo!=null) {
-    		System.out.println("removing fake!: " + selectedUnitInfo);
+//    		System.out.println("removing fake!: " + selectedUnitInfo);
     		enemyResourceDepotInfoMap.remove(selectedUnitInfo);
     	}
     	
@@ -772,8 +772,8 @@ public class AttackDecisionMaker extends GameManager {
 //            }
 
             if(enemyCommandInfo==null) {
-            	System.out.println("unitInfo: " + unitInfo.getType() + ", " + unitInfo.getLastPosition() + ", " + unitInfo.getUnitID());
-            	System.out.println("should not aeofhawoefaowe @@@@@@@@@@@@@@@@@@@@@");
+//            	System.out.println("unitInfo: " + unitInfo.getType() + ", " + unitInfo.getLastPosition() + ", " + unitInfo.getUnitID());
+//            	System.out.println("should not aeofhawoefaowe @@@@@@@@@@@@@@@@@@@@@");
             }else {
             	enemyCommandInfo.updateInfo();
             }

@@ -155,12 +155,6 @@ public class VesselControl extends Control {
 				Position movePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX(), rangedUnit.getPosition().getY() + fleeVector.getY()); // 회피지점
 				//Position middlePosition = new Position(rangedUnit.getPosition().getX() + fleeVector.getX() / 2, rangedUnit.getPosition().getY() + fleeVector.getY() / 2); // 회피중간지점
 				
-				if(rangedUnit.getID() == 102){
-				//System.out.print("fleeVector: " + fleeVector.toString());
-				//System.out.print("movePosition: " + movePosition.toString());
-				//System.out.print("middlePosition: " + middlePosition.toString());
-				}
-				
 				double risk = 0;
 				risk = riskOfFleePositionAir(rangedUnit, movePosition, moveCalcSize, fleeOption.united); // 회피지점에서의 예상위험도
 				
@@ -168,9 +162,7 @@ public class VesselControl extends Control {
 
 				if (risk < 100 	&& (risk < minimumRisk || ((risk == minimumRisk) && distanceToGoal < minimumDistanceToGoal))) {
 				
-					//System.out.print("selected: " + i + "  ");
 					safePosition =  movePosition;
-					//System.out.println("setting position : " +safePosition.getX() + ","+safePosition.getY());
 					minimumRisk = risk;
 					minimumDistanceToGoal = distanceToGoal;
 				}

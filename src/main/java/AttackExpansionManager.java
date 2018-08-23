@@ -249,7 +249,7 @@ public class AttackExpansionManager {
 					if (UnitUtils.enemyUnitDiscovered(UnitType.Protoss_Dark_Templar)) {
 						if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Science_Vessel) == 0
 								&& UnitUtils.availableScanningCount() == 0) {
-							MyBotModule.Broodwar.printf("dark and no comsat or vessel");
+//							MyBotModule.Broodwar.printf("dark and no comsat or vessel");
 							isAttackMode = false;
 						}
 					}

@@ -203,7 +203,6 @@ public class ScvScoutControl extends Control {
 		else {
 			if (regionVertices.size() - 1 < vertexIndex) {
 				// scout scv가 오래 살아남았을 때 regionVertices가 변경되어 ArrayIndexOutOfBoundsException 발생 방지
-				System.out.println("reset vertexIndex to 0. regionVertices.size()=" + regionVertices.size() + ", vertexIndex=" + vertexIndex);
 				vertexIndex = 0;
 				
 			} else {

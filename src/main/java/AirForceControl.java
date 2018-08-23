@@ -21,11 +21,11 @@ public class AirForceControl extends Control {
 		int memberId = airunits.iterator().next().getID();
 		AirForceTeam airForceTeam = AirForceManager.Instance().airForTeamOfUnit(memberId);
 		if (airForceTeam.leaderUnit == null) {
-			System.out.println(memberId + "'s airSquad has no leader. member.size=" + airForceTeam.memberList.size());
+//			System.out.println(memberId + "'s airSquad has no leader. member.size=" + airForceTeam.memberList.size());
 			return;
 		}
 		if (AirForceManager.Instance().getTargetPositions().isEmpty()) {
-			System.out.println("AirForceManager targetPositions is empty");
+//			System.out.println("AirForceManager targetPositions is empty");
 			return;
 		}
 		

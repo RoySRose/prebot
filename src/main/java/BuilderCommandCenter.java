@@ -84,7 +84,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				if (StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE)
 						&& !StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.QUICK_ATTACK)) {
 					setCommandCenterBlockAndSeedPosition();
-//					System.out.println("fast 2nd commandcenter - for double (vs protoss)");
 					return true;
 				}
 				
@@ -93,7 +92,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				List<Unit> tankWraiths = UnitUtils.getUnitList(CommonCode.UnitFindRange.ALL, UnitType.Terran_Wraith, UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode);
 				if (!bunkers.isEmpty() && tankWraiths.size() >= 4) {
 					setCommandCenterBlockAndSeedPosition();
-//					System.out.println("fast 2nd commandcenter - bunker defense (vs terran)");
 					return true;
 				}
 			}
@@ -102,18 +100,15 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 				if (InfoUtils.enemyRace() == Race.Protoss && !StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.DOUBLE)) {
 					if (UnitUtils.myCompleteUnitDiscovered(UnitType.Terran_Siege_Tank_Tank_Mode)) {
 						setCommandCenterBlockAndSeedPosition();
-//						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
 					}
 				} else if (UnitUtils.myUnitDiscovered(UnitType.Terran_Starport)) {
 					if (UnitUtils.myUnitDiscovered(UnitType.Terran_Wraith, UnitType.Terran_Valkyrie) || MyBotModule.Broodwar.self().minerals() > 600) {
 						setCommandCenterBlockAndSeedPosition();
-//						System.out.println("normal 2nd commandcenter - over 400 minerals");
 						return true;
 					}
 				} else {
 					setCommandCenterBlockAndSeedPosition();
-//					System.out.println("normal 2nd commandcenter - over 400 minerals");
 					return true;
 				}
 			}
@@ -127,28 +122,24 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			// 돈이 600 넘고 아군 유닛이 많으면 멀티하기
 			if (MyBotModule.Broodwar.self().minerals() > 600 && factoryUnitCount > 30 * 4) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("normal next commandcenter - over 30 mechanics & over 600 minerals");
 				return true;
 
 			}
 			// 공격시 돈 250 넘으면 멀티하기
 			if (isAttackMode && StrategyIdea.mainSquadMode != MicroConfig.MainSquadMode.SPEED_ATTCK && MyBotModule.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("attack and next commandcenter - attack & over 250 minerals");
 				return true;
 			}
 			
 			// READY TO POSITION 까지 나왔는데 아직 커맨드가 2개이면 250 넘었을 때 멀티
 			if (StrategyIdea.campType == PositionFinder.CampType.READY_TO && allCommandCenterCount == 2 && MyBotModule.Broodwar.self().minerals() > 250) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("ready to commandcenter - only 2 center & over 250 minerals");
 				return true;
 			}
 			
 			// 800 넘으면 멀티하기
 			if (MyBotModule.Broodwar.self().minerals() > 800) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("minerals next commandcenter - over 800 minerals");
 				return true;
 			}
 			
@@ -179,19 +170,15 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 			for (Unit units : commandCenters) {
 				leftMinerals += WorkerManager.Instance().getWorkerData().getMineralsSumNearDepot(units);
 			}
-//			System.out.println("minerals lefted only " + leftMinerals);
 			if (leftMinerals < 8000 && isAttackMode) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;
 			}
 			if (leftMinerals < 4000) {
 				setCommandCenterBlockAndSeedPosition();
-//				System.out.println("next commandcenter - minerals lefted only " + leftMinerals);
 				return true;
 			}
 			if (factoryUnitCount > 40 * 4) {
-//				System.out.println("next commandcenter - over 40 mechanics");
 				setCommandCenterBlockAndSeedPosition();
 				return true;
 			}
@@ -222,7 +209,6 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     		seedPosition = BuildOrderItem.SeedPositionStrategy.NextExpansionPoint;
     	}
     	if(TilePositionUtils.isValidTilePosition(seedTilePosition)){
-//    		System.out.println("set command center to 1 turret position");
 //    		//FileUtils.appendTextToFile("log.txt", "\n set command center to 1 turret position :: " + seedTilePosition);
     		setTilePosition(seedTilePosition);
     	}else {

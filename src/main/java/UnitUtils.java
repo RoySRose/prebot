@@ -248,7 +248,6 @@ public class UnitUtils {
 			}
 			if (TargetFilter.excludeByFilter(eui, targetFilter)) {
 //				String temp = ""; for (UnitType unitType : unitTypes) { temp += unitType.toString(); }
-//				System.out.println(eui.getType() + " is filtered. targetFilter=" + targetFilter + "\n" + temp);
 				continue;
 			}
 			if (ignorableEnemyUnitInfo(eui)) {
@@ -444,11 +443,6 @@ public class UnitUtils {
 			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}
 		boolean ignorable = ignorableEnemyUnitInfo(eui, ignoreSeconds);
-//		if (ignorable) {
-//			if (eui.getType() == UnitType.Terran_Siege_Tank_Siege_Mode || eui.getType() == UnitType.Terran_Siege_Tank_Tank_Mode) {
-//				System.out.println("ignorable : " + eui);
-//			}
-//		}
 		return ignorable;
 	}
 	
@@ -805,7 +799,6 @@ public class UnitUtils {
 	public static int activatedCommandCenterCount() {
 		Integer activatedCommandCount = SpecificValueCache.get(SpecificValueCache.ValueType.ACTIVATED_COMMAND_COUNT, Integer.class);
 		if (activatedCommandCount != null) {
-//			System.out.println("cacahed data " + activatedCommandCount);
 			return activatedCommandCount;
 		}
 		activatedCommandCount = 0;

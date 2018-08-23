@@ -32,9 +32,9 @@ public class BuildManagerFailureProtector {
 			failInfo.suspendStartFrame = CommonCode.NONE; // 정지 시작시간을 초기화 한다.
 			failInfo.suspendDurationFrame *= 2; // 정지 시간을 2배로 증가시킨다.
 			
-			String message = "*** " + metaType.getName() + " unlocked ***";
-			MyBotModule.Broodwar.printf(message);
-			System.out.println(message);
+//			String message = "*** " + metaType.getName() + " unlocked ***";
+//			MyBotModule.Broodwar.printf(message);
+//			System.out.println(message);
 			return false;
 		}
 		
@@ -53,9 +53,9 @@ public class BuildManagerFailureProtector {
 			failInfo.failCount = 0;
 			failInfo.suspendStartFrame = TimeUtils.elapsedFrames();
 
-			String message = "*** " + metaType.getName() + " locked - " + TimeUtils.framesToTimeString(failInfo.suspendDurationFrame) + " ***";
-			MyBotModule.Broodwar.printf(message);
-			System.out.println(message);
+//			String message = "*** " + metaType.getName() + " locked - " + TimeUtils.framesToTimeString(failInfo.suspendDurationFrame) + " ***";
+//			MyBotModule.Broodwar.printf(message);
+//			System.out.println(message);
 		}
 	}
 	

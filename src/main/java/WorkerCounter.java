@@ -86,7 +86,6 @@ public class WorkerCounter {
         if(enemyResourceDepot == null) {
         	return;
         }
-        //System.out.println("visible: " + enemyResourceDepot.isVisible() + ", " + mineralCalculator.allVisible());
         
         if(enemyResourceDepot.isVisible() && mineralCalculator.allVisible()){
         	if(MyBotModule.Broodwar.getFrameCount() - fullCheckStartFrame > 300) {
@@ -112,12 +111,10 @@ public class WorkerCounter {
 	        	if(gasWorkerCnt > 3) {
 	        		gasWorkerCnt=3;
 	        	}
-	        	//System.out.println("workerCnt: " + workerCnt + ", buildWorkerCnt: " + buildWorkerCnt + ", gasWorkerCnt: " + gasWorkerCnt); 
 	        	workerCnt -= buildWorkerCnt;
 	            workerCnt -= gasWorkerCnt;
 	            
 	            this.lastFullCheckFrame = MyBotModule.Broodwar.getFrameCount();
-	            //System.out.println("setting realworker1: " + workerCnt);
 	            setWorkerCount(workerCnt);
         	}
         }else if(enemyResourceDepot.isVisible()){

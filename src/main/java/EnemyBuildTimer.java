@@ -280,7 +280,7 @@ public class EnemyBuildTimer {
 					expectBuildFrame = buildFrameByStrategy;
 				}
 				if (expectBuildFrame == CommonCode.UNKNOWN) {
-					System.out.println("################ ERROR - updateDefaultExpectTime" + buildFrameByStrategy + " / " + buildingType);
+					//System.out.println("################ ERROR - updateDefaultExpectTime" + buildFrameByStrategy + " / " + buildingType);
 				}
 				updateBuildTimeExpect(buildingType, expectBuildFrame, ignoreMinimum);
 				addCertainBuildTime(buildingType, expectBuildFrame);

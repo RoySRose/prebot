@@ -58,7 +58,6 @@ public abstract class Strategist {
 
 	private boolean phase02End() {
 		if (TimeUtils.after(8 * TimeUtils.MINUTE)) {
-			System.out.println("TIME IS UP");
 			return true;
 		}
 
@@ -68,7 +67,6 @@ public abstract class Strategist {
 					return false;
 				}
 			}
-//			System.out.println("MISSION COMPLETE");
 			return true;
 			
 		} else {
@@ -80,7 +78,6 @@ public abstract class Strategist {
 			if (UnitUtils.myFactoryUnitSupplyCount() + UnitUtils.myWraithUnitSupplyCount() < 32) {
 				return false;
 			}
-//			System.out.println("DEFAULT MISSION COMPLETE");
 			return true;
 			
 		}

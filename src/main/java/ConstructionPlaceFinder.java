@@ -1206,7 +1206,7 @@ public class ConstructionPlaceFinder {
 			{
 				if (unit.getType().isBuilding() && !unit.isLifted())
 				{
-					System.out.println(" there is something for const :: " + b.getType() + " :: "+unit.getType()+"(" + x + " , " + y +")");
+//					System.out.println(" there is something for const :: " + b.getType() + " :: "+unit.getType()+"(" + x + " , " + y +")");
 					return false;
 				}
 			}
