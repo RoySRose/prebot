@@ -35,12 +35,12 @@ public class ScienceFacilityControl extends BuildingFlyControl {
 
     @Override
     public void checkFlyCondition(Unit unit) {
-        if (InformationManager.Instance().enemyRace == Race.Zerg) {
-            if (MicroConfig.Upgrade.hasResearched(TechType.Irradiate)) {
-                buildingFlyMap.get(unit).setBuildingFly(BuildingFly.UP);
-            }
-        } else {
+//        if (InformationManager.Instance().enemyRace == Race.Zerg) {
+//            if (MicroConfig.Upgrade.hasResearched(TechType.Irradiate)) {
+//                buildingFlyMap.get(unit).setBuildingFly(BuildingFly.UP);
+//            }
+//        } else {
             buildingFlyMap.get(unit).setBuildingFly(BuildingFly.UP);
-        }
+//        }
     }
 }
