@@ -67,17 +67,8 @@ public abstract class Squad {
 //			System.out.println("ALREADY EXECUTED SQUAD - " + squadName);
 			return;
 		}
-		BigWatch.start("findEnemies - " + squadName);
 		findEnemies();
-		BigWatch.record("findEnemies - " + squadName);
-		
-		if (!squadExecuted()) {
-			BigWatch.start("squadExecution - " + squadName);
-		}
 		execute();
-		if (!squadExecuted()) {
-			BigWatch.record("squadExecution - " + squadName);
-		}
 		
 		squadExecutedFrame = TimeUtils.elapsedFrames();
 	}

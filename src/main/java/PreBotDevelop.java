@@ -67,7 +67,7 @@ public class PreBotDevelop extends DefaultBWListener {
 		// Pause 상태에서는 timeStartedAtFrame 를 계속 갱신해서, timeElapsedAtFrame 이 제대로
 		// 계산되도록 한다
 		try {
-			BigWatch.clear();
+//			BigWatch.clear();
 			gameCommander.onFrame();
 		} catch (Exception e) {
 			Broodwar.printf("[Error Stack Trace]");

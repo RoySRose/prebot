@@ -2,7 +2,6 @@
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -1595,26 +1594,26 @@ public class PreBotUXManager {
 	}
 
 	private void drawBigWatch() {
-		Map<String, Long> resultTimeMap = BigWatch.getResultTimeMap();
-		Map<String, Long> recordTimeMap = BigWatch.getRecordTimeMap();
-
-		List<String> tags = new ArrayList<>(recordTimeMap.keySet());
-		Collections.sort(tags);
-		
-		int currentY = 0;
-		for (String tag : tags) {
-			Long resultTime = resultTimeMap.get(tag);
-			resultTime = resultTime == null ? 0L : resultTime;
-			Long recordTime = recordTimeMap.get(tag);
-			
-			char drawColor = UxColor.CHAR_WHITE;
-			if (recordTime > 10L) {
-				drawColor = UxColor.CHAR_TEAL;
-			} else if (recordTime > 30L) {
-				drawColor = UxColor.CHAR_RED;
-			}
-			MyBotModule.Broodwar.drawTextScreen(10, currentY += 10, UxColor.CHAR_WHITE + tag + " : " + resultTime + " / " + drawColor + recordTime);
-		}
+//		Map<String, Long> resultTimeMap = BigWatch.getResultTimeMap();
+//		Map<String, Long> recordTimeMap = BigWatch.getRecordTimeMap();
+//
+//		List<String> tags = new ArrayList<>(recordTimeMap.keySet());
+//		Collections.sort(tags);
+//		
+//		int currentY = 0;
+//		for (String tag : tags) {
+//			Long resultTime = resultTimeMap.get(tag);
+//			resultTime = resultTime == null ? 0L : resultTime;
+//			Long recordTime = recordTimeMap.get(tag);
+//			
+//			char drawColor = UxColor.CHAR_WHITE;
+//			if (recordTime > 10L) {
+//				drawColor = UxColor.CHAR_TEAL;
+//			} else if (recordTime > 30L) {
+//				drawColor = UxColor.CHAR_RED;
+//			}
+//			MyBotModule.Broodwar.drawTextScreen(10, currentY += 10, UxColor.CHAR_WHITE + tag + " : " + resultTime + " / " + drawColor + recordTime);
+//		}
 	}
 	
 	private void drawPathData(){

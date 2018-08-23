@@ -82,8 +82,6 @@ public class CombatManager extends GameManager {
 	}
 
 	private void combatUnitArrangement() {
-		BigWatch.start("combatUnitArrangement");
-
 		// 팩토리
 		updateSquadDefault(MicroConfig.SquadInfo.MAIN_ATTACK); // 탱크, 골리앗, 발키리
 		updateTankDefenseSquad(); // 탱크
@@ -100,8 +98,6 @@ public class CombatManager extends GameManager {
 		updateSquadDefault(MicroConfig.SquadInfo.WATCHER); // 벌처
 		updateSquadDefault(MicroConfig.SquadInfo.CHECKER); // 벌처
 		updateGuerillaSquad(); // 벌처
-		
-		BigWatch.record("combatUnitArrangement");
 	}
 
 	private void squadExecution() {

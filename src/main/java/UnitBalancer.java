@@ -1,12 +1,12 @@
 
 
-import bwapi.Unit;
-import bwapi.UnitType;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import bwapi.Unit;
+import bwapi.UnitType;
 
 public class UnitBalancer {
 
@@ -41,10 +41,8 @@ public class UnitBalancer {
     }
 
     public void update(){
-    	BigWatch.start("balancer");
         groupSize = LagObserver.groupsize();
         resetMap();
-        BigWatch.record("balancer");
     }
 
     private void resetMap() {
