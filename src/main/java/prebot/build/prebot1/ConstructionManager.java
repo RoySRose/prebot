@@ -19,6 +19,7 @@ import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
 import prebot.common.util.CommandUtils;
+import prebot.common.util.FileUtils;
 import prebot.common.util.TilePositionUtils;
 import prebot.common.util.TimeUtils;
 import prebot.micro.WorkerManager;
@@ -267,6 +268,7 @@ public class ConstructionManager extends GameManager {
 
 			// 건설 일꾼이 Unassigned 인 상태에서 getBuildLocationNear 로 건설할 위치를 다시 정합니다. . Assigned 
 //	        FileUtils.appendTextToFile("log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
+//	        FileUtils.appendTextToFile(b.getType(), "log.txt", "\n assignWorkersToUnassignedBuildings relocationTilePosition :: " + b.getType() + " :: " + b.getDesiredPosition());
 			TilePosition relocationTilePosition = ConstructionPlaceFinder.Instance().getBuildLocationNear(b.getType(), b.getDesiredPosition());
 
 			//System.out.println( "ConstructionPlaceFinder Selected Location : " + testLocation.x + "," + testLocation.y );
