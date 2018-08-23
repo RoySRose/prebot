@@ -1653,23 +1653,34 @@ public class ConstructionPlaceFinder {
 	
 	public void setTilesToAvoidAddonBuilding(Unit unit) {
 		
-		int fromx = unit.getTilePosition().getX() - 1;
-		int fromy = unit.getTilePosition().getY() - 1;
+		int px = unit.getTilePosition().getX();
+		int py = unit.getTilePosition().getY();
+		
+		int fromx = px > 0 ? px - 1 : px;
+		int fromy = py > 0 ? py - 1 : py;
+		
+		int rwidth = reserveMap.length;
+		int rheight = reserveMap[0].length;
+		
+		if(unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport) {
+			FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: fromx & fromy :: ( " + fromx + " , " + fromy + ") :: rwidth & rheight :: ( " + rwidth + " , " + rheight + ")");
+		}
 		
 
-		for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++)
+		for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth() && x < rwidth ; x++)
 //		for (int x = fromx; x > 0 && x < fromx + 7 && x < Prebot.Broodwar.mapWidth(); x++)
 	        {
 //	            for (int y = fromy ; y > 0 && y < fromy + 5 && y < Prebot.Broodwar.mapHeight(); y++)
-			for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++)
+			for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight() && y < rheight; y++)
             {
-				if(x==fromx + 5 || x==fromx + 6 || x==fromx + 7){
-					if(y == fromy) {
-						continue;
-					}
+				if( (x==fromx + 5 || x==fromx + 6 || x==fromx + 7) && y == fromy){
+					continue;
 //					else if(y > fromy) {
 //						tilesToAvoidAddonBuilding[x][y] = true;
 //					}
+				}
+				if(unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport) {
+					FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
 				}
 				tilesToAvoid[x][y] = true;
 				
@@ -1693,8 +1704,17 @@ public class ConstructionPlaceFinder {
 	
 	public void setTilesToAvoidAddonBuildingFree(Unit unit) {
 		
-		int fromx = unit.getTilePosition().getX()-1;
-		int fromy = unit.getTilePosition().getY()-1;
+		int px = unit.getTilePosition().getX();
+		int py = unit.getTilePosition().getY();
+		
+		int fromx = px > 0 ? px - 1 : px;
+		int fromy = py > 0 ? py - 1 : py;
+		
+		int rwidth = reserveMap.length;
+		int rheight = reserveMap[0].length;
+		
+//		int fromx = unit.getTilePosition().getX()-1;
+//		int fromy = unit.getTilePosition().getY()-1;
 		
 		boolean allFree = false;
 
@@ -1707,8 +1727,8 @@ public class ConstructionPlaceFinder {
 			if(hasWhatBuilds(builderTile, builderType)) {
 //				마스터 건물이 있을경우 타일 시작지점도 마스터 포지션으로 재 설정
 				allFree = true;
-				fromx = builderTile.getX() - 1;
-				fromy = builderTile.getY() - 1;
+				fromx = builderTile.getX() > 0 ? builderTile.getX() - 1 : 0;
+				fromy = builderTile.getY() > 0 ? builderTile.getY() - 1 : 0;
 			}
 
 		}else {
@@ -1719,17 +1739,15 @@ public class ConstructionPlaceFinder {
 		}
 		
 		if(allFree) {
-			for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth(); x++){
-				
-				for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight(); y++){
-				
+			for (int x = fromx; x >= 0 && x < fromx + 8 && x < MyBotModule.Broodwar.mapWidth() && x < rwidth ; x++)
+				{
+				for (int y = fromy; y >= 0 && y < fromy + 5 && y < MyBotModule.Broodwar.mapHeight() && y < rheight; y++)
+					{
 			
-					if(x==fromx + 5 || x==fromx + 6 || x==fromx + 7){
-						if(y == fromy) {
-							continue;
-						}
+					if( (x==fromx + 5 || x==fromx + 6 || x==fromx + 7) && y == fromy){
+						continue;
 //						else if(y > fromy) {
-//							tilesToAvoidAddonBuilding[x][y] = false;
+//							tilesToAvoidAddonBuilding[x][y] = true;
 //						}
 					}
 					tilesToAvoid[x][y] = false;
