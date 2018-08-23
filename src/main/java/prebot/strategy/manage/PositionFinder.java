@@ -791,9 +791,9 @@ public class PositionFinder {
 	}
 	
 	public Position expansionDefensePositionSiege() {
-		if (expansionDefensePositionSiege != null) {
-			return expansionDefensePositionSiege;
-		}
+//		if (expansionDefensePositionSiege != null) {
+//			return expansionDefensePositionSiege;
+//		}
 		Position myBasePosition = InfoUtils.myBase().getPosition();
 		Position firstChokePosition = InfoUtils.myFirstChoke().getCenter();
 		
@@ -807,7 +807,7 @@ public class PositionFinder {
 
 		if (InfoUtils.enemyRace() == Race.Zerg) {
 			double radian1 = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
-			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 170);
+			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 210);
 			
 			double radian2 = MicroUtils.targetDirectionRadian(defensePosition, firstChokePosition);
 			defensePosition = MicroUtils.getMovePosition(defensePosition, radian2, 30);
