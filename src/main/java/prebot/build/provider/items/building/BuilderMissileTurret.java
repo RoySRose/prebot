@@ -57,7 +57,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 					setHighPriority(true);
 					setBlocking(true);
 					setTilePosition(BlockingEntrance.Instance().entrance_turret1);
-					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret1 :: " + BlockingEntrance.Instance().entrance_turret1);
+					//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret1 :: " + BlockingEntrance.Instance().entrance_turret1);
 					return true;
 				}
 			}
@@ -67,7 +67,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 					setHighPriority(true);
 					setBlocking(true);
 					setTilePosition(BlockingEntrance.Instance().entrance_turret2);
-					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret2 :: " + BlockingEntrance.Instance().entrance_turret2);
+					//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct entrance_turret2 :: " + BlockingEntrance.Instance().entrance_turret2);
 					return true;
 				}
 			}
@@ -133,7 +133,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());
-//			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct myBase :: " + myBase.getPosition().toTilePosition());
+//			//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct myBase :: " + myBase.getPosition().toTilePosition());
 			return true;
 		}
 		
@@ -146,7 +146,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 			setBlocking(true);
 			setTilePosition(mutalDef.toTilePosition());
 //			System.out.println("need turret to  mutalDef :: " + mutalDef.toTilePosition());
-			FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mutalDef :: " + mutalDef.toTilePosition());
+			//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mutalDef :: " + mutalDef.toTilePosition());
 			return true;
 		}
 
@@ -176,7 +176,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(betweenChoke.toTilePosition());
-//				FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct betweenChoke :: " + betweenChoke.toTilePosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct betweenChoke :: " + betweenChoke.toTilePosition());
 				return true;
 			}
 		
@@ -199,7 +199,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(mySecondChoke.getCenter().toTilePosition());
-//				FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mySecondChoke :: " + mySecondChoke.getCenter().toTilePosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct mySecondChoke :: " + mySecondChoke.getCenter().toTilePosition());
 				return true;
 			}
 			
@@ -207,7 +207,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(myFirstExpansion.getPosition().toTilePosition());
-//				FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct myFirstExpansion :: " + myFirstExpansion.getPosition().toTilePosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct myFirstExpansion :: " + myFirstExpansion.getPosition().toTilePosition());
 				return true;
 			}
 //			}
@@ -223,13 +223,13 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				}
 				if(!TilePositionUtils.equals(myBase.getTilePosition(), commandCenter.getTilePosition())
 					&& !TilePositionUtils.equals(myFirstExpansion.getTilePosition(), commandCenter.getTilePosition())) {
-//					FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: not main base :: " + commandCenter.getTilePosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: not main base :: " + commandCenter.getTilePosition());
 					if (validMineralCountNearDepot(commandCenter) > 6) {
 						if (noTurretNearPosition(commandCenter.getPosition(), 150, 150, turretCount, otherCommandTurret+add_turret, 10)) {
 							setHighPriority(true);
 							setBlocking(true);
 							setTilePosition(commandCenter.getPosition().toTilePosition());
-//							FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct near command :: " + commandCenter.getTilePosition());
+//							//FileUtils.appendTextToFile("log.txt", "\n BuilderMissileTurret :: construct near command :: " + commandCenter.getTilePosition());
 							return true;
 						}
 					}

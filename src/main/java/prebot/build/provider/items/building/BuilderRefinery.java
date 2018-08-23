@@ -34,7 +34,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 			return false;
 		}
 		
-//		FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: check gasrush :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().isGasRushed());
+//		//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: check gasrush :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().isGasRushed());
     	
 		if (!InformationManager.Instance().isGasRushed() && MyBotModule.Broodwar.self().allUnitCount(UnitType.Terran_Refinery) == 0) {
 			
@@ -44,7 +44,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 			
 			if (barrackCount > 0 && suppleCompleteCount > 0 && scvCompleteCount > 10) {
 				
-//				FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: no gasrush :: no refinery :: immediately :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().myfirstGas.getTilePosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: no gasrush :: no refinery :: immediately :: " + Prebot.Broodwar.getFrameCount() + " :: " + InformationManager.Instance().myfirstGas.getTilePosition());
 				setBlocking(true);
 				setHighPriority(true);
 //				setTilePosition(InformationManager.Instance().myfirstGas.getTilePosition());
@@ -70,12 +70,12 @@ public class BuilderRefinery extends DefaultBuildableItem {
 					continue;
 				if (unitsAround.getType() == UnitType.Terran_Refinery || unitsAround.getType() == UnitType.Zerg_Extractor
 						|| unitsAround.getType() == UnitType.Protoss_Assimilator) {
-//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: already built :: " + unitsAround.getTilePosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: already built :: " + unitsAround.getTilePosition());
 					refineryAlreadyBuilt = true;
 					break;
 				}
 				if (unitsAround.getType() == UnitType.Resource_Vespene_Geyser) {
-//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: find gas :: " + unitsAround.getTilePosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: find gas :: " + unitsAround.getTilePosition());
 					geyserAround = unitsAround;
 				}
 			}
@@ -85,11 +85,11 @@ public class BuilderRefinery extends DefaultBuildableItem {
 //			}
 
 			if (InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE && geyserAround != null) {
-//				FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: aaa :: " + geyserAround.getTilePosition());
+//				//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: aaa :: " + geyserAround.getTilePosition());
 				if (InformationManager.Instance().getMyfirstGas() != null) {
-//					FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: bbb :: " + geyserAround.getTilePosition());
+//					//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: bbb :: " + geyserAround.getTilePosition());
 					if (geyserAround.getPosition().equals(InformationManager.Instance().getMyfirstGas().getPosition())) {
-//						FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: ccc :: " + geyserAround.getTilePosition());
+//						//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: ccc :: " + geyserAround.getTilePosition());
 						continue;
 					}
 				}
@@ -103,7 +103,7 @@ public class BuilderRefinery extends DefaultBuildableItem {
 					}
 					if (WorkerManager.Instance().getWorkerData().getNumAssignedWorkers(commandCenter) > 9) {
 						if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Refinery) == 0) {
-//							FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: set BuildQuere :: " + findGeyser);
+//							//FileUtils.appendTextToFile("log.txt", "\n  BuilderRefinery :: set BuildQuere :: " + findGeyser);
 							setTilePosition(findGeyser);
 							return true;
 						}

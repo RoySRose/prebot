@@ -242,10 +242,10 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
     	}
     	if(TilePositionUtils.isValidTilePosition(seedTilePosition)){
 //    		System.out.println("set command center to 1 turret position");
-//    		FileUtils.appendTextToFile("log.txt", "\n set command center to 1 turret position :: " + seedTilePosition);
+//    		//FileUtils.appendTextToFile("log.txt", "\n set command center to 1 turret position :: " + seedTilePosition);
     		setTilePosition(seedTilePosition);
     	}else {
-//    		FileUtils.appendTextToFile("log.txt", "\n set command center to :: " + seedPosition);
+//    		//FileUtils.appendTextToFile("log.txt", "\n set command center to :: " + seedPosition);
     		setSeedPositionStrategy(seedPosition);
     	}
     	setBlocking(true);

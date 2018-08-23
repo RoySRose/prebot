@@ -88,7 +88,7 @@ public class ConstructionPlaceFinder {
 	{
 		// seedPosition 을 입력한 경우 그 근처에서 찾는다
 		if (TilePositionUtils.isValidTilePosition(seedPosition)) {
-//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before PlaceFinder seedPosition true ==>> " + buildingType + " :: " + seedPosition);
+//			//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before PlaceFinder seedPosition true ==>> " + buildingType + " :: " + seedPosition);
 			TilePosition desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
 			return desiredPosition;
 		}
@@ -96,14 +96,14 @@ public class ConstructionPlaceFinder {
 		// seedPosition 을 입력하지 않은 경우
 		TilePosition desiredPosition = TilePosition.None;
 		
-//		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy SeedPositionStrategy ==>> " + buildingType + " :: " + seedPositionStrategy);
+//		//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy SeedPositionStrategy ==>> " + buildingType + " :: " + seedPositionStrategy);
 		
 		switch (seedPositionStrategy) {
 
             case MainBaseLocation:
-//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition(), true);
-//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 if (desiredPosition == null) {
                     BuildManager.Instance().mainBaseLocationFull = true;
                 }
@@ -111,9 +111,9 @@ public class ConstructionPlaceFinder {
 
             case FirstExpansionLocation:
                 if (InfoUtils.myFirstExpansion() != null) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstExpansion().getTilePosition());
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     if (desiredPosition == null) {
                         BuildManager.Instance().firstExpansionLocationFull = true;
                     }
@@ -122,9 +122,9 @@ public class ConstructionPlaceFinder {
 
             case FirstChokePoint:
                 if (InfoUtils.myFirstChoke() != null) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myFirstChoke().getCenter().toTilePosition());
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     if (desiredPosition == null) {
                         BuildManager.Instance().firstChokePointFull = true;
                     }
@@ -133,9 +133,9 @@ public class ConstructionPlaceFinder {
 
             case SecondChokePoint:
                 if (InfoUtils.mySecondChoke() != null) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.mySecondChoke().getCenter().toTilePosition());
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                     if (desiredPosition == null) {
                         BuildManager.Instance().secondChokePointFull = true;
                     }
@@ -143,30 +143,30 @@ public class ConstructionPlaceFinder {
                 break;
 
             case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
-//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start");
-//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start");
+//            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
-//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 if (nextExpansionLocation != null) {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + nextExpansionLocation.getTilePosition());
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation != null");
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy seedPosition true ==>> " + buildingType + " :: " + nextExpansionLocation.getTilePosition());
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation != null");
                     desiredPosition = getBuildLocationNear(buildingType, nextExpansionLocation.getTilePosition());
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation != null");
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation != null");
                 } else {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation == null");
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation == null");
                     desiredPosition = getBuildLocationNear(buildingType, InfoUtils.myBase().getTilePosition());
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation == null");
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: nextExpansionLocation == null");
                 }
-//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> " + buildingType + " :: " + desiredPosition);
+//                //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy desiredPosition ==>> " + buildingType + " :: " + desiredPosition);
                 break;
 
             case NextSupplePoint:
             	if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
                     if (BuildManager.Instance().fisrtSupplePointFull != true) {
                         TilePosition supplyPosition = BlockingEntrance.Instance().getSupplyPosition();
-//                        FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                        //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                         desiredPosition = getBuildLocationNear(buildingType, supplyPosition);
-//                        FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                        //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
 
                         if (desiredPosition == null) {
                             BuildManager.Instance().fisrtSupplePointFull = true;
@@ -179,14 +179,14 @@ public class ConstructionPlaceFinder {
             case SecondMainBaseLocation:
             	
             	if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory) && BuildManager.Instance().fisrtSupplePointFull) {
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: supple");
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: supple");
                     desiredPosition = getBuildLocationNear(buildingType, BlockingEntrance.Instance().getSupplyPosition(InformationManager.Instance().secondStartPosition.getTilePosition()));
-//                    FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: supple");
+//                    //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: supple");
 //                    System.out.println(" getSupplyPosition ==>>>> " + desiredPosition);
                 }else {
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: else");
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: else");
                 	desiredPosition = getBuildLocationNear(buildingType, InformationManager.Instance().getSecondStartPosition().getTilePosition(), true);
-//                	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: else");
+//                	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy + " :: else");
                 }
 //                System.out.println(" SecondMainBaseLocation ==>>>> " + desiredPosition);
                 if (desiredPosition == null) {
@@ -195,9 +195,9 @@ public class ConstructionPlaceFinder {
                 break;
 
             case LastBuilingPoint:
-//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 BaseLocation temp = InformationManager.Instance().getLastBuildingLocation();
-//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder after :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 if(temp != null) {
                 	desiredPosition = temp.getTilePosition();
                 }else {
@@ -216,11 +216,11 @@ public class ConstructionPlaceFinder {
 //                break;
 
             case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
-//            	FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
                 desiredPosition = getBuildLocationNear(buildingType, lastBuilingFinalLocation);
-//                FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
-//                FileUtils.appendTextToFile("log.txt", "\n getLastBuilingFinalLocation ==>> "+ buildingType + " :: " + lastBuilingFinalLocation + " :: " + desiredPosition);
+//                //FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
+//                //FileUtils.appendTextToFile("log.txt", "\n getLastBuilingFinalLocation ==>> "+ buildingType + " :: " + lastBuilingFinalLocation + " :: " + desiredPosition);
                 break;
 
             default:
@@ -261,17 +261,17 @@ public class ConstructionPlaceFinder {
 //		if(buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory){
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal();
 		} else {
-//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
+//			//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear spiralMethod set ==>> "+ buildingType + " :: " + desiredPosition);
 			constructionPlaceSearchMethod = ConstructionPlaceSearchMethod.SpiralMethod.ordinal();
 		}
 		
 		int buildingGapSpace = getBuildingSpaceGap(buildingType, desiredPosition, methodFix, spaceZero, constructionPlaceSearchMethod);
-//		FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: getBuildingSpaceGap "+ buildingType + " :: " + desiredPosition);
+//		//FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: getBuildingSpaceGap "+ buildingType + " :: " + desiredPosition);
 		TilePosition buildPosition = TilePosition.None;
 		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
 			while (buildingGapSpace >= 0) {
-//				FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 turret while ==>> "+ buildingType + " :: " + desiredPosition + " :: buildingGapSpace => " +buildingGapSpace);
+//				//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear4 turret while ==>> "+ buildingType + " :: " + desiredPosition + " :: buildingGapSpace => " +buildingGapSpace);
 				buildPosition = getBuildLocationNear(buildingType, desiredPosition, buildingGapSpace, constructionPlaceSearchMethod);
 				
 				if (TilePositionUtils.isValidTilePosition(buildPosition)) {
@@ -299,7 +299,7 @@ public class ConstructionPlaceFinder {
 
 		}
 		
-//		FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: final buildPosition :: " + buildPosition);
+//		//FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: final buildPosition :: " + buildPosition);
 
 //		System.out.println("getBuildLocationNear :: " + buildingType + " :: " + desiredPosition);
 		if (TilePositionUtils.isValidTilePosition(buildPosition)) {
@@ -313,7 +313,7 @@ public class ConstructionPlaceFinder {
 		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
 		int buildingGapSpace = BuildConfig.buildingSpacing;
 		
-//		FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
+//		//FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 
 		// ResourceDepot (Nexus, Command Center, Hatchery), Protoss_Pylon, Terran_Supply_Depot, 
 		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 buildingGapSpace을 다른 Config 값으로 설정하도록 한다
@@ -347,13 +347,13 @@ public class ConstructionPlaceFinder {
 ////				if(desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX()
 ////				 &&desiredPosition.getX() == BlockingEntrance.Instance().entrance_turret1.getX()) {
 //					buildingGapSpace = 0;
-////					FileUtils.appendTextToFile("log.txt","\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
+////					//FileUtils.appendTextToFile("log.txt","\n entrance_turret1 : buildingGapSpace : " + buildingGapSpace);
 //				}
 //			}
 //			if(BlockingEntrance.Instance().entrance_turret2 != TilePosition.None) {
 //				if(TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().entrance_turret2)) {
 //					buildingGapSpace = 0;
-////					FileUtils.appendTextToFile("log.txt","\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
+////					//FileUtils.appendTextToFile("log.txt","\n entrance_turret2 : buildingGapSpace : " + buildingGapSpace);
 //				}
 //			}
 			
@@ -426,10 +426,10 @@ public class ConstructionPlaceFinder {
 ////			|| (desiredPosition.getX() == BlockingEntrance.Instance().barrack.getX() && desiredPosition.getY() == BlockingEntrance.Instance().barrack.getY())
 ////		){
 //			buildingGapSpace = 0;
-//			FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap initial set " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
+//			//FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap initial set " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 //		}
 		
-//		FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap return space :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
+//		//FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap return space :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 		return buildingGapSpace;
 	}
 
@@ -442,7 +442,7 @@ public class ConstructionPlaceFinder {
 		TilePosition resultPosition = TilePosition.None;
 		ConstructionTask b = new ConstructionTask(buildingType, desiredPosition);
 
-//		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear PlaceFinder Start :: " + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition);
+//		//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear PlaceFinder Start :: " + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition);
 		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
 		// maxRange 는 16 ~ 64가 적당하다
 		// 값을 찾아내라. = BaseLocation.isStartingLocation 을 체크해서 메인이면 저값. 나머진 다른값
@@ -483,7 +483,7 @@ public class ConstructionPlaceFinder {
 				}
 			}
 			
-//			FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear maxrange ==>> "+ buildingType + " :: " + desiredPosition + " ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
+//			//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear maxrange ==>> "+ buildingType + " :: " + desiredPosition + " ::" + maxRange + " :: buildingGapSpace => " +buildingGapSpace);
 	            
             int currentX = desiredPosition.getX();
 			int currentY = desiredPosition.getY();
@@ -495,9 +495,9 @@ public class ConstructionPlaceFinder {
 			int spiralDirectionY = 1;
 			while (spiralMaxLength < maxRange) {
 				if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
-//					FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace before PlaceFinder seedPosition true :: " + buildingType + " :: " + desiredPosition + " :: " + new TilePosition(currentX, currentY) + " :: " + buildingGapSpace);
+//					//FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace before PlaceFinder seedPosition true :: " + buildingType + " :: " + desiredPosition + " :: " + new TilePosition(currentX, currentY) + " :: " + buildingGapSpace);
 					boolean isPossiblePlace = canBuildHereWithSpace(new TilePosition(currentX, currentY), b, buildingGapSpace);
-//					FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace after PlaceFinder seedPosition true  :: " + buildingType + " :: " + desiredPosition + " :: " + new TilePosition(currentX, currentY) + " :: " + buildingGapSpace + " :: " + isPossiblePlace);
+//					//FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace after PlaceFinder seedPosition true  :: " + buildingType + " :: " + desiredPosition + " :: " + new TilePosition(currentX, currentY) + " :: " + buildingGapSpace + " :: " + isPossiblePlace);
 					if (isPossiblePlace) {
                         if (b.getType() == UnitType.Terran_Factory && MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Factory) >= 2) {
 						
@@ -521,7 +521,7 @@ public class ConstructionPlaceFinder {
                                 }
                                 
                                 boolean isPossiblePlaceAjust = canBuildHereWithSpace(new TilePosition(currentXPlus, currentY), b, buildingGapSpace);
-//                                FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: isPossiblePlaceAjust :: "  + resultPosition);
+//                                //FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: isPossiblePlaceAjust :: "  + resultPosition);
                                 if (!isPossiblePlaceAjust) {
 //                                	System.out.println("finding place for fac stop move");
                                     break;
@@ -530,11 +530,11 @@ public class ConstructionPlaceFinder {
                             }
 
                             resultPosition = new TilePosition(currentXPlus+adjust, currentY);
-//                            FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: resultPosition :: "  + resultPosition);
+//                            //FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: resultPosition :: "  + resultPosition);
 //                            System.out.println(" resultPosition of factory :: " + resultPosition);
                             break;
                         }else {
-//                        	FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: resultPosition :: "  + resultPosition);
+//                        	//FileUtils.appendTextToFile(b.getType(),"log.txt", "\n canBuildHereWithSpace :: resultPosition :: "  + resultPosition);
                             resultPosition = new TilePosition(currentX, currentY);
                             break;
                         }
@@ -603,7 +603,7 @@ public class ConstructionPlaceFinder {
 						currentY = currentY + depostSizeY;
 						
 						resultPosition = TilePosition.None;
-//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 1시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 1시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 					
 				}else {
@@ -622,7 +622,7 @@ public class ConstructionPlaceFinder {
 							}
 	
 							currentX = currentX + depostSizeX;
-//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -637,7 +637,7 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
 						resultPosition = TilePosition.None;
-//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 					
 				}
@@ -659,7 +659,7 @@ public class ConstructionPlaceFinder {
 							}
 							
 							currentX = currentX - depostSizeX;
-//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -672,7 +672,7 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY + depostSizeY;
 						resultPosition = TilePosition.None;
-//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}else {
 //					7시
@@ -690,7 +690,7 @@ public class ConstructionPlaceFinder {
 							}
 							
 							currentX = currentX - depostSizeX;
-//							FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -703,7 +703,7 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
 						resultPosition = TilePosition.None;
-//						FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}
 			}
@@ -712,7 +712,7 @@ public class ConstructionPlaceFinder {
 		} else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.NewMethod.ordinal()) {
 		}
 
-//		FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear PlaceFinder End :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + desiredPosition);
+//		//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear PlaceFinder End :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + desiredPosition);
 		return resultPosition;
 	}
 
@@ -721,10 +721,10 @@ public class ConstructionPlaceFinder {
 	public final boolean canBuildHereWithSpace(TilePosition position, final ConstructionTask b, int buildingGapSpace)
 	{
 		//if we can't build here, we of course can't build here with space
-//		FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace PlaceFinder start :: " + System.currentTimeMillis() + " :: " + b.getType() + " :: " + position);
-//		FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace start :: " + position);
+//		//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace PlaceFinder start :: " + System.currentTimeMillis() + " :: " + b.getType() + " :: " + position);
+//		//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace start :: " + position);
 		if (!canBuildHere(position, b)) {
-//			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: canBuildHere false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+//			//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: canBuildHere false :: "+ b.getType() + " // " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		}
 
@@ -785,7 +785,7 @@ public class ConstructionPlaceFinder {
 //				|| (position.getX() == BlockingEntrance.Instance().factory.getX() && position.getY() == BlockingEntrance.Instance().factory.getY() && b.getType() == UnitType.Terran_Factory)
 //				|| (position.getX() == BlockingEntrance.Instance().barrack.getX() && position.getY() == BlockingEntrance.Instance().barrack.getY() && b.getType() == UnitType.Terran_Barracks)){
 //				
-////				FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace chk initial point:: buildingType "+ b.getType() + " // position :: " + position  +" // buildingGapSpace :: " + buildingGapSpace);
+////				//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace chk initial point:: buildingType "+ b.getType() + " // position :: " + position  +" // buildingGapSpace :: " + buildingGapSpace);
 //				width = 0;
 //				height = 0;
 //				buildingGapSpace = 0;
@@ -811,7 +811,7 @@ public class ConstructionPlaceFinder {
 			
 
 
-//			FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace for loop :: "+ b.getType() + " :: " + "["+startx+","+starty+"] :: ["+endx+","+endy+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+//			//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace for loop :: "+ b.getType() + " :: " + "["+startx+","+starty+"] :: ["+endx+","+endy+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
 
 			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
 			for (int x = startx < 0 ? 0 : startx; x >= 0 && x < endx; x++)
@@ -819,12 +819,12 @@ public class ConstructionPlaceFinder {
 				for (int y = starty < 0 ? 0 : starty; y >= 0 && y < endy; y++)
 				{
 					
-//					FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace loop :: "+ b.getType() + " :: " + "["+x+","+y+"] :: ["+endx+","+endy+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+//					//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace loop :: "+ b.getType() + " :: " + "["+x+","+y+"] :: ["+endx+","+endy+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
 					
 //					if(canAddonBuilding == true && 
 //						((x == position.getX() + 4 && y == position.getY())
 //						||(x == position.getX() + 5 && y == position.getY()))) {
-////						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: hereis up of addon :: no tile check :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+////						//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace :: hereis up of addon :: no tile check :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 //						continue;
 //					}
 					
@@ -844,27 +844,27 @@ public class ConstructionPlaceFinder {
 						if(x > startx && x < endx -1 && y > starty && y < endy-1) {
 //								System.out.println(" avoid tile check :: " + position + " :: (" + x + " , " + y + ")");
 							if (isBuildableTile(b, x, y) == false) {
-//								FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isBuildableTile false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
-//									FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//								//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isBuildableTile false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+//									//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 								return false;
 							}
 						}else {
 							if (isBuildableTileFac(b, x, y) == false) {
-//								FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isBuildableTileFac false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
-	//								FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//								//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isBuildableTileFac false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+	//								//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 								return false;
 							}
 						}
 					}else {
 					// if we can't build here, or space is reserved, we can't build here
 						if (isBuildableTile(b, x, y) == false) {
-//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//							//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isBuildableTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
 
 //					if (isReservedTile(x, y)) {
-//						FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//						//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isReservedTile false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 //						return false;
 //					}
 					
@@ -888,7 +888,7 @@ public class ConstructionPlaceFinder {
 							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot
 							&& b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport) {
 						if (isTilesToAvoid(x, y)) {
-//							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoid false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+//							//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoid false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
@@ -899,7 +899,7 @@ public class ConstructionPlaceFinder {
 							return false;
 						}
 						
-//						FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
+//						//FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
 					}
 					
 					if (b.getType() == UnitType.Terran_Factory ||
@@ -907,7 +907,7 @@ public class ConstructionPlaceFinder {
 						if(x > startx && x < endx -1 && y > starty && y < endy-1) {
 //							System.out.println(" avoid tile check :: " + position + " :: (" + x + " , " + y + ")");
 							if (isTilesToAvoid(x, y)) {
-//								FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isTilesToAvoid false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+//								//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isTilesToAvoid false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
 								return false;
 							}
 						}
@@ -921,7 +921,7 @@ public class ConstructionPlaceFinder {
 //							}
 //					}else if(b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport){
 //						if (isTilesToAvoidAddonBuilding(x, y)) {
-////							FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidFac false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
+////							//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoidFac false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);
 //							return false;
 //						}
 //					}
@@ -935,7 +935,7 @@ public class ConstructionPlaceFinder {
 //						&& b.getType() != UnitType.Terran_Barracks
 						) {
 						if (isTilesToAvoidSupply(x, y)) {
-//							FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isTilesToAvoidSupply false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
+//							//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace :: isTilesToAvoidSupply false :: "+ b.getType() + " :: " + "["+x+","+y+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
 							return false;
 						}
 					}
@@ -952,10 +952,10 @@ public class ConstructionPlaceFinder {
 
 		// if this rectangle doesn't fit on the map we can't build here
 		if (b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport &&(startx < 0 || starty < 0 || endx > MyBotModule.Broodwar.mapWidth() || endx < position.getX() + width || endy > MyBotModule.Broodwar.mapHeight())) {
-//			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return false :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
+//			//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return false :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return false;
 		} else {
-//			FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return true :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
+//			//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace return true :: "+ b.getType() + " // buildingGapSpace :: " + buildingGapSpace);
 			return true;
 		}
 
@@ -965,7 +965,7 @@ public class ConstructionPlaceFinder {
 	/// Broodwar 의 canBuildHere 및 _reserveMap 와 isOverlapsWithBaseLocation 을 체크
 	public final boolean canBuildHere(TilePosition position, final ConstructionTask b) {
 		if (!MyBotModule.Broodwar.canBuildHere(position, b.getType())) {
-//			FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> !Prebot.Broodwar.canBuildHere :: " + position);
+//			//FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> !Prebot.Broodwar.canBuildHere :: " + position);
 			return false;
 		}
 		
@@ -998,7 +998,7 @@ public class ConstructionPlaceFinder {
 				//if (reserveMap.get(x).get(y))
 				if (reserveMap[x][y])
 				{
-//							FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here reserveMap :: " + x + " , " + y);
+//							//FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> can not build here reserveMap :: " + x + " , " + y);
 					return false;
 				}
 			}
@@ -1022,7 +1022,7 @@ public class ConstructionPlaceFinder {
 			seedPosition = InfoUtils.myBase().getTilePosition();
 		}
 		
-//		FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
+//		//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
 
 		//TODO BASICBOT 1.1 버젼의 가스 처리다.. 확인해 봐야함.
 //		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
@@ -1059,20 +1059,20 @@ public class ConstructionPlaceFinder {
 		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers()) {
 			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
 			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
-//			FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
+//			//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
 
 			Position geyserPos = geyser.getInitialPosition();
 			TilePosition geyserTilePos = geyser.getInitialTilePosition();
 
 			// 이미 예약되어있는가
 			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
-//				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
+//				//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
 				continue;
 			}
 
 			// if it is not connected fron seedPosition, it is located in another island
 			if (!BWTA.isConnected(seedPosition, geyserTilePos)) {
-//				FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos not connected :: " + geyserTilePos + " :: " + seedPosition);
+//				//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos not connected :: " + geyserTilePos + " :: " + seedPosition);
 				continue;
 			}
 
@@ -1081,7 +1081,7 @@ public class ConstructionPlaceFinder {
 			List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
 			for (Unit u : alreadyBuiltUnits) {
 				if (u.getType().isRefinery() && u.exists()) {
-//					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
+//					//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear is alreadyBuiltUnits");
 					refineryAlreadyBuilt = true;
 					break;
 				}
@@ -1092,7 +1092,7 @@ public class ConstructionPlaceFinder {
 				if (thisDistance < minGeyserDistanceFromSeedPosition) {
 					minGeyserDistanceFromSeedPosition = thisDistance;
 					closestGeyser = geyser.getInitialTilePosition();
-//					FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear set closestGeyser :: " + closestGeyser);
+//					//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear set closestGeyser :: " + closestGeyser);
 				}
 			}
 		}
@@ -1374,7 +1374,7 @@ public class ConstructionPlaceFinder {
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
-//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			//FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
 //			return true;
 //		}
 		int rwidth = tilesToAvoid.length;
@@ -1402,7 +1402,7 @@ public class ConstructionPlaceFinder {
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
-//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			//FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
 //			return true;
 //		}
 		
@@ -1430,7 +1430,7 @@ public class ConstructionPlaceFinder {
 ////		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
 ////		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
 ////		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
-////			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+////			//FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
 ////			return true;
 ////		}
 //		
@@ -1451,7 +1451,7 @@ public class ConstructionPlaceFinder {
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().starport2
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().factory
 //		|| new TilePosition(x,y) == BlockingEntrance.Instance().barrack) {
-//			FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
+//			//FileUtils.appendTextToFile("log.txt", "\n isTilesToAvoid free pass initial");
 //			return true;
 //		}
 		
@@ -1672,7 +1672,7 @@ public class ConstructionPlaceFinder {
 		int rheight = reserveMap[0].length;
 		
 		if(unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport) {
-//			FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: fromx & fromy :: ( " + fromx + " , " + fromy + ") :: rwidth & rheight :: ( " + rwidth + " , " + rheight + ")");
+//			//FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: fromx & fromy :: ( " + fromx + " , " + fromy + ") :: rwidth & rheight :: ( " + rwidth + " , " + rheight + ")");
 		}
 		
 
@@ -1690,7 +1690,7 @@ public class ConstructionPlaceFinder {
 				}
 				if(unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport) {
 					tilesToAvoidAddonBuilding[x][y] = true;
-//					FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
+//					//FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
 				}
 				tilesToAvoid[x][y] = true;
 				
@@ -1704,10 +1704,10 @@ public class ConstructionPlaceFinder {
 			}
 		}
 		
-//		FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: tilesToAvoidAddonBuilding ::" + tilesToAvoidAddonBuilding);
+//		//FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: tilesToAvoidAddonBuilding ::" + tilesToAvoidAddonBuilding);
 //		
 //		for(TilePosition point : tilesToAvoidAddonBuilding) {
-//			FileUtils.appendTextToFile("avoidTileAddonBuilding.txt", "\n setTilesToAvoidAddonBuilding :: " + point);
+//			//FileUtils.appendTextToFile("avoidTileAddonBuilding.txt", "\n setTilesToAvoidAddonBuilding :: " + point);
 //			System.out.println("setTilesToAvoidAddonBuildingFree :: " + point);
 //		}
 	}
@@ -1762,7 +1762,7 @@ public class ConstructionPlaceFinder {
 					}
 					if(unit.getType() == UnitType.Terran_Factory || unit.getType() == UnitType.Terran_Starport) {
 						tilesToAvoidAddonBuilding[x][y] = false;
-//						FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
+//						//FileUtils.appendTextToFile("log.txt", "\n setTilesToAvoidAddonBuilding :: " + unit.getType() + " :: ( " + x + " , " + y + ")");
 					}
 					tilesToAvoid[x][y] = false;
 
@@ -1961,7 +1961,7 @@ public class ConstructionPlaceFinder {
 //			System.out.println("lastBuilding is not null :: " + lastBuilding);
 			for(TilePosition lastBuildingP : lastBuilding) {
 				
-//				FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: "+ a +" of lastBuildingPosition :: " + lastBuildingP);
+//				//FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: "+ a +" of lastBuildingPosition :: " + lastBuildingP);
 //				System.out.println(" syso debugBuildLocation :: " + lastBuildingP);
 				a++;
 			}
@@ -1970,7 +1970,7 @@ public class ConstructionPlaceFinder {
 		if(lastBuildingFinal.size() != 0) {
 //			System.out.println("lastBuildingFinal is not null :: " + lastBuildingFinal);
 			for(TilePosition lastBuildingFinalP : lastBuildingFinal) {
-//				FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: " + b+ " of lastBuildingFinalPosition :: " + lastBuildingFinalP);
+//				//FileUtils.appendTextToFile("logFinalBuilding.txt", "\n debugBuildLocation :: " + b+ " of lastBuildingFinalPosition :: " + lastBuildingFinalP);
 				b++;
 			}
 		}
@@ -2005,9 +2005,9 @@ public class ConstructionPlaceFinder {
 //		List<Unit> nearInvisibleUnit = UnitUtils.getUnitsInRadius(CommonCode.PlayerRange.ENEMY, centerPosition, radiusP);
 //		for(Unit unit : nearInvisibleUnit) {
 //			if(unit.getType() == UnitType.Protoss_Dark_Templar || unit.getType() == UnitType.Zerg_Lurker) {
-//				FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: there is invisible unit in turret radius :: " + radiusP);
+//				//FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: there is invisible unit in turret radius :: " + radiusP);
 //				if(UnitUtils.availableScanningCount() == 0) {
-//					FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: But can't use comsat :: don't construct turret");
+//					//FileUtils.appendTextToFile("log.txt", "\n Builder MissileTurret :: But can't use comsat :: don't construct turret");
 //					return false;
 //				}
 //				
