@@ -266,7 +266,7 @@ public class ConstructionPlaceFinder {
 		}
 		
 		int buildingGapSpace = getBuildingSpaceGap(buildingType, desiredPosition, methodFix, spaceZero, constructionPlaceSearchMethod);
-		FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: getBuildingSpaceGap "+ buildingType + " :: " + desiredPosition);
+//		FileUtils.appendTextToFile(buildingType, "log.txt", "\n getBuildLocationNear :: getBuildingSpaceGap "+ buildingType + " :: " + desiredPosition);
 		TilePosition buildPosition = TilePosition.None;
 		
 		if (buildingType == UnitType.Terran_Missile_Turret) {
