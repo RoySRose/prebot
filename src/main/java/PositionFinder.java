@@ -81,7 +81,6 @@ public class PositionFinder {
 		StrategyIdea.campPosition = campTypeToPosition();
 		StrategyIdea.campPositionSiege = campTypeToSiegePositionForSiege();
 		StrategyIdea.mainPosition = getMainPosition();
-//		System.out.println(StrategyIdea.campType + " : " + PositionUtils.isValidGroundPosition(StrategyIdea.campPosition));
 
 		updateMainSquadCenter();
 		updateEnemyUnitPosition();
@@ -141,9 +140,6 @@ public class PositionFinder {
 				}
 			}
 
-//			System.out.println("facto : " + factorySupplyCount);
-//			System.out.println("enemy : " + enemyGroundUnitSupplyCount);
-//			System.out.println("########################################################");
 			
 			// 딕텍팅이 괜찮다면 병력 수에 따라 앞마당이나 두번째 초크로 병력을 이동한다.
 			if (firstExpansionDetectingOk) {
@@ -181,9 +177,6 @@ public class PositionFinder {
 						|| factorySupplyCount >= enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN) {
 					return PositionFinder.CampType.EXPANSION;
 				}
-//				System.out.println("###########################################");
-//				System.out.println("myTankSupplyCount : " + myTankSupplyCount);
-//				System.out.println("factorySupplyCount : " + factorySupplyCount + " / " + "enemyGroundUnitSupplyCount + SECOND_CHOKE_MARGIN : " + (enemyGroundUnitSupplyCount + FIRST_EXPANSION_MARGIN));
 			}
 			
 //			if (InfoUtils.enemyRace() == Race.Zerg) {
@@ -422,7 +415,6 @@ public class PositionFinder {
 				
 				Integer discoveredFrame = dropUnitDiscoveredMap.get(eui.getUnitID());
 				if (TimeUtils.elapsedFrames(discoveredFrame) < 15 * TimeUtils.SECOND) {
-					System.out.println("drop!!");
 					sumOfDropX += eui.getLastPosition().getX();
 					sumOfDropY += eui.getLastPosition().getY();
 					dropCount++;
@@ -892,7 +884,6 @@ public class PositionFinder {
 		
 		// 일정시간 경과 후퇴
 		if (TimeUtils.elapsedSeconds(watcherOtherPositionFrame) > 90) {
-			System.out.println("time's up");
 			watcherOtherPosition = null;
 			return true;
 		}
@@ -901,7 +892,6 @@ public class PositionFinder {
 		if (regroupLeader.getDistance(watcherOtherPosition) < 200) {
 			Set<UnitInfo> euis = UnitUtils.getEnemyUnitInfosInRadius(TargetFilter.AIR_UNIT|TargetFilter.UNFIGHTABLE, watcherOtherPosition, 500, true, false);
 			if (euis.isEmpty()) {
-				System.out.println("no ground enemy");
 				watcherOtherPosition = null;
 				return true;
 			}

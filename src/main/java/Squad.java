@@ -117,7 +117,6 @@ public abstract class Squad {
 		if (mainSquad.squadExecuted()) {
 			return mainSquad.euiList;
 		} else {
-			System.out.println("#### SOMETHING'S WRONG!!! MAIN SQUAD'S EUILIST MUST NOT BE EMPTY ####");
 			return null;
 		}
 	}

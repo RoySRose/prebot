@@ -74,8 +74,6 @@ public class SpiderMineManger {
 					}
 				}
 			}
-//			System.out.println("good position      : " + GOOD_POSITIONS);
-//			System.out.println("late good position : " + GOOD_POSITIONS_LATE);
 			
 			// 공격준비지역
 //			GOOD_POSITIONS.add(myReadyToAttackPos);
@@ -92,7 +90,6 @@ public class SpiderMineManger {
 
 	private boolean secondInit() {
 		GOOD_POSITIONS.addAll(GOOD_POSITIONS_LATE);
-		System.out.println("late good position added : " + GOOD_POSITIONS_LATE);
 		return true;
 	}
 

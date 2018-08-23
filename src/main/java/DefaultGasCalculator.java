@@ -90,7 +90,6 @@ public class DefaultGasCalculator implements GasCalculator{
             this.realGas = 5000 - geyser.getResources();
 
             if(!hasGasBuilding && geyser.getResources() < 5000){
-                System.out.println("something is wrong with gasCalculator calculation");
             }
         }
     }

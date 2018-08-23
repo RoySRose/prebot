@@ -53,7 +53,7 @@ public class StrategyAnalyseManager {
 
 		if (!StrategyChanger.stopStrategiestForDebugging) {
 			if (strategyToApply != EnemyStrategy.UNKNOWN && StrategyIdea.currentStrategy != strategyToApply) {
-				MyBotModule.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
+//				MyBotModule.Broodwar.printf(UxColor.CHAR_WHITE + "ENEMY STRATEY : " + strategyToApply.name());
 				StrategyIdea.strategyHistory.add(StrategyIdea.currentStrategy);
 				StrategyIdea.currentStrategy = strategyToApply;
 				this.applyDetailValue(strategyToApply);
@@ -167,15 +167,12 @@ public class StrategyAnalyseManager {
 		TilePosition enemyFirstExpansionTile = InfoUtils.enemyFirstExpansion().getTilePosition();
 		
 		if (MyBotModule.Broodwar.isVisible(enemyBaseTile)) {
-//			System.out.println("base explored");
 			lastCheckFrameBase = TimeUtils.elapsedFrames();
 		}
 		if (MyBotModule.Broodwar.isVisible(enemyGasTile)) {
-//			System.out.println("gas explored");
 			lastCheckFrameGas = TimeUtils.elapsedFrames();
 		}
 		if (MyBotModule.Broodwar.isVisible(enemyFirstExpansionTile)) {
-//			System.out.println("expansion explored");
 			lastCheckFrameFirstExpansion = TimeUtils.elapsedFrames();
 		}
 	}

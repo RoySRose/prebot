@@ -89,7 +89,6 @@ public class ResearchSelector implements Selector<MetaType>{
 		
 //		비어있는 머신샵이 최소 큐에 들어있는 개발건 보다 많아야 선택
 		if(canMachineShopCnt != 0 && QueueResearch < canMachineShopCnt) {
-//			System.out.println("QueueResearch : " + QueueResearch + " / canMachineShopCnt : " + canMachineShopCnt);
 			canResearch = true;
 		}
 		
@@ -104,7 +103,6 @@ public class ResearchSelector implements Selector<MetaType>{
 			
 			
 			for(MetaType e : upgradeOrder) {
-//				System.out.println("upgradeOrder chk==> " + e.getName());
 				if(BuildManager.Instance().buildQueue.getItemCount(e) != 0){
 					continue;
 				}
@@ -115,7 +113,6 @@ public class ResearchSelector implements Selector<MetaType>{
 							) {
 						continue;
 					}else {
-//						System.out.println("upgradeOrder selected ==> " + metaType.getUpgradeType());
 						metaType = e;
 						break;
 					}
@@ -128,7 +125,6 @@ public class ResearchSelector implements Selector<MetaType>{
 						continue;
 					}else {
 						metaType = e;
-//						System.out.println("techOrder selected ==> " + metaType.getTechType());
 						break;
 					}
 				}

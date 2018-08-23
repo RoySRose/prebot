@@ -990,7 +990,6 @@ public class InformationManager extends GameManager {
 			closeButFarFromEnemyLocation.getTilePosition();
 			return closeButFarFromEnemyLocation.getTilePosition();
 		} else {
-            System.out.println("이거모야!! 나오면 안되니까 나오면 성욱이에게!");
 			return null;
 		}
 	}
@@ -1188,7 +1187,6 @@ public class InformationManager extends GameManager {
 
 			if (mainBaseLocations.get(selfPlayer) != null) {
 				BaseLocation sourceBaseLocation = mainBaseLocations.get(selfPlayer);
-				System.out.println("* my base changed" + sourceBaseLocation.getTilePosition());
 
 				firstChokePoint.put(selfPlayer, BWTA.getNearestChokepoint(sourceBaseLocation.getTilePosition()));
 
@@ -1237,7 +1235,6 @@ public class InformationManager extends GameManager {
 			if (mainBaseLocations.get(enemyPlayer) != null && mainBaseLocations.get(selfPlayer) != null) {
 				BaseLocation enemySourceBaseLocation = mainBaseLocations.get(enemyPlayer);
 				BaseLocation mySourceBaseLocation = mainBaseLocations.get(selfPlayer);
-				System.out.println("* enemy base changed" + enemySourceBaseLocation.getTilePosition());
 
 				firstChokePoint.put(enemyPlayer, BWTA.getNearestChokepoint(enemySourceBaseLocation.getTilePosition()));
 
@@ -1434,11 +1431,9 @@ public class InformationManager extends GameManager {
 		for (BaseLocation base : BWTA.getBaseLocations()) {
 			// BaseLocation을 equal로 비교하면 오류가 있을 수 있다.
 			if (tileSet.contains(base.getTilePosition())) {
-				System.out.println(tileSet + " skiped");
 				continue;
 			}
 			if (base.minerals() < 1000) {
-				System.out.println(tileSet + " skiped(mineral)");
 				continue;
 			}
 			otherExpansionLocations.add(base);
@@ -1475,7 +1470,6 @@ public class InformationManager extends GameManager {
 //			readyToAttackPosition.put(enemyPlayer, enemyReadyToPos);
 
 		} catch (Exception ex) {
-			System.out.println(ex);
 		}
 	}
 

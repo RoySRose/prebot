@@ -128,9 +128,7 @@ public class ZergStrategist extends Strategist {
 	}
 	
 	private EnemyStrategy fastMutaliskByTime() {
-//		System.out.println(EnemyBuildTimer.Instance().mutaliskInMyBaseFrame + " / " + TimeUtils.timeToFrames(5, 30));
 		if (EnemyBuildTimer.Instance().mutaliskInMyBaseFrame == CommonCode.UNKNOWN) {
-			System.out.println("mutaliskInMyBaseFrame is unknown.");
 			if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Lair)) {
 				return EnemyStrategy.ZERG_VERY_FAST_MUTAL;
 			} else {
@@ -202,7 +200,6 @@ public class ZergStrategist extends Strategist {
 			return true;
 		}
 		warithActivatedFrame = TimeUtils.elapsedFrames();
-		System.out.println("fast wraith activated");
 		return true;
 	}
 
@@ -223,7 +220,6 @@ public class ZergStrategist extends Strategist {
 			return false;
 		}
 		warithActivatedFrame = TimeUtils.elapsedFrames();
-		System.out.println("late wraith activated");
 		return true;
 	}
 }

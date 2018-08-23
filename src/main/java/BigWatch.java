@@ -66,8 +66,8 @@ public class BigWatch {
 					CombatManager.Instance(),
 					AttackDecisionMaker.Instance());
 			
-			System.out.println("################# over 55ms ########################");
-			System.out.println("[managers]");
+//			System.out.println("################# over 55ms ########################");
+//			System.out.println("[managers]");
 			for (GameManager gameManager : gameManagers) {
 				String simpleName = gameManager.getClass().getSimpleName();
 				long recorded = gameManager.getRecorded();
@@ -78,15 +78,15 @@ public class BigWatch {
 					}
 					totalDebugMap.put(simpleName, integer);
 				}
-				System.out.println(simpleName + "=" + recorded);
+//				System.out.println(simpleName + "=" + recorded);
 			}
-			System.out.println();
-			System.out.println("[bigwatch]");
-			System.out.println(resultTimeMap);
-			System.out.println();
-			System.out.println("[result]");
-			System.out.println(totalDebugMap);
-			System.out.println("####################################################");
+//			System.out.println();
+//			System.out.println("[bigwatch]");
+//			System.out.println(resultTimeMap);
+//			System.out.println();
+//			System.out.println("[result]");
+//			System.out.println(totalDebugMap);
+//			System.out.println("####################################################");
 		}
 		
 		startTimeMap.clear();

@@ -56,9 +56,9 @@ public class BuilderBunker extends DefaultBuildableItem {
 					if (bunkerBuildLeftSecond == CommonCode.UNKNOWN || leftSeconds < bunkerBuildLeftSecond) {
 						bunkerBuildLeftSecond = leftSeconds;
 						if (bunkerBuildLeftSecond == 0) {
-							MyBotModule.Broodwar.sendText("Bunker.");
+							//MyBotModule.Broodwar.sendText("Bunker.");
 						} else {
-							MyBotModule.Broodwar.sendText("" + bunkerBuildLeftSecond);
+							//MyBotModule.Broodwar.sendText("" + bunkerBuildLeftSecond);
 						}
 					}
 				}

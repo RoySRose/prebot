@@ -5,7 +5,6 @@ public class BuilderExample extends DefaultBuildableItem {
     }
 
     public final boolean buildCondition(){
-        System.out.println("example build condition check");
         return true;
     }
 

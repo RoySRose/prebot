@@ -661,7 +661,7 @@ public class AirForceManager {
 				Unit airForceLeader = airForceTeam.leaderUnit;
 				Unit compareForceLeader = compareForceUnit.leaderUnit;
 				if (airForceLeader.getID() == compareForceLeader.getID()) {
-					System.out.println("no sense. the same id = " + airForceLeader.getID());
+//					System.out.println("no sense. the same id = " + airForceLeader.getID());
 					continue;
 				}
 				if (airForceLeader.getDistance(compareForceLeader) <= AIR_FORCE_TEAM_MERGE_DISTANCE) {

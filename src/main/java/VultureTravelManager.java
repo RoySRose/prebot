@@ -91,21 +91,16 @@ public class VultureTravelManager {
 			baseSet.add(closeBase);
 			
 			if (closeBase.getDistance(centerTilePosition.toPosition()) < 500) {
-				System.out.println("center base. " + closeBase.getPosition());
 			} else {
 				baseLocationsCheckerOrdered.add(closeBase);
 			}
 		}
-		System.out.println("baseLocationsCheckerOrdered initiated (size=" + baseLocationsCheckerOrdered.size()+ ")");
 		
 		// old
-		System.out.println("travel site initiated (size=" + otherBases.size()+ ")");
 		for (int i = 0; i < baseLocationsCheckerOrdered.size(); i++) {
 			BaseLocation baseLocation = baseLocationsCheckerOrdered.get(i);
 			travelSites.add(new TravelSite(baseLocation, 0, 0, 0, i));
-			System.out.print(baseLocation.getPosition() + " / ");
 		}
-		System.out.println();
 		initialized = true;
 	}
 

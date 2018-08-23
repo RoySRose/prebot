@@ -281,7 +281,7 @@ public class ConstructionManager extends GameManager {
 					relocationTilePosition = BuildManager.Instance().getDesiredPosition(b.getType(), TilePosition.None, BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
 				}
 				if (relocationTilePosition == TilePosition.None) {
-					System.out.println(" relocationTilePosition recalculate desiredPosition None");
+//					System.out.println(" relocationTilePosition recalculate desiredPosition None");
 //					//FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition None");
 					continue;
 				}else{
@@ -294,7 +294,7 @@ public class ConstructionManager extends GameManager {
 					
 					if (relocationTilePosition == TilePosition.None) continue;
 					
-					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
+//					System.out.println(" relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 //					//FileUtils.appendTextToFile("log.txt", "\n relocationTilePosition recalculate desiredPosition ok :: " + relocationTilePosition.getX() + ","+ relocationTilePosition.getY());
 				}
 			}
@@ -305,8 +305,8 @@ public class ConstructionManager extends GameManager {
 			// 건설을 못하는 worker 가 계속 construction worker 로 선정될 수 있다. 직전에 선정되었었던 worker 는 다시 선정안하도록 합니다
 			Unit workerToAssign = WorkerManager.Instance().chooseConstuctionWorkerClosestTo(b.getType(), relocationTilePosition, true, b.getLastConstructionWorkerID());
 	        if (workerToAssign == null) {
-	        	System.out.println("No worker to assing " + b.getType().toString() + ". lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
-	        	System.out.println(b.getType().toString() + relocationTilePosition + ", " + b.getLastConstructionWorkerID());
+//	        	System.out.println("No worker to assing " + b.getType().toString() + ". lastWorkerId=" + b.getLastConstructionWorkerID() + ", desiredPosition=" + b.getDesiredPosition().toPosition());
+//	        	System.out.println(b.getType().toString() + relocationTilePosition + ", " + b.getLastConstructionWorkerID());
 	        	continue;
 	        }
 			//System.out.println("set ConstuctionWorker " + workerToAssign.getID());
@@ -724,7 +724,7 @@ public class ConstructionManager extends GameManager {
 				}
 
 				if (isDeadlockCase) {
-					System.out.println("deadlock cancel at conQ :: " + b.getType() + " :: required :: " + requiredUnits.toString());
+//					System.out.println("deadlock cancel at conQ :: " + b.getType() + " :: required :: " + requiredUnits.toString());
 					toCancel.add(b);
 				}
 			}
@@ -732,7 +732,7 @@ public class ConstructionManager extends GameManager {
 
 		for (ConstructionTask i : toCancel)
 		{
-			System.out.println("cacnel type=" + i.getType() + ", desiredPosition=" + i.getDesiredPosition());
+//			System.out.println("cacnel type=" + i.getType() + ", desiredPosition=" + i.getDesiredPosition());
 //			//FileUtils.appendTextToFile("log.txt", "\n cacnel type= "+ i.getType() + ", desiredPosition=" + i.getDesiredPosition() + " :: " + Prebot.Broodwar.getFrameCount());
 //			cancelConstructionTask(i.getType(), i.getDesiredPosition());
 			cancelConstructionTask(i);

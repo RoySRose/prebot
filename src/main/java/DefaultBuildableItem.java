@@ -53,7 +53,7 @@ public abstract class DefaultBuildableItem implements BuildableItem{
     	if(!metaType.isUnit() && 
     			(buildCondition.seedPositionStrategy != BuildOrderItem.SeedPositionStrategy.NoLocation
     			|| buildCondition.tilePosition != TilePosition.None)) {
-            System.out.println("Only UnitType can have position attribute");
+            //System.out.println("Only UnitType can have position attribute");
         }
         //when blocking is false check resource
 		if (!buildCondition.blocking) {

@@ -48,7 +48,6 @@ public class LagTest {
 		startTime = currentTime;
 
 		if (estimatedTime > warnDuration) {
-			System.out.println("### " + name + "." + section + " : " + estimatedTime + (microTime ? " microsec" : " millisec"));
 			return true;
 		} else {
 			return false;
@@ -63,7 +62,6 @@ public class LagTest {
 		startTime = currentTime;
 
 		if (estimatedTime > warnDuration) {
-			System.out.println("### " + name + "." + section + " : " + estimatedTime + (microTime ? " microsec" : " millisec"));
 			return true;
 		} else {
 			return false;

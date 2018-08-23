@@ -419,13 +419,11 @@ public class CombatManager extends GameManager {
 				int vulturePower = VultureFightPredictor.powerOfWatchers(squad.unitList);
 				int enemyPower = VultureFightPredictor.powerOfEnemiesByUnitInfo(euiList);
 				if (vulturePower < enemyPower - 50) { // 질것 같으면 후퇴
-					System.out.println("remove guerialla - retreat");
 					return true;
 				}
 
 				int guerillaScore = GuerillaScore.guerillaScoreByUnitInfo(euiList); // 이득볼게 없으면 후퇴
 				if (guerillaScore <= 0) {
-					System.out.println("remove guerialla - nothing to do");
 					return true;
 				}
 			}

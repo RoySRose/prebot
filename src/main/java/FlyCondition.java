@@ -17,7 +17,7 @@ public class FlyCondition{
         this.isGateway = isGateway;
         if(isGateway){
             if(tilePosition == null){
-                System.out.println("TilePosition must not be null");
+//                System.out.println("TilePosition must not be null");
             }
             this.landPosition = tilePosition;
         }else {

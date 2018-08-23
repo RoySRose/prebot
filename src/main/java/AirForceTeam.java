@@ -90,7 +90,7 @@ public class AirForceTeam {
 	public Position getTargetPosition() {
 		List<Position> targetPositions = AirForceManager.Instance().getTargetPositions();
 		if (targetPositions.isEmpty()) {
-			System.out.println("ERROR - airforceTeam targetposition is empty");
+//			System.out.println("ERROR - airforceTeam targetposition is empty");
 			return StrategyIdea.mainSquadCenter;
 		}
 		
@@ -100,7 +100,7 @@ public class AirForceTeam {
 		}
 		Position targetPosition = targetPositions.get(currentTargetIndex);
 		if (targetPosition == null) {
-			System.out.println("ERROR - index=" + currentTargetIndex + " / " + targetPositions);
+//			System.out.println("ERROR - index=" + currentTargetIndex + " / " + targetPositions);
 			return StrategyIdea.mainSquadCenter;
 		}
 		return targetPosition;

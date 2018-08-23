@@ -47,7 +47,6 @@ public class InitialBuildProvider {
 	
 	
 	public void onStart() {
-		System.out.println("InitialBuildProvider onStart start");
 		
 		nowStrategy = null;
 		bfStrategy = null;
@@ -72,7 +71,6 @@ public class InitialBuildProvider {
 			new VsZerg(firstSupplyPos, barrackPos, secondSupplyPos, factoryPos, bunkerPos1, starport1, starport2);
 		}
 		
-		System.out.println("InitialBuildProvider onStart end");
 	}
 
     public void updateInitialBuild(){
@@ -227,11 +225,11 @@ public class InitialBuildProvider {
 		}
 
 		if (removedFromBuildQueue > 0 || removedFromConstructionQueue > 0 || cancelBuildings.size() > 0) {
-			System.out.println("########################################");
-			System.out.println("removed from build queue : " + removedFromBuildQueue);
-			System.out.println("removed from construction queue : " + removedFromConstructionQueue);
-			System.out.println("canceled incomplete building = " + cancelBuildings.size());
-			System.out.println("########################################");
+//			System.out.println("########################################");
+//			System.out.println("removed from build queue : " + removedFromBuildQueue);
+//			System.out.println("removed from construction queue : " + removedFromConstructionQueue);
+//			System.out.println("canceled incomplete building = " + cancelBuildings.size());
+//			System.out.println("########################################");
 		}
 	}
 
@@ -283,7 +281,6 @@ public class InitialBuildProvider {
         if (!tempbuildQueue.isEmpty()) {
 //            checkItem= tempbuildQueue.getHighestPriorityItem();
             while(true){
-            	System.out.println("unitType :: " + unitType + " while true");
                 if(tempbuildQueue.canGetNextItem() == true){
                     tempbuildQueue.canGetNextItem();
                 }else{

@@ -351,12 +351,6 @@ public class MicroUtils {
 		
 		// 상대가 때리기 위해 거리를 좁히거나 벌려야 하는 경우(coolTime <= catchTime)
 		if (cooltime <= catchTime + MyBotModule.Broodwar.getLatency() * 2) { // 명령에 대한 지연시간(latency)을 더한다. ex) LAN(UDP) : 5
-//			System.out.println("#################################");
-//			System.out.println("vulture id " + rangedUnit.getID() + ": " + cooltime + " <= " + catchTime + " + " + Prebot.Broodwar.getLatency() * 2);
-//			System.out.println("distanceToAttack = " + distanceToAttack);
-//			System.out.println("getDistance = " + rangedUnit.getDistance(targetUnit));
-//			System.out.println("weaponMaxRange = " + Prebot.Broodwar.self().weaponMaxRange(attackUnitWeapon));
-//			System.out.println("#################################");
 			return true;
 		}
 		

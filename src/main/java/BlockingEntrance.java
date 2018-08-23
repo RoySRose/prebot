@@ -672,7 +672,6 @@ public class BlockingEntrance {
             yinc = true;
         }
         
-//        System.out.println(" next supply position ==>> " + loc.toString());
 		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc, Building.SUPPLY_AREA));
 		return supply_pos;
 
@@ -680,32 +679,20 @@ public class BlockingEntrance {
 	
 	public final TilePosition getSupplyPosition()
 	{
-		/*System.out.println("getSupplyPosition start");
-		System.out.println("getSupplyPosition mapName :: " + mapName);
-		System.out.println("getSupplyPosition loc_t :: " + loc_t);
-		System.out.println("getSupplyPosition SUPPLY_AREA :: " + Building.SUPPLY_AREA);*/
-		
 		TilePosition supply_pos = postitionStorage.get(combine(mapName, loc_t, Building.SUPPLY_AREA));
-		//System.out.println(" supply_pos end==>>> ( " + supply_pos.getX() + " , " + supply_pos.getY() + " ) ");
 		return supply_pos;
 	}
 	
 	public final TilePosition getTurretPosition(int a)
 	{
-		/*System.out.println("getSupplyPosition start");
-		System.out.println("getSupplyPosition mapName :: " + mapName);
-		System.out.println("getSupplyPosition loc_t :: " + loc_t);
-		System.out.println("getSupplyPosition SUPPLY_AREA :: " + Building.SUPPLY_AREA);*/
 		if(a == 1) {
 			TilePosition turret_pos = postitionStorage.get(combine(mapName, loc_t, Building.ENTRANCE_TURRET1));
 			if(turret_pos != TilePosition.None){
-//				System.out.println("turret 1 position not None :: " + turret_pos );
 				return turret_pos;
 			}
 		}else if(a == 2) {
 			TilePosition turret_pos = postitionStorage.get(combine(mapName, loc_t, Building.ENTRANCE_TURRET2));
 			if(turret_pos != TilePosition.None){
-//				System.out.println("turret 2 position not None :: " + turret_pos );
 				return turret_pos;
 			}
 		}

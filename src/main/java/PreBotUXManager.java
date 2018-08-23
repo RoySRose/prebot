@@ -139,12 +139,10 @@ public class PreBotUXManager {
 		clearDecisionListForUx();
 		
 //		if (TimeUtils.executeRotation(1, 11)) {
-////			System.out.println("execute debugBuildLocationSet");
 //			ConstructionPlaceFinder.Instance().debugBuildLocationSet();
 //		}
 //		
 //		if (TimeUtils.executeRotation(1, 233)) {
-////			System.out.println("execute debugBuildLocationPrint");
 //			ConstructionPlaceFinder.Instance().debugBuildLocationPrint();
 //		}
 	}
@@ -153,12 +151,10 @@ public class PreBotUXManager {
 	private void drawExpectedResource2() {
 		 int m=190;
         //MyBotModule.Broodwar.drawTextScreen(190, 10, "EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
-        System.out.println("EnemyPredictedUnitLIst: " + AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.size());
 		int l=10;
         for (Entry<UnitType, MutableFloat> enenmy : AttackDecisionMaker.Instance().predictedTotalEnemyAttackUnit.entrySet()){
         	float cnt = enenmy.getValue().get();
            	UnitType unitType = enenmy.getKey();
-           	System.out.println( unitType.toString().substring(7, 14)+" : "+cnt);
            	//MyBotModule.Broodwar.drawTextScreen(m, l+=10, unitType.toString().substring(7, 14)+" : "+cnt);
         }
 	}
@@ -882,7 +878,6 @@ public class PreBotUXManager {
 			}
 			hasSavedBWTAInfo = true;
 			
-//			System.out.println(blueCount + " " + cyanCount + " " + orangeCount + " " + yellowCount + " " + greenCount + " " + redCount);
 		}
 
 		if(hasSavedBWTAInfo)
@@ -1148,7 +1143,6 @@ public class PreBotUXManager {
 					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Red, false);
 				}
 //				if(ConstructionPlaceFinder.Instance().getTilesToAvoidAddonBuilding(x, y)) {
-////					System.out.println("getTilesToAvoidAddonBuilding is ture :: (" + x + " , " + y + ")");
 //					int x1 = x * 32 + 8;
 //					int y1 = y * 32 + 8;
 //					int x2 = (x + 1) * 32 - 8;
@@ -1627,12 +1621,6 @@ public class PreBotUXManager {
 		for (Unit depot : UnitUtils.getUnitList(UnitType.Terran_Command_Center)) {
 			List<Minerals> mineralsList = WorkerData.depotMineral.get(depot);
 			if (mineralsList == null) { // TODO
-//				System.out.println("mineralsList is null.");
-//				if (depot != null) {
-//					System.out.println("depot=" + depot.getID() +  "" + depot.getPosition());
-//				} else {
-//					System.out.println("depot is null");
-//				}
 				return;
 			}
 			
