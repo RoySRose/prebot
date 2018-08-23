@@ -43,6 +43,7 @@ public class AttackDecisionMaker extends GameManager {
 
     public Decision decision;
     Boolean foundEnemyMainBase;
+    Boolean falseEnemyMainBase;
     public ScoreBoard scoreBoard;
 
     private static AttackDecisionMaker instance = new AttackDecisionMaker();
@@ -74,6 +75,7 @@ public class AttackDecisionMaker extends GameManager {
         this.enemyGasToPredict = 0;
         this.predictedTotalEnemyAttackUnit = new HashMap<>();
         this.foundEnemyMainBase = false;
+        this.falseEnemyMainBase=false;
         this.decision = Decision.DEFENCE;
         this.scoreBoard = new ScoreBoard();
     }
@@ -88,8 +90,8 @@ public class AttackDecisionMaker extends GameManager {
     	enemyGasToPredict=0;
         //removeDestroyedDepot(InformationManager.Instance().enemyRace);
         
+    	addFakeMainDepot(InformationManager.Instance().enemyRace);
         addNewResourceDepot(InformationManager.Instance().enemyRace);
-        addFakeMainDepot(InformationManager.Instance().enemyRace);
         updateResources(InformationManager.Instance().enemyRace);
 
 //        if(tempPhase = checkPhase3()) {
@@ -604,18 +606,18 @@ public class AttackDecisionMaker extends GameManager {
 
     private void addFakeMainDepot(Race enemyRace) {
 
-    	if(foundEnemyMainBase) {
+    	if(foundEnemyMainBase || falseEnemyMainBase) {
     		return;
     	}
     	
-    	for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
-
-            EnemyCommandInfo enemyCommandInfo = enemyResourceDepot.getValue();
-
-           if(enemyCommandInfo.isMainBase) {
-        	   return;
-           }
-        }
+//    	for (Map.Entry<UnitInfo, EnemyCommandInfo> enemyResourceDepot : enemyResourceDepotInfoMap.entrySet()){
+//
+//            EnemyCommandInfo enemyCommandInfo = enemyResourceDepot.getValue();
+//
+//           if(enemyCommandInfo.isMainBase) {
+//        	   return;
+//           }
+//      }
     	
     	BaseLocation enemyMainBase = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		
@@ -633,6 +635,7 @@ public class AttackDecisionMaker extends GameManager {
     	
     	System.out.println("add false: " + falseDepot.getLastPosition());
     	
+    	falseEnemyMainBase =true;
         EnemyCommandInfo enemyCommandInfo = new EnemyCommandInfo(falseDepot, true);
         enemyCommandInfo.setLastCheckFrame(0);
         enemyResourceDepotInfoMap.put(falseDepot, enemyCommandInfo);
@@ -660,8 +663,6 @@ public class AttackDecisionMaker extends GameManager {
         List<Position> resourceDepotPosition = new ArrayList<>();
         
         boolean isMainBase = false;
-        UnitInfo selectedUnitInfo = null;
-        UnitInfo selectedUnitInfo2 = null;
         for(UnitInfo unitInfo : enemyResourceDepot){
 
         	if(!enemyResourceDepotInfoMap.containsKey(unitInfo)){
@@ -677,56 +678,55 @@ public class AttackDecisionMaker extends GameManager {
                 	
                 	BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
                     
-                	if(enemyBaseLocation !=null)
-                	isMainBase = PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition());
+                	if(enemyBaseLocation !=null) {
+                		isMainBase = PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition());
+                	}
                     
-                	System.out.println("add : " + unitInfo + ", " + isMainBase + ", " + unitInfo.getLastPosition());
+                
                 	
-                	selectedUnitInfo = unitInfo;
+                	
+                	EnemyCommandInfo enemyCommandInfo;
+                	if(isMainBase) {
+                		System.out.println("found real main: " + unitInfo.getLastPosition());
+                		if(falseEnemyMainBase) {
+                			enemyCommandInfo = removefake(unitInfo);
+                			falseEnemyMainBase = false;
+                		}else {
+                			enemyCommandInfo = new EnemyCommandInfo(unitInfo, isMainBase);
+                		}
+                		foundEnemyMainBase = true;
+        	        }else {
+            			enemyCommandInfo = new EnemyCommandInfo(unitInfo, isMainBase);
+            		}
+                	System.out.println("add : " + unitInfo + ", " + isMainBase + ", " + unitInfo.getLastPosition());
+        	        enemyResourceDepotInfoMap.put(unitInfo, enemyCommandInfo);
+                	
                     resourceDepotPosition.add(unitInfo.getLastPosition());
                     
                     break;
                 }
             }else {
-            	if(!foundEnemyMainBase) {
-            		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-                    
-            		if(enemyBaseLocation != null) {
-	            		if(PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition())) {
-	            			System.out.println("multi first but save");
-	            			foundEnemyMainBase = true;
-	            			enemyResourceDepotInfoMap.get(unitInfo).isMainBase = true;
-	            		}
-            		}
-            	}
+//            	if(!foundEnemyMainBase) {
+//            		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+//                    
+//            		if(enemyBaseLocation != null) {
+//	            		if(PositionUtils.equals(enemyBaseLocation.getPosition(), unitInfo.getLastPosition())) {
+//	            			System.out.println("multi first but save");
+//	            			foundEnemyMainBase = true;
+//	            			enemyResourceDepotInfoMap.get(unitInfo).isMainBase = true;
+//	            		}
+//            		}
+//            	}
             	//For moving CommandCenter
             	if(InformationManager.Instance().enemyRace == Race.Terran && MyBotModule.Broodwar.getFrameCount()>30000 && !resourceDepotPosition.contains(unitInfo.getLastPosition())){
             		if(!unitInfo.getUnit().isFlying() && getMineralPatchesNearDepot(unitInfo.getLastPosition()).size() > 6 ){
-            			selectedUnitInfo2 = unitInfo;
+            			EnemyCommandInfo enemyCommandInfo = new EnemyCommandInfo(unitInfo, false);
+                    	enemyResourceDepotInfoMap.remove(unitInfo);
+                        enemyResourceDepotInfoMap.put(unitInfo, enemyCommandInfo);
+                        resourceDepotPosition.add(unitInfo.getLastPosition());
                     }
             	}
             }
-        }
-        
-        if(selectedUnitInfo != null) {
-	        if(isMainBase) {
-	        	System.out.println("found real main: " + selectedUnitInfo.getLastPosition());
-	        	foundEnemyMainBase = true;
-	        }
-	    	
-	        EnemyCommandInfo enemyCommandInfo;
-	        if(isMainBase) {
-	        	enemyCommandInfo = removefake(selectedUnitInfo);
-	        }else {
-	        	enemyCommandInfo = new EnemyCommandInfo(selectedUnitInfo, isMainBase);
-	        }
-	        enemyResourceDepotInfoMap.put(selectedUnitInfo, enemyCommandInfo);
-        }
-        if(selectedUnitInfo2 != null) {
-        	EnemyCommandInfo enemyCommandInfo = new EnemyCommandInfo(selectedUnitInfo2, false);
-        	enemyResourceDepotInfoMap.remove(selectedUnitInfo2);
-            enemyResourceDepotInfoMap.put(selectedUnitInfo2, enemyCommandInfo);
-            resourceDepotPosition.add(selectedUnitInfo2.getLastPosition());
         }
     }
 
@@ -747,6 +747,7 @@ public class AttackDecisionMaker extends GameManager {
         }
     	
     	if(selectedUnitInfo!=null) {
+    		System.out.println("removing fake!: " + selectedUnitInfo);
     		enemyResourceDepotInfoMap.remove(selectedUnitInfo);
     	}
     	
@@ -784,6 +785,7 @@ public class AttackDecisionMaker extends GameManager {
 //            }
 
             if(enemyCommandInfo==null) {
+            	System.out.println("unitInfo: " + unitInfo.getType() + ", " + unitInfo.getLastPosition() + ", " + unitInfo.getUnitID());
             	System.out.println("should not aeofhawoefaowe @@@@@@@@@@@@@@@@@@@@@");
             }else {
             	enemyCommandInfo.updateInfo();
