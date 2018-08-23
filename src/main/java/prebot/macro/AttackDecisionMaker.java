@@ -169,7 +169,7 @@ public class AttackDecisionMaker extends GameManager {
     		return Decision.DEFENCE;
     	}
     	
-    	if (decision == Decision.DEFENCE && myForcePoint < 1200) {
+		if (decision == Decision.DEFENCE && myForcePoint < startForcePoint()) {
     		return Decision.DEFENCE;
     	}
     		
@@ -242,7 +242,22 @@ public class AttackDecisionMaker extends GameManager {
         return Decision.DEFENCE;
     }
 
-    private boolean attackByFullSupply() {
+    private int startForcePoint() {
+    	if (InfoUtils.enemyRace() == Race.Protoss) {
+    		if (UnitUtils.enemyUnitDiscovered(
+    				UnitType.Protoss_Stargate,
+    				UnitType.Protoss_Arbiter, UnitType.Protoss_Arbiter_Tribunal,
+    				UnitType.Protoss_Carrier, UnitType.Protoss_Fleet_Beacon)) {
+        		return 1200;
+    		} else {
+    			return 3000;
+    		}
+    	}
+    	
+		return 1200;
+	}
+
+	private boolean attackByFullSupply() {
 		if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
 			if (InfoUtils.myRace() == Race.Terran) {
 				if (PlayerUtils.enoughResource(2000, 1500)) {

@@ -296,7 +296,7 @@ public class PositionFinder {
 			return defensePosition;
 		}
 
-		if (campType == PositionFinder.CampType.EXPANSION) {
+		if (campType == PositionFinder.CampType.FIRST_CHOKE || campType == PositionFinder.CampType.EXPANSION) {
 			return expansionDefensePositionSiege();
 		} else {
 			return StrategyIdea.campPosition;
@@ -804,16 +804,20 @@ public class PositionFinder {
 		Position positionBaseSided = firstDistance < secondDistance ? secondChokeSides.first : secondChokeSides.second;
 		
 		Position defensePosition = null;
+
 		if (InfoUtils.enemyRace() == Race.Zerg) {
 			double radian1 = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
-			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 270);
+			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 170);
 			
 			double radian2 = MicroUtils.targetDirectionRadian(defensePosition, firstChokePosition);
 			defensePosition = MicroUtils.getMovePosition(defensePosition, radian2, 30);
 			
 		} else {
-			double radian = MicroUtils.targetDirectionRadian(positionBaseSided, firstChokePosition);
-			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian, 130);
+			double radian1 = MicroUtils.targetDirectionRadian(positionBaseSided, myBasePosition);
+			defensePosition = MicroUtils.getMovePosition(positionBaseSided, radian1, 170);
+			
+			double radian2 = MicroUtils.targetDirectionRadian(defensePosition, firstChokePosition);
+			defensePosition = MicroUtils.getMovePosition(defensePosition, radian2, 30);
 		}
 		
 		return expansionDefensePositionSiege = defensePosition;
