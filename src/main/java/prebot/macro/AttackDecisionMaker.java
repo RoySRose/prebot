@@ -79,7 +79,7 @@ public class AttackDecisionMaker extends GameManager {
     }
 
     public void update() {
-    	if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER7, 0), LagObserver.managerRotationSize())) {
+    	if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER8, 0), LagObserver.managerRotationSize())) {
     		return;
     	}
     	

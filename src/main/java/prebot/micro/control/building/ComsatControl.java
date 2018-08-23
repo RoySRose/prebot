@@ -42,7 +42,7 @@ public class ComsatControl extends Control {
 		if (TimeUtils.elapsedFrames(scanUsedFrame) < 4 * TimeUtils.SECOND) {
 			return;
 		}
-		if (!TimeUtils.executeRotation(0, 24)) {
+		if (!TimeUtils.executeRotation(0, 23)) {
 			return;
 		}
 		

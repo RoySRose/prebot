@@ -16,6 +16,7 @@ import prebot.common.constant.CommonCode;
 import prebot.common.debug.BigWatch;
 import prebot.common.main.GameManager;
 import prebot.common.main.MyBotModule;
+import prebot.common.main.PreBotDevelop;
 import prebot.common.util.InfoUtils;
 import prebot.common.util.TimeUtils;
 import prebot.common.util.UnitUtils;
@@ -103,14 +104,10 @@ public class CombatManager extends GameManager {
 	public void update() {
 		logObserver.start();
 
-		updateSquadData();
 		combatUnitArrangement();
 		squadExecution();
 		
 		logObserver.observe();
-	}
-
-	private void updateSquadData() {
 	}
 
 	private void combatUnitArrangement() {
@@ -152,18 +149,20 @@ public class CombatManager extends GameManager {
 			squadData.exclude(invalidUnit);
 		}
 		
-		List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, squad.getUnitTypes());
-		
-		List<Unit> assignableUnitList = new ArrayList<>();
-		for (Unit unit : squadTypeUnitList) {
-			if (squad.want(unit)) {
-				assignableUnitList.add(unit);
+    	if (MyBotModule.Broodwar.self().supplyUsed() < 100 || TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER7, 0), LagObserver.managerRotationSize())) {
+			List<Unit> squadTypeUnitList = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, squad.getUnitTypes());
+			
+			List<Unit> assignableUnitList = new ArrayList<>();
+			for (Unit unit : squadTypeUnitList) {
+				if (squad.want(unit)) {
+					assignableUnitList.add(unit);
+				}
 			}
-		}
-		List<Unit> recruitUnitList = squad.recruit(assignableUnitList);
-		for (Unit recuitUnit : recruitUnitList) {
-			squadData.assign(recuitUnit, squad);
-		}
+			List<Unit> recruitUnitList = squad.recruit(assignableUnitList);
+			for (Unit recuitUnit : recruitUnitList) {
+				squadData.assign(recuitUnit, squad);
+			}
+    	}
 	}
 
 	private void updateTankDefenseSquad() {

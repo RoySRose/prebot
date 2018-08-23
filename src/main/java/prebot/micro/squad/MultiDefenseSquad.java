@@ -124,9 +124,10 @@ public class MultiDefenseSquad extends Squad {
 
 	@Override
 	public void findEnemies() {
+		boolean findNearCenter = false;
+		
 		euiList.clear();
 		Position targetPosition = getTargetPosition();
-		UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, targetPosition, UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		for (Unit tank : unitList) {
 			if (!TimeUtils.executeUnitRotation(tank, LagObserver.groupsize())) {
 				continue;
@@ -138,6 +139,10 @@ public class MultiDefenseSquad extends Squad {
 				continue;
 			}
 			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, tank.getPosition(), 100);
+			findNearCenter = true;
+		}
+		if (findNearCenter) {
+			UnitUtils.addEnemyUnitInfosInRadiusForGround(euiList, targetPosition, UnitType.Terran_Siege_Tank_Siege_Mode.sightRange() + MicroConfig.COMMON_ADD_RADIUS);
 		}
 	}
 	

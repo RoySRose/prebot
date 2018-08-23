@@ -14,8 +14,6 @@ public class LagObserver {
 	public static int getManagerLagLevel() {
 		return managerLagLevel;
 	}
-
-	private static final int MANAGER_ROTATION_SIZE = 8;
 	
 	public static int managerRotationSize() { // 7, 14, 21, 28
 		return MANAGER_ROTATION_SIZE * managerLagLevel;
@@ -63,6 +61,8 @@ public class LagObserver {
 //	private static int testRotationSize() {
 //		return 16;
 //	}
+
+	private static final int MANAGER_ROTATION_SIZE = 9;
 	
 	public static final int MANAGER0 = 0; //info
 	public static final int MANAGER1 = 1; //strategy
@@ -71,7 +71,8 @@ public class LagObserver {
 	public static final int MANAGER4 = 4; //build
 	public static final int MANAGER5 = 5; //construction
 	public static final int MANAGER6 = 6; //worker
-	public static final int MANAGER7 = 7; //attack decision
+	public static final int MANAGER7 = 7; //combat
+	public static final int MANAGER8 = 8; //attack decision
 
 	private static final boolean ADJUST_ON = true;
 	
@@ -124,12 +125,12 @@ public class LagObserver {
 					}
 				}
 			}
-			managerLagLevel = groupsize / 8 + 1;
+			managerLagLevel = groupsize / MANAGER_ROTATION_SIZE + 1; // manager size = 9
 			
 			if (MyBotModule.Broodwar.self().supplyUsed() > 300) {
-				groupMinSize = 8;
+				groupMinSize = MANAGER_ROTATION_SIZE;
 				if (groupsize < groupMinSize) {
-					groupsize = 8;
+					groupsize = MANAGER_ROTATION_SIZE;
 				}
 			}
 		}
