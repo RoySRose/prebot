@@ -62,6 +62,7 @@ public class InformationManager extends GameManager {
 
 	// 입막시 방어 안전 위치
 	private Position safePosition;
+	private Position behindMineralPosition;
 	private Position holdConPosition;
 
 	/// 해당 Player의 주요 건물들이 있는 BaseLocation. <br>
@@ -147,6 +148,7 @@ public class InformationManager extends GameManager {
 		firstBarrack = null;
 
 		safePosition = null;
+		behindMineralPosition = null;
 		holdConPosition = null;
 		secondStartPosition = null;
 //		MainBaseSuppleLimit =0;
@@ -1708,6 +1710,10 @@ public class InformationManager extends GameManager {
 		return safePosition;
 	}
 	
+	public Position isBehindMineralPosition() {
+		return behindMineralPosition;
+	}
+	
 	public Position isHoldConPosition() {
 		return holdConPosition;
 	}
@@ -2221,6 +2227,9 @@ public class InformationManager extends GameManager {
 					earlyDefenseSafePosition(UnitType.Terran_Marine, supple);
 					earlyDefenseHoldePosition(UnitType.Terran_Marine, supple);
 				}
+				if(behindMineralPosition == null){
+					earlyDefenseBehindMeneralPosition();
+				}
 			} else if (supple.getTilePosition().equals(secondSupplePos)) {
 				secondSupple = true;
 			}
@@ -2280,4 +2289,23 @@ public class InformationManager extends GameManager {
 				supple.getPosition().getY() + fleeVector.getY()); // 회피지점
 
 	}
+	
+    /* 입막시 마린 안전 방어 지역 (다른 유닛 필요시 사용) */
+    public void earlyDefenseBehindMeneralPosition() {
+        Position nearMineral = WorkerManager.Instance().getWorkerData().getNearMineralToBase(FirstCC);
+//        System.out.println("FirstCC : " + FirstCC.getPosition());
+//        System.out.println(nearMineral.getPoint());
+        int reverseX = nearMineral.getX() - FirstCC.getX(); // 타겟과 반대로 가는 x양
+        int reverseY = nearMineral.getY() - FirstCC.getY(); // 타겟과 반대로 가는 y양
+        final double fleeRadian = Math.atan2(reverseY, reverseX); // 회피 각도
+
+        double fleeRadianAdjust = fleeRadian; // 회피 각(radian)
+        int moveCalcSize = (int) (UnitType.Terran_SCV.topSpeed() * 10);
+        Position fleeVector = new Position((int) (moveCalcSize * Math.cos(fleeRadianAdjust)),
+                (int) (moveCalcSize * Math.sin(fleeRadianAdjust))); // 이동벡터
+        behindMineralPosition = new Position(nearMineral.getX() + fleeVector.getX(),
+                nearMineral.getY() + fleeVector.getY()).makeValid(); // 회피지점
+//        System.out.println("behindMineralPosition : " + behindMineralPosition.getPoint());
+    }
+
 }

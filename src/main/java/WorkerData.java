@@ -879,4 +879,28 @@ public class WorkerData {
 		if (j == WorkerData.WorkerJob.Scout) return 'S';
 		return 'X';
 	}
+	
+    public Position getNearMineralToBase(Unit depot)
+    {
+        // get the depot associated with this unit
+        if (depot == null) {
+            return null;
+        }
+        Unit bestMineral = null;
+        double bestDist = 100000000;
+        
+        for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+        {
+            if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < 320)
+            {
+                double dist = unit.getDistance(depot);
+                if (dist < bestDist) {
+                    bestMineral = unit;
+                    bestDist = dist;
+                }
+            }
+        }
+        return bestMineral.getPosition();
+    }
+
 }
