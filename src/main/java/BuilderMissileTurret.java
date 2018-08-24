@@ -186,7 +186,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				return true;
 			}
 			
-			if (noTurretNearPosition(myFirstExpansion.getPosition(), 250, 150, turretCount, otherCommandTurret+add_turret, 10)) {
+			if (noTurretNearPosition(myFirstExpansion.getPosition(), 200, 150, turretCount, otherCommandTurret, 0)) {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(myFirstExpansion.getPosition().toTilePosition());

@@ -775,6 +775,17 @@ public class ConstructionPlaceFinder {
 //				height = 0;
 //				buildingGapSpace = 0;
 //			}
+			
+			if( (TilePositionUtils.equals(position, BlockingEntrance.Instance().first_supple)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().second_supple)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport1)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
+					&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE
+				){
+					buildingGapSpace = 0;
+				}
 
 
 			// 상하좌우에 buildingGapSpace 만큼 간격을 띄운다
@@ -817,7 +828,7 @@ public class ConstructionPlaceFinder {
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().second_supple)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport1)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
-						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
+//						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
 						&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE
 					){
