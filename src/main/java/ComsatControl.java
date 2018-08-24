@@ -145,6 +145,10 @@ public class ComsatControl extends Control {
 			List<Unit> myAttackUnits = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
 					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 			
+			if (InfoUtils.enemyRace() == Race.Terran) {
+				myAttackUnits.addAll(UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
+			}
+			
 			Race enemyRace = InfoUtils.enemyRace();
 			int myAttackUnitInWeaponRangeCount = 0;
 			for (Unit myAttackUnit : myAttackUnits) {

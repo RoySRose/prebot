@@ -24,7 +24,7 @@ public class WraithFightPredictor {
 		WRAITH_TARGET.put(UnitType.Terran_Medic, 150);
 		WRAITH_TARGET.put(UnitType.Terran_Ghost, 150);
 		WRAITH_TARGET.put(UnitType.Terran_Goliath, 400);
-		WRAITH_TARGET.put(UnitType.Terran_Wraith, 100);
+		WRAITH_TARGET.put(UnitType.Terran_Wraith, 95);
 		WRAITH_TARGET.put(UnitType.Terran_Valkyrie, 300);
 		WRAITH_TARGET.put(UnitType.Terran_Battlecruiser, 500);
 		WRAITH_TARGET.put(UnitType.Terran_Bunker, 1000);
