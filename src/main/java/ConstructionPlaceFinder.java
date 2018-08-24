@@ -11,15 +11,15 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
-/// 건설위치 탐색을 위한 class
+/// 嫄댁꽕�쐞移� �깘�깋�쓣 �쐞�븳 class
 public class ConstructionPlaceFinder {
 
-	/// 건설위치 탐색 방법
+	/// 嫄댁꽕�쐞移� �깘�깋 諛⑸쾿
 	public enum ConstructionPlaceSearchMethod { 
-		SpiralMethod,	///< 나선형으로 돌아가며 탐색
-		SupplyDepotMethod, /// < 서플라이 디팟 메쏘드. 가로 세로를 서플라이 크기만큼 더해서 찾기
-		ExistAddonPosition, /// < 애드온만 남은 팩토리 스타포트의 경우
-		NewMethod 		///< 예비
+		SpiralMethod,	///< �굹�꽑�삎�쑝濡� �룎�븘媛�硫� �깘�깋
+		SupplyDepotMethod, /// < �꽌�뵆�씪�씠 �뵒�뙚 硫붿룜�뱶. 媛�濡� �꽭濡쒕�� �꽌�뵆�씪�씠 �겕湲곕쭔�겮 �뜑�빐�꽌 李얘린
+		ExistAddonPosition, /// < �븷�뱶�삩留� �궓�� �뙥�넗由� �뒪���룷�듃�쓽 寃쎌슦
+		NewMethod 		///< �삁鍮�
 	};
 	
 //	20180815. hkk. for lastBuilding Location Debug
@@ -29,21 +29,21 @@ public class ConstructionPlaceFinder {
 //	public int maxSupplyCntX = 3;
 //	public int maxSupplyCntY = 4;
 	
-	/// 건물 건설 예정 타일을 저장해놓기 위한 2차원 배열<br>
-	/// TilePosition 단위이기 때문에 보통 128*128 사이즈가 된다<br>
-	/// 참고로, 건물이 이미 지어진 타일은 저장하지 않는다
+	/// 嫄대Ъ 嫄댁꽕 �삁�젙 ���씪�쓣 ���옣�빐�넃湲� �쐞�븳 2李⑥썝 諛곗뿴<br>
+	/// TilePosition �떒�쐞�씠湲� �븣臾몄뿉 蹂댄넻 128*128 �궗�씠利덇� �맂�떎<br>
+	/// 李멸퀬濡�, 嫄대Ъ�씠 �씠誘� 吏��뼱吏� ���씪�� ���옣�븯吏� �븡�뒗�떎
 	private boolean[][] reserveMap = new boolean[128][128];
 	
-	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 담는 자료구조. 여기에는 Addon 이외에는 건물을 짓지 않도록 합니다	
+	/// BaseLocation 怨� Mineral / Geyser �궗�씠�쓽 ���씪�뱾�쓣 �떞�뒗 �옄猷뚭뎄議�. �뿬湲곗뿉�뒗 Addon �씠�쇅�뿉�뒗 嫄대Ъ�쓣 吏볦� �븡�룄濡� �빀�땲�떎	
 //	private Set<TilePosition> tilesToAvoid = new HashSet<TilePosition>();
 	private boolean[][] tilesToAvoid = new boolean[128][128];
 //	private Set<TilePosition> tilesToAvoidAbsolute = new HashSet<TilePosition>();
 	private boolean[][] tilesToAvoidAbsolute = new boolean[128][128];
 
-	//서플라이 짓는 지역
+	//�꽌�뵆�씪�씠 吏볥뒗 吏��뿭
 //	private Set<TilePosition> tilesToAvoidSupply = new HashSet<TilePosition>();
 	private boolean[][] tilesToAvoidSupply = new boolean[128][128];
-	//팩토리 건설 지역
+	//�뙥�넗由� 嫄댁꽕 吏��뿭
 //	private Set<TilePosition> tilesToAvoidAddonBuilding = new HashSet<TilePosition>();
 	private boolean[][] tilesToAvoidAddonBuilding = new boolean[128][128];
 
@@ -56,7 +56,7 @@ public class ConstructionPlaceFinder {
 	
 	private static boolean isInitialized = false;
 	
-	/// static singleton 객체를 리턴합니다
+	/// static singleton 媛앹껜瑜� 由ы꽩�빀�땲�떎
 	public static ConstructionPlaceFinder Instance() {
 		if (!isInitialized) {
 			instance.setTilesToAvoid();
@@ -66,19 +66,19 @@ public class ConstructionPlaceFinder {
 		return instance;
 	}
 
-	/// seedPosition 및 seedPositionStrategy 파라메터를 활용해서 건물 건설 가능 위치를 탐색해서 리턴합니다<br>
-	/// seedPosition 주위에서 가능한 곳을 선정하거나, seedPositionStrategy 에 따라 지형 분석결과 해당 지점 주위에서 가능한 곳을 선정합니다<br>
-	/// seedPosition, seedPositionStrategy 을 입력하지 않으면, MainBaseLocation 주위에서 가능한 곳을 리턴합니다
+	/// seedPosition 諛� seedPositionStrategy �뙆�씪硫뷀꽣瑜� �솢�슜�빐�꽌 嫄대Ъ 嫄댁꽕 媛��뒫 �쐞移섎�� �깘�깋�빐�꽌 由ы꽩�빀�땲�떎<br>
+	/// seedPosition 二쇱쐞�뿉�꽌 媛��뒫�븳 怨녹쓣 �꽑�젙�븯嫄곕굹, seedPositionStrategy �뿉 �뵲�씪 吏��삎 遺꾩꽍寃곌낵 �빐�떦 吏��젏 二쇱쐞�뿉�꽌 媛��뒫�븳 怨녹쓣 �꽑�젙�빀�땲�떎<br>
+	/// seedPosition, seedPositionStrategy �쓣 �엯�젰�븯吏� �븡�쑝硫�, MainBaseLocation 二쇱쐞�뿉�꽌 媛��뒫�븳 怨녹쓣 由ы꽩�빀�땲�떎
 	public final TilePosition getBuildLocationWithSeedPositionAndStrategy(UnitType buildingType, TilePosition seedPosition, BuildOrderItem.SeedPositionStrategy seedPositionStrategy)
 	{
-		// seedPosition 을 입력한 경우 그 근처에서 찾는다
+		// seedPosition �쓣 �엯�젰�븳 寃쎌슦 洹� 洹쇱쿂�뿉�꽌 李얜뒗�떎
 		if (TilePositionUtils.isValidTilePosition(seedPosition)) {
 //			//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy before PlaceFinder seedPosition true ==>> " + buildingType + " :: " + seedPosition);
 			TilePosition desiredPosition = getBuildLocationNear(buildingType, seedPosition, true, true);
 			return desiredPosition;
 		}
 		
-		// seedPosition 을 입력하지 않은 경우
+		// seedPosition �쓣 �엯�젰�븯吏� �븡�� 寃쎌슦
 		TilePosition desiredPosition = TilePosition.None;
 		
 //		//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy SeedPositionStrategy ==>> " + buildingType + " :: " + seedPositionStrategy);
@@ -127,7 +127,7 @@ public class ConstructionPlaceFinder {
                 }
                 break;
 
-            case NextExpansionPoint: // TODO NextSupplePoint 전에 중간포인트로 봐야하나?
+            case NextExpansionPoint: // TODO NextSupplePoint �쟾�뿉 以묎컙�룷�씤�듃濡� 遊먯빞�븯�굹?
 //            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy NextExpansionPoint start");
 //            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 BaseLocation nextExpansionLocation = InformationManager.Instance().getNextExpansionLocation();
@@ -200,7 +200,7 @@ public class ConstructionPlaceFinder {
 //                }
 //                break;
 
-            case getLastBuilingFinalLocation: // 이놈이 마지막이니까.... NULL 일수가 없다.
+            case getLastBuilingFinalLocation: // �씠�냸�씠 留덉�留됱씠�땲源�.... NULL �씪�닔媛� �뾾�떎.
 //            	//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationWithSeedPositionAndStrategy placeFinder before :: " + System.currentTimeMillis()+ " :: " + buildingType + " :: " + seedPositionStrategy);
                 TilePosition lastBuilingFinalLocation = InformationManager.Instance().getLastBuilingFinalLocation();
                 desiredPosition = getBuildLocationNear(buildingType, lastBuilingFinalLocation);
@@ -215,11 +215,11 @@ public class ConstructionPlaceFinder {
 		return desiredPosition;
 	}
 
-	/// desiredPosition 근처에서 건물 건설 가능 위치를 탐색해서 리턴합니다<br>
-	/// desiredPosition 주위에서 가능한 곳을 찾아 반환합니다<br>
-	/// desiredPosition 이 valid 한 곳이 아니라면, desiredPosition 를 MainBaseLocation 로 해서 주위를 찾는다<br>
+	/// desiredPosition 洹쇱쿂�뿉�꽌 嫄대Ъ 嫄댁꽕 媛��뒫 �쐞移섎�� �깘�깋�빐�꽌 由ы꽩�빀�땲�떎<br>
+	/// desiredPosition 二쇱쐞�뿉�꽌 媛��뒫�븳 怨녹쓣 李얠븘 諛섑솚�빀�땲�떎<br>
+	/// desiredPosition �씠 valid �븳 怨녹씠 �븘�땲�씪硫�, desiredPosition 瑜� MainBaseLocation 濡� �빐�꽌 二쇱쐞瑜� 李얜뒗�떎<br>
 	/// Returns a suitable TilePosition to build a given building type near specified TilePosition aroundTile.<br>
-	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (다른 유닛들이 자리에 있어서, Pylon, Creep, 건물지을 타일 공간이 전혀 없는 경우 등)
+	/// Returns BWAPI::TilePositions::None, if suitable TilePosition is not exists (�떎瑜� �쑀�떅�뱾�씠 �옄由ъ뿉 �엳�뼱�꽌, Pylon, Creep, 嫄대Ъ吏��쓣 ���씪 怨듦컙�씠 �쟾�� �뾾�뒗 寃쎌슦 �벑)
 	
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition) {
 		return getBuildLocationNear(buildingType, desiredPosition, false);
@@ -238,7 +238,7 @@ public class ConstructionPlaceFinder {
 			desiredPosition = InfoUtils.myBase().getTilePosition();
 		}
 
-		// TODO 과제 : 건설 위치 탐색 방법은 ConstructionPlaceSearchMethod::SpiralMethod 로 하는데, 더 좋은 방법은 생각해볼 과제이다
+		// TODO 怨쇱젣 : 嫄댁꽕 �쐞移� �깘�깋 諛⑸쾿�� ConstructionPlaceSearchMethod::SpiralMethod 濡� �븯�뒗�뜲, �뜑 醫뗭� 諛⑸쾿�� �깮媛곹빐蹂� 怨쇱젣�씠�떎
 		int constructionPlaceSearchMethod = 0;
 
 		if((buildingType == UnitType.Terran_Supply_Depot || buildingType == UnitType.Terran_Academy || buildingType == UnitType.Terran_Armory)
@@ -263,11 +263,11 @@ public class ConstructionPlaceFinder {
 					return buildPosition;
 				}
 						
-				// 찾을 수 없다면, buildingGapSpace 값을 줄여서 다시 탐색한다
-				// buildingGapSpace 값이 1이면 지상유닛이 못지나가는 경우가 많아  제외하도록 한다 
-				// 4 -> 3 -> 2 -> 0 -> 탐색 종료
-				//      3 -> 2 -> 0 -> 탐색 종료 
-				//           1 -> 0 -> 탐색 종료
+				// 李얠쓣 �닔 �뾾�떎硫�, buildingGapSpace 媛믪쓣 以꾩뿬�꽌 �떎�떆 �깘�깋�븳�떎
+				// buildingGapSpace 媛믪씠 1�씠硫� 吏��긽�쑀�떅�씠 紐살��굹媛��뒗 寃쎌슦媛� 留롮븘  �젣�쇅�븯�룄濡� �븳�떎 
+				// 4 -> 3 -> 2 -> 0 -> �깘�깋 醫낅즺
+				//      3 -> 2 -> 0 -> �깘�깋 醫낅즺 
+				//           1 -> 0 -> �깘�깋 醫낅즺
 				if (buildingGapSpace > 2) {
 					buildingGapSpace -= 1;
 				} else if (buildingGapSpace == 2) {
@@ -295,13 +295,13 @@ public class ConstructionPlaceFinder {
 	}
 
 	private int getBuildingSpaceGap(UnitType buildingType, TilePosition desiredPosition, Boolean methodFix, Boolean spaceZero, int constructionPlaceSearchMethod) {
-		// 일반적인 건물에 대해서는 건물 크기보다 Config::Macro::BuildingSpacing 칸 만큼 상하좌우로 더 넓게 여유공간을 두어서 빈 자리를 검색한다
+		// �씪諛섏쟻�씤 嫄대Ъ�뿉 ���빐�꽌�뒗 嫄대Ъ �겕湲곕낫�떎 Config::Macro::BuildingSpacing 移� 留뚰겮 �긽�븯醫뚯슦濡� �뜑 �꼻寃� �뿬�쑀怨듦컙�쓣 �몢�뼱�꽌 鍮� �옄由щ�� 寃��깋�븳�떎
 		int buildingGapSpace = BuildConfig.buildingSpacing;
 		
 //		//FileUtils.appendTextToFile("log.txt","\n getBuildingSpaceGap :: " + buildingType + " :: " + desiredPosition + " :: " + buildingGapSpace);
 
 		// ResourceDepot (Nexus, Command Center, Hatchery), Protoss_Pylon, Terran_Supply_Depot, 
-		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony 는 다른 건물 바로 옆에 붙여 짓는 경우가 많으므로 buildingGapSpace을 다른 Config 값으로 설정하도록 한다
+		// Protoss_Photon_Cannon, Terran_Bunker, Terran_Missile_Turret, Zerg_Creep_Colony �뒗 �떎瑜� 嫄대Ъ 諛붾줈 �쁿�뿉 遺숈뿬 吏볥뒗 寃쎌슦媛� 留롮쑝誘�濡� buildingGapSpace�쓣 �떎瑜� Config 媛믪쑝濡� �꽕�젙�븯�룄濡� �븳�떎
 		buildingGapSpace = 0 ;
 //		if (buildingType.isResourceDepot()) {
 //			buildingGapSpace = BuildConfig.buildingResourceDepotSpacing;
@@ -317,7 +317,7 @@ public class ConstructionPlaceFinder {
 //					|| (desiredPosition.getX() == BlockingEntrance.Instance().second_supple.getX() && desiredPosition.getY() == BlockingEntrance.Instance().second_supple.getY())) {
 			} else if (TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().first_supple)
 					|| TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().second_supple)) {			
-				// 20180719. hkk. 저그전에 대비해서 첫서플과 두번째 서플은 건물들을 붙여지어야 함
+				// 20180719. hkk. ��洹몄쟾�뿉 ��鍮꾪빐�꽌 泥レ꽌�뵆怨� �몢踰덉㎏ �꽌�뵆�� 嫄대Ъ�뱾�쓣 遺숈뿬吏��뼱�빞 �븿
 				buildingGapSpace = 0;
 			} else if(constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()){
 				buildingGapSpace = 0;
@@ -346,7 +346,7 @@ public class ConstructionPlaceFinder {
 			buildingGapSpace = 0;
 		}
 			
-//			프리봇 1조건 테스트 추가
+//			�봽由щ큸 1議곌굔 �뀒�뒪�듃 異붽�
 //		} else if(buildingType == UnitType.Terran_Barracks){
 //			buildingGapSpace = 0;
 //		} else if(buildingType == UnitType.Terran_Factory){
@@ -359,7 +359,7 @@ public class ConstructionPlaceFinder {
 		
 		
 		
-//		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
+//		20180728. hkk. �씠�땲�뀥 鍮뚮뱶 吏��젙嫄대Ъ�뱾�� �뿬諛� 0
 //		if( (TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
 //				||TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2) )
 //				&& buildingType == UnitType.Terran_Starport
@@ -380,7 +380,7 @@ public class ConstructionPlaceFinder {
 //		}
 		
 		
-//		20180821. hkk. 적용 테스트중
+//		20180821. hkk. �쟻�슜 �뀒�뒪�듃以�
 		
 		
 		if( !TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().factory)
@@ -389,7 +389,7 @@ public class ConstructionPlaceFinder {
 				buildingGapSpace = 1;
 			}
 		
-//		20180728. hkk. 이니셜 빌드 지정건물들은 여백 0
+//		20180728. hkk. �씠�땲�뀥 鍮뚮뱶 吏��젙嫄대Ъ�뱾�� �뿬諛� 0
 		if( (!TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport1)
 			&& !TilePositionUtils.equals(desiredPosition, BlockingEntrance.Instance().starport2))
 			&& buildingType == UnitType.Terran_Starport)
@@ -418,25 +418,25 @@ public class ConstructionPlaceFinder {
 		return buildingGapSpace;
 	}
 
-	/// 해당 buildingType 이 건설될 수 있는 위치를 desiredPosition 근처에서 탐색해서 탐색결과를 리턴합니다<br>
-	/// buildingGapSpace를 반영해서 canBuildHereWithSpace 를 사용해서 체크<br>
-	/// 못찾는다면 BWAPI::TilePositions::None 을 리턴합니다<br>
-	/// TODO 과제 : 건물을 계획없이 지을수 있는 곳에 짓는 것을 계속 하다보면, 유닛이 건물 사이에 갇히는 경우가 발생할 수 있는데, 이를 방지하는 방법은 생각해볼 과제입니다
+	/// �빐�떦 buildingType �씠 嫄댁꽕�맆 �닔 �엳�뒗 �쐞移섎�� desiredPosition 洹쇱쿂�뿉�꽌 �깘�깋�빐�꽌 �깘�깋寃곌낵瑜� 由ы꽩�빀�땲�떎<br>
+	/// buildingGapSpace瑜� 諛섏쁺�빐�꽌 canBuildHereWithSpace 瑜� �궗�슜�빐�꽌 泥댄겕<br>
+	/// 紐살갼�뒗�떎硫� BWAPI::TilePositions::None �쓣 由ы꽩�빀�땲�떎<br>
+	/// TODO 怨쇱젣 : 嫄대Ъ�쓣 怨꾪쉷�뾾�씠 吏��쓣�닔 �엳�뒗 怨녹뿉 吏볥뒗 寃껋쓣 怨꾩냽 �븯�떎蹂대㈃, �쑀�떅�씠 嫄대Ъ �궗�씠�뿉 媛뉙엳�뒗 寃쎌슦媛� 諛쒖깮�븷 �닔 �엳�뒗�뜲, �씠瑜� 諛⑹��븯�뒗 諛⑸쾿�� �깮媛곹빐蹂� 怨쇱젣�엯�땲�떎
 	public final TilePosition getBuildLocationNear(UnitType buildingType, TilePosition desiredPosition, int buildingGapSpace, int constructionPlaceSearchMethod) {
 		//returns a valid build location near the desired tile position (x,y).
 		TilePosition resultPosition = TilePosition.None;
 		ConstructionTask b = new ConstructionTask(buildingType, desiredPosition);
 
 //		//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear PlaceFinder Start :: " + System.currentTimeMillis() + " :: " + buildingType + " :: " + desiredPosition);
-		// maxRange 를 설정하지 않거나, maxRange 를 128으로 설정하면 지도 전체를 다 탐색하는데, 매우 느려질뿐만 아니라, 대부분의 경우 불필요한 탐색이 된다
-		// maxRange 는 16 ~ 64가 적당하다
-		// 값을 찾아내라. = BaseLocation.isStartingLocation 을 체크해서 메인이면 저값. 나머진 다른값
+		// maxRange 瑜� �꽕�젙�븯吏� �븡嫄곕굹, maxRange 瑜� 128�쑝濡� �꽕�젙�븯硫� 吏��룄 �쟾泥대�� �떎 �깘�깋�븯�뒗�뜲, 留ㅼ슦 �뒓�젮吏덈퓧留� �븘�땲�씪, ��遺�遺꾩쓽 寃쎌슦 遺덊븘�슂�븳 �깘�깋�씠 �맂�떎
+		// maxRange �뒗 16 ~ 64媛� �쟻�떦�븯�떎
+		// 媛믪쓣 李얠븘�궡�씪. = BaseLocation.isStartingLocation �쓣 泥댄겕�빐�꽌 硫붿씤�씠硫� ��媛�. �굹癒몄쭊 �떎瑜멸컪
 		int maxRange = 0; // maxRange = BWAPI::Broodwar->mapWidth()/4;
 			
 		if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SpiralMethod.ordinal()) {
 
-			// desiredPosition 으로부터 시작해서 spiral 하게 탐색하는 방법
-			// 처음에는 아래 방향 (0,1) -> 오른쪽으로(1,0) -> 위로(0,-1) -> 왼쪽으로(-1,0) -> 아래로(0,1) -> ..
+			// desiredPosition �쑝濡쒕��꽣 �떆�옉�빐�꽌 spiral �븯寃� �깘�깋�븯�뒗 諛⑸쾿
+			// 泥섏쓬�뿉�뒗 �븘�옒 諛⑺뼢 (0,1) -> �삤瑜몄そ�쑝濡�(1,0) -> �쐞濡�(0,-1) -> �쇊履쎌쑝濡�(-1,0) -> �븘�옒濡�(0,1) -> ..
 			
 			if(InformationManager.Instance().getMapSpecificInformation().getMap() == MapSpecificInformation.GameMap.CIRCUITBREAKER) {
 				maxRange = 23;
@@ -530,7 +530,7 @@ public class ConstructionPlaceFinder {
 				currentY = currentY + spiralDirectionY;
 				numSteps++;
 				
-				// 다른 방향으로 전환한다
+				// �떎瑜� 諛⑺뼢�쑝濡� �쟾�솚�븳�떎
 				if (numSteps == spiralMaxLength) {
 					numSteps = 0;
 
@@ -550,8 +550,8 @@ public class ConstructionPlaceFinder {
 			}
 			
 		} else if (constructionPlaceSearchMethod == ConstructionPlaceSearchMethod.SupplyDepotMethod.ordinal()) {
-			//서플라이 디팟 용 로직(4X4)
-			// y축부터 시작. 최초 포지션에서 X축 + 3 넘어가면 Y축 +2
+			//�꽌�뵆�씪�씠 �뵒�뙚 �슜 濡쒖쭅(4X4)
+			// y異뺣��꽣 �떆�옉. 理쒖큹 �룷吏��뀡�뿉�꽌 X異� + 3 �꽆�뼱媛�硫� Y異� +2
 			int currentX = desiredPosition.getX();
 			int currentY = desiredPosition.getY();
 			int depostSizeX = 3;
@@ -560,7 +560,7 @@ public class ConstructionPlaceFinder {
 			
 			if(BlockingEntrance.Instance().xinc) {
 				if(BlockingEntrance.Instance().yinc) {
-//					1시
+//					1�떆
 					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
 						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
 							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
@@ -588,11 +588,11 @@ public class ConstructionPlaceFinder {
 						currentY = currentY + depostSizeY;
 						
 						resultPosition = TilePosition.None;
-//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 1시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 1�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 					
 				}else {
-//					5시
+//					5�떆
 					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
 						for(int x_position= 0; x_position < BlockingEntrance.Instance().maxSupplyCntX ; x_position ++){	
 							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
@@ -607,7 +607,7 @@ public class ConstructionPlaceFinder {
 							}
 	
 							currentX = currentX + depostSizeX;
-//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -622,14 +622,14 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
 						resultPosition = TilePosition.None;
-//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 5�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 					
 				}
 				
 			}else {
 				if(BlockingEntrance.Instance().yinc) {
-//					11시
+//					11�떆
 					for(int y_position  = 0; y_position < BlockingEntrance.Instance().maxSupplyCntY ; y_position ++){
 						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
 							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
@@ -644,7 +644,7 @@ public class ConstructionPlaceFinder {
 							}
 							
 							currentX = currentX - depostSizeX;
-//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -657,10 +657,10 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY + depostSizeY;
 						resultPosition = TilePosition.None;
-//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 11�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}else {
-//					7시
+//					7�떆
 					for(int y_position  = BlockingEntrance.Instance().maxSupplyCntY; y_position > 0 ; y_position --){
 						for(int x_position= BlockingEntrance.Instance().maxSupplyCntX; x_position > 0 ; x_position --){	
 							if (currentX >= 0 && currentX < MyBotModule.Broodwar.mapWidth() && currentY >= 0 && currentY < MyBotModule.Broodwar.mapHeight()) {
@@ -675,7 +675,7 @@ public class ConstructionPlaceFinder {
 							}
 							
 							currentX = currentX - depostSizeX;
-//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//							//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 //							currentY = currentY + depostSizeY;
 							//currentY = currentY + spiralDirectionY;
 						}
@@ -688,7 +688,7 @@ public class ConstructionPlaceFinder {
 						currentX = desiredPosition.getX();
 						currentY = currentY - depostSizeY;
 						resultPosition = TilePosition.None;
-//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7시:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
+//						//FileUtils.appendTextToFile("log.txt", "\n getBuildLocationNear 7�떆:: supply tile :: currentX : " + currentX + " / currentY : " + currentY);
 					}
 				}
 			}
@@ -701,8 +701,8 @@ public class ConstructionPlaceFinder {
 		return resultPosition;
 	}
 
-	/// 해당 위치에 건물 건설이 가능한지 여부를 buildingGapSpace 조건을 포함해서 판단하여 리턴합니다<br>
-	/// Broodwar 의 canBuildHere, isBuildableTile, isReservedTile 를 체크합니다
+	/// �빐�떦 �쐞移섏뿉 嫄대Ъ 嫄댁꽕�씠 媛��뒫�븳吏� �뿬遺�瑜� buildingGapSpace 議곌굔�쓣 �룷�븿�빐�꽌 �뙋�떒�븯�뿬 由ы꽩�빀�땲�떎<br>
+	/// Broodwar �쓽 canBuildHere, isBuildableTile, isReservedTile 瑜� 泥댄겕�빀�땲�떎
 	public final boolean canBuildHereWithSpace(TilePosition position, final ConstructionTask b, int buildingGapSpace)
 	{
 		//if we can't build here, we of course can't build here with space
@@ -718,7 +718,7 @@ public class ConstructionPlaceFinder {
 		int height = b.getType().tileHeight();
 
 		// define the rectangle of the building spot
-		// 건물 크기보다 상하좌우로 더 큰 사각형
+		// 嫄대Ъ �겕湲곕낫�떎 �긽�븯醫뚯슦濡� �뜑 �겙 �궗媛곹삎
 		int startx;
 		int starty;
 		int endx;
@@ -728,7 +728,7 @@ public class ConstructionPlaceFinder {
 		
 		boolean horizontalOnly = false;
 
-		if (b.getType().isAddon()) { // Addon 타입의 건물일 경우에는, 그 Addon 건물 왼쪽에 whatBuilds 건물이 있는지를 체크한다
+		if (b.getType().isAddon()) { // Addon ���엯�쓽 嫄대Ъ�씪 寃쎌슦�뿉�뒗, 洹� Addon 嫄대Ъ �쇊履쎌뿉 whatBuilds 嫄대Ъ�씠 �엳�뒗吏�瑜� 泥댄겕�븳�떎
 			final UnitType builderType = b.getType().whatBuilds().first;
 			TilePosition builderTile = new TilePosition(position.getX() - builderType.tileWidth(), position.getY() + 2 - builderType.tileHeight());
 			
@@ -738,7 +738,7 @@ public class ConstructionPlaceFinder {
 			endx = position.getX() + width + buildingGapSpace;
 			endy = position.getY() + height + buildingGapSpace;
 
-			// builderTile에 Lifted 건물이 아니고 whatBuilds 건물이 아닌 건물이 있는지 체크
+			// builderTile�뿉 Lifted 嫄대Ъ�씠 �븘�땲怨� whatBuilds 嫄대Ъ�씠 �븘�땶 嫄대Ъ�씠 �엳�뒗吏� 泥댄겕
 			
 			if(!hasWhatBuilds(builderTile, builderType)) return false;
 //			for (int i = 0; i <= builderType.tileWidth(); ++i) {
@@ -764,6 +764,18 @@ public class ConstructionPlaceFinder {
 				width += 2;
 
 			}
+			
+			
+			if( (TilePositionUtils.equals(position, BlockingEntrance.Instance().first_supple)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().second_supple)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport1)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
+					||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
+					&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE
+				){
+					buildingGapSpace = 0; 
+				}
 	
 //			if( (position.getX() == BlockingEntrance.Instance().starport1.getX() && position.getY() == BlockingEntrance.Instance().starport1.getY() && b.getType() == UnitType.Terran_Starport)
 //				|| (position.getX() == BlockingEntrance.Instance().starport2.getX() && position.getY() == BlockingEntrance.Instance().starport2.getY() && b.getType() == UnitType.Terran_Starport)
@@ -777,7 +789,7 @@ public class ConstructionPlaceFinder {
 //			}
 
 
-			// 상하좌우에 buildingGapSpace 만큼 간격을 띄운다
+			// �긽�븯醫뚯슦�뿉 buildingGapSpace 留뚰겮 媛꾧꺽�쓣 �쓣�슫�떎
 			if (horizontalOnly == false) {
 				startx = position.getX() - buildingGapSpace;
 				starty = position.getY() - buildingGapSpace;
@@ -785,7 +797,7 @@ public class ConstructionPlaceFinder {
 				endx = position.getX() + width + buildingGapSpace;
 				endy = position.getY() + height + buildingGapSpace;
 			}
-			// 좌우로만 buildingGapSpace 만큼 간격을 띄운다
+			// 醫뚯슦濡쒕쭔 buildingGapSpace 留뚰겮 媛꾧꺽�쓣 �쓣�슫�떎
 			else {
 				startx = position.getX() - buildingGapSpace;
 				starty = position.getY();
@@ -798,7 +810,7 @@ public class ConstructionPlaceFinder {
 
 //			//FileUtils.appendTextToFile(b.getType(), "log.txt", "\n canBuildHereWithSpace for loop :: "+ b.getType() + " :: " + "["+startx+","+starty+"] :: ["+endx+","+endy+"]"  +" :: buildingGapSpace :: " + buildingGapSpace);
 
-			// 건물이 차지할 공간 뿐 아니라 주위의 buildingGapSpace 공간까지 다 비어있는지, 건설가능한 타일인지, 예약되어있는것은 아닌지, TilesToAvoid 에 해당하지 않는지 체크
+			// 嫄대Ъ�씠 李⑥��븷 怨듦컙 肉� �븘�땲�씪 二쇱쐞�쓽 buildingGapSpace 怨듦컙源뚯� �떎 鍮꾩뼱�엳�뒗吏�, 嫄댁꽕媛��뒫�븳 ���씪�씤吏�, �삁�빟�릺�뼱�엳�뒗寃껋� �븘�땶吏�, TilesToAvoid �뿉 �빐�떦�븯吏� �븡�뒗吏� 泥댄겕
 			for (int x = startx < 0 ? 0 : startx; x >= 0 && x < endx; x++)
 			{
 				for (int y = starty < 0 ? 0 : starty; y >= 0 && y < endy; y++)
@@ -817,7 +829,7 @@ public class ConstructionPlaceFinder {
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().second_supple)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport1)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().starport2)
-						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
+//						||TilePositionUtils.equals(position, BlockingEntrance.Instance().factory)
 						||TilePositionUtils.equals(position, BlockingEntrance.Instance().barrack))
 						&& InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE
 					){
@@ -859,15 +871,15 @@ public class ConstructionPlaceFinder {
 //						}
 //					}
 					
-////					20180815. hkk. 커맨드 센터 일경우. new 커맨드 센터 본진이, old 커맨드 센터 컴셋 위치를 침범하면 안된다.
+////					20180815. hkk. 而ㅻ㎤�뱶 �꽱�꽣 �씪寃쎌슦. new 而ㅻ㎤�뱶 �꽱�꽣 蹂몄쭊�씠, old 而ㅻ㎤�뱶 �꽱�꽣 而댁뀑 �쐞移섎�� 移⑤쾾�븯硫� �븞�맂�떎.
 					if(b.getType() == UnitType.Terran_Command_Center) {
 						if(isTilesToAvoidEntranceTurret(x, y)) {
 							return false;
 						}
 					}
 
-					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
-//					20180719. hkk. 저그전 대비 배럭과 서플 가스 주변에 붙여짓기 필요
+					// ResourceDepot / Addon 嫄대Ъ�씠 �븘�땶 �씪諛� 嫄대Ъ�쓽 寃쎌슦, BaseLocation 怨� Geyser �궗�씠 ���씪 (TilesToAvoid) �뿉�뒗 嫄대Ъ�쓣 吏볦� �븡�뒗�떎
+//					20180719. hkk. ��洹몄쟾 ��鍮� 諛곕윮怨� �꽌�뵆 媛��뒪 二쇰��뿉 遺숈뿬吏볤린 �븘�슂
 					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false
 							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
 							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot
@@ -897,7 +909,7 @@ public class ConstructionPlaceFinder {
 							}
 						}
 					}
-//					20180806. hkk. 1,2 번쨰 터렛은 지정
+//					20180806. hkk. 1,2 踰덉�� �꽣�젢�� 吏��젙
 //					}else if (b.getType() == UnitType.Terran_Missile_Turret) {
 					
 //					if (b.getType() == UnitType.Terran_Missile_Turret && InitialBuildProvider.Instance().getAdaptStrategyStatus() != InitialBuildProvider.AdaptStrategyStatus.COMPLETE) {
@@ -913,7 +925,7 @@ public class ConstructionPlaceFinder {
 					
 					
 					
-					//서플라이 지역은 서플라이 / 아카데미 / 아머리 외에는 지을수 없다.
+					//�꽌�뵆�씪�씠 吏��뿭�� �꽌�뵆�씪�씠 / �븘移대뜲誘� / �븘癒몃━ �쇅�뿉�뒗 吏��쓣�닔 �뾾�떎.
 					if (b.getType() != UnitType.Terran_Supply_Depot
 						&& b.getType() != UnitType.Terran_Academy
 						&& b.getType() != UnitType.Terran_Armory
@@ -946,8 +958,8 @@ public class ConstructionPlaceFinder {
 
 	}
 
-	/// 해당 위치에 건물 건설이 가능한지 여부를 리턴합니다 <br>
-	/// Broodwar 의 canBuildHere 및 _reserveMap 와 isOverlapsWithBaseLocation 을 체크
+	/// �빐�떦 �쐞移섏뿉 嫄대Ъ 嫄댁꽕�씠 媛��뒫�븳吏� �뿬遺�瑜� 由ы꽩�빀�땲�떎 <br>
+	/// Broodwar �쓽 canBuildHere 諛� _reserveMap �� isOverlapsWithBaseLocation �쓣 泥댄겕
 	public final boolean canBuildHere(TilePosition position, final ConstructionTask b) {
 		if (!MyBotModule.Broodwar.canBuildHere(position, b.getType())) {
 //			//FileUtils.appendTextToFile("log.txt", "\n canBuildHere ==> !Prebot.Broodwar.canBuildHere :: " + position);
@@ -974,7 +986,7 @@ public class ConstructionPlaceFinder {
 			for (int y = position.getY() ; y < position.getY() + b.getType().tileHeight() + addHeight; y++)
 			{
 				
-//				20180823. hkk. 애드온 지역이 맵밖으로 나간다면 그곳은 건설 불가
+//				20180823. hkk. �븷�뱶�삩 吏��뿭�씠 留듬컰�쑝濡� �굹媛꾨떎硫� 洹멸납�� 嫄댁꽕 遺덇�
 				if (x < 0 || y < 0 || x >= rwidth || y >= rheight)
 				{
 					return false;
@@ -990,7 +1002,7 @@ public class ConstructionPlaceFinder {
 		}
 
 		// if it overlaps a base location return false
-		// ResourceDepot 건물이 아닌 다른 건물은 BaseLocation 위치에 짓지 못하도록 한다
+		// ResourceDepot 嫄대Ъ�씠 �븘�땶 �떎瑜� 嫄대Ъ�� BaseLocation �쐞移섏뿉 吏볦� 紐삵븯�룄濡� �븳�떎
 		if (isOverlapsWithBaseLocation(position, b.getType())) {
 			return false;
 		} else {
@@ -998,9 +1010,9 @@ public class ConstructionPlaceFinder {
 		}
 	}
 
-	/// seedPosition 근처에서 Refinery 건물 건설 가능 위치를 탐색해서 리턴합니다 <br>
-	/// 지도상의 여러 가스 광산 (Resource_Vespene_Geyser) 중 예약되어있지 않은 곳(isReservedTile), 다른 섬이 아닌 곳, 이미 Refinery 가 지어져있지않은 곳 중<br> 
-	/// seedPosition 과 가장 가까운 곳을 리턴합니다
+	/// seedPosition 洹쇱쿂�뿉�꽌 Refinery 嫄대Ъ 嫄댁꽕 媛��뒫 �쐞移섎�� �깘�깋�빐�꽌 由ы꽩�빀�땲�떎 <br>
+	/// 吏��룄�긽�쓽 �뿬�윭 媛��뒪 愿묒궛 (Resource_Vespene_Geyser) 以� �삁�빟�릺�뼱�엳吏� �븡�� 怨�(isReservedTile), �떎瑜� �꽟�씠 �븘�땶 怨�, �씠誘� Refinery 媛� 吏��뼱�졇�엳吏��븡�� 怨� 以�<br> 
+	/// seedPosition 怨� 媛��옣 媛�源뚯슫 怨녹쓣 由ы꽩�빀�땲�떎
 	public final TilePosition getRefineryPositionNear(TilePosition seedPosition) {
 		
 		if (!TilePositionUtils.isValidTilePosition(seedPosition)) {
@@ -1009,25 +1021,25 @@ public class ConstructionPlaceFinder {
 		
 //		//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear start :: " + seedPosition + " :: " + Prebot.Broodwar.getFrameCount());
 
-		//TODO BASICBOT 1.1 버젼의 가스 처리다.. 확인해 봐야함.
+		//TODO BASICBOT 1.1 踰꾩졏�쓽 媛��뒪 泥섎━�떎.. �솗�씤�빐 遊먯빞�븿.
 //		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers())
 //		{
-//			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
-//			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
+//			// geyser->getPosition() �쓣 �븯硫�, Unknown �쑝濡� �굹�삱 �닔 �엳�떎.
+//			// 諛섎뱶�떆 geyser->getInitialPosition() �쓣 �궗�슜�빐�빞 �븳�떎
 //			Position geyserPos = geyser.getInitialPosition();
 //			TilePosition geyserTilePos = geyser.getInitialTilePosition();
 //
-//			// 이미 예약되어있는가
+//			// �씠誘� �삁�빟�릺�뼱�엳�뒗媛�
 //			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
 //				continue;
 //			}
 //
-//			// geyser->getType() 을 하면, Unknown 이거나, Resource_Vespene_Geyser 이거나, Terran_Refinery 와 같이 건물명이 나오고, 
-//			// 건물이 파괴되어도 자동으로 Resource_Vespene_Geyser 로 돌아가지 않는다
-//			// geyser 위치에 있는 유닛들에 대해 isRefinery() 로 체크를 해봐야 한다
+//			// geyser->getType() �쓣 �븯硫�, Unknown �씠嫄곕굹, Resource_Vespene_Geyser �씠嫄곕굹, Terran_Refinery �� 媛숈씠 嫄대Ъ紐낆씠 �굹�삤怨�, 
+//			// 嫄대Ъ�씠 �뙆愿대릺�뼱�룄 �옄�룞�쑝濡� Resource_Vespene_Geyser 濡� �룎�븘媛�吏� �븡�뒗�떎
+//			// geyser �쐞移섏뿉 �엳�뒗 �쑀�떅�뱾�뿉 ���빐 isRefinery() 濡� 泥댄겕瑜� �빐遊먯빞 �븳�떎
 //
-//			// seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는가
-//			// Fighting Spirit 맵처럼 seedPosition 으로부터 동일한 거리 내에 geyser 가 여러개 있을 수 있는 경우 Refinery 건물을 짓기 위해서는 seedPosition 을 정확하게 입력해야 한다
+//			// seedPosition �쑝濡쒕��꽣 16 TILE_SIZE 嫄곕━ �씠�궡�뿉 �엳�뒗媛�
+//			// Fighting Spirit 留듭쿂�읆 seedPosition �쑝濡쒕��꽣 �룞�씪�븳 嫄곕━ �궡�뿉 geyser 媛� �뿬�윭媛� �엳�쓣 �닔 �엳�뒗 寃쎌슦 Refinery 嫄대Ъ�쓣 吏볤린 �쐞�빐�꽌�뒗 seedPosition �쓣 �젙�솗�븯寃� �엯�젰�빐�빞 �븳�떎
 //			double thisDistance = geyserTilePos.getDistance(seedPosition);
 //			
 //			if (thisDistance <= 16 && thisDistance < minGeyserDistanceFromSeedPosition)
@@ -1040,16 +1052,16 @@ public class ConstructionPlaceFinder {
 		TilePosition closestGeyser = TilePosition.None;
 		double minGeyserDistanceFromSeedPosition = 100000000;
 		
-		// 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
+		// �쟾泥� geyser 以묒뿉�꽌 seedPosition �쑝濡쒕��꽣 16 TILE_SIZE 嫄곕━ �씠�궡�뿉 �엳�뒗 寃껋쓣 李얜뒗�떎
 		for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers()) {
-			// geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
-			// 반드시 geyser->getInitialPosition() 을 사용해야 한다
+			// geyser->getPosition() �쓣 �븯硫�, Unknown �쑝濡� �굹�삱 �닔 �엳�떎.
+			// 諛섎뱶�떆 geyser->getInitialPosition() �쓣 �궗�슜�빐�빞 �븳�떎
 //			//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear getStaticGeysers :: " + geyser.getTilePosition());
 
 			Position geyserPos = geyser.getInitialPosition();
 			TilePosition geyserTilePos = geyser.getInitialTilePosition();
 
-			// 이미 예약되어있는가
+			// �씠誘� �삁�빟�릺�뼱�엳�뒗媛�
 			if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
 //				//FileUtils.appendTextToFile("log.txt", "\n getRefineryPositionNear geyserTilePos is reserved :: " + geyserTilePos);
 				continue;
@@ -1061,7 +1073,7 @@ public class ConstructionPlaceFinder {
 				continue;
 			}
 
-			// 이미 지어져 있는가
+			// �씠誘� 吏��뼱�졇 �엳�뒗媛�
 			boolean refineryAlreadyBuilt = false;
 			List<Unit> alreadyBuiltUnits = MyBotModule.Broodwar.getUnitsInRadius(geyserPos, 4 * BuildConfig.TILE_SIZE);
 			for (Unit u : alreadyBuiltUnits) {
@@ -1092,15 +1104,15 @@ public class ConstructionPlaceFinder {
         Unit closestGeyser = null;
         double minGeyserDistanceFromSeedPosition = 100000000;
 
-        // 전체 geyser 중에서 seedPosition 으로부터 16 TILE_SIZE 거리 이내에 있는 것을 찾는다
+        // �쟾泥� geyser 以묒뿉�꽌 seedPosition �쑝濡쒕��꽣 16 TILE_SIZE 嫄곕━ �씠�궡�뿉 �엳�뒗 寃껋쓣 李얜뒗�떎
         for (Unit geyser : MyBotModule.Broodwar.getStaticGeysers()) {
-            // geyser->getPosition() 을 하면, Unknown 으로 나올 수 있다.
-            // 반드시 geyser->getInitialPosition() 을 사용해야 한다
+            // geyser->getPosition() �쓣 �븯硫�, Unknown �쑝濡� �굹�삱 �닔 �엳�떎.
+            // 諛섎뱶�떆 geyser->getInitialPosition() �쓣 �궗�슜�빐�빞 �븳�떎
 
             Position geyserPos = geyser.getInitialPosition();
             TilePosition geyserTilePos = geyser.getInitialTilePosition();
 
-            // 이미 예약되어있는가
+            // �씠誘� �삁�빟�릺�뼱�엳�뒗媛�
             if (isReservedTile(geyserTilePos.getX(), geyserTilePos.getY())) {
                 continue;
             }
@@ -1119,8 +1131,8 @@ public class ConstructionPlaceFinder {
         return closestGeyser;
     }
 
-	/// 해당 위치가 BaseLocation 과 겹치는지 여부를 리턴합니다<br>
-	/// BaseLocation 에는 ResourceDepot 건물만 건설하고, 다른 건물은 건설하지 않기 위함입니다
+	/// �빐�떦 �쐞移섍� BaseLocation 怨� 寃뱀튂�뒗吏� �뿬遺�瑜� 由ы꽩�빀�땲�떎<br>
+	/// BaseLocation �뿉�뒗 ResourceDepot 嫄대Ъ留� 嫄댁꽕�븯怨�, �떎瑜� 嫄대Ъ�� 嫄댁꽕�븯吏� �븡湲� �쐞�븿�엯�땲�떎
 	public final boolean isOverlapsWithBaseLocation(TilePosition tile, UnitType type)
 	{
 		// if it's a resource depot we don't care if it overlaps
@@ -1156,7 +1168,7 @@ public class ConstructionPlaceFinder {
 		return false;
 	}
 
-	/// 건물 건설 가능 타일인지 여부를 리턴합니다
+	/// 嫄대Ъ 嫄댁꽕 媛��뒫 ���씪�씤吏� �뿬遺�瑜� 由ы꽩�빀�땲�떎
 	public final boolean isBuildableTile(final ConstructionTask b, int x, int y)
 	{
 		TilePosition tp = new TilePosition(x, y);
@@ -1165,14 +1177,14 @@ public class ConstructionPlaceFinder {
 			return false;
 		}
 
-		// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 체크
+		// 留� �뜲�씠�꽣 肉먮쭔 �븘�땲�씪 鍮뚮뵫 �뜲�씠�꽣瑜� 紐⑤몢 怨좊젮�빐�꽌 isBuildable 泥댄겕
 		//if (BWAPI::Broodwar->isBuildable(x, y) == false)
 		if (MyBotModule.Broodwar.isBuildable(x, y, true) == false)
 		{
 			return false;
 		}
 
-		// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
+		// constructionWorker �씠�쇅�쓽 �떎瑜� �쑀�떅�씠 �엳�쑝硫� false瑜� 由ы꽩�븳�떎
 		for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(x, y))
 		{
 			if ((b.getConstructionWorker() != null) && (unit != b.getConstructionWorker()))
@@ -1190,7 +1202,7 @@ public class ConstructionPlaceFinder {
 	}
 	
 	
-	/// 건물 건설 가능 타일인지 여부를 리턴합니다
+	/// 嫄대Ъ 嫄댁꽕 媛��뒫 ���씪�씤吏� �뿬遺�瑜� 由ы꽩�빀�땲�떎
 		public final boolean isBuildableTileFac(final ConstructionTask b, int x, int y)
 		{
 			TilePosition tp = new TilePosition(x, y);
@@ -1199,9 +1211,9 @@ public class ConstructionPlaceFinder {
 				return false;
 			}
 
-			// 맵 데이터 뿐만 아니라 빌딩 데이터를 모두 고려해서 isBuildable 
+			// 留� �뜲�씠�꽣 肉먮쭔 �븘�땲�씪 鍮뚮뵫 �뜲�씠�꽣瑜� 紐⑤몢 怨좊젮�빐�꽌 isBuildable 
 
-			// constructionWorker 이외의 다른 유닛이 있으면 false를 리턴한다
+			// constructionWorker �씠�쇅�쓽 �떎瑜� �쑀�떅�씠 �엳�쑝硫� false瑜� 由ы꽩�븳�떎
 			for (Unit unit : MyBotModule.Broodwar.getUnitsOnTile(x, y))
 			{
 				if (unit.getType().isBuilding() && !unit.isLifted())
@@ -1214,7 +1226,7 @@ public class ConstructionPlaceFinder {
 			return true;
 		}
 
-	/// 건물 건설 예정 타일로 예약해서, 다른 건물을 중복해서 짓지 않도록 합니다
+	/// 嫄대Ъ 嫄댁꽕 �삁�젙 ���씪濡� �삁�빟�빐�꽌, �떎瑜� 嫄대Ъ�쓣 以묐났�빐�꽌 吏볦� �븡�룄濡� �빀�땲�떎
 	public void reserveTiles(TilePosition position, int width, int height, UnitType unit)
 	{
 //		System.out.println(" Set reserveMap start:: " + unit + " :: " + position + " :: width :: " + width + " :: height :: " + height);
@@ -1267,7 +1279,7 @@ public class ConstructionPlaceFinder {
 		}
 	}
 	
-	/// 건물 건설 예정 타일로 예약했던 것을 해제합니다
+	/// 嫄대Ъ 嫄댁꽕 �삁�젙 ���씪濡� �삁�빟�뻽�뜕 寃껋쓣 �빐�젣�빀�땲�떎
 	public void freeTiles(TilePosition position, int width, int height, UnitType unit)
 	{
 		/*int rwidth = reserveMap.size();
@@ -1324,7 +1336,7 @@ public class ConstructionPlaceFinder {
 		}
 	}
 
-	// 건물 건설 예약되어있는 타일인지 체크
+	// 嫄대Ъ 嫄댁꽕 �삁�빟�릺�뼱�엳�뒗 ���씪�씤吏� 泥댄겕
 	public final boolean isReservedTile(int x, int y)
 	{
 		/*int rwidth = reserveMap.size();
@@ -1345,12 +1357,12 @@ public class ConstructionPlaceFinder {
 		return reserveMap[x][y];
 	}
 
-	/// reserveMap을 리턴합니다
+	/// reserveMap�쓣 由ы꽩�빀�땲�떎
 	public boolean[][] getReserveMap() {
 		return reserveMap;
 	}
 
-	/// (x, y) 가 BaseLocation 과 Mineral / Geyser 사이의 타일에 해당하는지 여부를 리턴합니다
+	/// (x, y) 媛� BaseLocation 怨� Mineral / Geyser �궗�씠�쓽 ���씪�뿉 �빐�떦�븯�뒗吏� �뿬遺�瑜� 由ы꽩�빀�땲�떎
 	public final boolean isTilesToAvoid(int x, int y)
 	{
 //		if(new TilePosition(x,y) == BlockingEntrance.Instance().first_supple
@@ -1476,7 +1488,7 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidAbsolute[x][y];
 	}
 	
-	/// (x, y) 가 서플라이 지역이라면 지을수 없다.
+	/// (x, y) 媛� �꽌�뵆�씪�씠 吏��뿭�씠�씪硫� 吏��쓣�닔 �뾾�떎.
 	public final boolean isTilesToAvoidSupply(int x, int y)
 	{
 //		for (TilePosition t : tilesToAvoidSupply) {
@@ -1495,18 +1507,18 @@ public class ConstructionPlaceFinder {
 		return tilesToAvoidSupply[x][y];
 	}
 
-	/// BaseLocation 과 Mineral / Geyser 사이의 타일들을 찾아 _tilesToAvoid 에 저장합니다<br>
-	/// BaseLocation 과 Geyser 사이, ResourceDepot 건물과 Mineral 사이 공간으로 건물 건설 장소를 정하면<br> 
-	/// 일꾼 유닛들이 장애물이 되어서 건설 시작되기까지 시간이 오래걸리고, 지어진 건물이 장애물이 되어서 자원 채취 속도도 느려지기 때문에, 이 공간은 건물을 짓지 않는 공간으로 두기 위함입니다
+	/// BaseLocation 怨� Mineral / Geyser �궗�씠�쓽 ���씪�뱾�쓣 李얠븘 _tilesToAvoid �뿉 ���옣�빀�땲�떎<br>
+	/// BaseLocation 怨� Geyser �궗�씠, ResourceDepot 嫄대Ъ怨� Mineral �궗�씠 怨듦컙�쑝濡� 嫄대Ъ 嫄댁꽕 �옣�냼瑜� �젙�븯硫�<br> 
+	/// �씪袁� �쑀�떅�뱾�씠 �옣�븷臾쇱씠 �릺�뼱�꽌 嫄댁꽕 �떆�옉�릺湲곌퉴吏� �떆媛꾩씠 �삤�옒嫄몃━怨�, 吏��뼱吏� 嫄대Ъ�씠 �옣�븷臾쇱씠 �릺�뼱�꽌 �옄�썝 梨꾩랬 �냽�룄�룄 �뒓�젮吏�湲� �븣臾몄뿉, �씠 怨듦컙�� 嫄대Ъ�쓣 吏볦� �븡�뒗 怨듦컙�쑝濡� �몢湲� �쐞�븿�엯�땲�떎
 	public void setTilesToAvoid()
 	{
-		// ResourceDepot 건물의 width = 4 타일, height = 3 타일
-		// Geyser 의            width = 4 타일, height = 2 타일
-		// Mineral 의           width = 2 타일, height = 1 타일
+		// ResourceDepot 嫄대Ъ�쓽 width = 4 ���씪, height = 3 ���씪
+		// Geyser �쓽            width = 4 ���씪, height = 2 ���씪
+		// Mineral �쓽           width = 2 ���씪, height = 1 ���씪
 
 		for (BaseLocation base : BWTA.getBaseLocations())
 		{
-			// Island 일 경우 건물 지을 공간이 절대적으로 좁기 때문에 건물 안짓는 공간을 두지 않는다
+			// Island �씪 寃쎌슦 嫄대Ъ 吏��쓣 怨듦컙�씠 �젅���쟻�쑝濡� 醫곴린 �븣臾몄뿉 嫄대Ъ �븞吏볥뒗 怨듦컙�쓣 �몢吏� �븡�뒗�떎
 			if (base.isIsland()) continue;
 			if (BWTA.isConnected(base.getTilePosition(), InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition()) == false) continue;
 
@@ -1516,7 +1528,7 @@ public class ConstructionPlaceFinder {
 			int bx4 = base.getTilePosition().getX() + 4;
 			int by3 = base.getTilePosition().getY() + 3;
 
-			// BaseLocation 과 Geyser 사이의 타일을 BWTA::getShortestPath 를 사용해서 구한 후 _tilesToAvoid 에 추가
+			// BaseLocation 怨� Geyser �궗�씠�쓽 ���씪�쓣 BWTA::getShortestPath 瑜� �궗�슜�빐�꽌 援ы븳 �썑 _tilesToAvoid �뿉 異붽�
 			for (Unit geyser : base.getGeysers())
 			{
 				TilePosition closeGeyserPosition = geyser.getInitialTilePosition();
@@ -1543,7 +1555,7 @@ public class ConstructionPlaceFinder {
 
 			}
 
-			// BaseLocation 과 Mineral 사이의 타일을 BWTA::getShortestPath 를 사용해서 구한 후 _tilesToAvoid 에 추가
+			// BaseLocation 怨� Mineral �궗�씠�쓽 ���씪�쓣 BWTA::getShortestPath 瑜� �궗�슜�빐�꽌 援ы븳 �썑 _tilesToAvoid �뿉 異붽�
 			for (Unit mineral : base.getMinerals())
 			{
 				TilePosition closeMineralPosition = mineral.getInitialTilePosition();
@@ -1608,7 +1620,7 @@ public class ConstructionPlaceFinder {
 	}
     
    
-	/// BaseLocation 과 Mineral / Geyser 사이의 타일들의 목록을 리턴합니다		
+	/// BaseLocation 怨� Mineral / Geyser �궗�씠�쓽 ���씪�뱾�쓽 紐⑸줉�쓣 由ы꽩�빀�땲�떎		
 //	public Set<TilePosition> getTilesToAvoid() {
 //		return tilesToAvoid;
 //	}
@@ -1713,14 +1725,14 @@ public class ConstructionPlaceFinder {
 		
 		boolean allFree = false;
 
-//		20180821. hkk. 애드온 건물이 부셔졌는데, 마스터 건물이 있거나, 마스터건물이 부셔졌는데, 애드온 건물이 있다면 그 Avoid Tile 은 보존한다.
+//		20180821. hkk. �븷�뱶�삩 嫄대Ъ�씠 遺��뀛議뚮뒗�뜲, 留덉뒪�꽣 嫄대Ъ�씠 �엳嫄곕굹, 留덉뒪�꽣嫄대Ъ�씠 遺��뀛議뚮뒗�뜲, �븷�뱶�삩 嫄대Ъ�씠 �엳�떎硫� 洹� Avoid Tile �� 蹂댁〈�븳�떎.
 		if(unit.getType().isAddon()) {
 			final UnitType builderType = unit.getType().whatBuilds().first;
 			TilePosition builderTile = new TilePosition(fromx + 1 - builderType.tileWidth(), fromy + 1 + 2 - builderType.tileHeight());
 			
 			
 			if(hasWhatBuilds(builderTile, builderType)) {
-//				마스터 건물이 있을경우 타일 시작지점도 마스터 포지션으로 재 설정
+//				留덉뒪�꽣 嫄대Ъ�씠 �엳�쓣寃쎌슦 ���씪 �떆�옉吏��젏�룄 留덉뒪�꽣 �룷吏��뀡�쑝濡� �옱 �꽕�젙
 				allFree = true;
 				fromx = builderTile.getX() > 0 ? builderTile.getX() - 1 : 0;
 				fromy = builderTile.getY() > 0 ? builderTile.getY() - 1 : 0;
@@ -1775,7 +1787,7 @@ public class ConstructionPlaceFinder {
 				for(int y = 0;  y < 3 ; y++){
 
 //					TilePosition t = new TilePosition(addonX+x,addonY+y);
-//					2018015. hkk. 컴셋 자리는 커맨드센터도 짓지 못하게끔 피해준다.
+//					2018015. hkk. 而댁뀑 �옄由щ뒗 而ㅻ㎤�뱶�꽱�꽣�룄 吏볦� 紐삵븯寃뚮걫 �뵾�빐以��떎.
 //					if( (x == 4 || x == 5 || x == 6) && TilePositionUtils.equals(cc,InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getTilePosition())) {
 //					if( x == 0 || x == 1 || x == 6) {
 //						System.out.println("comsat position of main command :: " + t);
@@ -1840,10 +1852,10 @@ public class ConstructionPlaceFinder {
 //				System.out.println("main base ==>> " + supply_x +" / " + supply_y);
 				
 				
-//				x축 y축 모두 증가는 변동없음
+//				x異� y異� 紐⑤몢 利앷��뒗 蹂��룞�뾾�쓬
 				if(BlockingEntrance.Instance().xinc) {
 					if(!BlockingEntrance.Instance().yinc) {
-//						5시
+//						5�떆
 //						supply_x = BlockingEntrance.Instance().getSupplyPosition(mainbase).getX();
 						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) ); 
 					}
@@ -1851,10 +1863,10 @@ public class ConstructionPlaceFinder {
 					
 				}else {
 					if(BlockingEntrance.Instance().yinc) {
-//						11시
+//						11�떆
 						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;  
 					}else {
-//						7시
+//						7�떆
 						supply_x = supply_x - (3 * (BlockingEntrance.Instance().maxSupplyCntX -1) ) ;
 						supply_y = supply_y - (2 * (BlockingEntrance.Instance().maxSupplyCntY -1) );
 					}
