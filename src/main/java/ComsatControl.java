@@ -208,14 +208,29 @@ public class ComsatControl extends Control {
 		// find place
 		List<TilePosition> scanTilePositionCandidate = new ArrayList<TilePosition>();
 		if (InfoUtils.enemyBase() != null) {
+
 			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
-				scanTilePositionCandidate.add(InfoUtils.enemyFirstChoke().getCenter().toTilePosition());
-			}
+                Position scanPosotion = InfoUtils.enemyFirstChoke().getCenter();
+                MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+                if (cell != null) {
+                    if (TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 5000) {
+                        scanTilePositionCandidate.add(scanPosotion.toTilePosition());
+                    }
+
+                }
+            }
 		}
 		if (InfoUtils.enemyFirstExpansion() != null) {
-			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
-				scanTilePositionCandidate.add(InfoUtils.enemySecondChoke().getCenter().toTilePosition());
-			}
+            if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
+                Position scanPosotion = InfoUtils.enemySecondChoke().getCenter();
+                MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+                if (cell != null) {
+                    if (TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 5000) {
+                        scanTilePositionCandidate.add(scanPosotion.toTilePosition());
+                    }
+
+                }
+            }
 		}
 
 
@@ -315,7 +330,7 @@ public class ComsatControl extends Control {
 			}
 			
 	        int lastFullCheckFrame= enemyResourceDepot.getValue().getLastFullCheckFrame();
-	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 4000) {
+	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 3500) {
 	        	if(lastFullCheckFrame < earlist) {
 	        		scanPosition = enemyResourceDepot.getKey().getLastPosition();
 	        		earlist = lastFullCheckFrame;
