@@ -145,7 +145,7 @@ public class ComsatControl extends Control {
 			List<Unit> myAttackUnits = UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Vulture,
 					UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Siege_Tank_Siege_Mode, UnitType.Terran_Goliath);
 			
-			if (InfoUtils.enemyRace() == Race.Terran) {
+			if (eui.getType() == UnitType.Terran_Wraith) {
 				myAttackUnits.addAll(UnitUtils.getUnitList(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Wraith));
 			}
 			
@@ -167,8 +167,6 @@ public class ComsatControl extends Control {
 				}
 				int enemyUnitDistance = myAttackUnit.getDistance(eui.getLastPosition());
 				
-//				System.out.println("1: " + enemyUnitDistance);
-//				System.out.println("2: " + (weaponMaxRange + weaponRangeMargin));
 				if (enemyUnitDistance < weaponMaxRange + weaponRangeMargin) {
 					myAttackUnitInWeaponRangeCount++;
 
