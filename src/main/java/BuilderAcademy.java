@@ -28,6 +28,10 @@ public class BuilderAcademy extends DefaultBuildableItem {
 		if (StrategyIdea.currentStrategy == EnemyStrategy.ZERG_FAST_1HAT_LURKER) {
 			return true;
 		}
+		
+		if (UnitUtils.enemyUnitDiscovered(UnitType.Terran_Control_Tower)) {
+			return true;
+		}
 
 		// 활성화된 커맨드가 2개 이상일 경우
 		return UnitUtils.activatedCommandCenterCount() >= 2;

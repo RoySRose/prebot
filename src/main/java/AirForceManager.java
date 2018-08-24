@@ -642,6 +642,10 @@ public class AirForceManager {
 		List<AirForceTeam> airForceTeamList = new ArrayList<>(new HashSet<>(airForceTeamMap.values()));
 		Map<Integer, Integer> airForceTeamMergeMap = new HashMap<>(); // key:merge될 그룹 leaderID, value:merge할 그룹 leaderID
 		
+		int mergeDistance = AIR_FORCE_TEAM_MERGE_DISTANCE;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			mergeDistance += 120;
+		}
 		for (int i = 0; i < airForceTeamList.size(); i++) {
 			AirForceTeam airForceTeam = airForceTeamList.get(i);
 			if (airForceTeam.repairCenter != null) {
@@ -664,7 +668,7 @@ public class AirForceManager {
 //					System.out.println("no sense. the same id = " + airForceLeader.getID());
 					continue;
 				}
-				if (airForceLeader.getDistance(compareForceLeader) <= AIR_FORCE_TEAM_MERGE_DISTANCE) {
+				if (airForceLeader.getDistance(compareForceLeader) <= mergeDistance) {
 					airForceTeamMergeMap.put(compareForceLeader.getID(), airForceLeader.getID());
 				}
 			}
