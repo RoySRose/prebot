@@ -13,6 +13,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.WeaponType;
+import bwta.BWTA;
 import bwta.BaseLocation;
 
 public class ComsatControl extends Control {
@@ -194,45 +195,71 @@ public class ComsatControl extends Control {
 
 	/// 정찰용 스캔 포지션
 	private Position getScanPositionForObservation() {
+
+
+        Position oldestCheckPosition = CheckForResourceInfoNeeded();
+
+        if(oldestCheckPosition != Position.None) {
+            System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
+
+            return oldestCheckPosition;
+        }
+
 		// find place
 		List<TilePosition> scanTilePositionCandidate = new ArrayList<TilePosition>();
 		if (InfoUtils.enemyBase() != null) {
-			scanTilePositionCandidate.add(InfoUtils.enemyBase().getTilePosition());
 			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
 				scanTilePositionCandidate.add(InfoUtils.enemyFirstChoke().getCenter().toTilePosition());
 			}
 		}
 		if (InfoUtils.enemyFirstExpansion() != null) {
-			scanTilePositionCandidate.add(InfoUtils.enemyFirstExpansion().getTilePosition());
 			if (InfoUtils.enemyRace() == Race.Protoss || InfoUtils.enemyRace() == Race.Terran) {
 				scanTilePositionCandidate.add(InfoUtils.enemySecondChoke().getCenter().toTilePosition());
 			}
 		}
-		
+
+
 		if (TimeUtils.afterTime(14, 0)) {
-			if (InformationManager.Instance().getIslandBaseLocations() != null) {
-				for (BaseLocation islands : InformationManager.Instance().getIslandBaseLocations()) {
-					
-					Position scanPosotion = islands.getPosition();
-					MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
-					if (cell == null) {
-						continue;
-					}
-					if(TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 12000) {
-						scanTilePositionCandidate.add(islands.getTilePosition());
-					}
-				}
-			}
+            int comsatCnt = UnitUtils.getUnitCount(CommonCode.UnitFindRange.COMPLETE, UnitType.Terran_Comsat_Station);
+
+            if(comsatCnt > 2) {
+                for (BaseLocation emptyBase : BWTA.getBaseLocations()) {
+                    for (BaseLocation enemyBase : InfoUtils.enemyOccupiedBases()) {
+                        if (emptyBase.getPosition() == enemyBase.getPosition()) {
+                            break;
+                        }
+                    }
+                    for (BaseLocation enemyBase : InfoUtils.myOccupiedBases()) {
+                        if (emptyBase.getPosition() == enemyBase.getPosition()) {
+                            break;
+                        }
+                    }
+
+//                    if(emptyBase.isIsland()){
+//                        Position scanPosotion = emptyBase.getPosition();
+//                        MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+//                        if (cell == null) {
+//                            continue;
+//                        }
+//                        if(TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 12000) {
+//                            scanTilePositionCandidate.add(emptyBase.getTilePosition());
+//                        }
+//                    }else {
+
+                    Position scanPosotion = emptyBase.getPosition();
+                    MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+                    if (cell == null) {
+                        continue;
+                    }
+
+                    if (TimeUtils.elapsedFrames(cell.getTimeLastScan()) > 5000) {
+                        scanTilePositionCandidate.add(emptyBase.getTilePosition());
+                    }
+//                    }
+                }
+            }
 		}
 
-		
-		Position oldestCheckPosition = CheckForResourceInfoNeeded();
-		
-		if(oldestCheckPosition != Position.None) {
-//			System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
-			
-			return oldestCheckPosition;
-		}
 		int oldestLastCheckTime = CommonCode.INT_MAX;
 		for (TilePosition scanTilePosition : scanTilePositionCandidate) {
 			if (MyBotModule.Broodwar.isVisible(scanTilePosition)) {
@@ -245,7 +272,7 @@ public class ComsatControl extends Control {
 			int lastScanTime = TimeUtils.elapsedFrames(cell.getTimeLastScan());
 			int lastVisitTime = TimeUtils.elapsedFrames(cell.getTimeLastVisited());
 			int lastCheckTime = Math.min(lastScanTime, lastVisitTime);
-			
+
 			if (lastCheckTime < oldestLastCheckTime) {
 				oldestCheckPosition = scanPosotion;
 				oldestLastCheckTime = lastCheckTime;
@@ -288,7 +315,7 @@ public class ComsatControl extends Control {
 			}
 			
 	        int lastFullCheckFrame= enemyResourceDepot.getValue().getLastFullCheckFrame();
-	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 2500) {
+	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 4000) {
 	        	if(lastFullCheckFrame < earlist) {
 	        		scanPosition = enemyResourceDepot.getKey().getLastPosition();
 	        		earlist = lastFullCheckFrame;
