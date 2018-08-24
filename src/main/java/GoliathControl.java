@@ -45,10 +45,12 @@ public class GoliathControl extends Control {
 					continue;
 				}
 			} else {
-				if (InfoUtils.euiListInBase().isEmpty() && InfoUtils.euiListInExpansion().isEmpty()) {
-					if (unit.getDistance(StrategyIdea.mainSquadCenter) > coverRadius) {
-						CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
-						continue;
+				if (InfoUtils.enemyRace() != Race.Terran) {
+					if (InfoUtils.euiListInBase().isEmpty() && InfoUtils.euiListInExpansion().isEmpty()) {
+						if (unit.getDistance(StrategyIdea.mainSquadCenter) > coverRadius) {
+							CommandUtils.move(unit, StrategyIdea.mainSquadCenter);
+							continue;
+						}
 					}
 				}
 			}

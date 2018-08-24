@@ -40,8 +40,8 @@ public class WraithTargetCalculator extends TargetScoreCalculator {
 		TYPE_SCORE.put(UnitType.Terran_Ghost, 300);
 		TYPE_SCORE.put(UnitType.Terran_Battlecruiser, 300);
 		TYPE_SCORE.put(UnitType.Terran_Goliath, 300);
-		TYPE_SCORE.put(UnitType.Terran_Wraith, 280);
-		TYPE_SCORE.put(UnitType.Terran_Valkyrie, 300);
+		TYPE_SCORE.put(UnitType.Terran_Wraith, 350);
+		TYPE_SCORE.put(UnitType.Terran_Valkyrie, 350);
 	}
 
 	@Override
