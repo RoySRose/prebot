@@ -24,10 +24,6 @@ public class ComsatControl extends Control {
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
 		
-		if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER0, 0), LagObserver.managerRotationSize())) {
-			return;
-		}
-		
 		if (TimeUtils.elapsedFrames(scanUsedFrame) < 4 * TimeUtils.SECOND) {
 			return;
 		}
