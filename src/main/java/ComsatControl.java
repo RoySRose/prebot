@@ -200,8 +200,7 @@ public class ComsatControl extends Control {
         Position oldestCheckPosition = CheckForResourceInfoNeeded();
 
         if(oldestCheckPosition != Position.None) {
-            System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
-
+//            System.out.println("scan resource. position=" + oldestCheckPosition + ", time=" + TimeUtils.framesToTimeString(scanUsedFrame));
             return oldestCheckPosition;
         }
 
