@@ -69,7 +69,7 @@ public class BuilderCommandCenter extends DefaultBuildableItem {
 		}
 		
 		// 총 최대 커맨드 개수 7개
-		if (commandCenters.size() > 7) {
+		if (UnitUtils.hasUnitOrWillBeCount(UnitType.Terran_Command_Center) > 7) {
 			return false;
 		}
 
