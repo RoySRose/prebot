@@ -27,7 +27,8 @@ public class BuilderValkyrie extends DefaultBuildableItem {
 		if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) < maxValkyrieCnt) {
 			// if(Prebot.Broodwar.self().deadUnitCount(UnitType.Terran_Wraith) < 5)
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Valkyrie, null) == 0) {
-				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Valkyrie)) {
+//				if (!UnitUtils.myUnitDiscovered(UnitType.Terran_Valkyrie)) {
+				if (MyBotModule.Broodwar.self().completedUnitCount(UnitType.Terran_Valkyrie) < 3) {
 					setHighPriority(true);
 				}
 				return true;
