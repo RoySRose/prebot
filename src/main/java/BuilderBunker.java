@@ -38,6 +38,7 @@ public class BuilderBunker extends DefaultBuildableItem {
 
 		if (InfoUtils.enemyRace() == Race.Protoss) {
 			if (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_INIT
+					|| (StrategyIdea.currentStrategy == EnemyStrategy.PROTOSS_FAST_DARK && UnitUtils.myFactoryUnitSupplyCount() <= 2 * 4)
 					|| StrategyIdea.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
 				int waitingBlockSeconds = 12;
 				if (StrategyIdea.currentStrategy.buildTimeMap.featureEnabled(EnemyStrategyOptions.BuildTimeMap.Feature.TWOGATE)) {
