@@ -244,7 +244,15 @@ public class AttackDecisionMaker extends GameManager {
 	}
 
 	private boolean attackByFullSupply() {
-		if (MyBotModule.Broodwar.self().supplyUsed() > 380) {
+		int supplyFullCount = 360;
+		if (InfoUtils.enemyRace() == Race.Terran) {
+			supplyFullCount = 380;
+		} else if (InfoUtils.enemyRace() == Race.Protoss) {
+			supplyFullCount = 360;
+		} else if (InfoUtils.enemyRace() == Race.Zerg) {
+			supplyFullCount = 340;
+		}
+		if (MyBotModule.Broodwar.self().supplyUsed() > supplyFullCount) {
 			if (InfoUtils.myRace() == Race.Terran) {
 				if (PlayerUtils.enoughResource(2000, 1500)) {
 					return true;
