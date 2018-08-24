@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -123,22 +124,34 @@ public class EarlyDefenseSquad extends Squad {
 		Region campRegion = BWTA.getRegion(StrategyIdea.campPosition);
 		Unit bunker = marineControl.getCompleteBunker(campRegion);
 		
+		int zealotCount = 0;
+		for (Unit enemyUnit : enemyInSightList) {
+			if (enemyUnit.getType() == UnitType.Protoss_Zealot) {
+				zealotCount++;
+			}
+		}
+		
 		double scvCountForDefense = 0.0;
 		for (Unit enemy : enemyInSightList) {
 			if (UnitUtils.isValidUnit(enemy)) {
-				if(!enemy.getType().isWorker() 
-						&& !enemy.getType().isBuilding()
-						&& InfoUtils.myBase().getPosition().getDistance(enemy) > 300){
-					continue;
-				}
-				
-				if(enemy.getType().isWorker()){
+				if (enemy.getType().isWorker()) {
 					Region unitRegion = BWTA.getRegion(enemy.getPosition());
 					Region baseRegion = BWTA.getRegion(InfoUtils.myBase().getPosition());
-					if(unitRegion != baseRegion){
+					if (unitRegion != baseRegion) {
 						continue;
 					}
-					
+				} else if (enemy.getType().isBuilding()) {
+					if (zealotCount >= 2) {
+						continue;
+					}
+				} else {
+					int activationDistance = 300;
+					if (InfoUtils.enemyRace() == Race.Protoss) {
+						activationDistance = 350;
+					}
+					if (InfoUtils.myBase().getPosition().getDistance(enemy) > activationDistance) {
+						continue;
+					}
 				}
 				
 				if(bunker != null && bunker.getLoadedUnits().size() > 0 || marineList.size() >= 2){
