@@ -896,7 +896,11 @@ public class InformationManager extends GameManager {
 //			}
 			
 			if (numberOfCC >= 2) {
-				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+				if(InformationManager.Instance().enemyRace == Race.Terran) {
+					resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
+				}else {
+					resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+				}
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true);
 			}
 //			else if (numberOfCC == 3) {
@@ -921,9 +925,9 @@ public class InformationManager extends GameManager {
 //				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, true, false);
 //			}
 
-//			if (resultBase == null) {
-//				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
-//			}
+			if (resultBase == null) {
+				resultBase = getCloseButFarFromEnemyLocation(BWTA.getBaseLocations(), false, true, false, false);
+			}
 			
 //			//FileUtils.appendTextToFile("log.txt", "\n getNextExpansionLocation numberOfCC :: " + numberOfCC + " :: " + resultBase.getTilePosition());
 		}
