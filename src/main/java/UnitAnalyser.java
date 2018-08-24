@@ -33,7 +33,7 @@ public abstract class UnitAnalyser {
 				CommonCode.RegionType regionType = PositionUtils.positionToRegionType(found.getLastPosition());
 				if (regionType == CommonCode.RegionType.ENEMY_BASE) {
 					foundFoundInEnemyBase.add(found);
-				} else if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION) {
+				} else if (regionType == CommonCode.RegionType.ENEMY_FIRST_EXPANSION || regionType == CommonCode.RegionType.ENEMY_THIRD_REGION) {
 					foundInEnemyExpansion.add(found);
 				} else if (regionType == CommonCode.RegionType.MY_BASE) {
 					foundInMyBase.add(found);

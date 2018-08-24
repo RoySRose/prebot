@@ -74,7 +74,7 @@ public enum EnemyStrategy {
 			, TimeMapForProtoss.PROTOSS_TWOGATE_TECH()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION, EnemyStrategyOptions.Mission.MissionType.NO_ENEMY, EnemyStrategyOptions.Mission.MissionType.VULTURE)),
 	
-	PROTOSS_STARGATE(2, 3, 1, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
+	PROTOSS_STARGATE(3, 2, 1, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
 			, EnemyStrategyOptions.MarineCount.FOUR_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_STARGATE()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.RETREAT)),
@@ -84,7 +84,7 @@ public enum EnemyStrategy {
 			, TimeMapForProtoss.PROTOSS_DOUBLE_GROUND()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.EXPANSION)),
 	
-	PROTOSS_DOUBLE_CARRIER(2, 3, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
+	PROTOSS_DOUBLE_CARRIER(3, 2, 0, EnemyStrategyOptions.FactoryRatio.Weight.TANK, EnemyStrategyOptions.UpgradeOrder.get(EnemyStrategyOptions.UpgradeOrder.FacUp.TS, EnemyStrategyOptions.UpgradeOrder.FacUp.VM, EnemyStrategyOptions.UpgradeOrder.FacUp.VS)
 			, EnemyStrategyOptions.MarineCount.ONE_MARINE, EnemyStrategyOptions.AddOnOption.IMMEDIATELY, EnemyStrategyOptions.ExpansionOption.TWO_FACTORY
 			, TimeMapForProtoss.PROTOSS_DOUBLE_CARRIER()
 			, EnemyStrategyOptions.Mission.missions(EnemyStrategyOptions.Mission.MissionType.RETREAT)),
