@@ -1708,7 +1708,7 @@ public class PreBotUXManager {
 		// target position
 		List<Position> targetPositions = AirForceManager.Instance().getTargetPositions();
 		for (int i = 0; i < targetPositions.size(); i++) {
-			MyBotModule.Broodwar.drawTextMap(targetPositions.get(i), "position#" + i);
+			MyBotModule.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(targetPositions.get(i), 0, 0), "position#" + i);
 		}
 		
 		// air force team
@@ -1760,6 +1760,7 @@ public class PreBotUXManager {
 		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyGroundSquadPosition : " + StrategyIdea.nearGroundEnemyPosition + " / " + StrategyIdea.enemyUnitStatus);
 		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyAirSquadPosition : " + StrategyIdea.nearAirEnemyPosition);
 		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "enemyDropEnemyPosition : " + StrategyIdea.dropEnemyPosition);
+		MyBotModule.Broodwar.drawTextScreen(10, y += 15, "earlyDefenseBehind: " + PositionFinder.Instance().earlyDefenseBehind());
 		
 		y += 10;
 		Position enemyBasePosition = null;
@@ -1826,6 +1827,10 @@ public class PreBotUXManager {
 		}
 		if (InfoUtils.enemyReadyToPosition() != null) {
 			MyBotModule.Broodwar.drawTextMap(InfoUtils.enemyReadyToPosition(), "enemyReadyTo");
+		}
+		Position earlyDefenseBehind = PositionFinder.Instance().earlyDefenseBehind();
+		if (earlyDefenseBehind != null) {
+			MyBotModule.Broodwar.drawTextMap(PositionUtils.positionAdjsuted(earlyDefenseBehind, -50, 0), "earlyDefenseBehind");
 		}
 //		if (VultureTravelManager.Instance().getTravelSites() != null) {
 //			for (TravelSite site : VultureTravelManager.Instance().getTravelSites()) {

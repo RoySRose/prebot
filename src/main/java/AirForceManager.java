@@ -271,8 +271,14 @@ public class AirForceManager {
 		double vectorXSegment = vectorX / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 		double vectorYSegment = vectorY / (AIR_FORCE_TARGET_MIDDLE_POSITION_SIZE + 1);
 
-		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT && expansionFirst) {
-			addAirForceTargetPositions(getMineralPositions());
+		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT) {
+			if (expansionFirst) {
+				addAirForceTargetPositions(getMineralPositions());
+			} else {
+				if (InfoUtils.enemyRace() == Race.Zerg && TimeUtils.beforeTime(10, 0)) {
+					addAirForceTargetPositions(getBehindMineralPosition());
+				}
+			}
 		}
 
 		addAirForceTargetPositions(firstBase.getPosition());
@@ -284,8 +290,14 @@ public class AirForceManager {
 		}
 		addAirForceTargetPositions(secondBase.getPosition());
 
-		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT && !expansionFirst) {
-			addAirForceTargetPositions(getMineralPositions());
+		if (strikeLevel < AirForceManager.StrikeLevel.CRITICAL_SPOT) {
+			if (!expansionFirst) {
+				addAirForceTargetPositions(getMineralPositions());
+			} else {
+				if (InfoUtils.enemyRace() == Race.Zerg && TimeUtils.beforeTime(10, 0)) {
+					addAirForceTargetPositions(getBehindMineralPosition());
+				}
+			}
 		}
 		
 		if (InfoUtils.enemyRace() == Race.Terran) {
@@ -327,6 +339,34 @@ public class AirForceManager {
 			if (closeTankInfo != null) {
 				addAirForceTargetPositions(closeTankInfo.getLastPosition());
 			}
+		}
+	}
+
+	private Position getBehindMineralPosition() {
+		Position enemyBasePosition = InfoUtils.enemyBase().getPosition();
+		Position enemyFirstExpansionPosition = InfoUtils.enemyFirstExpansion().getPosition();
+		
+		double radian = MicroUtils.targetDirectionRadian(enemyBasePosition, enemyFirstExpansionPosition);
+		double radian90plus = MicroUtils.rotate(radian, +90);
+		double radian90minus = MicroUtils.rotate(radian, -90);
+		
+		Position position90plus = MicroUtils.getMovePosition(enemyBasePosition, radian90plus, 400);
+		Position position90minus = MicroUtils.getMovePosition(enemyBasePosition, radian90minus, 400);
+		
+		if (!PositionUtils.isValidPosition(position90plus)) {
+			return position90plus.makeValid();
+		}
+		if (!PositionUtils.isValidPosition(position90minus)) {
+			return position90minus.makeValid();
+		}
+		
+		double distance90plus = position90plus.getDistance(enemyFirstExpansionPosition);
+		double distance90minus = position90minus.getDistance(enemyFirstExpansionPosition);
+		
+		if (distance90plus > distance90minus) {
+			return position90plus;
+		} else {
+			return position90minus;
 		}
 	}
 

@@ -41,6 +41,7 @@ public class PositionFinder {
 	private Position basefirstChokeMiddlePosition = null;
 	private Position expansionDefensePosition = null;
 	private Position expansionDefensePositionSiege = null;
+	private Position earlyDefenseBehind = null;
 	
 	private int watcherOtherPositionFrame = CommonCode.NONE;
 	private Position watcherOtherPosition = null;
@@ -820,6 +821,57 @@ public class PositionFinder {
 		} else {
 			return firstChokePosition;
 		}
+	}
+	
+	/* 입막시 마린 안전 방어 지역 (다른 유닛 필요시 사용) */
+	public Position earlyDefenseBehind() {
+		if (earlyDefenseBehind != null) {
+			return earlyDefenseBehind;
+		}
+		Position myBasePosition = InfoUtils.myBase().getPosition();
+		Position myFirstExpansionPosition = InfoUtils.myFirstExpansion().getPosition();
+		
+		double radian = MicroUtils.targetDirectionRadian(myBasePosition, myFirstExpansionPosition);
+		double radian90plus = MicroUtils.rotate(radian, +90);
+		double radian90minus = MicroUtils.rotate(radian, -90);
+		
+		Position position90plus = MicroUtils.getMovePosition(myBasePosition, radian90plus, 500);
+		Position position90minus = MicroUtils.getMovePosition(myBasePosition, radian90minus, 500);
+		
+		if (!PositionUtils.isValidPosition(position90plus)) {
+			return earlyDefenseBehind = position90plus.makeValid();
+		}
+		if (!PositionUtils.isValidPosition(position90minus)) {
+			return earlyDefenseBehind = position90minus.makeValid();
+		}
+		
+		double distance90plus = position90plus.getDistance(myFirstExpansionPosition);
+		double distance90minus = position90minus.getDistance(myFirstExpansionPosition);
+		
+		if (distance90plus > distance90minus) {
+			return earlyDefenseBehind = position90plus;
+		} else {
+			return earlyDefenseBehind = position90minus;
+		}
+	}
+	
+	private Position getNearMineralToBase(Position depotPosition) {
+		// get the depot associated with this unit
+		if (depotPosition == null) {
+			return null;
+		}
+		Unit bestMineral = null;
+		double bestDist = 100000000;
+		for (Unit unit : MyBotModule.Broodwar.getMinerals()) {
+			if (unit.getDistance(depotPosition) < 450) {
+				double dist = unit.getDistance(depotPosition);
+				if (dist < bestDist) {
+					bestMineral = unit;
+					bestDist = dist;
+				}
+			}
+		}
+		return bestMineral.getPosition();
 	}
 
 	public boolean enemyBaseDestroyed(BaseLocation enemyBase) {
