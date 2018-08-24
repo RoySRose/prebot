@@ -439,6 +439,8 @@ public class UnitUtils {
 //			} else {
 				ignoreSeconds = StrategyConfig.IGNORE_ENEMY_SIEGE_TANK_SECONDS;
 //			}
+		} else if (eui.getType() == UnitType.Protoss_Interceptor) {
+			ignoreSeconds = 1;
 		} else {
 			ignoreSeconds = StrategyConfig.IGNORE_ENEMY_UNITINFO_SECONDS;
 		}

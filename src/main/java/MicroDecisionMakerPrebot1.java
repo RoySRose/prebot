@@ -34,6 +34,10 @@ public class MicroDecisionMakerPrebot1 {
 				enemyIsComplete = enemy.isCompleted();
 				enemyPosition = enemy.getPosition();
 				enemyUnitType = enemy.getType();
+			} else {
+				if (enemyUnitType == UnitType.Protoss_Interceptor) {
+					continue;
+				}
 			}
 
 			if (enemyIsComplete && saveUnitLevel >= 1) {
