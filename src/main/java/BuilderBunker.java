@@ -67,7 +67,8 @@ public class BuilderBunker extends DefaultBuildableItem {
 			if (bunkerBuildLeftSecond == 0) {
 				setBlocking(true);
 				setHighPriority(true);
-				setTilePosition(BlockingEntrance.Instance().bunker1);
+//				setTilePosition(BlockingEntrance.Instance().bunker1);
+				setTilePosition(BlockingEntrance.Instance().first_supple);
 				return true;
 			}
 			
