@@ -84,7 +84,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 //		
 		int baseTurret = 1;
 		
-		int otherCommandTurret = 1;
+		int otherCommandTurret = 3;
 		
 		if(MyBotModule.Broodwar.enemy().getRace()== Race.Protoss) {
 			baseTurret = 2;
@@ -186,7 +186,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 				return true;
 			}
 			
-			if (noTurretNearPosition(myFirstExpansion.getPosition(), 250, 150, turretCount, otherCommandTurret+add_turret, 10)) {
+			if (noTurretNearPosition(myFirstExpansion.getPosition(), 150, 150, turretCount, 1+add_turret, 0)) {
 				setHighPriority(true);
 				setBlocking(true);
 				setTilePosition(myFirstExpansion.getPosition().toTilePosition());
