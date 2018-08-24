@@ -786,6 +786,10 @@ public class ConstructionPlaceFinder {
 				){
 					buildingGapSpace = 0;
 				}
+			
+			if(b.getType() == UnitType.Terran_Bunker && (TilePositionUtils.equals(position, BlockingEntrance.Instance().bunker1)||TilePositionUtils.equals(position, BlockingEntrance.Instance().bunker2))) {
+				buildingGapSpace = 1;
+			}
 
 
 			// 상하좌우에 buildingGapSpace 만큼 간격을 띄운다
@@ -879,9 +883,9 @@ public class ConstructionPlaceFinder {
 
 					// ResourceDepot / Addon 건물이 아닌 일반 건물의 경우, BaseLocation 과 Geyser 사이 타일 (TilesToAvoid) 에는 건물을 짓지 않는다
 //					20180719. hkk. 저그전 대비 배럭과 서플 가스 주변에 붙여짓기 필요
-					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false
-							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
-							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot
+					if (b.getType().isResourceDepot() == false && b.getType().isAddon() == false && b.getType() != UnitType.Terran_Missile_Turret
+//							&& b.getType() != UnitType.Terran_Bunker && b.getType() != UnitType.Terran_Missile_Turret
+//							&& b.getType() != UnitType.Terran_Barracks && b.getType() != UnitType.Terran_Supply_Depot
 							&& b.getType() != UnitType.Terran_Factory && b.getType() != UnitType.Terran_Starport) {
 						if (isTilesToAvoid(x, y)) {
 //							//FileUtils.appendTextToFile("log.txt", "\n canBuildHereWithSpace isTilesToAvoid false :: "+ b.getType() + " // " + "["+x+","+y+"]"  +" // buildingGapSpace :: " + buildingGapSpace);

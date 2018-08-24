@@ -112,7 +112,7 @@ public class BuilderMissileTurret extends DefaultBuildableItem {
 		// 미사일 터렛이 많을수록 더 넓은 지역을 커버하니 지을 수가 없게 되는것이 아닌지??
 		// 베이스는 숫자를 (350 != 300) 일부러 다르게 한것인가? 터렛범위에 빌드/컨스트럭션 큐 범위
 //		System.out.println(" turret postion check start");
-		if (noTurretNearPosition(myBase.getPosition(), 250, 200, turretCount, baseTurret+add_turret, 15)) {
+		if (noTurretNearPosition(myBase.getTilePosition().toPosition(), 250, 200, turretCount, baseTurret+add_turret, 15)) {
 			setHighPriority(true);
 			setBlocking(true);
 			setTilePosition(myBase.getPosition().toTilePosition());
