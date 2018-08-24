@@ -23,6 +23,11 @@ public class ComsatControl extends Control {
 
 	@Override
 	public void control(Collection<Unit> unitList, Collection<UnitInfo> euiList) {
+		
+		if (!TimeUtils.executeRotation(LagObserver.managerExecuteRotation(LagObserver.MANAGER0, 0), LagObserver.managerRotationSize())) {
+			return;
+		}
+		
 		if (TimeUtils.elapsedFrames(scanUsedFrame) < 4 * TimeUtils.SECOND) {
 			return;
 		}
@@ -328,8 +333,11 @@ public class ComsatControl extends Control {
 				continue;
 			}
 			
+			Position scanPosotion = enemyCommandInfo.unitInfo.getLastPosition();
+			MapGrid.GridCell cell = MapGrid.Instance().getCell(scanPosotion);
+            
 	        int lastFullCheckFrame= enemyResourceDepot.getValue().getLastFullCheckFrame();
-	        if(TimeUtils.elapsedFrames(lastFullCheckFrame) > 3500) {
+	        if((lastFullCheckFrame != 0 && TimeUtils.elapsedFrames(lastFullCheckFrame) > 3500 ) || (lastFullCheckFrame == 0 && TimeUtils.elapsedFrames(cell.getTimeLastVisited()) > 3500)) {
 	        	if(lastFullCheckFrame < earlist) {
 	        		scanPosition = enemyResourceDepot.getKey().getLastPosition();
 	        		earlist = lastFullCheckFrame;
