@@ -199,7 +199,9 @@ public class EarlyDefenseSquad extends Squad {
 			}
 		}
 		for (Unit unit : unitList) {
-			UnitUtils.addEnemyUnitInfosInRadiusForEarlyDefense(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+			if(unit.getType() == UnitType.Terran_Marine){
+				UnitUtils.addEnemyUnitInfosInRadiusForEarlyDefense(euiList, unit.getPosition(), unit.getType().sightRange() + MicroConfig.COMMON_ADD_RADIUS);
+			}
 		}
 	}
 

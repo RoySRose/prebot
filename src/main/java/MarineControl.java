@@ -96,7 +96,7 @@ public class MarineControl extends Control {
 							//MicroUtils.kiting(marine, decision.eui, kOption);
 							if (MicroUtils.arrivedToPosition(marine,StrategyIdea.mainSquadLeaderPosition)) {
 								if (MicroUtils.timeToRandomMove(marine)) {
-									Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+									Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 70);
 									CommandUtils.attackMove(marine, randomPosition);
 								}
 							}else{
@@ -107,7 +107,7 @@ public class MarineControl extends Control {
 					if(campType != PositionFinder.CampType.INSIDE  && campType != PositionFinder.CampType.FIRST_CHOKE){
 						if (MicroUtils.arrivedToPosition(marine,StrategyIdea.mainSquadLeaderPosition)) {
 							if (MicroUtils.timeToRandomMove(marine)) {
-								Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), MicroConfig.RANDOM_MOVE_DISTANCE);
+								Position randomPosition = PositionUtils.randomPosition(marine.getPosition(), 70);
 								CommandUtils.attackMove(marine, randomPosition);
 							}
 						}else{
