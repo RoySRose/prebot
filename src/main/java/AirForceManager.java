@@ -492,7 +492,8 @@ public class AirForceManager {
 			} else if (InfoUtils.enemyRace() == Race.Zerg) {
 				if (TimeUtils.elapsedFrames(strikeLevelStartFrame) > 100 * TimeUtils.SECOND) { // 레이쓰가 활동한지 일정시간 지남
 					levelDown = true;
-				} else if (UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 히드라 발견
+				} else if (UnitUtils.enemyUnitDiscovered(UnitType.Zerg_Spore_Colony)
+						|| UnitUtils.enemyCompleteUnitDiscovered(UnitType.Zerg_Hydralisk)) { // 스포어 발견, 또는 히드라 발견
 					levelDown = true;
 				}
 			} else if (InfoUtils.enemyRace() == Race.Protoss) {
